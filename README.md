@@ -34,7 +34,9 @@ _thumbnailImage.SetImage(fullPathToImage, () =>
 });
 ```
 
-If you want to stop loading requests when you leave your activity is no longer used/paused:
+###Advanced usage
+
+If you want to stop pending loading requests. For example when your activity gets paused/resumed:
 ```C#
 protected override void OnPause()
 {
@@ -68,7 +70,7 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
 };
 ```
 
-###Advanced usage
+###Custom loading logic
 As the name suggests it SimpleImageViewAsync is simple: it loads images from a full path. But you can customize the image loading logic very easily.
 
 To do so you just need to inherit from ImageWorkerBase and ImageViewAsyncBase. You can look at ImageWorker and SimpleImageViewAsync they are both subclasses.
