@@ -60,7 +60,9 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
       break;
     case ScrollState.Idle:
       ImageWorker.SetPauseWork(false); // loading requests are allowed again
-      _myListView.ForcePdfThumbnailsRedraw(); // Here you should have your custom method that forces redrawing visible list items
+      
+      // Here you should have your custom method that forces redrawing visible list items
+      _myListView.ForcePdfThumbnailsRedraw();
       break;
   }
 };
