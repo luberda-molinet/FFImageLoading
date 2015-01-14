@@ -11,7 +11,6 @@ namespace HGR.Mobile.Droid.ImageLoading.Views
         {
         }
 
-
         protected ImageViewAsyncBase(Context context, IAttributeSet attrs) : base(context, attrs)
         {
         }

@@ -57,6 +57,7 @@
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ImageViewAsyncBase.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
+    <Compile Include="Views\SimpleImageViewAsync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache\" />

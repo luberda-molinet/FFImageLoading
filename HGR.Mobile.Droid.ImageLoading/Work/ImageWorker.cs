@@ -10,6 +10,25 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 
 	public class ImageWorker : ImageWorkerBase<string>, IImageWorker
 	{
+        private static ImageWorker _instance;
+
+        static ImageWorker()
+        {
+            _instance = new ImageWorker();
+        }
+
+        public static ImageWorker Instance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+        private ImageWorker(): base()
+        {
+        }
+
         public override ImageLoaderTask GetLoaderTask(string path, ImageView imageView)
 		{
             return new ImageLoaderTask(path, imageView);
