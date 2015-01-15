@@ -28,13 +28,11 @@ namespace HGR.Mobile.Droid.ImageLoading.Cache
 
         }
 
-        public Task<byte[]> GetAsync(string url)
+        public async Task<byte[]> GetAsync(string url, TimeSpan? duration = null)
         {
-            return GetAsync(url, new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days
-        }
+            if (duration == null)
+                duration = new TimeSpan(30, 0, 0, 0); // by default we cache data 30 days
 
-        public async Task<byte[]> GetAsync(string url, TimeSpan duration)
-        {
             string filename = _md5Helper.MD5(url);
             byte[] data = await _diskCache.TryGet(filename).ConfigureAwait(false);
             if (data != null)
@@ -51,7 +49,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Cache
             }
 
             // this ensures the fullpath exists
-            await _diskCache.AddOrUpdate(filename, data, duration).ConfigureAwait(false);
+            await _diskCache.AddOrUpdate(filename, data, duration.Value).ConfigureAwait(false);
             return data;
         }
     }

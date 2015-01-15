@@ -38,8 +38,11 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 		private readonly string _path;
         private readonly int _resampleWidth;
         private readonly int _resampleHeight;
+        private readonly TimeSpan? _cacheDuration;
 
-        public ImageLoaderTask(string path, ImageView imageView, ImageSource source = ImageSource.Filepath, int resampleWidth = -1, int resampleHeight = -1)
+        public ImageLoaderTask(string path, ImageView imageView,
+            ImageSource source = ImageSource.Filepath, int resampleWidth = -1, int resampleHeight = -1,
+            TimeSpan? cacheDuration = null)
 		{
 			CancellationToken = new CancellationTokenSource();
             _context = Android.App.Application.Context.ApplicationContext;
@@ -48,6 +51,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             _source = source;
             _resampleWidth = resampleWidth;
             _resampleHeight = resampleHeight;
+            _cacheDuration = cacheDuration;
 			_imageWeakReference = new WeakReference<ImageView>(imageView);
 
 			_options = new BitmapFactory.Options()
@@ -246,7 +250,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                         bytes = await FileStore.ReadBytes(path).ConfigureAwait(false);
                         break;
                     case ImageSource.Url:
-                        bytes = await new DownloadCache().GetAsync(path).ConfigureAwait(false);
+                        bytes = await new DownloadCache().GetAsync(path, _cacheDuration).ConfigureAwait(false);
                         break;
                 }
             }

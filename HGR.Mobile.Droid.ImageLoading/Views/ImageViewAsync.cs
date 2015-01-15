@@ -37,7 +37,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Views
             ImageService.LoadImage(filepath, task, this, onComplete);
         }
 
-        public virtual void SetFromUrl(string url, Action onComplete = null, int resampleWidth = -1, int resampleHeight = -1)
+        public virtual void SetFromUrl(string url, Action onComplete = null, int resampleWidth = -1, int resampleHeight = -1, TimeSpan? duration = null)
         {
             var task = new ImageLoaderTask(url, this, ImageLoaderTask.ImageSource.Url, resampleWidth, resampleHeight);
             ImageService.LoadImage(url, task, this, onComplete);
