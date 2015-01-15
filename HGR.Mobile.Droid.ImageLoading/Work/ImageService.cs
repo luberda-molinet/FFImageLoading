@@ -2,6 +2,7 @@ using Android.Widget;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Contexts;
 using System;
+using HGR.Mobile.Droid.ImageLoading.Views;
 
 namespace HGR.Mobile.Droid.ImageLoading.Work
 {
@@ -12,6 +13,16 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         static ImageService()
         {
             _worker = new ImageWorker();
+        }
+
+        public static TaskParameter LoadFile(string filepath)
+        {
+            return TaskParameter.FromFile(filepath);
+        }
+
+        public static TaskParameter LoadUrl(string url, TimeSpan? cacheDuration = null)
+        {
+            return TaskParameter.FromUrl(url, cacheDuration);
         }
 
         public static bool ExitTasksEarly
@@ -42,9 +53,9 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             _worker.RemovePendingTask(task);
         }
 
-        public static void LoadImage(string key, ImageLoaderTask task, ImageView imageView, Action action)
+        public static void LoadImage(string key, ImageLoaderTask task, ImageView imageView)
         {
-            _worker.LoadImage(key, task, imageView, action);
+            _worker.LoadImage(key, task, imageView);
         }
     }
 }

@@ -68,6 +68,8 @@
     <Compile Include="Work\ImageService.cs" />
     <Compile Include="Work\ImageWorker.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
+    <Compile Include="Work\TaskParameter.cs" />
+    <Compile Include="Work\TaskParameterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache\" />

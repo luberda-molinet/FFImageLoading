@@ -32,17 +32,23 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         /// <returns></returns>
         bool CancelPotentialWork(string path, ImageView imageView);
 
-        void LoadImage(string key, ImageLoaderTask task, ImageView imageView, Action action);
+        void LoadImage(string key, ImageLoaderTask task, ImageView imageView);
     }
 
     public class ImageWorker : IImageWorker
     {
+        private class PendingTask
+        {
+            public ImageLoaderTask ImageLoadingTask { get; set; }
+            public Task FrameworkWrappingTask { get; set; }
+        }
+
         private const bool _useFadeInBitmap = true;
 
         private readonly Resources _resources;
         private readonly int _defaultParallelTasks;
         private readonly object _pauseWorkLock = new object();
-        private readonly List<ImageLoaderTask> _pendingTasks = new List<ImageLoaderTask>();
+        private readonly List<PendingTask> _pendingTasks = new List<PendingTask>();
         private readonly object _runningLock = new object();
 
         private bool _exitTasksEarly;
@@ -143,7 +149,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 if (pauseWork)
                 {
                     MiniLogger.Debug("SetPauseWork paused.");
-                    _pendingTasks.ForEach(t => t.Cancel());
+                    _pendingTasks.ForEach(t => t.ImageLoadingTask.Cancel());
                     _pendingTasks.Clear();
                 }
 
@@ -158,58 +164,93 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         {
             lock (_pauseWorkLock)
             {
-                _pendingTasks.Remove(task);
+                var pendingTask = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask == task);
+                if (pendingTask != null)
+                    _pendingTasks.Remove(pendingTask);
             }
         }
 
-        public void LoadImage(string key, ImageLoaderTask task, ImageView imageView, Action action)
+        public void LoadImage(string key, ImageLoaderTask task, ImageView imageView)
         {
             if (string.IsNullOrEmpty(key))
                 return;
 
-            Action onComplete = () =>
-            {
-                if (action != null)
-                    action();
-            };
-
             var value = ImageCache.Instance.Get(key);
-            if (value != null)
-            {
+            if (value != null) {
                 MiniLogger.Debug(string.Format("Image from cache: {0}", key));
                 // Bitmap found in memory cache
                 imageView.SetImageDrawable(value);
                 imageView.LayoutParameters.Height = value.IntrinsicHeight;
                 imageView.LayoutParameters.Width = value.IntrinsicWidth;
 
-                onComplete();
-            }
-            else if (CancelPotentialWork(key, imageView))
-            {
+                task.Parameters.OnSuccess();
+            } else if (CancelPotentialWork(key, imageView)) {
                 if (_pauseWork)
                     return;
-
-                task.OnComplete += (s, e) => onComplete();
 
                 var asyncDrawable = new AsyncDrawable(_resources, null, task);
                 imageView.SetImageDrawable(asyncDrawable);
 
                 MiniLogger.Debug(string.Format("Generating/retrieving image: {0}", key));
 
-                lock (_pauseWorkLock)
-                {
-                    _pendingTasks.Add(task);
+                var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
+                PendingTask alreadyRunningTaskForSameKey = null;
+                lock (_pauseWorkLock) {
+                    alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.Key == key);
+                    if (alreadyRunningTaskForSameKey == null)
+                        _pendingTasks.Add(currentPendingTask);
                 }
 
-                Run(task);
+                if (alreadyRunningTaskForSameKey == null) {
+                    Run(currentPendingTask);
+                } else {
+                    WaitForSimilarTask(currentPendingTask, alreadyRunningTaskForSameKey, imageView);
+                }
             }
         }
 
-        private async void Run(ImageLoaderTask imageLoaderTask)
+        private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyRunningTaskForSameKey, ImageView imageView)
+        {
+            string key = alreadyRunningTaskForSameKey.ImageLoadingTask.Key;
+
+            Action forceLoad = () => {
+                lock (_pauseWorkLock) {
+                    _pendingTasks.Add(currentPendingTask);
+                }
+
+                Run(currentPendingTask);
+            };
+
+            if (alreadyRunningTaskForSameKey.FrameworkWrappingTask == null) {
+                MiniLogger.Debug("No C# Task defined for key: " + key);
+                forceLoad();
+                return;
+            }
+
+            MiniLogger.Debug("Wait for similar request for key: " + key);
+            // This will wait for the pending task or if it is already finished then it will just pass
+            await alreadyRunningTaskForSameKey.FrameworkWrappingTask.ConfigureAwait(false);
+
+            // Now our image should be in the cache
+            var value = ImageCache.Instance.Get(key);
+
+            if (value != null) {
+                imageView.SetImageDrawable(value);
+                imageView.LayoutParameters.Height = value.IntrinsicHeight;
+                imageView.LayoutParameters.Width = value.IntrinsicWidth;
+                alreadyRunningTaskForSameKey.ImageLoadingTask.Parameters.OnSuccess();
+            } else {
+                MiniLogger.Debug("Similar request finished but the image is not in the cache: " + key);
+                forceLoad();
+            }
+        }
+
+        private async void Run(PendingTask pendingTask)
         {
             if (MaxParallelTasks <= 0)
             {
-                await imageLoaderTask.RunAsync().ConfigureAwait(false); // FMT: threadpool will limit concurrent work
+                pendingTask.FrameworkWrappingTask = pendingTask.ImageLoadingTask.RunAsync(); // FMT: threadpool will limit concurrent work
+                await pendingTask.FrameworkWrappingTask.ConfigureAwait(false);
                 return;
             }
 
@@ -225,11 +266,13 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 _isRunning = true;
             }
 
-            List<ImageLoaderTask> imageLoaderTasks = null;
+            List<PendingTask> currentLotOfPendingTasks = null;
             lock (_pauseWorkLock)
             {
-                imageLoaderTasks = _pendingTasks.Where(t => !t.IsCancelled && !t.Completed).Take(MaxParallelTasks).ToList();
-                if (imageLoaderTasks.Count == 0)
+                currentLotOfPendingTasks = _pendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+                    .Take(MaxParallelTasks)
+                    .ToList();
+                if (currentLotOfPendingTasks.Count == 0)
                 {
                     lock (_runningLock)
                     {
@@ -239,7 +282,12 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 }
             }
 
-            var tasks = imageLoaderTasks.Select(t => t.RunAsync());
+            foreach (var pendingTask in currentLotOfPendingTasks)
+            {
+                pendingTask.FrameworkWrappingTask = pendingTask.ImageLoadingTask.RunAsync();
+            }
+
+            var tasks = currentLotOfPendingTasks.Select(t => t.FrameworkWrappingTask);
             await Task.WhenAll(tasks).ConfigureAwait(false);
             
             lock (_runningLock)

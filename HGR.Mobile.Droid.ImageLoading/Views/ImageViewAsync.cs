@@ -31,18 +31,6 @@ namespace HGR.Mobile.Droid.ImageLoading.Views
             ImageService.CancelWorkFor(this);
         }
 
-        public virtual void SetFromFile(string filepath, Action onComplete = null, int resampleWidth = -1, int resampleHeight = -1)
-        {
-            var task = new ImageLoaderTask(filepath, this, ImageLoaderTask.ImageSource.Filepath, resampleWidth, resampleHeight);
-            ImageService.LoadImage(filepath, task, this, onComplete);
-        }
-
-        public virtual void SetFromUrl(string url, Action onComplete = null, int resampleWidth = -1, int resampleHeight = -1, TimeSpan? duration = null)
-        {
-            var task = new ImageLoaderTask(url, this, ImageLoaderTask.ImageSource.Url, resampleWidth, resampleHeight);
-            ImageService.LoadImage(url, task, this, onComplete);
-        }
-
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
         {
             if (Drawable == null) {
