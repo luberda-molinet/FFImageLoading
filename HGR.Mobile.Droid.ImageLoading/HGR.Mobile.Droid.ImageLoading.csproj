@@ -70,6 +70,7 @@
     <Compile Include="Views\ImageViewAsync.cs" />
     <Compile Include="Work\TaskParameter.cs" />
     <Compile Include="Work\TaskParameterExtensions.cs" />
+    <Compile Include="Helpers\MainThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache\" />

@@ -166,8 +166,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                     return;
 
                 // Post on main thread
-                Handler handler = new Handler(Looper.MainLooper);
-                handler.Post(() => {
+                MainThread.Post(() => {
                     if (CancellationToken.IsCancellationRequested)
                         return;
 

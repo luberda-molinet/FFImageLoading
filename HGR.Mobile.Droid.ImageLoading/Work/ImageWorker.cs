@@ -182,7 +182,6 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 imageView.SetImageDrawable(value);
                 imageView.LayoutParameters.Height = value.IntrinsicHeight;
                 imageView.LayoutParameters.Width = value.IntrinsicWidth;
-
                 task.Parameters.OnSuccess();
             } else if (CancelPotentialWork(key, imageView)) {
                 if (_pauseWork)
@@ -235,10 +234,12 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             var value = ImageCache.Instance.Get(key);
 
             if (value != null) {
-                imageView.SetImageDrawable(value);
-                imageView.LayoutParameters.Height = value.IntrinsicHeight;
-                imageView.LayoutParameters.Width = value.IntrinsicWidth;
-                alreadyRunningTaskForSameKey.ImageLoadingTask.Parameters.OnSuccess();
+                MainThread.Post(() => {
+                    imageView.SetImageDrawable(value);
+                    imageView.LayoutParameters.Height = value.IntrinsicHeight;
+                    imageView.LayoutParameters.Width = value.IntrinsicWidth;
+                    alreadyRunningTaskForSameKey.ImageLoadingTask.Parameters.OnSuccess();
+                });
             } else {
                 MiniLogger.Debug("Similar request finished but the image is not in the cache: " + key);
                 forceLoad();
