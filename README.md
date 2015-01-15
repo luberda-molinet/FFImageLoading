@@ -19,19 +19,29 @@ Some code could be refactored, improved, probably better written too. If you fee
 Please remember that this has been developed for our needs. We never though of releasing it when writing it.
 
 ###Simple usage
-Use the SimpleImageViewAsync instead of the Android ImageView.
+Use the ImageViewAsync instead of the Android ImageView.
 
-Then when you want to load the image:
+Then when you want to load the image from a file:
 ```C#
-_thumbnailImage.SetImage(fullPathToImage);
+_imageView.SetFromFile(fullPathToImage);
+```
+
+Or from an URL. In this case the image is cached (by default 30 days but there is an optional TimeSpan so you can choose yours).
+```C#
+_imageView.SetFromUrl(urlToImage);
 ```
 
 You can also have a callback when the image is loaded.
 ```C#
-_thumbnailImage.SetImage(fullPathToImage, () =>
+_imageView.SetFromUrl(urlToImage, () =>
 {
   // your code here...
 });
+```
+
+If you want to resample the image so it takes less memory then you can define your new width/height. Note: it will keep aspect ratio even if you give crazy values to width/height and it can only downscale.
+```C#
+_imageView.SetFromUrl(urlToImage, resampleWidth: 150); // you can only give one value since we keep aspect ratio
 ```
 
 ###Advanced usage
@@ -41,13 +51,13 @@ If you want to stop pending loading requests. For example when your activity get
 protected override void OnPause()
 {
 	base.OnPause();
-	ImageWorker.SetExitTaskEarly(true);
+	ImageService.SetExitTasksEarly(true);
 }
 
 protected override void OnResume()
 {
 	base.OnResume();
-	ImageWorker.SetExitTaskEarly(false);
+	ImageService.SetExitTasksEarly(false);
 }
 ```
 
@@ -58,10 +68,10 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
   switch (scrollArgs.ScrollState)
   {
     case ScrollState.Fling:
-      ImageWorker.SetPauseWork(true); // all image loading requests will be silently canceled
+      ImageService.SetPauseWork(true); // all image loading requests will be silently canceled
       break;
     case ScrollState.Idle:
-      ImageWorker.SetPauseWork(false); // loading requests are allowed again
+      ImageService.SetPauseWork(false); // loading requests are allowed again
       
       // Here you should have your custom method that forces redrawing visible list items
       _myListView.ForcePdfThumbnailsRedraw();
@@ -71,6 +81,6 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
 ```
 
 ###Custom loading logic
-As the name suggests it SimpleImageViewAsync is simple: it loads images from a full path. But you can customize the image loading logic very easily.
+Customizing the loading logic is very easy: you should inherit from ImageLoaderTask and there put your own logic. 
 
-To do so you just need to inherit from ImageWorkerBase and ImageViewAsyncBase. You can look at ImageWorker and SimpleImageViewAsync they are both subclasses.
+Then you just need to inherit from ImageAsyncView and add your custom SetFromxxx method.
