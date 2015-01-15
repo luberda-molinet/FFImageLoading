@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace HGR.Mobile.Droid.ImageLoading.Helpers
 {
-    public static class MiniLogger
+    internal static class MiniLogger
     {
         [Conditional("DEBUG")]
         public static void Debug(string message)

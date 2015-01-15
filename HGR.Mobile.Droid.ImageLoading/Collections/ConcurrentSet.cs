@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 
 namespace HGR.Mobile.Droid.ImageLoading.Collections
 {
-	public class ConcurrentSet<T> : ICollection<T>, IEnumerable<T>, IEnumerable
+	internal class ConcurrentSet<T> : ICollection<T>, IEnumerable<T>, IEnumerable
 	{
 		readonly ConcurrentDictionary<T, byte> _storage;
 

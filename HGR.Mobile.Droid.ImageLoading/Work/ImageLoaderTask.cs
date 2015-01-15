@@ -14,11 +14,18 @@ using HGR.Mobile.Droid.ImageLoading.Cache;
 using HGR.Mobile.Droid.ImageLoading.Extensions;
 using HGR.Mobile.Droid.ImageLoading.Drawables;
 using System.IO;
+using HGR.Mobile.Droid.ImageLoading.IO;
 
 namespace HGR.Mobile.Droid.ImageLoading.Work
 {
 	public class ImageLoaderTask
 	{
+        public enum ImageSource
+        {
+            Filepath,
+            Url
+        }
+
 		public EventHandler OnComplete;
 
 		protected readonly Context _context;
@@ -26,14 +33,21 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 		private const int FADE_TRANSITION_MILISECONDS = 50;
 		private readonly WeakReference<ImageView> _imageWeakReference;
 		private readonly BitmapFactory.Options _options;
-		private readonly string _path;
 
-        public ImageLoaderTask(string path, ImageView imageView)
+        private readonly ImageSource _source;
+		private readonly string _path;
+        private readonly int _resampleWidth;
+        private readonly int _resampleHeight;
+
+        public ImageLoaderTask(string path, ImageView imageView, ImageSource source = ImageSource.Filepath, int resampleWidth = -1, int resampleHeight = -1)
 		{
 			CancellationToken = new CancellationTokenSource();
             _context = Android.App.Application.Context.ApplicationContext;
 
 			_path = path;
+            _source = source;
+            _resampleWidth = resampleWidth;
+            _resampleHeight = resampleHeight;
 			_imageWeakReference = new WeakReference<ImageView>(imageView);
 
 			_options = new BitmapFactory.Options()
@@ -126,7 +140,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         public async Task RunAsync()
 		{
             try {
-                if (Completed || CancellationToken.IsCancellationRequested || ImageWorkerService.ExitTasksEarly)
+                if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
                     return;
 
                 BitmapDrawable drawable = null;
@@ -163,7 +177,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                             OnComplete(this, EventArgs.Empty);
                     });
             } finally {
-                ImageWorker.RemovePendingTask(this);
+                ImageService.RemovePendingTask(this);
             }
 		}
 
@@ -176,7 +190,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             // thread and the ImageView that was originally bound to this task is still bound back
             // to this task and our "exit early" flag is not set then try and fetch the bitmap from
             // the cache
-            if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageWorkerService.ExitTasksEarly)
+            if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
                 return null;
 
             BitmapDrawable drawable = await GetDrawableAsync(_path).ConfigureAwait(false);
@@ -217,29 +231,28 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 				: null;
 		}
 
-        private async Task<byte[]> ReadBytes(string path)
-        {
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                using (var memory = new MemoryStream()) {
-                    await fs.CopyToAsync(memory).ConfigureAwait(false);
-                    return memory.ToArray();
-                }
-            }
-        }
-
         protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path)
 		{
             if (CancellationToken.IsCancellationRequested)
                 return null;
 
-            byte[] bytes;
+            byte[] bytes = null;
+
             try
             {
-                bytes = await ReadBytes(path).ConfigureAwait(false);
+                switch (_source)
+                {
+                    case ImageSource.Filepath:
+                        bytes = await FileStore.ReadBytes(path).ConfigureAwait(false);
+                        break;
+                    case ImageSource.Url:
+                        bytes = await new DownloadCache().GetAsync(path).ConfigureAwait(false);
+                        break;
+                }
             }
             catch (Exception ex)
             {
-                MiniLogger.Error("Unable to read file", ex);
+                MiniLogger.Error("Unable to retrieve image data", ex);
                 return null;
             }
 
@@ -263,6 +276,10 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 try
                 {
                     BitmapFactory.DecodeFile(path, options);
+                    if (_resampleWidth > 0)
+                        options.OutWidth = _resampleWidth;
+                    if (_resampleHeight > 0)
+                        options.OutHeight = _resampleHeight;
                 }
                 catch (Exception ex)
                 {

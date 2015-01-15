@@ -2,7 +2,7 @@
 
 namespace HGR.Mobile.Droid.ImageLoading.Helpers
 {
-	public static class Utils
+	internal static class Utils
 	{
 		public static bool HasFroyo()
 		{
