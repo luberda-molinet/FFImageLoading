@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
-       <version>1.0.0.3</version>
+       <version>1.0.0.4</version>
        <title>Xamarin library to load images quickly and easily on Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
