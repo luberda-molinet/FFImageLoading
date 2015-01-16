@@ -3,7 +3,7 @@
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
        <version>1.0.0.0</version>
-       <title>Xamarin library to load images quickly & easily on Android</title>
+       <title>Xamarin library to load images quickly and easily on Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/Xam.Plugins.ImageLoading/master/LICENSE.md</licenseUrl>
@@ -13,7 +13,7 @@
        	 The library works starting from Android 4.1.
          We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused.
        </description>
-       <summary>Xamarin library to load images quickly & easily on Android.</summary>
+       <summary>Xamarin library to load images quickly and easily on Android.</summary>
        <tags>xamarin, android, bitmap, image, cache, quick, easy, lru, load, loading, save</tags>
        <dependencies>
        	<dependency id="ModernHttpClient" version="2.1" />
