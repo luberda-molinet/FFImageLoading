@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
-       <version>1.0.0.1</version>
+       <version>1.0.0.3</version>
        <title>Xamarin library to load images quickly and easily on Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -16,7 +16,7 @@
        <summary>Xamarin library to load images quickly and easily on Android.</summary>
        <tags>xamarin, android, bitmap, image, cache, quick, easy, lru, load, loading, save</tags>
        <dependencies>
-       	<dependency id="ModernHttpClient" version="2.1" />
+       	<dependency id="modernhttpclient" version="2.1.5" />
        </dependencies>
    </metadata>
    <files>
