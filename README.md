@@ -54,6 +54,16 @@ ImageService.LoadUrl(urlToImage)
 .Into(_imageView);
 ```
 
+There is a third callback: when image loading process finished. Whatever the result this method will be called:
+```C#
+ImageService.LoadUrl(urlToImage)
+.Finish(() =>
+{
+  // your code here...
+})
+.Into(_imageView);
+```
+
 If your download failed, or something wrong happened you can automatically retry. Here if loading from the URL failed then we will try 3 more times with a 200ms interval between each trial.
 ```C#
 ImageService.LoadUrl(urlToImage)
@@ -68,6 +78,16 @@ ImageService.LoadUrl(urlToImage).DownSample(width: 150).Into(_imageView);
 ```
 
 ###Advanced usage
+
+If you don't want to use the Retry() functionality but have your custom error handling/retry logic (for example: because you use Polly). Then you can use IntoAsync() instead of Into()
+```C#
+try {
+	// IntoAsync will throw exceptions
+	await ImageService.LoadUrl(urlToImage).IntoAsync(_imageView);
+} catch (Exception ex) {
+	// do whatever you want...
+}
+```
 
 If you want to stop pending loading requests. For example when your activity gets paused/resumed:
 ```C#
