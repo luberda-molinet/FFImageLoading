@@ -42,10 +42,10 @@
     <Reference Include="Mono.Android" />
     <Reference Include="System.Net.Http" />
     <Reference Include="ModernHttpClient">
-      <HintPath>..\..\..\packages\modernhttpclient.2.1.5\lib\MonoAndroid\ModernHttpClient.dll</HintPath>
+      <HintPath>..\packages\modernhttpclient.2.1.5\lib\MonoAndroid\ModernHttpClient.dll</HintPath>
     </Reference>
     <Reference Include="OkHttp">
-      <HintPath>..\..\..\packages\modernhttpclient.2.1.5\lib\MonoAndroid\OkHttp.dll</HintPath>
+      <HintPath>..\packages\modernhttpclient.2.1.5\lib\MonoAndroid\OkHttp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
