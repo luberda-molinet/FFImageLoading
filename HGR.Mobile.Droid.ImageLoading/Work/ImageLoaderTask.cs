@@ -49,14 +49,17 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 
             _parameters = parameters;
             if (_parameters.RetryCount > 0) {
+                var userErrorCallback = _parameters.OnError;
                 int retryCurrentValue = 0;
                 _parameters = _parameters.Error(async ex => {
-                    while (retryCurrentValue < _parameters.RetryCount) {
+                    if (retryCurrentValue < _parameters.RetryCount) {
+                        MiniLogger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", Key, retryCurrentValue));
                         if (_parameters.RetryDelayInMs > 0)
                             await Task.Delay(_parameters.RetryDelayInMs).ConfigureAwait(false);
                         await RunAsync().ConfigureAwait(false);
                         retryCurrentValue++;
                     }
+                    userErrorCallback(ex);
                 });
             }
         }
@@ -166,19 +169,20 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                     return;
 
                 // Post on main thread
-                MainThread.Post(() => {
+                await MainThread.PostAsync(() => {
                     if (CancellationToken.IsCancellationRequested)
                         return;
 
                     SetImageDrawable(imageView, drawable);
                     Completed = true;
                     _parameters.OnSuccess();
-                });
+                }).ConfigureAwait(false);
             } catch (Exception ex) {
                 MiniLogger.Error("An error occured", ex);
                 _parameters.OnError(ex);
             } finally {
                 ImageService.RemovePendingTask(this);
+                _parameters.OnFinish();
             }
         }
 

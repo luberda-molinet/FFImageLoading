@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
-       <version>1.0.0.0</version>
+       <version>1.0.0.1</version>
        <title>Xamarin library to load images quickly and easily on Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -22,5 +22,6 @@
    <files>
      <!--Xamarin.Android-->
      <file src="HGR.Mobile.Droid.ImageLoading/bin/Release/HGR.Mobile.Droid.ImageLoading.dll" target="lib/MonoAndroid10/HGR.Mobile.Droid.ImageLoading.dll" />
+     <file src="HGR.Mobile.Droid.ImageLoading/bin/Release/HGR.Mobile.Droid.ImageLoading.xml" target="lib/MonoAndroid10/HGR.Mobile.Droid.ImageLoading.xml" />
 	</files>
 </package>
