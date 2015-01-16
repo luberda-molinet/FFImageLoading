@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace HGR.Mobile.Droid.ImageLoading.Views
 {
-    public abstract class ImageViewAsync : ManagedImageView
+    public class ImageViewAsync : ManagedImageView
     {
         protected SizeF? _predefinedSize;
 
