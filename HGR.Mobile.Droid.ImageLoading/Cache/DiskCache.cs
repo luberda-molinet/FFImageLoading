@@ -181,6 +181,14 @@ namespace HGR.Mobile.Droid.ImageLoading.Cache
                 duration = TimeSpan.FromMilliseconds (timespan);
         }
 
+        public string BasePath
+        {
+            get
+            {
+                return basePath;
+            }
+        }
+
         public async Task AddOrUpdate (string key, byte[] data, TimeSpan duration)
         {
             key = SanitizeKey (key);

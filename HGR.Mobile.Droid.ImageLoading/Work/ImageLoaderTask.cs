@@ -24,7 +24,6 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         protected CancellationTokenSource CancellationToken;
         private const int FADE_TRANSITION_MILISECONDS = 50;
         private readonly WeakReference<ImageView> _imageWeakReference;
-        private readonly BitmapFactory.Options _options;
         private readonly TaskParameter _parameters;
 
         /// <summary>
@@ -41,9 +40,6 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             CancellationToken = new CancellationTokenSource();
             _context = Android.App.Application.Context.ApplicationContext;
             _imageWeakReference = new WeakReference<ImageView>(imageView);
-            _options = new BitmapFactory.Options() {
-                InPurgeable = true
-            };
 
             UseFadeInBitmap = true;
 
@@ -89,43 +85,26 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
         /// <param name="reqWidth"></param>
         /// <param name="reqHeight"></param>
         /// <returns></returns>
-        public static int CalculateInSampleSize(BitmapFactory.Options options,
-                                          int reqWidth, int reqHeight)
+        public int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight)
         {
-            // BEGIN_INCLUDE (calculate_sample_size)
             // Raw height and width of image
-            int height = options.OutHeight;
-            int width = options.OutWidth;
-            int inSampleSize = 1;
+            float height = options.OutHeight;
+            float width = options.OutWidth;
+            double inSampleSize = 1D;
 
-            if (height > reqHeight || width > reqWidth) {
-                int halfHeight = height / 2;
-                int halfWidth = width / 2;
+            if (height > reqHeight || width > reqWidth)
+            {
+                int halfHeight = (int)(height / 2);
+                int halfWidth = (int)(width / 2);
 
-                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-                // height and width larger than the requested height and width.
-                while ((halfHeight / inSampleSize) > reqHeight
-                && (halfWidth / inSampleSize) > reqWidth) {
+                // Calculate a inSampleSize that is a power of 2 - the decoder will use a value that is a power of two anyway.
+                while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth)
+                {
                     inSampleSize *= 2;
-                }
-
-                // This offers some additional logic in case the image has a strange
-                // aspect ratio. For example, a panorama may have a much larger
-                // width than height. In these cases the total pixels might still
-                // end up being too large to fit comfortably in memory, so we should
-                // be more aggressive with sample down the image (=larger inSampleSize).
-
-                long totalPixels = width * height / inSampleSize;
-
-                // Anything more than 2x the requested pixels we'll sample down further
-                long totalReqPixelsCap = reqWidth * reqHeight * 2;
-
-                while (totalPixels > totalReqPixelsCap) {
-                    inSampleSize *= 2;
-                    totalPixels /= 2;
                 }
             }
-            return inSampleSize;
+
+            return (int)inSampleSize;
         }
 
         public void Cancel()
@@ -235,12 +214,13 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 				: null;
         }
 
-        protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path)
+        protected virtual async Task<BitmapDrawable> GetDrawableAsync(string sourcePath)
         {
             if (CancellationToken.IsCancellationRequested)
                 return null;
 
             byte[] bytes = null;
+            string path = sourcePath;
 
             try {
                 switch (_parameters.Source) {
@@ -248,7 +228,9 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                     bytes = await FileStore.ReadBytes(path).ConfigureAwait(false);
                     break;
                 case ImageSource.Url:
-                    bytes = await new DownloadCache().GetAsync(path, _parameters.CacheDuration).ConfigureAwait(false);
+                    var downloadedData = await new DownloadCache().GetAsync(path, _parameters.CacheDuration).ConfigureAwait(false);
+                    bytes = downloadedData.Bytes;
+                    path = downloadedData.CachedPath;
                     break;
                 }
             } catch (Exception ex) {
@@ -274,26 +256,27 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
 
                 try {
                     BitmapFactory.DecodeFile(path, options);
-                    if (_parameters.DownSampleSize.Width > 0)
-                        options.OutWidth = (int)_parameters.DownSampleSize.Width;
-                    if (_parameters.DownSampleSize.Height > 0)
-                        options.OutHeight = (int)_parameters.DownSampleSize.Height;
                 } catch (Exception ex) {
                     MiniLogger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
                     _parameters.OnError(ex);
                     return null;
                 }
-                
+
                 if (CancellationToken.IsCancellationRequested)
                     return null;
 
+                options.InPurgeable = true;
+                options.InJustDecodeBounds = false;
+
                 try {
-                    // Calculate inSampleSize
-                    options.InSampleSize = CalculateInSampleSize(options, options.OutWidth, options.OutHeight);
-                
+                    if (_parameters.DownSampleSize.Width > 0 || _parameters.DownSampleSize.Height > 0) {
+                        // Calculate inSampleSize
+                        options.InSampleSize = CalculateInSampleSize(options, (int)_parameters.DownSampleSize.Width, (int)_parameters.DownSampleSize.Height);
+                    }
+
                     // If we're running on Honeycomb or newer, try to use inBitmap
                     if (Utils.HasHoneycomb())
-                        AddInBitmapOptions(_options);
+                        AddInBitmapOptions(options);
                 } catch (Exception ex) {
                     MiniLogger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
                     _parameters.OnError(ex);
@@ -304,7 +287,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
                 
                 Bitmap bitmap;
                 try {
-                    bitmap = BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length, _options);
+                    bitmap = BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length, options);
                 } catch (Exception ex) {
                     MiniLogger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
                     _parameters.OnError(ex);

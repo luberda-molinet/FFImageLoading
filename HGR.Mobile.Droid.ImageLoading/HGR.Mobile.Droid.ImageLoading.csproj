@@ -72,6 +72,7 @@
     <Compile Include="Work\TaskParameter.cs" />
     <Compile Include="Work\TaskParameterExtensions.cs" />
     <Compile Include="Helpers\MainThread.cs" />
+    <Compile Include="Cache\DownloadedData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache\" />
