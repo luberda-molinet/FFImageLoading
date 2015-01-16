@@ -2,6 +2,7 @@ Xam.Android.ImageLoading
 ==========================================
 
 Xamarin library to load images quickly & easily on Android.
+
 NuGet package is here: https://www.nuget.org/packages/Xam.Android.ImageLoading/
 
 ###Minimum Android version
@@ -13,36 +14,57 @@ We developed this library while working on an app that displays tons of pictures
 First we tried to use Picasso with C# bindings, we got good performances but after 15-20 minutes of usage our app was crashing due to memory issues: we saw some people having similar issues with Picasso and chosed to go C# all the way.
 We believed it would be easier for us to debug and maintain. For us, it is the case.
 
-The code has been released after a discussion on Xamarin forums.
+The code has been released after a discussion on Xamarin forums. It changed quite a lot since it was released.
 
 ###Warning
 Some code could be refactored, improved, probably better written too. If you feel that way you can do a pull request.
 Please remember that this has been developed for our needs. We never though of releasing it when writing it.
 
-###Simple usage
-Use the ImageViewAsync instead of the Android ImageView.
+###Description
+The library offers a Fluent API which is inspired by Picasso naming.
 
-Then when you want to load the image from a file:
+Contrary to Picasso you cannot use ImageLoading with standard ImageViews. Instead you should load your images into  ImageViewAsync instances. It should be very easy to update your code since ImageViewAsync inherits from ImageView.
+
+The library automatically deduplicates similar requests: if 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait. When the 1st real read is done then the 99 waiters will get the image.
+
+Both a memory cache and a disk cache are present.
+
+###Examples
+when you want to load the image from a file:
 ```C#
-_imageView.SetFromFile(fullPathToImage);
+ImageService.LoadFile(fullPathToImage).Into(_imageView);
 ```
 
 Or from an URL. In this case the image is cached (by default 30 days but there is an optional TimeSpan so you can choose yours).
 ```C#
-_imageView.SetFromUrl(urlToImage);
+ImageService.LoadUrl(urlToImage).Into(_imageView);
 ```
 
-You can also have a callback when the image is loaded.
+You can also have callbacks when the image is succesfully loaded or when there was errors:
 ```C#
-_imageView.SetFromUrl(urlToImage, () =>
+ImageService.LoadUrl(urlToImage)
+.Success(() =>
 {
   // your code here...
-});
+})
+.Error(exception =>
+{
+  // your code here...
+})
+.Into(_imageView);
 ```
 
-If you want to resample the image so it takes less memory then you can define your new width/height. Note: it will keep aspect ratio even if you give crazy values to width/height and it can only downscale.
+If your download failed, or something wrong happened you can automatically retry. Here if loading from the URL failed then we will try 3 more times with a 200ms interval between each trial.
 ```C#
-_imageView.SetFromUrl(urlToImage, resampleWidth: 150); // you can only give one value since we keep aspect ratio
+ImageService.LoadUrl(urlToImage)
+.Retry(3, 200)
+.Into(_imageView);
+```
+
+If you want to downsample the image so it takes less memory then you can define your new width/height. Note: it will keep aspect ratio even if you give crazy values to width/height and it can only downscale.
+```C#
+// you can only give one value since we keep aspect ratio
+ImageService.LoadUrl(urlToImage).DownSample(width: 150).Into(_imageView);
 ```
 
 ###Advanced usage
@@ -82,6 +104,4 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
 ```
 
 ###Custom loading logic
-Customizing the loading logic is very easy: you should inherit from ImageLoaderTask and there put your own logic. 
-
-Then you just need to inherit from ImageAsyncView and add your custom SetFromxxx method.
+Customizing the loading logic is very easy: you should inherit from ImageLoaderTask and there put your own logic.
