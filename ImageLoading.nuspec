@@ -8,6 +8,7 @@
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/Xam.Plugins.ImageLoading/master/LICENSE.md</licenseUrl>
        <projectUrl>https://github.com/molinch/Xam.Android.ImageLoading</projectUrl>
+       <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        <description>
        	 The library works starting from Android 4.1.
