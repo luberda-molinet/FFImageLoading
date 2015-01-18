@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using HGR.Mobile.Droid.ImageLoading.Views;
+using HGR.Mobile.Droid.ImageLoading.Helpers;
 
 namespace HGR.Mobile.Droid.ImageLoading.Work
 {
@@ -99,7 +100,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             if (action == null)
                 throw new Exception("Given lambda should not be null.");
 
-            OnSuccess = action;
+            OnSuccess = () => MainThread.Post(action); // ensure callbacks are invoked on main thread
             return this;
         }
 
@@ -113,7 +114,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             if (action == null)
                 throw new Exception("Given lambda should not be null.");
 
-            OnError = action;
+            OnError = ex => MainThread.Post(() => action(ex)); // ensure callbacks are invoked on main thread
             return this;
         }
 
@@ -127,7 +128,7 @@ namespace HGR.Mobile.Droid.ImageLoading.Work
             if (action == null)
                 throw new Exception("Given lambda should not be null.");
 
-            OnFinish = action;
+            OnFinish = () => MainThread.Post(action); // ensure callbacks are invoked on main thread
             return this;
         }
     }
