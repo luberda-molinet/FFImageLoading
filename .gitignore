@@ -1,3 +1,9 @@
 HGR.Mobile.Droid.ImageLoading/bin
 HGR.Mobile.Droid.ImageLoading/obj
 *.userprefs
+FFImageLoading.Common/bin
+FFImageLoading.Common/obj
+FFImageLoading.Droid/bin
+FFImageLoading.Droid/obj
+FFImageLoading.Touch/bin
+FFImageLoading.Touch/obj

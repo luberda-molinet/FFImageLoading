@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{74BF9402-3E13-4003-8923-BC20A1294CE2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FFImageLoading</RootNamespace>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
+    <AssemblyName>FFImageLoading.Droid</AssemblyName>
+    <TargetFrameworkVersion>v4.4</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <ConsolePause>false</ConsolePause>
+    <DocumentationFile>bin\Debug\FFImageLoading.Droid.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <ConsolePause>false</ConsolePause>
+    <DocumentationFile>bin\Release\HGR.Mobile.Droid.ImageLoading.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Cache\ILruCache.cs" />
+    <Compile Include="Cache\ImageCache.cs" />
+    <Compile Include="Cache\LruCache.cs" />
+    <Compile Include="Helpers\Utils.cs" />
+    <Compile Include="Work\ImageLoaderTask.cs" />
+    <Compile Include="Extensions\ImageViewExtensions.cs" />
+    <Compile Include="Drawables\ManagedBitmapDrawable.cs" />
+    <Compile Include="Collections\ConcurrentSet.cs" />
+    <Compile Include="Cache\IImageCache.cs" />
+    <Compile Include="Views\ManagedImageView.cs" />
+    <Compile Include="Views\ImageViewAsync.cs" />
+    <Compile Include="Helpers\MainThread.cs" />
+    <Compile Include="TaskParameterExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Cache\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Work\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Drawables\" />
+    <Folder Include="Collections\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

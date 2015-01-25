@@ -1,7 +1,7 @@
 Xam.Android.ImageLoading
 ==========================================
 
-Xamarin library to load images quickly & easily on Android.
+Xamarin library to load images quickly & easily on iOS and Android.
 
 NuGet package is here: https://www.nuget.org/packages/Xam.Android.ImageLoading/
 
