@@ -22,8 +22,10 @@ namespace FFImageLoading
         public static void Initialize(HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
-            if (_initialized)
-                throw new Exception("ImageService is already initialized");
+            if (_initialized) {
+                System.Diagnostics.Debug.WriteLine("FFImageLoading.ImageService is already initialized, nothing will happen");
+                return;
+            }
 
             var userDefinedConfig = new Configuration(httpClient, scheduler, logger, diskCache, downloadCache);
             Config = GetDefaultConfiguration(userDefinedConfig);
