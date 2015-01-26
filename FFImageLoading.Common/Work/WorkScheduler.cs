@@ -14,15 +14,6 @@ namespace FFImageLoading.Work
         /// <param name="task">Image loading task to cancel</param>
         void Cancel(IImageLoaderTask task);
 
-        /// <summary>
-        /// Returns true if the current work has been canceled or if there was no work in progress for this task.
-        /// Returns false if the work in progress deals with the same data. The work is not stopped in that case.
-        /// </summary>
-        /// <param name="key">Image key</param>
-        /// <param name="task">Image loading task to cancel</param>
-        /// <returns>See method summary</returns>
-        bool CancelPotentialWork(string key, IImageLoaderTask task);
-
         bool ExitTasksEarly { get; }
 
         void SetExitTasksEarly(bool exitTasksEarly);
@@ -98,32 +89,6 @@ namespace FFImageLoading.Work
             }
         }
 
-        /// <summary>
-        /// Returns true if the current work has been canceled or if there was no work in progress for this task.
-        /// Returns false if the work in progress deals with the same data. The work is not stopped in that case.
-        /// </summary>
-        /// <param name="key">Image key</param>
-        /// <param name="task">Image loading task to cancel</param>
-        /// <returns>See method summary</returns>
-        public bool CancelPotentialWork(string key, IImageLoaderTask task)
-        {
-            if (task != null && !task.IsCancelled)
-            {
-                if (string.IsNullOrWhiteSpace(task.Key) || !task.Key.Equals(key))
-                {
-                    // Cancel previous task
-                    task.Cancel();
-                }
-                else
-                {
-                    // The same work is already in progress
-                    return false;
-                }
-            }
-            // No task or an existing task was cancelled
-            return true;
-        }
-
         public bool ExitTasksEarly
         {
             get
@@ -178,20 +143,21 @@ namespace FFImageLoading.Work
         /// <param name="task">Image loading task.</param>
         public async void LoadImage(IImageLoaderTask task)
         {
-            if (string.IsNullOrEmpty(task.Key)) {
-                throw new Exception("Image loading key can not be null or empty");
+            if (task == null || task.IsCancelled)
+                return;
+
+            if (string.IsNullOrWhiteSpace(task.Key)) {
+                throw new Exception("Image loading key can not be null, empty or a whitespace");
             }
 
             if (await TryLoadingFromCacheAsync(task).ConfigureAwait(false))
                 return; // image successfully loaded from cache
 
-            if (!CancelPotentialWork(task.Key, task))
-                return;
-
-            if (_pauseWork)
+            if (task.IsCancelled || _pauseWork)
                 return;
 
             _logger.Debug(string.Format("Generating/retrieving image: {0}", task.Key));
+            task.Prepare();
 
             var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
             PendingTask alreadyRunningTaskForSameKey = null;

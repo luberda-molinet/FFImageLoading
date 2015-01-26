@@ -15,7 +15,6 @@ using FFImageLoading.IO;
 using FFImageLoading.Cache;
 using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
-using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
@@ -46,13 +45,15 @@ namespace FFImageLoading.Work
 
         public override void Prepare()
         {
-            var imageView = GetAttachedImageView();
+            ImageView imageView;
+            _imageWeakReference.TryGetTarget(out imageView);
             if (imageView == null)
                 return;
 
+            // Assign the Drawable to the image
             var resources = Android.App.Application.Context.ApplicationContext.Resources;
             var asyncDrawable = new AsyncDrawable(resources, null, this);
-            this.SetImageDrawable(imageView, asyncDrawable);
+            imageView.SetImageDrawable(asyncDrawable);
         }
 
         public bool UseFadeInBitmap { get; set; }

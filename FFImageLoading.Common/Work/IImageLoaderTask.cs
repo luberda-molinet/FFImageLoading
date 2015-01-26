@@ -15,11 +15,11 @@ namespace FFImageLoading.Work
 
         bool Completed { get; }
 
-        void Prepare();
-
         Task RunAsync();
 
         Task<bool> TryLoadingFromCacheAsync();
+
+        void Prepare();
     }
 }
 

@@ -7,8 +7,6 @@ using FFImageLoading.Work;
 using System.Net.Http;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
-using FFImageLoading.Helpers;
-using FFImageLoading.Cache;
 using FFImageLoading.Extensions;
 
 namespace FFImageLoading
@@ -17,15 +15,26 @@ namespace FFImageLoading
     {
         private static bool _initialized;
 
+        /// <summary>
+        /// Gets FFImageLoading configuration
+        /// </summary>
+        /// <value>The configuration used by FFImageLoading.</value>
         public static Configuration Config { get; private set; }
 
         public static void Initialize(HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
-            if (_initialized) {
-                System.Diagnostics.Debug.WriteLine("FFImageLoading.ImageService is already initialized, nothing will happen");
+            if (_initialized)
+                throw new Exception("FFImageLoading.ImageService is already initialized");
+
+            InitializeIfNeeded();
+        }
+
+        private static void InitializeIfNeeded(HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+            IDiskCache diskCache = null, IDownloadCache downloadCache = null)
+        {
+            if (_initialized)
                 return;
-            }
 
             var userDefinedConfig = new Configuration(httpClient, scheduler, logger, diskCache, downloadCache);
             Config = GetDefaultConfiguration(userDefinedConfig);
@@ -54,7 +63,7 @@ namespace FFImageLoading
         private static IWorkScheduler Scheduler
         {
             get {
-                Initialize();
+                InitializeIfNeeded();
                 return Config.Scheduler;
             }
         }
@@ -66,7 +75,7 @@ namespace FFImageLoading
         /// <param name="filepath">Path to the file.</param>
         public static TaskParameter LoadFile(string filepath)
         {
-            Initialize();
+            InitializeIfNeeded();
             return TaskParameter.FromFile(filepath);
         }
 
@@ -78,7 +87,7 @@ namespace FFImageLoading
         /// <param name="cacheDuration">How long the file will be cached on disk</param>
         public static TaskParameter LoadUrl(string url, TimeSpan? cacheDuration = null)
         {
-            Initialize();
+            InitializeIfNeeded();
             return TaskParameter.FromUrl(url, cacheDuration);
         }
 
@@ -133,9 +142,7 @@ namespace FFImageLoading
         /// <summary>
         /// Queue an image loading task.
         /// </summary>
-        /// <param name="key">Key used for caching.</param>
         /// <param name="task">Image loading task.</param>
-        /// <param name="imageView">Image view that will receive the loaded image.</param>
         public static void LoadImage(IImageLoaderTask task)
         {
             Scheduler.LoadImage(task);
