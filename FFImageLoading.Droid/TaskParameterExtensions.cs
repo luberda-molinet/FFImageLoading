@@ -34,7 +34,7 @@ namespace FFImageLoading
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<IScheduledWork>();
 
-            var scheduledWork = parameters
+            parameters
                 .Error(ex => {
                     userErrorCallback(ex);
                     tcs.SetException(ex);

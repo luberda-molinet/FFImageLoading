@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
-       <version>1.0.0.6</version>
+       <version>1.0.0.7-beta</version>
        <title>Xamarin library to load images quickly and easily on iOS and Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -20,9 +20,13 @@
        	<dependency id="modernhttpclient" version="2.1.5" />
        </dependencies>
    </metadata>
-   <files>
-     <!--Xamarin.Android-->
-     <file src="HGR.Mobile.Droid.ImageLoading/bin/Release/HGR.Mobile.Droid.ImageLoading.dll" target="lib/MonoAndroid10/HGR.Mobile.Droid.ImageLoading.dll" />
-     <file src="HGR.Mobile.Droid.ImageLoading/bin/Release/HGR.Mobile.Droid.ImageLoading.xml" target="lib/MonoAndroid10/HGR.Mobile.Droid.ImageLoading.xml" />
+	<files>
+		<!--Xamarin.Android-->
+		<file src="FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Droid.dll" />
+		<file src="FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.xml" target="lib/MonoAndroid10/FFImageLoading.Droid.xml" />
+
+		<!--Xamarin.iOS Unified-->
+		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Touch.dll" />
+		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Touch.xml" />
 	</files>
 </package>

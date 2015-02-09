@@ -3,7 +3,7 @@ using Java.Lang;
 
 namespace FFImageLoading.Cache
 {
-    internal abstract class LruCache<TValue> : LruCache
+    public abstract class LruCache<TValue> : LruCache
 		where TValue : Object
 	{
 

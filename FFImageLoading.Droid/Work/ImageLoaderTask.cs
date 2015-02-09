@@ -105,7 +105,7 @@ namespace FFImageLoading.Work
                 Parameters.OnError(ex);
             } finally {
                 ImageService.RemovePendingTask(this);
-                Parameters.OnFinish();
+                Parameters.OnFinish(this);
             }
         }
 

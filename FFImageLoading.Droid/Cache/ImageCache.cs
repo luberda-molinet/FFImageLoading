@@ -12,7 +12,7 @@ using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-	internal class ImageCache : LruCache<BitmapDrawable>, IImageCache
+	public class ImageCache : LruCache<BitmapDrawable>, IImageCache
 	{
 		private ConcurrentDictionary<string, bool> _references;
 		private readonly ConcurrentSet<SoftReference> _reusableBitmaps;
