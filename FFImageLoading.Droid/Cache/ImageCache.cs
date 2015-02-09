@@ -12,13 +12,13 @@ using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-	public class ImageCache : LruCache<BitmapDrawable>, IImageCache
+	internal class ImageCache : LruCache<BitmapDrawable>, IImageCache
 	{
 		private ConcurrentDictionary<string, bool> _references;
 		private readonly ConcurrentSet<SoftReference> _reusableBitmaps;
 		private static IImageCache _instance;
 
-		private ImageCache() : base(GetCacheSizeInPercent(0.6f))
+        private ImageCache(int maxCacheSize) : base(GetMaxCacheSize())
 		{
 			if (Utils.HasHoneycomb())
                 _reusableBitmaps = new ConcurrentSet<SoftReference>();
@@ -26,15 +26,15 @@ namespace FFImageLoading.Cache
 			_references = new ConcurrentDictionary<string, bool>();
 		}
 
-		public static IImageCache Instance
-		{
-			get
-			{
-                return _instance ?? (_instance = new ImageCache());
-			}
-		}
+        public static IImageCache Instance
+        {
+            get
+            {
+                return _instance ?? (_instance = new ImageCache(ImageService.Config.MaxCacheSize));
+            }
+        }
 
-		public int Count { get; set; }
+		public int Count { get; private set; }
 
 		public static int GetBitmapSize(BitmapDrawable bmp)
 		{
@@ -155,6 +155,14 @@ namespace FFImageLoading.Cache
 			return 1;
 		}
 
+        private static int GetMaxCacheSize()
+        {
+            if (ImageService.Config.MaxCacheSize <= 0)
+                return GetCacheSizeInPercent(0.2f); // 20%
+
+            return Math.Min(GetCacheSizeInPercent(0.2f), ImageService.Config.MaxCacheSize);
+        }
+
 		/// <summary>
 		/// Gets the memory cache size based on a percentage of the max available VM memory.
 		/// </summary>
@@ -166,7 +174,7 @@ namespace FFImageLoading.Cache
 			if (percent < 0.01f || percent > 0.8f)
 				throw new Exception("GetCacheSizeInPercent - percent must be between 0.01 and 0.8 (inclusive)");
 
-			return (int) Math.Round(percent*Runtime.GetRuntime().MaxMemory()/1024);
+            return (int)Math.Round(percent*Runtime.GetRuntime().MaxMemory());
 		}
 
 		private bool CanUseForInBitmap(Bitmap item, BitmapFactory.Options options)
@@ -185,13 +193,11 @@ namespace FFImageLoading.Cache
 			return byteCount <= item.AllocationByteCount;
 		}
 
-		//protected override int SizeOf(Object key, Object value)
-		//{
-		//	var size= GetBitmapSize((BitmapDrawable) value)/1024;
+		protected override int SizeOf(Object key, Object value)
+		{
+		    var size = GetBitmapSize((BitmapDrawable) value);
 
-		//	return size == 0
-		//		? 1
-		//		: size;
-		//}
+			return size == 0 ? 1 : size;
+		}
 	}
 }

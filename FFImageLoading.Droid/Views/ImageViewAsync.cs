@@ -2,6 +2,7 @@ using System;
 using Android.Content;
 using Android.Util;
 using System.Drawing;
+using FFImageLoading.Extensions;
 
 namespace FFImageLoading.Views
 {
@@ -27,7 +28,7 @@ namespace FFImageLoading.Views
 
         public void CancelLoading()
         {
-            ImageService.CancelWorkFor(this);
+            ImageService.CancelWorkFor(this.GetImageLoaderTask());
         }
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)

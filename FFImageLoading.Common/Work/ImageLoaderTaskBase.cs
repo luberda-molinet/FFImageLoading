@@ -43,7 +43,8 @@ namespace FFImageLoading.Work
             }
         }
 
-        public abstract void Prepare();
+        public virtual void Prepare() {
+        }
 
         public abstract Task RunAsync();
 
@@ -58,7 +59,7 @@ namespace FFImageLoading.Work
             // make sure callbacks are invoked on Main thread
             Parameters.Success(() => MainThreadDispatcher.Post(successCallback));
             Parameters.Error(ex => MainThreadDispatcher.Post(() => errorCallback(ex)));
-            Parameters.Finish(() => MainThreadDispatcher.Post(finishCallback));
+            Parameters.Finish(scheduledWork => MainThreadDispatcher.Post(() => finishCallback(scheduledWork)));
 
             if (Parameters.RetryCount > 0) {
                 int retryCurrentValue = 0;

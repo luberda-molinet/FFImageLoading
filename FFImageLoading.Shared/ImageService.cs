@@ -1,4 +1,3 @@
-using Android.Widget;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Contexts;
 using System;
@@ -8,6 +7,7 @@ using System.Net.Http;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
 using FFImageLoading.Extensions;
+using System.Threading;
 
 namespace FFImageLoading
 {
@@ -21,7 +21,16 @@ namespace FFImageLoading
         /// <value>The configuration used by FFImageLoading.</value>
         public static Configuration Config { get; private set; }
 
-        public static void Initialize(HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+        /// <summary>
+        /// Initialize ImageService default values. This can only be done once: during app start.
+        /// </summary>
+        /// <param name="maxCacheSize">Max cache size. If zero then 20% of the memory will be used.</param>
+        /// <param name="httpClient">.NET HttpClient to use. If null then a ModernHttpClient is instanciated.</param>
+        /// <param name="scheduler">Work scheduler used to organize/schedule loading tasks.</param>
+        /// <param name="logger">Basic logger. If null a very simple implementation that prints to console is used.</param>
+        /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
+        /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
+        public static void Initialize(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
             if (_initialized)
@@ -30,13 +39,13 @@ namespace FFImageLoading
             InitializeIfNeeded();
         }
 
-        private static void InitializeIfNeeded(HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+        private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
             if (_initialized)
                 return;
 
-            var userDefinedConfig = new Configuration(httpClient, scheduler, logger, diskCache, downloadCache);
+            var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
             Config = GetDefaultConfiguration(userDefinedConfig);
 
             _initialized = true;
@@ -44,14 +53,15 @@ namespace FFImageLoading
 
         private static Configuration GetDefaultConfiguration(Configuration userDefinedConfig)
         {
-            var context = Android.App.Application.Context.ApplicationContext;
-            var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
+            var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new ModernHttpClient.NativeMessageHandler());
+
             var logger = userDefinedConfig.Logger ?? new MiniLogger();
             var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger);
-            var diskCache = userDefinedConfig.DiskCache ?? DiskCache.CreateCache(context, typeof(ImageService).Name);
+            var diskCache = userDefinedConfig.DiskCache ?? DiskCache.CreateCache(typeof(ImageService).Name);
             var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(httpClient, diskCache);
 
             return new Configuration(
+                userDefinedConfig.MaxCacheSize,
                 httpClient,
                 scheduler,
                 logger,
@@ -124,10 +134,10 @@ namespace FFImageLoading
         /// <summary>
         /// Cancel any loading work for the given ImageView
         /// </summary>
-        /// <param name="imageView">Image view.</param>
-        public static void CancelWorkFor(ImageView imageView)
+        /// <param name="task">Image loading task to cancel.</param>
+        public static void CancelWorkFor(IImageLoaderTask task)
         {
-            Scheduler.Cancel(imageView.GetImageLoaderTask());
+            Scheduler.Cancel(task);
         }
 
         /// <summary>

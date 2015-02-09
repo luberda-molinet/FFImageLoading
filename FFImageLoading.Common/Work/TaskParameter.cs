@@ -40,7 +40,7 @@ namespace FFImageLoading.Work
             OnError = ex => {
             };
 
-            OnFinish = () => {
+            OnFinish = scheduledWork => {
             };
         }
 
@@ -60,7 +60,7 @@ namespace FFImageLoading.Work
 
         public Action<Exception> OnError { get; private set; }
 
-        public Action OnFinish { get; private set; }
+        public Action<IScheduledWork> OnFinish { get; private set; }
 
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
@@ -120,7 +120,7 @@ namespace FFImageLoading.Work
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="action">Action to invoke when process is done
-        public TaskParameter Finish(Action action)
+        public TaskParameter Finish(Action<IScheduledWork> action)
         {
             if (action == null)
                 throw new Exception("Given lambda should not be null.");

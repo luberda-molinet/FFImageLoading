@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using Env = Android.OS.Environment;
 using System.Collections.Concurrent;
 using FFImageLoading.IO;
 using FFImageLoading.Cache;
@@ -54,6 +53,9 @@ namespace FFImageLoading.Cache
 
         public DiskCache (string basePath, string version)
         {
+            // Can't use minilogger here, we would have too many dependencies
+            System.Diagnostics.Debug.WriteLine("DiskCache path: " + basePath);
+
             this.basePath = basePath;
             if (!Directory.Exists (basePath))
                 Directory.CreateDirectory (basePath);
@@ -70,13 +72,12 @@ namespace FFImageLoading.Cache
             ThreadPool.QueueUserWorkItem (CleanCallback);
         }
 
-        public static DiskCache CreateCache (Android.Content.Context ctx, string cacheName, string version = "1.0")
+        public static DiskCache CreateCache (string cacheName, string version = "1.0")
         {
-            /*string cachePath = Env.ExternalStorageState == Env.MediaMounted
-                || !Env.IsExternalStorageRemovable ? ctx.ExternalCacheDir.AbsolutePath : ctx.CacheDir.AbsolutePath;*/
-            string cachePath = ctx.CacheDir.AbsolutePath;
+            string tmpPath = System.IO.Path.GetTempPath();
+            string cachePath = Path.Combine(tmpPath, cacheName);
 
-            return new DiskCache (Path.Combine (cachePath, cacheName), version);
+            return new DiskCache (cachePath, version);
         }
 
         void InitializeWithJournal ()
@@ -127,7 +128,10 @@ namespace FFImageLoading.Cache
             KeyValuePair<string, CacheEntry>[] kvps;
             var now = DateTime.UtcNow;
             kvps = entries.Where (kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).Take (10).ToArray ();
-            Android.Util.Log.Info ("DiskCacher", "Removing {0} elements from the cache", kvps.Length);
+
+            // Can't use minilogger here, we would have too many dependencies
+            System.Diagnostics.Debug.WriteLine(string.Format("DiskCacher: Removing {0} elements from the cache", kvps.Length));
+
             foreach (var kvp in kvps)
             {
                 CacheEntry oldCacheEntry;

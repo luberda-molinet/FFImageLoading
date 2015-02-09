@@ -23,7 +23,8 @@ namespace FFImageLoading.Work
         private const int FADE_TRANSITION_MILISECONDS = 50;
         private readonly WeakReference<ImageView> _imageWeakReference;
 
-        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView) : base(mainThreadDispatcher, miniLogger, parameters)
+        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
+            : base(mainThreadDispatcher, miniLogger, parameters)
         {
             CancellationToken = new CancellationTokenSource();
             Context = Android.App.Application.Context.ApplicationContext;

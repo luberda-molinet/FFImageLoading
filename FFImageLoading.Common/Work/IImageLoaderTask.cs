@@ -3,17 +3,11 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-    public interface IImageLoaderTask
+    public interface IImageLoaderTask: IScheduledWork
     {
         string Key { get; }
 
         TaskParameter Parameters { get; }
-
-        void Cancel();
-
-        bool IsCancelled { get; }
-
-        bool Completed { get; }
 
         Task RunAsync();
 

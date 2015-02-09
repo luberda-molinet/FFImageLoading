@@ -41,6 +41,7 @@
     <Compile Include="Cache\DownloadedData.cs" />
     <Compile Include="Cache\IDiskCache.cs" />
     <Compile Include="Work\WorkScheduler.cs" />
+    <Compile Include="Work\IScheduledWork.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

@@ -33,19 +33,63 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="ModernHttpClient">
+      <HintPath>..\..\..\..\..\packages\modernhttpclient.2.1.5\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Folder Include="Cache\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Work\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Config\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Cache\ImageCache.cs" />
+    <Compile Include="Cache\IImageCache.cs" />
+    <Compile Include="Extensions\UIImageExtensions.cs" />
+    <Compile Include="Work\ImageLoaderTask.cs" />
+    <Compile Include="Helpers\MainThread.cs" />
+    <Compile Include="TaskParameterExtensions.cs" />
+    <Compile Include="..\FFImageLoading.Common\Cache\DownloadedData.cs">
+      <Link>Cache\DownloadedData.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Cache\IDiskCache.cs">
+      <Link>Cache\IDiskCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Cache\IDownloadCache.cs">
+      <Link>Cache\IDownloadCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Config\Configuration.cs">
+      <Link>Config\Configuration.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Helpers\IMainThreadDispatcher.cs">
+      <Link>Helpers\IMainThreadDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Helpers\IMiniLogger.cs">
+      <Link>Helpers\IMiniLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\IImageLoaderTask.cs">
+      <Link>Work\IImageLoaderTask.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\ImageLoaderTaskBase.cs">
+      <Link>Work\ImageLoaderTaskBase.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\TaskParameter.cs">
+      <Link>Work\TaskParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\WorkScheduler.cs">
+      <Link>Work\WorkScheduler.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\IScheduledWork.cs">
+      <Link>Work\IScheduledWork.cs</Link>
+    </Compile>
   </ItemGroup>
+  <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
