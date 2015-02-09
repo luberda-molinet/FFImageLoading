@@ -1,4 +1,4 @@
-FFImageLoading - Fast & Furious Image Loading
+Fast & Furious Image Loading
 ==========================================
 
 Xamarin library to load images quickly & easily on iOS and Android.
@@ -50,7 +50,7 @@ ImageService.LoadUrl(urlToImage)
 There is a third callback: when image loading process finished. Whatever the result this method will be called:
 ```C#
 ImageService.LoadUrl(urlToImage)
-.Finish(() =>
+.Finish(workScheduled =>
 {
   // your code here...
 })
