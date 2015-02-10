@@ -20,7 +20,7 @@ The library automatically deduplicates similar requests: if 100 similar requests
 
 Both a memory cache and a disk cache are present.
 
-Note: Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead you should simply load your images into ImageViewAsync instances. It is very easy to update your code since ImageViewAsync inherits from ImageView.
+*Note on Android: Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.*
 
 ###API
 when you want to load the image from a file:
