@@ -1,35 +1,28 @@
-Xam.Android.ImageLoading
+Fast & Furious Image Loading
 ==========================================
 
 Xamarin library to load images quickly & easily on iOS and Android.
 
 NuGet package is here: https://www.nuget.org/packages/Xam.Android.ImageLoading/
 
-###Minimum Android version
-The library works starting from Android 4.1.
+###Minimum OS version
+The library works starting from Android 4 and iOS 7.
 
 ###History
 We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused.
 
-First we tried to use Picasso with C# bindings, we got good performances but after 15-20 minutes of usage our app was crashing due to memory issues: we saw some people having similar issues with Picasso and chosed to go C# all the way.
-We believed it would be easier for us to debug and maintain. For us, it is the case.
-
-The code has been released after a discussion on Xamarin forums. It changed quite a lot since it was released.
-
-###Warning
-Some code could be refactored, improved, probably better written too. If you feel that way you can do a pull request.
-Please remember that this has been developed for our needs. We never though of releasing it when writing it.
+We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
 
 ###Description
 The library offers a Fluent API which is inspired by Picasso naming.
-
-Contrary to Picasso you cannot use ImageLoading with standard ImageViews. Instead you should load your images into  ImageViewAsync instances. It should be very easy to update your code since ImageViewAsync inherits from ImageView.
 
 The library automatically deduplicates similar requests: if 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait. When the 1st real read is done then the 99 waiters will get the image.
 
 Both a memory cache and a disk cache are present.
 
-###Examples
+*Note on Android: Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.*
+
+###API
 when you want to load the image from a file:
 ```C#
 ImageService.LoadFile(fullPathToImage).Into(_imageView);
@@ -57,7 +50,7 @@ ImageService.LoadUrl(urlToImage)
 There is a third callback: when image loading process finished. Whatever the result this method will be called:
 ```C#
 ImageService.LoadUrl(urlToImage)
-.Finish(() =>
+.Finish(workScheduled =>
 {
   // your code here...
 })
@@ -124,4 +117,4 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
 ```
 
 ###Custom loading logic
-Customizing the loading logic is very easy: you should inherit from ImageLoaderTask and there put your own logic.
+Customizing the loading logic is very easy: inherit from ImageLoaderTask and put your own logic.
