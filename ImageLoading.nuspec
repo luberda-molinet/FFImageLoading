@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xam.Android.ImageLoading</id>
-       <version>1.0.0.7-beta</version>
+       <version>1.0.1</version>
        <title>Xamarin library to load images quickly and easily on iOS and Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -11,11 +11,11 @@
        <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        <description>
-       	 The library works starting from Android 4.1.
+       	 The library works starting from Android 4 and iOS 7?
          We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused.
        </description>
        <summary>Xamarin library to load images quickly and easily on iOS and Android.</summary>
-       <tags>xamarin, android, bitmap, image, cache, quick, easy, lru, load, loading, save</tags>
+       <tags>xamarin, android, ios, bitmap, image, cache, quick, easy, lru, load, loading, save</tags>
        <dependencies>
        	<dependency id="modernhttpclient" version="2.1.5" />
        </dependencies>
