@@ -36,7 +36,7 @@ namespace FFImageLoading.Cache
 
         public UIImage Get(string key)
         {
-            return (UIImage)_cache.ValueForKey(new NSString(key));
+            return (UIImage)_cache.ObjectForKey(new NSString(key));
         }
 
         public void Add(string key, UIImage value)
