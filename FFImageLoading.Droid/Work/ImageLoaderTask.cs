@@ -182,7 +182,7 @@ namespace FFImageLoading.Work
                 options.InJustDecodeBounds = false;
 
                 try {
-                    if (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0) {
+                    if (Parameters.DownSampleSize!=null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0)) {
                         // Calculate inSampleSize
                         options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
                     }
