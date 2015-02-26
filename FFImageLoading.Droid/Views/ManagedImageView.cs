@@ -3,11 +3,17 @@ using Android.Graphics.Drawables;
 using Android.Util;
 using Android.Widget;
 using FFImageLoading.Drawables;
+using System;
+using Android.Runtime;
 
 namespace FFImageLoading.Views
 {
 	public class ManagedImageView : ImageView
 	{
+        public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
+
 		public ManagedImageView(Context context) : base(context, null)
 		{
 		}

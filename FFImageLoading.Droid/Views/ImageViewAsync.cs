@@ -3,12 +3,18 @@ using Android.Content;
 using Android.Util;
 using System.Drawing;
 using FFImageLoading.Extensions;
+using Android.Runtime;
 
 namespace FFImageLoading.Views
 {
     public class ImageViewAsync : ManagedImageView
     {
         protected SizeF? _predefinedSize;
+
+        public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+            SetWillNotDraw(false);
+        }
 
         public ImageViewAsync(Context context, SizeF? predefinedSize = null) : base(context)
         {
