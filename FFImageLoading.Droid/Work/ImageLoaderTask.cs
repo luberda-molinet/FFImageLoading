@@ -121,8 +121,11 @@ namespace FFImageLoading.Work
 
             await MainThreadDispatcher.PostAsync(() => {
                 imageView.SetImageDrawable(value);
-                imageView.LayoutParameters.Height = value.IntrinsicHeight;
-                imageView.LayoutParameters.Width = value.IntrinsicWidth;
+				if (imageView.AdjustViewBounds)
+				{
+					imageView.LayoutParameters.Height = value.IntrinsicHeight;
+					imageView.LayoutParameters.Width = value.IntrinsicWidth;
+				}
             }).ConfigureAwait(false);
             return true; // found and loaded from cache
         }
@@ -301,8 +304,11 @@ namespace FFImageLoading.Work
 
         private void SetImageDrawable(ImageView imageView, Drawable drawable)
         {
-            imageView.LayoutParameters.Height = drawable.IntrinsicHeight;
-            imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
+			if (imageView.AdjustViewBounds)
+			{
+				imageView.LayoutParameters.Height = drawable.IntrinsicHeight;
+				imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
+			}
 
             if (UseFadeInBitmap) {
                 var drawables = new[] {

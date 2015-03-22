@@ -7,3 +7,4 @@ FFImageLoading.Droid/bin
 FFImageLoading.Droid/obj
 FFImageLoading.Touch/bin
 FFImageLoading.Touch/obj
+*.nupkg
