@@ -101,6 +101,17 @@ namespace FFImageLoading
             return TaskParameter.FromUrl(url, cacheDuration);
         }
 
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a file from application bundle.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="filepath">Path to the file.</param>
+		public static TaskParameter LoadFileFromApplicationBundle(string filepath)
+		{
+			InitializeIfNeeded();
+			return TaskParameter.FromApplicationBundle(filepath);
+		}
+
         /// <summary>
         /// Gets a value indicating whether ImageService will exit tasks earlier
         /// </summary>
