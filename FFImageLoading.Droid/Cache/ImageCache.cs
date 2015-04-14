@@ -185,6 +185,9 @@ namespace FFImageLoading.Cache
 				return item.Width == options.OutWidth && item.Height == options.OutHeight && options.InSampleSize == 1;
 			}
 
+			if (options.InSampleSize == 0)
+				options.InSampleSize = 1; // to avoid division by zero
+			
 			// From Android 4.4 (KitKat) onward we can re-use if the byte size of the new bitmap
 			// is smaller than the reusable bitmap candidate allocation byte count.
 			int width = options.OutWidth/options.InSampleSize;

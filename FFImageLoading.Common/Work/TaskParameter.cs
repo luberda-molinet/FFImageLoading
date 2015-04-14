@@ -66,6 +66,14 @@ namespace FFImageLoading.Work
 
 		public Tuple<int, int> DownSampleSize { get; private set; }
 
+		public ImageSource LoadingPlaceholderSource { get; private set; }
+
+		public string LoadingPlaceholderPath { get; private set; }
+
+		public ImageSource ErrorPlaceholderSource { get; private set; }
+
+		public string ErrorPlaceholderPath { get; private set; }
+
 		public int RetryCount { get; private set; }
 
 		public int RetryDelayInMs { get; private set; }
@@ -75,6 +83,30 @@ namespace FFImageLoading.Work
 		public Action<Exception> OnError { get; private set; }
 
 		public Action<IScheduledWork> OnFinish { get; private set; }
+
+		/// <summary>
+		/// Defines the placeholder used while loading.
+		/// </summary>
+		/// <param name="path">Path to the file.</param>
+		/// <param name="source">Source for the path: local, web, assets</param>
+		public TaskParameter LoadingPlaceholder(string path, ImageSource source = ImageSource.Filepath)
+		{
+			LoadingPlaceholderPath = path;
+			LoadingPlaceholderSource = source;
+			return this;
+		}
+
+		/// <summary>
+		/// Defines the placeholder used when an error occurs.
+		/// </summary>
+		/// <param name="filepath">Path to the file.</param>
+		/// <param name="source">Source for the path: local, web, assets</param>
+		public TaskParameter ErrorPlaceholder(string filepath, ImageSource source = ImageSource.Filepath)
+		{
+			ErrorPlaceholderPath = filepath;
+			ErrorPlaceholderSource = source;
+			return this;
+		}
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.

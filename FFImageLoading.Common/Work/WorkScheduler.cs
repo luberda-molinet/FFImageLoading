@@ -158,7 +158,7 @@ namespace FFImageLoading.Work
                 return;
 
             _logger.Debug(string.Format("Generating/retrieving image: {0}", task.Key));
-            task.Prepare();
+			await task.PrepareAsync().ConfigureAwait(false);
 
             var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
             PendingTask alreadyRunningTaskForSameKey = null;

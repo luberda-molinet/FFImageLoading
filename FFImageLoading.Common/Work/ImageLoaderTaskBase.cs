@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-    public abstract class ImageLoaderTaskBase: IImageLoaderTask
+	public abstract class ImageLoaderTaskBase: IImageLoaderTask
     {
         protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters)
         {
@@ -15,6 +15,10 @@ namespace FFImageLoading.Work
             ConfigureParameters();
         }
 
+		/// <summary>
+		/// Gets the parameters used to retrieve the image.
+		/// </summary>
+		/// <value>The parameters to retrieve the image.</value>
         public TaskParameter Parameters { get; protected set; }
        
         protected IMainThreadDispatcher MainThreadDispatcher { get; private set; }
@@ -23,8 +27,16 @@ namespace FFImageLoading.Work
 
         protected CancellationTokenSource CancellationToken { get; set; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Work.ImageLoaderTaskBase"/> is completed.
+		/// </summary>
+		/// <value><c>true</c> if completed; otherwise, <c>false</c>.</value>
         public bool Completed { get; set; }
 
+		/// <summary>
+		/// Gets the cache key for this image loading task.
+		/// </summary>
+		/// <value>The cache key.</value>
         public virtual string Key {
             get {
                 return Parameters.Path;
@@ -43,12 +55,18 @@ namespace FFImageLoading.Work
             }
         }
 
-        public virtual void Prepare() {
-        }
+		/// <summary>
+		/// Prepares the instance before it runs.
+		/// </summary>
+		public abstract Task PrepareAsync();
 
         public abstract Task RunAsync();
 
-        public abstract Task<bool> TryLoadingFromCacheAsync();
+		/// <summary>
+		/// Tries to load requested image from the cache asynchronously.
+		/// </summary>
+		/// <returns>A boolean indicating if image was loaded from cache.</returns>
+		public abstract Task<bool> TryLoadingFromCacheAsync();
 
         private void ConfigureParameters()
         {

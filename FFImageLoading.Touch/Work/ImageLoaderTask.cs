@@ -35,7 +35,21 @@ namespace FFImageLoading.Work
 		protected IDownloadCache DownloadCache { get; private set; }
 
 		/// <summary>
-		/// Once the image is processed, associates it to the imageView
+		/// Prepares the instance before it runs.
+		/// </summary>
+		public override async Task PrepareAsync()
+		{
+			var imageView = _getNativeControl();
+			if (imageView == null)
+				return;
+
+			var isPlaceholderLoaded = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
+			if (isPlaceholderLoaded)
+				return;
+		}
+
+		/// <summary>
+		/// Runs the image loading task: gets image from file, url, asset or cache. Then assign it to the imageView.
 		/// </summary>
 		public override async Task RunAsync()
 		{
@@ -44,15 +58,18 @@ namespace FFImageLoading.Work
 				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
 					return;
 
+				await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
+
 				UIImage image = null;
 				try
 				{
-					image = await RetrieveImageAsync().ConfigureAwait(false);
+					image = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
 					Logger.Error("An error occured while retrieving image.", ex);
 					Parameters.OnError(ex);
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 					return;
 				}
 
@@ -81,6 +98,7 @@ namespace FFImageLoading.Work
 			{
 				Logger.Error("An error occured", ex);
 				Parameters.OnError(ex);
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 			}
 			finally
 			{
@@ -89,6 +107,10 @@ namespace FFImageLoading.Work
 			}
 		}
 
+		/// <summary>
+		/// Tries to load requested image from the cache asynchronously.
+		/// </summary>
+		/// <returns>A boolean indicating if image was loaded from cache.</returns>
 		public override async Task<bool> TryLoadingFromCacheAsync()
 		{
 			var nativeControl = _getNativeControl();
@@ -106,7 +128,7 @@ namespace FFImageLoading.Work
 			return true; // found and loaded from cache
 		}
 
-		protected virtual async Task<UIImage> GetImageAsync(string sourcePath)
+		protected virtual async Task<UIImage> GetImageAsync(string sourcePath, ImageSource source)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -116,7 +138,7 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				switch (Parameters.Source)
+				switch (source)
 				{
 					case ImageSource.ApplicationBundle:
 					case ImageSource.Filepath:
@@ -146,7 +168,52 @@ namespace FFImageLoading.Work
 			}).ConfigureAwait(false);
 		}
 
-		private async Task<UIImage> RetrieveImageAsync()
+		/// <summary>
+		/// Loads given placeHolder into the imageView.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="placeholderPath">Full path to the placeholder.</param>
+		/// <param name="source">Source for the path: local, web, assets</param>
+		private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
+		{
+			if (string.IsNullOrWhiteSpace(placeholderPath))
+				return false;
+
+			UIImage image = null;
+
+			try
+			{
+				image = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("An error occured while retrieving placeholder's drawable.", ex);
+				return false;
+			}
+
+			if (image == null)
+				return false;
+			
+			var imageView = _getNativeControl();
+			if (imageView == null)
+				return false;
+
+			if (CancellationToken.IsCancellationRequested)
+				return false;
+
+			// Post on main thread but don't wait for it
+			MainThreadDispatcher.Post(() =>
+			{
+				if (CancellationToken.IsCancellationRequested)
+					return;
+
+				_doWithImage(image);
+			});
+
+			return true;
+		}
+
+		private async Task<UIImage> RetrieveImageAsync(string sourcePath, ImageSource source)
 		{
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
@@ -155,12 +222,12 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || _getNativeControl() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			var image = await GetImageAsync(Parameters.Path).ConfigureAwait(false);
+			var image = await GetImageAsync(sourcePath, source).ConfigureAwait(false);
 			if (image == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(Parameters.Path, image);
+			ImageCache.Instance.Add(sourcePath, image);
 
 			return image;
 		}

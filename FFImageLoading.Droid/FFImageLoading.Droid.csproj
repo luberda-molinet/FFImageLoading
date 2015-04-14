@@ -97,6 +97,7 @@
     <Compile Include="..\FFImageLoading.Common\Work\IScheduledWork.cs">
       <Link>Work\IScheduledWork.cs</Link>
     </Compile>
+    <Compile Include="Work\IAsyncDrawable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache\" />

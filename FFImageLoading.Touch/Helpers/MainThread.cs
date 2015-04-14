@@ -8,7 +8,7 @@ namespace FFImageLoading.Helpers
     {
         public void Post(Action action)
         {
-            UIApplication.SharedApplication.InvokeOnMainThread(action);
+            UIApplication.SharedApplication.BeginInvokeOnMainThread(action);
         }
 
         public Task PostAsync(Action action)

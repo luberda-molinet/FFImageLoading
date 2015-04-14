@@ -45,7 +45,10 @@ namespace FFImageLoading.Work
 		{
 		}
 
-		public override void Prepare()
+		/// <summary>
+		/// Prepares the instance before it runs.
+		/// </summary>
+		public override async Task PrepareAsync()
 		{
 			ImageView imageView;
 			_imageWeakReference.TryGetTarget(out imageView);
@@ -54,10 +57,17 @@ namespace FFImageLoading.Work
 
 			// Assign the Drawable to the image
 			var resources = Android.App.Application.Context.ApplicationContext.Resources;
-			var asyncDrawable = new AsyncDrawable(resources, null, this);
-			imageView.SetImageDrawable(asyncDrawable);
+			var drawable = new AsyncDrawable(resources, null, this);
+			imageView.SetImageDrawable(drawable);
+
+			// This should probably be reworked at some point so we don't create a dummy AsyncDrawable
+			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether a fade in transition is used to show the image.
+		/// </summary>
+		/// <value><c>true</c> if a fade in transition is used; otherwise, <c>false</c>.</value>
 		public bool UseFadeInBitmap { get; set; }
 
 		protected IDownloadCache DownloadCache { get; private set; }
@@ -65,7 +75,7 @@ namespace FFImageLoading.Work
 		protected Context Context { get; private set; }
 
 		/// <summary>
-		/// Once the image is processed, associates it to the imageView
+		/// Runs the image loading task: gets image from file, url, asset or cache. Then assign it to the imageView.
 		/// </summary>
 		public override async Task RunAsync()
 		{
@@ -73,11 +83,11 @@ namespace FFImageLoading.Work
 			{
 				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
 					return;
-
+				
 				BitmapDrawable drawable = null;
 				try
 				{
-					drawable = await RetrieveDrawableAsync().ConfigureAwait(false);
+					drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
@@ -88,24 +98,32 @@ namespace FFImageLoading.Work
 
 				if (drawable == null)
 					return;
-
-				var imageView = GetAttachedImageView();
-				if (imageView == null)
-					return;
-
-				if (CancellationToken.IsCancellationRequested)
-					return;
-
-				// Post on main thread
-				await MainThreadDispatcher.PostAsync(() =>
+				
+				try
 				{
+					var imageView = GetAttachedImageView();
+					if (imageView == null)
+						return;
+
 					if (CancellationToken.IsCancellationRequested)
 						return;
 
-					SetImageDrawable(imageView, drawable);
-					Completed = true;
-					Parameters.OnSuccess();
-				}).ConfigureAwait(false);
+					// Post on main thread
+					await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						SetImageDrawable(imageView, drawable, UseFadeInBitmap);
+						Completed = true;
+						Parameters.OnSuccess();
+					}).ConfigureAwait(false);
+				}
+				catch
+				{
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+					throw;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -119,6 +137,10 @@ namespace FFImageLoading.Work
 			}
 		}
 
+		/// <summary>
+		/// Tries to load requested image from the cache asynchronously.
+		/// </summary>
+		/// <returns>A boolean indicating if image was loaded from cache.</returns>
 		public override async Task<bool> TryLoadingFromCacheAsync()
 		{
 			var imageView = GetAttachedImageView();
@@ -141,7 +163,7 @@ namespace FFImageLoading.Work
 			return true; // found and loaded from cache
 		}
 
-		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string sourcePath)
+		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string sourcePath, ImageSource source, bool isPlaceHolder)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -151,7 +173,7 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				switch (Parameters.Source)
+				switch (source)
 				{
 					case ImageSource.ApplicationBundle:
 						var stream = Context.Assets.Open(path);
@@ -219,7 +241,7 @@ namespace FFImageLoading.Work
 						// Calculate inSampleSize
 						options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
 					}
-
+					
 					// If we're running on Honeycomb or newer, try to use inBitmap
 					if (Utils.HasHoneycomb())
 						AddInBitmapOptions(options);
@@ -248,23 +270,72 @@ namespace FFImageLoading.Work
 				if (bitmap == null || CancellationToken.IsCancellationRequested)
 					return null;
 
+				// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
 				if (Utils.HasHoneycomb())
 				{
-					// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-					return new BitmapDrawable(Context.Resources, bitmap);
+					if (isPlaceHolder)
+						return new AsyncDrawable(Context.Resources, bitmap, this);
+					else
+						return new BitmapDrawable(Context.Resources, bitmap);
 				}
-				else
+				else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
 				{
-					// Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
-					// which will recycle automagically
-					return new ManagedBitmapDrawable(Context.Resources, bitmap);
+					if (isPlaceHolder)
+						return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
+					else
+						return new ManagedBitmapDrawable(Context.Resources, bitmap);
 				}
 			}).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Loads given placeHolder into the imageView.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="placeholderPath">Full path to the placeholder.</param>
+		/// <param name="source">Source for the path: local, web, assets</param>
+		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
+		{
+			if (string.IsNullOrWhiteSpace(placeholderPath))
+				return false;
+
+			BitmapDrawable drawable = null;
+			try
+			{
+				drawable = await RetrieveDrawableAsync(placeholderPath, source, true).ConfigureAwait(false);
+
+				if (drawable == null)
+					return false;
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("An error occured while retrieving drawable.", ex);
+				Parameters.OnError(ex);
+				return false;
+			}
+			
+			var imageView = GetAttachedImageView();
+			if (imageView == null)
+				return false;
+
+			if (CancellationToken.IsCancellationRequested)
+				return false;
+
+			// Post on main thread but don't wait for it
+			MainThreadDispatcher.Post(() =>
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return;
+
+					SetImageDrawable(imageView, drawable, false);
+				});
+
+			return true;
+		}
+
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates
 		// having a width and height equal to or larger than the requested width and height.
-		private async Task<BitmapDrawable> RetrieveDrawableAsync()
+		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isPlaceHolder)
 		{
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
@@ -273,12 +344,12 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			BitmapDrawable drawable = await GetDrawableAsync(Parameters.Path).ConfigureAwait(false);
+			BitmapDrawable drawable = await GetDrawableAsync(sourcePath, source, isPlaceHolder).ConfigureAwait(false);
 			if (drawable == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(Parameters.Path, drawable);
+			ImageCache.Instance.Add(sourcePath, drawable);
 
 			return drawable;
 		}
@@ -341,7 +412,7 @@ namespace FFImageLoading.Work
 				: null;
 		}
 
-		private void SetImageDrawable(ImageView imageView, Drawable drawable)
+		private void SetImageDrawable(ImageView imageView, Drawable drawable, bool fadeIn)
 		{
 			if (imageView.AdjustViewBounds)
 			{
@@ -349,7 +420,7 @@ namespace FFImageLoading.Work
 				imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
 			}
 
-			if (UseFadeInBitmap)
+			if (fadeIn)
 			{
 				var drawables = new[] {
                     new ColorDrawable(Color.Transparent),
@@ -368,11 +439,29 @@ namespace FFImageLoading.Work
 		}
 	}
 
-	public class AsyncDrawable : BitmapDrawable
+	public class AsyncDrawable : BitmapDrawable, IAsyncDrawable
 	{
 		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
 
 		public AsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
+			: base(res, bitmap)
+		{
+			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
+		}
+
+		public ImageLoaderTask GetImageLoaderTask()
+		{
+			ImageLoaderTask task;
+			_imageLoaderTaskReference.TryGetTarget(out task);
+			return task;
+		}
+	}
+
+	public class ManagedAsyncDrawable : ManagedBitmapDrawable, IAsyncDrawable
+	{
+		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
+
+		public ManagedAsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
 			: base(res, bitmap)
 		{
 			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
