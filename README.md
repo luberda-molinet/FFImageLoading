@@ -3,7 +3,7 @@ Fast & Furious Image Loading
 
 Xamarin library to load images quickly & easily on iOS and Android.
 
-NuGet package is here: https://www.nuget.org/packages/Xam.Android.ImageLoading/
+NuGet package is here: https://www.nuget.org/packages/Xamarin.FFImageLoading/
 
 ###Minimum OS version
 The library works starting from Android 4 and iOS 7.
@@ -33,6 +33,11 @@ Or from an URL. In this case the image is cached (by default 30 days but there i
 ImageService.LoadUrl(urlToImage).Into(_imageView);
 ```
 
+Or from your assets/bundled data (typically on Android)
+```C#
+ImageService.LoadFileFromApplicationBundle(relativePathToImage).Into(_imageView);
+```
+
 You can also have callbacks when the image is succesfully loaded or when there was errors:
 ```C#
 ImageService.LoadUrl(urlToImage)
@@ -54,6 +59,14 @@ ImageService.LoadUrl(urlToImage)
 {
   // your code here...
 })
+.Into(_imageView);
+```
+
+It is possible to define placeholders while image is loading or when an error occured
+```C#
+ImageService.LoadUrl(urlToImage)
+.LoadingPlaceholder("loading.png") // by default placeholders load from file
+.ErrorPlaceholder("http://mydomain.com/error.png", ImageSource.Url) // but they can also load from a URL
 .Into(_imageView);
 ```
 
