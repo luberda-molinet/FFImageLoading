@@ -60,6 +60,15 @@ namespace FFImageLoading.Work
 		/// </summary>
 		public abstract Task PrepareAsync();
 
+		/// <summary>
+		/// Cancel current task only if needed
+		/// </summary>
+		public void CancelIfNeeded()
+		{
+			if (!IsCancelled && !this.Completed)
+				Cancel();
+		}
+
         public abstract Task RunAsync();
 
 		/// <summary>

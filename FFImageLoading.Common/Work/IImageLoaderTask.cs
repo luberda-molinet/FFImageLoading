@@ -32,6 +32,11 @@ namespace FFImageLoading.Work
 		/// Prepares the instance before it runs.
 		/// </summary>
         Task PrepareAsync();
+
+		/// <summary>
+		/// Cancel current task only if needed
+		/// </summary>
+		void CancelIfNeeded();
     }
 }
 

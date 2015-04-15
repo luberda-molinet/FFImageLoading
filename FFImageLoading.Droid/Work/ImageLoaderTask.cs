@@ -54,6 +54,14 @@ namespace FFImageLoading.Work
 			_imageWeakReference.TryGetTarget(out imageView);
 			if (imageView == null)
 				return;
+			
+			// Cancel current task attached to the same image view, if needed only
+			var currentAssignedTask = imageView.GetImageLoaderTask();
+			if (currentAssignedTask != null)
+			{
+				Logger.Debug("Cancel current task attached to the same image view");
+				currentAssignedTask.CancelIfNeeded();
+			}
 
 			// Assign the Drawable to the image
 			var resources = Android.App.Application.Context.ApplicationContext.Resources;
