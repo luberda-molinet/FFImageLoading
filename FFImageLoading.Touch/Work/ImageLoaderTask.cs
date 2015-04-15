@@ -72,23 +72,37 @@ namespace FFImageLoading.Work
 
 				if (CancellationToken.IsCancellationRequested || _getNativeControl() == null)
 					return;
-				
-				// Post on main thread
-				await MainThreadDispatcher.PostAsync(() =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return;
 
-					_doWithImage(image);
-					Completed = true;
-					Parameters.OnSuccess();
-				}).ConfigureAwait(false);
+				Exception trappedException = null;
+				try
+				{
+					// Post on main thread
+					await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						_doWithImage(image);
+						Completed = true;
+						Parameters.OnSuccess();
+					}).ConfigureAwait(false);
+				}
+				catch (Exception ex2)
+				{
+					trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+				}
+
+				// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+				if (trappedException != null)
+				{
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+					throw trappedException;
+				}
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("An error occured", ex);
 				Parameters.OnError(ex);
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 			}
 			finally
 			{

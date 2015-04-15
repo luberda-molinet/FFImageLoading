@@ -103,13 +103,14 @@ namespace FFImageLoading.Work
 					Parameters.OnError(ex);
 					drawable = null;
 				}
-
+					
 				if (drawable == null)
 				{
 					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 					return;
 				}
-				
+
+				Exception trappedException = null;
 				try
 				{
 					var imageView = GetAttachedImageView();
@@ -130,11 +131,18 @@ namespace FFImageLoading.Work
 						Parameters.OnSuccess();
 					}).ConfigureAwait(false);
 				}
-				catch
+				catch (Exception ex2)
+				{
+					trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+				}
+
+				// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+				if (trappedException != null)
 				{
 					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-					throw;
+					throw trappedException;
 				}
+
 			}
 			catch (Exception ex)
 			{
