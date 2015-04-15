@@ -101,11 +101,14 @@ namespace FFImageLoading.Work
 				{
 					Logger.Error("An error occured while retrieving drawable.", ex);
 					Parameters.OnError(ex);
-					return;
+					drawable = null;
 				}
 
 				if (drawable == null)
+				{
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 					return;
+				}
 				
 				try
 				{

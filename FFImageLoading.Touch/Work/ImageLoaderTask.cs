@@ -39,13 +39,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		public override async Task PrepareAsync()
 		{
-			var imageView = _getNativeControl();
-			if (imageView == null)
-				return;
-
-			var isPlaceholderLoaded = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
-			if (isPlaceholderLoaded)
-				return;
+			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -58,8 +52,6 @@ namespace FFImageLoading.Work
 				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
 					return;
 
-				await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
-
 				UIImage image = null;
 				try
 				{
@@ -69,20 +61,18 @@ namespace FFImageLoading.Work
 				{
 					Logger.Error("An error occured while retrieving image.", ex);
 					Parameters.OnError(ex);
+					image = null;
+				}
+
+				if (image == null)
+				{
 					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
 					return;
 				}
 
-				if (image == null)
+				if (CancellationToken.IsCancellationRequested || _getNativeControl() == null)
 					return;
-
-				var imageView = _getNativeControl();
-				if (imageView == null)
-					return;
-
-				if (CancellationToken.IsCancellationRequested)
-					return;
-
+				
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 				{
@@ -206,7 +196,7 @@ namespace FFImageLoading.Work
 			{
 				if (CancellationToken.IsCancellationRequested)
 					return;
-
+				
 				_doWithImage(image);
 			});
 
