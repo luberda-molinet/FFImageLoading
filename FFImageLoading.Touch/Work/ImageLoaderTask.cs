@@ -163,13 +163,19 @@ namespace FFImageLoading.Work
 			}
 
 			return await Task.Run(() =>
-			{
-				if (CancellationToken.IsCancellationRequested)
-					return null;
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return null;
+				
+					// Special case to handle WebP decoding on iOS
+					if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+					{
+						return new WebP.Touch.WebPCodec().Decode(bytes);
+					}
 
-				nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-				return new UIImage(NSData.FromArray(bytes), scale);
-			}).ConfigureAwait(false);
+					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
+					return new UIImage(NSData.FromArray(bytes), scale);
+				}).ConfigureAwait(false);
 		}
 
 		/// <summary>
