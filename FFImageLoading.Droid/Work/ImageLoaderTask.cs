@@ -235,16 +235,19 @@ namespace FFImageLoading.Work
 			{
 				if (CancellationToken.IsCancellationRequested)
 					return null;
-
-				try
+				
+				if (source != ImageSource.ApplicationBundle)
 				{
-					BitmapFactory.DecodeFile(path, options);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-					Parameters.OnError(ex);
-					return null;
+					try
+					{
+						BitmapFactory.DecodeFile(path, options); // This method doesn't work with Android assets
+					}
+					catch (Exception ex)
+					{
+						Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
+						Parameters.OnError(ex);
+						return null;
+					}
 				}
 
 				if (CancellationToken.IsCancellationRequested)
