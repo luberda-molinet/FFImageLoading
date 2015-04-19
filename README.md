@@ -19,7 +19,8 @@ The library offers a Fluent API which is inspired by Picasso naming.
 The library automatically deduplicates similar requests: if 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait. When the 1st real read is done then the 99 waiters will get the image.
 
 Both a memory cache and a disk cache are present.
-WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: https://github.com/molinch/WebP.Touch, which are then included as a Nuget dependency.
+
+WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: https://github.com/molinch/WebP.Touch, which are then included as a Nuget dependency. As long as your file ends with .webp it will be handled by the lib.
 
 *Note on Android: Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.*
 
