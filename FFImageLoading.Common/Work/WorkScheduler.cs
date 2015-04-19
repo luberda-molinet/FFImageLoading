@@ -152,8 +152,12 @@ namespace FFImageLoading.Work
             }
 
             if (await TryLoadingFromCacheAsync(task).ConfigureAwait(false))
+			{
+				if (task.Parameters.OnFinish != null)
+					task.Parameters.OnFinish(task);
                 return; // image successfully loaded from cache
-
+			}
+			
             if (task.IsCancelled || _pauseWork)
                 return;
 
