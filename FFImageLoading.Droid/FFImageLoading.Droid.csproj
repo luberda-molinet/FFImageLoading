@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -98,17 +98,9 @@
       <Link>Work\IScheduledWork.cs</Link>
     </Compile>
     <Compile Include="Work\IAsyncDrawable.cs" />
+    <Compile Include="Work\ITransformation.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Cache\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="Work\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Drawables\" />
-    <Folder Include="Collections\" />
-    <Folder Include="Views\" />
-    <Folder Include="Config\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

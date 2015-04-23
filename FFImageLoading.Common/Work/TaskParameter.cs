@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Work
 {
@@ -44,6 +45,8 @@ namespace FFImageLoading.Work
 
 		private TaskParameter()
 		{
+            Transformations = new List<ITransformation>();
+
 			// default values so we don't have a null value
 			OnSuccess = () =>
 			{
@@ -83,6 +86,22 @@ namespace FFImageLoading.Work
 		public Action<Exception> OnError { get; private set; }
 
 		public Action<IScheduledWork> OnFinish { get; private set; }
+
+        public List<ITransformation> Transformations { get; private set; }
+
+        public TaskParameter Transform(ITransformation transformation)
+        {
+            if (transformation == null) throw new Exception("transformation");
+            Transformations.Add(transformation);
+            return this;
+        }
+
+        public TaskParameter Transform(IEnumerable<ITransformation> transformations)
+        {
+            if (transformations == null) throw new ArgumentNullException("transformations");
+            Transformations.AddRange(transformations);
+            return this;
+        }
 
 		/// <summary>
 		/// Defines the placeholder used while loading.
