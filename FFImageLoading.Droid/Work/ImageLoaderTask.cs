@@ -173,7 +173,7 @@ namespace FFImageLoading.Work
 			await MainThreadDispatcher.PostAsync(() =>
 			{
 				imageView.SetImageDrawable(value);
-				if (imageView.AdjustViewBounds)
+				if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 				{
 					imageView.LayoutParameters.Height = value.IntrinsicHeight;
 					imageView.LayoutParameters.Width = value.IntrinsicWidth;
@@ -445,7 +445,7 @@ namespace FFImageLoading.Work
 
 		private void SetImageDrawable(ImageView imageView, Drawable drawable, bool fadeIn)
 		{
-			if (imageView.AdjustViewBounds)
+			if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 			{
 				imageView.LayoutParameters.Height = drawable.IntrinsicHeight;
 				imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
