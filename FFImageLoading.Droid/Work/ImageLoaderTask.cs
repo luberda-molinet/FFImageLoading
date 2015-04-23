@@ -182,65 +182,41 @@ namespace FFImageLoading.Work
 			return true; // found and loaded from cache
 		}
 
-		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string sourcePath, ImageSource source, bool isPlaceHolder)
+		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path, ImageSource source, bool isPlaceHolder)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			byte[] bytes = null;
-			string path = sourcePath;
+			var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+			if (stream == null)
+				return null;
 
 			try
 			{
-				switch (source)
+				// First decode with inJustDecodeBounds=true to check dimensions
+				var options = new BitmapFactory.Options
 				{
-					case ImageSource.ApplicationBundle:
-						var stream = Context.Assets.Open(path);
-						using (var memory = new MemoryStream())
-						{
-							await stream.CopyToAsync(memory).ConfigureAwait(false);
-							bytes = memory.ToArray();
-						}
-						break;
-					case ImageSource.Filepath:
-						bytes = await FileStore.ReadBytes(path).ConfigureAwait(false);
-						break;
-					case ImageSource.Url:
-						var downloadedData = await DownloadCache.GetAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
-						bytes = downloadedData.Bytes;
-						path = downloadedData.CachedPath;
-						break;
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.Error("Unable to retrieve image data", ex);
-				Parameters.OnError(ex);
-				return null;
-			}
+					InJustDecodeBounds = true
+				};
 
-			if (bytes == null || bytes.Length <= 0)
-				return null;
-
-			// First decode with inJustDecodeBounds=true to check dimensions
-			var options = new BitmapFactory.Options
-			{
-				InJustDecodeBounds = true
-			};
-
-			if (CancellationToken.IsCancellationRequested)
-				return null;
-
-			return await Task.Run(() =>
-			{
 				if (CancellationToken.IsCancellationRequested)
 					return null;
-				
-				if (source != ImageSource.ApplicationBundle)
+
+				return await Task.Run(async () =>
 				{
+					if (CancellationToken.IsCancellationRequested)
+						return null;
+					
 					try
 					{
-						BitmapFactory.DecodeFile(path, options); // This method doesn't work with Android assets
+						BitmapFactory.DecodeStream(stream, null, options);
+
+						if (!stream.CanSeek) { // Assets stream can't be seeked to origin position
+							stream.Dispose();
+							stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+						} else {
+							stream.Seek(0, SeekOrigin.Begin);
+						}
 					}
 					catch (Exception ex)
 					{
@@ -248,66 +224,71 @@ namespace FFImageLoading.Work
 						Parameters.OnError(ex);
 						return null;
 					}
-				}
 
-				if (CancellationToken.IsCancellationRequested)
-					return null;
-
-				options.InPurgeable = true;
-				options.InJustDecodeBounds = false;
-
-				try
-				{
-					if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
-					{
-						// Calculate inSampleSize
-						options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
-					}
+					if (CancellationToken.IsCancellationRequested)
+						return null;
 					
-					// If we're running on Honeycomb or newer, try to use inBitmap
+					options.InPurgeable = true;
+					options.InJustDecodeBounds = false;
+
+					try
+					{
+						if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+						{
+							// Calculate inSampleSize
+							options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
+						}
+						
+						// If we're running on Honeycomb or newer, try to use inBitmap
+						if (Utils.HasHoneycomb())
+							AddInBitmapOptions(options);
+					}
+					catch (Exception ex)
+					{
+						Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
+						Parameters.OnError(ex);
+					}
+
+					if (CancellationToken.IsCancellationRequested)
+						return null;
+
+					Bitmap bitmap;
+					try
+					{
+						bitmap = BitmapFactory.DecodeStream(stream, null, options);
+					}
+					catch (Exception ex)
+					{
+						Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
+						Parameters.OnError(ex);
+						return null;
+					}
+
+					if (bitmap == null || CancellationToken.IsCancellationRequested)
+						return null;
+
+					// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
 					if (Utils.HasHoneycomb())
-						AddInBitmapOptions(options);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
-					Parameters.OnError(ex);
-				}
-
-				if (CancellationToken.IsCancellationRequested)
-					return null;
-
-				Bitmap bitmap;
-				try
-				{
-					bitmap = BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length, options);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-					Parameters.OnError(ex);
-					return null;
-				}
-
-				if (bitmap == null || CancellationToken.IsCancellationRequested)
-					return null;
-
-				// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-				if (Utils.HasHoneycomb())
-				{
-					if (isPlaceHolder)
-						return new AsyncDrawable(Context.Resources, bitmap, this);
-					else
-						return new BitmapDrawable(Context.Resources, bitmap);
-				}
-				else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
-				{
-					if (isPlaceHolder)
-						return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
-					else
-						return new ManagedBitmapDrawable(Context.Resources, bitmap);
-				}
-			}).ConfigureAwait(false);
+					{
+						if (isPlaceHolder)
+							return new AsyncDrawable(Context.Resources, bitmap, this);
+						else
+							return new BitmapDrawable(Context.Resources, bitmap);
+					}
+					else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
+					{
+						if (isPlaceHolder)
+							return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
+						else
+							return new ManagedBitmapDrawable(Context.Resources, bitmap);
+					}
+				}).ConfigureAwait(false);
+			}
+			finally
+			{
+					if (stream != null)
+						stream.Dispose();
+			}
 		}
 
 		/// <summary>
@@ -353,6 +334,34 @@ namespace FFImageLoading.Work
 				});
 
 			return true;
+		}
+
+		private async Task<Stream> GetStreamAsync(string path, ImageSource source)
+		{
+			Stream stream = null;
+			try
+			{
+				switch (source)
+				{
+					case ImageSource.ApplicationBundle:
+						stream = Context.Assets.Open(path, Access.Streaming);
+						break;
+					case ImageSource.Filepath:
+						stream = FileStore.GetInputStream(path);
+						break;
+					case ImageSource.Url:
+						stream = await DownloadCache.GetStreamAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("Unable to retrieve image data", ex);
+				Parameters.OnError(ex);
+				return null;
+			}
+
+			return stream;
 		}
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates

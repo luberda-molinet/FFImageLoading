@@ -6,9 +6,19 @@ namespace FFImageLoading.IO
 {
     internal static class FileStore
     {
+		public static Stream GetInputStream(string path)
+		{
+			return new FileStream(path, FileMode.Open, FileAccess.Read);
+		}
+
+		public static Stream GetOutputStream(string path)
+		{
+			return new FileStream(path, FileMode.Create, FileAccess.Write);
+		}
+
         public static async Task<byte[]> ReadBytes(string path)
         {
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+			using (var fs = GetInputStream(path)) {
                 using (var memory = new MemoryStream()) {
                     await fs.CopyToAsync(memory).ConfigureAwait(false);
                     return memory.ToArray();
@@ -18,7 +28,7 @@ namespace FFImageLoading.IO
 
         public static async Task WriteBytes(string path, byte[] data)
         {
-            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write)) {
+            using (var fs = GetOutputStream(path)) {
                 using (var memory = new MemoryStream(data)) {
                     await memory.CopyToAsync(fs);
                 }

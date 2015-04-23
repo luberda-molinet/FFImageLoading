@@ -225,6 +225,20 @@ namespace FFImageLoading.Cache
             return data;
         }
 
+		public Stream TryGetStream (string key)
+		{
+			key = SanitizeKey(key);
+			byte[] data = null;
+			if (!entries.ContainsKey(key))
+				return null;
+
+			try {
+				return FileStore.GetInputStream(key);
+			} catch {
+				return null;
+			}
+		}
+
         void AppendToJournal (JournalOp op, string key)
         {
             using (var writer = new StreamWriter (journalPath, true, encoding)) {
