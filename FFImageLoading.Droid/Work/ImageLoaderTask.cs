@@ -20,7 +20,7 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private const int FADE_TRANSITION_MILISECONDS = 50;
+		private const int FADE_TRANSITION_MILISECONDS = 200;
 		private readonly WeakReference<ImageView> _imageWeakReference;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
@@ -454,9 +454,9 @@ namespace FFImageLoading.Work
 			if (fadeIn)
 			{
 				var drawables = new[] {
-                    new ColorDrawable(Color.Transparent),
-                    drawable
-                };
+					imageView.Drawable ?? new ColorDrawable(Color.Transparent),
+					drawable
+				};
 
 				var td = new TransitionDrawable(drawables);
 				imageView.SetImageDrawable(td);
