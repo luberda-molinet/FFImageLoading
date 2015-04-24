@@ -228,13 +228,14 @@ namespace FFImageLoading.Cache
 		public Stream TryGetStream (string key)
 		{
 			key = SanitizeKey(key);
-			byte[] data = null;
 			if (!entries.ContainsKey(key))
 				return null;
 
 			try {
-				return FileStore.GetInputStream(key);
-			} catch {
+                string filepath = Path.Combine(basePath, key);
+                return FileStore.GetInputStream(filepath);
+            }
+            catch {
 				return null;
 			}
 		}
