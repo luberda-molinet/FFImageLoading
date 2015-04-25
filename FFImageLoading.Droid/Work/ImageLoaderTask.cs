@@ -267,6 +267,11 @@ namespace FFImageLoading.Work
 					if (bitmap == null || CancellationToken.IsCancellationRequested)
 						return null;
 
+                    foreach(var transformation in Parameters.Transformations)
+                    {
+                        bitmap = transformation.Transform(bitmap);
+                    }
+
 					// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
 					if (Utils.HasHoneycomb())
 					{

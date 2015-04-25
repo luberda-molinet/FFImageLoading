@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading", "FFImageLoading.Common\FFImageLoading.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Shared", "FFImageLoading.Shared\FFImageLoading.Shared.shproj", "{E72AC4ED-03A8-465C-95A2-38B0544B37DB}"
@@ -9,16 +11,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Droid", "FFI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Touch", "FFImageLoading.Touch\FFImageLoading.Touch.csproj", "{1597F7D4-432C-4F26-B508-0F6FAF0B9711}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B48F3C95-B33F-4EF5-B223-06356D749A80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLoading.Sample", "samples\ImageLoading.Sample\ImageLoading.Sample.csproj", "{F898A684-E9C1-4154-9F80-6037287233F5}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FFImageLoading.Shared\FFImageLoading.Shared.projitems*{e72ac4ed-03a8-465c-95a2-38b0544b37db}*SharedItemsImports = 13
+		FFImageLoading.Shared\FFImageLoading.Shared.projitems*{74bf9402-3e13-4003-8923-bc20a1294ce2}*SharedItemsImports = 4
+		FFImageLoading.Shared\FFImageLoading.Shared.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51CA3BE2-DF00-4F49-8054-E5C776992B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{51CA3BE2-DF00-4F49-8054-E5C776992B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51CA3BE2-DF00-4F49-8054-E5C776992B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,5 +34,21 @@ Global
 		{74BF9402-3E13-4003-8923-BC20A1294CE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74BF9402-3E13-4003-8923-BC20A1294CE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74BF9402-3E13-4003-8923-BC20A1294CE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1597F7D4-432C-4F26-B508-0F6FAF0B9711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F898A684-E9C1-4154-9F80-6037287233F5}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F898A684-E9C1-4154-9F80-6037287233F5} = {B48F3C95-B33F-4EF5-B223-06356D749A80}
 	EndGlobalSection
 EndGlobal
