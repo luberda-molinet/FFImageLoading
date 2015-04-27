@@ -89,19 +89,23 @@ namespace FFImageLoading.Work
 
         public List<ITransformation> Transformations { get; private set; }
 
-        public TaskParameter Transform(ITransformation transformation)
-        {
-            if (transformation == null) throw new Exception("transformation");
-            Transformations.Add(transformation);
-            return this;
-        }
+		public TaskParameter Transform(ITransformation transformation)
+		{
+			if (transformation == null)
+				throw new NullReferenceException("The transformation argument was null.");
 
-        public TaskParameter Transform(IEnumerable<ITransformation> transformations)
-        {
-            if (transformations == null) throw new ArgumentNullException("transformations");
-            Transformations.AddRange(transformations);
-            return this;
-        }
+			Transformations.Add(transformation);
+			return this;
+		}
+
+		public TaskParameter Transform(IEnumerable<ITransformation> transformations)
+		{
+			if (transformations == null)
+				throw new ArgumentNullException("The transformations argument was null");
+
+			Transformations.AddRange(transformations);
+			return this;
+		}
 
 		/// <summary>
 		/// Defines the placeholder used while loading.

@@ -122,14 +122,14 @@ namespace FFImageLoading.Work
 
 					// Post on main thread
 					await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (CancellationToken.IsCancellationRequested)
-							return;
+						{
+							if (CancellationToken.IsCancellationRequested)
+								return;
 
-						SetImageDrawable(imageView, drawable, UseFadeInBitmap);
-						Completed = true;
-						Parameters.OnSuccess();
-					}).ConfigureAwait(false);
+							SetImageDrawable(imageView, drawable, UseFadeInBitmap);
+							Completed = true;
+							Parameters.OnSuccess();
+						}).ConfigureAwait(false);
 				}
 				catch (Exception ex2)
 				{
@@ -171,14 +171,14 @@ namespace FFImageLoading.Work
 				return false; // not available in the cache
 
 			await MainThreadDispatcher.PostAsync(() =>
-			{
-				imageView.SetImageDrawable(value);
-				if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 				{
-					imageView.LayoutParameters.Height = value.IntrinsicHeight;
-					imageView.LayoutParameters.Width = value.IntrinsicWidth;
-				}
-			}).ConfigureAwait(false);
+					imageView.SetImageDrawable(value);
+					if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+					{
+						imageView.LayoutParameters.Height = value.IntrinsicHeight;
+						imageView.LayoutParameters.Width = value.IntrinsicWidth;
+					}
+				}).ConfigureAwait(false);
 			return true; // found and loaded from cache
 		}
 
@@ -203,96 +203,110 @@ namespace FFImageLoading.Work
 					return null;
 
 				return await Task.Run(async () =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return null;
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return null;
 					
-					try
-					{
-						BitmapFactory.DecodeStream(stream, null, options);
-
-						if (!stream.CanSeek) { // Assets stream can't be seeked to origin position
-							stream.Dispose();
-							stream = await GetStreamAsync(path, source).ConfigureAwait(false);
-						} else {
-							stream.Seek(0, SeekOrigin.Begin);
-						}
-					}
-					catch (Exception ex)
-					{
-						Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-						Parameters.OnError(ex);
-						return null;
-					}
-
-					if (CancellationToken.IsCancellationRequested)
-						return null;
-					
-					options.InPurgeable = true;
-					options.InJustDecodeBounds = false;
-
-					try
-					{
-						if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+						try
 						{
-							// Calculate inSampleSize
-							options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
+							BitmapFactory.DecodeStream(stream, null, options);
+
+							if (!stream.CanSeek)
+							{ // Assets stream can't be seeked to origin position
+								stream.Dispose();
+								stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+							}
+							else
+							{
+								stream.Seek(0, SeekOrigin.Begin);
+							}
 						}
+						catch (Exception ex)
+						{
+							Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
+							Parameters.OnError(ex);
+							return null;
+						}
+
+						if (CancellationToken.IsCancellationRequested)
+							return null;
+					
+						options.InPurgeable = true;
+						options.InJustDecodeBounds = false;
+
+						try
+						{
+							if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+							{
+								// Calculate inSampleSize
+								options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
+							}
 						
-						// If we're running on Honeycomb or newer, try to use inBitmap
+							// If we're running on Honeycomb or newer, try to use inBitmap
+							if (Utils.HasHoneycomb())
+								AddInBitmapOptions(options);
+						}
+						catch (Exception ex)
+						{
+							Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
+							Parameters.OnError(ex);
+						}
+
+						if (CancellationToken.IsCancellationRequested)
+							return null;
+
+						Bitmap bitmap;
+						try
+						{
+							bitmap = BitmapFactory.DecodeStream(stream, null, options);
+						}
+						catch (Exception ex)
+						{
+							Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
+							Parameters.OnError(ex);
+							return null;
+						}
+
+						if (bitmap == null || CancellationToken.IsCancellationRequested)
+							return null;
+
+						if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+						{
+							foreach (var transformation in Parameters.Transformations)
+							{
+								try
+								{
+									var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+									bitmap = bitmapHolder.ToNative();
+								}
+								catch (Exception ex)
+								{
+									Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+								}
+							}
+						}
+
+						// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
 						if (Utils.HasHoneycomb())
-							AddInBitmapOptions(options);
-					}
-					catch (Exception ex)
-					{
-						Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
-						Parameters.OnError(ex);
-					}
-
-					if (CancellationToken.IsCancellationRequested)
-						return null;
-
-					Bitmap bitmap;
-					try
-					{
-						bitmap = BitmapFactory.DecodeStream(stream, null, options);
-					}
-					catch (Exception ex)
-					{
-						Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-						Parameters.OnError(ex);
-						return null;
-					}
-
-					if (bitmap == null || CancellationToken.IsCancellationRequested)
-						return null;
-
-                    foreach(var transformation in Parameters.Transformations)
-                    {
-                        bitmap = transformation.Transform(bitmap);
-                    }
-
-					// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-					if (Utils.HasHoneycomb())
-					{
-						if (isPlaceHolder)
-							return new AsyncDrawable(Context.Resources, bitmap, this);
-						else
-							return new BitmapDrawable(Context.Resources, bitmap);
-					}
-					else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
-					{
-						if (isPlaceHolder)
-							return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
-						else
-							return new ManagedBitmapDrawable(Context.Resources, bitmap);
-					}
-				}).ConfigureAwait(false);
+						{
+							if (isPlaceHolder)
+								return new AsyncDrawable(Context.Resources, bitmap, this);
+							else
+								return new BitmapDrawable(Context.Resources, bitmap);
+						}
+						else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
+						{
+							if (isPlaceHolder)
+								return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
+							else
+								return new ManagedBitmapDrawable(Context.Resources, bitmap);
+						}
+					}).ConfigureAwait(false);
 			}
 			finally
 			{
-					if (stream != null)
-						stream.Dispose();
+				if (stream != null)
+					stream.Dispose();
 			}
 		}
 
@@ -458,7 +472,8 @@ namespace FFImageLoading.Work
 
 			if (fadeIn)
 			{
-				var drawables = new[] {
+				var drawables = new[]
+				{
 					imageView.Drawable ?? new ColorDrawable(Color.Transparent),
 					drawable
 				};

@@ -34,7 +34,6 @@
     <Compile Include="Helpers\IMainThreadDispatcher.cs" />
     <Compile Include="Helpers\IMiniLogger.cs" />
     <Compile Include="Work\IImageLoaderTask.cs" />
-    <Compile Include="Work\TaskParameter.cs" />
     <Compile Include="Work\ImageLoaderTaskBase.cs" />
     <Compile Include="Config\Configuration.cs" />
     <Compile Include="Cache\IDownloadCache.cs" />
@@ -42,6 +41,9 @@
     <Compile Include="Cache\IDiskCache.cs" />
     <Compile Include="Work\WorkScheduler.cs" />
     <Compile Include="Work\IScheduledWork.cs" />
+    <Compile Include="Work\TaskParameter.cs" />
+    <Compile Include="Work\ITransformation.cs" />
+    <Compile Include="Work\IBitmap.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

@@ -174,7 +174,25 @@ namespace FFImageLoading.Work
 					}
 
 					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-					return new UIImage(NSData.FromArray(bytes), scale);
+					var image = new UIImage(NSData.FromArray(bytes), scale);
+
+					if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+					{
+						foreach (var transformation in Parameters.Transformations)
+						{
+							try
+							{
+								var bitmapHolder = transformation.Transform(new BitmapHolder(image));
+								image = bitmapHolder.ToNative();
+							}
+							catch (Exception ex)
+							{
+								Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+							}
+						}
+					}
+
+					return image;
 				}).ConfigureAwait(false);
 		}
 

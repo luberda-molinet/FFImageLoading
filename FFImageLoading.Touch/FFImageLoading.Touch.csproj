@@ -80,15 +80,23 @@
     <Compile Include="..\FFImageLoading.Common\Work\ImageLoaderTaskBase.cs">
       <Link>Work\ImageLoaderTaskBase.cs</Link>
     </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\TaskParameter.cs">
-      <Link>Work\TaskParameter.cs</Link>
-    </Compile>
     <Compile Include="..\FFImageLoading.Common\Work\WorkScheduler.cs">
       <Link>Work\WorkScheduler.cs</Link>
     </Compile>
     <Compile Include="..\FFImageLoading.Common\Work\IScheduledWork.cs">
       <Link>Work\IScheduledWork.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\TaskParameter.cs">
+      <Link>Work\TaskParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\IBitmap.cs">
+      <Link>Work\IBitmap.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\ITransformation.cs">
+      <Link>Work\ITransformation.cs</Link>
+    </Compile>
+    <Compile Include="Work\BitmapHolder.cs" />
+    <Compile Include="Work\TransformationBase.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
