@@ -17,14 +17,14 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-    public class CropCircleTransformation : ITransformation
+	public class CropCircleTransformation : TransformationBase, ITransformation
     {
-        public string Key
+        public override string Key
         {
             get { return "CropCircleTransformation()"; }
         }
 
-        public Bitmap Transform(Bitmap source)
+        protected override Bitmap Transform(Bitmap source)
         {
             int size = Math.Min(source.Width, source.Height);
 

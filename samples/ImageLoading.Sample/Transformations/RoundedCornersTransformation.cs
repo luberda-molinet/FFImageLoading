@@ -18,7 +18,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-    public class RoundedCornersTransformation : ITransformation
+	public class RoundedCornersTransformation : TransformationBase, ITransformation
     {
         private int radius;
         private int margin;
@@ -29,12 +29,12 @@ namespace ImageLoading.Sample.Transformations
             this.margin = margin;
         }
 
-        public string Key
+        public override string Key
         {
             get { return "RoundedTransformation(radius=" + radius + ", margin=" + margin + ")"; }
         }
 
-        public Bitmap Transform(Bitmap source)
+        protected override Bitmap Transform(Bitmap source)
         {
             int width = source.Width;
             int height = source.Height;

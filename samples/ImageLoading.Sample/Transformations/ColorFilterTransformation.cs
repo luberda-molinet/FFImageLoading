@@ -17,7 +17,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-    public class ColorFilterTransformation : ITransformation
+	public class ColorFilterTransformation : TransformationBase, ITransformation
     {
         private Color mColor;
 
@@ -26,12 +26,12 @@ namespace ImageLoading.Sample.Transformations
             mColor = color;
         }
 
-        public string Key
+        public override string Key
         {
             get { return "ColorFilterTransformation(color=" + mColor + ")"; }
         }
 
-        public Bitmap Transform(Bitmap source)
+        protected override Bitmap Transform(Bitmap source)
         {
             int width = source.Width;
             int height = source.Height;

@@ -17,14 +17,14 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-    public class GrayscaleTransformation : ITransformation
+	public class GrayscaleTransformation : TransformationBase, ITransformation
     {
-        public string Key
+        public override string Key
         {
             get { return "GrayscaleTransformation()"; }
         }
 
-        public Bitmap Transform(Bitmap source)
+        protected override Bitmap Transform(Bitmap source)
         {
             int width = source.Width;
             int height = source.Height;

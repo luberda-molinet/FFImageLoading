@@ -18,7 +18,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-    public class BlurTransformation : ITransformation
+	public class BlurTransformation : TransformationBase, ITransformation
     {
         private const int MAX_RADIUS = 25;
 
@@ -37,12 +37,12 @@ namespace ImageLoading.Sample.Transformations
             mRadius = radius;
         }
 
-        public string Key
+        public override string Key
         {
             get { return "BlurTransformation(radius=" + mRadius + ")"; }
         }
 
-        public Android.Graphics.Bitmap Transform(Android.Graphics.Bitmap source)
+        protected override Android.Graphics.Bitmap Transform(Android.Graphics.Bitmap source)
         {
             Bitmap outBitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
             Canvas canvas = new Canvas(outBitmap);
