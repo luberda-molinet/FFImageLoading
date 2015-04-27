@@ -151,6 +151,8 @@ namespace FFImageLoading.Work
                 throw new Exception("Image loading key can not be null, empty or a whitespace");
             }
 
+			await task.PrepareAsync().ConfigureAwait(false);
+
             if (await TryLoadingFromCacheAsync(task).ConfigureAwait(false))
 			{
 				if (task.Parameters.OnFinish != null)
@@ -162,7 +164,6 @@ namespace FFImageLoading.Work
                 return;
 
             _logger.Debug(string.Format("Generating/retrieving image: {0}", task.Key));
-			await task.PrepareAsync().ConfigureAwait(false);
 
             var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
             PendingTask alreadyRunningTaskForSameKey = null;

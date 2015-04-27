@@ -399,7 +399,7 @@ namespace FFImageLoading.Work
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(sourcePath, drawable);
+			ImageCache.Instance.Add(sourcePath + TransformationsKey, drawable);
 
 			return drawable;
 		}

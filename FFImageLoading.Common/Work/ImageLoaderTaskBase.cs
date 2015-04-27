@@ -42,10 +42,7 @@ namespace FFImageLoading.Work
 		{
 			get
 			{
-				if (Parameters.Transformations == null || Parameters.Transformations.Count == 0)
-					return Parameters.Path;
-
-				return Parameters.Path + ";" + Parameters.Transformations.Select(t => t.Key).Aggregate((a, b) => a + ";" + b);
+				return Parameters.Path + TransformationsKey;
 			}
 		}
 
@@ -84,6 +81,17 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
 		public abstract Task<bool> TryLoadingFromCacheAsync();
+
+		protected string TransformationsKey
+		{
+			get
+			{
+				if (Parameters.Transformations == null || Parameters.Transformations.Count == 0)
+					return "";
+
+				return ";" + Parameters.Transformations.Select(t => t.Key).Aggregate((a, b) => a + ";" + b);
+			}
+		}
 
 		private void ConfigureParameters()
 		{
