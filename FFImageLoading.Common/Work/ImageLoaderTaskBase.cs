@@ -100,7 +100,7 @@ namespace FFImageLoading.Work
 			var finishCallback = Parameters.OnFinish;
 
 			// make sure callbacks are invoked on Main thread
-			Parameters.Success(() => MainThreadDispatcher.Post(successCallback));
+			Parameters.Success((w, h) => MainThreadDispatcher.Post(() => successCallback(w, h)));
 			Parameters.Error(ex => MainThreadDispatcher.Post(() => errorCallback(ex)));
 			Parameters.Finish(scheduledWork => MainThreadDispatcher.Post(() => finishCallback(scheduledWork)));
 

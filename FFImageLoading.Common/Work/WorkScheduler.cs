@@ -187,7 +187,6 @@ namespace FFImageLoading.Work
                 if (foundInCache) {
                     // Bitmap found in memory cache
                     _logger.Debug(string.Format("Image from cache: {0}", task.Key));
-                    task.Parameters.OnSuccess();
                 }
                 return foundInCache;
             } catch (Exception ex) {
@@ -220,9 +219,7 @@ namespace FFImageLoading.Work
 
             // Now our image should be in the cache
             bool foundInCache = await TryLoadingFromCacheAsync(currentPendingTask.ImageLoadingTask).ConfigureAwait(false);
-            if (foundInCache) {
-                alreadyRunningTaskForSameKey.ImageLoadingTask.Parameters.OnSuccess();
-            } else {
+            if (!foundInCache) {
                 _logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", key));
                 forceLoad();
             }

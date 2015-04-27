@@ -128,7 +128,7 @@ namespace FFImageLoading.Work
 
 							SetImageDrawable(imageView, drawable, UseFadeInBitmap);
 							Completed = true;
-							Parameters.OnSuccess();
+							Parameters.OnSuccess(drawable.IntrinsicWidth, drawable.IntrinsicHeight);
 						}).ConfigureAwait(false);
 				}
 				catch (Exception ex2)
@@ -179,6 +179,8 @@ namespace FFImageLoading.Work
 						imageView.LayoutParameters.Width = value.IntrinsicWidth;
 					}
 				}).ConfigureAwait(false);
+
+			Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
 			return true; // found and loaded from cache
 		}
 

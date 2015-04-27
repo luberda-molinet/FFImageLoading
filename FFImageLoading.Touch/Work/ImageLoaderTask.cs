@@ -78,14 +78,14 @@ namespace FFImageLoading.Work
 				{
 					// Post on main thread
 					await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (CancellationToken.IsCancellationRequested)
-							return;
+						{
+							if (CancellationToken.IsCancellationRequested)
+								return;
 
-						_doWithImage(image);
-						Completed = true;
-						Parameters.OnSuccess();
-					}).ConfigureAwait(false);
+							_doWithImage(image);
+							Completed = true;
+							Parameters.OnSuccess((int)image.Size.Width, (int)image.Size.Height);
+						}).ConfigureAwait(false);
 				}
 				catch (Exception ex2)
 				{
@@ -126,9 +126,11 @@ namespace FFImageLoading.Work
 				return false; // not available in the cache
 
 			await MainThreadDispatcher.PostAsync(() =>
-			{
-				_doWithImage(value);
-			}).ConfigureAwait(false);
+				{
+					_doWithImage(value);
+				}).ConfigureAwait(false);
+
+			Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
 			return true; // found and loaded from cache
 		}
 
@@ -231,12 +233,12 @@ namespace FFImageLoading.Work
 
 			// Post on main thread but don't wait for it
 			MainThreadDispatcher.Post(() =>
-			{
-				if (CancellationToken.IsCancellationRequested)
-					return;
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return;
 				
-				_doWithImage(image);
-			});
+					_doWithImage(image);
+				});
 
 			return true;
 		}
