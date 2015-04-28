@@ -9,9 +9,7 @@ NuGet package is here: https://www.nuget.org/packages/Xamarin.FFImageLoading/
 The library works starting from Android 4 and iOS 7.
 
 ###History
-We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused.
-
-We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
+We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused. We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
 
 ###Description
 The library offers a Fluent API which is inspired by Picasso naming.
@@ -53,6 +51,7 @@ ImageService.LoadUrl(urlToImage)
 })
 .Into(_imageView);
 ```
+Note: this callback is also available with width and height. In this case the callback is an Action<int, int>.
 
 There is a third callback: when image loading process finished. Whatever the result this method will be called:
 ```C#
@@ -84,6 +83,17 @@ If you want to downsample the image so it takes less memory then you can define 
 // you can only give one value since we keep aspect ratio
 ImageService.LoadUrl(urlToImage).DownSample(width: 150).Into(_imageView);
 ```
+
+Transformations are possible too:
+```C#
+ImageService.LoadUrl(urlToImage)
+.Transform(new CropCircleTransformation())
+.Transform(new GrayscaleTransformation())
+.Into(imgDisplay);
+```
+Original image, prior to transformation, is cached to disk. Transformed image is cached in memory.
+If the same image, with same transformations is requested then it will be loaded from memory.
+For more information about transformations open our sample project.
 
 ###Advanced usage
 
