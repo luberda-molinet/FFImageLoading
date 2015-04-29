@@ -9,7 +9,7 @@ namespace FFImageLoading.Work
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>
-        string Key { get; }
+        string GetKey(string path = null);
 
 		/// <summary>
 		/// Gets the parameters used to retrieve the image.

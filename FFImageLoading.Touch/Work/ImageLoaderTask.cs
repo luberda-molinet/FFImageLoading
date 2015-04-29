@@ -121,7 +121,7 @@ namespace FFImageLoading.Work
 			if (nativeControl == null)
 				return false; // weird situation, dunno what to do
 
-			var value = ImageCache.Instance.Get(Key);
+            var value = ImageCache.Instance.Get(GetKey());
 			if (value == null)
 				return false; // not available in the cache
 
@@ -257,7 +257,7 @@ namespace FFImageLoading.Work
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(sourcePath + TransformationsKey, image);
+			ImageCache.Instance.Add(GetKey(sourcePath), image);
 
 			return image;
 		}

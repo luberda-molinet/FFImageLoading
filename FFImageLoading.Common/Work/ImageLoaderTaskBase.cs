@@ -38,18 +38,15 @@ namespace FFImageLoading.Work
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>
-		public virtual string Key
+		public virtual string GetKey(string path = null)
 		{
-			get
-			{
-				return Parameters.Path + TransformationsKey;
-			}
+            return (path ?? Parameters.Path) + TransformationsKey;
 		}
 
 		public void Cancel()
 		{
 			CancellationToken.Cancel();
-			Logger.Debug(string.Format("Canceled image generation for {0}", Key));
+			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
 
 		public bool IsCancelled
@@ -111,7 +108,7 @@ namespace FFImageLoading.Work
 					{
 						if (retryCurrentValue < Parameters.RetryCount)
 						{
-							Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", Key, retryCurrentValue));
+                            Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryCurrentValue));
 							if (Parameters.RetryDelayInMs > 0)
 								await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
 							await RunAsync().ConfigureAwait(false);
