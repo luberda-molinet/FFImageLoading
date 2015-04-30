@@ -40,7 +40,11 @@ namespace FFImageLoading.Work
 		/// <value>The cache key.</value>
 		public virtual string GetKey(string path = null)
 		{
-            return (path ?? Parameters.Path) + TransformationsKey;
+			path = path ?? Parameters.Path;
+			if (string.IsNullOrWhiteSpace(path))
+				return null; // If path is null then something is wrong, we should not append transformations key
+
+			return path + TransformationsKey;
 		}
 
 		public void Cancel()
