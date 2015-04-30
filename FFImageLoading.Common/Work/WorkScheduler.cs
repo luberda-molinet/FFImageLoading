@@ -147,7 +147,8 @@ namespace FFImageLoading.Work
             if (task == null || task.IsCancelled)
                 return;
 
-            if (string.IsNullOrWhiteSpace(task.Key)) {
+            if (string.IsNullOrWhiteSpace(task.GetKey()))
+            {
                 throw new Exception("Image loading key can not be null, empty or a whitespace");
             }
 
@@ -163,12 +164,12 @@ namespace FFImageLoading.Work
             if (task.IsCancelled || _pauseWork)
                 return;
 
-            _logger.Debug(string.Format("Generating/retrieving image: {0}", task.Key));
+            _logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
 
             var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
             PendingTask alreadyRunningTaskForSameKey = null;
             lock (_pauseWorkLock) {
-                alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.Key == task.Key);
+                alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey());
                 if (alreadyRunningTaskForSameKey == null)
                     _pendingTasks.Add(currentPendingTask);
             }
@@ -186,7 +187,7 @@ namespace FFImageLoading.Work
                 bool foundInCache = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
                 if (foundInCache) {
                     // Bitmap found in memory cache
-                    _logger.Debug(string.Format("Image from cache: {0}", task.Key));
+                    _logger.Debug(string.Format("Image from cache: {0}", task.GetKey()));
                 }
                 return foundInCache;
             } catch (Exception ex) {
@@ -197,7 +198,7 @@ namespace FFImageLoading.Work
 
         private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyRunningTaskForSameKey)
         {
-            string key = alreadyRunningTaskForSameKey.ImageLoadingTask.Key;
+            string key = alreadyRunningTaskForSameKey.ImageLoadingTask.GetKey();
 
             Action forceLoad = () => {
                 lock (_pauseWorkLock) {
