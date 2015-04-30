@@ -68,6 +68,10 @@ namespace FFImageLoading.Work
 			var drawable = new AsyncDrawable(resources, null, this);
 			imageView.SetImageDrawable(drawable);
 
+			var value = ImageCache.Instance.Get(GetKey());
+			if (value != null) // If image is found in cache we don't show the loading placeholder
+				return;
+
 			// This should probably be reworked at some point so we don't create a dummy AsyncDrawable
 			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 		}

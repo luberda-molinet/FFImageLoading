@@ -39,6 +39,10 @@ namespace FFImageLoading.Work
 		/// </summary>
 		public override async Task PrepareAsync()
 		{
+			var value = ImageCache.Instance.Get(GetKey());
+			if (value != null) // If image is found in cache we don't show the loading placeholder
+				return;
+
 			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 		}
 
