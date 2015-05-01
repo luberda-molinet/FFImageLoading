@@ -34,11 +34,11 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="ModernHttpClient">
-      <HintPath>..\..\..\..\..\packages\modernhttpclient.2.2.0\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
-    </Reference>
     <Reference Include="WebP.Touch">
       <HintPath>..\..\..\..\..\packages\WebP.Touch.1.0.0\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
+    </Reference>
+    <Reference Include="ModernHttpClient">
+      <HintPath>..\..\..\..\..\packages\modernhttpclient.2.4.0\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
