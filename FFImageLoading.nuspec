@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xamarin.FFImageLoading</id>
-       <version>1.0.9</version>
+       <version>1.1</version>
        <title>Xamarin library to load images quickly and easily on iOS and Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -19,11 +19,11 @@
        <tags>xamarin, android, ios, bitmap, image, cache, webp, quick, easy, lru, load, loading, save</tags>
        <dependencies>
 		<group targetFramework="MonoAndroid10">
-			<dependency id="modernhttpclient" version="2.1.5" />
+			<dependency id="modernhttpclient" version="2.2.0" />
 		</group>
        	
        		<group targetFramework="Xamarin.iOS10">
-			<dependency id="modernhttpclient" version="2.1.5" />
+			<dependency id="modernhttpclient" version="2.2.0" />
 			<dependency id="WebP.Touch" version="1.0.0" />
        		</group>
        </dependencies>
