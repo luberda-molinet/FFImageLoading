@@ -23,11 +23,13 @@ namespace FFImageLoading.Views
 			SetWillNotDraw(false);
 		}
 
+		/* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
 		protected override void OnDetachedFromWindow()
 		{
 			SetImageDrawable(null);
 			base.OnDetachedFromWindow();
 		}
+		*/
 
 		public override void SetImageDrawable(Drawable drawable)
 		{

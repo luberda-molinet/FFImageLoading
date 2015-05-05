@@ -73,11 +73,12 @@ namespace FFImageLoading.Views
 			}
 		}
 
+		/* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
 		protected override void OnDetachedFromWindow()
 		{
 			CancelLoading();
 			base.OnDetachedFromWindow();
-		}
+		}*/
 
 		public void CancelLoading()
 		{
