@@ -106,6 +106,9 @@
     </Compile>
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Work\TransformationBase.cs" />
+    <Compile Include="..\FFImageLoading.Common\Cache\MemoryCacheResult.cs">
+      <Link>Cache\MemoryCacheResult.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

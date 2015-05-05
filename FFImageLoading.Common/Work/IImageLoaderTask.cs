@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
@@ -26,12 +27,12 @@ namespace FFImageLoading.Work
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		Task<bool> TryLoadingFromCacheAsync();
+		Task<CacheResult> TryLoadingFromCacheAsync();
 
 		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
-        Task PrepareAsync();
+		Task<bool> PrepareAndTryLoadingFromCacheAsync();
 
 		/// <summary>
 		/// Cancel current task only if needed

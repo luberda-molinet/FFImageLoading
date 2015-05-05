@@ -153,9 +153,8 @@ namespace FFImageLoading.Work
 				throw new Exception("Image loading key can not be null, empty or a whitespace");
 			}
 
-			await task.PrepareAsync().ConfigureAwait(false);
-
-			if (await TryLoadingFromCacheAsync(task).ConfigureAwait(false))
+			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
+			if (loadedFromCache)
 			{
 				if (task.Parameters.OnFinish != null)
 					task.Parameters.OnFinish(task);
@@ -186,25 +185,6 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		private async Task<bool> TryLoadingFromCacheAsync(IImageLoaderTask task)
-		{
-			try
-			{
-				bool foundInCache = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
-				if (foundInCache)
-				{
-					// Bitmap found in memory cache
-					_logger.Debug(string.Format("Image from cache: {0}", task.GetKey()));
-				}
-				return foundInCache;
-			}
-			catch (Exception ex)
-			{
-				task.Parameters.OnError(ex);
-				return false; // weird, what can we do if loading from cache fails
-			}
-		}
-
 		private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyRunningTaskForSameKey)
 		{
 			string key = alreadyRunningTaskForSameKey.ImageLoadingTask.GetKey();
@@ -231,8 +211,8 @@ namespace FFImageLoading.Work
 			await alreadyRunningTaskForSameKey.FrameworkWrappingTask.ConfigureAwait(false);
 
 			// Now our image should be in the cache
-			bool foundInCache = await TryLoadingFromCacheAsync(currentPendingTask.ImageLoadingTask).ConfigureAwait(false);
-			if (!foundInCache)
+			var cacheResult = await currentPendingTask.ImageLoadingTask.TryLoadingFromCacheAsync().ConfigureAwait(false);
+			if (cacheResult != FFImageLoading.Cache.CacheResult.Found)
 			{
 				_logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", key));
 				forceLoad();

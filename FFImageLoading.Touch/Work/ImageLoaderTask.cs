@@ -37,13 +37,14 @@ namespace FFImageLoading.Work
 		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
-		public override async Task PrepareAsync()
+		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
 		{
-			var value = ImageCache.Instance.Get(GetKey());
-			if (value != null) // If image is found in cache we don't show the loading placeholder
-				return;
+			var cacheResult = await TryLoadingFromCacheAsync().ConfigureAwait(false);
+			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
+				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 
 			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
+			return false;
 		}
 
 		/// <summary>
@@ -119,23 +120,31 @@ namespace FFImageLoading.Work
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		public override async Task<bool> TryLoadingFromCacheAsync()
+		public override async Task<CacheResult> TryLoadingFromCacheAsync()
 		{
-			var nativeControl = _getNativeControl();
-			if (nativeControl == null)
-				return false; // weird situation, dunno what to do
+			try
+			{
+				var nativeControl = _getNativeControl();
+				if (nativeControl == null)
+					return CacheResult.NotFound; // weird situation, dunno what to do
 
-            var value = ImageCache.Instance.Get(GetKey());
-			if (value == null)
-				return false; // not available in the cache
+	            var value = ImageCache.Instance.Get(GetKey());
+				if (value == null)
+					return CacheResult.NotFound; // not available in the cache
 
-			await MainThreadDispatcher.PostAsync(() =>
-				{
-					_doWithImage(value);
-				}).ConfigureAwait(false);
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						_doWithImage(value);
+					}).ConfigureAwait(false);
 
-			Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
-			return true; // found and loaded from cache
+				Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
+				return CacheResult.Found; // found and loaded from cache
+			}
+			catch (Exception ex)
+			{
+				Parameters.OnError(ex);
+				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
+			}
 		}
 
 		protected virtual async Task<UIImage> GetImageAsync(string sourcePath, ImageSource source)

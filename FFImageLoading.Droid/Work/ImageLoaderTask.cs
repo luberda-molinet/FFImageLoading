@@ -48,12 +48,12 @@ namespace FFImageLoading.Work
 		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
-		public override async Task PrepareAsync()
+		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
 		{
 			ImageView imageView;
 			_imageWeakReference.TryGetTarget(out imageView);
 			if (imageView == null)
-				return;
+				return false;
 			
 			// Cancel current task attached to the same image view, if needed only
 			var currentAssignedTask = imageView.GetImageLoaderTask();
@@ -63,17 +63,18 @@ namespace FFImageLoading.Work
 				currentAssignedTask.CancelIfNeeded();
 			}
 
+			var cacheResult = await TryLoadingFromCacheAsync(imageView).ConfigureAwait(false);
+			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
+				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
+
 			// Assign the Drawable to the image
 			var resources = Android.App.Application.Context.ApplicationContext.Resources;
 			var drawable = new AsyncDrawable(resources, null, this);
 			imageView.SetImageDrawable(drawable);
 
-			var value = ImageCache.Instance.Get(GetKey());
-			if (value != null) // If image is found in cache we don't show the loading placeholder
-				return;
-
 			// This should probably be reworked at some point so we don't create a dummy AsyncDrawable
 			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
+			return false;
 		}
 
 		/// <summary>
@@ -164,28 +165,46 @@ namespace FFImageLoading.Work
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		public override async Task<bool> TryLoadingFromCacheAsync()
+		public override Task<CacheResult> TryLoadingFromCacheAsync()
 		{
 			var imageView = GetAttachedImageView();
-			if (imageView == null)
-				return false; // weird situation, dunno what to do
+			return TryLoadingFromCacheAsync(imageView);
+		}
 
-            var value = ImageCache.Instance.Get(GetKey());
-			if (value == null)
-				return false; // not available in the cache
+		/// <summary>
+		/// Tries to load requested image from the cache asynchronously.
+		/// </summary>
+		/// <returns>A boolean indicating if image was loaded from cache.</returns>
+		private async Task<CacheResult> TryLoadingFromCacheAsync(ImageView imageView)
+		{
+			try
+			{
+				if (imageView == null)
+					return CacheResult.NotFound; // weird situation, dunno what to do
 
-			await MainThreadDispatcher.PostAsync(() =>
-				{
-					imageView.SetImageDrawable(value);
-					if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+				var value = ImageCache.Instance.Get(GetKey());
+				if (value == null)
+					return CacheResult.NotFound; // not available in the cache
+
+				Logger.Debug(string.Format("Image from cache: {0}", GetKey()));
+				await MainThreadDispatcher.PostAsync(() =>
 					{
-						imageView.LayoutParameters.Height = value.IntrinsicHeight;
-						imageView.LayoutParameters.Width = value.IntrinsicWidth;
-					}
-				}).ConfigureAwait(false);
+						imageView.SetImageDrawable(value);
+						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+						{
+							imageView.LayoutParameters.Height = value.IntrinsicHeight;
+							imageView.LayoutParameters.Width = value.IntrinsicWidth;
+						}
+					}).ConfigureAwait(false);
 
-			Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
-			return true; // found and loaded from cache
+				Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
+				return CacheResult.Found; // found and loaded from cache
+			}
+			catch (Exception ex)
+			{
+				Parameters.OnError(ex);
+				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
+			}
 		}
 
 		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path, ImageSource source, bool isPlaceHolder)
@@ -193,26 +212,22 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
-			if (stream == null)
-				return null;
-
-			try
-			{
-				// First decode with inJustDecodeBounds=true to check dimensions
-				var options = new BitmapFactory.Options
+			return await Task.Run(async () =>
 				{
-					InJustDecodeBounds = true
-				};
+					if (CancellationToken.IsCancellationRequested)
+						return null;
 
-				if (CancellationToken.IsCancellationRequested)
-					return null;
-
-				return await Task.Run(async () =>
+					// First decode with inJustDecodeBounds=true to check dimensions
+					var options = new BitmapFactory.Options
 					{
-						if (CancellationToken.IsCancellationRequested)
-							return null;
-					
+						InJustDecodeBounds = true
+					};
+								
+					var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+					if (stream == null)
+						return null;
+					try
+					{
 						try
 						{
 							BitmapFactory.DecodeStream(stream, null, options);
@@ -307,13 +322,13 @@ namespace FFImageLoading.Work
 							else
 								return new ManagedBitmapDrawable(Context.Resources, bitmap);
 						}
-					}).ConfigureAwait(false);
-			}
-			finally
-			{
-				if (stream != null)
-					stream.Dispose();
-			}
+					}
+					finally
+					{
+						if (stream != null)
+							stream.Dispose();
+					}
+				}).ConfigureAwait(false);
 		}
 
 		/// <summary>

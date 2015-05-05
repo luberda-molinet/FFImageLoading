@@ -3,6 +3,7 @@ using System.Threading;
 using FFImageLoading.Helpers;
 using System.Threading.Tasks;
 using System.Linq;
+using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
@@ -66,7 +67,7 @@ namespace FFImageLoading.Work
 		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
-		public abstract Task PrepareAsync();
+		public abstract Task<bool> PrepareAndTryLoadingFromCacheAsync();
 
 		/// <summary>
 		/// Cancel current task only if needed
@@ -83,7 +84,7 @@ namespace FFImageLoading.Work
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		public abstract Task<bool> TryLoadingFromCacheAsync();
+		public abstract Task<CacheResult> TryLoadingFromCacheAsync();
 
 		protected string TransformationsKey
 		{
