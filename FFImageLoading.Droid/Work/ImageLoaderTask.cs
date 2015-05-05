@@ -327,20 +327,23 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			BitmapDrawable drawable = null;
-			try
+			BitmapDrawable drawable = ImageCache.Instance.Get(GetKey(placeholderPath));
+			if (drawable == null)
 			{
-				drawable = await RetrieveDrawableAsync(placeholderPath, source, true).ConfigureAwait(false);
-
-				if (drawable == null)
+				try
+				{
+					drawable = await RetrieveDrawableAsync(placeholderPath, source, true).ConfigureAwait(false);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error("An error occured while retrieving drawable.", ex);
+					Parameters.OnError(ex);
 					return false;
+				}
 			}
-			catch (Exception ex)
-			{
-				Logger.Error("An error occured while retrieving drawable.", ex);
-				Parameters.OnError(ex);
+
+			if (drawable == null)
 				return false;
-			}
 			
 			var imageView = GetAttachedImageView();
 			if (imageView == null)

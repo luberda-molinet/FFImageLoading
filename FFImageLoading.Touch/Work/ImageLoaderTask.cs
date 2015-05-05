@@ -213,16 +213,18 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			UIImage image = null;
-
-			try
+			UIImage image = ImageCache.Instance.Get(GetKey(placeholderPath));
+			if (image == null)
 			{
-				image = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error("An error occured while retrieving placeholder's drawable.", ex);
-				return false;
+				try
+				{
+					image = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error("An error occured while retrieving placeholder's drawable.", ex);
+					return false;
+				}
 			}
 
 			if (image == null)
