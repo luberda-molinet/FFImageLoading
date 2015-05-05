@@ -17,7 +17,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-	public class ColorFilterTransformation : TransformationBase, ITransformation
+	public class ColorFilterTransformation : TransformationBase
     {
         private Color mColor;
 

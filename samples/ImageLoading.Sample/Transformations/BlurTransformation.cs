@@ -18,7 +18,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-	public class BlurTransformation : TransformationBase, ITransformation
+	public class BlurTransformation : TransformationBase
     {
         private const int MAX_RADIUS = 25;
 

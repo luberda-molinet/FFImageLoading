@@ -17,7 +17,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-	public class GrayscaleTransformation : TransformationBase, ITransformation
+	public class GrayscaleTransformation : TransformationBase
     {
         public override string Key
         {

@@ -17,7 +17,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-	public class CropCircleTransformation : TransformationBase, ITransformation
+	public class CropCircleTransformation : TransformationBase
     {
         public override string Key
         {

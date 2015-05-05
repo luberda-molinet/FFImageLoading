@@ -13,7 +13,7 @@ using Android.Support.V4.App;
 
 namespace ImageLoading.Sample
 {
-    [Android.App.Activity(Label = "ImageLoading - Sample", MainLauncher = true, Icon = "@drawable/icon")]
+    [Android.App.Activity(Label = "FFImageLoading - Swipe", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : FragmentActivity
     {
         public const string POSITION = "position";
@@ -44,6 +44,27 @@ namespace ImageLoading.Sample
             public static int PxToDp(int px)
             {
                 return (int)(px / Resources.System.DisplayMetrics.Density);
+            }
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.options, menu);
+            return true;
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.btnSwipe:
+                    StartActivity(typeof(MainActivity));
+                    return true;
+                case Resource.Id.btnRecycler:
+                    StartActivity(typeof(RecyclerActivity));
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
             }
         }
     }
