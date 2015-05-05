@@ -53,7 +53,7 @@ namespace FFImageLoading
 
         private static Configuration GetDefaultConfiguration(Configuration userDefinedConfig)
         {
-            var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new ModernHttpClient.NativeMessageHandler());
+            var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new ModernHttpClient.NativeMessageHandler(true, false));
 
             var logger = userDefinedConfig.Logger ?? new MiniLogger();
             var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger);
