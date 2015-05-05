@@ -34,7 +34,6 @@
     <Compile Include="Helpers\IMainThreadDispatcher.cs" />
     <Compile Include="Helpers\IMiniLogger.cs" />
     <Compile Include="Work\IImageLoaderTask.cs" />
-    <Compile Include="Work\ImageLoaderTaskBase.cs" />
     <Compile Include="Config\Configuration.cs" />
     <Compile Include="Cache\IDownloadCache.cs" />
     <Compile Include="Cache\DownloadedData.cs" />

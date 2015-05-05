@@ -20,5 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Cache\DiskCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Cache\DownloadCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImageService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Work\ImageLoaderTaskBase.cs" />
   </ItemGroup>
 </Project>
