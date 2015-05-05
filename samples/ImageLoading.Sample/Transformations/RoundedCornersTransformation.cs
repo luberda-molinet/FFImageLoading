@@ -18,7 +18,7 @@ namespace ImageLoading.Sample.Transformations
     /// <summary>
     /// https://github.com/wasabeef/picasso-transformations
     /// </summary>
-	public class RoundedCornersTransformation : TransformationBase, ITransformation
+	public class RoundedCornersTransformation : TransformationBase
     {
         private int radius;
         private int margin;
