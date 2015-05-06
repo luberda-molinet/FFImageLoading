@@ -67,13 +67,14 @@ namespace FFImageLoading.Work
 			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
 				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 
-			// Assign the Drawable to the image
-			var resources = Android.App.Application.Context.ApplicationContext.Resources;
-			var drawable = new AsyncDrawable(resources, null, this);
-			imageView.SetImageDrawable(drawable);
+			bool hasDrawable = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, imageView, true).ConfigureAwait(false);
+			if (!hasDrawable)
+			{
+				// Assign the Drawable to the image
+				var drawable = new AsyncDrawable(Context.Resources, null, this);
+				imageView.SetImageDrawable(drawable);
+			}
 
-			// This should probably be reworked at some point so we don't create a dummy AsyncDrawable
-			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 			return false;
 		}
 
@@ -108,20 +109,21 @@ namespace FFImageLoading.Work
 					Parameters.OnError(ex);
 					drawable = null;
 				}
-					
+
+				var imageView = GetAttachedImageView();
+				if (imageView == null)
+					return;
+
 				if (drawable == null)
 				{
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+					// Show error placeholder
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 					return;
 				}
 
 				Exception trappedException = null;
 				try
 				{
-					var imageView = GetAttachedImageView();
-					if (imageView == null)
-						return;
-
 					if (CancellationToken.IsCancellationRequested)
 						return;
 
@@ -144,7 +146,8 @@ namespace FFImageLoading.Work
 				// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
 				if (trappedException != null)
 				{
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+					// Show error placeholder
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 					throw trappedException;
 				}
 
@@ -207,7 +210,7 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path, ImageSource source, bool isPlaceHolder)
+		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -310,14 +313,14 @@ namespace FFImageLoading.Work
 						// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
 						if (Utils.HasHoneycomb())
 						{
-							if (isPlaceHolder)
+							if (isLoadingPlaceHolder)
 								return new AsyncDrawable(Context.Resources, bitmap, this);
 							else
 								return new BitmapDrawable(Context.Resources, bitmap);
 						}
 						else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
 						{
-							if (isPlaceHolder)
+							if (isLoadingPlaceHolder)
 								return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
 							else
 								return new ManagedBitmapDrawable(Context.Resources, bitmap);
@@ -337,17 +340,33 @@ namespace FFImageLoading.Work
 		/// <returns>An awaitable task.</returns>
 		/// <param name="placeholderPath">Full path to the placeholder.</param>
 		/// <param name="source">Source for the path: local, web, assets</param>
-		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
+		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, ImageView imageView, bool isLoadingPlaceholder)
 		{
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
+			if (imageView == null)
+				return false;
+
 			BitmapDrawable drawable = ImageCache.Instance.Get(GetKey(placeholderPath));
-			if (drawable == null)
+
+			if (drawable != null)
 			{
+				// We should wrap drawable in an AsyncDrawable, nothing is deferred
+				drawable = new AsyncDrawable(Context.Resources, drawable.Bitmap, this);
+			}
+			else
+			{
+				// Here we asynchronously load our placeholder: it is deferred so we need a temporary AsyncDrawable
+				drawable = new AsyncDrawable(Context.Resources, null, this);
+				await MainThreadDispatcher.PostAsync(() =>
+				{
+					imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
+				}).ConfigureAwait(false);
+				
 				try
 				{
-					drawable = await RetrieveDrawableAsync(placeholderPath, source, true).ConfigureAwait(false);
+					drawable = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
@@ -360,21 +379,16 @@ namespace FFImageLoading.Work
 			if (drawable == null)
 				return false;
 			
-			var imageView = GetAttachedImageView();
-			if (imageView == null)
-				return false;
-
 			if (CancellationToken.IsCancellationRequested)
 				return false;
 
-			// Post on main thread but don't wait for it
-			MainThreadDispatcher.Post(() =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return;
+			await MainThreadDispatcher.PostAsync(() =>
+			{
+				if (CancellationToken.IsCancellationRequested)
+					return;
 
-					SetImageDrawable(imageView, drawable, false);
-				});
+				SetImageDrawable(imageView, drawable, false);
+			}).ConfigureAwait(false);
 
 			return true;
 		}
@@ -409,7 +423,7 @@ namespace FFImageLoading.Work
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates
 		// having a width and height equal to or larger than the requested width and height.
-		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isPlaceHolder)
+		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
 		{
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
@@ -418,7 +432,7 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			BitmapDrawable drawable = await GetDrawableAsync(sourcePath, source, isPlaceHolder).ConfigureAwait(false);
+			BitmapDrawable drawable = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder).ConfigureAwait(false);
 			if (drawable == null)
 				return null;
 
