@@ -13,7 +13,8 @@ namespace FFImageLoading
 {
     public static class ImageService
     {
-        private static bool _initialized;
+        private static volatile bool _initialized;
+		private static object _initializeLock = new object();
 
         /// <summary>
         /// Gets FFImageLoading configuration
@@ -33,8 +34,11 @@ namespace FFImageLoading
         public static void Initialize(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
-            if (_initialized)
-                throw new Exception("FFImageLoading.ImageService is already initialized");
+			lock (_initializeLock)
+			{
+				if (_initialized)
+					throw new Exception("FFImageLoading.ImageService is already initialized");
+			}
 
             InitializeIfNeeded();
         }
@@ -42,13 +46,19 @@ namespace FFImageLoading
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
             IDiskCache diskCache = null, IDownloadCache downloadCache = null)
         {
-            if (_initialized)
-                return;
+			if (_initialized)
+				return;
 
-            var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
-            Config = GetDefaultConfiguration(userDefinedConfig);
+			lock (_initializeLock)
+			{
+				if (_initialized)
+					return;
+			
+				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
+				Config = GetDefaultConfiguration(userDefinedConfig);
 
-            _initialized = true;
+				_initialized = true;
+			}
         }
 
         private static Configuration GetDefaultConfiguration(Configuration userDefinedConfig)
