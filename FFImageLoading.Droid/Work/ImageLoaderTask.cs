@@ -185,11 +185,16 @@ namespace FFImageLoading.Work
 				if (imageView == null)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
-				var value = ImageCache.Instance.Get(GetKey());
+                var key = GetKey();
+
+                if (string.IsNullOrWhiteSpace(key))
+                    return CacheResult.NotFound; 
+
+                var value = ImageCache.Instance.Get(key);
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
-				Logger.Debug(string.Format("Image from cache: {0}", GetKey()));
+                Logger.Debug(string.Format("Image from cache: {0}", key));
 				await MainThreadDispatcher.PostAsync(() =>
 					{
 						imageView.SetImageDrawable(value);
@@ -396,6 +401,9 @@ namespace FFImageLoading.Work
 		private async Task<Stream> GetStreamAsync(string path, ImageSource source)
 		{
 			Stream stream = null;
+
+            if (string.IsNullOrWhiteSpace(path)) return null;
+
 			try
 			{
 				switch (source)
@@ -425,6 +433,8 @@ namespace FFImageLoading.Work
 		// having a width and height equal to or larger than the requested width and height.
 		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
 		{
+            if (string.IsNullOrWhiteSpace(sourcePath)) return null;
+
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
 			// to this task and our "exit early" flag is not set then try and fetch the bitmap from

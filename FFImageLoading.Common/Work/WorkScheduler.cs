@@ -148,11 +148,6 @@ namespace FFImageLoading.Work
 			if (task == null || task.IsCancelled)
 				return;
 
-			if (string.IsNullOrWhiteSpace(task.GetKey()))
-			{
-				throw new Exception("Image loading key can not be null, empty or a whitespace");
-			}
-
 			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
 			if (loadedFromCache)
 			{
