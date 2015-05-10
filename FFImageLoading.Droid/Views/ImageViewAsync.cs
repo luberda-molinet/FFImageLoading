@@ -104,51 +104,59 @@ namespace FFImageLoading.Views
 		{
 			if (Drawable != null && Drawable.IntrinsicWidth != 0)
 			{
-				var matrix = this.ImageMatrix;
-				float scaleFactor = 1f;
-				float scaleFactorWidth, scaleFactorHeight;
-				scaleFactorWidth = (float)Width / (float)Drawable.IntrinsicWidth;
-				scaleFactorHeight = (float)Height / (float)Drawable.IntrinsicHeight;
-
-				if (ScaleToFit)
+				bool bottomAlignmentDefined = BottomAlign != BottomAlign.None;
+				if (ScaleToFit || bottomAlignmentDefined)
 				{
-					if (scaleFactorHeight < scaleFactorWidth)
-					{
-						scaleFactor = scaleFactorHeight;
-					}
-					else
-					{
-						scaleFactor = scaleFactorWidth;
-					}
-				}
-				matrix.SetScale(scaleFactor, scaleFactor, 0, 0);
+					var matrix = this.ImageMatrix;
+					float scaleFactor = 1f;
 
-				if (BottomAlign != BottomAlign.None)
-				{
-					//align to the bottom
-					if (Height - (Drawable.IntrinsicHeight * scaleFactor) > 0)
+					if (ScaleToFit)
 					{
-						matrix.PostTranslate(0, Height - (Drawable.IntrinsicHeight * scaleFactor));
-					}
+						float scaleFactorWidth = (float)Width / (float)Drawable.IntrinsicWidth;
+						float scaleFactorHeight = (float)Height / (float)Drawable.IntrinsicHeight;
 
-					if (Width - (Drawable.IntrinsicWidth * scaleFactor) > 0)
-					{
-						switch (BottomAlign)
+						if (scaleFactorHeight < scaleFactorWidth)
 						{
-							case BottomAlign.Left:
-								//by default is aligned to the left
-								break;
-							case BottomAlign.Center:
-								matrix.PostTranslate((Width - (Drawable.IntrinsicWidth * scaleFactor)) / 2, 0);
-								break;
-							case BottomAlign.Right:
-								matrix.PostTranslate(Width - (Drawable.IntrinsicWidth * scaleFactor), 0);
-								break;
+							scaleFactor = scaleFactorHeight;
+						}
+						else
+						{
+							scaleFactor = scaleFactorWidth;
+						}
+
+						if (scaleFactor != 1f)
+						{
+							matrix.SetScale(scaleFactor, scaleFactor, 0, 0);
 						}
 					}
-				}
 
-				ImageMatrix = matrix;
+					if (BottomAlign != BottomAlign.None)
+					{
+						//align to the bottom
+						if (Height - (Drawable.IntrinsicHeight * scaleFactor) > 0)
+						{
+							matrix.PostTranslate(0, Height - (Drawable.IntrinsicHeight * scaleFactor));
+						}
+
+						if (Width - (Drawable.IntrinsicWidth * scaleFactor) > 0)
+						{
+							switch (BottomAlign)
+							{
+								case BottomAlign.Left:
+								//by default is aligned to the left
+									break;
+								case BottomAlign.Center:
+									matrix.PostTranslate((Width - (Drawable.IntrinsicWidth * scaleFactor)) / 2, 0);
+									break;
+								case BottomAlign.Right:
+									matrix.PostTranslate(Width - (Drawable.IntrinsicWidth * scaleFactor), 0);
+									break;
+							}
+						}
+					}
+
+					ImageMatrix = matrix;
+				}
 			}
 
 			return base.SetFrame(l, t, r, b);
