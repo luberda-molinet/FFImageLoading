@@ -11,6 +11,8 @@ using Android.Views;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
+using Android.Support.V4.Util;
+using Android.Support.V4.App;
 
 namespace ImageLoading.Sample
 {
@@ -35,7 +37,33 @@ namespace ImageLoading.Sample
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup viewGroup, int position)
         {
             View view = LayoutInflater.From(viewGroup.Context).Inflate(Resource.Layout.list_item, viewGroup, false);
+            view.Click += view_Click;
             return new ViewHolder(view);
+        }
+
+        void view_Click(object sender, EventArgs e)
+        {
+			var position = (int)((View)sender).Tag;
+
+			var view = (View)sender;
+			var pictureImage = view.FindViewById<ImageViewAsync>(Resource.Id.pictureImage);
+			var txtTitle = view.FindViewById<TextView>(Resource.Id.txtTitle);
+
+			Intent intent = new Intent(context, typeof(DetailActivity));
+			intent.PutExtra(DetailActivity.POSITION, position);
+
+			if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Lollipop)
+			{
+				var p1 = Pair.Create(pictureImage, pictureImage.TransitionName);
+				var p2 = Pair.Create(txtTitle, txtTitle.TransitionName);
+
+				var options = ActivityOptionsCompat.MakeSceneTransitionAnimation(context, p1, p2);
+				context.StartActivity(intent, options.ToBundle());
+			}
+			else
+			{
+				context.StartActivity(intent);
+			}
         }
 
         // Replace the contents of a view (invoked by the layout manager)
@@ -46,6 +74,7 @@ namespace ImageLoading.Sample
             var vh = viewHolder as ViewHolder;
 
             vh.Title.Text = position.ToString();
+			vh.ItemView.Tag = position;
 
             ImageService.LoadUrl(item)
                .Retry(3, 200)

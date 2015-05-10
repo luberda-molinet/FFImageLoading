@@ -10,11 +10,12 @@
     android:layout_marginRight="8dp"
     card_view:cardCornerRadius="4dp">
     <RelativeLayout
+        android:background="#fff"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <FFImageLoading.Views.ImageViewAsync
             android:id="@+id/pictureImage"
-            android:transitionName="venueLogo"
+            android:transitionName="logoimage"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="6dp"
@@ -23,7 +24,7 @@
             android:layout_height="110dp" />
         <TextView
             android:id="@+id/txtTitle"
-            android:transitionName="venueTitle"
+            android:transitionName="title"
             android:textColor="#000"
             android:textStyle="bold"
             android:layout_alignParentTop="true"
