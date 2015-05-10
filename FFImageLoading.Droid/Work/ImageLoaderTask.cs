@@ -20,8 +20,9 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private const int FADE_TRANSITION_MILISECONDS = 200;
+		private const float FADE_TRANSITION_MILISECONDS = 400f;
 		private readonly WeakReference<ImageView> _imageWeakReference;
+		private WeakReference<Drawable> _loadingPlaceholderWeakReference;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
 			: base(mainThreadDispatcher, miniLogger, parameters)
@@ -223,7 +224,7 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			return await Task.Run(async () =>
+			return await Task.Run<BitmapDrawable>(async () =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
@@ -317,21 +318,20 @@ namespace FFImageLoading.Work
 								}
 							}
 						}
-
-						// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-						if (Utils.HasHoneycomb())
+							
+						if (isLoadingPlaceHolder)
 						{
-							if (isLoadingPlaceHolder)
-								return new AsyncDrawable(Context.Resources, bitmap, this);
-							else
-								return new BitmapDrawable(Context.Resources, bitmap);
+							return new AsyncDrawable(Context.Resources, bitmap, this);
 						}
-						else // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable which will recycle automagically
+						else
 						{
-							if (isLoadingPlaceHolder)
-								return new ManagedAsyncDrawable(Context.Resources, bitmap, this);
-							else
-								return new ManagedBitmapDrawable(Context.Resources, bitmap);
+							Drawable placeholderDrawable = null;
+							if (_loadingPlaceholderWeakReference != null)
+							{
+								_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
+							}
+
+							return new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS);
 						}
 					}
 					finally
@@ -386,6 +386,8 @@ namespace FFImageLoading.Work
 
 			if (drawable == null)
 				return false;
+
+			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(drawable);
 			
 			if (CancellationToken.IsCancellationRequested)
 				return false;
@@ -521,23 +523,7 @@ namespace FFImageLoading.Work
 				imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
 			}
 
-			if (fadeIn)
-			{
-				var drawables = new[]
-				{
-					imageView.Drawable ?? new ColorDrawable(Color.Transparent),
-					drawable
-				};
-
-				var td = new TransitionDrawable(drawables);
-				imageView.SetImageDrawable(td);
-				td.StartTransition(FADE_TRANSITION_MILISECONDS);
-				//imageView.SetImageDrawable(drawable);
-			}
-			else
-			{
-				imageView.SetImageDrawable(drawable);
-			}
+			imageView.SetImageDrawable(drawable);
 		}
 	}
 
@@ -559,21 +545,72 @@ namespace FFImageLoading.Work
 		}
 	}
 
-	public class ManagedAsyncDrawable : ManagedBitmapDrawable, IAsyncDrawable
+	public class FFBitmapDrawable : BitmapDrawable
 	{
-		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
+		private const int _alpha = 0xFF;
+		private readonly float _fadingTime;
+		private readonly long _startTimeMillis;
+		private Drawable _placeholder;
+		private bool _animating;
 
-		public ManagedAsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
+		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime)
 			: base(res, bitmap)
 		{
-			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
+			_placeholder = placeholder ?? new ColorDrawable(Color.Transparent);
+			_fadingTime = fadingTime;
+			_animating = true;
+			_startTimeMillis = SystemClock.UptimeMillis();
 		}
 
-		public ImageLoaderTask GetImageLoaderTask()
+		public override void Draw(Canvas canvas)
 		{
-			ImageLoaderTask task;
-			_imageLoaderTaskReference.TryGetTarget(out task);
-			return task;
+			var uptime = SystemClock.UptimeMillis();
+			float normalized = (uptime - _startTimeMillis) / _fadingTime;
+			if (normalized >= 1f)
+			{
+				_animating = false;
+				_placeholder = null;
+				base.Draw(canvas);
+			}
+			else
+			{
+				if (_placeholder != null)
+				{
+					_placeholder.Draw(canvas);
+				}
+
+				int partialAlpha = (int)(_alpha * normalized);
+				SetAlpha(partialAlpha);
+				base.Draw(canvas);
+				SetAlpha(_alpha);
+			}
+		}
+
+		public override void SetAlpha(int alpha)
+		{
+			if (_placeholder != null)
+			{
+				_placeholder.SetAlpha(alpha);
+			}
+			base.SetAlpha(alpha);
+		}
+
+		public override void SetColorFilter(Color color, PorterDuff.Mode mode)
+		{
+			if (_placeholder != null)
+			{
+				_placeholder.SetColorFilter(color, mode);
+			}
+			base.SetColorFilter(color, mode);
+		}
+
+		protected override void OnBoundsChange(Rect bounds)
+		{
+			if (_placeholder != null)
+			{
+				_placeholder.SetBounds(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+			}
+			base.OnBoundsChange(bounds);
 		}
 	}
 }
