@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#ccc"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_marginBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+        <FFImageLoading.Views.ImageViewAsync
+            android:id="@+id/backgroundImage"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageLoading.Sample.Views.BorderedImageView
+            android:id="@+id/logoImage"
+            android:transitionName="logoimage"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            app:bordered_color="@android:color/white"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/txtTitle"
+        android:transitionName="title"
+        android:textColor="#000"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name" />
+</LinearLayout>

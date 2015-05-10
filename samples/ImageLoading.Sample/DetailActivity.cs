@@ -1,0 +1,56 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Android.App;
+using Android.Content;
+using Android.OS;
+using Android.Runtime;
+using Android.Support.V7.App;
+using Android.Views;
+using Android.Widget;
+using FFImageLoading;
+using FFImageLoading.Views;
+using ImageLoading.Sample.Transformations;
+
+namespace ImageLoading.Sample
+{
+    [Android.App.Activity(Label = "FFImageLoading - Detail", Theme = "@style/ImageLoading.Theme")]
+    public class DetailActivity : AppCompatActivity
+    {
+		public const string POSITION = "Position";
+
+        ImageViewAsync backgroundImage, logoImage;
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            SetContentView(Resource.Layout.detail_item);
+
+			backgroundImage = FindViewById<ImageViewAsync>(Resource.Id.backgroundImage);
+            logoImage = FindViewById<ImageViewAsync>(Resource.Id.logoImage);
+			var txtTitle = FindViewById<TextView>(Resource.Id.txtTitle);
+
+			var position = Intent.GetIntExtra (POSITION, 0);
+			var image = Config.Images [position];
+
+			txtTitle.Text = position.ToString ();
+
+			ImageService.LoadUrl(image)
+               .Retry(3, 200)
+               .DownSample(200, 200)
+               .LoadingPlaceholder(Config.LoadingPlaceholderPath)
+               .ErrorPlaceholder(Config.ErrorPlaceholderPath)
+               .Into(logoImage);
+
+			ImageService.LoadUrl(image)
+                .Retry(3, 200)
+                .DownSample(500, 500)
+                .Transform(new BlurTransformation(this))
+                .LoadingPlaceholder(Config.LoadingPlaceholderPath)
+                .ErrorPlaceholder(Config.ErrorPlaceholderPath)
+                .Into(backgroundImage);
+        }
+    }
+}

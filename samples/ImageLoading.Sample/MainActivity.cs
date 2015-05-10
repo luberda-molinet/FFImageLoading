@@ -10,11 +10,12 @@ using FFImageLoading;
 using FFImageLoading.Views;
 using Android.Content.Res;
 using Android.Support.V4.App;
+using Android.Support.V7.App;
 
 namespace ImageLoading.Sample
 {
-    [Android.App.Activity(Label = "FFImageLoading - Swipe", MainLauncher = true, Icon = "@drawable/icon")]
-    public class MainActivity : FragmentActivity
+    [Android.App.Activity(Label = "FFImageLoading - Swipe", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/ImageLoading.Theme")]
+    public class MainActivity : AppCompatActivity
     {
         public const string POSITION = "position";
 
