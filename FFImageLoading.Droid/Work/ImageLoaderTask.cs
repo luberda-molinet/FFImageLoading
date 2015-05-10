@@ -72,7 +72,10 @@ namespace FFImageLoading.Work
 			{
 				// Assign the Drawable to the image
 				var drawable = new AsyncDrawable(Context.Resources, null, this);
-				imageView.SetImageDrawable(drawable);
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						imageView.SetImageDrawable(drawable);
+					}).ConfigureAwait(false);
 			}
 
 			return false;
