@@ -40,16 +40,16 @@ namespace ImageLoading.Sample
 			ImageService.LoadUrl(image)
                .Retry(3, 200)
                .DownSample(200, 200)
-               .LoadingPlaceholder(Config.LoadingPlaceholderPath)
-               .ErrorPlaceholder(Config.ErrorPlaceholderPath)
+				.LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
+				.ErrorPlaceholder(Config.ErrorPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
                .Into(logoImage);
 
 			ImageService.LoadUrl(image)
                 .Retry(3, 200)
                 .DownSample(500, 500)
                 .Transform(new BlurTransformation(this))
-                .LoadingPlaceholder(Config.LoadingPlaceholderPath)
-                .ErrorPlaceholder(Config.ErrorPlaceholderPath)
+				.LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
+				.ErrorPlaceholder(Config.ErrorPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
                 .Into(backgroundImage);
         }
     }
