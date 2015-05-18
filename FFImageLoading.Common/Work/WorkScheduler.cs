@@ -117,7 +117,8 @@ namespace FFImageLoading.Work
 				if (pauseWork)
 				{
 					_logger.Debug("SetPauseWork paused.");
-					foreach (var task in _pendingTasks)
+					var tempList = _pendingTasks.ToList(); // we iterate on a copy
+					foreach (var task in tempList)
 						task.ImageLoadingTask.Cancel();
 					_pendingTasks.Clear();
 				}
