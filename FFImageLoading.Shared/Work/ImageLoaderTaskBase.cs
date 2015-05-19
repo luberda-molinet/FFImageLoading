@@ -55,7 +55,8 @@ namespace FFImageLoading.Work
 		{
 			ImageService.RemovePendingTask(this);
 			CancellationToken.Cancel();
-			Parameters.OnFinish(this);
+			if (Parameters.OnFinish != null)
+				Parameters.OnFinish(this);
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
 

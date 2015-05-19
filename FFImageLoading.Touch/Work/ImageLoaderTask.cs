@@ -112,10 +112,11 @@ namespace FFImageLoading.Work
 			finally
 			{
 				// if we still need to retry then it's obviously not finished yet
-				if (NumberOfRetryNeeded == 0)
+				if (NumberOfRetryNeeded == 0 || IsCancelled)
 				{
 					ImageService.RemovePendingTask(this);
-					Parameters.OnFinish(this);
+					if (Parameters.OnFinish != null)
+						Parameters.OnFinish(this);
 				}
 			}
 		}

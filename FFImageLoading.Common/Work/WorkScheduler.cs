@@ -234,6 +234,10 @@ namespace FFImageLoading.Work
 				_logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", key));
 				forceLoad();
 			}
+			else
+			{
+				//TODO FMT: We should call Finish callback in that case
+			}
 		}
 
 		private async void Run(PendingTask pendingTask)
