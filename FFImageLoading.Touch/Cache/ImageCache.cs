@@ -20,10 +20,7 @@ namespace FFImageLoading.Cache
             System.Diagnostics.Debug.WriteLine(string.Format("LruCache size: {0}MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
-            NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => {
-                _cache.RemoveAllObjects();
-                System.GC.Collect(); // FMT: it's probably better to collect the GC since we need memory back?
-            });
+            NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());
         }
 
         public static IImageCache Instance
@@ -43,6 +40,12 @@ namespace FFImageLoading.Cache
         {
             _cache.SetCost(value, new NSString(key), value.GetMemorySize());
         }
+
+		public void Clear()
+		{
+			_cache.RemoveAllObjects();
+			System.GC.Collect(); // FMT: it's probably better to collect the GC since we need memory back?
+		}
     }
 }
 

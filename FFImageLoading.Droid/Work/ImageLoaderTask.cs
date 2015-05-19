@@ -95,87 +95,64 @@ namespace FFImageLoading.Work
 		/// <summary>
 		/// Runs the image loading task: gets image from file, url, asset or cache. Then assign it to the imageView.
 		/// </summary>
-		public override async Task RunAsync()
+		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
+			BitmapDrawable drawable = null;
 			try
 			{
-				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
-					return;
-				
-				BitmapDrawable drawable = null;
-				try
-				{
-					drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("An error occured while retrieving drawable.", ex);
-					Parameters.OnError(ex);
-					drawable = null;
-				}
-
-				var imageView = GetAttachedImageView();
-				if (imageView == null)
-					return;
-
-				if (drawable == null)
-				{
-					// Show error placeholder
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
-					return;
-				}
-
-				Exception trappedException = null;
-				try
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return;
-
-					// Post on main thread
-					await MainThreadDispatcher.PostAsync(() =>
-						{
-							if (CancellationToken.IsCancellationRequested)
-								return;
-
-							SetImageDrawable(imageView, drawable, UseFadeInBitmap);
-							Completed = true;
-							Parameters.OnSuccess(drawable.IntrinsicWidth, drawable.IntrinsicHeight);
-						}).ConfigureAwait(false);
-				}
-				catch (Exception ex2)
-				{
-					trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-				}
-
-				// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-				if (trappedException != null)
-				{
-					// Show error placeholder
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
-					throw trappedException;
-				}
-			}
-			catch (OutOfMemoryException oom)
-			{
-				Logger.Error("Received an OutOfMemory we will clear the cache", oom);
-				ImageCache.Instance.Clear();
-				Parameters.OnError(oom);
+				drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("An error occured", ex);
-				Parameters.OnError(ex);
+				Logger.Error("An error occured while retrieving drawable.", ex);
+				drawable = null;
 			}
-			finally
+
+			var imageView = GetAttachedImageView();
+			if (imageView == null)
+				return GenerateResult.InvalidTarget;
+
+			if (drawable == null)
 			{
-				// if we still need to retry then it's obviously not finished yet
-				if (NumberOfRetryNeeded == 0 || IsCancelled)
-				{
-					ImageService.RemovePendingTask(this);
-					if (Parameters.OnFinish != null)
-						Parameters.OnFinish(this);
-				}
+				// Show error placeholder
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				return GenerateResult.Failed;
 			}
+
+			Exception trappedException = null;
+			try
+			{
+				if (CancellationToken.IsCancellationRequested)
+					return GenerateResult.Canceled;
+
+				// Post on main thread
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						SetImageDrawable(imageView, drawable, UseFadeInBitmap);
+						Completed = true;
+						Parameters.OnSuccess(drawable.IntrinsicWidth, drawable.IntrinsicHeight);
+					}).ConfigureAwait(false);
+
+				if (!Completed)
+					return GenerateResult.Failed;
+			}
+			catch (Exception ex2)
+			{
+				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			}
+
+			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			if (trappedException != null)
+			{
+				// Show error placeholder
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				throw trappedException;
+			}
+
+			return GenerateResult.Success;
 		}
 
 		/// <summary>
@@ -248,6 +225,7 @@ namespace FFImageLoading.Work
 					var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
 					if (stream == null)
 						return null;
+					
 					try
 					{
 						try
@@ -258,6 +236,8 @@ namespace FFImageLoading.Work
 							{ // Assets stream can't be seeked to origin position
 								stream.Dispose();
 								stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+								if (stream == null)
+									return null;
 							}
 							else
 							{
@@ -267,7 +247,6 @@ namespace FFImageLoading.Work
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-							Parameters.OnError(ex);
 							return null;
 						}
 
@@ -292,7 +271,6 @@ namespace FFImageLoading.Work
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
-							Parameters.OnError(ex);
 						}
 
 						if (CancellationToken.IsCancellationRequested)
@@ -306,7 +284,6 @@ namespace FFImageLoading.Work
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-							Parameters.OnError(ex);
 							return null;
 						}
 
@@ -389,7 +366,6 @@ namespace FFImageLoading.Work
 				catch (Exception ex)
 				{
 					Logger.Error("An error occured while retrieving drawable.", ex);
-					Parameters.OnError(ex);
 					return false;
 				}
 			}
@@ -437,7 +413,6 @@ namespace FFImageLoading.Work
 			catch (Exception ex)
 			{
 				Logger.Error("Unable to retrieve image data", ex);
-				Parameters.OnError(ex);
 				return null;
 			}
 

@@ -50,75 +50,61 @@ namespace FFImageLoading.Work
 		/// <summary>
 		/// Runs the image loading task: gets image from file, url, asset or cache. Then assign it to the imageView.
 		/// </summary>
-		public override async Task RunAsync()
+		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
+			UIImage image = null;
 			try
 			{
-				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
-					return;
-
-				UIImage image = null;
-				try
-				{
-					image = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("An error occured while retrieving image.", ex);
-					Parameters.OnError(ex);
-					image = null;
-				}
-
-				if (image == null)
-				{
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-					return;
-				}
-
-				if (CancellationToken.IsCancellationRequested || _getNativeControl() == null)
-					return;
-
-				Exception trappedException = null;
-				try
-				{
-					// Post on main thread
-					await MainThreadDispatcher.PostAsync(() =>
-						{
-							if (CancellationToken.IsCancellationRequested)
-								return;
-
-							_doWithImage(image);
-							Completed = true;
-							Parameters.OnSuccess((int)image.Size.Width, (int)image.Size.Height);
-						}).ConfigureAwait(false);
-				}
-				catch (Exception ex2)
-				{
-					trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-				}
-
-				// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-				if (trappedException != null)
-				{
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-					throw trappedException;
-				}
+				image = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("An error occured", ex);
-				Parameters.OnError(ex);
+				Logger.Error("An error occured while retrieving image.", ex);
+				image = null;
 			}
-			finally
+
+			if (image == null)
 			{
-				// if we still need to retry then it's obviously not finished yet
-				if (NumberOfRetryNeeded == 0 || IsCancelled)
-				{
-					ImageService.RemovePendingTask(this);
-					if (Parameters.OnFinish != null)
-						Parameters.OnFinish(this);
-				}
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+				return GenerateResult.Failed;
 			}
+
+			if (CancellationToken.IsCancellationRequested)
+				return GenerateResult.Canceled;
+					
+			if (_getNativeControl() == null)
+				return GenerateResult.InvalidTarget;
+
+			Exception trappedException = null;
+			try
+			{
+				// Post on main thread
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						_doWithImage(image);
+						Completed = true;
+						Parameters.OnSuccess((int)image.Size.Width, (int)image.Size.Height);
+					}).ConfigureAwait(false);
+
+				if (!Completed)
+					return GenerateResult.Failed;
+			}
+			catch (Exception ex2)
+			{
+				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			}
+
+			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			if (trappedException != null)
+			{
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+				throw trappedException;
+			}
+
+			return GenerateResult.Success;
 		}
 
 		/// <summary>

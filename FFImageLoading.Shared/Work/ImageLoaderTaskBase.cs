@@ -82,7 +82,67 @@ namespace FFImageLoading.Work
 				Cancel();
 		}
 
-		public abstract Task RunAsync();
+		public async Task RunAsync()
+		{
+			try
+			{
+				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
+					return;
+
+				GenerateResult generatingImageSucceeded = GenerateResult.Failed;
+				Exception ex = null;
+
+				Func<Task> perform = async () =>
+					{
+						try
+						{
+							generatingImageSucceeded = await TryGeneratingImageAsync().ConfigureAwait(false);
+						}
+						catch (OutOfMemoryException oom)
+						{
+							Logger.Error("Received an OutOfMemory we will clear the cache", oom);
+							ImageCache.Instance.Clear();
+							ex = oom;
+						}
+						catch (Exception ex2)
+						{
+							Logger.Error("An error occured", ex);
+							ex = ex2;
+						}
+					};
+
+				await perform().ConfigureAwait(false);
+
+				// Retry logic if needed
+				while (generatingImageSucceeded == GenerateResult.Failed && !IsCancelled && !Completed && NumberOfRetryNeeded > 0)
+				{
+					int retryNumber = Parameters.RetryCount - NumberOfRetryNeeded;
+					Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryNumber));
+
+					if (Parameters.RetryDelayInMs > 0)
+						await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
+
+					await perform().ConfigureAwait(false);
+					NumberOfRetryNeeded--;
+				}
+
+				if (generatingImageSucceeded == GenerateResult.Failed)
+				{
+					if (ex == null)
+						ex = new Exception("FFImageLoading is unable to generate image.");
+
+					Parameters.OnError(ex);
+				}
+			}
+			finally
+			{
+				ImageService.RemovePendingTask(this);
+				//if (Parameters.OnFinish != null)
+				Parameters.OnFinish(this);
+			}
+		}
+
+		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 
 		/// <summary>
 		/// Tries to load requested image from the cache asynchronously.
@@ -115,23 +175,6 @@ namespace FFImageLoading.Work
 					MainThreadDispatcher.Post(() => finishCallback(scheduledWork));
 					Parameters.Dispose(); // if Finish is called then Parameters are useless now, we can dispose them so we don't keep a reference to callbacks
 				});
-
-			if (NumberOfRetryNeeded > 0)
-			{
-				Parameters = Parameters.Error(async ex =>
-					{
-						if (NumberOfRetryNeeded > 0)
-						{
-							int retryNumber = Parameters.RetryCount - NumberOfRetryNeeded;
-							Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryNumber));
-							if (Parameters.RetryDelayInMs > 0)
-								await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
-							await RunAsync().ConfigureAwait(false);
-							NumberOfRetryNeeded --;
-						}
-						errorCallback(ex);
-					});
-			}
 		}
 	}
 }

@@ -106,6 +106,9 @@
     <Compile Include="..\FFImageLoading.Common\Cache\CacheResult.cs">
       <Link>Cache\CacheResult.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\GenerateResult.cs">
+      <Link>Work\GenerateResult.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
