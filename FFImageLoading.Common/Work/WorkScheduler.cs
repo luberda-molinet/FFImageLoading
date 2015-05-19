@@ -166,7 +166,7 @@ namespace FFImageLoading.Work
 			PendingTask alreadyRunningTaskForSameKey = null;
 			lock (_pauseWorkLock)
 			{
-				alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey());
+				alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey() && (!t.ImageLoadingTask.IsCancelled));
 				if (alreadyRunningTaskForSameKey == null)
 					_pendingTasks.Add(currentPendingTask);
 			}
