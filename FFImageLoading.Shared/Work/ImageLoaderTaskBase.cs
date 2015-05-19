@@ -12,6 +12,7 @@ namespace FFImageLoading.Work
 		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters)
 		{
 			Parameters = parameters;
+			NumberOfRetryNeeded = parameters.RetryCount;
 			MainThreadDispatcher = mainThreadDispatcher;
 			Logger = miniLogger;
 			ConfigureParameters();
@@ -28,6 +29,8 @@ namespace FFImageLoading.Work
 		protected IMiniLogger Logger { get; private set; }
 
 		protected CancellationTokenSource CancellationToken { get; set; }
+
+		protected int NumberOfRetryNeeded { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Work.ImageLoaderTaskBase"/> is completed.
@@ -108,18 +111,18 @@ namespace FFImageLoading.Work
 			Parameters.Error(ex => MainThreadDispatcher.Post(() => errorCallback(ex)));
 			Parameters.Finish(scheduledWork => MainThreadDispatcher.Post(() => finishCallback(scheduledWork)));
 
-			if (Parameters.RetryCount > 0)
+			if (NumberOfRetryNeeded > 0)
 			{
-				int retryCurrentValue = 0;
 				Parameters = Parameters.Error(async ex =>
 					{
-						if (retryCurrentValue < Parameters.RetryCount)
+						if (NumberOfRetryNeeded > 0)
 						{
-                            Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryCurrentValue));
+							int retryNumber = Parameters.RetryCount - NumberOfRetryNeeded;
+							Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryNumber));
 							if (Parameters.RetryDelayInMs > 0)
 								await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
 							await RunAsync().ConfigureAwait(false);
-							retryCurrentValue++;
+							NumberOfRetryNeeded --;
 						}
 						errorCallback(ex);
 					});

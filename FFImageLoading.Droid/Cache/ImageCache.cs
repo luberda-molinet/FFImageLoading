@@ -17,6 +17,7 @@ namespace FFImageLoading.Cache
 		private ConcurrentDictionary<string, bool> _references;
 		private readonly ConcurrentSet<SoftReference> _reusableBitmaps;
 		private static IImageCache _instance;
+		private static object _clearLock;
 
         private ImageCache(int maxCacheSize) : base(GetMaxCacheSize())
 		{
@@ -24,6 +25,7 @@ namespace FFImageLoading.Cache
                 _reusableBitmaps = new ConcurrentSet<SoftReference>();
 
 			_references = new ConcurrentDictionary<string, bool>();
+			_clearLock = new object();
 		}
 
         public static IImageCache Instance
@@ -33,8 +35,6 @@ namespace FFImageLoading.Cache
                 return _instance ?? (_instance = new ImageCache(ImageService.Config.MaxCacheSize));
             }
         }
-
-		public int Count { get; private set; }
 
 		public static int GetBitmapSize(BitmapDrawable bmp)
 		{
@@ -49,11 +49,40 @@ namespace FFImageLoading.Cache
 
 		public void Clear()
 		{
-			if (_references != null && _references.Count > 0)
-				_references.Clear();
-			EvictAll();
-            // Can't use minilogger here, we would have too many dependencies
-            System.Diagnostics.Debug.WriteLine("ImageCache cleared.");
+			bool didClean = false;
+
+			lock (_clearLock)
+			{
+				if (_references != null && _references.Count > 0)
+				{
+					_references.Clear();
+					didClean = true;
+				}
+
+				if (_reusableBitmaps != null && _reusableBitmaps.Count > 0)
+				{
+					_reusableBitmaps.Clear();
+					didClean = true;
+				}
+
+				if (Size > 0)
+				{
+					EvictAll();
+					didClean = true;
+				}
+
+				if (didClean)
+				{
+					// Force immediate Garbage collection
+					System.GC.Collect();
+				}
+			}
+
+			if (didClean)
+			{
+				// Can't use minilogger here, we would have too many dependencies
+				System.Diagnostics.Debug.WriteLine("ImageCache cleared and forcing immediate garbage collection.");
+			}
 		}
 
 		public void Add(string key, BitmapDrawable bitmap)
@@ -70,7 +99,6 @@ namespace FFImageLoading.Cache
 			}
 			_references.GetOrAdd(key, true);
 			Put(key, bitmap);
-			Count++;
 		}
 
 		public Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options)
@@ -116,7 +144,6 @@ namespace FFImageLoading.Cache
 				old.SetIsCached(false);
 				bool tmp;
 				_references.TryRemove((string) key, out tmp);
-				Count--;
 			}
 			else
 			{

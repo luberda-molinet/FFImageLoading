@@ -154,7 +154,12 @@ namespace FFImageLoading.Work
 					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 					throw trappedException;
 				}
-
+			}
+			catch (OutOfMemoryException oom)
+			{
+				Logger.Error("Received an OutOfMemory we will clear the cache", oom);
+				ImageCache.Clear();
+				Parameters.OnError(oom);
 			}
 			catch (Exception ex)
 			{
@@ -165,7 +170,30 @@ namespace FFImageLoading.Work
 			{
 				ImageService.RemovePendingTask(this);
 				Parameters.OnFinish(this);
+
+				if (NumberOfRetryNeeded == 0)
+				{
+					CleanUp();
+				}
 			}
+		}
+
+		private void CleanUp()
+		{
+			// remove reference to callbacks
+			Parameters.OnSuccess = null;
+			Parameters.OnError = null;
+			Parameters.OnFinish = null;
+
+			// clear transformations list
+			if (Parameters.Transformations != null)
+			{
+				Parameters.Transformations.Clear();
+				Parameters.Transformations = null;
+			}
+
+			_imageWeakReference = null;
+			_loadingPlaceholderWeakReference = null;
 		}
 
 		/// <summary>
