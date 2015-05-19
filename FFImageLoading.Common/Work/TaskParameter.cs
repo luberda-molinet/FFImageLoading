@@ -10,8 +10,10 @@ namespace FFImageLoading.Work
 		ApplicationBundle
 	}
 
-	public class TaskParameter
+	public class TaskParameter: IDisposable
 	{
+		private bool _disposed;
+
 		/// <summary>
 		/// Constructs a new TaskParameter to load an image from a file.
 		/// </summary>
@@ -61,6 +63,26 @@ namespace FFImageLoading.Work
 			};
 		}
 
+		public void Dispose()
+		{
+			if (!_disposed)
+			{
+				// remove reference to callbacks
+				OnSuccess = null;
+				OnError = null;
+				OnFinish = null;
+
+				// clear transformations list
+				if (Transformations != null)
+				{
+					Transformations.Clear();
+					Transformations = null;
+				}
+
+				_disposed = true;
+			}
+		}
+
 		public ImageSource Source { get; private set; }
 
 		public string Path { get; private set; }
@@ -87,7 +109,7 @@ namespace FFImageLoading.Work
 
 		public Action<IScheduledWork> OnFinish { get; private set; }
 
-        public List<ITransformation> Transformations { get; private set; }
+		public List<ITransformation> Transformations { get; private set; }
 
 		public TaskParameter Transform(ITransformation transformation)
 		{

@@ -89,6 +89,11 @@ namespace FFImageLoading.Work
 			{
 				_logger.Error("Exception occurent trying to cancel the task", e);
 			}
+			finally
+			{
+				if (task != null)
+					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+			}
 		}
 
 		public bool ExitTasksEarly
@@ -146,20 +151,36 @@ namespace FFImageLoading.Work
 		/// <param name="task">Image loading task.</param>
 		public async void LoadImage(IImageLoaderTask task)
 		{
-			if (task == null || task.IsCancelled)
+			if (task == null)
 				return;
+
+			if (task.IsCancelled)
+			{
+				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+				return;
+			}
 
 			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
 			if (loadedFromCache)
 			{
 				if (task.Parameters.OnFinish != null)
 					task.Parameters.OnFinish(task);
+
+				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
 				return; // image successfully loaded from cache
 			}
 			
 			if (task.IsCancelled || _pauseWork)
+			{
+				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
 				return;
+			}
 
+			QueueAndGenerateImage(task);
+		}
+
+		private void QueueAndGenerateImage(IImageLoaderTask task)
+		{
 			_logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
 
 			var currentPendingTask = new PendingTask() { ImageLoadingTask = task };

@@ -30,7 +30,7 @@ namespace FFImageLoading.Work
 
 		protected CancellationTokenSource CancellationToken { get; set; }
 
-		protected int NumberOfRetryNeeded { get; private set; }
+		public int NumberOfRetryNeeded { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Work.ImageLoaderTaskBase"/> is completed.
@@ -109,7 +109,11 @@ namespace FFImageLoading.Work
 			// make sure callbacks are invoked on Main thread
 			Parameters.Success((w, h) => MainThreadDispatcher.Post(() => successCallback(w, h)));
 			Parameters.Error(ex => MainThreadDispatcher.Post(() => errorCallback(ex)));
-			Parameters.Finish(scheduledWork => MainThreadDispatcher.Post(() => finishCallback(scheduledWork)));
+			Parameters.Finish(scheduledWork =>
+				{
+					MainThreadDispatcher.Post(() => finishCallback(scheduledWork));
+					Parameters.Dispose(); // if Finish is called then Parameters are useless now, we can dispose them so we don't keep a reference to callbacks
+				});
 
 			if (NumberOfRetryNeeded > 0)
 			{

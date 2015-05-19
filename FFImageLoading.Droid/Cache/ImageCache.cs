@@ -65,7 +65,7 @@ namespace FFImageLoading.Cache
 					didClean = true;
 				}
 
-				if (Size > 0)
+				if (Size() > 0)
 				{
 					EvictAll();
 					didClean = true;

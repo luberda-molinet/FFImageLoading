@@ -158,7 +158,7 @@ namespace FFImageLoading.Work
 			catch (OutOfMemoryException oom)
 			{
 				Logger.Error("Received an OutOfMemory we will clear the cache", oom);
-				ImageCache.Clear();
+				ImageCache.Instance.Clear();
 				Parameters.OnError(oom);
 			}
 			catch (Exception ex)
@@ -168,32 +168,13 @@ namespace FFImageLoading.Work
 			}
 			finally
 			{
-				ImageService.RemovePendingTask(this);
-				Parameters.OnFinish(this);
-
+				// if we still need to retry then it's obviously not finished yet
 				if (NumberOfRetryNeeded == 0)
 				{
-					CleanUp();
+					ImageService.RemovePendingTask(this);
+					Parameters.OnFinish(this);
 				}
 			}
-		}
-
-		private void CleanUp()
-		{
-			// remove reference to callbacks
-			Parameters.OnSuccess = null;
-			Parameters.OnError = null;
-			Parameters.OnFinish = null;
-
-			// clear transformations list
-			if (Parameters.Transformations != null)
-			{
-				Parameters.Transformations.Clear();
-				Parameters.Transformations = null;
-			}
-
-			_imageWeakReference = null;
-			_loadingPlaceholderWeakReference = null;
 		}
 
 		/// <summary>
