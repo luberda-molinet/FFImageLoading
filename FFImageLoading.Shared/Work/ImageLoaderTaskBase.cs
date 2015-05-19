@@ -53,8 +53,8 @@ namespace FFImageLoading.Work
 
 		public void Cancel()
 		{
-			CancellationToken.Cancel();
 			ImageService.RemovePendingTask(this);
+			CancellationToken.Cancel();
 			Parameters.OnFinish(this);
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}

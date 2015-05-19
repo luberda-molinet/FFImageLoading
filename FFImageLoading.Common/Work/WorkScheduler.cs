@@ -117,7 +117,8 @@ namespace FFImageLoading.Work
 				if (pauseWork)
 				{
 					_logger.Debug("SetPauseWork paused.");
-					foreach (var task in _pendingTasks)
+					var tempList = _pendingTasks.ToList(); // we iterate on a copy
+					foreach (var task in tempList)
 						task.ImageLoadingTask.Cancel();
 					_pendingTasks.Clear();
 				}
@@ -165,7 +166,7 @@ namespace FFImageLoading.Work
 			PendingTask alreadyRunningTaskForSameKey = null;
 			lock (_pauseWorkLock)
 			{
-				alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey());
+				alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey() && (!t.ImageLoadingTask.IsCancelled));
 				if (alreadyRunningTaskForSameKey == null)
 					_pendingTasks.Add(currentPendingTask);
 			}
