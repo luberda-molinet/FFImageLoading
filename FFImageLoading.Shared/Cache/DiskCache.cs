@@ -200,7 +200,7 @@ namespace FFImageLoading.Cache
 
             bool existed = entries.ContainsKey (key);
             string filepath = Path.Combine(basePath, key);
-            await FileStore.WriteBytes(filepath, data).ConfigureAwait(false);
+            await FileStore.WriteBytesAsync(filepath, data).ConfigureAwait(false);
 
             AppendToJournal (existed ? JournalOp.Modified : JournalOp.Created,
                 key,
@@ -217,7 +217,10 @@ namespace FFImageLoading.Cache
                 return null;
             try {
                 string filepath = Path.Combine (basePath, key);
-                data = await FileStore.ReadBytes(filepath).ConfigureAwait(false);
+				if (!FileStore.Exists(filepath))
+					return null;
+				
+                data = await FileStore.ReadBytesAsync(filepath).ConfigureAwait(false);
             } catch {
                 return null;
             }

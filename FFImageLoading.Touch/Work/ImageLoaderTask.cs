@@ -152,7 +152,10 @@ namespace FFImageLoading.Work
 				{
 					case ImageSource.ApplicationBundle:
 					case ImageSource.Filepath:
-						bytes = await FileStore.ReadBytes(path).ConfigureAwait(false);
+						if (FileStore.Exists(path))
+						{
+							bytes = await FileStore.ReadBytesAsync(path).ConfigureAwait(false);
+						}
 						break;
 					case ImageSource.Url:
 						var downloadedData = await DownloadCache.GetAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
@@ -167,6 +170,9 @@ namespace FFImageLoading.Work
 				Parameters.OnError(ex);
 				return null;
 			}
+
+			if (bytes == null)
+				return null;
 
 			return await Task.Run(() =>
 				{

@@ -16,7 +16,12 @@ namespace FFImageLoading.IO
 			return new FileStream(path, FileMode.Create, FileAccess.Write);
 		}
 
-        public static async Task<byte[]> ReadBytes(string path)
+		public static bool Exists(string path)
+		{
+			return File.Exists(path);
+		}
+
+        public static async Task<byte[]> ReadBytesAsync(string path)
         {
 			using (var fs = GetInputStream(path)) {
                 using (var memory = new MemoryStream()) {
@@ -26,7 +31,7 @@ namespace FFImageLoading.IO
             }
         }
 
-        public static async Task WriteBytes(string path, byte[] data)
+        public static async Task WriteBytesAsync(string path, byte[] data)
         {
             using (var fs = GetOutputStream(path)) {
                 using (var memory = new MemoryStream(data)) {
