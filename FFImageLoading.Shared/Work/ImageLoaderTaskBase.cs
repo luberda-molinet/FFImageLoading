@@ -126,7 +126,7 @@ namespace FFImageLoading.Work
 					NumberOfRetryNeeded--;
 				}
 
-				if (generatingImageSucceeded == GenerateResult.Failed)
+				if (!IsCancelled && !Completed && generatingImageSucceeded == GenerateResult.Failed)
 				{
 					if (ex == null)
 						ex = new Exception("FFImageLoading is unable to generate image.");
@@ -137,8 +137,8 @@ namespace FFImageLoading.Work
 			finally
 			{
 				ImageService.RemovePendingTask(this);
-				//if (Parameters.OnFinish != null)
-				Parameters.OnFinish(this);
+				if (Parameters.OnFinish != null)
+					Parameters.OnFinish(this);
 			}
 		}
 
