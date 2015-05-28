@@ -91,7 +91,7 @@ namespace FFImageLoading.Work
 			}
 			finally
 			{
-				if (task != null)
+				if (task != null && task.IsCancelled)
 					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
 			}
 		}

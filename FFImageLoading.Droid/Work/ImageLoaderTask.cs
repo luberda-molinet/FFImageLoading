@@ -176,6 +176,9 @@ namespace FFImageLoading.Work
 				if (imageView == null)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
                 var key = GetKey();
 
                 if (string.IsNullOrWhiteSpace(key))
@@ -185,9 +188,15 @@ namespace FFImageLoading.Work
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
                 Logger.Debug(string.Format("Image from cache: {0}", key));
 				await MainThreadDispatcher.PostAsync(() =>
 					{
+						if (IsCancelled)
+							return;
+						
 						imageView.SetImageDrawable(value);
 						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 						{
@@ -196,11 +205,16 @@ namespace FFImageLoading.Work
 						}
 					}).ConfigureAwait(false);
 
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				if (Parameters.OnSuccess != null)
 				Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
 			{
+				if (Parameters.OnError != null)
 				Parameters.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
