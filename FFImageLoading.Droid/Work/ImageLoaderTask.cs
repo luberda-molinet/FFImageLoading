@@ -191,11 +191,15 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
 
-                Logger.Debug(string.Format("Image from cache: {0}", key));
+				Logger.Debug(string.Format("Image from cache: {0}", key));
 				await MainThreadDispatcher.PostAsync(() =>
 					{
 						if (IsCancelled)
 							return;
+
+						var ffDrawable = value as FFBitmapDrawable;
+						if (ffDrawable != null)
+							ffDrawable.StopFadeAnimation();
 						
 						imageView.SetImageDrawable(value);
 						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
@@ -209,13 +213,13 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not sure what to return in that case
 
 				if (Parameters.OnSuccess != null)
-				Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
+					Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
 			{
 				if (Parameters.OnError != null)
-				Parameters.OnError(ex);
+					Parameters.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
 		}
@@ -546,16 +550,16 @@ namespace FFImageLoading.Work
 
 	public class FFBitmapDrawable : BitmapDrawable
 	{
-		private const int _alpha = 0xFF;
 		private readonly float _fadingTime;
 		private readonly long _startTimeMillis;
+		private int _alpha = 0xFF;
 		private Drawable _placeholder;
-		private bool _animating;
+		private volatile bool _animating;
 
 		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime)
 			: base(res, bitmap)
 		{
-			_placeholder = placeholder ?? new ColorDrawable(Color.Transparent);
+			_placeholder = placeholder;
 			_fadingTime = fadingTime;
 			_animating = true;
 			_startTimeMillis = SystemClock.UptimeMillis();
@@ -563,30 +567,47 @@ namespace FFImageLoading.Work
 
 		public override void Draw(Canvas canvas)
 		{
-			var uptime = SystemClock.UptimeMillis();
-			float normalized = (uptime - _startTimeMillis) / _fadingTime;
-			if (normalized >= 1f)
+			if (!_animating)
 			{
-				_animating = false;
-				_placeholder = null;
+				base.SetAlpha(_alpha);
 				base.Draw(canvas);
 			}
 			else
 			{
-				if (_placeholder != null)
+				var uptime = SystemClock.UptimeMillis();
+				float normalized = (uptime - _startTimeMillis) / _fadingTime;
+				if (normalized >= 1f)
 				{
-					_placeholder.Draw(canvas);
+					_animating = false;
+					_placeholder = null;
+					base.Draw(canvas);
 				}
+				else
+				{
+					if (_placeholder != null)
+					{
+						_placeholder.Draw(canvas);
+					}
 
-				int partialAlpha = (int)(_alpha * normalized);
-				SetAlpha(partialAlpha);
-				base.Draw(canvas);
-				SetAlpha(_alpha);
+					int partialAlpha = (int)(_alpha * normalized);
+					base.SetAlpha(partialAlpha);
+					base.Draw(canvas);
+					base.SetAlpha(_alpha);
+				}
 			}
+		}
+
+
+		public void StopFadeAnimation()
+		{
+			_animating = false;
+			_placeholder = null;
 		}
 
 		public override void SetAlpha(int alpha)
 		{
+			_alpha = alpha;
+
 			if (_placeholder != null)
 			{
 				_placeholder.SetAlpha(alpha);
