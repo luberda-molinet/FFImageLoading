@@ -40,7 +40,7 @@ namespace FFImageLoading
 					throw new Exception("FFImageLoading.ImageService is already initialized");
 			}
 
-            InitializeIfNeeded();
+            InitializeIfNeeded(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
