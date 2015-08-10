@@ -178,5 +178,17 @@ namespace FFImageLoading
         {
             Scheduler.LoadImage(task);
         }
+
+		/// <summary>
+		/// Invalidates the memory cache.
+		/// </summary>
+		public static void InvalidateMemoryCache()
+		{
+			#if __ANDROID__
+			ImageCache.Instance.Clear();
+			#elif __IOS__
+			ImageCache.Instance.Clear();
+			#endif
+		}
     }
 }
