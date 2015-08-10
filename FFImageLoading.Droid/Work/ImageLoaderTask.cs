@@ -55,7 +55,7 @@ namespace FFImageLoading.Work
 			_imageWeakReference.TryGetTarget(out imageView);
 			if (imageView == null)
 				return false;
-			
+
 			// Cancel current task attached to the same image view, if needed only
 			var currentAssignedTask = imageView.GetImageLoaderTask();
 			if (currentAssignedTask != null)
@@ -98,14 +98,17 @@ namespace FFImageLoading.Work
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
 			BitmapDrawable drawable = null;
-			try
+			if (!string.IsNullOrWhiteSpace(Parameters.Path))
 			{
-				drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error("An error occured while retrieving drawable.", ex);
-				drawable = null;
+				try
+				{
+					drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error("An error occured while retrieving drawable.", ex);
+					drawable = null;
+				}
 			}
 
 			var imageView = GetAttachedImageView();
@@ -179,12 +182,12 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
 
-                var key = GetKey();
+				var key = GetKey();
 
-                if (string.IsNullOrWhiteSpace(key))
-                    return CacheResult.NotFound; 
+				if (string.IsNullOrWhiteSpace(key))
+					return CacheResult.NotFound;
 
-                var value = ImageCache.Instance.Get(key);
+				var value = ImageCache.Instance.Get(key);
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
@@ -200,7 +203,7 @@ namespace FFImageLoading.Work
 						var ffDrawable = value as FFBitmapDrawable;
 						if (ffDrawable != null)
 							ffDrawable.StopFadeAnimation();
-						
+
 						imageView.SetImageDrawable(value);
 						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 						{
@@ -239,11 +242,11 @@ namespace FFImageLoading.Work
 					{
 						InJustDecodeBounds = true
 					};
-								
+
 					var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
 					if (stream == null)
 						return null;
-					
+
 					try
 					{
 						try
@@ -270,7 +273,7 @@ namespace FFImageLoading.Work
 
 						if (CancellationToken.IsCancellationRequested)
 							return null;
-					
+
 						options.InPurgeable = true;
 						options.InJustDecodeBounds = false;
 
@@ -281,7 +284,7 @@ namespace FFImageLoading.Work
 								// Calculate inSampleSize
 								options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
 							}
-						
+
 							// If we're running on Honeycomb or newer, try to use inBitmap
 							if (Utils.HasHoneycomb())
 								AddInBitmapOptions(options);
@@ -323,7 +326,7 @@ namespace FFImageLoading.Work
 								}
 							}
 						}
-							
+
 						if (isLoadingPlaceHolder)
 						{
 							return new AsyncDrawable(Context.Resources, bitmap, this);
@@ -376,7 +379,7 @@ namespace FFImageLoading.Work
 				{
 					imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
 				}).ConfigureAwait(false);
-				
+
 				try
 				{
 					drawable = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
@@ -392,7 +395,7 @@ namespace FFImageLoading.Work
 				return false;
 
 			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(drawable);
-			
+
 			if (CancellationToken.IsCancellationRequested)
 				return false;
 
@@ -411,7 +414,7 @@ namespace FFImageLoading.Work
 		{
 			Stream stream = null;
 
-            if (string.IsNullOrWhiteSpace(path)) return null;
+			if (string.IsNullOrWhiteSpace(path)) return null;
 
 			try
 			{
@@ -441,7 +444,7 @@ namespace FFImageLoading.Work
 		// having a width and height equal to or larger than the requested width and height.
 		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
 		{
-            if (string.IsNullOrWhiteSpace(sourcePath)) return null;
+			if (string.IsNullOrWhiteSpace(sourcePath)) return null;
 
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back

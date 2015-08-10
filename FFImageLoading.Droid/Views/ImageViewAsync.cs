@@ -54,12 +54,12 @@ namespace FFImageLoading.Views
 			}
 		}
 
-		private BottomAlign _bottomAlign;
+		private AlignMode _bottomAlign;
 		/// <summary>
 		/// Gets or sets a value if the image should be aligned to left and bottom in the available space.
 		/// <remarks>AdjustViewToBounds should be false and ScaleType should be matrix.</remarks>
 		/// </summary>
-		public BottomAlign BottomAlign
+		public AlignMode AlignMode
 		{
 			get
 			{
@@ -104,7 +104,7 @@ namespace FFImageLoading.Views
 		{
 			if (Drawable != null && Drawable.IntrinsicWidth != 0)
 			{
-				bool bottomAlignmentDefined = BottomAlign != BottomAlign.None;
+				bool bottomAlignmentDefined = AlignMode != AlignMode.None;
 				if (ScaleToFit || bottomAlignmentDefined)
 				{
 					var matrix = this.ImageMatrix;
@@ -130,29 +130,34 @@ namespace FFImageLoading.Views
 						}
 					}
 
-					if (BottomAlign != BottomAlign.None)
+					if (AlignMode != AlignMode.None)
 					{
-						//align to the bottom
-						if (Height - (Drawable.IntrinsicHeight * scaleFactor) > 0)
+						if (AlignMode != AlignMode.TopCenter && Height - (Drawable.IntrinsicHeight * scaleFactor) > 0)
 						{
+							//align to the bottom
 							matrix.PostTranslate(0, Height - (Drawable.IntrinsicHeight * scaleFactor));
 						}
 
 						if (Width - (Drawable.IntrinsicWidth * scaleFactor) > 0)
 						{
-							switch (BottomAlign)
+							switch (AlignMode)
 							{
-								case BottomAlign.Left:
-								//by default is aligned to the left
+								case AlignMode.BottomLeft:
+									//by default is aligned to the left
 									break;
-								case BottomAlign.Center:
+								case AlignMode.BottomCenter:
 									matrix.PostTranslate((Width - (Drawable.IntrinsicWidth * scaleFactor)) / 2, 0);
 									break;
-								case BottomAlign.Right:
+								case AlignMode.BottomRight:
 									matrix.PostTranslate(Width - (Drawable.IntrinsicWidth * scaleFactor), 0);
+									break;
+								case AlignMode.TopCenter:
+									matrix.PostTranslate((Width - (Drawable.IntrinsicWidth * scaleFactor)) / 2, 0);
 									break;
 							}
 						}
+
+
 					}
 
 					ImageMatrix = matrix;
@@ -163,11 +168,12 @@ namespace FFImageLoading.Views
 		}
 	}
 
-	public enum BottomAlign
+	public enum AlignMode
 	{
 		None,
-		Left,
-		Center,
-		Right
+		TopCenter,
+		BottomLeft,
+		BottomCenter,
+		BottomRight
 	}
 }
