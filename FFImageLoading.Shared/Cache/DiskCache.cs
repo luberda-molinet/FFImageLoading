@@ -36,6 +36,7 @@ namespace FFImageLoading.Cache
         string basePath;
         string journalPath;
         string version;
+		object lockJournal;
 
         struct CacheEntry
         {
@@ -61,6 +62,7 @@ namespace FFImageLoading.Cache
                 Directory.CreateDirectory (basePath);
             this.journalPath = Path.Combine (basePath, JournalFileName);
             this.version = version;
+			this.lockJournal = new object();
 
             try {
                 InitializeWithJournal ();
@@ -82,45 +84,56 @@ namespace FFImageLoading.Cache
 
         void InitializeWithJournal ()
         {
-            if (!File.Exists (journalPath)) {
-                using (var writer = new StreamWriter (journalPath, false, encoding)) {
-                    writer.WriteLine (Magic);
-                    writer.WriteLine (version);
-                }
-                return;
-            }
+			lock (lockJournal)
+			{
+				if (!File.Exists(journalPath))
+				{
+					using (var writer = new StreamWriter(journalPath, false, encoding))
+					{
+						writer.WriteLine(Magic);
+						writer.WriteLine(version);
+					}
+					return;
+				}
 
-            string line = null;
-            using (var reader = new StreamReader (journalPath, encoding)) {
-                if (!EnsureHeader (reader))
-                    throw new InvalidOperationException ("Invalid header");
-                while ((line = reader.ReadLine ()) != null) {
-                    try {
-                        var op = ParseOp (line);
-                        string key;
-                        DateTime origin;
-                        TimeSpan duration;
+				string line = null;
+				using (var reader = new StreamReader(journalPath, encoding))
+				{
+					if (!EnsureHeader(reader))
+						throw new InvalidOperationException("Invalid header");
+					while ((line = reader.ReadLine()) != null)
+					{
+						try
+						{
+							var op = ParseOp(line);
+							string key;
+							DateTime origin;
+							TimeSpan duration;
 
-                        switch (op) {
-                        case JournalOp.Created:
-                            ParseEntry (line, out key, out origin, out duration);
-                            entries.TryAdd (key, new CacheEntry (origin, duration));
-                            break;
-                        case JournalOp.Modified:
-                            ParseEntry (line, out key, out origin, out duration);
-                            entries[key] = new CacheEntry (origin, duration);
-                            break;
-                        case JournalOp.Deleted:
-                            ParseEntry (line, out key);
-                            CacheEntry oldEntry;
-                            entries.TryRemove (key, out oldEntry);
-                            break;
-                        }
-                    } catch {
-                        break;
-                    }
-                }
-            }
+							switch (op)
+							{
+								case JournalOp.Created:
+									ParseEntry(line, out key, out origin, out duration);
+									entries.TryAdd(key, new CacheEntry(origin, duration));
+									break;
+								case JournalOp.Modified:
+									ParseEntry(line, out key, out origin, out duration);
+									entries[key] = new CacheEntry(origin, duration);
+									break;
+								case JournalOp.Deleted:
+									ParseEntry(line, out key);
+									CacheEntry oldEntry;
+									entries.TryRemove(key, out oldEntry);
+									break;
+							}
+						}
+						catch
+						{
+							break;
+						}
+					}
+				}
+			}
         }
 
         void CleanCallback (object state)
@@ -245,26 +258,34 @@ namespace FFImageLoading.Cache
 
         void AppendToJournal (JournalOp op, string key)
         {
-            using (var writer = new StreamWriter (journalPath, true, encoding)) {
-                writer.Write ((char)op);
-                writer.Write (' ');
-                writer.Write (key);
-                writer.WriteLine ();
-            }
+			lock (lockJournal)
+			{
+				using (var writer = new StreamWriter(journalPath, true, encoding))
+				{
+					writer.Write((char)op);
+					writer.Write(' ');
+					writer.Write(key);
+					writer.WriteLine();
+				}
+			}
         }
 
         void AppendToJournal (JournalOp op, string key, DateTime origin, TimeSpan ttl)
         {
-            using (var writer = new StreamWriter (journalPath, true, encoding)) {
-                writer.Write ((char)op);
-                writer.Write (' ');
-                writer.Write (key);
-                writer.Write (' ');
-                writer.Write (origin.Ticks);
-                writer.Write (' ');
-                writer.Write ((long)ttl.TotalMilliseconds);
-                writer.WriteLine ();
-            }
+			lock (lockJournal)
+			{
+				using (var writer = new StreamWriter(journalPath, true, encoding))
+				{
+					writer.Write((char)op);
+					writer.Write(' ');
+					writer.Write(key);
+					writer.Write(' ');
+					writer.Write(origin.Ticks);
+					writer.Write(' ');
+					writer.Write((long)ttl.TotalMilliseconds);
+					writer.WriteLine();
+				}
+			}
         }
 
         string SanitizeKey (string key)
