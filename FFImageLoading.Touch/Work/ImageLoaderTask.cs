@@ -124,7 +124,7 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not available in the cache
 
 				if (IsCancelled)
-					return CacheResult.Found;
+					return CacheResult.NotFound; // not sure what to return in that case
 
 				await MainThreadDispatcher.PostAsync(() =>
 					{
@@ -132,7 +132,7 @@ namespace FFImageLoading.Work
 					}).ConfigureAwait(false);
 
 				if (IsCancelled)
-					return CacheResult.Found;
+					return CacheResult.NotFound; // not sure what to return in that case
 				
 				Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
 				return CacheResult.Found; // found and loaded from cache
