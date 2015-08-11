@@ -68,9 +68,9 @@ namespace FFImageLoading.Work
 			if (!_disposed)
 			{
 				// remove reference to callbacks
-				OnSuccess = null;
-				OnError = null;
-				OnFinish = null;
+				OnSuccess = (w, h) => {};
+				OnError = (e) => {};
+				OnFinish = (sw) => {};
 
 				// clear transformations list
 				if (Transformations != null)

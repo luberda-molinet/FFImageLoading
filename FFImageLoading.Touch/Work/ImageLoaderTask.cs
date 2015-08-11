@@ -123,11 +123,17 @@ namespace FFImageLoading.Work
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
+				if (IsCancelled)
+					return CacheResult.Found;
+
 				await MainThreadDispatcher.PostAsync(() =>
 					{
 						_doWithImage(value);
 					}).ConfigureAwait(false);
 
+				if (IsCancelled)
+					return CacheResult.Found;
+				
 				Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
 				return CacheResult.Found; // found and loaded from cache
 			}
