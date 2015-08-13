@@ -184,6 +184,8 @@ namespace FFImageLoading
 		/// </summary>
 		public static void InvalidateMemoryCache()
 		{
+			InitializeIfNeeded();
+
 			#if __ANDROID__
 			ImageCache.Instance.Clear();
 			#elif __IOS__
