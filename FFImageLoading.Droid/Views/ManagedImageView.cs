@@ -2,7 +2,6 @@
 using Android.Graphics.Drawables;
 using Android.Util;
 using Android.Widget;
-using FFImageLoading.Drawables;
 using System;
 using Android.Runtime;
 
@@ -43,20 +42,12 @@ namespace FFImageLoading.Views
 
 		private static void NotifyDrawable(Drawable drawable, bool isDisplayed)
 		{
-			var bitmapDrawable = drawable as ManagedBitmapDrawable;
-			if (bitmapDrawable != null)
+			var layerDrawable = drawable as LayerDrawable;
+			if (layerDrawable != null)
 			{
-				bitmapDrawable.SetIsDisplayed(isDisplayed);
-			}
-			else
-			{
-				var layerDrawable = drawable as LayerDrawable;
-				if (layerDrawable != null)
+				for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
 				{
-					for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
-					{
-						NotifyDrawable(layerDrawable.GetDrawable(i), isDisplayed);
-					}
+					NotifyDrawable(layerDrawable.GetDrawable(i), isDisplayed);
 				}
 			}
 		}

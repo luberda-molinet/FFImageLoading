@@ -57,7 +57,6 @@
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Extensions\ImageViewExtensions.cs" />
-    <Compile Include="Drawables\ManagedBitmapDrawable.cs" />
     <Compile Include="Collections\ConcurrentSet.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />

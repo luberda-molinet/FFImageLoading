@@ -12,7 +12,6 @@ using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using FFImageLoading.IO;
 using FFImageLoading.Cache;
-using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
 using Android.Runtime;
 using System;

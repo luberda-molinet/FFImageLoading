@@ -8,7 +8,6 @@ using Math = System.Math;
 using System.Collections.Concurrent;
 using FFImageLoading.Collections;
 using FFImageLoading.Helpers;
-using FFImageLoading.Drawables;
 using Android.Content;
 using Android.App;
 using Android.Content.PM;
@@ -92,14 +91,7 @@ namespace FFImageLoading.Cache
 		{
             if (string.IsNullOrWhiteSpace(key) || bitmap == null || _references.ContainsKey(key))
 				return;
-
-
-			var managedBitmap = bitmap as ManagedBitmapDrawable;
-
-			if (managedBitmap != null)
-			{
-				managedBitmap.SetIsCached(true);
-			}
+			
 			_references.GetOrAdd(key, true);
 			Put(key, bitmap);
 		}
