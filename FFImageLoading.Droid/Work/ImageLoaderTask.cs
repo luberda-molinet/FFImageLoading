@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Android.Content;
 using Android.Content.Res;
 using Android.Graphics;
@@ -15,6 +14,8 @@ using FFImageLoading.IO;
 using FFImageLoading.Cache;
 using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
+using Android.Runtime;
+using System;
 
 namespace FFImageLoading.Work
 {
@@ -265,6 +266,19 @@ namespace FFImageLoading.Work
 								stream.Seek(0, SeekOrigin.Begin);
 							}
 						}
+						catch (OutOfMemoryException)
+						{
+							GC.Collect();
+							return null;
+						}
+						catch (Java.Lang.Throwable vme)
+						{
+							if (vme.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+							{
+								GC.Collect();
+							}
+							return null;
+						}
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
@@ -301,6 +315,19 @@ namespace FFImageLoading.Work
 						try
 						{
 							bitmap = BitmapFactory.DecodeStream(stream, null, options);
+						}
+						catch (OutOfMemoryException)
+						{
+							GC.Collect();
+							return null;
+						}
+						catch (Java.Lang.Throwable vme)
+						{
+							if (vme.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+							{
+								GC.Collect();
+							}
+							return null;
 						}
 						catch (Exception ex)
 						{
