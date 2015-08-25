@@ -570,8 +570,13 @@ namespace FFImageLoading.Work
 			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
 		}
 
+		public AsyncDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+
 		public ImageLoaderTask GetImageLoaderTask()
 		{
+			if (_imageLoaderTaskReference == null)
+				return null;
+
 			ImageLoaderTask task;
 			_imageLoaderTaskReference.TryGetTarget(out task);
 			return task;
@@ -594,6 +599,8 @@ namespace FFImageLoading.Work
 			_animating = true;
 			_startTimeMillis = SystemClock.UptimeMillis();
 		}
+
+		public FFBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
 
 		public override void Draw(Canvas canvas)
 		{
