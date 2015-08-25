@@ -17,14 +17,14 @@ namespace FFImageLoading.Cache
 	public class ImageCache : LruCache<BitmapDrawable>, IImageCache
 	{
 		private ConcurrentDictionary<string, bool> _references;
-		private readonly ConcurrentSet<SoftReference> _reusableBitmaps;
+		private readonly ConcurrentSet<WeakReference> _reusableBitmaps;
 		private static IImageCache _instance;
 		private static object _clearLock;
 
         private ImageCache(int maxCacheSize) : base(GetMaxCacheSize())
 		{
 			if (Utils.HasHoneycomb())
-                _reusableBitmaps = new ConcurrentSet<SoftReference>();
+				_reusableBitmaps = new ConcurrentSet<WeakReference>();
 
 			_references = new ConcurrentDictionary<string, bool>();
 			_clearLock = new object();
@@ -100,32 +100,41 @@ namespace FFImageLoading.Cache
 		{
 			Bitmap bitmap = null;
 
-			var bitmapToRemove = new List<SoftReference>();
+			var bitmapToRemove = new List<WeakReference>();
 			if (_reusableBitmaps != null && !_reusableBitmaps.IsEmpty)
 			{
-				foreach (var softReference in _reusableBitmaps)
+				foreach (var weakReference in _reusableBitmaps)
 				{
-					var item = softReference.Get() as Bitmap;
+					var item = weakReference.Get() as Bitmap;
 					if (item != null && item.IsMutable)
 					{
 						if (CanUseForInBitmap(item, options))
 						{
 							bitmap = item;
-							bitmapToRemove.Add(softReference);
+							bitmapToRemove.Add(weakReference);
 							break;
 						}
 					}
 					else
 					{
-						bitmapToRemove.Add(softReference);
+						bitmapToRemove.Add(weakReference);
 					}
 				}
 			}
 
 			if (_reusableBitmaps != null && bitmapToRemove.Count > 0)
 			{
-				foreach (var i in bitmapToRemove)
-					_reusableBitmaps.TryRemove(i);
+				foreach (var weakReference in bitmapToRemove)
+				{
+					_reusableBitmaps.TryRemove(weakReference);
+
+					var item = weakReference.Get() as Bitmap;
+					// We need to inform .NET GC that the Bitmap is no longer in use
+					if (item != bitmap && item != null)
+					{
+						item.Dispose();
+					}
+				}
 			}
 
 			return bitmap;
@@ -133,20 +142,20 @@ namespace FFImageLoading.Cache
 
 		protected override void EntryRemoved(bool evicted, Object key, Object oldValue, Object newValue)
 		{
-			var old = oldValue as ManagedBitmapDrawable;
-			if (old != null)
-			{
-				old.SetIsCached(false);
-				bool tmp;
-				_references.TryRemove((string) key, out tmp);
-			}
-			else
+			var drawable = oldValue as BitmapDrawable;
+			var bitmap = drawable.Bitmap;
+			if (bitmap != null && bitmap.Handle != System.IntPtr.Zero)
 			{
 				if (Utils.HasHoneycomb())
 				{
-					_reusableBitmaps.TryAdd(new SoftReference((oldValue as BitmapDrawable).Bitmap));
+					_reusableBitmaps.TryAdd(new WeakReference(bitmap));
 				}
 			}
+
+			// We need to inform .NET GC that the Bitmap is no longer in use in .NET world.
+			// It might get reused by Java world, and we can access it later again since we still have a Java weakreference to it
+			bitmap.Dispose();
+
 			//var oldBmp = (BitmapDrawable) oldValue;
 			//oldBmp.Bitmap.Recycle();
 		}

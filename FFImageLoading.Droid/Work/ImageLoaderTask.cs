@@ -334,6 +334,8 @@ namespace FFImageLoading.Work
 							return null;
 						}
 
+						try
+						{
 						if (bitmap == null || CancellationToken.IsCancellationRequested)
 							return null;
 
@@ -366,6 +368,12 @@ namespace FFImageLoading.Work
 							}
 
 							return new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS);
+						}
+					}
+					finally
+					{
+							if (bitmap != null)
+								bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
 						}
 					}
 					finally
