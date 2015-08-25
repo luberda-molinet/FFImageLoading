@@ -20,7 +20,13 @@ Both a memory cache and a disk cache are present.
 
 WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: https://github.com/molinch/WebP.Touch, which are then included as a Nuget dependency. As long as your file ends with .webp it will be handled by the lib.
 
-*Note on Android: Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.*
+###Android remarks
+Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
+
+By default, on Android, images are loaded without transparency channel. This allows saving 50% of memory since 1 pixel uses 2 bytes instead of 4 bytes in RGBA.
+- This is overridable for all images using `ImageService.Initialize(loadWithTransparencyChannel:true)`
+- Or, per image request, by explicitly setting `TaskParameter.TransparencyChannel(true or false)`
+
 
 ###API
 when you want to load the image from a file:
