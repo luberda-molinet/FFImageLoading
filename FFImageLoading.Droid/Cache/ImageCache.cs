@@ -9,6 +9,9 @@ using System.Collections.Concurrent;
 using FFImageLoading.Collections;
 using FFImageLoading.Helpers;
 using FFImageLoading.Drawables;
+using Android.Content;
+using Android.App;
+using Android.Content.PM;
 
 namespace FFImageLoading.Cache
 {
@@ -201,7 +204,17 @@ namespace FFImageLoading.Cache
 			if (percent < 0.01f || percent > 0.8f)
 				throw new Exception("GetCacheSizeInPercent - percent must be between 0.01 and 0.8 (inclusive)");
 
-            return (int)Math.Round(percent*Runtime.GetRuntime().MaxMemory());
+			var context = Android.App.Application.Context.ApplicationContext;
+			var am = (ActivityManager) context.GetSystemService(Context.ActivityService);
+			bool largeHeap = (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
+			int memoryClass = am.MemoryClass;
+			if (largeHeap && Utils.HasHoneycomb())
+			{
+				memoryClass = am.LargeMemoryClass;
+			}
+
+			int availableMemory = 1024 * 1024 * memoryClass;
+			return (int)Math.Round(percent * availableMemory);
 		}
 
 		private bool CanUseForInBitmap(Bitmap item, BitmapFactory.Options options)
