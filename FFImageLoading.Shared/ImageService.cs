@@ -31,8 +31,9 @@ namespace FFImageLoading
         /// <param name="logger">Basic logger. If null a very simple implementation that prints to console is used.</param>
         /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
         /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
+		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
         public static void Initialize(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-            IDiskCache diskCache = null, IDownloadCache downloadCache = null)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
         {
 			lock (_initializeLock)
 			{
@@ -40,11 +41,11 @@ namespace FFImageLoading
 					throw new Exception("FFImageLoading.ImageService is already initialized");
 			}
 
-            InitializeIfNeeded(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
+			InitializeIfNeeded(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel);
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-            IDiskCache diskCache = null, IDownloadCache downloadCache = null)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
         {
 			if (_initialized)
 				return;
@@ -54,7 +55,7 @@ namespace FFImageLoading
 				if (_initialized)
 					return;
 			
-				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache);
+				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel);
 				Config = GetDefaultConfiguration(userDefinedConfig);
 
 				_initialized = true;
@@ -76,7 +77,8 @@ namespace FFImageLoading
                 scheduler,
                 logger,
                 diskCache,
-                downloadCache
+                downloadCache,
+				userDefinedConfig.LoadWithTransparencyChannel
             );
         }
 

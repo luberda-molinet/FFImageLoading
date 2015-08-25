@@ -21,7 +21,7 @@ namespace FFImageLoading.Work
 		/// <param name="filepath">Path to the file.</param>
 		public static TaskParameter FromFile(string filepath)
 		{
-			return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath };
+			return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath};
 		}
 
 		/// <summary>
@@ -111,6 +111,8 @@ namespace FFImageLoading.Work
 
 		public List<ITransformation> Transformations { get; private set; }
 
+		public bool? LoadTransparencyChannel { get; private set; }
+
 		public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)
@@ -162,6 +164,17 @@ namespace FFImageLoading.Work
 		public TaskParameter DownSample(int width = 0, int height = 0)
 		{
 			DownSampleSize = Tuple.Create(width, height);
+			return this;
+		}
+
+		/// <summary>
+		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="loadTransparencyChannel">If set to <c>true</c> force loading alpha channel otherwise force not loading it.</param>
+		public TaskParameter TransparencyChannel(bool loadTransparencyChannel)
+		{
+			LoadTransparencyChannel = loadTransparencyChannel;
 			return this;
 		}
 

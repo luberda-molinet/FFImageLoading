@@ -290,6 +290,12 @@ namespace FFImageLoading.Work
 						options.InPurgeable = true;
 						options.InJustDecodeBounds = false;
 
+						if (!ImageService.Config.LoadWithTransparencyChannel || Parameters.LoadTransparencyChannel == null || !Parameters.LoadTransparencyChannel.Value)
+						{
+							// Same quality but no transparency channel. This allows to save 50% of memory: 1 pixel=2bytes instead of 4.
+							options.InPreferredConfig = Bitmap.Config.Rgb565;
+						}
+
 						try
 						{
 							if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
@@ -336,42 +342,42 @@ namespace FFImageLoading.Work
 
 						try
 						{
-						if (bitmap == null || CancellationToken.IsCancellationRequested)
-							return null;
+							if (bitmap == null || CancellationToken.IsCancellationRequested)
+								return null;
 
-						if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-						{
-							foreach (var transformation in Parameters.Transformations)
+							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
 							{
-								try
+								foreach (var transformation in Parameters.Transformations)
 								{
-									var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
-									bitmap = bitmapHolder.ToNative();
-								}
-								catch (Exception ex)
-								{
-									Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+									try
+									{
+										var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+										bitmap = bitmapHolder.ToNative();
+									}
+									catch (Exception ex)
+									{
+										Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+									}
 								}
 							}
-						}
 
-						if (isLoadingPlaceHolder)
-						{
-							return new AsyncDrawable(Context.Resources, bitmap, this);
-						}
-						else
-						{
-							Drawable placeholderDrawable = null;
-							if (_loadingPlaceholderWeakReference != null)
+							if (isLoadingPlaceHolder)
 							{
-								_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
+								return new AsyncDrawable(Context.Resources, bitmap, this);
 							}
+							else
+							{
+								Drawable placeholderDrawable = null;
+								if (_loadingPlaceholderWeakReference != null)
+								{
+									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
+								}
 
-							return new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS);
+								return new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS);
+							}
 						}
-					}
-					finally
-					{
+						finally
+						{
 							if (bitmap != null)
 								bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
 						}

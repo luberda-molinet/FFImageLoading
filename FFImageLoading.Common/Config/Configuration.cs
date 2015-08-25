@@ -9,7 +9,7 @@ namespace FFImageLoading.Config
     public class Configuration
     {
         public Configuration(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-            IDiskCache diskCache = null, IDownloadCache downloadCache = null)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
         {
             MaxCacheSize = maxCacheSize;
             HttpClient = httpClient;
@@ -17,6 +17,7 @@ namespace FFImageLoading.Config
             Logger = logger;
             DiskCache = diskCache;
             DownloadCache = downloadCache;
+			LoadWithTransparencyChannel = loadWithTransparencyChannel;
         }
 
         /// <summary>
@@ -54,6 +55,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The download cache.</value>
         public IDownloadCache DownloadCache { get; private set; }
+
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
+		/// </summary>
+		/// <value><c>true</c> if FFIMageLoading loads images with transparency; otherwise, <c>false</c>.</value>
+		public bool LoadWithTransparencyChannel { get; private set; }
     }
 }
 
