@@ -7,6 +7,7 @@ using Android.Runtime;
 
 namespace FFImageLoading.Views
 {
+	[Register("ffimageloading.views.ImageViewAsync")]
 	public class ImageViewAsync : ManagedImageView
 	{
 		protected SizeF? _predefinedSize;
