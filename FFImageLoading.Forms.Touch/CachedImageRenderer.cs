@@ -7,7 +7,10 @@ using Xamarin.Forms;
 using FFImageLoading.Work;
 using FFImageLoading;
 using Foundation;
+using FFImageLoading.Forms;
+using FFImageLoading.Forms.Touch;
 
+[assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
 {
 	/// <summary>
@@ -17,18 +20,17 @@ namespace FFImageLoading.Forms.Touch
 	public class CachedImageRenderer : ViewRenderer<CachedImage, UIImageView>
 	{
 		/// <summary>
-		/// Used for registration with dependency service
+		///   Used for registration with dependency service
 		/// </summary>
-		public async static void Init()
+		public static void Init()
 		{
-			var temp = DateTime.Now;
 		}
 
-		private bool isDisposed;
+		private bool _isDisposed;
 
 		protected override void Dispose(bool disposing)
 		{
-			if (isDisposed)
+			if (_isDisposed)
 			{
 				return;
 			}
@@ -39,7 +41,7 @@ namespace FFImageLoading.Forms.Touch
 				image.Dispose();
 			}
 
-			isDisposed = true;
+			_isDisposed = true;
 			base.Dispose(disposing);
 		}
 
@@ -65,15 +67,15 @@ namespace FFImageLoading.Forms.Touch
 		{
 			base.OnElementPropertyChanged(sender, e);
 
-			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
+			if (e.PropertyName == Image.SourceProperty.PropertyName)
 			{
 				SetImage(null);
 			}
-			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
+			if (e.PropertyName == Image.IsOpaqueProperty.PropertyName)
 			{
 				SetOpacity();
 			}
-			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
+			if (e.PropertyName == Image.AspectProperty.PropertyName)
 			{
 				SetAspect();
 			}
@@ -149,7 +151,7 @@ namespace FFImageLoading.Forms.Touch
 					imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 				}
 					
-				imageLoader.TransparencyChannel = Element.TransparencyEnabled;
+				imageLoader.TransparencyChannel(Element.TransparencyEnabled);
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
 				imageLoader.Into(Control);	
@@ -158,7 +160,7 @@ namespace FFImageLoading.Forms.Touch
 
 		void ImageLoadingFinished(CachedImage element)
 		{
-			if (element != null && !isDisposed)
+			if (element != null && !_isDisposed)
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();

@@ -6,7 +6,7 @@ namespace FFImageLoading.Forms.Droid
 {
 	public class CachedImageView : ImageViewAsync
 	{
-		private bool skipInvalidate;
+		private bool _skipInvalidate;
 
 		public CachedImageView(Context context) : base(context)
 		{
@@ -14,9 +14,9 @@ namespace FFImageLoading.Forms.Droid
 
 		public override void Invalidate()
 		{
-			if (this.skipInvalidate)
+			if (this._skipInvalidate)
 			{
-				this.skipInvalidate = false;
+				this._skipInvalidate = false;
 				return;
 			}
 			base.Invalidate();
@@ -24,7 +24,7 @@ namespace FFImageLoading.Forms.Droid
 
 		public void SkipInvalidate()
 		{
-			this.skipInvalidate = true;
+			this._skipInvalidate = true;
 		}
 	}
 

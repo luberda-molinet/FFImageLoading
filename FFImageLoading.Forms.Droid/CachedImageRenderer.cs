@@ -20,14 +20,13 @@ namespace FFImageLoading.Forms.Droid
 	public class CachedImageRenderer : ViewRenderer<CachedImage, ImageViewAsync>
 	{
 		/// <summary>
-		/// Used for registration with dependency service
+		///   Used for registration with dependency service
 		/// </summary>
-		public async static void Init()
+		public static void Init()
 		{
-			var temp = DateTime.Now;
 		}
 
-		private bool isDisposed;
+		private bool _isDisposed;
 
 		public CachedImageRenderer()
 		{
@@ -36,9 +35,9 @@ namespace FFImageLoading.Forms.Droid
 
 		protected override void Dispose(bool disposing)
 		{
-			if (!isDisposed)
+			if (!_isDisposed)
 			{
-				isDisposed = true;
+				_isDisposed = true;
 				base.Dispose(disposing);
 			}
 		}
@@ -96,7 +95,7 @@ namespace FFImageLoading.Forms.Droid
 					formsImageView.SkipInvalidate();
 				}
 
-				if (Element != null && object.Equals(Element.Source, source) && !isDisposed)
+				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
 					TaskParameter imageLoader = null;
 
@@ -140,7 +139,7 @@ namespace FFImageLoading.Forms.Droid
 							imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 						}
 							
-						imageLoader.TransparencyChannel = Element.TransparencyEnabled;
+						imageLoader.TransparencyChannel(Element.TransparencyEnabled);
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));
 						imageLoader.Into(Control);	
@@ -151,7 +150,7 @@ namespace FFImageLoading.Forms.Droid
 
 		void ImageLoadingFinished(CachedImage element)
 		{
-			if (element != null && !isDisposed)
+			if (element != null && !_isDisposed)
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();	
