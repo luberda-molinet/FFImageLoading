@@ -4,6 +4,7 @@ Fast & Furious Image Loading
 Xamarin library to load images quickly & easily on iOS and Android.
 
 NuGet package is here: https://www.nuget.org/packages/Xamarin.FFImageLoading/
+And here to use it in Xamarin.Forms: https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
 
 ###Minimum OS version
 The library works starting from Android 4 and iOS 7.
@@ -19,6 +20,9 @@ The library automatically deduplicates similar requests: if 100 similar requests
 Both a memory cache and a disk cache are present.
 
 WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: https://github.com/molinch/WebP.Touch, which are then included as a Nuget dependency. As long as your file ends with .webp it will be handled by the lib.
+
+###Xamarin.Forms
+The Xamarin Forms NuGet package ships FFImageLoading for iOS and Android. Thanks to Daniel Luberda for his help here.
 
 ###Android remarks
 Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
