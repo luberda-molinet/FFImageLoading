@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Xamarin.FFImageLoading.Forms</id>
+        <version>1.1.5</version>
+        <title>Xamarin Forms rendered to load images quickly and easily.</title>
+        <authors>Daniel Luberda, Fabien Molinet</authors>
+        <owners></owners>
+        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>
+       <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
+       <requireLicenseAcceptance>false</requireLicenseAcceptance>
+       <description>
+        The library works starting from Android 4 and iOS 7.
+     We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused.
+     It also supports WebP format on Android and iOS.
+
+        Ensure you call CachedImageRenderer.Init() on each platform.
+       </description>
+       <summary>Xamarin Forms rendered to load images quickly and easily.</summary>
+       <tags>xamarin, forms, xamarin.forms, android, ios, bitmap, image, cache, webp, quick, easy, lru, load, loading, save</tags>
+        <dependencies>
+            <dependency id="Xamarin.Forms" version="1.4.4.6392" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.5" />
+        </dependencies>
+   </metadata>
+    <files>
+        <!--Xamarin.Android-->
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Droid/bin/Release/FFImageLoading.Forms.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.Droid.dll" />
+
+        <!--Xamarin.iOS Unified-->
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.dll" />
+    </files>
+</package>
