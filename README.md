@@ -4,6 +4,7 @@ Fast & Furious Image Loading
 Xamarin library to load images quickly & easily on iOS and Android.
 
 NuGet package is here: https://www.nuget.org/packages/Xamarin.FFImageLoading/
+
 And here to use it in Xamarin.Forms: https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
 
 ###Minimum OS version
