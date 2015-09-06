@@ -108,6 +108,9 @@
     <Compile Include="..\FFImageLoading.Common\Work\GenerateResult.cs">
       <Link>Work\GenerateResult.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\ImageSize.cs">
+      <Link>Work\ImageSize.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

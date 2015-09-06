@@ -252,12 +252,12 @@ namespace FFImageLoading.Work
 			var tcs = new TaskCompletionSource<bool>();
 
 			var successCallback = pendingTask.ImageLoadingTask.Parameters.OnSuccess;
-			pendingTask.ImageLoadingTask.Parameters.Success((w, h) =>
+			pendingTask.ImageLoadingTask.Parameters.Success(size =>
 			{
 				tcs.TrySetResult(true);
 
 				if (successCallback != null)
-					successCallback(w, h);
+					successCallback(size);
 			});
 
 			var finishCallback = pendingTask.ImageLoadingTask.Parameters.OnFinish;

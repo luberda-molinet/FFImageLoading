@@ -86,7 +86,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image);
 						Completed = true;
-						Parameters.OnSuccess((int)image.Size.Width, (int)image.Size.Height);
+						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height));
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -134,7 +134,7 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
 				
-				Parameters.OnSuccess((int)value.Size.Width, (int)value.Size.Height);
+				Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height));
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)

@@ -136,7 +136,7 @@ namespace FFImageLoading.Work
 
 						SetImageDrawable(imageView, drawable, UseFadeInBitmap);
 						Completed = true;
-						Parameters.OnSuccess(drawable.IntrinsicWidth, drawable.IntrinsicHeight);
+						Parameters.OnSuccess(new ImageSize(drawable.IntrinsicWidth, drawable.IntrinsicHeight));
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -216,7 +216,7 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not sure what to return in that case
 
 				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(value.IntrinsicWidth, value.IntrinsicHeight);
+					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight));
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
