@@ -111,6 +111,15 @@
     <Compile Include="..\FFImageLoading.Common\Work\ImageSize.cs">
       <Link>Work\ImageSize.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\LoadingResult.cs">
+      <Link>Work\LoadingResult.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Cache\CacheStream.cs">
+      <Link>Cache\CacheStream.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\WithLoadingResult.cs">
+      <Link>Work\WithLoadingResult.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

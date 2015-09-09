@@ -12,6 +12,7 @@ namespace FFImageLoading.Cache
 
         public string CachedPath { get; private set; }
         public byte[] Bytes { get; private set; }
+		public bool RetrievedFromDiskCache { get; set; }
     }
 }
 

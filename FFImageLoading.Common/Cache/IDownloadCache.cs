@@ -8,7 +8,7 @@ namespace FFImageLoading.Cache
     {
         Task<DownloadedData> GetAsync(string url, TimeSpan? duration = null);
 
-		Task<Stream> GetStreamAsync(string url, TimeSpan? duration = null);
+		Task<CacheStream> GetStreamAsync(string url, TimeSpan? duration = null);
     }
 }
 

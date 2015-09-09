@@ -22,7 +22,7 @@ namespace FFImageLoading.Cache
             _diskCache = diskCache;
         }
 
-        public async Task<DownloadedData> GetAsync(string url, TimeSpan? duration = null)
+		public async Task<DownloadedData> GetAsync(string url, TimeSpan? duration = null)
         {
             string filename = _md5Helper.MD5(url);
             string filepath = Path.Combine(_diskCache.BasePath, filename);
@@ -34,16 +34,16 @@ namespace FFImageLoading.Cache
             return new DownloadedData(filepath, data);
         }
 
-		public async Task<Stream> GetStreamAsync(string url, TimeSpan? duration = null)
+		public async Task<CacheStream> GetStreamAsync(string url, TimeSpan? duration = null)
 		{
 			string filename = _md5Helper.MD5(url);
 			string filepath = Path.Combine(_diskCache.BasePath, filename);
 			var stream = _diskCache.TryGetStream(filename);
 			if (stream != null)
-				return stream;
+				return new CacheStream(stream, true);
 
 			var data = await DownloadAndCacheAsync(url, filename, filepath, duration).ConfigureAwait(false);
-			return new MemoryStream(data);
+			return new CacheStream(new MemoryStream(data), false);
 		}
 
 		private async Task<byte[]> DownloadAndCacheAsync(string url, string filename, string filepath, TimeSpan? duration)

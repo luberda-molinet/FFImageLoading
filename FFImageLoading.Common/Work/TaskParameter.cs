@@ -50,7 +50,7 @@ namespace FFImageLoading.Work
             Transformations = new List<ITransformation>();
 
 			// default values so we don't have a null value
-			OnSuccess = s =>
+			OnSuccess = (s,r) =>
 			{
 			};
 
@@ -68,7 +68,7 @@ namespace FFImageLoading.Work
 			if (!_disposed)
 			{
 				// remove reference to callbacks
-				OnSuccess = (s) => {};
+				OnSuccess = (s, r) => {};
 				OnError = (e) => {};
 				OnFinish = (sw) => {};
 
@@ -103,7 +103,7 @@ namespace FFImageLoading.Work
 
 		public int RetryDelayInMs { get; private set; }
 
-		public Action<ImageSize> OnSuccess { get; private set; }
+		public Action<ImageSize, LoadingResult> OnSuccess { get; private set; }
 
 		public Action<Exception> OnError { get; private set; }
 
@@ -201,7 +201,7 @@ namespace FFImageLoading.Work
 			if (action == null)
 				throw new Exception("Given lambda should not be null.");
 
-			OnSuccess = s => action();
+			OnSuccess = (s, r) => action();
 			return this;
 		}
 
@@ -210,7 +210,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
 		/// <param name="action">Action to invoke when loading succeded. Argument is the size of the image loaded.</param>
-		public TaskParameter Success(Action<ImageSize> action)
+		public TaskParameter Success(Action<ImageSize, LoadingResult> action)
 		{
 			if (action == null)
 				throw new Exception("Given lambda should not be null.");

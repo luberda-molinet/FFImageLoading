@@ -46,6 +46,9 @@
     <Compile Include="Cache\CacheResult.cs" />
     <Compile Include="Work\GenerateResult.cs" />
     <Compile Include="Work\ImageSize.cs" />
+    <Compile Include="Work\LoadingResult.cs" />
+    <Compile Include="Cache\CacheStream.cs" />
+    <Compile Include="Work\WithLoadingResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

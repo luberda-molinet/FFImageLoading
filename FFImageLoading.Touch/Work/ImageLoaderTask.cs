@@ -52,10 +52,12 @@ namespace FFImageLoading.Work
 		/// </summary>
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
+			WithLoadingResult<UIImage> imageWithResult = null;
 			UIImage image = null;
 			try
 			{
-				image = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
+				imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
+				image = imageWithResult.Item;
 			}
 			catch (Exception ex)
 			{
@@ -86,7 +88,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height));
+						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -134,7 +136,7 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
 				
-				Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height));
+				Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
@@ -144,13 +146,14 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<UIImage> GetImageAsync(string sourcePath, ImageSource source)
+		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
 			byte[] bytes = null;
 			string path = sourcePath;
+			LoadingResult? result = null;
 
 			try
 			{
@@ -161,12 +164,14 @@ namespace FFImageLoading.Work
 						if (FileStore.Exists(path))
 						{
 							bytes = await FileStore.ReadBytesAsync(path).ConfigureAwait(false);
+							result = source == ImageSource.ApplicationBundle ? LoadingResult.ApplicationBundle : LoadingResult.Disk;
 						}
 						break;
 					case ImageSource.Url:
 						var downloadedData = await DownloadCache.GetAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
 						bytes = downloadedData.Bytes;
 						path = downloadedData.CachedPath;
+						result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;
 						break;
 				}
 			}
@@ -180,7 +185,7 @@ namespace FFImageLoading.Work
 			if (bytes == null)
 				return null;
 
-			return await Task.Run(() =>
+			var image = await Task.Run(() =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
@@ -192,7 +197,7 @@ namespace FFImageLoading.Work
 					}
 
 					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-					var image = new UIImage(NSData.FromArray(bytes), scale);
+					var imageIn = new UIImage(NSData.FromArray(bytes), scale);
 
 					if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
 					{
@@ -200,8 +205,8 @@ namespace FFImageLoading.Work
 						{
 							try
 							{
-								var bitmapHolder = transformation.Transform(new BitmapHolder(image));
-								image = bitmapHolder.ToNative();
+								var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
+								imageIn = bitmapHolder.ToNative();
 							}
 							catch (Exception ex)
 							{
@@ -210,8 +215,10 @@ namespace FFImageLoading.Work
 						}
 					}
 
-					return image;
+					return imageIn;
 				}).ConfigureAwait(false);
+
+			return WithLoadingResult.Encapsulate(image, result.Value);
 		}
 
 		/// <summary>
@@ -230,7 +237,8 @@ namespace FFImageLoading.Work
 			{
 				try
 				{
-					image = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
+					var imageWithResult = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
+					image = imageWithResult.Item;
 				}
 				catch (Exception ex)
 				{
@@ -261,7 +269,7 @@ namespace FFImageLoading.Work
 			return true;
 		}
 
-		private async Task<UIImage> RetrieveImageAsync(string sourcePath, ImageSource source)
+		private async Task<WithLoadingResult<UIImage>> RetrieveImageAsync(string sourcePath, ImageSource source)
 		{
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
@@ -270,14 +278,14 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || _getNativeControl() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			var image = await GetImageAsync(sourcePath, source).ConfigureAwait(false);
-			if (image == null)
+			var imageWithResult = await GetImageAsync(sourcePath, source).ConfigureAwait(false);
+			if (imageWithResult == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(sourcePath), image);
+			ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);
 
-			return image;
+			return imageWithResult;
 		}
 	}
 }

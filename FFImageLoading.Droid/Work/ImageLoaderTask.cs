@@ -97,17 +97,17 @@ namespace FFImageLoading.Work
 		/// </summary>
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
-			BitmapDrawable drawable = null;
+			WithLoadingResult<BitmapDrawable> drawableWithResult = null;
 			if (!string.IsNullOrWhiteSpace(Parameters.Path))
 			{
 				try
 				{
-					drawable = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
+					drawableWithResult = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
 					Logger.Error("An error occured while retrieving drawable.", ex);
-					drawable = null;
+					drawableWithResult = null;
 				}
 			}
 
@@ -115,7 +115,7 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return GenerateResult.InvalidTarget;
 
-			if (drawable == null)
+			if (drawableWithResult == null)
 			{
 				// Show error placeholder
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
@@ -134,9 +134,9 @@ namespace FFImageLoading.Work
 						if (CancellationToken.IsCancellationRequested)
 							return;
 
-						SetImageDrawable(imageView, drawable, UseFadeInBitmap);
+						SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize(drawable.IntrinsicWidth, drawable.IntrinsicHeight));
+						Parameters.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -216,7 +216,7 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not sure what to return in that case
 
 				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight));
+					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
@@ -227,12 +227,12 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<BitmapDrawable> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
+		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			return await Task.Run<BitmapDrawable>(async () =>
+			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async () =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
@@ -243,9 +243,11 @@ namespace FFImageLoading.Work
 						InJustDecodeBounds = true
 					};
 
-					var stream = await GetStreamAsync(path, source).ConfigureAwait(false);
-					if (stream == null)
+					var streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
+					if (streamWithResult == null)
 						return null;
+
+					var stream = streamWithResult.Item;
 
 					try
 					{
@@ -256,7 +258,8 @@ namespace FFImageLoading.Work
 							if (!stream.CanSeek)
 							{ // Assets stream can't be seeked to origin position
 								stream.Dispose();
-								stream = await GetStreamAsync(path, source).ConfigureAwait(false);
+								streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
+								stream = streamWithResult.Item;
 								if (stream == null)
 									return null;
 							}
@@ -363,7 +366,7 @@ namespace FFImageLoading.Work
 
 							if (isLoadingPlaceHolder)
 							{
-								return new AsyncDrawable(Context.Resources, bitmap, this);
+								return WithLoadingResult.Encapsulate<BitmapDrawable>(new AsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
 							}
 							else
 							{
@@ -373,7 +376,7 @@ namespace FFImageLoading.Work
 									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
 								}
 
-								return new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS);
+								return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS), streamWithResult.Result);
 							}
 						}
 						finally
@@ -422,7 +425,8 @@ namespace FFImageLoading.Work
 
 				try
 				{
-					drawable = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
+					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
+					drawable = drawableWithResult.Item;
 				}
 				catch (Exception ex)
 				{
@@ -450,9 +454,9 @@ namespace FFImageLoading.Work
 			return true;
 		}
 
-		private async Task<Stream> GetStreamAsync(string path, ImageSource source)
+		private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
 		{
-			Stream stream = null;
+			WithLoadingResult<Stream> streamAndResult = null;
 
 			if (string.IsNullOrWhiteSpace(path)) return null;
 
@@ -461,13 +465,15 @@ namespace FFImageLoading.Work
 				switch (source)
 				{
 					case ImageSource.ApplicationBundle:
-						stream = Context.Assets.Open(path, Access.Streaming);
+						streamAndResult = WithLoadingResult.Encapsulate(Context.Assets.Open(path, Access.Streaming), LoadingResult.ApplicationBundle);
 						break;
 					case ImageSource.Filepath:
-						stream = FileStore.GetInputStream(path);
+						streamAndResult = WithLoadingResult.Encapsulate(FileStore.GetInputStream(path), LoadingResult.Disk);
 						break;
 					case ImageSource.Url:
-						stream = await DownloadCache.GetStreamAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
+						var cachedStream = await DownloadCache.GetStreamAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
+						streamAndResult = WithLoadingResult.Encapsulate(cachedStream.ImageStream,
+							cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
 						break;
 				}
 			}
@@ -477,12 +483,12 @@ namespace FFImageLoading.Work
 				return null;
 			}
 
-			return stream;
+			return streamAndResult;
 		}
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates
 		// having a width and height equal to or larger than the requested width and height.
-		private async Task<BitmapDrawable> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
+		private async Task<WithLoadingResult<BitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
 		{
 			if (string.IsNullOrWhiteSpace(sourcePath)) return null;
 
@@ -493,14 +499,14 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			BitmapDrawable drawable = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder).ConfigureAwait(false);
-			if (drawable == null)
+			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder).ConfigureAwait(false);
+			if (drawableWithResult == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(sourcePath), drawable);
+			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.Item);
 
-			return drawable;
+			return drawableWithResult;
 		}
 
 		/// <summary>

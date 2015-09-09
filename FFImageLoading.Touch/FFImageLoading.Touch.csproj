@@ -103,6 +103,15 @@
     <Compile Include="..\FFImageLoading.Common\Work\ImageSize.cs">
       <Link>Work\ImageSize.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\LoadingResult.cs">
+      <Link>Work\LoadingResult.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Work\WithLoadingResult.cs">
+      <Link>Work\WithLoadingResult.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Common\Cache\CacheStream.cs">
+      <Link>Cache\CacheStream.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
