@@ -57,7 +57,7 @@ namespace FFImageLoading.Work
 			try
 			{
 				imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
-				image = imageWithResult.Item;
+				image = imageWithResult == null ? null : imageWithResult.Item;
 			}
 			catch (Exception ex)
 			{
@@ -238,7 +238,7 @@ namespace FFImageLoading.Work
 				try
 				{
 					var imageWithResult = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
-					image = imageWithResult.Item;
+					image = imageWithResult == null ? null : imageWithResult.Item;
 				}
 				catch (Exception ex)
 				{

@@ -259,7 +259,8 @@ namespace FFImageLoading.Work
 							{ // Assets stream can't be seeked to origin position
 								stream.Dispose();
 								streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-								stream = streamWithResult.Item;
+								stream = streamWithResult == null ? null : streamWithResult.Item;
+
 								if (stream == null)
 									return null;
 							}
@@ -426,7 +427,7 @@ namespace FFImageLoading.Work
 				try
 				{
 					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
-					drawable = drawableWithResult.Item;
+					drawable = drawableWithResult == null ? null : drawableWithResult.Item;
 				}
 				catch (Exception ex)
 				{
