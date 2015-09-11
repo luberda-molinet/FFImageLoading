@@ -18,36 +18,47 @@ namespace ImageLoading.Sample
 {
     public class ImageFragment : Fragment
     {
-        int position;
+		private int _position;
+		private ImageViewAsync _imgDisplay;
 
         public ImageFragment(int position = 0)
         {
-            this.position = position;
+            this._position = position;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
 			var view = inflater.Inflate (Resource.Layout.fragment_image, container, false);
 		
-			var imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
-			var textView = view.FindViewById<TextView>(Resource.Id.textView);
-		
-            var urlToImage = Config.Images[position];
+			using (var textView = view.FindViewById<TextView>(Resource.Id.textView))
+			{
+				textView.Text = _position.ToString();
+			}
 
-            ImageService.LoadUrl(urlToImage)
-                .Retry(3, 200)
-                .DownSample(300, 300)
-                .Transform(new CropCircleTransformation())
-                .Transform(new GrayscaleTransformation())
-                .LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
-                .ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)
-                .Into(imgDisplay);
+			_imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
+			var urlToImage = Config.Images[_position];
 
-			textView.Text = position.ToString();
-
+			ImageService.LoadUrl(urlToImage)
+				.Retry(3, 200)
+				.DownSample(300, 300)
+				.Transform(new CropCircleTransformation())
+				.Transform(new GrayscaleTransformation())
+				.LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
+				.ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)
+				.Into(_imgDisplay);
+			
 			return view;
         }
 
+		public override void OnDestroyView()
+		{
+			if (_imgDisplay != null)
+			{
+				_imgDisplay.Dispose();
+				_imgDisplay = null;
+			}
 
+			base.OnDestroyView();
+		}
     }
 }
