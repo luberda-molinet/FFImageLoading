@@ -75,8 +75,11 @@ namespace FFImageLoading.Cache
 
 				if (didClean)
 				{
-					// Force immediate Garbage collection
+					// Force immediate Garbage collection. Please note that is resource intensive.
 					System.GC.Collect();
+					System.GC.WaitForPendingFinalizers ();
+					System.GC.WaitForPendingFinalizers (); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
+					System.GC.Collect ();
 				}
 			}
 

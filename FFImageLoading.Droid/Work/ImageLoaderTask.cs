@@ -269,19 +269,6 @@ namespace FFImageLoading.Work
 								stream.Seek(0, SeekOrigin.Begin);
 							}
 						}
-						catch (OutOfMemoryException)
-						{
-							GC.Collect();
-							return null;
-						}
-						catch (Java.Lang.Throwable vme)
-						{
-							if (vme.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
-							{
-								GC.Collect();
-							}
-							return null;
-						}
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
@@ -325,16 +312,11 @@ namespace FFImageLoading.Work
 						{
 							bitmap = BitmapFactory.DecodeStream(stream, null, options);
 						}
-						catch (OutOfMemoryException)
-						{
-							GC.Collect();
-							return null;
-						}
 						catch (Java.Lang.Throwable vme)
 						{
 							if (vme.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
 							{
-								GC.Collect();
+								ImageCache.Instance.Clear(); // Clear will also force a Garbage collection
 							}
 							return null;
 						}
