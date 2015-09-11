@@ -21,6 +21,8 @@ namespace FFImageLoading.Work
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
 		private const float FADE_TRANSITION_MILISECONDS = 400f;
+		private static object _decodingLock = new object();
+
 		private readonly WeakReference<ImageView> _imageWeakReference;
 		private WeakReference<Drawable> _loadingPlaceholderWeakReference;
 
@@ -253,7 +255,10 @@ namespace FFImageLoading.Work
 					{
 						try
 						{
+							lock(_decodingLock)
+							{
 							BitmapFactory.DecodeStream(stream, null, options);
+							}
 
 							if (!stream.CanSeek)
 							{ // Assets stream can't be seeked to origin position
@@ -310,7 +315,10 @@ namespace FFImageLoading.Work
 						Bitmap bitmap;
 						try
 						{
+							lock(_decodingLock)
+							{
 							bitmap = BitmapFactory.DecodeStream(stream, null, options);
+						}
 						}
 						catch (Java.Lang.Throwable vme)
 						{
