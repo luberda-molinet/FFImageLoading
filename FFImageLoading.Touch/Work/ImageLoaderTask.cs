@@ -25,7 +25,6 @@ namespace FFImageLoading.Work
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage> doWithImage, nfloat imageScale)
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
-			CancellationToken = new CancellationTokenSource();
 			_getNativeControl = getNativeControl;
 			_doWithImage = doWithImage;
 			_imageScale = imageScale;

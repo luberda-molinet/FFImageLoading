@@ -163,10 +163,7 @@ namespace FFImageLoading.Work
 			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
 			if (loadedFromCache)
 			{
-				if (task.Parameters.OnFinish != null)
-					task.Parameters.OnFinish(task);
-
-				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+				task.Dispose();
 				return; // image successfully loaded from cache
 			}
 			

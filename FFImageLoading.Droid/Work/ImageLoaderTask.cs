@@ -29,8 +29,6 @@ namespace FFImageLoading.Work
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
-			CancellationToken = new CancellationTokenSource();
-			Context = Android.App.Application.Context.ApplicationContext;
 			DownloadCache = downloadCache;
 			_imageWeakReference = new WeakReference<ImageView>(imageView);
 
@@ -92,7 +90,13 @@ namespace FFImageLoading.Work
 
 		protected IDownloadCache DownloadCache { get; private set; }
 
-		protected Context Context { get; private set; }
+		protected Context Context
+		{
+			get
+			{
+				return Android.App.Application.Context.ApplicationContext;
+			}
+		}
 
 		/// <summary>
 		/// Runs the image loading task: gets image from file, url, asset or cache. Then assign it to the imageView.
@@ -257,7 +261,7 @@ namespace FFImageLoading.Work
 						{
 							lock(_decodingLock)
 							{
-							BitmapFactory.DecodeStream(stream, null, options);
+								BitmapFactory.DecodeStream(stream, null, options);
 							}
 
 							if (!stream.CanSeek)
@@ -317,8 +321,8 @@ namespace FFImageLoading.Work
 						{
 							lock(_decodingLock)
 							{
-							bitmap = BitmapFactory.DecodeStream(stream, null, options);
-						}
+								bitmap = BitmapFactory.DecodeStream(stream, null, options);
+							}
 						}
 						catch (Java.Lang.Throwable vme)
 						{

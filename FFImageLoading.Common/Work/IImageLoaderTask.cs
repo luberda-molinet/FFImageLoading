@@ -4,7 +4,7 @@ using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
-    public interface IImageLoaderTask: IScheduledWork
+    public interface IImageLoaderTask: IScheduledWork, IDisposable
     {
 		/// <summary>
 		/// Gets the cache key for this image loading task.

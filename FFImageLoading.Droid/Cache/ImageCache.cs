@@ -55,22 +55,48 @@ namespace FFImageLoading.Cache
 
 			lock (_clearLock)
 			{
-				if (_references != null && _references.Count > 0)
-				{
-					_references.Clear();
-					didClean = true;
-				}
-
 				if (_reusableBitmaps != null && _reusableBitmaps.Count > 0)
 				{
+					foreach (var weakReference in _reusableBitmaps)
+					{
+						var item = weakReference.Get() as Bitmap;
+						if (item != null && item.Handle != System.IntPtr.Zero && !item.IsRecycled)
+						{
+							// Here it is safe to recycle, these items aren't supposed to be displayed anymore
+							item.Recycle();
+						}
+					}
+
 					_reusableBitmaps.Clear();
 					didClean = true;
 				}
 
 				if (Size() > 0)
 				{
+					if (_references != null && _references.Count > 0)
+					{
+						foreach (var pair in _references)
+						{
+							var drawable = Get(pair.Key) as BitmapDrawable;
+							if (drawable != null && drawable.Handle != System.IntPtr.Zero)
+							{
+								var item = drawable.Bitmap;
+								if (item != null && item.Handle != System.IntPtr.Zero && !item.IsRecycled)
+								{
+									item.Dispose();
+								}
+								drawable.Dispose();
+							}
+						}
+					}
+
 					EvictAll();
 					didClean = true;
+				}
+
+				if (_references != null && _references.Count > 0)
+				{
+					_references.Clear();
 				}
 
 				if (didClean)
@@ -146,6 +172,9 @@ namespace FFImageLoading.Cache
 		protected override void EntryRemoved(bool evicted, Object key, Object oldValue, Object newValue)
 		{
 			var drawable = oldValue as BitmapDrawable;
+			if (drawable == null)
+				return;
+
 			var bitmap = drawable.Bitmap;
 			if (bitmap != null && bitmap.Handle != System.IntPtr.Zero)
 			{
@@ -157,10 +186,8 @@ namespace FFImageLoading.Cache
 
 			// We need to inform .NET GC that the Bitmap is no longer in use in .NET world.
 			// It might get reused by Java world, and we can access it later again since we still have a Java weakreference to it
+			drawable.Dispose();
 			bitmap.Dispose();
-
-			//var oldBmp = (BitmapDrawable) oldValue;
-			//oldBmp.Bitmap.Recycle();
 		}
 
 		/// <summary>

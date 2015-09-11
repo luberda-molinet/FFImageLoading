@@ -7,15 +7,42 @@ using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
-	public abstract class ImageLoaderTaskBase: IImageLoaderTask
+	public abstract class ImageLoaderTaskBase: IImageLoaderTask, IDisposable
 	{
 		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters)
 		{
+			CancellationToken = new CancellationTokenSource();
 			Parameters = parameters;
 			NumberOfRetryNeeded = parameters.RetryCount;
 			MainThreadDispatcher = mainThreadDispatcher;
 			Logger = miniLogger;
 			ConfigureParameters();
+		}
+
+		#region IDisposable implementation
+
+		public void Dispose()
+		{
+			Finish();
+		}
+
+		#endregion
+
+		public void Finish()
+		{
+			if (CancellationToken != null)
+			{
+				CancellationToken.Dispose();
+			}
+
+			if (Parameters != null)
+			{
+				if (Parameters.OnFinish != null)
+				{
+					Parameters.OnFinish(this); // should call dispose
+				}
+				Parameters.Dispose(); // but to be safer let's call it here anyway
+			}
 		}
 
 		/// <summary>
@@ -28,7 +55,7 @@ namespace FFImageLoading.Work
 
 		protected IMiniLogger Logger { get; private set; }
 
-		protected CancellationTokenSource CancellationToken { get; set; }
+		protected CancellationTokenSource CancellationToken { get; private set; }
 
 		public int NumberOfRetryNeeded { get; private set; }
 
@@ -55,8 +82,7 @@ namespace FFImageLoading.Work
 		{
 			ImageService.RemovePendingTask(this);
 			CancellationToken.Cancel();
-			if (Parameters.OnFinish != null)
-				Parameters.OnFinish(this);
+			Finish();
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
 
@@ -137,8 +163,7 @@ namespace FFImageLoading.Work
 			finally
 			{
 				ImageService.RemovePendingTask(this);
-				if (Parameters.OnFinish != null)
-					Parameters.OnFinish(this);
+				Finish();
 			}
 		}
 
