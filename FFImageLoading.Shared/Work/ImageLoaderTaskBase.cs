@@ -30,11 +30,6 @@ namespace FFImageLoading.Work
 
 		public void Finish()
 		{
-			if (CancellationToken != null)
-			{
-				CancellationToken.Dispose();
-			}
-
 			if (Parameters != null)
 			{
 				if (Parameters.OnFinish != null)
