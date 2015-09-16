@@ -32,16 +32,37 @@ namespace FFImageLoading
         /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
         /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
 		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
-        public static void Initialize(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
+        public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null)
         {
 			lock (_initializeLock)
 			{
-				if (_initialized)
-					throw new Exception("FFImageLoading.ImageService is already initialized");
-			}
+				_initialized = false;
 
-			InitializeIfNeeded(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel);
+				if (Config != null)
+				{
+					// If DownloadCache is not updated but HttpClient is then we inform DownloadCache
+					if (httpClient != null && downloadCache == null)
+					{
+						downloadCache = Config.DownloadCache;
+						downloadCache.DownloadHttpClient = httpClient;
+					}
+
+					logger.Debug("Skip configuration for maxCacheSize and diskCache. They cannot be redefined.");
+					maxCacheSize = Config.MaxCacheSize;
+					diskCache = Config.DiskCache;
+
+					// Redefine these if they were provided only
+					httpClient = httpClient ?? Config.HttpClient;
+					scheduler = scheduler ?? Config.Scheduler;
+					logger = logger ?? Config.Logger;
+					downloadCache = downloadCache ?? Config.DownloadCache;
+					loadWithTransparencyChannel = loadWithTransparencyChannel ?? Config.LoadWithTransparencyChannel;
+				}
+
+
+				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel ?? false);
+			}
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,

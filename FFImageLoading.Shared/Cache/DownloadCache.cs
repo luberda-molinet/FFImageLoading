@@ -11,16 +11,17 @@ namespace FFImageLoading.Cache
 {
     public class DownloadCache: IDownloadCache
     {
-        private readonly HttpClient _httpClient;
         private readonly MD5Helper _md5Helper;
         private readonly IDiskCache _diskCache;
 
         public DownloadCache(HttpClient httpClient, IDiskCache diskCache)
         {
-            _httpClient = httpClient;
+			DownloadHttpClient = httpClient;
             _md5Helper = new MD5Helper();
             _diskCache = diskCache;
         }
+
+		public HttpClient DownloadHttpClient { get; set; }
 
 		public async Task<DownloadedData> GetAsync(string url, TimeSpan? duration = null)
         {
@@ -51,7 +52,7 @@ namespace FFImageLoading.Cache
 			if (duration == null)
 				duration = new TimeSpan(30, 0, 0, 0); // by default we cache data 30 days
 			
-			var data = await _httpClient.GetByteArrayAsync(url).ConfigureAwait(false);
+			var data = await DownloadHttpClient.GetByteArrayAsync(url).ConfigureAwait(false);
 			if (data == null)
 				data = new byte[0];
 
