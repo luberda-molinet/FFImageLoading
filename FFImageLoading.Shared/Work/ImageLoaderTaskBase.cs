@@ -60,6 +60,8 @@ namespace FFImageLoading.Work
 		/// <value><c>true</c> if completed; otherwise, <c>false</c>.</value>
 		public bool Completed { get; set; }
 
+		public abstract bool UsesSameNativeControl(IImageLoaderTask task);
+
 		/// <summary>
 		/// Gets the cache key for this image loading task.
 		/// </summary>

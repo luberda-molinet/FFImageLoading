@@ -160,6 +160,12 @@ namespace FFImageLoading.Work
 				return;
 			}
 
+			foreach (var pendingTask in _pendingTasks.ToList())
+			{
+				if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+					pendingTask.ImageLoadingTask.CancelIfNeeded();
+			}
+
 			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
 			if (loadedFromCache)
 			{

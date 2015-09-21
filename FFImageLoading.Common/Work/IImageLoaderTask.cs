@@ -7,6 +7,13 @@ namespace FFImageLoading.Work
     public interface IImageLoaderTask: IScheduledWork, IDisposable
     {
 		/// <summary>
+		/// Indicates if the task uses the same native control
+		/// </summary>
+		/// <returns><c>true</c>, if same native control is used, <c>false</c> otherwise.</returns>
+		/// <param name="task">Task to check.</param>
+		bool UsesSameNativeControl(IImageLoaderTask task);
+
+		/// <summary>
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>

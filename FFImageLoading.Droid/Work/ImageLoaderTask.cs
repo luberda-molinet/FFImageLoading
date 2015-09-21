@@ -47,6 +47,29 @@ namespace FFImageLoading.Work
 		}
 
 		/// <summary>
+		/// Indicates if the task uses the same native control
+		/// </summary>
+		/// <returns><c>true</c>, if same native control is used, <c>false</c> otherwise.</returns>
+		/// <param name="task">Task to check.</param>
+		public override bool UsesSameNativeControl(IImageLoaderTask task)
+		{
+			var loaderTask = task as ImageLoaderTask;
+			if (loaderTask == null)
+				return false;
+			return UsesSameNativeControl(loaderTask);
+		}
+
+		private bool UsesSameNativeControl(ImageLoaderTask task)
+		{
+			var currentControl = GetAttachedImageView();
+			var control = task.GetAttachedImageView();
+			if (currentControl == null || control == null || currentControl.Handle == IntPtr.Zero || control.Handle == IntPtr.Zero)
+				return false;
+
+			return currentControl.Handle == control.Handle;
+		}
+
+		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
 		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
@@ -55,15 +78,7 @@ namespace FFImageLoading.Work
 			_imageWeakReference.TryGetTarget(out imageView);
 			if (imageView == null)
 				return false;
-
-			// Cancel current task attached to the same image view, if needed only
-			var currentAssignedTask = imageView.GetImageLoaderTask();
-			if (currentAssignedTask != null)
-			{
-				Logger.Debug("Cancel current task attached to the same image view");
-				currentAssignedTask.CancelIfNeeded();
-			}
-
+			
 			var cacheResult = await TryLoadingFromCacheAsync(imageView).ConfigureAwait(false);
 			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
 				return true; // stop processing if loaded from cache OR if loading from cached raised an exception

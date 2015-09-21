@@ -34,6 +34,29 @@ namespace FFImageLoading.Work
 		protected IDownloadCache DownloadCache { get; private set; }
 
 		/// <summary>
+		/// Indicates if the task uses the same native control
+		/// </summary>
+		/// <returns><c>true</c>, if same native control is used, <c>false</c> otherwise.</returns>
+		/// <param name="task">Task to check.</param>
+		public override bool UsesSameNativeControl(IImageLoaderTask task)
+		{
+			var loaderTask = task as ImageLoaderTask;
+			if (loaderTask == null)
+				return false;
+			return UsesSameNativeControl(loaderTask);
+		}
+
+		private bool UsesSameNativeControl(ImageLoaderTask task)
+		{
+			var currentControl = _getNativeControl();
+			var control = task._getNativeControl();
+			if (currentControl == null || control == null || currentControl.Handle == IntPtr.Zero || control.Handle == IntPtr.Zero)
+				return false;
+
+			return currentControl.Handle == control.Handle;
+		}
+
+		/// <summary>
 		/// Prepares the instance before it runs.
 		/// </summary>
 		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
