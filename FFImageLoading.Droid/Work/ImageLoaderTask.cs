@@ -495,7 +495,7 @@ namespace FFImageLoading.Work
 				return null;
 
 			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder).ConfigureAwait(false);
-			if (drawableWithResult == null)
+			if (drawableWithResult == null || drawableWithResult.Item == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache

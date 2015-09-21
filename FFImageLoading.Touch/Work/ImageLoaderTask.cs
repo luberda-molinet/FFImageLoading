@@ -278,7 +278,7 @@ namespace FFImageLoading.Work
 				return null;
 
 			var imageWithResult = await GetImageAsync(sourcePath, source).ConfigureAwait(false);
-			if (imageWithResult == null)
+			if (imageWithResult == null || imageWithResult.Item == null)
 				return null;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache

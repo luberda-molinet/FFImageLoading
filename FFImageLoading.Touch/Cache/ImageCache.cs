@@ -38,6 +38,9 @@ namespace FFImageLoading.Cache
 
         public void Add(string key, UIImage value)
         {
+			if (string.IsNullOrWhiteSpace(key) || value == null)
+				return;
+			
             _cache.SetCost(value, new NSString(key), value.GetMemorySize());
         }
 
