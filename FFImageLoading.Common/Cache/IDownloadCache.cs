@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 
 namespace FFImageLoading.Cache
 {
@@ -9,9 +10,9 @@ namespace FFImageLoading.Cache
     {
 		HttpClient DownloadHttpClient { get; set; }
 
-        Task<DownloadedData> GetAsync(string url, TimeSpan? duration = null);
+        Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null);
 
-		Task<CacheStream> GetStreamAsync(string url, TimeSpan? duration = null);
+		Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null);
     }
 }
 

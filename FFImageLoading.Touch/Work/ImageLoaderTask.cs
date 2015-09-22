@@ -190,7 +190,7 @@ namespace FFImageLoading.Work
 						}
 						break;
 					case ImageSource.Url:
-						var downloadedData = await DownloadCache.GetAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
+						var downloadedData = await DownloadCache.GetAsync(path, CancellationToken.Token, Parameters.CacheDuration).ConfigureAwait(false);
 						bytes = downloadedData.Bytes;
 						path = downloadedData.CachedPath;
 						result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;

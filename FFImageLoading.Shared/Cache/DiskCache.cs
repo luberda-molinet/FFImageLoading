@@ -32,6 +32,7 @@ namespace FFImageLoading.Cache
 
         const string JournalFileName = ".journal";
         const string Magic = "MONOID";
+		const int BufferSize = 4096; // default value of .NET framework for CopyToAsync buffer size
         readonly Encoding encoding = Encoding.UTF8;
         string basePath;
         string journalPath;
@@ -207,38 +208,51 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public async Task AddOrUpdateAsync (string key, byte[] data, TimeSpan duration)
-        {
-            key = SanitizeKey (key);
+		public async Task AddOrUpdateAsync (string key, Stream stream, CancellationToken token, TimeSpan duration)
+		{
+			key = SanitizeKey (key);
 
-            bool existed = entries.ContainsKey (key);
-            string filepath = Path.Combine(basePath, key);
-            await FileStore.WriteBytesAsync(filepath, data).ConfigureAwait(false);
+			bool existed = entries.ContainsKey (key);
+			string filepath = Path.Combine(basePath, key);
 
-            AppendToJournal (existed ? JournalOp.Modified : JournalOp.Created,
-                key,
-                DateTime.UtcNow,
-                duration);
-            entries[key] = new CacheEntry (DateTime.UtcNow, duration);
-        }
+			using (var fs = FileStore.GetOutputStream(filepath))
+			{
+				await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
+			}
 
-        public async Task<byte[]> TryGetAsync (string key)
+			AppendToJournal (existed ? JournalOp.Modified : JournalOp.Created,
+				key,
+				DateTime.UtcNow,
+				duration);
+			entries[key] = new CacheEntry (DateTime.UtcNow, duration);
+		}
+
+        public async Task<byte[]> TryGetAsync (string key, CancellationToken token)
         {
             key = SanitizeKey (key);
             byte[] data = null;
             if (!entries.ContainsKey (key))
                 return null;
-            try {
+			
+            try
+			{
                 string filepath = Path.Combine (basePath, key);
 				if (!FileStore.Exists(filepath))
 					return null;
-				
-                data = await FileStore.ReadBytesAsync(filepath).ConfigureAwait(false);
-            } catch {
+
+				using (var fs = FileStore.GetInputStream(filepath))
+				{
+					using (var ms = new MemoryStream())
+					{
+						await fs.CopyToAsync(ms, BufferSize, token).ConfigureAwait(false);
+						return ms.ToArray();
+					}
+				}
+            }
+			catch
+			{
                 return null;
             }
-
-            return data;
         }
 
 		public Stream TryGetStream (string key)
@@ -247,11 +261,13 @@ namespace FFImageLoading.Cache
 			if (!entries.ContainsKey(key))
 				return null;
 
-			try {
+			try
+			{
                 string filepath = Path.Combine(basePath, key);
                 return FileStore.GetInputStream(filepath);
             }
-            catch {
+            catch
+			{
 				return null;
 			}
 		}

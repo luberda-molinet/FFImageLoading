@@ -481,7 +481,7 @@ namespace FFImageLoading.Work
 						streamAndResult = WithLoadingResult.Encapsulate(FileStore.GetInputStream(path), LoadingResult.Disk);
 						break;
 					case ImageSource.Url:
-						var cachedStream = await DownloadCache.GetStreamAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
+						var cachedStream = await DownloadCache.GetStreamAsync(path, CancellationToken.Token, Parameters.CacheDuration).ConfigureAwait(false);
 						streamAndResult = WithLoadingResult.Encapsulate(cachedStream.ImageStream,
 							cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
 						break;
