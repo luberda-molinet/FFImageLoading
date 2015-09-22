@@ -19,7 +19,13 @@ namespace FFImageLoading
 
 		public async Task<WithLoadingResult<Stream>> GetStream(string identifier)
 		{
-			return WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
+			var resourceId = Context.Resources.GetIdentifier (identifier.ToLower (), "drawable", Context.PackageName);
+			Stream stream = null;
+			if (resourceId != 0)
+			{
+				stream = Context.Resources.OpenRawResource (resourceId);
+			}
+			return WithLoadingResult.Encapsulate(stream, LoadingResult.ApplicationBundle);
 		}
 
 		public void Dispose() {
