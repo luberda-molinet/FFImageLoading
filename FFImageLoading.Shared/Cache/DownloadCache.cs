@@ -30,8 +30,8 @@ namespace FFImageLoading.Cache
             string filename = _md5Helper.MD5(url);
             string filepath = Path.Combine(_diskCache.BasePath, filename);
 			byte[] data = await _diskCache.TryGetAsync(filename, token).ConfigureAwait(false);
-            if (data != null)
-                return new DownloadedData(filepath, data);
+			if (data != null)
+				return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
 
 			using (var memoryStream = await DownloadAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false))
 			{
