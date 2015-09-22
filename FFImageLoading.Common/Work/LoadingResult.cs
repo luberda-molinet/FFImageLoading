@@ -9,6 +9,7 @@ namespace FFImageLoading.Work
 		Disk,
 		Internet,
 		ApplicationBundle,
+		CompiledResource,
 	}
 }
 

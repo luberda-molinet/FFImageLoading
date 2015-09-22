@@ -125,6 +125,8 @@
     <Compile Include="Work\StreamResolver\IStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
     <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\ResourceIdentifiersCache.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

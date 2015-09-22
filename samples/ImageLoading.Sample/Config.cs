@@ -14,8 +14,11 @@ namespace ImageLoading.Sample
 {
     public class Config
     {
-        public const string LoadingPlaceholderPath = "placeholder";
-        public const string ErrorPlaceholderPath = "error";
+        public const string LoadingPlaceholderPath = "Images/placeholder.jpg";
+        public const string ErrorPlaceholderPath = "Images/error.jpg";
+
+		public const string LoadingPlaceholderResource = "placeholder";
+		public const string ErrorPlaceholderResource = "error";
 
         public const string LoadingPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//placeholder.jpg";
         public const string ErrorPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//error.jpg";

@@ -77,11 +77,11 @@ namespace ImageLoading.Sample
 			vh.ItemView.Tag = position;
 
             ImageService.LoadUrl(item)
-               .Retry(3, 200)
-               .DownSample(100, 100)
-               .LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
-               .ErrorPlaceholder(Config.ErrorPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
-               .Into(vh.Image);
+              	.Retry(3, 200)
+              	.DownSample(100, 100)
+				.LoadingPlaceholder(Config.LoadingPlaceholderResource, FFImageLoading.Work.ImageSource.CompiledResource)
+				.ErrorPlaceholder(Config.ErrorPlaceholderResource, FFImageLoading.Work.ImageSource.CompiledResource)
+              	.Into(vh.Image);
         }
 
         public class ViewHolder : RecyclerView.ViewHolder

@@ -13,6 +13,8 @@ namespace FFImageLoading
 			{
 				case ImageSource.ApplicationBundle:
 					return new ApplicationBundleStreamResolver();
+				case ImageSource.CompiledResource:
+					return new CompiledResourceStreamResolver();
 				case ImageSource.Filepath:
 					return new FilePathStreamResolver();
 				case ImageSource.Url:
