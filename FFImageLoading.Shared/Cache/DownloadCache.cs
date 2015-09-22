@@ -35,7 +35,7 @@ namespace FFImageLoading.Cache
 
 			using (var memoryStream = await DownloadAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false))
 			{
-				return new DownloadedData(filepath, memoryStream.ToArray());
+				return new DownloadedData(filepath, memoryStream == null ? null : memoryStream.ToArray());
 			}
         }
 
