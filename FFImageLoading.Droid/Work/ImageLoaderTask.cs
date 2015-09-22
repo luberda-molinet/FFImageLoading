@@ -248,27 +248,36 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
+		/**
+		 * Note, caller must Dispose Bitmap
+		 **/
+		protected virtual async Task<WithLoadingResult<Bitmap>> GetBitmapAsync(string path, ImageSource source)
 		{
 			if (CancellationToken.IsCancellationRequested)
+			{
 				return null;
+			}
 
-			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async () =>
+			return await Task.Run<WithLoadingResult<Bitmap>>(async () =>
 				{
 					if (CancellationToken.IsCancellationRequested)
-						return null;
-
-					// First decode with inJustDecodeBounds=true to check dimensions
-					var options = new BitmapFactory.Options
 					{
-						InJustDecodeBounds = true
-					};
+						return null;
+					}
 
 					var streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
 					if (streamWithResult == null)
+					{
 						return null;
+					}
 
 					var stream = streamWithResult.Item;
+
+					// First decode with inJustDecodeBounds=true to check dimensions
+					var options = new BitmapFactory.Options
+						{
+							InJustDecodeBounds = true
+						};
 
 					try
 					{
@@ -321,7 +330,9 @@ namespace FFImageLoading.Work
 
 							// If we're running on Honeycomb or newer, try to use inBitmap
 							if (Utils.HasHoneycomb())
+							{
 								AddInBitmapOptions(options);
+							}
 						}
 						catch (Exception ex)
 						{
@@ -329,9 +340,12 @@ namespace FFImageLoading.Work
 						}
 
 						if (CancellationToken.IsCancellationRequested)
+						{
 							return null;
+						}
 
-						Bitmap bitmap;
+						Bitmap bitmap = null;
+
 						try
 						{
 							lock(_decodingLock)
@@ -353,52 +367,76 @@ namespace FFImageLoading.Work
 							return null;
 						}
 
-						try
-						{
-							if (bitmap == null || CancellationToken.IsCancellationRequested)
-								return null;
+						return WithLoadingResult.Encapsulate<Bitmap>(bitmap, streamWithResult.Result);
 
-							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-							{
-								foreach (var transformation in Parameters.Transformations)
-								{
-									try
-									{
-										var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
-										bitmap = bitmapHolder.ToNative();
-									}
-									catch (Exception ex)
-									{
-										Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-									}
-								}
-							}
-
-							if (isLoadingPlaceHolder)
-							{
-								return WithLoadingResult.Encapsulate<BitmapDrawable>(new AsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
-							}
-							else
-							{
-								Drawable placeholderDrawable = null;
-								if (_loadingPlaceholderWeakReference != null)
-								{
-									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
-								}
-
-								return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS), streamWithResult.Result);
-							}
-						}
-						finally
-						{
-							if (bitmap != null)
-								bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
-						}
 					}
 					finally
 					{
 						if (stream != null)
+						{
 							stream.Dispose();
+						}
+					}
+
+				}
+			).ConfigureAwait(false);
+		}
+
+		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
+		{
+			if (CancellationToken.IsCancellationRequested)
+				return null;
+
+			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async () =>
+				{
+					if (CancellationToken.IsCancellationRequested)
+					{
+						return null;
+					}
+
+					var bitmapWithResult = await GetBitmapAsync(path, source);
+					Bitmap bitmap = bitmapWithResult.Item;
+
+					try
+					{
+						if (bitmap == null || CancellationToken.IsCancellationRequested)
+							return null;
+
+						if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+						{
+							foreach (var transformation in Parameters.Transformations)
+							{
+								try
+								{
+									var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+									bitmap = bitmapHolder.ToNative();
+								}
+								catch (Exception ex)
+								{
+									Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+								}
+							}
+						}
+
+						if (isLoadingPlaceHolder)
+						{
+							return WithLoadingResult.Encapsulate<BitmapDrawable>(new AsyncDrawable(Context.Resources, bitmap, this), bitmapWithResult.Result);
+						}
+						else
+						{
+							Drawable placeholderDrawable = null;
+							if (_loadingPlaceholderWeakReference != null)
+							{
+								_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
+							}
+
+							return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS), bitmapWithResult.Result);
+						}
+					}
+					finally
+					{
+						if (bitmap != null)
+							bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
 					}
 				}).ConfigureAwait(false);
 		}
@@ -472,19 +510,9 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				switch (source)
+				using (var resolver = StreamResolverFactory.GetResolver (source, Parameters, DownloadCache)) 
 				{
-					case ImageSource.ApplicationBundle:
-						streamAndResult = WithLoadingResult.Encapsulate(Context.Assets.Open(path, Access.Streaming), LoadingResult.ApplicationBundle);
-						break;
-					case ImageSource.Filepath:
-						streamAndResult = WithLoadingResult.Encapsulate(FileStore.GetInputStream(path), LoadingResult.Disk);
-						break;
-					case ImageSource.Url:
-						var cachedStream = await DownloadCache.GetStreamAsync(path, Parameters.CacheDuration).ConfigureAwait(false);
-						streamAndResult = WithLoadingResult.Encapsulate(cachedStream.ImageStream,
-							cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
-						break;
+					streamAndResult = await resolver.GetStream (path).ConfigureAwait (false);
 				}
 			}
 			catch (Exception ex)
