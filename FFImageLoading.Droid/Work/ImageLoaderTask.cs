@@ -265,7 +265,7 @@ namespace FFImageLoading.Work
 					};
 
 					var streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-					if (streamWithResult == null)
+					if (streamWithResult == null || streamWithResult.Item == null)
 						return null;
 
 					var stream = streamWithResult.Item;
