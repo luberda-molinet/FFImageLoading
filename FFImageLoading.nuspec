@@ -24,7 +24,7 @@
        	
        		<group targetFramework="Xamarin.iOS10">
 			<dependency id="modernhttpclient" version="2.2.0" />
-			<dependency id="WebP.Touch" version="1.0.0" />
+			<dependency id="WebP.Touch" version="1.0.1" />
        		</group>
        </dependencies>
    </metadata>
