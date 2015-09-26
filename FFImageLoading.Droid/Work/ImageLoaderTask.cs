@@ -239,6 +239,8 @@ namespace FFImageLoading.Work
 
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
+				
+				Completed = true;
 
 				if (Parameters.OnSuccess != null)
 					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
