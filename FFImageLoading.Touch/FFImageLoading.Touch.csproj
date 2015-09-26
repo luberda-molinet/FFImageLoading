@@ -47,6 +47,7 @@
     <Folder Include="Work\" />
     <Folder Include="Helpers\" />
     <Folder Include="Config\" />
+    <Folder Include="Work\DataResolver\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -112,6 +113,11 @@
     <Compile Include="..\FFImageLoading.Common\Cache\CacheStream.cs">
       <Link>Cache\CacheStream.cs</Link>
     </Compile>
+    <Compile Include="Work\DataResolver\FilePathDataResolver.cs" />
+    <Compile Include="Work\DataResolver\IDataResolver.cs" />
+    <Compile Include="Work\DataResolver\UrlDataResolver.cs" />
+    <Compile Include="Work\DataResolver\UIImageData.cs" />
+    <Compile Include="Work\DataResolver\DataResolverFactory.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
