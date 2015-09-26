@@ -44,6 +44,7 @@ namespace FFImageLoading.Work
 		private readonly int _defaultParallelTasks;
 		private readonly object _pauseWorkLock;
 		private readonly List<PendingTask> _pendingTasks;
+		private readonly object _pendingTasksLock = new object();
 		private readonly object _runningLock = new object();
 
 		private bool _exitTasksEarly;
@@ -122,10 +123,20 @@ namespace FFImageLoading.Work
 				if (pauseWork)
 				{
 					_logger.Debug("SetPauseWork paused.");
-					var tempList = _pendingTasks.ToList(); // we iterate on a copy
-					foreach (var task in tempList)
+
+					List<PendingTask> pendingTasksCopy;
+					lock (_pendingTasksLock)
+					{
+						pendingTasksCopy = _pendingTasks.ToList(); // we iterate on a copy
+					}
+
+					foreach (var task in pendingTasksCopy)
 						task.ImageLoadingTask.Cancel();
-					_pendingTasks.Clear();
+
+					lock (_pendingTasksLock)
+					{ 
+						_pendingTasks.Clear();
+					}
 				}
 
 				if (!pauseWork)
@@ -139,9 +150,12 @@ namespace FFImageLoading.Work
 		{
 			lock (_pauseWorkLock)
 			{
-				var pendingTask = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask == task);
-				if (pendingTask != null)
-					_pendingTasks.Remove(pendingTask);
+				lock (_pendingTasksLock)
+				{
+					var pendingTask = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask == task);
+					if (pendingTask != null)
+						_pendingTasks.Remove(pendingTask);
+				}
 			}
 		}
 
@@ -160,7 +174,12 @@ namespace FFImageLoading.Work
 				return;
 			}
 
-			foreach (var pendingTask in _pendingTasks.ToList())
+			List<PendingTask> pendingTasksCopy;
+			lock (_pendingTasksLock)
+			{
+				pendingTasksCopy = _pendingTasks.ToList();
+			}
+			foreach (var pendingTask in pendingTasksCopy)
 			{
 				if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
 					pendingTask.ImageLoadingTask.CancelIfNeeded();
@@ -190,9 +209,12 @@ namespace FFImageLoading.Work
 			PendingTask alreadyRunningTaskForSameKey = null;
 			lock (_pauseWorkLock)
 			{
-				alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey() && (!t.ImageLoadingTask.IsCancelled));
-				if (alreadyRunningTaskForSameKey == null)
-					_pendingTasks.Add(currentPendingTask);
+				lock (_pendingTasksLock)
+				{
+					alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey() && (!t.ImageLoadingTask.IsCancelled));
+					if (alreadyRunningTaskForSameKey == null)
+						_pendingTasks.Add(currentPendingTask);
+				}
 			}
 
 			if (alreadyRunningTaskForSameKey == null)
@@ -288,9 +310,13 @@ namespace FFImageLoading.Work
 			List<PendingTask> currentLotOfPendingTasks = null;
 			lock (_pauseWorkLock)
 			{
-				currentLotOfPendingTasks = _pendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+				lock (_pendingTasksLock)
+				{
+					currentLotOfPendingTasks = _pendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
                     .Take(MaxParallelTasks)
                     .ToList();
+				}
+
 				if (currentLotOfPendingTasks.Count == 0)
 				{
 					lock (_runningLock)
