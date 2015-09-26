@@ -62,8 +62,11 @@ namespace FFImageLoading.Work
 
 		private bool UsesSameNativeControl(ImageLoaderTask task)
 		{
-			var currentControl = GetAttachedImageView();
-			var control = task.GetAttachedImageView();
+			ImageView currentControl;
+			_imageWeakReference.TryGetTarget(out currentControl);
+
+			ImageView control;
+			task._imageWeakReference.TryGetTarget(out control);
 			if (currentControl == null || control == null || currentControl.Handle == IntPtr.Zero || control.Handle == IntPtr.Zero)
 				return false;
 
