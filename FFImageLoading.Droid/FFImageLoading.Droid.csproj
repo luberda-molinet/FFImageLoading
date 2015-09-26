@@ -120,6 +120,12 @@
     <Compile Include="..\FFImageLoading.Common\Work\WithLoadingResult.cs">
       <Link>Work\WithLoadingResult.cs</Link>
     </Compile>
+    <Compile Include="Work\StreamResolver\ApplicationBundleStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\FilePathStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\IStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
+    <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
+    <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -134,5 +140,8 @@
   </ProjectExtensions>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Work\StreamResolver\" />
   </ItemGroup>
 </Project>

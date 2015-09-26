@@ -47,6 +47,16 @@ namespace FFImageLoading.Work
 			return new TaskParameter() { Source = ImageSource.ApplicationBundle, Path = filepath };
 		}
 
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a compiled drawable resource.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="resourceName">Name of the resource in drawable folder without extension</param>
+		public static TaskParameter FromCompiledResource(string resourceName)
+		{
+			return new TaskParameter() { Source = ImageSource.CompiledResource, Path = resourceName };
+		}
+
 		private TaskParameter()
 		{
             Transformations = new List<ITransformation>();

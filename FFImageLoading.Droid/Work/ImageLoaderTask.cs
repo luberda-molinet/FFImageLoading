@@ -466,34 +466,13 @@ namespace FFImageLoading.Work
 
 		private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
 		{
-			WithLoadingResult<Stream> streamAndResult = null;
-
 			if (string.IsNullOrWhiteSpace(path)) return null;
 
 			try
 			{
-				switch (source)
+				using (var resolver = StreamResolverFactory.GetResolver(source, Parameters, DownloadCache))
 				{
-					case ImageSource.ApplicationBundle:
-						streamAndResult = WithLoadingResult.Encapsulate(Context.Assets.Open(path, Access.Streaming), LoadingResult.ApplicationBundle);
-						break;
-					case ImageSource.CompiledResource:
-						int resourceId = Context.Resources.GetIdentifier(path.ToLower(), "drawable", Context.PackageName);
-						Stream stream = null;
-						if (resourceId != 0)
-						{
-							stream = Context.Resources.OpenRawResource (resourceId);
-						}
-						streamAndResult = WithLoadingResult.Encapsulate(stream, LoadingResult.CompiledResource);
-						break;
-					case ImageSource.Filepath:
-						streamAndResult = WithLoadingResult.Encapsulate(FileStore.GetInputStream(path), LoadingResult.Disk);
-						break;
-					case ImageSource.Url:
-						var cachedStream = await DownloadCache.GetStreamAsync(path, CancellationToken.Token, Parameters.CacheDuration).ConfigureAwait(false);
-						streamAndResult = WithLoadingResult.Encapsulate(cachedStream.ImageStream,
-							cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
-						break;
+					return await resolver.GetStream(path, CancellationToken.Token).ConfigureAwait(false);
 				}
 			}
 			catch (Exception ex)
@@ -501,8 +480,6 @@ namespace FFImageLoading.Work
 				Logger.Error("Unable to retrieve image data", ex);
 				return null;
 			}
-
-			return streamAndResult;
 		}
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates

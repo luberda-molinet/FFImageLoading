@@ -179,23 +179,12 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				switch (source)
+				using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
 				{
-					case ImageSource.ApplicationBundle:
-					case ImageSource.CompiledResource:
-					case ImageSource.Filepath:
-						if (FileStore.Exists(path))
-						{
-							bytes = await FileStore.ReadBytesAsync(path).ConfigureAwait(false);
-							result = (LoadingResult)(int)source; // Some values of ImageSource and LoadingResult are shared
-						}
-						break;
-					case ImageSource.Url:
-						var downloadedData = await DownloadCache.GetAsync(path, CancellationToken.Token, Parameters.CacheDuration).ConfigureAwait(false);
-						bytes = downloadedData.Bytes;
-						path = downloadedData.CachedPath;
-						result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;
-						break;
+					var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
+					bytes = data.Data;
+					path = data.ResultIdentifier;
+					result = data.Result;
 				}
 			}
 			catch (Exception ex)

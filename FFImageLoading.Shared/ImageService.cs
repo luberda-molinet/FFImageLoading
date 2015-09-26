@@ -145,6 +145,17 @@ namespace FFImageLoading
 			return TaskParameter.FromApplicationBundle(filepath);
 		}
 
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a compiled drawable resource.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="resourceName">Name of the resource in drawable folder without extension</param>
+		public static TaskParameter LoadCompiledResource(string resourceName)
+		{
+			InitializeIfNeeded();
+			return TaskParameter.FromCompiledResource(resourceName);
+		}
+
         /// <summary>
         /// Gets a value indicating whether ImageService will exit tasks earlier
         /// </summary>
