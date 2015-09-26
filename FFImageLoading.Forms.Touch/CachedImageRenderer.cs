@@ -111,29 +111,39 @@ namespace FFImageLoading.Forms.Touch
 
 			TaskParameter imageLoader = null;
 
-			if (source == null)
+			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
+
+			if (ffSource == null)
 			{
 				Control.Image = null;
 				ImageLoadingFinished(Element);
 			}
-			else if (source is UriImageSource)
+			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
 			{
-				var urlSource = (UriImageSource)source;
-				imageLoader = ImageService.LoadUrl(urlSource.Uri.ToString(), Element.CacheDuration);
+				imageLoader = ImageService.LoadUrl(ffSource.Path, Element.CacheDuration);
 			}
-			else if (source is FileImageSource)
+			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
 			{
-				var fileSource = (FileImageSource)source;
-				Control.Image = UIImage.FromBundle(fileSource.File);
-				ImageLoadingFinished(Element);
-			}
-			else
-			{
-				throw new NotImplementedException("ImageSource type not supported");
+				imageLoader = ImageService.LoadFileFromApplicationBundle(ffSource.Path);
 			}
 
 			if (imageLoader != null)
 			{
+				// LoadingPlaceholder
+				if (Element.LoadingPlaceholder != null)
+				{
+					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+					imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+				}
+
+				// ErrorPlaceholder
+				if (Element.ErrorPlaceholder != null)
+				{
+					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+					imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+				}
+
+				// Downsample
 				if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 				{
 					if (Element.DownsampleHeight > Element.DownsampleWidth)
@@ -146,16 +156,18 @@ namespace FFImageLoading.Forms.Touch
 					}
 				}
 
+				// RetryCount
 				if (Element.RetryCount > 0)
 				{
 					imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 				}
-					
+
+				// TransparencyChannel
 				imageLoader.TransparencyChannel(Element.TransparencyEnabled);
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
 				imageLoader.Into(Control);	
-			}	
+			}
 		}
 
 		void ImageLoadingFinished(CachedImage element)

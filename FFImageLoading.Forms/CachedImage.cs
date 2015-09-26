@@ -113,6 +113,40 @@ namespace FFImageLoading.Forms
 				SetValue(TransparencyEnabledProperty, value); 
 			}
 		}
+
+		public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.LoadingPlaceholder, null);
+
+		/// <summary>
+		/// Gets or sets the loading placeholder image.
+		/// </summary>
+		public ImageSource LoadingPlaceholder
+		{
+			get
+			{
+				return (ImageSource)GetValue(LoadingPlaceholderProperty); 
+			}
+			set
+			{
+				SetValue(LoadingPlaceholderProperty, value); 
+			}
+		}
+
+		public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.ErrorPlaceholder, null);
+
+		/// <summary>
+		/// Gets or sets the error placeholder image.
+		/// </summary>
+		public ImageSource ErrorPlaceholder
+		{
+			get
+			{
+				return (ImageSource)GetValue(ErrorPlaceholderProperty); 
+			}
+			set
+			{
+				SetValue(ErrorPlaceholderProperty, value); 
+			}
+		}
 	}
 }
 
