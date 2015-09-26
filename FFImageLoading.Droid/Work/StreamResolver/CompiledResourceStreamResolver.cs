@@ -21,11 +21,14 @@ namespace FFImageLoading.Work.StreamResolver
 
 		public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
+			// Resource name is always without extension
+			string resourceName = Path.GetFileNameWithoutExtension(identifier);
+
 			int resourceId = 0;
-			if (!_resourceIdentifiersCache.TryGetValue(identifier, out resourceId))
+			if (!_resourceIdentifiersCache.TryGetValue(resourceName, out resourceId))
 			{
-				resourceId = Context.Resources.GetIdentifier(identifier.ToLower(), "drawable", Context.PackageName);
-				_resourceIdentifiersCache.TryAdd(identifier.ToLower(), resourceId);
+				resourceId = Context.Resources.GetIdentifier(resourceName.ToLower(), "drawable", Context.PackageName);
+				_resourceIdentifiersCache.TryAdd(resourceName.ToLower(), resourceId);
 			}
 
 			Stream stream = null;
