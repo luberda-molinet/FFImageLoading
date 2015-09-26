@@ -20,11 +20,11 @@ namespace FFImageLoading.Work.DataResolver
 		public async Task<UIImageData> GetData(string identifier, CancellationToken token)
 		{
 			if (!FileStore.Exists(identifier))
-			{
-				var bytes = await FileStore.ReadBytesAsync(identifier).ConfigureAwait(false);
-				var result = (LoadingResult)(int)_source; // Some values of ImageSource and LoadingResult are shared
-				return new UIImageData() { Data = bytes, Result = result, ResultIdentifier = identifier };
-			}
+				return null;
+
+			var bytes = await FileStore.ReadBytesAsync(identifier).ConfigureAwait(false);
+			var result = (LoadingResult)(int)_source; // Some values of ImageSource and LoadingResult are shared
+			return new UIImageData() { Data = bytes, Result = result, ResultIdentifier = identifier };
 		}
 
 		public void Dispose() {

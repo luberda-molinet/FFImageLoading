@@ -15,6 +15,7 @@ using FFImageLoading.Cache;
 using FFImageLoading.Extensions;
 using Android.Runtime;
 using System;
+using FFImageLoading.Work.StreamResolver;
 
 namespace FFImageLoading.Work
 {
