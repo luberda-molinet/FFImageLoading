@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading", "FFImageLoading.Common\FFImageLoading.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib", "FFImageLoading.Common\FFImageLoading-contrib.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Shared", "FFImageLoading.Shared\FFImageLoading.Shared.shproj", "{E72AC4ED-03A8-465C-95A2-38B0544B37DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Droid", "FFImageLoading.Droid\FFImageLoading.Droid.csproj", "{74BF9402-3E13-4003-8923-BC20A1294CE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Droid", "FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj", "{74BF9402-3E13-4003-8923-BC20A1294CE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Touch", "FFImageLoading.Touch\FFImageLoading.Touch.csproj", "{1597F7D4-432C-4F26-B508-0F6FAF0B9711}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Touch", "FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj", "{1597F7D4-432C-4F26-B508-0F6FAF0B9711}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B48F3C95-B33F-4EF5-B223-06356D749A80}"
 EndProject
