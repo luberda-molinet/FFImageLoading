@@ -182,11 +182,12 @@ namespace FFImageLoading.Work
 				switch (source)
 				{
 					case ImageSource.ApplicationBundle:
+					case ImageSource.CompiledResource:
 					case ImageSource.Filepath:
 						if (FileStore.Exists(path))
 						{
 							bytes = await FileStore.ReadBytesAsync(path).ConfigureAwait(false);
-							result = source == ImageSource.ApplicationBundle ? LoadingResult.ApplicationBundle : LoadingResult.Disk;
+							result = (LoadingResult)(int)source; // Some values of ImageSource and LoadingResult are shared
 						}
 						break;
 					case ImageSource.Url:

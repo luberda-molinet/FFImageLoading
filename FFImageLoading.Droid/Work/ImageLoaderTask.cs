@@ -477,6 +477,15 @@ namespace FFImageLoading.Work
 					case ImageSource.ApplicationBundle:
 						streamAndResult = WithLoadingResult.Encapsulate(Context.Assets.Open(path, Access.Streaming), LoadingResult.ApplicationBundle);
 						break;
+					case ImageSource.CompiledResource:
+						int resourceId = Context.Resources.GetIdentifier(path.ToLower(), "drawable", Context.PackageName);
+						Stream stream = null;
+						if (resourceId != 0)
+						{
+							stream = Context.Resources.OpenRawResource (resourceId);
+						}
+						streamAndResult = WithLoadingResult.Encapsulate(stream, LoadingResult.CompiledResource);
+						break;
 					case ImageSource.Filepath:
 						streamAndResult = WithLoadingResult.Encapsulate(FileStore.GetInputStream(path), LoadingResult.Disk);
 						break;

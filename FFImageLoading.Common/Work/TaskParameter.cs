@@ -5,9 +5,11 @@ namespace FFImageLoading.Work
 {
 	public enum ImageSource
 	{
-		Filepath,
-		Url,
-		ApplicationBundle
+		Url = 3,
+
+		Filepath = 10,
+		ApplicationBundle = 11,
+		CompiledResource = 12
 	}
 
 	public class TaskParameter: IDisposable
