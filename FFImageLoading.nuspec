@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xamarin.FFImageLoading</id>
-       <version>1.1.5</version>
+       <version>1.1.6</version>
        <title>Xamarin library to load images quickly and easily on iOS and Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
