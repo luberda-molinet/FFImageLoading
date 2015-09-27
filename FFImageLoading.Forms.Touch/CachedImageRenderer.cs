@@ -133,14 +133,16 @@ namespace FFImageLoading.Forms.Touch
 				if (Element.LoadingPlaceholder != null)
 				{
 					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
-					imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+					if (placeholderSource != null)
+						imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 				}
 
 				// ErrorPlaceholder
 				if (Element.ErrorPlaceholder != null)
 				{
 					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
-					imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+					if (placeholderSource != null)
+						imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 				}
 
 				// Downsample
