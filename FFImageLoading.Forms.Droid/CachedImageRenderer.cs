@@ -80,7 +80,7 @@ namespace FFImageLoading.Forms.Droid
 			else 
 				Control.SetScaleType(ImageView.ScaleType.FitCenter);
 		}
-
+			
 		private void UpdateBitmap(Image previous = null)
 		{
 			if (previous == null || !object.Equals(previous.Source, Element.Source))
@@ -99,29 +99,49 @@ namespace FFImageLoading.Forms.Droid
 				{
 					TaskParameter imageLoader = null;
 
-					if (source is UriImageSource)
-					{
-						var urlSource = (UriImageSource)source;
-						imageLoader = ImageService.LoadUrl(urlSource.Uri.ToString(), Element.CacheDuration);
-					}
-					else if (source is FileImageSource)
-					{
-						var fileSource = (FileImageSource)source;
-						Control.SetImageDrawable(Context.Resources.GetDrawable(fileSource.File));
-						ImageLoadingFinished(Element);
-					}
-					else if (source == null)
+					var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
+
+					if (ffSource == null)
 					{
 						Control.SetImageDrawable(null);
 						ImageLoadingFinished(Element);
 					}
-					else
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
 					{
-						throw new NotImplementedException("ImageSource type not supported");
+						imageLoader = ImageService.LoadUrl(ffSource.Path, Element.CacheDuration);
+					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
+					{
+						imageLoader = ImageService.LoadCompiledResource(ffSource.Path);
+					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
+					{
+						imageLoader = ImageService.LoadFileFromApplicationBundle(ffSource.Path);
+					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
+					{
+						imageLoader = ImageService.LoadFile(ffSource.Path);
 					}
 
 					if (imageLoader != null)
 					{
+						// LoadingPlaceholder
+						if (Element.LoadingPlaceholder != null)
+						{
+							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+							if (placeholderSource != null)
+								imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+						}
+
+						// ErrorPlaceholder
+						if (Element.ErrorPlaceholder != null)
+						{
+							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+							if (placeholderSource != null)
+								imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+						}
+
+						// Downsample
 						if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 						{
 							if (Element.DownsampleHeight > Element.DownsampleWidth)
@@ -134,11 +154,13 @@ namespace FFImageLoading.Forms.Droid
 							}
 						}
 
+						// RetryCount
 						if (Element.RetryCount > 0)
 						{
 							imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 						}
 							
+						// TransparencyChannel
 						imageLoader.TransparencyChannel(Element.TransparencyEnabled);
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));

@@ -25,6 +25,34 @@ WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: 
 ###Xamarin.Forms
 The Xamarin Forms NuGet package ships FFImageLoading for iOS and Android. Thanks to Daniel Luberda for his help here.
 
+```C#
+// Initialization:
+FFImageLoading.Forms.Droid.CachedImageRenderer.Init();
+// or
+FFImageLoading.Forms.Touch.CachedImageRenderer.Init();
+```
+
+```C#
+// Xamarin.Forms example:
+var cachedImage = new CachedImage() {
+	HorizontalOptions = LayoutOptions.Center,
+	VerticalOptions = LayoutOptions.Center,
+	WidthRequest = 300,
+	HeightRequest = 300,
+	CacheDuration = TimeSpan.FromDays(30),
+	DownsampleHeight = 300,
+	RetryCount = 3,
+	RetryDelay = 250,
+	TransparencyEnabled = false,
+	// Shown after loading error occurs:
+	ErrorPlaceholder = "http://yourcompany.com/error.jpg",
+	// Shown before targe image is loaded:
+	LoadingPlaceholder = "loading.png",
+	// Target Image:
+	Source = "http://yourcompany.com/image.jpg",
+};
+```
+
 ###Android remarks
 Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
 
