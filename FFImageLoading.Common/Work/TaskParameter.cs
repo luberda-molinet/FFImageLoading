@@ -125,6 +125,8 @@ namespace FFImageLoading.Work
 
 		public bool? LoadTransparencyChannel { get; private set; }
 
+		public bool? FadeAnimationEnabled { get; private set; }
+
 		public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)
@@ -187,6 +189,17 @@ namespace FFImageLoading.Work
 		public TaskParameter TransparencyChannel(bool loadTransparencyChannel)
 		{
 			LoadTransparencyChannel = loadTransparencyChannel;
+			return this;
+		}
+
+		/// <summary>
+		/// Indicates if the fade animation should be enabled.
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="enabled">If set to <c>true</c> enabled.</param>
+		public TaskParameter FadeAnimation(bool enabled)
+		{
+			FadeAnimationEnabled = enabled;
 			return this;
 		}
 

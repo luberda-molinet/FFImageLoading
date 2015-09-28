@@ -32,8 +32,6 @@ namespace FFImageLoading.Work
 		{
 			DownloadCache = downloadCache;
 			_imageWeakReference = new WeakReference<ImageView>(imageView);
-
-			UseFadeInBitmap = true;
 		}
 
 		/// <summary>
@@ -105,7 +103,14 @@ namespace FFImageLoading.Work
 		/// Gets or sets a value indicating whether a fade in transition is used to show the image.
 		/// </summary>
 		/// <value><c>true</c> if a fade in transition is used; otherwise, <c>false</c>.</value>
-		public bool UseFadeInBitmap { get; set; }
+		public bool UseFadeInBitmap 
+		{ 
+			get
+			{
+				return Parameters.FadeAnimationEnabled.HasValue ? 
+					Parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+			}
+		}
 
 		protected IDownloadCache DownloadCache { get; private set; }
 
@@ -392,7 +397,7 @@ namespace FFImageLoading.Work
 									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
 								}
 
-								return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS), streamWithResult.Result);
+								return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
 							}
 						}
 						finally
@@ -612,12 +617,12 @@ namespace FFImageLoading.Work
 		private Drawable _placeholder;
 		private volatile bool _animating;
 
-		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime)
+		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime, bool fadeEnabled)
 			: base(res, bitmap)
 		{
 			_placeholder = placeholder;
 			_fadingTime = fadingTime;
-			_animating = true;
+			_animating = fadeEnabled;
 			_startTimeMillis = SystemClock.UptimeMillis();
 		}
 

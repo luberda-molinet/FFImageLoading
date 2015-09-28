@@ -97,20 +97,37 @@ namespace FFImageLoading.Forms
 			}
 		}
 
-		public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create<CachedImage, bool> (w => w.TransparencyEnabled, false);
+		public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.TransparencyEnabled, null);
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.
 		/// </summary>
-		public bool TransparencyEnabled
+		public bool? TransparencyEnabled
 		{
 			get
 			{
-				return (bool)GetValue(TransparencyEnabledProperty); 
+				return (bool?)GetValue(TransparencyEnabledProperty); 
 			}
 			set
 			{
 				SetValue(TransparencyEnabledProperty, value); 
+			}
+		}
+
+		public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.FadeAnimationEnabled, null);
+
+		/// <summary>
+		/// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
+		/// </summary>
+		public bool? FadeAnimationEnabled
+		{
+			get
+			{
+				return (bool?)GetValue(FadeAnimationEnabledProperty); 
+			}
+			set
+			{
+				SetValue(FadeAnimationEnabledProperty, value); 
 			}
 		}
 

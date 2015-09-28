@@ -9,7 +9,7 @@ namespace FFImageLoading.Config
     public class Configuration
     {
         public Configuration(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled=false)
         {
             MaxCacheSize = maxCacheSize;
             HttpClient = httpClient;
@@ -18,6 +18,7 @@ namespace FFImageLoading.Config
             DiskCache = diskCache;
             DownloadCache = downloadCache;
 			LoadWithTransparencyChannel = loadWithTransparencyChannel;
+			FadeAnimationEnabled = fadeAnimationEnabled;
         }
 
         /// <summary>
@@ -61,6 +62,12 @@ namespace FFImageLoading.Config
 		/// </summary>
 		/// <value><c>true</c> if FFIMageLoading loads images with transparency; otherwise, <c>false</c>.</value>
 		public bool LoadWithTransparencyChannel { get; private set; }
+
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> fade animation enabled.
+		/// </summary>
+		/// <value><c>true</c> if fade animation enabled; otherwise, <c>false</c>.</value>
+		public bool FadeAnimationEnabled { get; private set; }
     }
 }
 
