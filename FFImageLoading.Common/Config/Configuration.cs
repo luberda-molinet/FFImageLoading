@@ -9,7 +9,7 @@ namespace FFImageLoading.Config
     public class Configuration
     {
         public Configuration(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled=false)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled=true)
         {
             MaxCacheSize = maxCacheSize;
             HttpClient = httpClient;
