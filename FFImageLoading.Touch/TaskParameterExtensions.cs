@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using UIKit;
+using CoreAnimation;
 
 
 namespace FFImageLoading
@@ -30,7 +31,22 @@ namespace FFImageLoading
                 UIImageView refView = getNativeControl();
                 if (refView == null)
                     return;
-                refView.Image = img;
+
+
+				var isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ? 
+					parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+
+				if (isFadeAnimationEnabled)
+				{
+					// fade animation
+					UIView.Transition(refView, 0.4f, UIViewAnimationOptions.TransitionCrossDissolve,
+						() => { refView.Image = img; },
+						() => {  });
+				}
+				else
+				{
+					refView.Image = img;
+				}
             };
 
             return parameters.Into(getNativeControl, doWithImage, imageScale);

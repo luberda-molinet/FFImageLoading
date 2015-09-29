@@ -31,7 +31,7 @@ namespace FFImageLoading.Work
 			_imageScale = imageScale;
 			DownloadCache = downloadCache;
 		}
-
+			
 		protected IDownloadCache DownloadCache { get; private set; }
 
 		/// <summary>
