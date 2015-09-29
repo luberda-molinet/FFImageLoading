@@ -270,8 +270,8 @@ namespace FFImageLoading.Work
 			if (image == null)
 				return false;
 			
-			var imageView = _getNativeControl();
-			if (imageView == null)
+			var view = _getNativeControl();
+			if (view == null)
 				return false;
 
 			if (CancellationToken.IsCancellationRequested)
