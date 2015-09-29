@@ -161,7 +161,12 @@ namespace FFImageLoading.Forms.Droid
 						}
 							
 						// TransparencyChannel
-						imageLoader.TransparencyChannel(Element.TransparencyEnabled);
+						if (Element.TransparencyEnabled.HasValue)
+							imageLoader.TransparencyChannel(Element.TransparencyEnabled.Value);
+
+						// FadeAnimation
+						if (Element.FadeAnimationEnabled.HasValue)
+							imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));
 						imageLoader.Into(Control);	
