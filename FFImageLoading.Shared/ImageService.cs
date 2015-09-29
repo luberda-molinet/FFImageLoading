@@ -32,8 +32,9 @@ namespace FFImageLoading
         /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
         /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
 		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
-        public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null)
+		/// <param name="fadeAnimationEnabled">Defines if fading should be performed while loading images.</param>
+		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null)
         {
 			lock (_initializeLock)
 			{
@@ -58,15 +59,16 @@ namespace FFImageLoading
 					logger = logger ?? Config.Logger;
 					downloadCache = downloadCache ?? Config.DownloadCache;
 					loadWithTransparencyChannel = loadWithTransparencyChannel ?? Config.LoadWithTransparencyChannel;
+					fadeAnimationEnabled = fadeAnimationEnabled ?? Config.FadeAnimationEnabled;
 				}
 
 
-				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel ?? false);
+				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel ?? false, fadeAnimationEnabled ?? true);
 			}
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false)
+			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled = true)
         {
 			if (_initialized)
 				return;
@@ -76,7 +78,7 @@ namespace FFImageLoading
 				if (_initialized)
 					return;
 			
-				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel);
+				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel, fadeAnimationEnabled);
 				Config = GetDefaultConfiguration(userDefinedConfig);
 
 				_initialized = true;
@@ -99,7 +101,8 @@ namespace FFImageLoading
                 logger,
                 diskCache,
                 downloadCache,
-				userDefinedConfig.LoadWithTransparencyChannel
+				userDefinedConfig.LoadWithTransparencyChannel,
+				userDefinedConfig.FadeAnimationEnabled
             );
         }
 
