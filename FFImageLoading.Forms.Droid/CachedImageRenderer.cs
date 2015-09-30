@@ -114,6 +114,14 @@ namespace FFImageLoading.Forms.Droid
 					{
 						imageLoader = ImageService.LoadCompiledResource(ffSource.Path);
 					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
+					{
+						imageLoader = ImageService.LoadFileFromApplicationBundle(ffSource.Path);
+					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
+					{
+						imageLoader = ImageService.LoadFile(ffSource.Path);
+					}
 
 					if (imageLoader != null)
 					{
@@ -128,7 +136,7 @@ namespace FFImageLoading.Forms.Droid
 						// ErrorPlaceholder
 						if (Element.ErrorPlaceholder != null)
 						{
-							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
 							if (placeholderSource != null)
 								imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 						}
