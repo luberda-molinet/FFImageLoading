@@ -148,7 +148,7 @@ namespace FFImageLoading.Forms.Touch
 				// ErrorPlaceholder
 				if (Element.ErrorPlaceholder != null)
 				{
-					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
 					if (placeholderSource != null)
 						imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 				}
