@@ -1,25 +1,25 @@
 ﻿using System;
 
 using Xamarin.Forms;
-using FFImageLoading.Forms.Sample.ViewModels;
 using DLToolkit.PageFactory;
+using FFImageLoading.Forms.Sample.ViewModels;
+using FFImageLoading.Forms.Transformations;
 using FFImageLoading.Forms.Sample.Models;
 using System.Collections.Generic;
-using FFImageLoading.Forms.Transformations;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
-	public class ListExamplePage : PFContentPage<ListExampleViewModel>
+	public class TransformationExamplePage :  PFContentPage<TransformationExampleViewModel>
 	{
-		public ListExamplePage()
+		public TransformationExamplePage()
 		{
-			Title = "List Demo";
+			Title = "Transformation Demo";
 
 			var listView = new ListView() {
 				HorizontalOptions = LayoutOptions.FillAndExpand, 
 				VerticalOptions = LayoutOptions.FillAndExpand,
 				ItemsSource = ViewModel.Items,
-				ItemTemplate = new DataTemplate(typeof(ListExampleCell)),
+				ItemTemplate = new DataTemplate(typeof(TransformationExampleCell)),
 				HasUnevenRows = false,
 				RowHeight = 210,
 			};
@@ -27,9 +27,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 			Content = listView;
 		}
 
-		class ListExampleCell : ViewCell
+		class TransformationExampleCell : ViewCell
 		{
-			public ListExampleCell()
+			public TransformationExampleCell()
 			{
 				var image = new CachedImage() {
 					WidthRequest = 200,
@@ -41,6 +41,10 @@ namespace FFImageLoading.Forms.Sample.Pages
 					RetryCount = 3,
 					RetryDelay = 500,
 					LoadingPlaceholder = "loading.png",
+					Transformations = new List<IFormsTransformation>() {
+						new GrayscaleTransformation(),
+						new CircleTransformation(),
+					}
 				};
 				image.SetBinding<ListExampleItem>(CachedImage.SourceProperty, v => v.ImageUrl);
 
@@ -56,7 +60,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					VerticalOptions = LayoutOptions.FillAndExpand,
 					Padding = 5,
 				};
-					
+
 				root.Children.Add(image, new Rectangle(0f, 0f, 200f, 200f));
 				root.Children.Add(fileName, new Rectangle(200f, 0f, 150f, 200f));
 

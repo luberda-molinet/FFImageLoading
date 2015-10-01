@@ -180,6 +180,16 @@ namespace FFImageLoading.Forms.Touch
 				if (Element.FadeAnimationEnabled.HasValue)
 					imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
+				// Transformations
+				if (Element.Transformations != null)
+				{
+					foreach (var transformation in Element.Transformations)
+					{
+						if (transformation != null)
+							imageLoader.Transform(TransformationBinding.GetNativeTransformation(transformation));
+					}
+				}
+
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
 				imageLoader.Into(Control);	
 			}

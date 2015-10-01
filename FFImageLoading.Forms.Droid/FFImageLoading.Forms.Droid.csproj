@@ -13,7 +13,7 @@
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Forms.Droid</AssemblyName>
-    <TargetFrameworkVersion>v5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,12 +60,16 @@
     <Reference Include="FFImageLoading.Droid">
       <HintPath>..\packages\Xamarin.FFImageLoading.1.1.6\lib\MonoAndroid10\FFImageLoading.Droid.dll</HintPath>
     </Reference>
+    <Reference Include="FFImageLoading.Forms.Droid">
+      <HintPath>bin\Release\FFImageLoading.Forms.Droid.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="CachedImageRenderer.cs" />
     <Compile Include="CachedImageView.cs" />
     <Compile Include="ImageSourceBinding.cs" />
+    <Compile Include="TransformationBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -80,6 +84,10 @@
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
+      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
+      <Name>FFImageLoading-contrib.Droid</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
