@@ -53,6 +53,14 @@ var cachedImage = new CachedImage() {
 };
 ```
 
+#### Transformations support
+
+- RoundedTransformation
+- CircleTransformation
+- GrayscaleTransformation
+
+<img src="https://raw.githubusercontent.com/daniel-luberda/FFImageLoading/master/samples/Screenshots/android_list.png" width="200"/> <img src="https://raw.githubusercontent.com/daniel-luberda/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="200"/>
+
 ###Android remarks
 Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
 
