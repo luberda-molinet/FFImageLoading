@@ -8,8 +8,10 @@ namespace FFImageLoading.Config
 {
     public class Configuration
     {
-        public Configuration(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled=true)
+        public Configuration(int maxCacheSize, HttpClient httpClient, IWorkScheduler scheduler, IMiniLogger logger,
+			IDiskCache diskCache, IDownloadCache downloadCache, bool loadWithTransparencyChannel, bool fadeAnimationEnabled,
+			int httpHeadersTimeout, int httpReadTimeout
+		)
         {
             MaxCacheSize = maxCacheSize;
             HttpClient = httpClient;
@@ -19,6 +21,8 @@ namespace FFImageLoading.Config
             DownloadCache = downloadCache;
 			LoadWithTransparencyChannel = loadWithTransparencyChannel;
 			FadeAnimationEnabled = fadeAnimationEnabled;
+			HttpHeadersTimeout = httpHeadersTimeout;
+			HttpReadTimeout = httpReadTimeout;
         }
 
         /// <summary>
@@ -68,6 +72,18 @@ namespace FFImageLoading.Config
 		/// </summary>
 		/// <value><c>true</c> if fade animation enabled; otherwise, <c>false</c>.</value>
 		public bool FadeAnimationEnabled { get; private set; }
+
+		/// <summary>
+		/// Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.
+		/// </summary>
+		/// <value>The http connect timeout.</value>
+		public int HttpHeadersTimeout { get; private set; }
+
+		/// <summary>
+		/// Maximum time in seconds to wait before the HTTP request is cancelled.
+		/// </summary>
+		/// <value>The http read timeout.</value>
+		public int HttpReadTimeout { get; private set; }
     }
 }
 

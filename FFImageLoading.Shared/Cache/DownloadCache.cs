@@ -56,11 +56,22 @@ namespace FFImageLoading.Cache
 			if (duration == null)
 				duration = new TimeSpan(30, 0, 0, 0); // by default we cache data 30 days
 
-			using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseContentRead, token).ConfigureAwait(false))
+			int headersTimeout = ImageService.Config.HttpHeadersTimeout;
+			int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
+
+			var cancelHeadersToken = new CancellationTokenSource();
+			cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(headersTimeout));
+			var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token);
+
+			using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
 			{
 				if (!response.IsSuccessStatusCode || response.Content == null)
 					return null;
-				
+
+				var cancelReadToken = new CancellationTokenSource();
+				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
+				var linkedReadToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token);
+
 				using (var httpStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
 				{
 					int defaultCapacity = BufferSize;
@@ -70,7 +81,7 @@ namespace FFImageLoading.Cache
 					}
 
 					var memoryStream = new MemoryStream(defaultCapacity);
-					await httpStream.CopyToAsync(memoryStream, BufferSize, token).ConfigureAwait(false);
+					await httpStream.CopyToAsync(memoryStream, BufferSize, linkedReadToken.Token).ConfigureAwait(false);
 
 					if (memoryStream.Length == 0)
 					{
