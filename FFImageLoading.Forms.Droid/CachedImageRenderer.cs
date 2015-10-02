@@ -55,15 +55,26 @@ namespace FFImageLoading.Forms.Droid
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
 		}
-
+			
+		int fixLastCount = 0; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
+		ImageSourceBinding lastImageSource; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			base.OnElementPropertyChanged(sender, e);
-			if (e.PropertyName == Image.SourceProperty.PropertyName)
+			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				UpdateBitmap(null);
+				// TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
+				fixLastCount++;
+
+				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
+
+				if (!ffSource.Equals(lastImageSource) || fixLastCount > 1)
+				{
+					fixLastCount = 0;
+					lastImageSource = ffSource;
+					UpdateBitmap(null);	
+				}
 			}
-			if (e.PropertyName == Image.AspectProperty.PropertyName)
+			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{
 				UpdateAspect();
 			}
@@ -81,7 +92,7 @@ namespace FFImageLoading.Forms.Droid
 				Control.SetScaleType(ImageView.ScaleType.FitCenter);
 		}
 			
-		private void UpdateBitmap(Image previous = null)
+		private void UpdateBitmap(CachedImage previous = null)
 		{
 			if (previous == null || !object.Equals(previous.Source, Element.Source))
 			{
@@ -94,7 +105,7 @@ namespace FFImageLoading.Forms.Droid
 				{
 					formsImageView.SkipInvalidate();
 				}
-
+					
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
 					TaskParameter imageLoader = null;
