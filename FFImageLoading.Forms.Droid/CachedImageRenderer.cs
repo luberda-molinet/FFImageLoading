@@ -9,6 +9,8 @@ using FFImageLoading.Forms.Droid;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using FFImageLoading.Views;
+using System.Collections.Generic;
+using FFImageLoading.Forms.Transformations;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -24,6 +26,26 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
+			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
+			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
+			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
+		}
+
+		static Dictionary<Type, IMultiplatformTransformation> transformationsDict = new Dictionary<Type, IMultiplatformTransformation>();
+		public static Dictionary<Type, IMultiplatformTransformation> TransformationsDict
+		{
+			get { return transformationsDict; }
+		}
+
+		public static void RegisterTransformation(Type formsTransformationType, IMultiplatformTransformation androidTransformation)
+		{
+			if (transformationsDict.ContainsKey(formsTransformationType))
+				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
+
+			if (!typeof(IFormsTransformation).IsAssignableFrom(formsTransformationType))
+				throw new ArgumentException(string.Format("{0} must implement IFormsTransformation interface", formsTransformationType));
+
+			transformationsDict.Add(formsTransformationType, androidTransformation);
 		}
 
 		private bool _isDisposed;
@@ -56,13 +78,12 @@ namespace FFImageLoading.Forms.Droid
 			UpdateAspect();
 		}
 			
-		int fixLastCount = 0; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
-		ImageSourceBinding lastImageSource; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
+		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
+		ImageSourceBinding lastImageSource; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				// TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
 				fixLastCount++;
 
 				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
@@ -185,7 +206,14 @@ namespace FFImageLoading.Forms.Droid
 							foreach (var transformation in Element.Transformations)
 							{
 								if (transformation != null)
-									imageLoader.Transform(TransformationBinding.GetNativeTransformation(transformation));
+								{
+									IMultiplatformTransformation nativeTransformation;
+									if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
+									{
+										nativeTransformation.SetParameters(transformation.Parameters);
+										imageLoader.Transform(nativeTransformation);		
+									}
+								}
 							}
 						}
 

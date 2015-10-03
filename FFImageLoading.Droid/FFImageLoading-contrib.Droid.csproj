@@ -129,6 +129,9 @@
     <Compile Include="Transformations\CircleTransformation.cs" />
     <Compile Include="Transformations\GrayscaleTransformation.cs" />
     <Compile Include="Transformations\RoundedTransformation.cs" />
+    <Compile Include="..\FFImageLoading.Common\Work\IMultiplatformTransformation.cs">
+      <Link>Work\IMultiplatformTransformation.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

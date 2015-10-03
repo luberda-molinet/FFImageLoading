@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Forms.Transformations
 {
@@ -6,10 +7,16 @@ namespace FFImageLoading.Forms.Transformations
 	{
 		public RoundedTransformation(double radius)
 		{
-			Radius = radius;
+			Parameters = new object[]{
+				radius
+			};
 		}
 
-		public double Radius { get; private set; }
+		#region IFormsTransformation implementation
+
+		public object[] Parameters { get; private set; }
+
+		#endregion
 	}
 }
 

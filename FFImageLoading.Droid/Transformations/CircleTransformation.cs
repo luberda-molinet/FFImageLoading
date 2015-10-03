@@ -4,9 +4,13 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class CircleTransformation : TransformationBase
+	public class CircleTransformation : TransformationBase, IMultiplatformTransformation
 	{
 		public CircleTransformation()
+		{
+		}
+
+		public void SetParameters(object[] parameters)
 		{
 		}
 

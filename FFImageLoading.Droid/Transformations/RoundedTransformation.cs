@@ -4,13 +4,18 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class RoundedTransformation : TransformationBase
+	public class RoundedTransformation : TransformationBase, IMultiplatformTransformation
 	{
-		readonly double radius;
+		double radius;
 
 		public RoundedTransformation(double radius)
 		{
 			this.radius = radius;
+		}
+
+		public void SetParameters(object[] parameters)
+		{
+			this.radius = (double)parameters[0];
 		}
 
 		public override string Key
