@@ -79,7 +79,7 @@ namespace FFImageLoading.Forms.Droid
 		}
 			
 		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
-		ImageSourceBinding lastImageSource; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
+		ImageSourceBinding lastImageSource = null; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
@@ -88,7 +88,7 @@ namespace FFImageLoading.Forms.Droid
 
 				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
 
-				if (!ffSource.Equals(lastImageSource) || fixLastCount > 1)
+				if (ffSource == null || !ffSource.Equals(lastImageSource) || fixLastCount > 1)
 				{
 					fixLastCount = 0;
 					lastImageSource = ffSource;
@@ -135,7 +135,9 @@ namespace FFImageLoading.Forms.Droid
 
 					if (ffSource == null)
 					{
-						Control.SetImageDrawable(null);
+						if (Control != null)
+							Control.SetImageDrawable(null);
+						
 						ImageLoadingFinished(Element);
 					}
 					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
