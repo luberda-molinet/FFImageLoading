@@ -126,6 +126,9 @@
     <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
     <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
+    <Compile Include="Transformations\CircleTransformation.cs" />
+    <Compile Include="Transformations\GrayscaleTransformation.cs" />
+    <Compile Include="Transformations\RoundedTransformation.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -143,5 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Work\StreamResolver\" />
+    <Folder Include="Transformations\" />
   </ItemGroup>
 </Project>

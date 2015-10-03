@@ -104,10 +104,6 @@
       <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
       <Name>FFImageLoading-contrib.Droid</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading-contrib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>

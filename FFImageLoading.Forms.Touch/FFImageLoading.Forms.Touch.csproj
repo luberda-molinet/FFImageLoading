@@ -59,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CachedImageRenderer.cs" />
     <Compile Include="ImageSourceBinding.cs" />
+    <Compile Include="TransformationBinding.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
@@ -69,6 +70,10 @@
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj">
+      <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
+      <Name>FFImageLoading-contrib.Touch</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

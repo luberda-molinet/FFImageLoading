@@ -33,13 +33,21 @@ namespace FFImageLoading.Forms.Sample.Pages
 				Command = ViewModel.OpenPlaceholdersExampleCommand
 			};
 
+			var transformationsMenu = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Transformations Example",
+				HeightRequest = 100,
+				Command = ViewModel.OpenTransformationssExampleCommand
+			};
+
 			Content = new StackLayout { 
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				VerticalOptions = LayoutOptions.FillAndExpand,
 				Children = {
 					simpleMenu,
 					listMenu,
-					placeholdersMenu
+					placeholdersMenu,
+					transformationsMenu
 				}
 			};
 		}

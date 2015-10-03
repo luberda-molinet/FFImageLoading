@@ -38,6 +38,29 @@ namespace FFImageLoading.Forms.Droid
 				
 			throw new NotImplementedException("ImageSource type not supported");
 		}
+
+		public override bool Equals(object obj)
+		{
+			var item = obj as ImageSourceBinding;
+
+			if (item == null)
+			{
+				return false;
+			}
+
+			return this.ImageSource.Equals(item.ImageSource) && this.Path.Equals(item.Path);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int hash = 17;
+				hash = hash * 23 + this.ImageSource.GetHashCode();
+				hash = hash * 23 + Path.GetHashCode();
+				return  hash;
+			}
+		}
 	}
 }
 

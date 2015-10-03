@@ -63,19 +63,29 @@ namespace FFImageLoading.Forms.Touch
 			base.OnElementChanged(e);
 		}
 
+		int fixLastCount = 0; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
+		ImageSourceBinding lastImageSource; // TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			base.OnElementPropertyChanged(sender, e);
-
-			if (e.PropertyName == Image.SourceProperty.PropertyName)
+			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				SetImage(null);
+				// TODO TEMPORARY FIX (Xamarin.Forms.Android bug)
+				fixLastCount++;
+
+				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
+
+				if (!ffSource.Equals(lastImageSource) || fixLastCount > 1)
+				{
+					fixLastCount = 0;
+					lastImageSource = ffSource;
+					SetImage(null);
+				}
 			}
-			if (e.PropertyName == Image.IsOpaqueProperty.PropertyName)
+			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
 			{
 				SetOpacity();
 			}
-			if (e.PropertyName == Image.AspectProperty.PropertyName)
+			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{
 				SetAspect();
 			}
@@ -93,7 +103,7 @@ namespace FFImageLoading.Forms.Touch
 
 		private void SetImage(CachedImage oldElement = null)
 		{
-			Xamarin.Forms.ImageSource source = base.Element.Source;
+			Xamarin.Forms.ImageSource source = base.Element.Source; 
 			if (oldElement != null)
 			{
 				Xamarin.Forms.ImageSource source2 = oldElement.Source;
@@ -179,6 +189,16 @@ namespace FFImageLoading.Forms.Touch
 				// FadeAnimation
 				if (Element.FadeAnimationEnabled.HasValue)
 					imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
+
+				// Transformations
+				if (Element.Transformations != null)
+				{
+					foreach (var transformation in Element.Transformations)
+					{
+						if (transformation != null)
+							imageLoader.Transform(TransformationBinding.GetNativeTransformation(transformation));
+					}
+				}
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
 				imageLoader.Into(Control);	
