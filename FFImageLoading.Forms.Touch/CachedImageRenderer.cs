@@ -9,6 +9,8 @@ using FFImageLoading;
 using Foundation;
 using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
+using System.Collections.Generic;
+using FFImageLoading.Forms.Transformations;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -22,8 +24,28 @@ namespace FFImageLoading.Forms.Touch
 		/// <summary>
 		///   Used for registration with dependency service
 		/// </summary>
-		public static void Init()
+		public static new void Init()
 		{
+			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
+			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
+			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
+		}
+
+		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
+		public static Dictionary<Type, ITransformation> TransformationsDict
+		{
+			get { return transformationsDict; }
+		}
+
+		public static void RegisterTransformation(Type formsTransformationType, ITransformation iosTransformation)
+		{
+			if (transformationsDict.ContainsKey(formsTransformationType))
+				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
+
+			if (!typeof(IFormsTransformation).IsAssignableFrom(formsTransformationType))
+				throw new ArgumentException(string.Format("{0} must implement IFormsTransformation interface", formsTransformationType));
+
+			transformationsDict.Add(formsTransformationType, iosTransformation);
 		}
 
 		private bool _isDisposed;
@@ -63,19 +85,28 @@ namespace FFImageLoading.Forms.Touch
 			base.OnElementChanged(e);
 		}
 
+		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
+		ImageSourceBinding lastImageSource = null; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			base.OnElementPropertyChanged(sender, e);
-
-			if (e.PropertyName == Image.SourceProperty.PropertyName)
+			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				SetImage(null);
+				fixLastCount++;
+
+				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
+
+				if (ffSource == null || !ffSource.Equals(lastImageSource) || fixLastCount > 1)
+				{
+					fixLastCount = 0;
+					lastImageSource = ffSource;
+					SetImage(null);
+				}
 			}
-			if (e.PropertyName == Image.IsOpaqueProperty.PropertyName)
+			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
 			{
 				SetOpacity();
 			}
-			if (e.PropertyName == Image.AspectProperty.PropertyName)
+			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{
 				SetAspect();
 			}
@@ -93,7 +124,7 @@ namespace FFImageLoading.Forms.Touch
 
 		private void SetImage(CachedImage oldElement = null)
 		{
-			Xamarin.Forms.ImageSource source = base.Element.Source;
+			Xamarin.Forms.ImageSource source = base.Element.Source; 
 			if (oldElement != null)
 			{
 				Xamarin.Forms.ImageSource source2 = oldElement.Source;
@@ -115,7 +146,9 @@ namespace FFImageLoading.Forms.Touch
 
 			if (ffSource == null)
 			{
-				Control.Image = null;
+				if (Control != null)
+					Control.Image = null;
+				
 				ImageLoadingFinished(Element);
 			}
 			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -179,6 +212,23 @@ namespace FFImageLoading.Forms.Touch
 				// FadeAnimation
 				if (Element.FadeAnimationEnabled.HasValue)
 					imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
+
+				// Transformations
+				if (Element.Transformations != null)
+				{
+					foreach (var transformation in Element.Transformations)
+					{
+						if (transformation != null)
+						{
+							ITransformation nativeTransformation;
+							if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
+							{
+								nativeTransformation.SetParameters(transformation.Parameters);
+								imageLoader.Transform(nativeTransformation);		
+							}
+						}
+					}
+				}
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
 				imageLoader.Into(Control);	

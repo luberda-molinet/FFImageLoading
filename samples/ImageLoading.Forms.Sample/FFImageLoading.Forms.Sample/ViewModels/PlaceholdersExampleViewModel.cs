@@ -7,33 +7,31 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 	{
 		public PlaceholdersExampleViewModel()
 		{
-			RemoteLoadingPlaceholderExampleCommand = new PageFactoryCommand(() => {
-				ErrorImagePath = null;
-				LoadingImagePath = "http://res.cloudinary.com/dqeaiomo8/image/upload/v1443461222/loading_xcotss.png";
-				ImagePath = GetRandomImageUrl();
-			});
-
 			LocalLoadingPlaceholderExampleCommand = new PageFactoryCommand(() => {
 				ErrorImagePath = null;
 				LoadingImagePath = "loading.png";
 				ImagePath = GetRandomImageUrl();
 			});
 
+			RemoteLoadingPlaceholderExampleCommand = new PageFactoryCommand(() => {
+				ErrorImagePath = null;
+				LoadingImagePath = "http://res.cloudinary.com/dqeaiomo8/image/upload/v1443461222/loading_xcotss.png";
+				ImagePath = GetRandomImageUrl();
+			});
+
 			LocalErrorPlaceholderExampleCommand = new PageFactoryCommand(() => {
-				//LoadingImagePath = "loading.png";
-				LoadingImagePath = null;
 				ErrorImagePath = "error.png";
+				LoadingImagePath = null;
 				ImagePath = "http://notexisting.com/notexisting.jpg";
 			});
 
 			RemoteErrorPlaceholderExampleCommand = new PageFactoryCommand(() => {
-				//LoadingImagePath = "loading.png";
-				LoadingImagePath = null;
 				ErrorImagePath = "http://res.cloudinary.com/dqeaiomo8/image/upload/v1443461219/error_xxhxfn.png";
+				LoadingImagePath = null;
 				ImagePath = "http://notexisting.com/notexisting.jpg";
-			});
+			}); 
 		}
-
+			
 		public string GetRandomImageUrl()
 		{
 			return string.Format("http://loremflickr.com/600/600/nature?filename={0}.jpg", 

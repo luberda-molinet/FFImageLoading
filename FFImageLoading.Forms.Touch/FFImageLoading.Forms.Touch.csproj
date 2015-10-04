@@ -48,9 +48,6 @@
     <Reference Include="WebP.Touch">
       <HintPath>..\packages\WebP.Touch.1.0.1\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
-    <Reference Include="FFImageLoading.Touch">
-      <HintPath>..\packages\Xamarin.FFImageLoading.1.1.6\lib\Xamarin.iOS10\FFImageLoading.Touch.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -69,6 +66,10 @@
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj">
+      <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
+      <Name>FFImageLoading-contrib.Touch</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,15 +1,110 @@
 ﻿using System;
 using Xamarin.Forms;
+using System.Collections.Generic;
+using FFImageLoading.Forms.Transformations;
 
 namespace FFImageLoading.Forms
 {
 	/// <summary>
 	/// CachedImage - Xamarin.Forms image replacement with caching and downsampling capabilities
 	/// </summary>
-	public class CachedImage : Image
+	public class CachedImage : View
 	{
-		public static readonly BindablePropertyKey IsLoadingPropertyKey = BindableProperty.CreateReadOnly("IsLoading", typeof(bool), typeof(CachedImage), false, BindingMode.OneWayToSource, null, null, null, null, null);
+		/// <summary>
+		/// The aspect property.
+		/// </summary>
+		public static readonly BindableProperty AspectProperty = BindableProperty.Create<CachedImage, Aspect>(w => w.Aspect, Aspect.AspectFit);
 
+		/// <summary>
+		/// Gets or sets the aspect.
+		/// </summary>
+		/// <value>The aspect.</value>
+		public Aspect Aspect
+		{
+			get
+			{
+				return (Aspect)GetValue(AspectProperty);
+			}
+			set
+			{
+				SetValue(AspectProperty, value);
+			}
+		}
+
+		/// <summary>
+		/// The is loading property key.
+		/// </summary>
+		public static readonly BindablePropertyKey IsLoadingPropertyKey = BindableProperty.CreateReadOnly<CachedImage, bool>(w => w.IsLoading, false);
+
+		/// <summary>
+		/// The is loading property.
+		/// </summary>
+		public static readonly BindableProperty IsLoadingProperty = CachedImage.IsLoadingPropertyKey.BindableProperty;
+
+		/// <summary>
+		/// Gets a value indicating whether this instance is loading.
+		/// </summary>
+		/// <value><c>true</c> if this instance is loading; otherwise, <c>false</c>.</value>
+		public bool IsLoading
+		{
+			get
+			{
+				return (bool)GetValue(IsLoadingProperty);
+			}
+		}
+
+		/// <summary>
+		/// The is opaque property.
+		/// </summary>
+		public static readonly BindableProperty IsOpaqueProperty = BindableProperty.Create<CachedImage, bool>(w => w.IsOpaque, false);
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is opaque.
+		/// </summary>
+		/// <value><c>true</c> if this instance is opaque; otherwise, <c>false</c>.</value>
+		public bool IsOpaque
+		{
+			get
+			{
+				return (bool)GetValue(IsOpaqueProperty);
+			}
+			set
+			{
+				SetValue(IsOpaqueProperty, value);
+			}
+		}
+
+		/// <summary>
+		/// The source property.
+		/// </summary> 
+		public static readonly BindableProperty SourceProperty = BindableProperty.Create<CachedImage, ImageSource>(w => w.Source, null, BindingMode.OneWay, 
+		propertyChanged: (bindable, oldValue, newValue) => {
+			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanged");
+		}, 
+		propertyChanging: (bindable, oldValue, newValue) => {
+			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanging");
+		});
+			
+		/// <summary>
+		/// Gets or sets the source.
+		/// </summary>
+		/// <value>The source.</value>
+		[TypeConverter(typeof(ImageSourceConverter))]
+		public ImageSource Source
+		{
+			get
+			{
+				return (ImageSource)GetValue(SourceProperty);
+			}
+			set
+			{
+				SetValue(SourceProperty, value);
+			}
+		}
+
+		/// <summary>
+		/// The retry count property.
+		/// </summary>
 		public static readonly BindableProperty RetryCountProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryCount, 0);
 
 		/// <summary>
@@ -27,6 +122,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The retry delay property.
+		/// </summary>
 		public static readonly BindableProperty RetryDelayProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryDelay, 250);
 
 		/// <summary>
@@ -44,6 +142,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The downsample width property.
+		/// </summary>
 		public static readonly BindableProperty DownsampleWidthProperty = BindableProperty.Create<CachedImage, double> (w => w.DownsampleWidth, 0f);
 
 		/// <summary>
@@ -62,6 +163,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The downsample height property.
+		/// </summary>
 		public static readonly BindableProperty DownsampleHeightProperty = BindableProperty.Create<CachedImage, double> (w => w.DownsampleHeight, 0f);
 
 		/// <summary>
@@ -80,6 +184,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The cache duration property.
+		/// </summary>
 		public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create<CachedImage, TimeSpan> (w => w.CacheDuration, TimeSpan.FromDays(90));
 
 		/// <summary>
@@ -97,6 +204,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The transparency enabled property.
+		/// </summary>
 		public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.TransparencyEnabled, null);
 
 		/// <summary>
@@ -114,6 +224,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The fade animation enabled property.
+		/// </summary>
 		public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.FadeAnimationEnabled, null);
 
 		/// <summary>
@@ -131,6 +244,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The loading placeholder property.
+		/// </summary>
 		public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.LoadingPlaceholder, null);
 
 		/// <summary>
@@ -148,6 +264,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// The error placeholder property.
+		/// </summary>
 		public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.ErrorPlaceholder, null);
 
 		/// <summary>
@@ -164,6 +283,115 @@ namespace FFImageLoading.Forms
 				SetValue(ErrorPlaceholderProperty, value); 
 			}
 		}
+
+		/// <summary>
+		/// The transformations property.
+		/// </summary>
+		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<IFormsTransformation>> (w => w.Transformations, null);
+
+		/// <summary>
+		/// Gets or sets the transformations.
+		/// </summary>
+		/// <value>The transformations.</value>
+		public List<IFormsTransformation> Transformations
+		{
+			get
+			{
+				return (List<IFormsTransformation>)GetValue(TransformationsProperty); 
+			}
+			set
+			{
+				SetValue(TransformationsProperty, value); 
+			}
+		}
+
+		//
+		// Methods
+		//
+		protected override void OnBindingContextChanged()
+		{
+			if (this.Source != null)
+			{
+				BindableObject.SetInheritedBindingContext(this.Source, base.BindingContext);
+			}
+
+			base.OnBindingContextChanged();
+		}
+
+		protected override SizeRequest OnSizeRequest(double widthConstraint, double heightConstraint)
+		{
+			SizeRequest sizeRequest = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
+			double num = sizeRequest.Request.Width / sizeRequest.Request.Height;
+			double num2 = widthConstraint / heightConstraint;
+			double width = sizeRequest.Request.Width;
+			double height = sizeRequest.Request.Height;
+			if (width == 0 || height == 0)
+			{
+				return new SizeRequest(new Size(0, 0));
+			}
+			double num3 = width;
+			double num4 = height;
+			if (num2 > num)
+			{
+				switch (this.Aspect)
+				{
+					case Aspect.AspectFit:
+					case Aspect.AspectFill:
+						num4 = Math.Min(height, heightConstraint);
+						num3 = width * (num4 / height);
+						break;
+					case Aspect.Fill:
+						num3 = Math.Min(width, widthConstraint);
+						num4 = height * (num3 / width);
+						break;
+				}
+			}
+			else if (num2 < num)
+			{
+				switch (this.Aspect)
+				{
+					case Aspect.AspectFit:
+					case Aspect.AspectFill:
+						num3 = Math.Min(width, widthConstraint);
+						num4 = height * (num3 / width);
+						break;
+					case Aspect.Fill:
+						num4 = Math.Min(height, heightConstraint);
+						num3 = width * (num4 / height);
+						break;
+				}
+			}
+			else
+			{
+				num3 = Math.Min(width, widthConstraint);
+				num4 = height * (num3 / width);
+			} 
+			return new SizeRequest(new Size(num3, num4));
+		}
+
+//		private void OnSourceChanged(object sender, EventArgs eventArgs)
+//		{
+//			base.OnPropertyChanged(Image.SourceProperty.PropertyName);
+//			this.InvalidateMeasure();
+//		}
+
+//		private void OnSourcePropertyChanged(ImageSource oldvalue, ImageSource newvalue)
+//		{
+//			if (newvalue != null)
+//			{
+//				newvalue.SourceChanged += new EventHandler(this.OnSourceChanged);
+//				BindableObject.SetInheritedBindingContext(newvalue, base.BindingContext);
+//			}
+//			this.InvalidateMeasure();
+//		}
+//
+//		private void OnSourcePropertyChanging(ImageSource oldvalue, ImageSource newvalue)
+//		{
+//			if (oldvalue != null)
+//			{
+//				oldvalue.SourceChanged -= new EventHandler(this.OnSourceChanged);
+//			}
+//		}
 	}
 }
 

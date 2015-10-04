@@ -9,6 +9,8 @@ using FFImageLoading.Forms.Droid;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using FFImageLoading.Views;
+using System.Collections.Generic;
+using FFImageLoading.Forms.Transformations;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -24,6 +26,26 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
+			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
+			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
+			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
+		}
+
+		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
+		public static Dictionary<Type, ITransformation> TransformationsDict
+		{
+			get { return transformationsDict; }
+		}
+
+		public static void RegisterTransformation(Type formsTransformationType, ITransformation androidTransformation)
+		{
+			if (transformationsDict.ContainsKey(formsTransformationType))
+				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
+
+			if (!typeof(IFormsTransformation).IsAssignableFrom(formsTransformationType))
+				throw new ArgumentException(string.Format("{0} must implement IFormsTransformation interface", formsTransformationType));
+
+			transformationsDict.Add(formsTransformationType, androidTransformation);
 		}
 
 		private bool _isDisposed;
@@ -55,15 +77,25 @@ namespace FFImageLoading.Forms.Droid
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
 		}
-
+			
+		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
+		ImageSourceBinding lastImageSource = null; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			base.OnElementPropertyChanged(sender, e);
-			if (e.PropertyName == Image.SourceProperty.PropertyName)
+			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				UpdateBitmap(null);
+				fixLastCount++;
+
+				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
+
+				if (ffSource == null || !ffSource.Equals(lastImageSource) || fixLastCount > 1)
+				{
+					fixLastCount = 0;
+					lastImageSource = ffSource;
+					UpdateBitmap(null);	
+				}
 			}
-			if (e.PropertyName == Image.AspectProperty.PropertyName)
+			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{
 				UpdateAspect();
 			}
@@ -81,7 +113,7 @@ namespace FFImageLoading.Forms.Droid
 				Control.SetScaleType(ImageView.ScaleType.FitCenter);
 		}
 			
-		private void UpdateBitmap(Image previous = null)
+		private void UpdateBitmap(CachedImage previous = null)
 		{
 			if (previous == null || !object.Equals(previous.Source, Element.Source))
 			{
@@ -94,7 +126,7 @@ namespace FFImageLoading.Forms.Droid
 				{
 					formsImageView.SkipInvalidate();
 				}
-
+					
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
 					TaskParameter imageLoader = null;
@@ -103,7 +135,9 @@ namespace FFImageLoading.Forms.Droid
 
 					if (ffSource == null)
 					{
-						Control.SetImageDrawable(null);
+						if (Control != null)
+							Control.SetImageDrawable(null);
+						
 						ImageLoadingFinished(Element);
 					}
 					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -167,6 +201,23 @@ namespace FFImageLoading.Forms.Droid
 						// FadeAnimation
 						if (Element.FadeAnimationEnabled.HasValue)
 							imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
+
+						// Transformations
+						if (Element.Transformations != null)
+						{
+							foreach (var transformation in Element.Transformations)
+							{
+								if (transformation != null)
+								{
+									ITransformation nativeTransformation;
+									if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
+									{
+										nativeTransformation.SetParameters(transformation.Parameters);
+										imageLoader.Transform(nativeTransformation);		
+									}
+								}
+							}
+						}
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));
 						imageLoader.Into(Control);	

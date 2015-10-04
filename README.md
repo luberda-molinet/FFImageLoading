@@ -53,6 +53,21 @@ var cachedImage = new CachedImage() {
 };
 ```
 
+#### Transformations support
+
+- RoundedTransformation
+- CircleTransformation
+- GrayscaleTransformation
+
+<img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="200"/> <img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="200"/>
+
+#### Placeholders support
+
+- LoadingPlaceholder
+- ErrorPlaceholder
+
+<img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="200"/> <img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="200"/>
+
 ###Android remarks
 Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
 

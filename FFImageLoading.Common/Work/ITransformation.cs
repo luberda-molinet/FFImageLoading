@@ -9,5 +9,6 @@ namespace FFImageLoading.Work
     {
         string Key { get; }
 		IBitmap Transform(IBitmap source);
+		void SetParameters(object[] parameters);
     }
 }

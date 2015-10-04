@@ -223,6 +223,9 @@ namespace FFImageLoading.Work
 					{
 						foreach (var transformation in Parameters.Transformations)
 						{
+							if (CancellationToken.IsCancellationRequested)
+								return null;
+							
 							try
 							{
 								var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
