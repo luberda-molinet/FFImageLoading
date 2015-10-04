@@ -7,26 +7,26 @@ namespace FFImageLoading.Transformations
 {
 	public class RoundedTransformation : TransformationBase, IMultiplatformTransformation
 	{
-		double radius;
+		private double _radius;
 
 		public RoundedTransformation(double radius)
 		{
-			this.radius = radius;
+			_radius = radius;
 		}
 
 		public void SetParameters(object[] parameters)
 		{
-			this.radius = (double)parameters[0];
+			_radius = (double)parameters[0];
 		}
 
 		public override string Key
 		{
-			get { return string.Format("RoundedTransformation, radius = {0}", radius); }
+			get { return string.Format("RoundedTransformation, radius = {0}", _radius); }
 		}
 
 		protected override UIImage Transform(UIImage source)
 		{
-			var transformed = ToRounded(source, (nfloat)radius);
+			var transformed = ToRounded(source, (nfloat)_radius);
 			source.Dispose();
 
 			return transformed;
