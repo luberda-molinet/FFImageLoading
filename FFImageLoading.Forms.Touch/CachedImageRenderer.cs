@@ -24,20 +24,20 @@ namespace FFImageLoading.Forms.Touch
 		/// <summary>
 		///   Used for registration with dependency service
 		/// </summary>
-		public static void Init()
+		public static new void Init()
 		{
 			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
 			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
 			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
 		}
 
-		static Dictionary<Type, IMultiplatformTransformation> transformationsDict = new Dictionary<Type, IMultiplatformTransformation>();
-		public static Dictionary<Type, IMultiplatformTransformation> TransformationsDict
+		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
+		public static Dictionary<Type, ITransformation> TransformationsDict
 		{
 			get { return transformationsDict; }
 		}
 
-		public static void RegisterTransformation(Type formsTransformationType, IMultiplatformTransformation iosTransformation)
+		public static void RegisterTransformation(Type formsTransformationType, ITransformation iosTransformation)
 		{
 			if (transformationsDict.ContainsKey(formsTransformationType))
 				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
@@ -220,7 +220,7 @@ namespace FFImageLoading.Forms.Touch
 					{
 						if (transformation != null)
 						{
-							IMultiplatformTransformation nativeTransformation;
+							ITransformation nativeTransformation;
 							if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
 							{
 								nativeTransformation.SetParameters(transformation.Parameters);

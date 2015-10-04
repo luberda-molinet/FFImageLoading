@@ -4,13 +4,13 @@ using UIKit;
 
 namespace FFImageLoading.Transformations
 {
-	public class CircleTransformation : TransformationBase, IMultiplatformTransformation
+	public class CircleTransformation : TransformationBase
 	{
 		public CircleTransformation()
 		{
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
 		}
 

@@ -5,13 +5,13 @@ using UIKit;
 
 namespace FFImageLoading.Transformations
 {
-	public class GrayscaleTransformation : TransformationBase, IMultiplatformTransformation
+	public class GrayscaleTransformation : TransformationBase
 	{
 		public GrayscaleTransformation()
 		{
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
 		}
 

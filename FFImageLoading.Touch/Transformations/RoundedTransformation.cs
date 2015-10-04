@@ -5,7 +5,7 @@ using CoreGraphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class RoundedTransformation : TransformationBase, IMultiplatformTransformation
+	public class RoundedTransformation : TransformationBase
 	{
 		private double _radius;
 
@@ -14,7 +14,7 @@ namespace FFImageLoading.Transformations
 			_radius = radius;
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
 			_radius = (double)parameters[0];
 		}
