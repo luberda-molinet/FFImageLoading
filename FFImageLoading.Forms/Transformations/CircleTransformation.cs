@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Forms.Transformations
 {
@@ -7,6 +8,12 @@ namespace FFImageLoading.Forms.Transformations
 		public CircleTransformation()
 		{
 		}
+
+		#region IFormsTransformation implementation
+
+		public object[] Parameters { get; private set; }
+
+		#endregion
 	}
 }
 

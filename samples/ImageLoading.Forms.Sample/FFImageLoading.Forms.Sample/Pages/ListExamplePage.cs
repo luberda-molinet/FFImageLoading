@@ -4,8 +4,6 @@ using Xamarin.Forms;
 using FFImageLoading.Forms.Sample.ViewModels;
 using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.Models;
-using System.Collections.Generic;
-using FFImageLoading.Forms.Transformations;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {

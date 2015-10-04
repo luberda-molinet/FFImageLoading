@@ -4,9 +4,13 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class GrayscaleTransformation : TransformationBase
+	public class GrayscaleTransformation : TransformationBase, IMultiplatformTransformation
 	{
 		public GrayscaleTransformation()
+		{
+		}
+
+		public void SetParameters(object[] parameters)
 		{
 		}
 
