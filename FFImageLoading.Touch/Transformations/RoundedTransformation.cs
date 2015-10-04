@@ -26,25 +26,36 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			var transformed = ToRounded(source, (nfloat)_radius);
-			source.Dispose();
-
-			return transformed;
+			try
+			{
+				var transformed = ToRounded(source, (nfloat)_radius);
+				return transformed;
+			}
+			finally
+			{
+				source.Dispose();
+			}
 		}
 
 		public static UIImage ToRounded(UIImage source, nfloat rad)
 		{
 			UIGraphics.BeginImageContextWithOptions(source.Size, false, (nfloat)0.0);
-			CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
 
-			using (var path = UIBezierPath.FromRoundedRect(bounds, rad))			
+			try
 			{
-				path.AddClip();
-				source.Draw(bounds);
-				var newImage = UIGraphics.GetImageFromCurrentImageContext();
-				UIGraphics.EndImageContext();
+				CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
 
-				return newImage;
+				using (var path = UIBezierPath.FromRoundedRect(bounds, rad))			
+				{
+					path.AddClip();
+					source.Draw(bounds);
+					var newImage = UIGraphics.GetImageFromCurrentImageContext();
+					return newImage;
+				}
+			}
+			finally
+			{
+				UIGraphics.EndImageContext();
 			}
 		}
 	}
