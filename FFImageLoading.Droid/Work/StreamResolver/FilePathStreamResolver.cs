@@ -11,9 +11,10 @@ namespace FFImageLoading.Work.StreamResolver
 	public class FilePathStreamResolver : IStreamResolver
 	{
 		
-		public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
+		public Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
-			return WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk);
+			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk);
+			return Task.FromResult(result);
 		}
 
 		public void Dispose() {

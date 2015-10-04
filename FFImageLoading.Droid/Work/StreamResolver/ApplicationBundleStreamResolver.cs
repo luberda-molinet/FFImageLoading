@@ -18,9 +18,10 @@ namespace FFImageLoading.Work.StreamResolver
 			}
 		}
 
-		public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
+		public Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
-			return WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
+			var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
+			return Task.FromResult(result);
 		}
 
 		public void Dispose() {
