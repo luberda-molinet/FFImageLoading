@@ -31,13 +31,13 @@ namespace FFImageLoading.Forms.Droid
 			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
 		}
 
-		static Dictionary<Type, IMultiplatformTransformation> transformationsDict = new Dictionary<Type, IMultiplatformTransformation>();
-		public static Dictionary<Type, IMultiplatformTransformation> TransformationsDict
+		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
+		public static Dictionary<Type, ITransformation> TransformationsDict
 		{
 			get { return transformationsDict; }
 		}
 
-		public static void RegisterTransformation(Type formsTransformationType, IMultiplatformTransformation androidTransformation)
+		public static void RegisterTransformation(Type formsTransformationType, ITransformation androidTransformation)
 		{
 			if (transformationsDict.ContainsKey(formsTransformationType))
 				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
@@ -209,7 +209,7 @@ namespace FFImageLoading.Forms.Droid
 							{
 								if (transformation != null)
 								{
-									IMultiplatformTransformation nativeTransformation;
+									ITransformation nativeTransformation;
 									if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
 									{
 										nativeTransformation.SetParameters(transformation.Parameters);

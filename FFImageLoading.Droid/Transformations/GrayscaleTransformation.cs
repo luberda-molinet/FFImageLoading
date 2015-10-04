@@ -4,13 +4,13 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class GrayscaleTransformation : TransformationBase, IMultiplatformTransformation
+	public class GrayscaleTransformation : TransformationBase
 	{
 		public GrayscaleTransformation()
 		{
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
 		}
 
@@ -21,10 +21,15 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			var transformed = ToGrayscale(source);
-			source.Recycle();
-
-			return transformed;
+			try
+			{
+				var transformed = ToGrayscale(source);
+				return transformed;
+			}
+			finally
+			{
+				source.Recycle();
+			}
 		}
 
 		public static Bitmap ToGrayscale(Bitmap source)

@@ -4,13 +4,13 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class CircleTransformation : TransformationBase, IMultiplatformTransformation
+	public class CircleTransformation : TransformationBase
 	{
 		public CircleTransformation()
 		{
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
 		}
 
@@ -21,11 +21,16 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			int size = Math.Min(source.Width, source.Height);
-			var transformed = RoundedTransformation.ToRounded(source, size / 2);
-			source.Recycle();
-
-			return transformed;
+			try
+			{
+				int size = Math.Min(source.Width, source.Height);
+				var transformed = RoundedTransformation.ToRounded(source, size / 2);
+				return transformed;
+			}
+			finally
+			{
+				source.Recycle();
+			}
 		}
 	}
 }

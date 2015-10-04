@@ -5,46 +5,57 @@ using CoreGraphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class RoundedTransformation : TransformationBase, IMultiplatformTransformation
+	public class RoundedTransformation : TransformationBase
 	{
-		double radius;
+		private double _radius;
 
 		public RoundedTransformation(double radius)
 		{
-			this.radius = radius;
+			_radius = radius;
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
-			this.radius = (double)parameters[0];
+			_radius = (double)parameters[0];
 		}
 
 		public override string Key
 		{
-			get { return string.Format("RoundedTransformation, radius = {0}", radius); }
+			get { return string.Format("RoundedTransformation, radius = {0}", _radius); }
 		}
 
 		protected override UIImage Transform(UIImage source)
 		{
-			var transformed = ToRounded(source, (nfloat)radius);
-			source.Dispose();
-
-			return transformed;
+			try
+			{
+				var transformed = ToRounded(source, (nfloat)_radius);
+				return transformed;
+			}
+			finally
+			{
+				source.Dispose();
+			}
 		}
 
 		public static UIImage ToRounded(UIImage source, nfloat rad)
 		{
 			UIGraphics.BeginImageContextWithOptions(source.Size, false, (nfloat)0.0);
-			CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
 
-			using (var path = UIBezierPath.FromRoundedRect(bounds, rad))			
+			try
 			{
-				path.AddClip();
-				source.Draw(bounds);
-				var newImage = UIGraphics.GetImageFromCurrentImageContext();
-				UIGraphics.EndImageContext();
+				CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
 
-				return newImage;
+				using (var path = UIBezierPath.FromRoundedRect(bounds, rad))			
+				{
+					path.AddClip();
+					source.Draw(bounds);
+					var newImage = UIGraphics.GetImageFromCurrentImageContext();
+					return newImage;
+				}
+			}
+			finally
+			{
+				UIGraphics.EndImageContext();
 			}
 		}
 	}

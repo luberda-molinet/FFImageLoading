@@ -19,7 +19,7 @@ namespace FFImageLoading.Work.StreamResolver
 			}
 		}
 
-		public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
+		public Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
 			// Resource name is always without extension
 			string resourceName = Path.GetFileNameWithoutExtension(identifier);
@@ -36,7 +36,9 @@ namespace FFImageLoading.Work.StreamResolver
 			{
 				stream = Context.Resources.OpenRawResource (resourceId);
 			}
-			return WithLoadingResult.Encapsulate(stream, LoadingResult.CompiledResource);
+
+			var result = WithLoadingResult.Encapsulate(stream, LoadingResult.CompiledResource);
+			return Task.FromResult(result);
 		}
 
 		public void Dispose() {

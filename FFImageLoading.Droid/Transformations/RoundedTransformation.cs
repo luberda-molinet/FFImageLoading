@@ -4,31 +4,36 @@ using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
-	public class RoundedTransformation : TransformationBase, IMultiplatformTransformation
+	public class RoundedTransformation : TransformationBase
 	{
-		double radius;
+		private double _radius;
 
 		public RoundedTransformation(double radius)
 		{
-			this.radius = radius;
+			_radius = radius;
 		}
 
-		public void SetParameters(object[] parameters)
+		public override void SetParameters(object[] parameters)
 		{
-			this.radius = (double)parameters[0];
+			_radius = (double)parameters[0];
 		}
 
 		public override string Key
 		{
-			get { return string.Format("RoundedTransformation, radius = {0}", radius); }
+			get { return string.Format("RoundedTransformation, radius = {0}", _radius); }
 		}
 			
 		protected override Bitmap Transform(Bitmap source)
 		{
-			var transformed = ToRounded(source, (float)radius);
-			source.Recycle();
-
-			return transformed;
+			try
+			{
+				var transformed = ToRounded(source, (float)_radius);
+				return transformed;
+			}
+			finally
+			{
+				source.Recycle();
+			}
 		}
 
 		public static Bitmap ToRounded(Bitmap source, float rad)

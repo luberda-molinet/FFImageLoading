@@ -230,7 +230,6 @@ namespace FFImageLoading.Cache
         public async Task<byte[]> TryGetAsync (string key, CancellationToken token)
         {
             key = SanitizeKey (key);
-            byte[] data = null;
             if (!entries.ContainsKey (key))
                 return null;
 			
