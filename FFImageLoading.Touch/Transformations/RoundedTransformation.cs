@@ -41,9 +41,11 @@ namespace FFImageLoading.Transformations
 		{
 			UIGraphics.BeginImageContextWithOptions(source.Size, false, (nfloat)0.0);
 
+			nfloat size = (nfloat)Math.Min(source.Size.Width, source.Size.Height);
+
 			try
 			{
-				CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
+				CGRect bounds = new CGRect(0, 0, size, size);
 
 				using (var path = UIBezierPath.FromRoundedRect(bounds, rad))			
 				{
