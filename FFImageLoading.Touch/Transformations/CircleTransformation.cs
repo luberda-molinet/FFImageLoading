@@ -22,21 +22,15 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			UIGraphics.BeginImageContextWithOptions(source.Size, false, (nfloat)0.0);
 			try
 			{
-				var bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
-				using (var path = UIBezierPath.FromOval(bounds))			
-				{
-					path.AddClip();
-					source.Draw(bounds);
-					var newImage = UIGraphics.GetImageFromCurrentImageContext();
-					return newImage;
-				}
+				double size = Math.Min(source.Size.Width, source.Size.Height);
+
+				var transformed = RoundedTransformation.ToRounded(source, (nfloat)(size / 2));
+				return transformed;
 			}
 			finally
 			{
-				UIGraphics.EndImageContext();
 				source.Dispose();
 			}
 		}
