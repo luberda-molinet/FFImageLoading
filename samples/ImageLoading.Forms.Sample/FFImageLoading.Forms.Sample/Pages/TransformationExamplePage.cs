@@ -43,7 +43,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					LoadingPlaceholder = "loading.png",
 					Transformations = new List<IFormsTransformation>() {
 						new GrayscaleTransformation(),
-						new CircleTransformation(),
+						new RoundedTransformation(40),
 					}
 				};
 				image.SetBinding<ListExampleItem>(CachedImage.SourceProperty, v => v.ImageUrl);
