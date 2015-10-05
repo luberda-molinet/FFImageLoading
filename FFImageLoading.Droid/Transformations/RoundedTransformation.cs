@@ -40,8 +40,8 @@ namespace FFImageLoading.Transformations
 		{
 			int size = Math.Min(source.Width, source.Height);
 
-			int width = (source.Width - size) / 2;
-			int height = (source.Height - size) / 2;
+			int dx = (source.Width - size) / 2;
+			int dy = (source.Height - size) / 2;
 
 			Bitmap bitmap = Bitmap.CreateBitmap(size, size, Bitmap.Config.Argb8888);
 
@@ -50,16 +50,17 @@ namespace FFImageLoading.Transformations
 			using (BitmapShader shader = new BitmapShader(source, Shader.TileMode.Clamp, Shader.TileMode.Clamp))
 			using (Matrix matrix = new Matrix())
 			{
-				if (width != 0 || height != 0)
+				if (dx != 0 || dy != 0)
 				{
 					// source isn't square, move viewport to centre
-					matrix.SetTranslate(-width, -height);
+					matrix.SetTranslate(-dx, -dy);
 					shader.SetLocalMatrix(matrix);
 				}
 				paint.SetShader(shader);
 				paint.AntiAlias = true;
 
-				canvas.DrawCircle(rad, rad, rad, paint);
+				RectF rectF = new RectF(0, 0, size, size);
+				canvas.DrawRoundRect(rectF, rad, rad, paint);
 
 				return bitmap;				
 			}
