@@ -130,6 +130,8 @@
     <Compile Include="Transformations\GrayscaleTransformation.cs" />
     <Compile Include="Transformations\RoundedTransformation.cs" />
     <Compile Include="Transformations\BlurredTransformation.cs" />
+    <Compile Include="Transformations\ColorSpaceTransformation.cs" />
+    <Compile Include="Transformations\SepiaTransformation.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

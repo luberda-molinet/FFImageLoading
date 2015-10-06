@@ -34,20 +34,10 @@ namespace FFImageLoading.Transformations
 
 		public static Bitmap ToGrayscale(Bitmap source)
 		{
-			int width = source.Width;
-			int height = source.Height;
-
-			Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
-
-			using (Canvas canvas = new Canvas(bitmap))
-			using (ColorMatrix saturation = new ColorMatrix())
-			using (Paint paint = new Paint())
+			using (var colorMatrix = new ColorMatrix())
 			{
-				saturation.SetSaturation(0f);
-				paint.SetColorFilter(new ColorMatrixColorFilter(saturation));
-				canvas.DrawBitmap(source, 0, 0, paint);
-
-				return bitmap;	
+				colorMatrix.SetSaturation(0f);
+				return ColorSpaceTransformation.ToColorSpace(source, colorMatrix);
 			}
 		}
 	}

@@ -30,6 +30,7 @@ namespace FFImageLoading.Forms.Touch
 			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
 			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
 			RegisterTransformation(typeof(BlurredTransformation), new FFImageLoading.Transformations.BlurredTransformation(10));
+			RegisterTransformation(typeof(SepiaTransformation), new FFImageLoading.Transformations.SepiaTransformation());
 		}
 
 		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
