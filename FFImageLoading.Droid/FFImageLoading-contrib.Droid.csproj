@@ -129,6 +129,7 @@
     <Compile Include="Transformations\CircleTransformation.cs" />
     <Compile Include="Transformations\GrayscaleTransformation.cs" />
     <Compile Include="Transformations\RoundedTransformation.cs" />
+    <Compile Include="Transformations\BlurredTransformation.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

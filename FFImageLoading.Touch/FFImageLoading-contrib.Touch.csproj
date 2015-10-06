@@ -122,6 +122,7 @@
     <Compile Include="Transformations\CircleTransformation.cs" />
     <Compile Include="Transformations\RoundedTransformation.cs" />
     <Compile Include="Transformations\GrayscaleTransformation.cs" />
+    <Compile Include="Transformations\BlurredTransformation.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

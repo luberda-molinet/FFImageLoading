@@ -11,6 +11,7 @@ using Android.Runtime;
 using FFImageLoading.Views;
 using System.Collections.Generic;
 using FFImageLoading.Forms.Transformations;
+using Android.Content;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -26,9 +27,11 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
+			var formsContext = Android.App.Application.Context;
 			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
 			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
 			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
+			RegisterTransformation(typeof(BlurredTransformation), new FFImageLoading.Transformations.BlurredTransformation(formsContext, 10));
 		}
 
 		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
