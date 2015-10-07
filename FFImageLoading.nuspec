@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xamarin.FFImageLoading</id>
-       <version>1.1.7-alpha3</version>
+       <version>1.1.7-alpha4</version>
        <title>Xamarin library to load images quickly and easily on iOS and Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -28,6 +28,8 @@
    </metadata>
 	<files>
             <!--Core PCL-->
+            <file src="FFImageLoading.BaitAndSwitch/bin/Release/FFImageLoading.BaitAndSwitch.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.BaitAndSwitch.dll" />
+            <file src="FFImageLoading.BaitAndSwitch/bin/Release/FFImageLoading.BaitAndSwitch.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.BaitAndSwitch.xml" />
             <file src="FFImageLoading.Common/bin/Release/FFImageLoading.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.dll" />
             <file src="FFImageLoading.Common/bin/Release/FFImageLoading.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.xml" />
 

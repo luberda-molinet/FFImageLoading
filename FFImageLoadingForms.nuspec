@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Xamarin.FFImageLoading.Forms</id>
-        <version>1.1.7-alpha3</version>
+        <version>1.1.7-alpha4</version>
         <title>Xamarin Forms renderer to load images quickly and easily.</title>
         <authors>Daniel Luberda, Fabien Molinet</authors>
         <owners></owners>
@@ -23,17 +23,17 @@
        <tags>xamarin, forms, xamarin.forms, android, ios, bitmap, image, cache, webp, quick, easy, lru, load, loading, save</tags>
         <dependencies>
           <group targetFramework="portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha3" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha4" />
           </group>
 
           <group targetFramework="MonoAndroid10">
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha3" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha4" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha3" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha4" />
           </group>
         </dependencies>
    </metadata>
