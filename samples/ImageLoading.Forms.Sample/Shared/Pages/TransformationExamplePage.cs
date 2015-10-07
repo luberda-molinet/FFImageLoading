@@ -10,66 +10,92 @@ using FFImageLoading.Transformations;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
-	public class TransformationExamplePage :  PFContentPage<TransformationExampleViewModel>
+	public class TransformationExamplePage : PFContentPage<TransformationExampleViewModel>
 	{
 		public TransformationExamplePage()
 		{
-			Title = "Transformation Demo";
+			Title = "Transformations Demo";
 
-			var listView = new ListView() {
-				HorizontalOptions = LayoutOptions.FillAndExpand, 
-				VerticalOptions = LayoutOptions.FillAndExpand,
-				ItemsSource = ViewModel.Items,
-				ItemTemplate = new DataTemplate(typeof(TransformationExampleCell)),
-				HasUnevenRows = false,
-				RowHeight = 210,
+			var cachedImage = new CachedImage() {
+				HorizontalOptions = LayoutOptions.Center,
+				VerticalOptions = LayoutOptions.Center,
+				WidthRequest = 200,
+				HeightRequest = 200,
+				CacheDuration = TimeSpan.FromDays(30),
+				DownsampleHeight = 200,
+				RetryCount = 0,
+				RetryDelay = 250,
+				TransparencyEnabled = false,
 			};
 
-			Content = listView;
-		}
+			cachedImage.SetBinding<TransformationExampleViewModel>(CachedImage.TransformationsProperty, v => v.Transformations);
+			cachedImage.SetBinding<TransformationExampleViewModel>(CachedImage.LoadingPlaceholderProperty, v => v.LoadingImagePath);
+			cachedImage.SetBinding<TransformationExampleViewModel>(CachedImage.ErrorPlaceholderProperty, v => v.ErrorImagePath);
+			cachedImage.SetBinding<TransformationExampleViewModel>(CachedImage.SourceProperty, v => v.ImagePath);
 
-		class TransformationExampleCell : ViewCell
-		{
-			public TransformationExampleCell()
-			{
-				var image = new CachedImage() {
-					WidthRequest = 200,
-					HeightRequest = 200,
-					DownsampleHeight = 200,
-					TransparencyEnabled = false,
-					Aspect = Aspect.AspectFill,
-					CacheDuration = TimeSpan.FromDays(30),
-					RetryCount = 3,
-					RetryDelay = 500,
-					LoadingPlaceholder = "loading.png",
-					Transformations = new List<ITransformation>() {
-						// new SepiaTransformation(),
-						// new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix),
-						new BlurredTransformation(10),
-						new GrayscaleTransformation(),
-						new RoundedTransformation(40),
+			var button1 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Blurred Transformation Example",
+				Command = ViewModel.BlurredTransformationExampleCommand
+			};
+
+			var button2 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Circle Transformation Example",
+				Command = ViewModel.CircleTransformationExampleCommand
+			};
+
+			var button3 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "ColorSpace Transformation Example",
+				Command = ViewModel.ColorSpaceTransformationExampleCommand
+			};
+
+			var button4 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Grayscale Transformation Example",
+				Command = ViewModel.GrayscaleTransformationExampleCommand
+			};
+
+			var button5 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Rounded Transformation Example",
+				Command = ViewModel.RoundedTransformationExampleCommand
+			};
+
+			var button6 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Sepia Transformation Example",
+				Command = ViewModel.SepiaTransformationExampleCommand
+			};
+
+			var button7 = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Multiple effects Transformation Example",
+				Command = ViewModel.MultipleTransformationExampleCommand
+			};
+
+			var imagePath = new Label() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				FontSize = 9,
+			};
+			imagePath.SetBinding<TransformationExampleViewModel>(Label.TextProperty, v => v.ImagePath);
+
+			Content = new ScrollView() {
+				Content = new StackLayout { 
+					Children = {
+						imagePath,
+						cachedImage,
+						button1, 
+						button2, 
+						button3, 
+						button4,
+						button5,
+						button6,
+						button7,
 					}
-				};
-				image.SetBinding<ListExampleItem>(CachedImage.SourceProperty, v => v.ImageUrl);
-
-				var fileName = new Label() {
-					LineBreakMode = LineBreakMode.CharacterWrap,
-					YAlign = TextAlignment.Center,
-					XAlign = TextAlignment.Center,
-				};
-				fileName.SetBinding<ListExampleItem>(Label.TextProperty, v => v.FileName);
-
-				var root = new AbsoluteLayout() {
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					VerticalOptions = LayoutOptions.FillAndExpand,
-					Padding = 5,
-				};
-
-				root.Children.Add(image, new Rectangle(0f, 0f, 200f, 200f));
-				root.Children.Add(fileName, new Rectangle(200f, 0f, 150f, 200f));
-
-				View = root;	
-			}
+				}
+			};
 		}
 	}
 }

@@ -57,14 +57,16 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
 			imagePath.SetBinding<PlaceholdersExampleViewModel>(Label.TextProperty, v => v.ImagePath);
 
-			Content = new StackLayout { 
-				Children = {
-					imagePath,
-					cachedImage,
-					button1, 
-					button2, 
-					button3, 
-					button4,
+			Content = new ScrollView() {
+				Content = new StackLayout { 
+					Children = {
+						imagePath,
+						cachedImage,
+						button1, 
+						button2, 
+						button3, 
+						button4,
+					}
 				}
 			};
 		}

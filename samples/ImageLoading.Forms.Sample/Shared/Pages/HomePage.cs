@@ -15,39 +15,49 @@ namespace FFImageLoading.Forms.Sample.Pages
 			var simpleMenu = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Simple Example",
-				HeightRequest = 100,
+				HeightRequest = 80,
 				Command = ViewModel.OpenSimpleExampleCommand
 			};
 
 			var listMenu = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "List Example",
-				HeightRequest = 100,
+				HeightRequest = 80,
 				Command = ViewModel.OpenListExampleCommand
+			};
+
+			var listTransformationsMenu = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "List Transformations Example",
+				HeightRequest = 80,
+				Command = ViewModel.OpenListTransformationsExampleCommand
 			};
 
 			var placeholdersMenu = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Placeholders Example",
-				HeightRequest = 100,
+				HeightRequest = 80,
 				Command = ViewModel.OpenPlaceholdersExampleCommand
 			};
 
 			var transformationsMenu = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Transformations Example",
-				HeightRequest = 100,
-				Command = ViewModel.OpenTransformationssExampleCommand
+				HeightRequest = 80,
+				Command = ViewModel.OpenTransformationsExampleCommand
 			};
 
-			Content = new StackLayout { 
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				VerticalOptions = LayoutOptions.FillAndExpand,
-				Children = {
-					simpleMenu,
-					listMenu,
-					placeholdersMenu,
-					transformationsMenu
+			Content = new ScrollView() {
+				Content = new StackLayout { 
+					HorizontalOptions = LayoutOptions.FillAndExpand,
+					VerticalOptions = LayoutOptions.FillAndExpand,
+					Children = {
+						simpleMenu,
+						listMenu,
+						listTransformationsMenu,
+						placeholdersMenu,
+						transformationsMenu
+					}
 				}
 			};
 		}
