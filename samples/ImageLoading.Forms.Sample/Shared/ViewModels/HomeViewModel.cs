@@ -13,10 +13,13 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			OpenListExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<ListExampleViewModel>().PushPage());
 
+			OpenListTransformationsExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<ListTransformationExampleViewModel>().PushPage());
+
 			OpenPlaceholdersExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<PlaceholdersExampleViewModel>().PushPage());
 
-			OpenTransformationssExampleCommand = new PageFactoryCommand(() => 
+			OpenTransformationsExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<TransformationExampleViewModel>().PushPage());
 		}
 
@@ -24,9 +27,11 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 		public IPageFactoryCommand OpenListExampleCommand { get; private set; }
 
+		public IPageFactoryCommand OpenListTransformationsExampleCommand { get; private set; }
+
 		public IPageFactoryCommand OpenPlaceholdersExampleCommand { get; private set; }
 
-		public IPageFactoryCommand OpenTransformationssExampleCommand { get; private set; }
+		public IPageFactoryCommand OpenTransformationsExampleCommand { get; private set; }
 	}
 }
 

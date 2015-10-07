@@ -35,23 +35,19 @@
     <Compile Include="ViewModels\ListExampleViewModel.cs" />
     <Compile Include="ViewModels\PlaceholdersExampleViewModel.cs" />
     <Compile Include="ViewModels\SimpleExampleViewModel.cs" />
-    <Compile Include="ViewModels\TransformationExampleViewModel.cs" />
     <Compile Include="Pages\HomePage.cs" />
     <Compile Include="Pages\ListExamplePage.cs" />
     <Compile Include="Pages\PlaceholdersExamplePage.cs" />
     <Compile Include="Pages\SimpleExamplePage.cs" />
-    <Compile Include="Pages\TransformationExamplePage.cs" />
     <Compile Include="Models\ListExampleItem.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Pages\ListTransformationExamplePage.cs" />
+    <Compile Include="ViewModels\ListTransformationExampleViewModel.cs" />
+    <Compile Include="ViewModels\TransformationExampleViewModel.cs" />
+    <Compile Include="Pages\TransformationExamplePage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
-      <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
-      <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="Xamarin.Forms.Core">
       <HintPath>..\..\..\packages\Xamarin.Forms.1.4.4.6392\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
@@ -67,6 +63,15 @@
     </Reference>
     <Reference Include="DLToolkit.PageFactory.Forms">
       <HintPath>..\..\..\packages\DLToolkit.PageFactory.Forms.1.0.3\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading.Transformations">
+      <HintPath>..\..\..\packages\Xamarin.FFImageLoading.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Transformations.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading">
+      <HintPath>..\..\..\packages\Xamarin.FFImageLoading.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading.Forms">
+      <HintPath>..\..\..\packages\Xamarin.FFImageLoading.Forms.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
