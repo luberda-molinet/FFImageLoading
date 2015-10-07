@@ -5,8 +5,6 @@ using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;
 using FFImageLoading.Forms.Sample.Models;
 using System.Collections.Generic;
-using FFImageLoading.Transformations;
-using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
@@ -43,6 +41,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 					RetryDelay = 500,
 					LoadingPlaceholder = "loading.png",
 					Transformations = new List<ITransformation>() {
+						// new SepiaTransformation(),
+						// new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix),
+						new BlurredTransformation(10),
 						new GrayscaleTransformation(),
 						new RoundedTransformation(40),
 					}

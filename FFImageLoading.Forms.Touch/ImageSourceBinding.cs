@@ -25,15 +25,13 @@ namespace FFImageLoading.Forms.Touch
 			var uriImageSource = source as UriImageSource;
 			if (uriImageSource != null)
 			{
-				var urlSource = uriImageSource;
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, urlSource.Uri.ToString());
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uriImageSource.Uri.ToString());
 			}
 
 			var fileImageSource = source as FileImageSource;
 			if (fileImageSource != null)
 			{
-				var fileSource = fileImageSource;
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileSource.File);
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileImageSource.File);
 			}
 
 			throw new NotImplementedException("ImageSource type not supported");
