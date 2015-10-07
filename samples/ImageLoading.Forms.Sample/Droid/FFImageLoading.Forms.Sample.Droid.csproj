@@ -108,11 +108,10 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
   <ItemGroup>
-<<<<<<< HEAD
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.Shared.csproj">
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample.Shared</Name>
-=======
+    </ProjectReference>
     <ProjectReference Include="..\..\..\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
       <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
       <Name>FFImageLoading-contrib.Droid</Name>
@@ -136,7 +135,6 @@
     <ProjectReference Include="..\..\..\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
       <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
       <Name>FFImageLoading.Transformations.Droid</Name>
->>>>>>> molinch/master
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -136,11 +136,10 @@
     <BundleResource Include="Resources\loading.png" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.Shared.csproj">
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample.Shared</Name>
-=======
+    </ProjectReference>      
     <ProjectReference Include="..\..\..\FFImageLoading.Forms.Touch\FFImageLoading.Forms.Touch.csproj">
       <Project>{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}</Project>
       <Name>FFImageLoading.Forms.Touch</Name>
@@ -164,7 +163,6 @@
     <ProjectReference Include="..\..\..\FFImageLoading.Transformations.Touch\FFImageLoading.Transformations.Touch.csproj">
       <Project>{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}</Project>
       <Name>FFImageLoading.Transformations.Touch</Name>
->>>>>>> molinch/master
     </ProjectReference>
   </ItemGroup>
 </Project>

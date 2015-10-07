@@ -3,13 +3,10 @@
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;
-<<<<<<< HEAD
-=======
 using FFImageLoading.Forms.Sample.Models;
 using System.Collections.Generic;
 using FFImageLoading.Work;
 using FFImageLoading.Transformations;
->>>>>>> molinch/master
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
