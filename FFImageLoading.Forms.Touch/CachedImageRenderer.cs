@@ -10,7 +10,6 @@ using Foundation;
 using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
 using System.Collections.Generic;
-using FFImageLoading.Forms.Transformations;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -21,49 +20,14 @@ namespace FFImageLoading.Forms.Touch
 	[Preserve(AllMembers = true)]
 	public class CachedImageRenderer : ViewRenderer<CachedImage, UIImageView>
 	{
+		private bool _isDisposed;
+
 		/// <summary>
 		///   Used for registration with dependency service
 		/// </summary>
 		public static new void Init()
 		{
-			RegisterTransformation(typeof(CircleTransformation), 
-				new FFImageLoading.Transformations.CircleTransformation());
-			
-			RegisterTransformation(typeof(RoundedTransformation), 
-				new FFImageLoading.Transformations.RoundedTransformation(0));
-			
-			RegisterTransformation(typeof(GrayscaleTransformation), 
-				new FFImageLoading.Transformations.GrayscaleTransformation());
-			
-			RegisterTransformation(typeof(BlurredTransformation), 
-				new FFImageLoading.Transformations.BlurredTransformation(10));
-			
-			RegisterTransformation(typeof(SepiaTransformation), 
-				new FFImageLoading.Transformations.SepiaTransformation());
-
-			RegisterTransformation(typeof(ColorSpaceTransformation), 
-				new FFImageLoading.Transformations.ColorSpaceTransformation(
-					FFColorMatrix.GrayscaleColorMatrix));
 		}
-
-		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
-		public static Dictionary<Type, ITransformation> TransformationsDict
-		{
-			get { return transformationsDict; }
-		}
-
-		public static void RegisterTransformation(Type formsTransformationType, ITransformation iosTransformation)
-		{
-			if (transformationsDict.ContainsKey(formsTransformationType))
-				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
-
-			if (!typeof(IFormsTransformation).IsAssignableFrom(formsTransformationType))
-				throw new ArgumentException(string.Format("{0} must implement IFormsTransformation interface", formsTransformationType));
-
-			transformationsDict.Add(formsTransformationType, iosTransformation);
-		}
-
-		private bool _isDisposed;
 
 		protected override void Dispose(bool disposing)
 		{
@@ -231,18 +195,7 @@ namespace FFImageLoading.Forms.Touch
 				// Transformations
 				if (Element.Transformations != null)
 				{
-					foreach (var transformation in Element.Transformations)
-					{
-						if (transformation != null)
-						{
-							ITransformation nativeTransformation;
-							if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
-							{
-								nativeTransformation.SetParameters(transformation.Parameters);
-								imageLoader.Transform(nativeTransformation);		
-							}
-						}
-					}
+					imageLoader.Transform(Element.Transformations);
 				}
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));

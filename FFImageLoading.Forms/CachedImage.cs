@@ -1,7 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
-using FFImageLoading.Forms.Transformations;
 
 namespace FFImageLoading.Forms
 {
@@ -287,17 +286,17 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transformations property.
 		/// </summary>
-		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<IFormsTransformation>> (w => w.Transformations, null);
+		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, null);
 
 		/// <summary>
 		/// Gets or sets the transformations.
 		/// </summary>
 		/// <value>The transformations.</value>
-		public List<IFormsTransformation> Transformations
+		public List<FFImageLoading.Work.ITransformation> Transformations
 		{
 			get
 			{
-				return (List<IFormsTransformation>)GetValue(TransformationsProperty); 
+				return (List<FFImageLoading.Work.ITransformation>)GetValue(TransformationsProperty); 
 			}
 			set
 			{

@@ -10,15 +10,10 @@ namespace FFImageLoading.Transformations
 		private double _radius;
 		private Context _context;
 
-		public BlurredTransformation(Context context, double radius)
+		public BlurredTransformation(double radius)
 		{
 			_radius = radius;
-			_context = context;
-		}
-
-		public override void SetParameters(object[] parameters)
-		{
-			_radius = (double)parameters[0];
+			_context = Android.App.Application.Context;
 		}
 
 		public override string Key

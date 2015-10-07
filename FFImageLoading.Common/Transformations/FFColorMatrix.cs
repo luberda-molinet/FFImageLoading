@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FFImageLoading.Forms.Transformations
+namespace FFImageLoading.Transformations
 {
 	// http://docs.rainmeter.net/tips/colormatrix-guide
 	public static class FFColorMatrix

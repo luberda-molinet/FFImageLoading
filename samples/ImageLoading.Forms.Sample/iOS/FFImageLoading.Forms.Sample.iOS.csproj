@@ -137,5 +137,9 @@
       <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
       <Name>FFImageLoading-contrib.Touch</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading-contrib</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

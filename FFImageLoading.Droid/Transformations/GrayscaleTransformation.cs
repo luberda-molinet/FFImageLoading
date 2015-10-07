@@ -10,10 +10,6 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-		}
-
 		public override string Key
 		{
 			get { return "GrayscaleTransformation"; }

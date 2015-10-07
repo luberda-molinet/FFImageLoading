@@ -23,12 +23,6 @@ namespace FFImageLoading.Transformations
 			_colorMatrix = colorMatrix;
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-			float[][] rgbawMatrix = (float[][])parameters[0];
-			UpdateColorMatrix(rgbawMatrix);
-		}
-
 		public override string Key
 		{
 			get { return "ColorSpaceTransformation"; }

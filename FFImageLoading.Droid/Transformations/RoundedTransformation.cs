@@ -13,11 +13,6 @@ namespace FFImageLoading.Transformations
 			_radius = radius;
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-			_radius = (double)parameters[0];
-		}
-
 		public override string Key
 		{
 			get { return string.Format("RoundedTransformation, radius = {0}", _radius); }
