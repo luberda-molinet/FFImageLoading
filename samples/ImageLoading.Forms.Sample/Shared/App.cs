@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;

@@ -42,6 +42,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 					RetryDelay = 500,
 					LoadingPlaceholder = "loading.png",
 					Transformations = new List<IFormsTransformation>() {
+						// new SepiaTransformation(),
+						// new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix),
+						new BlurredTransformation(10),
 						new GrayscaleTransformation(),
 						new RoundedTransformation(40),
 					}
