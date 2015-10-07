@@ -378,8 +378,13 @@ namespace FFImageLoading.Work
 
 									try
 									{
+										var old = bitmap;
 										var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
 										bitmap = bitmapHolder.ToNative();
+
+										// Transformation succeeded, so garbage the source
+										old.Recycle();
+										old.Dispose();
 									}
 									catch (Exception ex)
 									{

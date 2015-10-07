@@ -26,15 +26,7 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			try
-			{
-				var transformed = ToRounded(source, (nfloat)_radius);
-				return transformed;
-			}
-			finally
-			{
-				source.Dispose();
-			}
+			return ToRounded(source, (nfloat)_radius);
 		}
 
 		public static UIImage ToRounded(UIImage source, nfloat rad)

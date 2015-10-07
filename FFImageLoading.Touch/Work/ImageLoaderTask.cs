@@ -225,11 +225,15 @@ namespace FFImageLoading.Work
 						{
 							if (CancellationToken.IsCancellationRequested)
 								return null;
-							
+
 							try
 							{
+								var old = imageIn;
 								var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
 								imageIn = bitmapHolder.ToNative();
+
+								// Transformation succeeded, so garbage the source
+								old.Dispose();
 							}
 							catch (Exception ex)
 							{

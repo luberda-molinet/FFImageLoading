@@ -11,6 +11,9 @@ namespace FFImageLoading.Transformations
 
 		public ColorSpaceTransformation(float[][] rgbawMatrix)
 		{
+			if (rgbawMatrix.Length != 5 || rgbawMatrix.Any(v => v.Length != 5))
+				throw new ArgumentException("Wrong size of RGBAW color matrix");
+
 			_colorMatrix = new ColorMatrix();
 			UpdateColorMatrix(rgbawMatrix);
 		}
@@ -62,15 +65,7 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToColorSpace(source, _colorMatrix);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToColorSpace(source, _colorMatrix);
 		}
 
 		public static Bitmap ToColorSpace(Bitmap source, ColorMatrix colorMatrix)

@@ -21,15 +21,7 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToGrayscale(source);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToGrayscale(source);
 		}
 
 		public static Bitmap ToGrayscale(Bitmap source)

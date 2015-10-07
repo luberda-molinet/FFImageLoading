@@ -25,15 +25,7 @@ namespace FFImageLoading.Transformations
 			
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToRounded(source, (float)_radius);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToRounded(source, (float)_radius);
 		}
 
 		public static Bitmap ToRounded(Bitmap source, float rad)
