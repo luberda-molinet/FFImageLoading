@@ -25,17 +25,15 @@ namespace FFImageLoading.Forms.Droid
 			var uriImageSource = source as UriImageSource;
 			if (uriImageSource != null)
 			{
-				var urlSource = uriImageSource;
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, urlSource.Uri.ToString());
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uriImageSource.Uri.ToString());
 			}
 
 			var fileImageSource = source as FileImageSource;
 			if (fileImageSource != null)
 			{
-				var fileSource = fileImageSource;
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileSource.File);
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
 			}
-				
+								
 			throw new NotImplementedException("ImageSource type not supported");
 		}
 
