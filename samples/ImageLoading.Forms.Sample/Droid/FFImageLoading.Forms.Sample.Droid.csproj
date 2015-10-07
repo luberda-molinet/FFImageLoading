@@ -105,13 +105,17 @@
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.Shared.csproj">
-      <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
-      <Name>FFImageLoading.Forms.Sample.Shared</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading-contrib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj">
+      <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
+      <Name>FFImageLoading.Forms.Sample</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
+      <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
+      <Name>FFImageLoading.Transformations.Droid</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

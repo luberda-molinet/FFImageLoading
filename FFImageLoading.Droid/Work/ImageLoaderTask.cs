@@ -371,7 +371,7 @@ namespace FFImageLoading.Work
 
 							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
 							{
-								foreach (var transformation in Parameters.Transformations)
+								foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 								{
 									if (CancellationToken.IsCancellationRequested)
 										return null;

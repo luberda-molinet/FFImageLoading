@@ -1,7 +1,8 @@
 ﻿using System;
-using Android.Graphics;
+using UIKit;
+using FFImageLoading.Work;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Transformations
 {
 	public abstract class TransformationBase: ITransformation
 	{
@@ -12,7 +13,7 @@ namespace FFImageLoading.Work
 			return new BitmapHolder(Transform(source.ToNative()));
 		}
 
-		protected abstract Bitmap Transform(Bitmap source);
+		protected abstract UIImage Transform(UIImage source);
 	}
 }
 

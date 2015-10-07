@@ -51,6 +51,14 @@
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading-contrib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Transformations\FFImageLoading.Transformations.csproj">
+      <Project>{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}</Project>
+      <Name>FFImageLoading.Transformations</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Xamarin.Forms.Core">

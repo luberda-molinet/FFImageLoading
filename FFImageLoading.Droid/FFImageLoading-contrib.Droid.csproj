@@ -59,19 +59,12 @@
     <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Work\IAsyncDrawable.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Work\TransformationBase.cs" />
     <Compile Include="Work\StreamResolver\ApplicationBundleStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\FilePathStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\IStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
     <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
-    <Compile Include="Transformations\CircleTransformation.cs" />
-    <Compile Include="Transformations\GrayscaleTransformation.cs" />
-    <Compile Include="Transformations\RoundedTransformation.cs" />
-    <Compile Include="Transformations\BlurredTransformation.cs" />
-    <Compile Include="Transformations\ColorSpaceTransformation.cs" />
-    <Compile Include="Transformations\SepiaTransformation.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -86,7 +79,6 @@
   </ProjectExtensions>
   <ItemGroup>
     <Folder Include="Work\StreamResolver\" />
-    <Folder Include="Transformations\" />
     <Folder Include="Config\" />
   </ItemGroup>
   <ItemGroup>

@@ -45,7 +45,6 @@
     <Folder Include="Helpers\" />
     <Folder Include="Config\" />
     <Folder Include="Work\DataResolver\" />
-    <Folder Include="Transformations\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,19 +54,12 @@
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Work\TransformationBase.cs" />
     <Compile Include="Work\DataResolver\FilePathDataResolver.cs" />
     <Compile Include="Work\DataResolver\IDataResolver.cs" />
     <Compile Include="Work\DataResolver\UrlDataResolver.cs" />
     <Compile Include="Work\DataResolver\UIImageData.cs" />
     <Compile Include="Work\DataResolver\DataResolverFactory.cs" />
-    <Compile Include="Transformations\CircleTransformation.cs" />
-    <Compile Include="Transformations\RoundedTransformation.cs" />
-    <Compile Include="Transformations\GrayscaleTransformation.cs" />
-    <Compile Include="Transformations\BlurredTransformation.cs" />
-    <Compile Include="Transformations\ColorSpaceTransformation.cs" />
-    <Compile Include="Transformations\SepiaTransformation.cs" />
+    <Compile Include="Work\BitmapHolder.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
