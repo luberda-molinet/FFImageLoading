@@ -39,9 +39,9 @@ namespace FFImageLoading.Transformations
 
 		public static UIImage ToRounded(UIImage source, nfloat rad)
 		{
-			UIGraphics.BeginImageContextWithOptions(source.Size, false, (nfloat)0.0);
-
 			nfloat size = (nfloat)Math.Min(source.Size.Width, source.Size.Height);
+
+			UIGraphics.BeginImageContextWithOptions(new CGSize(size, size), false, (nfloat)0.0);
 
 			try
 			{
