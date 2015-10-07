@@ -5,6 +5,8 @@ using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;
 using FFImageLoading.Forms.Sample.Models;
 using System.Collections.Generic;
+using FFImageLoading.Work;
+using FFImageLoading.Transformations;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {

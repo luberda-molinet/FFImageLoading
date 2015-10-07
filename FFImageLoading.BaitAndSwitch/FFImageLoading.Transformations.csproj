@@ -6,8 +6,8 @@
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading.BaitAndSwitch</RootNamespace>
-    <AssemblyName>FFImageLoading.BaitAndSwitch</AssemblyName>
+    <RootNamespace>FFImageLoading.Transformations</RootNamespace>
+    <AssemblyName>FFImageLoading.Transformations</AssemblyName>
     <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
