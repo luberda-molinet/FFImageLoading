@@ -36,12 +36,9 @@ namespace FFImageLoading.Transformations
 
 		public static UIImage ToSepia(UIImage source)
 		{
-			using (var context = CIContext.FromOptions(new CIContextOptions { UseSoftwareRenderer = false }))
-			using (var inputImage = CIImage.FromCGImage(source.CGImage))
-			using (var filter =  new CISepiaTone() { Image = inputImage, Intensity = 0.8f })
-			using (var resultImage = context.CreateCGImage(filter.OutputImage, inputImage.Extent))
+			using (var filter =  new CISepiaTone() { Intensity = 0.8f })
 			{
-				return new UIImage(resultImage);
+				return ColorSpaceTransformation.ToFilter(source, filter);
 			}
 		}
 	}

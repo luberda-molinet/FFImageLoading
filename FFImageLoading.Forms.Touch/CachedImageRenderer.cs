@@ -26,11 +26,24 @@ namespace FFImageLoading.Forms.Touch
 		/// </summary>
 		public static new void Init()
 		{
-			RegisterTransformation(typeof(CircleTransformation), new FFImageLoading.Transformations.CircleTransformation());
-			RegisterTransformation(typeof(RoundedTransformation), new FFImageLoading.Transformations.RoundedTransformation(0));
-			RegisterTransformation(typeof(GrayscaleTransformation), new FFImageLoading.Transformations.GrayscaleTransformation());
-			RegisterTransformation(typeof(BlurredTransformation), new FFImageLoading.Transformations.BlurredTransformation(10));
-			RegisterTransformation(typeof(SepiaTransformation), new FFImageLoading.Transformations.SepiaTransformation());
+			RegisterTransformation(typeof(CircleTransformation), 
+				new FFImageLoading.Transformations.CircleTransformation());
+			
+			RegisterTransformation(typeof(RoundedTransformation), 
+				new FFImageLoading.Transformations.RoundedTransformation(0));
+			
+			RegisterTransformation(typeof(GrayscaleTransformation), 
+				new FFImageLoading.Transformations.GrayscaleTransformation());
+			
+			RegisterTransformation(typeof(BlurredTransformation), 
+				new FFImageLoading.Transformations.BlurredTransformation(10));
+			
+			RegisterTransformation(typeof(SepiaTransformation), 
+				new FFImageLoading.Transformations.SepiaTransformation());
+
+			RegisterTransformation(typeof(ColorSpaceTransformation), 
+				new FFImageLoading.Transformations.ColorSpaceTransformation(
+					FFColorMatrix.GrayscaleColorMatrix));
 		}
 
 		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
