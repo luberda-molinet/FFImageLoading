@@ -11,10 +11,6 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-		}
-
 		public override string Key
 		{
 			get { return "GrayscaleTransformation"; }
@@ -22,17 +18,9 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			try
+			using (var colorSpace = CGColorSpace.CreateDeviceGray())
 			{
-				using (var colorSpace = CGColorSpace.CreateDeviceGray())
-				{
-					var transformed = ColorSpaceTransformation.ToColorSpace(source, colorSpace);
-					return transformed;	
-				}
-			}
-			finally
-			{
-				source.Dispose();
+				return ColorSpaceTransformation.ToColorSpace(source, colorSpace);
 			}
 		}
 	}

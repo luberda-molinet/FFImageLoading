@@ -10,8 +10,9 @@ using FFImageLoading.Forms;
 using Android.Runtime;
 using FFImageLoading.Views;
 using System.Collections.Generic;
-using FFImageLoading.Forms.Transformations;
+using FFImageLoading.Transformations;
 using Android.Content;
+using FFImageLoading.Work;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -27,43 +28,6 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
-			var formsContext = Android.App.Application.Context;
-
-			RegisterTransformation(typeof(CircleTransformation), 
-				new FFImageLoading.Transformations.CircleTransformation());
-			
-			RegisterTransformation(typeof(RoundedTransformation), 
-				new FFImageLoading.Transformations.RoundedTransformation(0));
-			
-			RegisterTransformation(typeof(GrayscaleTransformation), 
-				new FFImageLoading.Transformations.GrayscaleTransformation());
-			
-			RegisterTransformation(typeof(BlurredTransformation), 
-				new FFImageLoading.Transformations.BlurredTransformation(formsContext, 10));
-			
-			RegisterTransformation(typeof(SepiaTransformation), 
-				new FFImageLoading.Transformations.SepiaTransformation());
-			
-			RegisterTransformation(typeof(ColorSpaceTransformation), 
-				new FFImageLoading.Transformations.ColorSpaceTransformation(
-					FFColorMatrix.GrayscaleColorMatrix));
-		}
-
-		static Dictionary<Type, ITransformation> transformationsDict = new Dictionary<Type, ITransformation>();
-		public static Dictionary<Type, ITransformation> TransformationsDict
-		{
-			get { return transformationsDict; }
-		}
-
-		public static void RegisterTransformation(Type formsTransformationType, ITransformation androidTransformation)
-		{
-			if (transformationsDict.ContainsKey(formsTransformationType))
-				throw new InvalidOperationException(string.Format("{0} transformation is already registered", formsTransformationType));
-
-			if (!typeof(IFormsTransformation).IsAssignableFrom(formsTransformationType))
-				throw new ArgumentException(string.Format("{0} must implement IFormsTransformation interface", formsTransformationType));
-
-			transformationsDict.Add(formsTransformationType, androidTransformation);
 		}
 
 		private bool _isDisposed;
@@ -223,18 +187,7 @@ namespace FFImageLoading.Forms.Droid
 						// Transformations
 						if (Element.Transformations != null)
 						{
-							foreach (var transformation in Element.Transformations)
-							{
-								if (transformation != null)
-								{
-									ITransformation nativeTransformation;
-									if (TransformationsDict.TryGetValue(transformation.GetType(), out nativeTransformation))
-									{
-										nativeTransformation.SetParameters(transformation.Parameters);
-										imageLoader.Transform(nativeTransformation);		
-									}
-								}
-							}
+							imageLoader.Transform(Element.Transformations);
 						}
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));

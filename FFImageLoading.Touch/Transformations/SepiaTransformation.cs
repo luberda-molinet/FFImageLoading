@@ -12,10 +12,6 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-		}
-
 		public override string Key
 		{
 			get { return "SepiaTransformation"; }
@@ -23,15 +19,7 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			try
-			{
-				var transformed = ToSepia(source);
-				return transformed;
-			}
-			finally
-			{
-				source.Dispose();
-			}
+			return ToSepia(source);
 		}
 
 		public static UIImage ToSepia(UIImage source)

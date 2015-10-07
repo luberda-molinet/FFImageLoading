@@ -16,7 +16,7 @@
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <DevInstrumentationEnabled>True</DevInstrumentationEnabled>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,12 +55,6 @@
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.AppCompat, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\packages\Xamarin.Android.Support.v7.AppCompat.22.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
-    </Reference>
-    <Reference Include="ModernHttpClient">
-      <HintPath>..\..\packages\modernhttpclient.2.4.1\lib\MonoAndroid\ModernHttpClient.dll</HintPath>
-    </Reference>
-    <Reference Include="OkHttp">
-      <HintPath>..\..\packages\modernhttpclient.2.4.1\lib\MonoAndroid\OkHttp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +115,10 @@
     <ProjectReference Include="..\..\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
       <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
       <Name>FFImageLoading-contrib.Droid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

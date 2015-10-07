@@ -10,15 +10,10 @@ namespace FFImageLoading.Transformations
 		private double _radius;
 		private Context _context;
 
-		public BlurredTransformation(Context context, double radius)
+		public BlurredTransformation(double radius)
 		{
 			_radius = radius;
-			_context = context;
-		}
-
-		public override void SetParameters(object[] parameters)
-		{
-			_radius = (double)parameters[0];
+			_context = Android.App.Application.Context;
 		}
 
 		public override string Key
@@ -28,15 +23,7 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToBlurred(source, _context, (float)_radius);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToBlurred(source, _context, (float)_radius);
 		}
 
 		public static Bitmap ToBlurred(Bitmap source, Context context, float radius)
@@ -48,21 +35,22 @@ namespace FFImageLoading.Transformations
 				using (Canvas canvas = new Canvas(bitmap))
 				{
 					canvas.DrawBitmap(source, 0, 0, null);
-					Android.Renderscripts.RenderScript rs = Android.Renderscripts.RenderScript.Create(context);
-					Android.Renderscripts.Allocation overlayAlloc = Android.Renderscripts.Allocation.CreateFromBitmap(rs, bitmap);
-					Android.Renderscripts.ScriptIntrinsicBlur blur = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, overlayAlloc.Element);
+					using (Android.Renderscripts.RenderScript rs = Android.Renderscripts.RenderScript.Create(context))
+					{
+						using (Android.Renderscripts.Allocation overlayAlloc = Android.Renderscripts.Allocation.CreateFromBitmap(rs, bitmap))
+						{
+							using (Android.Renderscripts.ScriptIntrinsicBlur blur = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, overlayAlloc.Element))
+							{
+								blur.SetInput(overlayAlloc);
+								blur.SetRadius(radius);	
+								blur.ForEach(overlayAlloc);
+								overlayAlloc.CopyTo(bitmap);
 
-					blur.SetInput(overlayAlloc);
-					blur.SetRadius(radius);	
-					blur.ForEach(overlayAlloc);
-					overlayAlloc.CopyTo(bitmap);
-
-					rs.Destroy();			
-					blur.Dispose();
-					overlayAlloc.Dispose();
-					rs.Dispose();
-
-					return bitmap;				
+								rs.Destroy();
+								return bitmap;
+							}
+						}
+					}
 				}
 			}
 

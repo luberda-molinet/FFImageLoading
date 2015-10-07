@@ -13,11 +13,6 @@ namespace FFImageLoading.Transformations
 			_radius = radius;
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-			_radius = (double)parameters[0];
-		}
-
 		public override string Key
 		{
 			get { return string.Format("RoundedTransformation, radius = {0}", _radius); }
@@ -25,15 +20,7 @@ namespace FFImageLoading.Transformations
 			
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToRounded(source, (float)_radius);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToRounded(source, (float)_radius);
 		}
 
 		public static Bitmap ToRounded(Bitmap source, float rad)

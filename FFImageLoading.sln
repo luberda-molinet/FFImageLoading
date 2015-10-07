@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Droid"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Touch", "FFImageLoading.Forms.Touch\FFImageLoading.Forms.Touch.csproj", "{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.BaitAndSwitch", "FFImageLoading.BaitAndSwitch\FFImageLoading.BaitAndSwitch.csproj", "{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,18 @@ Global
 		{9F816002-DBA1-4175-A0CA-0DFD9E086786}.Release|iPhone.Build.0 = Release|Any CPU
 		{9F816002-DBA1-4175-A0CA-0DFD9E086786}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{9F816002-DBA1-4175-A0CA-0DFD9E086786}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|iPhone.Build.0 = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F898A684-E9C1-4154-9F80-6037287233F5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU

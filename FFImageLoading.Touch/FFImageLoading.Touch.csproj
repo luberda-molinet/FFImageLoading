@@ -34,9 +34,6 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="ModernHttpClient">
-      <HintPath>..\..\..\..\..\packages\modernhttpclient.2.2.0\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
-    </Reference>
     <Reference Include="WebP.Touch">
       <HintPath>..\..\..\..\..\packages\WebP.Touch.1.0.1\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
@@ -48,6 +45,7 @@
     <Folder Include="Helpers\" />
     <Folder Include="Config\" />
     <Folder Include="Work\DataResolver\" />
+    <Folder Include="Transformations\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -57,67 +55,19 @@
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="..\FFImageLoading.Common\Cache\DownloadedData.cs">
-      <Link>Cache\DownloadedData.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Cache\IDiskCache.cs">
-      <Link>Cache\IDiskCache.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Cache\IDownloadCache.cs">
-      <Link>Cache\IDownloadCache.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Config\Configuration.cs">
-      <Link>Config\Configuration.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Helpers\IMainThreadDispatcher.cs">
-      <Link>Helpers\IMainThreadDispatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Helpers\IMiniLogger.cs">
-      <Link>Helpers\IMiniLogger.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\IImageLoaderTask.cs">
-      <Link>Work\IImageLoaderTask.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\WorkScheduler.cs">
-      <Link>Work\WorkScheduler.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\IScheduledWork.cs">
-      <Link>Work\IScheduledWork.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\TaskParameter.cs">
-      <Link>Work\TaskParameter.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\IBitmap.cs">
-      <Link>Work\IBitmap.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\ITransformation.cs">
-      <Link>Work\ITransformation.cs</Link>
-    </Compile>
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Work\TransformationBase.cs" />
-    <Compile Include="..\FFImageLoading.Common\Cache\CacheResult.cs">
-      <Link>Cache\CacheResult.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\GenerateResult.cs">
-      <Link>Work\GenerateResult.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\ImageSize.cs">
-      <Link>Work\ImageSize.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\LoadingResult.cs">
-      <Link>Work\LoadingResult.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Work\WithLoadingResult.cs">
-      <Link>Work\WithLoadingResult.cs</Link>
-    </Compile>
-    <Compile Include="..\FFImageLoading.Common\Cache\CacheStream.cs">
-      <Link>Cache\CacheStream.cs</Link>
-    </Compile>
     <Compile Include="Work\DataResolver\FilePathDataResolver.cs" />
     <Compile Include="Work\DataResolver\IDataResolver.cs" />
     <Compile Include="Work\DataResolver\UrlDataResolver.cs" />
     <Compile Include="Work\DataResolver\UIImageData.cs" />
     <Compile Include="Work\DataResolver\DataResolverFactory.cs" />
+    <Compile Include="Transformations\CircleTransformation.cs" />
+    <Compile Include="Transformations\RoundedTransformation.cs" />
+    <Compile Include="Transformations\GrayscaleTransformation.cs" />
+    <Compile Include="Transformations\BlurredTransformation.cs" />
+    <Compile Include="Transformations\ColorSpaceTransformation.cs" />
+    <Compile Include="Transformations\SepiaTransformation.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
@@ -134,4 +84,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

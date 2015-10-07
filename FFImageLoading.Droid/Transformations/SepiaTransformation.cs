@@ -10,10 +10,6 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public override void SetParameters(object[] parameters)
-		{
-		}
-
 		public override string Key
 		{
 			get { return "SepiaTransformation"; }
@@ -21,15 +17,7 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			try
-			{
-				var transformed = ToSepia(source);
-				return transformed;
-			}
-			finally
-			{
-				source.Recycle();
-			}
+			return ToSepia(source);
 		}
 
 		public static Bitmap ToSepia(Bitmap source)

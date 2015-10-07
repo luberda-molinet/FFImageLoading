@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 using UIKit;
 using CoreGraphics;
 using CoreImage;
+using System.Linq;
 
 namespace FFImageLoading.Transformations
 {
@@ -13,6 +14,9 @@ namespace FFImageLoading.Transformations
 
 		public ColorSpaceTransformation(float[][] rgbawMatrix)
 		{
+			if (rgbawMatrix.Length != 5 || rgbawMatrix.Any(v => v.Length != 5))
+				throw new ArgumentException("Wrong size of RGBAW color matrix");
+
 			_colorSpace = null;
 			_colorMatrix = new CIColorMatrix();
 			UpdateColorMatrix(rgbawMatrix);
@@ -22,15 +26,6 @@ namespace FFImageLoading.Transformations
 		{
 			_colorSpace = colorSpace;
 			_colorMatrix = null;
-		}
-
-		public override void SetParameters(object[] parameters)
-		{
-			if (_colorMatrix != null)
-			{
-				float[][] rgbawMatrix = (float[][])parameters[0];
-				UpdateColorMatrix(rgbawMatrix);	
-			}
 		}
 
 		public override string Key
@@ -49,22 +44,13 @@ namespace FFImageLoading.Transformations
 			
 		protected override UIImage Transform(UIImage source)
 		{
-			try
+			if (_colorMatrix != null)
 			{
-				if (_colorMatrix != null)
-				{
-					var transformed = ToFilter(source, _colorMatrix);
-					return transformed;	
-				}
-				else
-				{
-					var transformed = ToColorSpace(source, _colorSpace);
-					return transformed;	
-				}
+				return ToFilter(source, _colorMatrix);
 			}
-			finally
+			else
 			{
-				source.Dispose();
+				return ToColorSpace(source, _colorSpace);
 			}
 		}
 

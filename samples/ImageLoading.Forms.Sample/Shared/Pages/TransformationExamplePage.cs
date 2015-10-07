@@ -3,9 +3,10 @@
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;
-using FFImageLoading.Forms.Transformations;
 using FFImageLoading.Forms.Sample.Models;
 using System.Collections.Generic;
+using FFImageLoading.Transformations;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
@@ -41,10 +42,14 @@ namespace FFImageLoading.Forms.Sample.Pages
 					RetryCount = 3,
 					RetryDelay = 500,
 					LoadingPlaceholder = "loading.png",
+<<<<<<< HEAD:samples/ImageLoading.Forms.Sample/Shared/Pages/TransformationExamplePage.cs
 					Transformations = new List<IFormsTransformation>() {
 						// new SepiaTransformation(),
 						// new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix),
 						new BlurredTransformation(10),
+=======
+					Transformations = new List<ITransformation>() {
+>>>>>>> molinch/master:samples/ImageLoading.Forms.Sample/FFImageLoading.Forms.Sample/Pages/TransformationExamplePage.cs
 						new GrayscaleTransformation(),
 						new RoundedTransformation(40),
 					}

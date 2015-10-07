@@ -12,8 +12,6 @@ namespace FFImageLoading.Work
 			return new BitmapHolder(Transform(source.ToNative()));
 		}
 
-		public abstract void SetParameters(object[] parameters);
-
 		protected abstract UIImage Transform(UIImage source);
 	}
 }

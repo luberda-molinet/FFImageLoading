@@ -77,9 +77,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
-    <Reference Include="ModernHttpClient">
-      <HintPath>..\..\..\packages\modernhttpclient.2.2.0\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
-    </Reference>
     <Reference Include="WebP.Touch">
       <HintPath>..\..\..\packages\WebP.Touch.1.0.1\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
@@ -139,6 +136,10 @@
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.Shared.csproj">
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

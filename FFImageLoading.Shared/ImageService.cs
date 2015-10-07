@@ -99,7 +99,7 @@ namespace FFImageLoading
 
         private static Configuration GetDefaultConfiguration(Configuration userDefinedConfig)
         {
-			var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new ModernHttpClient.NativeMessageHandler(true, false));
+			var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
 
 			if (userDefinedConfig.HttpReadTimeout > 0)
 			{

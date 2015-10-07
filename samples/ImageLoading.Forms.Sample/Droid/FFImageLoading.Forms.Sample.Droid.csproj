@@ -15,7 +15,7 @@
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Forms.Sample.Droid</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,11 +45,19 @@
     <Reference Include="Xamarin.Android.Support.v4">
       <HintPath>..\..\..\packages\Xamarin.Android.Support.v4.21.0.3.0\lib\MonoAndroid10\Xamarin.Android.Support.v4.dll</HintPath>
     </Reference>
+<<<<<<< HEAD
     <Reference Include="ModernHttpClient">
       <HintPath>..\..\..\packages\modernhttpclient.2.2.0\lib\MonoAndroid\ModernHttpClient.dll</HintPath>
     </Reference>
     <Reference Include="OkHttp">
       <HintPath>..\..\..\packages\modernhttpclient.2.2.0\lib\MonoAndroid\OkHttp.dll</HintPath>
+=======
+    <Reference Include="DLToolkit.PageFactory.Shared">
+      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Shared.1.0.3\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="DLToolkit.PageFactory.Forms">
+      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Forms.1.0.3\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
+>>>>>>> molinch/master
     </Reference>
     <Reference Include="Xamarin.Forms.Platform.Android">
       <HintPath>..\..\..\packages\Xamarin.Forms.1.4.4.6392\lib\MonoAndroid10\Xamarin.Forms.Platform.Android.dll</HintPath>
@@ -114,6 +122,10 @@
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.Shared.csproj">
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
