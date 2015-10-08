@@ -50,7 +50,6 @@
     <Compile Include="GrayscaleTransformation.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
-    <Compile Include="TransformationBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
