@@ -65,6 +65,7 @@
     <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
     <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
+    <Compile Include="Transformations\TransformationBase.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -80,6 +81,7 @@
   <ItemGroup>
     <Folder Include="Work\StreamResolver\" />
     <Folder Include="Config\" />
+    <Folder Include="Transformations\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
