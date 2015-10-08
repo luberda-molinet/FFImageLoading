@@ -3,20 +3,20 @@ using DLToolkit.PageFactory;
 
 namespace FFImageLoading.Forms.Sample.ViewModels
 {
-	public class PlaceholdersExampleViewModel : BaseViewModel
+	public class PlaceholdersExampleViewModel : BaseExampleViewModel
 	{
 		public PlaceholdersExampleViewModel()
 		{
 			LocalLoadingPlaceholderExampleCommand = new PageFactoryCommand(() => {
 				ErrorImagePath = null;
 				LoadingImagePath = "loading.png";
-				ImagePath = GetRandomImageUrl();
+				ImagePath = GetRandomImageUrl(width: 200, height: 200);
 			});
 
 			RemoteLoadingPlaceholderExampleCommand = new PageFactoryCommand(() => {
 				ErrorImagePath = null;
 				LoadingImagePath = "http://res.cloudinary.com/dqeaiomo8/image/upload/v1443461222/loading_xcotss.png";
-				ImagePath = GetRandomImageUrl();
+				ImagePath = GetRandomImageUrl(width: 200, height: 200);
 			});
 
 			LocalErrorPlaceholderExampleCommand = new PageFactoryCommand(() => {
@@ -30,12 +30,6 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				LoadingImagePath = null;
 				ImagePath = "http://notexisting.com/notexisting.jpg";
 			}); 
-		}
-			
-		public string GetRandomImageUrl()
-		{
-			return string.Format("http://loremflickr.com/600/600/nature?filename={0}.jpg", 
-				Guid.NewGuid().ToString("N"));
 		}
 
 		public string ImagePath {

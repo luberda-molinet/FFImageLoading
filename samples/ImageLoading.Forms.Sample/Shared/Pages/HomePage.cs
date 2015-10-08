@@ -47,6 +47,13 @@ namespace FFImageLoading.Forms.Sample.Pages
 				Command = ViewModel.OpenTransformationsExampleCommand
 			};
 
+			var downsamplingMenu = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Downsampling Example",
+				HeightRequest = 80,
+				Command = ViewModel.OpenDownsamplingExampleCommand
+			};
+
 			Content = new ScrollView() {
 				Content = new StackLayout { 
 					HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -56,7 +63,8 @@ namespace FFImageLoading.Forms.Sample.Pages
 						listMenu,
 						listTransformationsMenu,
 						placeholdersMenu,
-						transformationsMenu
+						transformationsMenu,
+						downsamplingMenu
 					}
 				}
 			};
