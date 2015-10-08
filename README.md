@@ -7,13 +7,16 @@ Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android 
 
 **Xamarin.Forms NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
 
+**Xamarin.Transformations NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Transformations/
+This package contains image transformations (see below).
+
 <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="150"/></a>
 
 **Xamarin.Forms Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample) and **Android Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample)
 
 ## Features
 
-- Xamarin.iOS, Xamarin.Android, Xamarin.Forms support (PCL compatible)
+- Xamarin.iOS (min iOS 7), Xamarin.Android (min Android 4), Xamarin.Forms support (PCL compatible)
 - Configurable disk and memory caching
 - Deduplication of similar download/load requests
 - Error and loading placeholders support
@@ -30,9 +33,6 @@ Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android 
   - RoundedTransformation
   - SepiaTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
-
-### Minimum OS version
-The library works starting from Android 4 and iOS 7.
 
 ### History
 We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused. We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
