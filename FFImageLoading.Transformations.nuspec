@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>Xamarin.FFImageLoading.Transformations</id>
-       <version>1.1.7-alpha6</version>
+       <version>1.1.7</version>
        <title>FFImageLoading image transformations</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
@@ -22,15 +22,15 @@
        <tags>xamarin, android, ios, bitmap, image, webp, transformation, blur, round, circle</tags>
        <dependencies>
           <group targetFramework="portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha6" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
           </group>
 
           <group targetFramework="MonoAndroid10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha6" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7-alpha6" />
+            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
           </group>
         </dependencies>
    </metadata>
