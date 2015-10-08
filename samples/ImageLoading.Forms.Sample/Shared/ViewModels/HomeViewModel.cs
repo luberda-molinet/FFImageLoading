@@ -21,6 +21,9 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 			OpenTransformationsExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<TransformationExampleViewModel>().PushPage());
+
+			OpenDownsamplingExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<DownsamplingExampleViewModel>().PushPage());
 		}
 
 		public IPageFactoryCommand OpenSimpleExampleCommand { get; private set; }
@@ -32,6 +35,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 		public IPageFactoryCommand OpenPlaceholdersExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenTransformationsExampleCommand { get; private set; }
+
+		public IPageFactoryCommand OpenDownsamplingExampleCommand { get; private set; }
 	}
 }
 

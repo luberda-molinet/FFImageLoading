@@ -17,6 +17,7 @@ Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android 
 - Configurable disk and memory caching
 - Deduplication of similar download/load requests
 - Error and loading placeholders support
+- Images can be automatically downsampled to specified size (less memory usage)
 - WebP support
 - Image loading Fade-In animations support
 - Can retry image downloads (RetryCount, RetryDelay)

@@ -18,8 +18,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				WidthRequest = 200,
 				HeightRequest = 200,
 				CacheDuration = TimeSpan.FromDays(30),
-				DownsampleHeight = 200,
-				RetryCount = 0,
+				RetryCount = 3,
 				RetryDelay = 250,
 				TransparencyEnabled = false,
 			};
