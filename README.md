@@ -1,19 +1,42 @@
 Fast & Furious Image Loading
 ==========================================
 
-Xamarin library to load images quickly & easily on iOS and Android.
+Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android and Xamarin.Forms.
 
-NuGet package is here: https://www.nuget.org/packages/Xamarin.FFImageLoading/
+**iOS / Android NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading/
 
-And here to use it in Xamarin.Forms: https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
+**Xamarin.Forms NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
 
-###Minimum OS version
+<a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="150"/></a>
+
+**Xamarin.Forms Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample) and **Android Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample)
+
+## Features
+
+- Xamarin.iOS, Xamarin.Android, Xamarin.Forms support (PCL compatible)
+- Configurable disk and memory caching
+- Deduplication of similar download/load requests
+- Error and loading placeholders support
+- WebP support
+- Image loading Fade-In animations support
+- Can retry image downloads (RetryCount, RetryDelay)
+- On Android transparency is disabled by default (configurable). Saves 50% of memory
+- Transformations support
+  - BlurredTransformation
+  - CircleTransformation
+  - ColorSpaceTransformation
+  - GrayscaleTransformation
+  - RoundedTransformation
+  - SepiaTransformation
+  - Supports custom transformations (native platform `ITransformation` implementations)
+
+### Minimum OS version
 The library works starting from Android 4 and iOS 7.
 
-###History
+### History
 We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused. We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
 
-###Description
+### Description
 The library offers a Fluent API which is inspired by Picasso naming.
 
 The library automatically deduplicates similar requests: if 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait. When the 1st real read is done then the 99 waiters will get the image.
@@ -22,7 +45,7 @@ Both a memory cache and a disk cache are present.
 
 WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: https://github.com/molinch/WebP.Touch, which are then included as a Nuget dependency. As long as your file ends with .webp it will be handled by the lib.
 
-###Xamarin.Forms
+### Xamarin.Forms
 The Xamarin Forms NuGet package ships FFImageLoading for iOS and Android. Thanks to Daniel Luberda for his help here.
 
 ```C#
@@ -53,22 +76,7 @@ var cachedImage = new CachedImage() {
 };
 ```
 
-#### Transformations support
-
-- RoundedTransformation
-- CircleTransformation
-- GrayscaleTransformation
-
-<img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="200"/> <img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="200"/>
-
-#### Placeholders support
-
-- LoadingPlaceholder
-- ErrorPlaceholder
-
-<img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="200"/> <img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="200"/>
-
-###Android remarks
+### Android remarks
 Unlike Picasso you cannot use FFImageLoading with standard ImageViews. Instead simply load your images into ImageViewAsync instances. Updating your code is very easy since ImageViewAsync inherits from ImageView.
 
 By default, on Android, images are loaded without transparency channel. This allows saving 50% of memory since 1 pixel uses 2 bytes instead of 4 bytes in RGBA.
@@ -76,7 +84,7 @@ By default, on Android, images are loaded without transparency channel. This all
 - Or, per image request, by explicitly setting `TaskParameter.TransparencyChannel(true or false)`
 
 
-###API
+### API
 when you want to load the image from a file:
 ```C#
 ImageService.LoadFile(fullPathToImage).Into(_imageView);
@@ -149,7 +157,7 @@ Original image, prior to transformation, is cached to disk. Transformed image is
 If the same image, with same transformations is requested then it will be loaded from memory.
 For more information about transformations open our sample project.
 
-###Advanced usage
+### Advanced usage
 
 If you don't want to use the Retry() functionality but have your custom error handling/retry logic (for example: because you use Polly). Then you can use IntoAsync() instead of Into()
 ```C#
@@ -195,5 +203,5 @@ _myListView.ScrollStateChanged += (object sender, ScrollStateChangedEventArgs sc
 };
 ```
 
-###Custom loading logic
+### Custom loading logic
 Customizing the loading logic is very easy: inherit from ImageLoaderTask and put your own logic.
