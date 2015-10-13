@@ -3,7 +3,7 @@
    <metadata minClientVersion="2.8.1">
        <id>Xamarin.FFImageLoading</id>
        <version>1.1.7</version>
-       <title>Xamarin library to load images quickly and easily on iOS and Android</title>
+       <title>FFImageLoading Plugin for Xamarin iOS/Android</title>
        <authors>Molinet Fabien</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
