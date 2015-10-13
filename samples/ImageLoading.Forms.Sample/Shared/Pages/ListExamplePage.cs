@@ -16,13 +16,27 @@ namespace FFImageLoading.Forms.Sample.Pages
 			var listView = new ListView() {
 				HorizontalOptions = LayoutOptions.FillAndExpand, 
 				VerticalOptions = LayoutOptions.FillAndExpand,
-				ItemsSource = ViewModel.Items,
 				ItemTemplate = new DataTemplate(typeof(ListExampleCell)),
 				HasUnevenRows = false,
 				RowHeight = 210,
 			};
+			listView.SetBinding<ListExampleViewModel>(ListView.ItemsSourceProperty, v => v.Items);
+			listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
-			Content = listView;
+			var button = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Duplicate list items",
+				Command = ViewModel.DuplicateListItemsCommand
+			};
+
+			Content = new StackLayout() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				VerticalOptions = LayoutOptions.FillAndExpand,
+				Children = {
+					listView, 
+					button,
+				}
+			};
 		}
 
 		class ListExampleCell : ViewCell

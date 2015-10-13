@@ -19,11 +19,12 @@ namespace FFImageLoading.Forms.Sample.Pages
 			var listView = new ListView() {
 				HorizontalOptions = LayoutOptions.FillAndExpand, 
 				VerticalOptions = LayoutOptions.FillAndExpand,
-				ItemsSource = ViewModel.Items,
 				ItemTemplate = new DataTemplate(typeof(TransformationExampleCell)),
 				HasUnevenRows = false,
 				RowHeight = 210,
 			};
+			listView.SetBinding<ListTransformationExampleViewModel>(ListView.ItemsSourceProperty, v => v.Items);
+			listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
 			Content = listView;
 		}

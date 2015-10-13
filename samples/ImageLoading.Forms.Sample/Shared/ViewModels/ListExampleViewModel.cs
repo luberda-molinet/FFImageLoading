@@ -2,6 +2,7 @@
 using DLToolkit.PageFactory;
 using System.Collections.ObjectModel;
 using FFImageLoading.Forms.Sample.Models;
+using System.Linq;
 
 namespace FFImageLoading.Forms.Sample.ViewModels
 {
@@ -10,6 +11,10 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 		public ListExampleViewModel()
 		{
 			GenerateSampleData();
+
+			DuplicateListItemsCommand = new PageFactoryCommand(() => {
+				Items = new ObservableCollection<ListExampleItem>(Items.Concat(Items));
+			});
 		}
 
 		public ObservableCollection<ListExampleItem> Items {
@@ -64,6 +69,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				Items.Add(item);
 			}
 		}
+
+		public IPageFactoryCommand DuplicateListItemsCommand { get; private set; }
 	}
 }
 
