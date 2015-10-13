@@ -60,22 +60,11 @@ namespace FFImageLoading.Forms.Droid
 			UpdateAspect();
 		}
 			
-		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
-		ImageSourceBinding lastImageSource = null; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				fixLastCount++;
-
-				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
-
-				if (ffSource == null || !ffSource.Equals(lastImageSource) || fixLastCount > 1)
-				{
-					fixLastCount = 0;
-					lastImageSource = ffSource;
-					UpdateBitmap(null);	
-				}
+				UpdateBitmap(null);	
 			}
 			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{

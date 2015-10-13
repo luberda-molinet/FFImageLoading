@@ -65,23 +65,12 @@ namespace FFImageLoading.Forms.Touch
 			}
 			base.OnElementChanged(e);
 		}
-
-		int fixLastCount = 0; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
-		ImageSourceBinding lastImageSource = null; // TODO TEMPORARY FIX (https://bugzilla.xamarin.com/show_bug.cgi?id=34531)
+			
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				fixLastCount++;
-
-				var ffSource = ImageSourceBinding.GetImageSourceBinding(Element.Source);
-
-				if (ffSource == null || !ffSource.Equals(lastImageSource) || fixLastCount > 1)
-				{
-					fixLastCount = 0;
-					lastImageSource = ffSource;
-					SetImage(null);
-				}
+				SetImage(null);
 			}
 			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
 			{
