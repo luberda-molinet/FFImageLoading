@@ -11,7 +11,7 @@ using Android.Views;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
-using ImageLoading.Sample.Transformations;
+using FFImageLoading.Transformations;
 
 namespace ImageLoading.Sample
 {
@@ -47,7 +47,7 @@ namespace ImageLoading.Sample
 			ImageService.LoadUrl(image)
                 .Retry(3, 200)
                 .DownSample(500, 500)
-                .Transform(new BlurTransformation(this))
+                .Transform(new BlurredTransformation(10))
 				.LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
 				.ErrorPlaceholder(Config.ErrorPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
                 .Into(backgroundImage);

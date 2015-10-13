@@ -12,7 +12,7 @@ using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using FFImageLoading.Work;
-using ImageLoading.Sample.Transformations;
+using FFImageLoading.Transformations;
 
 namespace ImageLoading.Sample
 {
@@ -41,7 +41,7 @@ namespace ImageLoading.Sample
 			ImageService.LoadUrl(urlToImage)
 				.Retry(3, 200)
 				.DownSample(300, 300)
-				.Transform(new CropCircleTransformation())
+				.Transform(new CircleTransformation())
 				.Transform(new GrayscaleTransformation())
 				.LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
 				.ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)

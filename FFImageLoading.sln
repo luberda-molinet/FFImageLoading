@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Touc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B48F3C95-B33F-4EF5-B223-06356D749A80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLoading.Sample", "samples\ImageLoading.Sample\ImageLoading.Sample.csproj", "{F898A684-E9C1-4154-9F80-6037287233F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Android.Sample", "samples\ImageLoading.Sample\Simple.Android.Sample.csproj", "{F898A684-E9C1-4154-9F80-6037287233F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Sample.Droid", "samples\ImageLoading.Forms.Sample\Droid\FFImageLoading.Forms.Sample.Droid.csproj", "{9F816002-DBA1-4175-A0CA-0DFD9E086786}"
 EndProject
