@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -39,15 +39,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Cache\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Work\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Config\" />
-    <Folder Include="Work\DataResolver\" />
-    <Folder Include="Transformations\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />

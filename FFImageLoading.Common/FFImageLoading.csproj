@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -33,6 +33,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\IMainThreadDispatcher.cs" />
     <Compile Include="Helpers\IMiniLogger.cs" />
+    <Compile Include="Helpers\IImageCacheHelper.cs" />
     <Compile Include="Work\IImageLoaderTask.cs" />
     <Compile Include="Config\Configuration.cs" />
     <Compile Include="Cache\IDownloadCache.cs" />
@@ -53,13 +54,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Work\" />
-    <Folder Include="Config\" />
-    <Folder Include="Cache\" />
-    <Folder Include="Transformations\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
