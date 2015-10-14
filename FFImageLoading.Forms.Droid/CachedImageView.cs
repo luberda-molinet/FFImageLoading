@@ -8,8 +8,6 @@ namespace FFImageLoading.Forms.Droid
 {
 	public class CachedImageView : ImageViewAsync
 	{
-		private bool _skipInvalidate;
-
 		public CachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
 		{
 		}
@@ -29,22 +27,6 @@ namespace FFImageLoading.Forms.Droid
 		public CachedImageView(Context context, IAttributeSet attrs, System.Drawing.SizeF? predefinedStyle) : base(context, attrs, predefinedStyle)
 		{
 		}
-
-		public override void Invalidate()
-		{
-			if (this._skipInvalidate)
-			{
-				this._skipInvalidate = false;
-				return;
-			}
-			base.Invalidate();
-		}
-
-		public void SkipInvalidate()
-		{
-			this._skipInvalidate = true;
-		}
 	}
-
 }
 

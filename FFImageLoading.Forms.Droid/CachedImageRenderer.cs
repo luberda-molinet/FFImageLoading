@@ -9,10 +9,6 @@ using FFImageLoading.Forms.Droid;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using FFImageLoading.Views;
-using System.Collections.Generic;
-using FFImageLoading.Transformations;
-using Android.Content;
-using FFImageLoading.Work;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -89,15 +85,13 @@ namespace FFImageLoading.Forms.Droid
 			if (previous == null || !object.Equals(previous.Source, Element.Source))
 			{
 				Xamarin.Forms.ImageSource source = Element.Source;
+				CachedImageView formsImageView = Control as CachedImageView;
 
+				if (formsImageView == null)
+					return;
+					
 				((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
-				CachedImageView formsImageView = Control as CachedImageView;
-				if (formsImageView != null)
-				{
-					formsImageView.SkipInvalidate();
-				}
-					
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
 					TaskParameter imageLoader = null;
@@ -180,6 +174,7 @@ namespace FFImageLoading.Forms.Droid
 						}
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));
+
 						imageLoader.Into(Control);	
 					}
 				}
