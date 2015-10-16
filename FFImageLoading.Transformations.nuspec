@@ -4,7 +4,7 @@
        <id>Xamarin.FFImageLoading.Transformations</id>
        <version>1.1.7</version>
        <title>FFImageLoading image transformations</title>
-       <authors>Molinet Fabien</authors>
+       <authors>Molinet Fabien, Daniel Luberda</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
        <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>

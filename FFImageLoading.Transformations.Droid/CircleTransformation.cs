@@ -17,8 +17,7 @@ namespace FFImageLoading.Transformations
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			int size = Math.Min(source.Width, source.Height);
-			return RoundedTransformation.ToRounded(source, size / 2);
+			return RoundedTransformation.ToRounded(source, 0f, 1f, 1f);
 		}
 	}
 }

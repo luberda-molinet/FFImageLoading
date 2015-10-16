@@ -18,8 +18,7 @@ namespace FFImageLoading.Transformations
 
 		protected override UIImage Transform(UIImage source)
 		{
-			double size = Math.Min(source.Size.Width, source.Size.Height);
-			return RoundedTransformation.ToRounded(source, (nfloat)(size / 2));
+			return RoundedTransformation.ToRounded(source, 0f, 1f, 1f);
 		}
 	}
 }
