@@ -46,6 +46,10 @@
     <Compile Include="GrayscaleTransformation.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
+    <Compile Include="FlipTransformation.cs" />
+    <Compile Include="..\FFImageLoading.Transformations\FlipType.cs">
+      <Link>FlipType.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
