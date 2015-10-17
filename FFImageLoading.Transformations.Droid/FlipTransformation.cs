@@ -1,6 +1,7 @@
 ﻿using System;
 using FFImageLoading.Work;
 using Android.Graphics;
+using Android.Util;
 
 namespace FFImageLoading.Transformations
 {
@@ -23,13 +24,24 @@ namespace FFImageLoading.Transformations
 			switch (_flipType)
 			{
 				case FlipType.Vertical:
-					throw new NotImplementedException();
+					return Flip(source, 1, -1);
 
 				case FlipType.Horizontal:
-					throw new NotImplementedException();
+					return Flip(source, -1, 1);
 
 				default:
 					throw new Exception("Invalid FlipType");
+			}
+		}
+
+		private Bitmap Flip(Bitmap source, int sx, int sy)
+		{
+			using (Matrix matrix = new Matrix())
+			{
+				matrix.PreScale(sx, sy);
+				Bitmap output = Bitmap.CreateBitmap(source, 0, 0, source.Width, source.Height, matrix, false);
+				output.Density = (int)DisplayMetricsDensity.Default;
+				return output;
 			}
 		}
 	}
