@@ -50,6 +50,10 @@
     <Compile Include="GrayscaleTransformation.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
+    <Compile Include="..\FFImageLoading.Transformations\FlipType.cs">
+      <Link>FlipType.cs</Link>
+    </Compile>
+    <Compile Include="FlipTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

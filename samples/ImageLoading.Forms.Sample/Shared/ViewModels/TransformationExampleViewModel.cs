@@ -16,7 +16,7 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 			BlurredTransformationExampleCommand = new PageFactoryCommand(() => {
 				Transformations = new List<ITransformation>() { 
-					new BlurredTransformation(10) 
+					new BlurredTransformation(10)
 				};
 				ImagePath = GetRandomImageUrl();
 			});
