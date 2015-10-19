@@ -74,9 +74,6 @@
     <Reference Include="FFImageLoading">
       <HintPath>..\..\..\packages\Xamarin.FFImageLoading.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Transformations.dll</HintPath>
     </Reference>
-    <Reference Include="FFImageLoading">
-      <HintPath>..\..\..\packages\Xamarin.FFImageLoading.Forms.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Forms.dll</HintPath>
-    </Reference>
     <ProjectReference Include="..\..\..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>

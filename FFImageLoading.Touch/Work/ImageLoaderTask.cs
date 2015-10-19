@@ -14,7 +14,7 @@ namespace FFImageLoading.Work
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
 		private readonly Func<UIView> _getNativeControl;
-		private readonly Action<UIImage> _doWithImage;
+		private readonly Action<UIImage, bool> _doWithImage;
 		private readonly nfloat _imageScale;
 
 		private static nfloat _screenScale;
@@ -24,7 +24,7 @@ namespace FFImageLoading.Work
 			_screenScale = UIScreen.MainScreen.Scale;
 		}
 
-		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage> doWithImage, nfloat imageScale)
+		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
 			_getNativeControl = getNativeControl;
@@ -110,7 +110,7 @@ namespace FFImageLoading.Work
 						if (CancellationToken.IsCancellationRequested)
 							return;
 
-						_doWithImage(image);
+						_doWithImage(image, false);
 						Completed = true;
 						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
@@ -145,6 +145,15 @@ namespace FFImageLoading.Work
 				if (nativeControl == null)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
+				if(Parameters.Source == ImageSource.ApplicationBundle) {
+					await MainThreadDispatcher.PostAsync(() =>
+						{
+							_doWithImage(UIImage.FromBundle(Parameters.Path), true);
+						}).ConfigureAwait(false);
+
+					return CacheResult.Found;
+				}
+
 	            var value = ImageCache.Instance.Get(GetKey());
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
@@ -154,7 +163,7 @@ namespace FFImageLoading.Work
 
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						_doWithImage(value);
+						_doWithImage(value, true);
 					}).ConfigureAwait(false);
 
 				if (IsCancelled)
@@ -198,7 +207,8 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("Unable to retrieve image data", ex);
+				var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
+				Logger.Error(message, ex);
 				Parameters.OnError(ex);
 				return null;
 			}
@@ -260,6 +270,20 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
+			if (source == ImageSource.ApplicationBundle)
+			{
+				// Post on main thread but don't wait for it
+				MainThreadDispatcher.Post(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						_doWithImage(UIImage.FromBundle(placeholderPath), true);
+					});
+
+				return true;
+			}
+
 			UIImage image = ImageCache.Instance.Get(GetKey(placeholderPath));
 			if (image == null)
 			{
@@ -291,7 +315,7 @@ namespace FFImageLoading.Work
 					if (CancellationToken.IsCancellationRequested)
 						return;
 				
-					_doWithImage(image);
+					_doWithImage(image, false);
 				});
 
 			return true;

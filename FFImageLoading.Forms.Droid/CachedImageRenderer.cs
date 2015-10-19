@@ -27,6 +27,7 @@ namespace FFImageLoading.Forms.Droid
 		}
 
 		private bool _isDisposed;
+		private IScheduledWork _currentTask;
 
 		public CachedImageRenderer()
 		{
@@ -50,8 +51,13 @@ namespace FFImageLoading.Forms.Droid
 			{
 				CachedImageView nativeControl = new CachedImageView(Context);
 				SetNativeControl(nativeControl);
+			} else {
+				e.OldElement.Cancelled -= Cancel;
 			}
-
+			if (e.NewElement != null)
+			{
+				e.NewElement.Cancelled += Cancel;
+			}
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
 		}
@@ -175,7 +181,7 @@ namespace FFImageLoading.Forms.Droid
 
 						imageLoader.Finish((work) => ImageLoadingFinished(Element));
 
-						imageLoader.Into(Control);	
+						_currentTask = imageLoader.Into(Control);	
 					}
 				}
 			}
@@ -187,6 +193,13 @@ namespace FFImageLoading.Forms.Droid
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();	
+			}
+		}
+
+		public void Cancel(object sender, EventArgs args)
+		{
+			if (_currentTask != null && !_currentTask.IsCancelled) {
+				_currentTask.Cancel ();
 			}
 		}
 	}
