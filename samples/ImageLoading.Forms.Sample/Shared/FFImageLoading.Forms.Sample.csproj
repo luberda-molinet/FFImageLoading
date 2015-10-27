@@ -48,6 +48,7 @@
     <Compile Include="Pages\DownsamplingExamplePage.cs" />
     <Compile Include="ViewModels\DownsamplingExampleViewModel.cs" />
     <Compile Include="ViewModels\BaseExampleViewModel.cs" />
+    <Compile Include="Models\MenuItem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
@@ -73,9 +74,6 @@
     </Reference>
     <Reference Include="FFImageLoading">
       <HintPath>..\..\..\packages\Xamarin.FFImageLoading.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Transformations.dll</HintPath>
-    </Reference>
-    <Reference Include="FFImageLoading">
-      <HintPath>..\..\..\packages\Xamarin.FFImageLoading.Forms.1.1.7-alpha5\lib\portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Forms.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\..\..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
