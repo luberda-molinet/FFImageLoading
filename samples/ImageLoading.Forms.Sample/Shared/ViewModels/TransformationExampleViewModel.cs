@@ -6,7 +6,7 @@ using FFImageLoading.Transformations;
 
 namespace FFImageLoading.Forms.Sample.ViewModels
 {
-	public class TransformationExampleViewModel : PlaceholdersExampleViewModel
+	public class TransformationExampleViewModel : BaseExampleViewModel
 	{
 		public TransformationExampleViewModel()
 		{
@@ -14,55 +14,103 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			LoadingImagePath = "loading.png";
 			Transformations = null;
 
-			BlurredTransformationExampleCommand = new PageFactoryCommand(() => {
-				Transformations = new List<ITransformation>() { 
-					new BlurredTransformation(10)
-				};
+			LoadAnotherImageCommand = new PageFactoryCommand(() => {
 				ImagePath = GetRandomImageUrl();
 			});
+		}
 
-			CircleTransformationExampleCommand = new PageFactoryCommand(() => {
+		public void ReloadTransformation(Type transformationType)
+		{
+			// CircleTransformation
+			if (transformationType == typeof(CircleTransformation))
+			{
 				Transformations = new List<ITransformation>() { 
 					new CircleTransformation() 
 				};
-				ImagePath = GetRandomImageUrl();
-			});
+			}
 
-			ColorSpaceTransformationExampleCommand = new PageFactoryCommand(() => {
-				Transformations = new List<ITransformation>() { 
-					new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix) 
-				};
-				ImagePath = GetRandomImageUrl();
-			});
-
-			GrayscaleTransformationExampleCommand = new PageFactoryCommand(() => {
-				Transformations = new List<ITransformation>() { 
-					new GrayscaleTransformation() 
-				};
-				ImagePath = GetRandomImageUrl();
-			});
-
-			RoundedTransformationExampleCommand = new PageFactoryCommand(() => {
+			// RoundedTransformation
+			if (transformationType == typeof(RoundedTransformation))
+			{
 				Transformations = new List<ITransformation>() { 
 					new RoundedTransformation(30) 
 				};
-				ImagePath = GetRandomImageUrl();
-			});
+			}
 
-			SepiaTransformationExampleCommand = new PageFactoryCommand(() => {
+			// CornersTransformation
+			if (transformationType == typeof(CornersTransformation))
+			{
 				Transformations = new List<ITransformation>() { 
-					new SepiaTransformation() 
+					new CornersTransformation(50, 0, 20, 30, 
+						CornerTransformType.TopLeftCut | CornerTransformType.BottomLeftRounded | CornerTransformType.BottomRightCut)
 				};
-				ImagePath = GetRandomImageUrl();
-			});
+			}
 
-			MultipleTransformationExampleCommand = new PageFactoryCommand(() => {
+			// GrayscaleTransformation
+			if (transformationType == typeof(GrayscaleTransformation))
+			{
 				Transformations = new List<ITransformation>() { 
-					new ColorSpaceTransformation(FFColorMatrix.BlackAndWhiteColorMatrix), 
-					new CircleTransformation() 
+					new GrayscaleTransformation()
 				};
-				ImagePath = GetRandomImageUrl();
-			});
+			}
+
+			// BlurredTransformation
+			if (transformationType == typeof(BlurredTransformation))
+			{
+				Transformations = new List<ITransformation>() { 
+					new BlurredTransformation(15)
+				};
+			}
+
+			// SepiaTransformation
+			if (transformationType == typeof(SepiaTransformation))
+			{
+				Transformations = new List<ITransformation>() { 
+					new SepiaTransformation()
+				};
+			}
+
+			// ColorSpaceTransformation
+			if (transformationType == typeof(ColorSpaceTransformation))
+			{
+				Transformations = new List<ITransformation>() { 
+					new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix)
+				};
+			}
+
+			// FlipTransformation
+			if (transformationType == typeof(FlipTransformation))
+			{
+				Transformations = new List<ITransformation>() { 
+					new FlipTransformation(FlipType.Vertical)
+				};
+			}
+
+			// MultipleTransformationsExample
+			if (transformationType == null)
+			{
+				Transformations = new List<ITransformation>() {
+					new CircleTransformation(),
+					new ColorSpaceTransformation(FFColorMatrix.BlackAndWhiteColorMatrix),
+				};
+
+				TransformationType = "Multiple: CircleTransformation and ColorSpaceTransformation";
+			}
+			else
+			{
+				TransformationType = transformationType.Name;
+			}
+
+			ImagePath = GetRandomImageUrl();	
+		}
+
+		public override void PageFactoryMessageReceived(string message, object sender, object arg)
+		{
+			if (message == "LoadTransformation")
+			{
+				var transformationType = arg as Type;
+				ReloadTransformation(transformationType);
+			}
 		}
 
 		public List<ITransformation> Transformations {
@@ -70,19 +118,27 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			set { SetField(value); }
 		}
 
-		public IPageFactoryCommand BlurredTransformationExampleCommand { get; private set; }
+		public string ImagePath {
+			get { return GetField<string>(); }
+			set { SetField(value); }
+		}
 
-		public IPageFactoryCommand CircleTransformationExampleCommand { get; private set; }
+		public string TransformationType {
+			get { return GetField<string>(); }
+			set { SetField(value); }
+		}
 
-		public IPageFactoryCommand ColorSpaceTransformationExampleCommand { get; private set; }
+		public string ErrorImagePath {
+			get { return GetField<string>(); }
+			set { SetField(value); }
+		}
 
-		public IPageFactoryCommand GrayscaleTransformationExampleCommand { get; private set; }
+		public string LoadingImagePath {
+			get { return GetField<string>(); }
+			set { SetField(value); }
+		}
 
-		public IPageFactoryCommand RoundedTransformationExampleCommand { get; private set; }
-
-		public IPageFactoryCommand SepiaTransformationExampleCommand { get; private set; }
-
-		public IPageFactoryCommand MultipleTransformationExampleCommand { get; private set; }
+		public IPageFactoryCommand LoadAnotherImageCommand { get; private set; }
 	}
 }
 
