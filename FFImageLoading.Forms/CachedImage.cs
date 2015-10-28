@@ -367,30 +367,6 @@ namespace FFImageLoading.Forms
 			} 
 			return new SizeRequest(new Size(num3, num4));
 		}
-
-//		private void OnSourceChanged(object sender, EventArgs eventArgs)
-//		{
-//			base.OnPropertyChanged(Image.SourceProperty.PropertyName);
-//			this.InvalidateMeasure();
-//		}
-
-//		private void OnSourcePropertyChanged(ImageSource oldvalue, ImageSource newvalue)
-//		{
-//			if (newvalue != null)
-//			{
-//				newvalue.SourceChanged += new EventHandler(this.OnSourceChanged);
-//				BindableObject.SetInheritedBindingContext(newvalue, base.BindingContext);
-//			}
-//			this.InvalidateMeasure();
-//		}
-//
-//		private void OnSourcePropertyChanging(ImageSource oldvalue, ImageSource newvalue)
-//		{
-//			if (oldvalue != null)
-//			{
-//				oldvalue.SourceChanged -= new EventHandler(this.OnSourceChanged);
-//			}
-//		}
 	}
 }
 

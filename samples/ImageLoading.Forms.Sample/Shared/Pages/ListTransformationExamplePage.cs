@@ -46,9 +46,10 @@ namespace FFImageLoading.Forms.Sample.Pages
 					Transformations = new List<ITransformation>() {
 						// new SepiaTransformation(),
 						// new ColorSpaceTransformation(FFColorMatrix.InvertColorMatrix),
-						new BlurredTransformation(10),
+						// new BlurredTransformation(10),
 						new GrayscaleTransformation(),
-						new RoundedTransformation(40),
+						new RoundedTransformation(60),
+						// new CornersTransformation(50, 50, 50, 50, CornerTransformType.AllRounded),
 					}
 				};
 				image.SetBinding<ListExampleItem>(CachedImage.SourceProperty, v => v.ImageUrl);

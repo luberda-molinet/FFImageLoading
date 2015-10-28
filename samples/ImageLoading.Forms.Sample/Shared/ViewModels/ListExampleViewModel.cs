@@ -10,11 +10,15 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 	{
 		public ListExampleViewModel()
 		{
-			GenerateSampleData();
-
 			DuplicateListItemsCommand = new PageFactoryCommand(() => {
-				Items = new ObservableCollection<ListExampleItem>(Items.Concat(Items));
+				Items = new ObservableCollection<ListExampleItem>(Items.Concat(GenerateSampleData()));
 			});
+		}
+
+		public override void PageFactoryMessageReceived(string message, object sender, object arg)
+		{
+			if (message == "Reload")
+				Items = GenerateSampleData();
 		}
 
 		public ObservableCollection<ListExampleItem> Items {
@@ -22,9 +26,9 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			set { SetField(value); }
 		}
 
-		void GenerateSampleData()
+		ObservableCollection<ListExampleItem> GenerateSampleData()
 		{
-			Items = new ObservableCollection<ListExampleItem>();
+			var list = new ObservableCollection<ListExampleItem>();
 
 			string[] images = {
 				"https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg",
@@ -66,8 +70,10 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					FileName = string.Format("image{0}.jpeg", i + 1),
 				};
 
-				Items.Add(item);
+				list.Add(item);
 			}
+
+			return list;
 		}
 
 		public IPageFactoryCommand DuplicateListItemsCommand { get; private set; }

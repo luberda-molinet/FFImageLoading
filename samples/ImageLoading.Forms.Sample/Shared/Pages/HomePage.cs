@@ -3,6 +3,7 @@
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
 using FFImageLoading.Forms.Sample.ViewModels;
+using System.Threading.Tasks;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
@@ -12,62 +13,26 @@ namespace FFImageLoading.Forms.Sample.Pages
 		{
 			Title = "FFImageLoading Sample";
 
-			var simpleMenu = new Button() {
+			var menuListView = new ListView() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Simple Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenSimpleExampleCommand
+				VerticalOptions = LayoutOptions.FillAndExpand,	
+				RowHeight = 60,
+				ItemTemplate = new DataTemplate(() => {
+					var cell = new TextCell();
+					cell.SetBinding<Models.MenuItem>(TextCell.TextProperty, v => v.Title);
+					cell.SetBinding<Models.MenuItem>(TextCell.DetailProperty, v => v.Detail);
+					cell.SetBinding<Models.MenuItem>(TextCell.CommandProperty, v => v.Command);
+					cell.SetBinding<Models.MenuItem>(TextCell.CommandParameterProperty, v => v.CommandParameter);
+					return cell;
+				}),
+				IsGroupingEnabled = true,
+				GroupDisplayBinding = new Binding("Key"),
 			};
 
-			var listMenu = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "List Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenListExampleCommand
-			};
+			menuListView.ItemSelected += (sender, e) => { menuListView.SelectedItem = null; };
+			menuListView.SetBinding<HomeViewModel>(ListView.ItemsSourceProperty, v => v.MenuItems);
 
-			var listTransformationsMenu = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "List Transformations Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenListTransformationsExampleCommand
-			};
-
-			var placeholdersMenu = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Placeholders Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenPlaceholdersExampleCommand
-			};
-
-			var transformationsMenu = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Transformations Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenTransformationsExampleCommand
-			};
-
-			var downsamplingMenu = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Downsampling Example",
-				HeightRequest = 80,
-				Command = ViewModel.OpenDownsamplingExampleCommand
-			};
-
-			Content = new ScrollView() {
-				Content = new StackLayout { 
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					VerticalOptions = LayoutOptions.FillAndExpand,
-					Children = {
-						simpleMenu,
-						listMenu,
-						listTransformationsMenu,
-						placeholdersMenu,
-						transformationsMenu,
-						downsamplingMenu
-					}
-				}
-			};
+			Content = menuListView;
 		}
 	}
 }

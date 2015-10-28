@@ -13,8 +13,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 			Title = "Downsampling example";
 
 			var cachedImage = new CachedImage() {
-				HorizontalOptions = LayoutOptions.Center,
-				VerticalOptions = LayoutOptions.Center,
+				HorizontalOptions = LayoutOptions.FillAndExpand,
 				CacheDuration = TimeSpan.FromDays(30),
 			};
 
@@ -36,15 +35,15 @@ namespace FFImageLoading.Forms.Sample.Pages
 
 			var imagePath = new Label() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
-				FontSize = 9,
+				FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
 			};
 			imagePath.SetBinding<DownsamplingExampleViewModel>(Label.TextProperty, v => v.ImagePath);
 
 			Content = new ScrollView() {
 				Content = new StackLayout { 
 					Children = {
-						imagePath,
 						cachedImage,
+						imagePath,
 						button1, 
 						button2, 
 					}

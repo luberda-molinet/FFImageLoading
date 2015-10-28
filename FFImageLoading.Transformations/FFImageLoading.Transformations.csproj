@@ -40,6 +40,8 @@
     <Compile Include="SepiaTransformation.cs" />
     <Compile Include="FlipTransformation.cs" />
     <Compile Include="FlipType.cs" />
+    <Compile Include="CornersTransformation.cs" />
+    <Compile Include="CornerTransformType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

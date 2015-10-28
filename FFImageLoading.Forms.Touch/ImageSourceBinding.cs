@@ -1,5 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
+using System.IO;
 
 namespace FFImageLoading.Forms.Touch
 {
@@ -31,6 +32,9 @@ namespace FFImageLoading.Forms.Touch
 			var fileImageSource = source as FileImageSource;
 			if (fileImageSource != null)
 			{
+				if (File.Exists(fileImageSource.File))
+					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
+				
 				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileImageSource.File);
 			}
 

@@ -18,8 +18,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				WidthRequest = 200,
 				HeightRequest = 200,
 				CacheDuration = TimeSpan.FromDays(30),
-				RetryCount = 3,
-				RetryDelay = 250,
+				RetryCount = 0,
 				TransparencyEnabled = false,
 			};
 			cachedImage.SetBinding<PlaceholdersExampleViewModel>(CachedImage.LoadingPlaceholderProperty, v => v.LoadingImagePath);

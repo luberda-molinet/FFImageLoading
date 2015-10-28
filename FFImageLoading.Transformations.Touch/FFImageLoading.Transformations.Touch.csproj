@@ -6,7 +6,7 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading.Transformations.Touch</RootNamespace>
+    <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
   </PropertyGroup>
@@ -49,6 +49,10 @@
     <Compile Include="FlipTransformation.cs" />
     <Compile Include="..\FFImageLoading.Transformations\FlipType.cs">
       <Link>FlipType.cs</Link>
+    </Compile>
+    <Compile Include="CornersTransformation.cs" />
+    <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
+      <Link>CornerTransformType.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

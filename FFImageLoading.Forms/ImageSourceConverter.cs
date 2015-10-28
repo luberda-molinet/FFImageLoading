@@ -17,6 +17,7 @@ namespace FFImageLoading.Forms
 			{
 				return null;
 			}
+
 			string text = value as string;
 			if (text == null)
 			{
@@ -25,11 +26,13 @@ namespace FFImageLoading.Forms
 					typeof(ImageSource)
 				}));
 			}
+
 			Uri uri;
-			if (!Uri.TryCreate(text, UriKind.Absolute, out uri) || !(uri.Scheme != "file"))
+			if (!Uri.TryCreate(text, UriKind.Absolute, out uri) || uri.Scheme == "file")
 			{
 				return ImageSource.FromFile(text);
 			}
+
 			return ImageSource.FromUri(uri);
 		}
 	}

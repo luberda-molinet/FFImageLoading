@@ -6,14 +6,14 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading.Transformations.Droid</RootNamespace>
+    <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
-    <TargetFrameworkVersion>v5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +54,10 @@
       <Link>FlipType.cs</Link>
     </Compile>
     <Compile Include="FlipTransformation.cs" />
+    <Compile Include="CornersTransformation.cs" />
+    <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
+      <Link>CornerTransformType.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -61,7 +65,6 @@
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
@@ -72,4 +75,5 @@
       <Name>FFImageLoading-contrib.Droid</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
