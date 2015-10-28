@@ -251,6 +251,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Gets or sets the loading placeholder image.
 		/// </summary>
+		[TypeConverter(typeof(ImageSourceConverter))]
 		public ImageSource LoadingPlaceholder
 		{
 			get
@@ -271,6 +272,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Gets or sets the error placeholder image.
 		/// </summary>
+		[TypeConverter(typeof(ImageSourceConverter))]
 		public ImageSource ErrorPlaceholder
 		{
 			get
