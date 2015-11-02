@@ -369,6 +369,15 @@ namespace FFImageLoading.Forms
 			} 
 			return new SizeRequest(new Size(num3, num4));
 		}
+			
+		public event EventHandler Cancelled;
+
+		public void Cancel()
+		{
+			if (this.Cancelled != null) {
+				this.Cancelled (this, EventArgs.Empty);
+			}
+		}
 	}
 }
 

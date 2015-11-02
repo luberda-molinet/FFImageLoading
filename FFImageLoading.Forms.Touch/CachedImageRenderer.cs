@@ -21,6 +21,7 @@ namespace FFImageLoading.Forms.Touch
 	public class CachedImageRenderer : ViewRenderer<CachedImage, UIImageView>
 	{
 		private bool _isDisposed;
+		private IScheduledWork _currentTask;
 
 		/// <summary>
 		///   Used for registration with dependency service
@@ -57,11 +58,17 @@ namespace FFImageLoading.Forms.Touch
 					ClipsToBounds = true
 				});
 			}
+			if (e.OldElement != null)
+			{
+				e.OldElement.Cancelled -= Cancel;
+			}
 			if (e.NewElement != null)
 			{
 				SetAspect();
 				SetImage(e.OldElement);
 				SetOpacity();
+
+				e.NewElement.Cancelled += Cancel;
 			}
 			base.OnElementChanged(e);
 		}
@@ -190,7 +197,7 @@ namespace FFImageLoading.Forms.Touch
 				}
 
 				imageLoader.Finish((work) => ImageLoadingFinished(Element));
-				imageLoader.Into(Control);	
+				_currentTask = imageLoader.Into(Control);	
 			}
 		}
 
@@ -200,6 +207,13 @@ namespace FFImageLoading.Forms.Touch
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();
+			}
+		}
+
+		public void Cancel(object sender, EventArgs args)
+		{
+			if (_currentTask != null && !_currentTask.IsCancelled) {
+				_currentTask.Cancel ();
 			}
 		}
 
