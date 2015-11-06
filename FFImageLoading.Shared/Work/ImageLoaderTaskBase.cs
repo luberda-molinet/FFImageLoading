@@ -129,7 +129,7 @@ namespace FFImageLoading.Work
 						}
 						catch (Exception ex2)
 						{
-							Logger.Error("An error occured", ex);
+							Logger.Error("An error occured", ex2);
 							ex = ex2;
 						}
 					};
