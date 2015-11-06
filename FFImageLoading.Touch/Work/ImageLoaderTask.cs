@@ -8,6 +8,7 @@ using FFImageLoading.IO;
 using Foundation;
 using FFImageLoading.Work.DataResolver;
 using System.Linq;
+using System.IO;
 
 namespace FFImageLoading.Work
 {
@@ -174,7 +175,40 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source)
+		/// <summary>
+		/// Loads the image from given stream asynchronously.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="stream">The stream to get data from.</param>
+		public override async Task<bool> LoadFromStreamAsync(Stream stream)
+		{
+			if (stream == null)
+				return false;
+			
+			var resultWithImage = await GetImageAsync("Stream", ImageSource.Stream, stream).ConfigureAwait(false);
+			if (resultWithImage == null || resultWithImage.Item == null)
+				return false;
+
+			var view = _getNativeControl();
+			if (view == null)
+				return false;
+
+			if (CancellationToken.IsCancellationRequested)
+				return false;
+
+			// Post on main thread but don't wait for it
+			MainThreadDispatcher.Post(() =>
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return;
+
+					_doWithImage(resultWithImage.Item, false);
+				});
+
+			return true;
+		}
+
+		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source, Stream originalStream = null)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -185,15 +219,28 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
+				if (originalStream != null)
 				{
-					var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
-					if (data == null)
-						return null;
+					using (var ms = new MemoryStream())
+					{
+						await originalStream.CopyToAsync(ms).ConfigureAwait(false);
+						bytes = ms.ToArray();
+						path = sourcePath;
+						result = LoadingResult.Stream;
+					}
+				}
+				else
+				{
+					using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
+					{
+						var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
+						if (data == null)
+							return null;
 
-					bytes = data.Data;
-					path = data.ResultIdentifier;
-					result = data.Result;
+						bytes = data.Data;
+						path = data.ResultIdentifier;
+						result = data.Result;
+					}
 				}
 			}
 			catch (System.OperationCanceledException oex)

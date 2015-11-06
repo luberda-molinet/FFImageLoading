@@ -9,7 +9,9 @@ namespace FFImageLoading.Work
 
 		Filepath = 10,
 		ApplicationBundle = 11,
-		CompiledResource = 12
+		CompiledResource = 12,
+
+		Stream = 20
 	}
 
 	public class TaskParameter: IDisposable
