@@ -196,6 +196,11 @@ namespace FFImageLoading.Work
 					result = data.Result;
 				}
 			}
+			catch (System.OperationCanceledException oex)
+			{
+				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
+				return null;
+			}
 			catch (Exception ex)
 			{
 				var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
