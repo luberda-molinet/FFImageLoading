@@ -7,13 +7,19 @@ namespace FFImageLoading.Helpers
     {
         public void Debug(string message)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+			DebugInternal(message);
         }
 
         public void Error(string errorMessage, Exception ex)
         {
             Console.WriteLine(errorMessage + Environment.NewLine + ex.ToString());
         }
+
+		[Conditional("DEBUG")]
+		private void DebugInternal(string message)
+		{
+			System.Diagnostics.Debug.WriteLine(message);
+		}
     }
 }
 

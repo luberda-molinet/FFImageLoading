@@ -199,73 +199,59 @@ namespace FFImageLoading.Work
 			return TryLoadingFromCacheAsync(imageView);
 		}
 
-		/// <summary>
-		/// Tries to load requested image from the cache asynchronously.
-		/// </summary>
-		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		private async Task<CacheResult> TryLoadingFromCacheAsync(ImageView imageView)
+		public async Task<Bitmap> LoadFromStream(Stream stream)
 		{
-			try
-			{
-				if (imageView == null)
-					return CacheResult.NotFound; // weird situation, dunno what to do
+			// Otherwise load image normally
+			var drawableWithResult = await GetDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
+			if (drawableWithResult == null || drawableWithResult.Item == null)
+				return null;
 
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
+			// If we have the bitmap we add it to the cache
+			ImageCache.Instance.Add(GetKey(), drawableWithResult.Item);
 
-				var key = GetKey();
-
-				if (string.IsNullOrWhiteSpace(key))
-					return CacheResult.NotFound;
-
-				var value = ImageCache.Instance.Get(key);
-				if (value == null)
-					return CacheResult.NotFound; // not available in the cache
-
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
-
-				Logger.Debug(string.Format("Image from cache: {0}", key));
-				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (IsCancelled)
-							return;
-
-						var ffDrawable = value as FFBitmapDrawable;
-						if (ffDrawable != null)
-							ffDrawable.StopFadeAnimation();
-
-						imageView.SetImageDrawable(value);
-						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
-						{
-							imageView.LayoutParameters.Height = value.IntrinsicHeight;
-							imageView.LayoutParameters.Width = value.IntrinsicWidth;
-						}
-					}).ConfigureAwait(false);
-
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
-				
-				Completed = true;
-
-				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
-				return CacheResult.Found; // found and loaded from cache
-			}
-			catch (Exception ex)
-			{
-				if (Parameters.OnError != null)
-					Parameters.OnError(ex);
-				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
-			}
+			return drawableWithResult.Item.Bitmap;
 		}
 
-		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder)
+		/// <summary>
+		/// Loads the image from given stream asynchronously.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="stream">The stream to get data from.</param>
+		public override async Task<bool> LoadFromStreamAsync(Stream stream)
+		{
+			if (stream == null)
+				return false;
+
+			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
+			if (resultWithDrawable == null || resultWithDrawable.Item == null)
+				return false;
+
+			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(resultWithDrawable.Item);
+
+			var imageView = GetAttachedImageView();
+			if (imageView == null)
+				return false;
+
+			if (CancellationToken.IsCancellationRequested)
+				return false;
+
+			await MainThreadDispatcher.PostAsync(() =>
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return;
+
+					SetImageDrawable(imageView, resultWithDrawable.Item, false);
+				}).ConfigureAwait(false);
+
+			return true;
+		}
+
+		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, Stream originalStream = null)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async () =>
+			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async() =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
@@ -276,29 +262,47 @@ namespace FFImageLoading.Work
 						InJustDecodeBounds = true
 					};
 
-					var streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-					if (streamWithResult == null || streamWithResult.Item == null)
-						return null;
+					Stream stream = null;
+					WithLoadingResult<Stream> streamWithResult = null;
+					if (originalStream != null)
+					{
+						streamWithResult = new WithLoadingResult<Stream>(originalStream, LoadingResult.Stream);
+					}
+					else
+					{
+						streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
+						if (streamWithResult == null || streamWithResult.Item == null)
+							return null;
 
-					var stream = streamWithResult.Item;
+						stream = streamWithResult.Item;
+					}
 
 					try
 					{
 						try
 						{
-							lock(_decodingLock)
+							lock (_decodingLock)
 							{
 								BitmapFactory.DecodeStream(stream, null, options);
 							}
 
 							if (!stream.CanSeek)
-							{ // Assets stream can't be seeked to origin position
-								stream.Dispose();
-								streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-								stream = streamWithResult == null ? null : streamWithResult.Item;
-
-								if (stream == null)
+							{
+								if (originalStream != null)
+								{
+									// If we cannot seek the original stream then there's not much we can do
 									return null;
+								}
+								else
+								{
+									// Assets stream can't be seeked to origin position
+									stream.Dispose();
+									streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
+									stream = streamWithResult == null ? null : streamWithResult.Item;
+
+									if (stream == null)
+										return null;
+								}
 							}
 							else
 							{
@@ -346,7 +350,7 @@ namespace FFImageLoading.Work
 						Bitmap bitmap;
 						try
 						{
-							lock(_decodingLock)
+							lock (_decodingLock)
 							{
 								bitmap = BitmapFactory.DecodeStream(stream, null, options);
 							}
@@ -420,7 +424,7 @@ namespace FFImageLoading.Work
 						if (stream != null)
 							stream.Dispose();
 					}
-				}).ConfigureAwait(false);
+				});
 		}
 
 		/// <summary>
@@ -484,6 +488,67 @@ namespace FFImageLoading.Work
 			return true;
 		}
 
+		/// <summary>
+		/// Tries to load requested image from the cache asynchronously.
+		/// </summary>
+		/// <returns>A boolean indicating if image was loaded from cache.</returns>
+		private async Task<CacheResult> TryLoadingFromCacheAsync(ImageView imageView)
+		{
+			try
+			{
+				if (imageView == null)
+					return CacheResult.NotFound; // weird situation, dunno what to do
+
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				var key = GetKey();
+
+				if (string.IsNullOrWhiteSpace(key))
+					return CacheResult.NotFound;
+
+				var value = ImageCache.Instance.Get(key);
+				if (value == null)
+					return CacheResult.NotFound; // not available in the cache
+
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				Logger.Debug(string.Format("Image from cache: {0}", key));
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (IsCancelled)
+							return;
+
+						var ffDrawable = value as FFBitmapDrawable;
+						if (ffDrawable != null)
+							ffDrawable.StopFadeAnimation();
+
+						imageView.SetImageDrawable(value);
+						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+						{
+							imageView.LayoutParameters.Height = value.IntrinsicHeight;
+							imageView.LayoutParameters.Width = value.IntrinsicWidth;
+						}
+					}).ConfigureAwait(false);
+
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				Completed = true;
+
+				if (Parameters.OnSuccess != null)
+					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
+				return CacheResult.Found; // found and loaded from cache
+			}
+			catch (Exception ex)
+			{
+				if (Parameters.OnError != null)
+					Parameters.OnError(ex);
+				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
+			}
+		}
+
 		private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
 		{
 			if (string.IsNullOrWhiteSpace(path)) return null;
@@ -494,6 +559,11 @@ namespace FFImageLoading.Work
 				{
 					return await resolver.GetStream(path, CancellationToken.Token).ConfigureAwait(false);
 				}
+			}
+			catch (System.OperationCanceledException oex)
+			{
+				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
+				return null;
 			}
 			catch (Exception ex)
 			{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FFImageLoading.Cache;
+using System.IO;
 
 namespace FFImageLoading.Work
 {
@@ -45,6 +46,13 @@ namespace FFImageLoading.Work
 		/// Cancel current task only if needed
 		/// </summary>
 		void CancelIfNeeded();
+
+		/// <summary>
+		/// Loads the image from given stream asynchronously.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="stream">The stream to get data from.</param>
+		Task<bool> LoadFromStreamAsync(Stream stream);
     }
 }
 

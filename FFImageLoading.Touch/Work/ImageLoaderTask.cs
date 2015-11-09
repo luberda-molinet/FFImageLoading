@@ -8,13 +8,14 @@ using FFImageLoading.IO;
 using Foundation;
 using FFImageLoading.Work.DataResolver;
 using System.Linq;
+using System.IO;
 
 namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
 		private readonly Func<UIView> _getNativeControl;
-		private readonly Action<UIImage> _doWithImage;
+		private readonly Action<UIImage, bool> _doWithImage;
 		private readonly nfloat _imageScale;
 
 		private static nfloat _screenScale;
@@ -24,7 +25,7 @@ namespace FFImageLoading.Work
 			_screenScale = UIScreen.MainScreen.Scale;
 		}
 
-		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage> doWithImage, nfloat imageScale)
+		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
 			_getNativeControl = getNativeControl;
@@ -110,7 +111,7 @@ namespace FFImageLoading.Work
 						if (CancellationToken.IsCancellationRequested)
 							return;
 
-						_doWithImage(image);
+						_doWithImage(image, false);
 						Completed = true;
 						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
@@ -154,7 +155,7 @@ namespace FFImageLoading.Work
 
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						_doWithImage(value);
+						_doWithImage(value, true);
 					}).ConfigureAwait(false);
 
 				if (IsCancelled)
@@ -174,7 +175,40 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source)
+		/// <summary>
+		/// Loads the image from given stream asynchronously.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="stream">The stream to get data from.</param>
+		public override async Task<bool> LoadFromStreamAsync(Stream stream)
+		{
+			if (stream == null)
+				return false;
+			
+			var resultWithImage = await GetImageAsync("Stream", ImageSource.Stream, stream).ConfigureAwait(false);
+			if (resultWithImage == null || resultWithImage.Item == null)
+				return false;
+
+			var view = _getNativeControl();
+			if (view == null)
+				return false;
+
+			if (CancellationToken.IsCancellationRequested)
+				return false;
+
+			// Post on main thread but don't wait for it
+			MainThreadDispatcher.Post(() =>
+				{
+					if (CancellationToken.IsCancellationRequested)
+						return;
+
+					_doWithImage(resultWithImage.Item, false);
+				});
+
+			return true;
+		}
+
+		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source, Stream originalStream = null)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -185,20 +219,39 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
+				if (originalStream != null)
 				{
-					var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
-					if (data == null)
-						return null;
-
-					bytes = data.Data;
-					path = data.ResultIdentifier;
-					result = data.Result;
+					using (var ms = new MemoryStream())
+					{
+						await originalStream.CopyToAsync(ms).ConfigureAwait(false);
+						bytes = ms.ToArray();
+						path = sourcePath;
+						result = LoadingResult.Stream;
+					}
 				}
+				else
+				{
+					using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
+					{
+						var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
+						if (data == null)
+							return null;
+
+						bytes = data.Data;
+						path = data.ResultIdentifier;
+						result = data.Result;
+					}
+				}
+			}
+			catch (System.OperationCanceledException oex)
+			{
+				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
+				return null;
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("Unable to retrieve image data", ex);
+				var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
+				Logger.Error(message, ex);
 				Parameters.OnError(ex);
 				return null;
 			}
@@ -291,7 +344,7 @@ namespace FFImageLoading.Work
 					if (CancellationToken.IsCancellationRequested)
 						return;
 				
-					_doWithImage(image);
+					_doWithImage(image, false);
 				});
 
 			return true;

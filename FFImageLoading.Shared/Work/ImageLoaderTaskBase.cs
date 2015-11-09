@@ -4,6 +4,7 @@ using FFImageLoading.Helpers;
 using System.Threading.Tasks;
 using System.Linq;
 using FFImageLoading.Cache;
+using System.IO;
 
 namespace FFImageLoading.Work
 {
@@ -129,7 +130,7 @@ namespace FFImageLoading.Work
 						}
 						catch (Exception ex2)
 						{
-							Logger.Error("An error occured", ex);
+							Logger.Error("An error occured", ex2);
 							ex = ex2;
 						}
 					};
@@ -164,13 +165,20 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
-
 		/// <summary>
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
 		public abstract Task<CacheResult> TryLoadingFromCacheAsync();
+
+		/// <summary>
+		/// Loads the image from given stream asynchronously.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="stream">The stream to get data from.</param>
+		public abstract Task<bool> LoadFromStreamAsync(Stream stream);
+
+		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 
 		protected string TransformationsKey
 		{

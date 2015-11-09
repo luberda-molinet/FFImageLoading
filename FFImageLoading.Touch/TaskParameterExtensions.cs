@@ -5,6 +5,7 @@ using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using UIKit;
 using CoreAnimation;
+using FFImageLoading.Cache;
 
 
 namespace FFImageLoading
@@ -27,16 +28,15 @@ namespace FFImageLoading
                 return refView;
             };
 
-            Action<UIImage> doWithImage = img => {
+			Action<UIImage, bool> doWithImage = (img, fromCache) => {
                 UIImageView refView = getNativeControl();
                 if (refView == null)
                     return;
 
-
 				var isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ? 
 					parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
 
-				if (isFadeAnimationEnabled)
+				if (isFadeAnimationEnabled && !fromCache)
 				{
 					// fade animation
 					UIView.Transition(refView, 0.4f, UIViewAnimationOptions.TransitionCrossDissolve,
@@ -68,7 +68,7 @@ namespace FFImageLoading
                 return refView;
             };
 
-            Action<UIImage> doWithImage = img => {
+			Action<UIImage, bool> doWithImage = (img, fromCache) => {
                 UIButton refView = getNativeControl();
                 if (refView == null)
                     return;
@@ -101,7 +101,7 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(button, imageScale));
         }
 
-        private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage> doWithImage, float imageScale = -1f)
+        private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, float imageScale = -1f)
         {
             var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
                 getNativeControl, doWithImage, imageScale);
