@@ -21,7 +21,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 				RowHeight = 210,
 			};
 			listView.SetBinding<ListExampleViewModel>(ListView.ItemsSourceProperty, v => v.Items);
-			listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
+
+            if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
+                listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
 			var button = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,

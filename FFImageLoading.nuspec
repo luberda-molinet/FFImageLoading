@@ -4,7 +4,7 @@
        <id>Xamarin.FFImageLoading</id>
        <version>1.1.7</version>
        <title>FFImageLoading Plugin for Xamarin iOS/Android</title>
-       <authors>Molinet Fabien</authors>
+       <authors>Fabien Molinet, Daniel Luberda</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
        <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>

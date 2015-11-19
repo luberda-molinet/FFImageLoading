@@ -254,21 +254,23 @@ namespace FFImageLoading.Cache
             }
         }
 
-		public Stream TryGetStream (string key)
+		public Task<Stream> TryGetStream (string key)
 		{
-			key = SanitizeKey(key);
-			if (!entries.ContainsKey(key))
-				return null;
+			return Task<Stream>.Run(() => {
+				key = SanitizeKey(key);
+				if (!entries.ContainsKey(key))
+					return null;
 
-			try
-			{
-                string filepath = Path.Combine(basePath, key);
-                return FileStore.GetInputStream(filepath);
-            }
-            catch
-			{
-				return null;
-			}
+				try
+				{
+					string filepath = Path.Combine(basePath, key);
+					return FileStore.GetInputStream(filepath);
+				}
+				catch
+				{
+					return null;
+				}	
+			});
 		}
 
         void AppendToJournal (JournalOp op, string key)

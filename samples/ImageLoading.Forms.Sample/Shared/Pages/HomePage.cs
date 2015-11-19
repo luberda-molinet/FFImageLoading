@@ -29,7 +29,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 				GroupDisplayBinding = new Binding("Key"),
 			};
 
-			menuListView.ItemSelected += (sender, e) => { menuListView.SelectedItem = null; };
+            if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
+			    menuListView.ItemSelected += (sender, e) => { menuListView.SelectedItem = null; };
+
 			menuListView.SetBinding<HomeViewModel>(ListView.ItemsSourceProperty, v => v.MenuItems);
 
 			Content = menuListView;

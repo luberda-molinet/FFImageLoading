@@ -50,6 +50,12 @@ namespace FFImageLoading.Forms.Sample.Pages
 				}
 			};
 		}
+
+		protected override void OnDisappearing()
+		{
+			base.OnDisappearing();
+			ViewModel.ImagePath = null;
+		}
 	}
 }
 

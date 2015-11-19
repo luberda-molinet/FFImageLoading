@@ -3,7 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
-	public class RoundedTransformation: ITransformation
+	public class RoundedTransformation : ITransformation
 	{
 		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
 
