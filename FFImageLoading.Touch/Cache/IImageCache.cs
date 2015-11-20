@@ -8,6 +8,7 @@ namespace FFImageLoading.Cache
         UIImage Get(string key);
         void Add(string key, UIImage bitmap);
 		void Clear();
+		void Remove(string key);
     }
 }
 

@@ -44,6 +44,11 @@ namespace FFImageLoading.Cache
             _cache.SetCost(value, new NSString(key), value.GetMemorySize());
         }
 
+		public void Remove(string key)
+		{
+			_cache.RemoveObjectForKey(new NSString(key));
+		}
+
 		public void Clear()
 		{
 			_cache.RemoveAllObjects();

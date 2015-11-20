@@ -241,5 +241,32 @@ namespace FFImageLoading
 			InitializeIfNeeded();
             ImageCache.Instance.Clear();
         }
+
+		/// <summary>
+		/// Invalidates the disk cache.
+		/// </summary>
+		public static void InvalidateDiskCache()
+		{
+			InitializeIfNeeded();
+			Config.DiskCache.Clear();
+		}
+
+		/// <summary>
+		/// Invalidates the cache for given key.
+		/// </summary>
+		public static void Invalidate(string key, CacheType cacheType)
+		{
+			InitializeIfNeeded();
+
+			if (cacheType == CacheType.All || cacheType == CacheType.Memory)
+			{
+				ImageCache.Instance.Remove(key);
+			}
+
+			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
+			{
+				Config.DiskCache.Remove(key);
+			}
+		}
     }
 }

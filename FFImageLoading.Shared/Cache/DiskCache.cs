@@ -22,7 +22,7 @@ using FFImageLoading.Cache;
 
 namespace FFImageLoading.Cache
 {
-    public class DiskCache: IDiskCache
+	public class DiskCache: IDiskCache
     {
         enum JournalOp {
             Created = 'c',
@@ -225,6 +225,29 @@ namespace FFImageLoading.Cache
 				DateTime.UtcNow,
 				duration);
 			entries[key] = new CacheEntry (DateTime.UtcNow, duration);
+		}
+
+		public void Remove(string key)
+		{
+			key = SanitizeKey (key);
+			string filepath = Path.Combine(basePath, key);
+
+			if (File.Exists(filepath))
+				File.Delete(filepath);
+
+			bool existed = entries.ContainsKey (key);
+			if (existed)
+				AppendToJournal(JournalOp.Deleted, key);
+		}
+
+		public void Clear()
+		{
+			lock (lockJournal)
+			{
+				Directory.Delete (basePath, true);
+				Directory.CreateDirectory (basePath);
+				entries.Clear();
+			}
 		}
 
         public async Task<byte[]> TryGetAsync (string key, CancellationToken token)
