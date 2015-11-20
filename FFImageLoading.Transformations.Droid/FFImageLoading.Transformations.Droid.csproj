@@ -58,6 +58,7 @@
     <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
       <Link>CornerTransformType.cs</Link>
     </Compile>
+    <Compile Include="CropTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

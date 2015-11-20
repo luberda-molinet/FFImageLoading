@@ -28,7 +28,7 @@ namespace FFImageLoading.Cache
 		public async Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null)
         {
             string filename = _md5Helper.MD5(url);
-            string filepath = Path.Combine(_diskCache.BasePath, filename);
+            string filepath = _diskCache.BasePath == null ? filename : Path.Combine(_diskCache.BasePath, filename);
 			byte[] data = await _diskCache.TryGetAsync(filename, token).ConfigureAwait(false);
 			if (data != null)
 				return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
@@ -42,8 +42,8 @@ namespace FFImageLoading.Cache
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null)
 		{
 			string filename = _md5Helper.MD5(url);
-			string filepath = Path.Combine(_diskCache.BasePath, filename);
-			var diskStream = _diskCache.TryGetStream(filename);
+			string filepath = _diskCache.BasePath == null ? filename : Path.Combine(_diskCache.BasePath, filename);
+			var diskStream = await _diskCache.TryGetStream(filename);
 			if (diskStream != null)
 				return new CacheStream(diskStream, true);
 

@@ -19,7 +19,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				HeightRequest = 300,
 				CacheDuration = TimeSpan.FromDays(30),
 				DownsampleHeight = 300,
-				RetryCount = 3,
+				RetryCount = 0,
 				RetryDelay = 250,
 				TransparencyEnabled = false,
 				Source = "http://lorempixel.com/output/city-q-c-600-600-5.jpg",

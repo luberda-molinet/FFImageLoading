@@ -13,7 +13,7 @@ namespace FFImageLoading.Cache
 
 		Task<byte[]> TryGetAsync (string key, CancellationToken token);
 
-		Stream TryGetStream (string key);
+		Task<Stream> TryGetStream (string key);
     }
 }
 

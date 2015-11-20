@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("molinef")]
+[assembly: AssemblyCopyright("Fabien Molinet, Daniel Luberda")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

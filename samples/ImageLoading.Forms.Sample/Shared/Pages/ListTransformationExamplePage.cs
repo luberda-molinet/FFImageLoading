@@ -23,8 +23,11 @@ namespace FFImageLoading.Forms.Sample.Pages
 				HasUnevenRows = false,
 				RowHeight = 210,
 			};
+
 			listView.SetBinding<ListTransformationExampleViewModel>(ListView.ItemsSourceProperty, v => v.Items);
-			listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
+
+            if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
+                listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
 			Content = listView;
 		}

@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Runtime.Remoting.Contexts;
 using System;
 using FFImageLoading.Config;
 using FFImageLoading.Work;
 using System.Net.Http;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
-using FFImageLoading.Extensions;
 using System.Threading;
 
 namespace FFImageLoading
@@ -241,12 +239,7 @@ namespace FFImageLoading
 		public static void InvalidateMemoryCache()
 		{
 			InitializeIfNeeded();
-
-			#if __ANDROID__
-			ImageCache.Instance.Clear();
-			#elif __IOS__
-			ImageCache.Instance.Clear();
-			#endif
-		}
+            ImageCache.Instance.Clear();
+        }
     }
 }
