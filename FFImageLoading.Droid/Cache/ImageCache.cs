@@ -125,6 +125,11 @@ namespace FFImageLoading.Cache
 			Put(key, bitmap);
 		}
 
+		public void Remove(string key)
+		{
+			base.Remove(key);
+		}
+
 		public Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options)
 		{
 			Bitmap bitmap = null;

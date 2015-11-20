@@ -14,6 +14,10 @@ namespace FFImageLoading.Cache
 		Task<byte[]> TryGetAsync (string key, CancellationToken token);
 
 		Task<Stream> TryGetStream (string key);
+
+		void Remove (string key);
+
+		void Clear();
     }
 }
 

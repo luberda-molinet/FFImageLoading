@@ -10,6 +10,7 @@ namespace FFImageLoading.Cache
         Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options);
         void Add(string key, BitmapDrawable bitmap);
 		void Clear();
+		void Remove(string key);
     }
 }
 
