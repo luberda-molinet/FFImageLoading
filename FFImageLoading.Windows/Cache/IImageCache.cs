@@ -11,6 +11,7 @@ namespace FFImageLoading.Cache
     {
         WriteableBitmap Get(string key);
         void Add(string key, WriteableBitmap bitmap);
+        void Remove(string key);
         void Clear();
     }
 }

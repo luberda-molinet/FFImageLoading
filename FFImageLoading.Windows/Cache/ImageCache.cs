@@ -83,5 +83,11 @@ namespace FFImageLoading.Cache
             GC.WaitForPendingFinalizers(); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
             GC.Collect();
         }
+
+        public void Remove(string key)
+        {
+            WeakReference<WriteableBitmap> removed;
+            _reusableBitmaps.TryRemove(key, out removed);
+        }
     }
 }

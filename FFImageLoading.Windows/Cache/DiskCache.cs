@@ -407,5 +407,64 @@ namespace FFImageLoading.Cache
                 .Where(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
                 .ToArray());
         }
+
+        public async void Remove(string key)
+        {
+            await isInitialized;
+            await semaphoreSlim.WaitAsync();
+
+            try
+            {
+                CacheEntry oldCacheEntry;
+                if (entries.TryRemove(key, out oldCacheEntry))
+                {
+                    try
+                    {
+                        var file = await cacheFolder.GetFileAsync(key);
+                        await file.DeleteAsync();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+
+        public async void Clear()
+        {
+            await isInitialized;
+            await semaphoreSlim.WaitAsync();
+
+            try
+            {
+                var entriesToRemove = entries.ToList();
+
+                foreach (var kvp in entriesToRemove)
+                {
+                    CacheEntry oldCacheEntry;
+                    if (entries.TryRemove(kvp.Key, out oldCacheEntry))
+                    {
+                        try
+                        {
+                            var file = await cacheFolder.GetFileAsync(kvp.Key);
+                            await file.DeleteAsync();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+                
+                journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting);
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
     }
 }
