@@ -24,9 +24,33 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
-		}
+            CachedImage.CacheCleared += CachedImageCacheCleared;
+            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
+        }
 
-		private bool _isDisposed;
+        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
+        {
+            ImageService.Invalidate(e.Key, e.CacheType);
+        }
+
+        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
+        {
+            switch (e.CacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
+        }
+
+        private bool _isDisposed;
 		private IScheduledWork _currentTask;
 
 		public CachedImageRenderer()

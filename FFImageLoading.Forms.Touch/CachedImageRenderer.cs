@@ -30,9 +30,34 @@ namespace FFImageLoading.Forms.Touch
 		{
 			// needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 			var dummy = new FFImageLoading.Forms.Touch.CachedImageRenderer();
-		}
 
-		protected override void Dispose(bool disposing)
+            CachedImage.CacheCleared += CachedImageCacheCleared;
+            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
+        }
+
+        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
+        {
+            ImageService.Invalidate(e.Key, e.CacheType);
+        }
+
+        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
+        {
+            switch (e.CacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
+        }
+
+        protected override void Dispose(bool disposing)
 		{
 			if (_isDisposed)
 			{

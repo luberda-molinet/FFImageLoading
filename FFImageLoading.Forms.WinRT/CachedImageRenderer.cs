@@ -25,6 +25,31 @@ namespace FFImageLoading.Forms.WinRT
         public static void Init()
         {
             new ImageRenderer();
+
+            CachedImage.CacheCleared += CachedImageCacheCleared;
+            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
+        }
+
+        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
+        {
+            ImageService.Invalidate(e.Key, e.CacheType);
+        }
+
+        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
+        {
+            switch (e.CacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
         }
 
         private bool measured;

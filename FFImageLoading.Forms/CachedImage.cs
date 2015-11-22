@@ -17,7 +17,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Gets or sets the aspect.
 		/// </summary>
-		/// <value>The aspect.</value>
+		/// <value>The aspect.</value> 
 		public Aspect Aspect
 		{
 			get
@@ -372,12 +372,44 @@ namespace FFImageLoading.Forms
 			
 		public event EventHandler Cancelled;
 
+        /// <summary>
+        /// Cancels image loading tasks
+        /// </summary>
 		public void Cancel()
 		{
 			if (this.Cancelled != null) {
 				this.Cancelled (this, EventArgs.Empty);
 			}
 		}
-	}
+
+        public static event EventHandler<CachedImageEvents.CacheClearedEventArgs> CacheCleared;
+
+        /// <summary>
+        /// Clears image cache
+        /// </summary>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static void ClearCache(Cache.CacheType cacheType)
+        {
+            if (CacheCleared != null)
+            {
+                CacheCleared(typeof(CachedImage), new CachedImageEvents.CacheClearedEventArgs(cacheType));
+            }
+        }
+
+        public static event EventHandler<CachedImageEvents.CacheInvalidatedEventArgs> CacheInvalidated;
+
+        /// <summary>
+        /// Invalidates cache for a specified key
+        /// </summary>
+        /// <param name="key">Key to invalidate</param>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static void InvalidateCache(string key, Cache.CacheType cacheType)
+        {
+            if (CacheInvalidated != null)
+            {
+                CacheInvalidated(typeof(CachedImage), new CachedImageEvents.CacheInvalidatedEventArgs(key, cacheType));
+            }
+        }
+    }
 }
 
