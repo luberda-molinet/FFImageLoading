@@ -1,0 +1,24 @@
+﻿<Page
+    x:Class="Simple.WinPhone.Sample.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Simple.WinPhone.Sample"
+    xmlns:ff="using:FFImageLoading"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ff:FFImage Name="image"
+        VerticalAlignment="Stretch" 
+        HorizontalAlignment="Stretch"
+        LoadingPlaceholder="loading.png"
+        ErrorPlaceholder="error.png"
+        CacheDuration="30"
+        RetryCount="3"
+        RetryDelay="250"
+        DownsampleHeight="300"
+        Source="http://lorempixel.com/output/city-q-c-600-600-5.jpg">
+    </ff:FFImage>
+
+</Page>
