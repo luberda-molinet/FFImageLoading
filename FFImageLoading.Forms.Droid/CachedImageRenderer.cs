@@ -9,6 +9,8 @@ using FFImageLoading.Forms.Droid;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using FFImageLoading.Views;
+using FFImageLoading.Helpers;
+using System.Threading;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -131,7 +133,7 @@ namespace FFImageLoading.Forms.Droid
 					if (ffSource == null)
 					{
 						if (Control != null)
-							Control.SetImageDrawable(null);
+							Control.SetImageDrawable(null);	
 						
 						ImageLoadingFinished(Element);
 					}
@@ -150,6 +152,10 @@ namespace FFImageLoading.Forms.Droid
 					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
 					{
 						imageLoader = ImageService.LoadFile(ffSource.Path);
+					}
+					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
+					{
+						imageLoader = ImageService.LoadStream(ffSource.Stream);
 					}
 
 					if (imageLoader != null)

@@ -6,6 +6,8 @@ using System.Net.Http;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
 using System.Threading;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace FFImageLoading
 {
@@ -174,6 +176,12 @@ namespace FFImageLoading
 		{
 			InitializeIfNeeded();
 			return TaskParameter.FromCompiledResource(resourceName);
+		}
+
+		public static TaskParameter LoadStream(Func<CancellationToken, Task<Stream>> stream)
+		{
+			InitializeIfNeeded();
+			return TaskParameter.FromStream(stream);
 		}
 
         /// <summary>

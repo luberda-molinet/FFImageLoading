@@ -69,6 +69,9 @@ namespace FFImageLoading.Work
 		/// <value>The cache key.</value>
 		public virtual string GetKey(string path = null)
 		{
+			if (Parameters.Stream != null)
+				return "Stream" + Parameters.Stream.GetHashCode();
+
 			path = path ?? Parameters.Path;
 			if (string.IsNullOrWhiteSpace(path))
 				return null; // If path is null then something is wrong, we should not append transformations key
@@ -116,39 +119,59 @@ namespace FFImageLoading.Work
 				GenerateResult generatingImageSucceeded = GenerateResult.Failed;
 				Exception ex = null;
 
-				Func<Task> perform = async () =>
+
+				if (Parameters.Stream == null)
+				{
+					Func<Task> perform = async () =>
+						{
+							try
+							{
+								generatingImageSucceeded = await TryGeneratingImageAsync().ConfigureAwait(false);
+							}
+							catch (OutOfMemoryException oom)
+							{
+								Logger.Error("Received an OutOfMemory we will clear the cache", oom);
+								ImageCache.Instance.Clear();
+								ex = oom;
+							}
+							catch (Exception ex2)
+							{
+								Logger.Error("An error occured", ex2);
+								ex = ex2;
+							}
+						};
+
+					await perform().ConfigureAwait(false);
+
+					// Retry logic if needed
+					while (generatingImageSucceeded == GenerateResult.Failed && !IsCancelled && !Completed && NumberOfRetryNeeded > 0)
 					{
-						try
+						int retryNumber = Parameters.RetryCount - NumberOfRetryNeeded;
+						Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryNumber));
+
+						if (Parameters.RetryDelayInMs > 0)
+							await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
+
+						await perform().ConfigureAwait(false);
+						NumberOfRetryNeeded--;
+					}
+				}
+				else
+				{
+					using (var stream = await Parameters.Stream(CancellationToken.Token).ConfigureAwait(false))
+					{
+						try 
 						{
-							generatingImageSucceeded = await TryGeneratingImageAsync().ConfigureAwait(false);
-						}
-						catch (OutOfMemoryException oom)
-						{
-							Logger.Error("Received an OutOfMemory we will clear the cache", oom);
-							ImageCache.Instance.Clear();
-							ex = oom;
-						}
-						catch (Exception ex2)
+							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
+						} 
+						catch (Exception ex2) 
 						{
 							Logger.Error("An error occured", ex2);
 							ex = ex2;
 						}
-					};
-
-				await perform().ConfigureAwait(false);
-
-				// Retry logic if needed
-				while (generatingImageSucceeded == GenerateResult.Failed && !IsCancelled && !Completed && NumberOfRetryNeeded > 0)
-				{
-					int retryNumber = Parameters.RetryCount - NumberOfRetryNeeded;
-					Logger.Debug(string.Format("Retry loading operation for key {0}, trial {1}", GetKey(), retryNumber));
-
-					if (Parameters.RetryDelayInMs > 0)
-						await Task.Delay(Parameters.RetryDelayInMs).ConfigureAwait(false);
-
-					await perform().ConfigureAwait(false);
-					NumberOfRetryNeeded--;
+					}
 				}
+
 
 				if (!IsCancelled && !Completed && generatingImageSucceeded == GenerateResult.Failed)
 				{
@@ -176,7 +199,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public abstract Task<bool> LoadFromStreamAsync(Stream stream);
+		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream);
 
 		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 

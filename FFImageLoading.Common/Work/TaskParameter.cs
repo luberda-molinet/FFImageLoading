@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
@@ -59,6 +62,16 @@ namespace FFImageLoading.Work
 			return new TaskParameter() { Source = ImageSource.CompiledResource, Path = resourceName };
 		}
 
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a stream
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="stream">Stream.</param>
+		public static TaskParameter FromStream(Func<CancellationToken, Task<Stream>> stream)
+		{
+			return new TaskParameter() { Source = ImageSource.Stream, Stream = stream };
+		}
+
 		private TaskParameter()
 		{
             Transformations = new List<ITransformation>();
@@ -93,6 +106,8 @@ namespace FFImageLoading.Work
 					Transformations = null;
 				}
 
+				Stream = null;
+
 				_disposed = true;
 			}
 		}
@@ -100,6 +115,8 @@ namespace FFImageLoading.Work
 		public ImageSource Source { get; private set; }
 
 		public string Path { get; private set; }
+
+		public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
 		public TimeSpan? CacheDuration { get; private set; }
 

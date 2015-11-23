@@ -180,32 +180,69 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public override async Task<bool> LoadFromStreamAsync(Stream stream)
+		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
 		{
 			if (stream == null)
-				return false;
-			
-			var resultWithImage = await GetImageAsync("Stream", ImageSource.Stream, stream).ConfigureAwait(false);
-			if (resultWithImage == null || resultWithImage.Item == null)
-				return false;
-
-			var view = _getNativeControl();
-			if (view == null)
-				return false;
+				return GenerateResult.Failed;
 
 			if (CancellationToken.IsCancellationRequested)
-				return false;
+				return GenerateResult.Canceled;
 
-			// Post on main thread but don't wait for it
-			MainThreadDispatcher.Post(() =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return;
+			WithLoadingResult<UIImage> imageWithResult = null;
+			UIImage image = null;
+			try
+			{
+				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, stream).ConfigureAwait(false);
+				image = imageWithResult == null ? null : imageWithResult.Item;
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("An error occured while retrieving image.", ex);
+				image = null;
+			}
 
-					_doWithImage(resultWithImage.Item, false);
-				});
+			if (image == null)
+			{
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+				return GenerateResult.Failed;
+			}
 
-			return true;
+			if (CancellationToken.IsCancellationRequested)
+				return GenerateResult.Canceled;
+
+			if (_getNativeControl() == null)
+				return GenerateResult.InvalidTarget;
+
+			Exception trappedException = null;
+			try
+			{
+				// Post on main thread
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						_doWithImage(image, false);
+						Completed = true;
+						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+					}).ConfigureAwait(false);
+
+				if (!Completed)
+					return GenerateResult.Failed;
+			}
+			catch (Exception ex2)
+			{
+				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			}
+
+			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			if (trappedException != null)
+			{
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+				throw trappedException;
+			}
+
+			return GenerateResult.Success;
 		}
 
 		protected virtual async Task<WithLoadingResult<UIImage>> GetImageAsync(string sourcePath, ImageSource source, Stream originalStream = null)

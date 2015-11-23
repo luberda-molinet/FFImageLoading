@@ -169,6 +169,10 @@ namespace FFImageLoading.Forms.Touch
 			{
 				imageLoader = ImageService.LoadFile(ffSource.Path);
 			}
+			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
+			{
+				imageLoader = ImageService.LoadStream(ffSource.Stream);
+			}
 
 			if (imageLoader != null)
 			{

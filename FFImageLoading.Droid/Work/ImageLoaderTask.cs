@@ -199,51 +199,79 @@ namespace FFImageLoading.Work
 			return TryLoadingFromCacheAsync(imageView);
 		}
 
-		public async Task<Bitmap> LoadFromStream(Stream stream)
-		{
-			// Otherwise load image normally
-			var drawableWithResult = await GetDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-			if (drawableWithResult == null || drawableWithResult.Item == null)
-				return null;
-
-			// If we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(), drawableWithResult.Item);
-
-			return drawableWithResult.Item.Bitmap;
-		}
+//		public async Task<Bitmap> LoadFromStream(Stream stream)
+//		{
+//			// Otherwise load image normally
+//			var drawableWithResult = await GetDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
+//			if (drawableWithResult == null || drawableWithResult.Item == null)
+//				return null;
+//
+//			// If we have the bitmap we add it to the cache
+//			ImageCache.Instance.Add(GetKey(), drawableWithResult.Item);
+//
+//			return drawableWithResult.Item.Bitmap;
+//		}
 
 		/// <summary>
 		/// Loads the image from given stream asynchronously.
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public override async Task<bool> LoadFromStreamAsync(Stream stream)
+		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
 		{
 			if (stream == null)
-				return false;
+				return GenerateResult.Failed;
 
-			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
-			if (resultWithDrawable == null || resultWithDrawable.Item == null)
-				return false;
-
-			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(resultWithDrawable.Item);
+			if (CancellationToken.IsCancellationRequested)
+				return GenerateResult.Canceled;
 
 			var imageView = GetAttachedImageView();
 			if (imageView == null)
-				return false;
+				return GenerateResult.InvalidTarget;
 
-			if (CancellationToken.IsCancellationRequested)
-				return false;
+			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
+			if (resultWithDrawable == null || resultWithDrawable.Item == null)
+			{
+				// Show error placeholder
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 
-			await MainThreadDispatcher.PostAsync(() =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return;
+				return GenerateResult.Failed;
+			}
 
-					SetImageDrawable(imageView, resultWithDrawable.Item, false);
-				}).ConfigureAwait(false);
+			Exception trappedException = null;
+			try
+			{
+				if (CancellationToken.IsCancellationRequested)
+					return GenerateResult.Canceled;
 
-			return true;
+				// Post on main thread
+				await MainThreadDispatcher.PostAsync(() =>
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return;
+
+						SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
+						Completed = true;
+						Parameters.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
+					}).ConfigureAwait(false);
+
+				if (!Completed)
+					return GenerateResult.Failed;
+			}
+			catch (Exception ex2)
+			{
+				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			}
+
+			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
+			if (trappedException != null)
+			{
+				// Show error placeholder
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				throw trappedException;
+			}
+
+			return GenerateResult.Success;
 		}
 
 		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, Stream originalStream = null)
@@ -271,11 +299,12 @@ namespace FFImageLoading.Work
 					else
 					{
 						streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-						if (streamWithResult == null || streamWithResult.Item == null)
-							return null;
-
-						stream = streamWithResult.Item;
 					}
+
+					if (streamWithResult == null || streamWithResult.Item == null)
+						return null;
+
+					stream = streamWithResult.Item;
 
 					try
 					{
