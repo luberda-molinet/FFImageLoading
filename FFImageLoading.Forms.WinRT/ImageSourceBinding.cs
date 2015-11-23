@@ -4,6 +4,7 @@ using Xamarin.Forms;
 using Windows.Storage;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace FFImageLoading.Forms.WinRT
 {
@@ -15,9 +16,17 @@ namespace FFImageLoading.Forms.WinRT
             Path = path;
         }
 
+        public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
+        {
+            ImageSource = FFImageLoading.Work.ImageSource.Stream;
+            Stream = stream;
+        }
+
         public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
 
         public string Path { get; private set; }
+
+        public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
         internal static async Task<ImageSourceBinding> GetImageSourceBinding(Xamarin.Forms.ImageSource source)
         {
@@ -53,6 +62,12 @@ namespace FFImageLoading.Forms.WinRT
                 return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileImageSource.File);
             }
 
+            var streamImageSource = source as StreamImageSource;
+            if (streamImageSource != null)
+            {
+                return new ImageSourceBinding(streamImageSource.Stream);
+            }
+
             throw new NotImplementedException("ImageSource type not supported");
         }
 
@@ -65,7 +80,7 @@ namespace FFImageLoading.Forms.WinRT
                 return false;
             }
 
-            return this.ImageSource.Equals(item.ImageSource) && this.Path.Equals(item.Path);
+            return this.ImageSource.Equals(item.ImageSource) && this.Path.Equals(item.Path) && this.Stream.Equals(item.Stream);
         }
 
         public override int GetHashCode()
@@ -75,6 +90,7 @@ namespace FFImageLoading.Forms.WinRT
                 int hash = 17;
                 hash = hash * 23 + this.ImageSource.GetHashCode();
                 hash = hash * 23 + Path.GetHashCode();
+                hash = hash * 23 + Stream.GetHashCode();
                 return hash;
             }
         }
