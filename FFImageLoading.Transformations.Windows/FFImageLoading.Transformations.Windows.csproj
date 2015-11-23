@@ -62,6 +62,9 @@
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
     <Compile Include="WritableBitmapEx\BitmapContext.cs" />
+    <Compile Include="WritableBitmapEx\BitmapFactory.cs" />
+    <Compile Include="WritableBitmapEx\WriteableBitmapContextExtensions.cs" />
+    <Compile Include="WritableBitmapEx\WriteableBitmapBaseExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <TargetPlatform Include="Windows, Version=8.1" />
