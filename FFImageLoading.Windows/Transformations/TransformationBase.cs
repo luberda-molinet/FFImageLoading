@@ -14,9 +14,9 @@ namespace FFImageLoading.Transformations
 
         public IBitmap Transform(IBitmap source)
         {
-            return new BitmapHolder(Transform(source.ToNative()));
+            return Transform(source.ToNative());
         }
 
-        protected abstract WriteableBitmap Transform(WriteableBitmap source);
+        protected abstract BitmapHolder Transform(BitmapHolder source);
     }
 }

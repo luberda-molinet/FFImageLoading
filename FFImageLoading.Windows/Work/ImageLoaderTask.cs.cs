@@ -277,6 +277,8 @@ namespace FFImageLoading.Work
                 if (CancellationToken.IsCancellationRequested)
                     return null;
 
+                WriteableBitmap writableBitmap = null;
+
                 // Special case to handle WebP decoding on iOS
                 if (sourcePath.ToLowerInvariant().EndsWith(".webp"))
                 {
@@ -284,15 +286,10 @@ namespace FFImageLoading.Work
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
 
-                WriteableBitmap imageIn = await bytes.ToBitmapImageAsync();
-                /*
-                await MainThreadDispatcher.PostAsync(async () => {
-                    imageIn = await bytes.ToBitmapImageAsync();
-                }).ConfigureAwait(false);
-                */
-
                 if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
                 {
+                    BitmapHolder imageIn = await bytes.ToBitmapHolderAsync();
+
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
                         if (CancellationToken.IsCancellationRequested)
@@ -302,28 +299,31 @@ namespace FFImageLoading.Work
                         {
                             var old = imageIn;
 
-                            IBitmap bitmapHolder = null;
-                            
-                            await MainThreadDispatcher.PostAsync(() => {
-                                bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
-                            });
-                            
+                            IBitmap bitmapHolder = transformation.Transform(imageIn);
                             imageIn = bitmapHolder.ToNative();
 
-                            // Transformation succeeded, so garbage the source
                             // old = null;
-                            // PLEASE NOTE! In Windows we could reuse WriteableBitmap (less memory usage) so we don't need that
+                            // PLEASE NOTE! In Windows we could reuse int array (less memory usage) so we don't need that
                         }
                         catch (Exception ex)
                         {
                             Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
                         }
                     }
+
+                    await MainThreadDispatcher.PostAsync(async () =>
+                    {
+                        writableBitmap = await imageIn.ToBitmapImageAsync();
+                    });
+                }
+                else
+                {
+                    writableBitmap = await bytes.ToBitmapImageAsync();
                 }
 
-                return imageIn;
+                return writableBitmap;
             }).ConfigureAwait(false);
-
+   
             return WithLoadingResult.Encapsulate(image, result.Value);
         }
 

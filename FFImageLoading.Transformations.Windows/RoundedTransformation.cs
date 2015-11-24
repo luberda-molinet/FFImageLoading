@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFImageLoading.Work;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace FFImageLoading.Transformations
             }
         }
 
-        protected override WriteableBitmap Transform(WriteableBitmap source)
+        protected override BitmapHolder Transform(BitmapHolder source)
         {
             return source;
         }

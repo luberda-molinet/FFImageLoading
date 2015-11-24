@@ -1,4 +1,5 @@
 ﻿using FFImageLoading.Transformations.WritableBitmapEx;
+using FFImageLoading.Work;
 using System;
 using System.Linq;
 using Windows.UI.Xaml.Media.Imaging;
@@ -22,14 +23,14 @@ namespace FFImageLoading.Transformations
             get { return "ColorSpaceTransformation"; }
         }
 
-        protected override WriteableBitmap Transform(WriteableBitmap source)
+        protected override BitmapHolder Transform(BitmapHolder source)
         {
             ToColorSpace(source, _rgbawMatrix);
 
             return source;
         }
 
-        public static void ToColorSpace(WriteableBitmap bmp, float[][] rgbawMatrix)
+        public static void ToColorSpace(BitmapHolder bmp, float[][] rgbawMatrix)
         {
             var r0 = rgbawMatrix[0][0];
             var r1 = rgbawMatrix[0][1];
@@ -56,53 +57,49 @@ namespace FFImageLoading.Transformations
             var bOffset = rgbawMatrix[4][2];
             var aOffset = rgbawMatrix[4][3];
 
-            using (var context = bmp.GetBitmapContext())
+            var nWidth = bmp.Width;
+            var nHeight = bmp.Height;
+            var px = bmp.Pixels;
+            var len = bmp.Pixels.Length;
+
+            for (var i = 0; i < len; i++)
             {
-                var nWidth = context.Width;
-                var nHeight = context.Height;
-                var px = context.Pixels;
+                var c = px[i];
+                var a = (c >> 24) & 0x000000FF;
+                var r = (c >> 16) & 0x000000FF;
+                var g = (c >> 8) & 0x000000FF;
+                var b = (c) & 0x000000FF;
 
-                var rp = context.Pixels;
-                var len = context.Length;
-                for (var i = 0; i < len; i++)
-                {
-                    var c = px[i];
-                    var a = (c >> 24) & 0x000000FF;
-                    var r = (c >> 16) & 0x000000FF;
-                    var g = (c >> 8) & 0x000000FF;
-                    var b = (c) & 0x000000FF;
+                var rNew = (int)(r * r0 + g * g0 + b * b0 + a * a0 + rOffset);
+                var gNew = (int)(r * r1 + g * g1 + b * b1 + a * a1 + gOffset);
+                var bNew = (int)(r * r2 + g * g2 + b * b2 + a * a2 + bOffset);
+                var aNew = (int)(r * r3 + g * g3 + b * b3 + a * a3 + aOffset);
 
-                    var rNew = (int)(r * r0 + g * g0 + b * b0 + a * a0 + rOffset);
-                    var gNew = (int)(r * r1 + g * g1 + b * b1 + a * a1 + gOffset);
-                    var bNew = (int)(r * r2 + g * g2 + b * b2 + a * a2 + bOffset);
-                    var aNew = (int)(r * r3 + g * g3 + b * b3 + a * a3 + aOffset);
+                if (rNew > 255)
+                    rNew = 255;
 
-                    if (rNew > 255)
-                        rNew = 255;
+                if (gNew > 255)
+                    gNew = 255;
 
-                    if (gNew > 255)
-                        gNew = 255;
+                if (bNew > 255)
+                    bNew = 255;
 
-                    if (bNew > 255)
-                        bNew = 255;
+                if (aNew > 255)
+                    aNew = 255;
 
-                    if (aNew > 255)
-                        aNew = 255;
+                if (rNew < 0)
+                    rNew = 0;
 
-                    if (rNew < 0)
-                        rNew = 0;
+                if (gNew < 0)
+                    gNew = 0;
 
-                    if (gNew < 0)
-                        gNew = 0;
+                if (bNew < 0)
+                    bNew = 0;
 
-                    if (bNew < 0)
-                        bNew = 0;
+                if (aNew < 0)
+                    aNew = 0;
 
-                    if (aNew < 0)
-                        aNew = 0;
-
-                    rp[i] = (aNew << 24) | (rNew << 16) | (gNew << 8) | bNew;
-                }
+                px[i] = (aNew << 24) | (rNew << 16) | (gNew << 8) | bNew;
             }
         }
     }

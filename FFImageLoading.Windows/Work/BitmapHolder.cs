@@ -5,35 +5,31 @@ namespace FFImageLoading.Work
 {
     public class BitmapHolder : IBitmap
     {
-        public BitmapHolder(WriteableBitmap bitmap)
+        public BitmapHolder(int[] pixels, int width, int height)
         {
-            NativeBitmap = bitmap;
+            Pixels = pixels;
+            Width = width;
+            Height = height;
         }
 
         public int Height
         {
-            get
-            {
-                return NativeBitmap.PixelHeight;
-            }
+            get; private set; 
         }
 
         public int Width
         {
-            get
-            {
-                return NativeBitmap.PixelWidth;
-            }
+            get; private set; 
         }
 
-        internal WriteableBitmap NativeBitmap { get; private set; }
+        public int[] Pixels { get; private set; }
     }
 
     public static class IBitmapExtensions
     {
-        public static WriteableBitmap ToNative(this IBitmap bitmap)
+        public static BitmapHolder ToNative(this IBitmap bitmap)
         {
-            return ((BitmapHolder)bitmap).NativeBitmap;
+            return (BitmapHolder)bitmap;
         }
     }
 }

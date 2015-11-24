@@ -1,4 +1,5 @@
 ﻿using FFImageLoading.Transformations.WritableBitmapEx;
+using FFImageLoading.Work;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Transformations
@@ -17,7 +18,7 @@ namespace FFImageLoading.Transformations
             get { return string.Format("FlipTransformation, Type=", _flipType.ToString()); }
         }
 
-        protected override WriteableBitmap Transform(WriteableBitmap source)
+        protected override BitmapHolder Transform(BitmapHolder source)
         {
             var transformed = ToFlipped(source, _flipType);
             
@@ -25,54 +26,43 @@ namespace FFImageLoading.Transformations
             return transformed;
         }
 
-        public static WriteableBitmap ToFlipped(WriteableBitmap bmp, FlipType flipMode)
+        public static BitmapHolder ToFlipped(BitmapHolder bmp, FlipType flipMode)
         {
-            using (var context = bmp.GetBitmapContext())
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = bmp.Width;
+            var h = bmp.Height;
+            var p = bmp.Pixels;
+            var i = 0;
+            BitmapHolder result = new BitmapHolder(new int[bmp.Pixels.Length], w, h);
+
+            if (flipMode == FlipType.Horizontal)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
-                var p = context.Pixels;
-                var i = 0;
-                WriteableBitmap result = null;
-
-                if (flipMode == FlipType.Horizontal)
+                var rp = result.Pixels;
+                for (var y = h - 1; y >= 0; y--)
                 {
-                    result = BitmapFactory.New(w, h);
-                    using (var destContext = result.GetBitmapContext())
+                    for (var x = 0; x < w; x++)
                     {
-                        var rp = destContext.Pixels;
-                        for (var y = h - 1; y >= 0; y--)
-                        {
-                            for (var x = 0; x < w; x++)
-                            {
-                                var srcInd = y * w + x;
-                                rp[i] = p[srcInd];
-                                i++;
-                            }
-                        }
+                        var srcInd = y * w + x;
+                        rp[i] = p[srcInd];
+                        i++;
                     }
                 }
-                else if (flipMode == FlipType.Vertical)
-                {
-                    result = BitmapFactory.New(w, h);
-                    using (var destContext = result.GetBitmapContext())
-                    {
-                        var rp = destContext.Pixels;
-                        for (var y = 0; y < h; y++)
-                        {
-                            for (var x = w - 1; x >= 0; x--)
-                            {
-                                var srcInd = y * w + x;
-                                rp[i] = p[srcInd];
-                                i++;
-                            }
-                        }
-                    }
-                }
-
-                return result;
             }
+            else if (flipMode == FlipType.Vertical)
+            {
+                var rp = result.Pixels;
+                for (var y = 0; y < h; y++)
+                {
+                    for (var x = w - 1; x >= 0; x--)
+                    {
+                        var srcInd = y * w + x;
+                        rp[i] = p[srcInd];
+                        i++;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }
