@@ -1,22 +1,22 @@
 Fast & Furious Image Loading
 ==========================================
 
-Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android and Xamarin.Forms.
+Xamarin library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms and Windows (WinRT, UWP).
 
 **iOS / Android NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading/
 
 **Xamarin.Forms NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/
 
-**Xamarin.Transformations NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Transformations/
+**Transformations NuGet package:** https://www.nuget.org/packages/Xamarin.FFImageLoading.Transformations/
 This package contains image transformations (see below).
 
 <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="150"/></a>
 
-**Xamarin.Forms Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample) and **Android Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample)
+**Xamarin.Forms Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample), **Android Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample), **Windows Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample)
 
 ## Features
 
-- Xamarin.iOS (min iOS 7), Xamarin.Android (min Android 4), Xamarin.Forms support (PCL compatible)
+- Xamarin.iOS (min iOS 7), Xamarin.Android (min Android 4), Xamarin.Forms and Windows (WinRT, UWP) support
 - Configurable disk and memory caching
 - Deduplication of similar download/load requests
 - Error and loading placeholders support
@@ -27,11 +27,9 @@ This package contains image transformations (see below).
 - On Android transparency is disabled by default (configurable). Saves 50% of memory
 - Transformations support
   - BlurredTransformation
-  - CircleTransformation
-  - ColorSpaceTransformation
-  - GrayscaleTransformation
-  - RoundedTransformation
-  - SepiaTransformation
+  - CircleTransformation, RoundedTransformation, CornersTransformation
+  - ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
+  - FlipTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
 
 ### History
@@ -50,10 +48,8 @@ WebP is supported on both iOS and Android. Bindings have been done for iOS, ie: 
 The Xamarin Forms NuGet package ships FFImageLoading for iOS and Android. Thanks to Daniel Luberda for his help here.
 
 ```C#
-// Initialization:
-FFImageLoading.Forms.Droid.CachedImageRenderer.Init();
-// or
-FFImageLoading.Forms.Touch.CachedImageRenderer.Init();
+// IMPORTANT!!! Initialization:
+CachedImageRenderer.Init();
 ```
 
 ```C#
