@@ -32,6 +32,22 @@
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <OutputPath>bin\Windows Debug\</OutputPath>
+    <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
+    <OutputPath>bin\Windows Release\</OutputPath>
+    <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="CachedImageEvents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -36,6 +36,24 @@
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <OutputPath>bin\Windows Debug\</OutputPath>
+    <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
+    <OutputPath>bin\Windows Release\</OutputPath>
+    <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -67,7 +85,9 @@
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Config\" />
+  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -78,11 +98,7 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <Folder Include="Work\StreamResolver\" />
-    <Folder Include="Config\" />
-    <Folder Include="Transformations\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
