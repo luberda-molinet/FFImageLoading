@@ -77,10 +77,17 @@ namespace FFImageLoading.Forms
 		/// The source property.
 		/// </summary> 
 		public static readonly BindableProperty SourceProperty = BindableProperty.Create<CachedImage, ImageSource>(w => w.Source, null, BindingMode.OneWay, 
-		propertyChanged: (bindable, oldValue, newValue) => {
+			propertyChanged: (bindable, oldValue, newValue) => {
 			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanged");
+
+			if (newValue != null)
+			{
+				BindableObject.SetInheritedBindingContext(newValue, bindable.BindingContext);
+			}
+
+			((CachedImage)bindable).InvalidateMeasure();
 		}, 
-		propertyChanging: (bindable, oldValue, newValue) => {
+			propertyChanging: (bindable, oldValue, newValue) => {
 			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanging");
 		});
 			
@@ -313,10 +320,16 @@ namespace FFImageLoading.Forms
 		{
 			if (this.Source != null)
 			{
-				BindableObject.SetInheritedBindingContext(this.Source, base.BindingContext);
+				BindableObject.SetInheritedBindingContext(Source, BindingContext);
 			}
 
 			base.OnBindingContextChanged();
+		}
+
+		public void InvalidateViewMeasure()
+		{
+			// this.OnPropertyChanged(Image.SourceProperty.PropertyName);
+			InvalidateMeasure();
 		}
 
 		protected override SizeRequest OnSizeRequest(double widthConstraint, double heightConstraint)

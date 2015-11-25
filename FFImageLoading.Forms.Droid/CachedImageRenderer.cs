@@ -223,6 +223,7 @@ namespace FFImageLoading.Forms.Droid
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();	
+				element.InvalidateViewMeasure();
 			}
 		}
 

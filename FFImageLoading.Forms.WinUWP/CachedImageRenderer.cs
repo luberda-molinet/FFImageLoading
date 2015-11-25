@@ -249,6 +249,7 @@ namespace FFImageLoading.Forms.WinUWP
             {
                 ((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
                 ((IVisualElementController)element).NativeSizeChanged();
+                element.InvalidateViewMeasure();
             }
         }
 
