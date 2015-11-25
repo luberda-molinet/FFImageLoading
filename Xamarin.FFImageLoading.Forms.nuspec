@@ -36,22 +36,22 @@
         
         <dependencies>
           <group targetFramework="portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
 
           <group targetFramework="MonoAndroid10">
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
           
           <group targetFramework="portable-win81+wpa81">
           	<dependency id="Xamarin.Forms" version="1.5.0.6447" />
-            <dependency id="FFImageLoading.Windows" version="1.2.0" />
+            <dependency id="FFImageLoading.Windows" version="1.2.0-alpha1" />
           </group> 
 <!-- DISABLED
           <group targetFramework="portable-uap10.0">

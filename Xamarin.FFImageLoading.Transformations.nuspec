@@ -29,19 +29,19 @@
        
        <dependencies>
           <group targetFramework="portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
 
           <group targetFramework="MonoAndroid10">
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
-            <dependency id="Xamarin.FFImageLoading" version="1.2.0" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>
 
           <group targetFramework="portable-net45+win81+wpa81+uap10.0">
-            <dependency id="FFImageLoading.Windows" version="1.2.0" />
+            <dependency id="FFImageLoading.Windows" version="1.2.0-alpha1" />
           </group>       
           
         </dependencies>
