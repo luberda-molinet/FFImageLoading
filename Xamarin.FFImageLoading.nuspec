@@ -4,7 +4,7 @@
    
        <id>Xamarin.FFImageLoading</id>
        <version>1.2.0-alpha1</version>
-       <title>FFImageLoading Plugin for Xamarin iOS/Android</title>
+       <title>FFImageLoading Plugin for Xamarin iOS/Android and Windows</title>
        <authors>Fabien Molinet, Daniel Luberda</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
@@ -13,12 +13,12 @@
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        <description>
-       		Library to load images quickly and easily on Windows (WinRT, UWP).
+       		Library to load images quickly and easily.
        	 
        	 	Features:
 
        
-			- Xamarin.iOS, Xamarin.Android, Xamarin.Forms support
+			- Xamarin.iOS, Xamarin.Android, Xamarin.Forms and Windows (WinRT, UWP) support
 			- Configurable disk and memory caching
 			- Deduplication of similar download/load requests
 			- Error and loading placeholders support
@@ -30,7 +30,7 @@
 			- Transformations support built-in and custom native platform ITransformation implementations
        </description>
        
-       <summary>Xamarin library to load images quickly and easily on iOS and Android.</summary>
+       <summary>Xamarin library to load images quickly and easily on Xamarin iOS/Android and Windows.</summary>
        <tags>xamarin, android, ios, image, cache, caching, memory, bitmap, lru, load, loading, save, effects, photo</tags>
        
        <dependencies>
@@ -40,8 +40,12 @@
  		<group targetFramework="Xamarin.iOS10">
 		    <dependency id="WebP.Touch" version="1.0.1" />
  		</group>
+ 		
+ 		<group targetFramework="portable-win81+wpa81+uap10.0">
+		    <dependency id="Microsoft.Net.Http" version="2.2.29" />
+ 		</group> 		
        </dependencies>
-       
+
 	</metadata>
 	
 	<files>
@@ -60,6 +64,12 @@
 		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Touch.xml" />
     	<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.dll" target="lib/Xamarin.iOS10/FFImageLoading.dll" />
         <file src="FFImageLoading.Touch/bin/Release/FFImageLoading.xml" target="lib/Xamarin.iOS10/FFImageLoading.xml" />
+        
+        <!--Windows-->
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.dll" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.Windows.dll" />
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.xml" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.Windows.xml" />
+        <file src="FFImageLoading.Windows/bin/Release/FFImageLoading.dll" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows/bin/Release/FFImageLoading.xml" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.xml" />
 	</files>
 	
 </package>
