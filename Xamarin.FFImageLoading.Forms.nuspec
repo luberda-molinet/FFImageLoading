@@ -81,15 +81,15 @@
         <file src="FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.xml" />
         
         <!--Windows WinRT-->
-        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/portable-win81+wpa81/FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.xml" target="lib/portable-win81+wpa81/FFImageLoading.xml.xml" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/portable-win81+wpa81/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.xml" target="lib/portable-win81+wpa81/FFImageLoading.xml.xml" />
         <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.dll" target="lib/portable-net45+win81+wpa81/FFImageLoading.Forms.WinRT.dll" />
         <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.xml" target="lib/portable-net45+win81+wpa81/FFImageLoading.Forms.WinRT.xml" />
                 
         <!--Windows UWP-->
 <!-- DISABLED        
-        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/portable-net45+uap10.0/FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.xml" target="lib/portable-net45+uap10.0/FFImageLoading.xml.xml" />
+        <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/portable-net45+uap10.0/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinUWP/bin/Windows ReleaseFFImageLoading.Forms.xml" target="lib/portable-net45+uap10.0/FFImageLoading.xml.xml" />
         <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.dll" target="lib/portable-net45+uap10.0/FFImageLoading.Forms.WinUWP.dll" />
         <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.xml" target="lib/portable-net45+uap10.0/FFImageLoading.Forms.WinUWP.xml" />        
 -->

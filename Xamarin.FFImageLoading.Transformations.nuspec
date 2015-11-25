@@ -41,7 +41,7 @@
           </group>
 
           <group targetFramework="portable-net45+win81+wpa81+uap10.0">
-            <dependency id="FFImageLoading.Windows" version="1.2.0-alpha1" />
+            <dependency id="Xamarin.FFImageLoading" version="1.2.0-alpha1" />
           </group>       
           
         </dependencies>

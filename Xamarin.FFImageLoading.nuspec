@@ -68,8 +68,8 @@
         <!--Windows-->
 		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.dll" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.Windows.dll" />
 		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.xml" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.Windows.xml" />
-        <file src="FFImageLoading.Windows/bin/Release/FFImageLoading.dll" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows/bin/Release/FFImageLoading.xml" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.dll" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.xml" target="lib/portable-win81+wpa81+uap10.0/FFImageLoading.xml" />
 	</files>
 	
 </package>
