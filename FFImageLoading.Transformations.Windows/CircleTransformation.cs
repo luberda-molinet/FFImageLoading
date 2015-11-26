@@ -1,10 +1,4 @@
 ﻿using FFImageLoading.Work;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Transformations
 {
@@ -21,6 +15,7 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
+            RoundedTransformation.ToRounded(source, 0, 1f, 1f);
             return source;
         }
     }

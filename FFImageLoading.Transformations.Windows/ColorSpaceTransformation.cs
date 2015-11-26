@@ -1,5 +1,4 @@
-﻿using FFImageLoading.Transformations.WritableBitmapEx;
-using FFImageLoading.Work;
+﻿using FFImageLoading.Work;
 using System;
 using System.Linq;
 using Windows.UI.Xaml.Media.Imaging;

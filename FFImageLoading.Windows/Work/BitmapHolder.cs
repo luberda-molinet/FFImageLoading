@@ -23,6 +23,14 @@ namespace FFImageLoading.Work
         }
 
         public int[] Pixels { get; private set; }
+
+        public void SetPixels(int[] pixels, int width, int height)
+        {
+            Pixels = null;
+            Pixels = pixels;
+            Width = width;
+            Height = height;
+        }
     }
 
     public static class IBitmapExtensions

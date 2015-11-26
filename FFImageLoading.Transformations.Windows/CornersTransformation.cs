@@ -77,5 +77,35 @@ namespace FFImageLoading.Transformations
         {
             return source;
         }
+
+        public static BitmapHolder ToTransformedCorners(BitmapHolder source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
+            CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
+        {
+            double sourceWidth = source.Width;
+            double sourceHeight = source.Height;
+
+            double desiredWidth = sourceWidth;
+            double desiredHeight = sourceHeight;
+
+            double desiredRatio = cropWidthRatio / cropHeightRatio;
+            double currentRatio = sourceWidth / sourceHeight;
+
+            if (currentRatio > desiredRatio)
+                desiredWidth = (cropWidthRatio * sourceHeight / cropHeightRatio);
+            else if (currentRatio < desiredRatio)
+                desiredHeight = (cropHeightRatio * sourceWidth / cropWidthRatio);
+
+            topLeftCornerSize = topLeftCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
+            topRightCornerSize = topRightCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
+            bottomLeftCornerSize = bottomLeftCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
+            bottomRightCornerSize = bottomRightCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
+
+            float cropX = (float)((sourceWidth - desiredWidth) / 2);
+            float cropY = (float)((sourceHeight - desiredHeight) / 2);
+
+            //TODO not implemented
+
+            return source;
+        }
     }
 }

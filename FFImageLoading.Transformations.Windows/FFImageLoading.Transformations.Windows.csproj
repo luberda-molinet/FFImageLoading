@@ -36,14 +36,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
     <OutputPath>bin\Windows Debug\</OutputPath>
-    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <DefineConstants>DEBUG;NETFX_CORE</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
     <OutputPath>bin\Windows Release\</OutputPath>
@@ -79,15 +80,13 @@
     <Compile Include="CircleTransformation.cs" />
     <Compile Include="ColorSpaceTransformation.cs" />
     <Compile Include="CornersTransformation.cs" />
+    <Compile Include="CropTransformation.cs" />
     <Compile Include="FlipTransformation.cs" />
     <Compile Include="GrayscaleTransformation.cs" />
+    <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
-    <Compile Include="WritableBitmapEx\BitmapContext.cs" />
-    <Compile Include="WritableBitmapEx\BitmapFactory.cs" />
-    <Compile Include="WritableBitmapEx\WriteableBitmapContextExtensions.cs" />
-    <Compile Include="WritableBitmapEx\WriteableBitmapBaseExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <TargetPlatform Include="Windows, Version=8.1" />

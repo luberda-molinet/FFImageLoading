@@ -79,7 +79,10 @@ namespace FFImageLoading.Forms.WinRT
 
             if (Control == null)
             {
-                Windows.UI.Xaml.Controls.Image control = new Windows.UI.Xaml.Controls.Image();
+                Windows.UI.Xaml.Controls.Image control = new Windows.UI.Xaml.Controls.Image()
+                {
+                    Stretch = GetStretch(Aspect.AspectFill)
+                };
                 control.ImageOpened += OnImageOpened;
                 SetNativeControl(control);
             }
