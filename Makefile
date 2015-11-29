@@ -6,9 +6,9 @@ package:
 	nuget pack Xamarin.FFImageLoading.Forms.nuspec
 
 FFImageLoading:
-	xbuild source/FFImageLoading.Common/FFImageLoading-contrib.csproj /p:Configuration=Release
-	xbuild source/FFImageLoading.Touch/FFImageLoading-contrib.Touch.csproj /p:Configuration=Release
-	xbuild source/FFImageLoading.Droid/FFImageLoading-contrib.Droid.csproj /p:Configuration=Release
+	xbuild source/FFImageLoading.Common/FFImageLoading-contrib.csproj /p:Configuration=Release /p:BuildingInsideVisualStudio=true
+	xbuild source/FFImageLoading.Touch/FFImageLoading-contrib.Touch.csproj /p:Configuration=Release /p:BuildingInsideVisualStudio=true
+	xbuild source/FFImageLoading.Droid/FFImageLoading-contrib.Droid.csproj /p:Configuration=Release /p:BuildingInsideVisualStudio=true
 
 Transformations:
 	xbuild source/FFImageLoading.Transformations/FFImageLoading.Transformations.csproj /p:Configuration=Release
