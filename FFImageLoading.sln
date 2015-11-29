@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib", "FFImageLoading.Common\FFImageLoading-contrib.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib", "source\FFImageLoading.Common\FFImageLoading-contrib.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Shared", "FFImageLoading.Shared\FFImageLoading.Shared.shproj", "{E72AC4ED-03A8-465C-95A2-38B0544B37DB}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Shared", "source\FFImageLoading.Shared\FFImageLoading.Shared.shproj", "{E72AC4ED-03A8-465C-95A2-38B0544B37DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Droid", "FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj", "{74BF9402-3E13-4003-8923-BC20A1294CE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Droid", "source\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj", "{74BF9402-3E13-4003-8923-BC20A1294CE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Touch", "FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj", "{1597F7D4-432C-4F26-B508-0F6FAF0B9711}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Touch", "source\FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj", "{1597F7D4-432C-4F26-B508-0F6FAF0B9711}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B48F3C95-B33F-4EF5-B223-06356D749A80}"
 EndProject
@@ -25,25 +25,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Sample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.WinPhone.Sample", "samples\Simple.WinPhone.Sample\Simple.WinPhone.Sample.csproj", "{E3C76DAE-56BA-4058-9513-F9E69DF8E700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms", "FFImageLoading.Forms\FFImageLoading.Forms.csproj", "{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms", "source\FFImageLoading.Forms\FFImageLoading.Forms.csproj", "{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Droid", "FFImageLoading.Forms.Droid\FFImageLoading.Forms.Droid.csproj", "{7014FEB6-0338-4A47-B600-4A1B48127C5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Droid", "source\FFImageLoading.Forms.Droid\FFImageLoading.Forms.Droid.csproj", "{7014FEB6-0338-4A47-B600-4A1B48127C5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Touch", "FFImageLoading.Forms.Touch\FFImageLoading.Forms.Touch.csproj", "{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Touch", "source\FFImageLoading.Forms.Touch\FFImageLoading.Forms.Touch.csproj", "{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations", "FFImageLoading.Transformations\FFImageLoading.Transformations.csproj", "{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations", "source\FFImageLoading.Transformations\FFImageLoading.Transformations.csproj", "{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Touch", "FFImageLoading.Transformations.Touch\FFImageLoading.Transformations.Touch.csproj", "{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Touch", "source\FFImageLoading.Transformations.Touch\FFImageLoading.Transformations.Touch.csproj", "{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Droid", "FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj", "{BD3CEB96-93D6-47BD-9474-01DFCD320897}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Droid", "source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj", "{BD3CEB96-93D6-47BD-9474-01DFCD320897}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.WinRT", "FFImageLoading.Forms.WinRT\FFImageLoading.Forms.WinRT.csproj", "{0CD66811-BD69-4479-A4F1-C038AF475765}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.WinRT", "source\FFImageLoading.Forms.WinRT\FFImageLoading.Forms.WinRT.csproj", "{0CD66811-BD69-4479-A4F1-C038AF475765}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Windows", "FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj", "{610543A5-D06F-4BCA-9443-E6ADDFF06C71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.Windows", "source\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj", "{610543A5-D06F-4BCA-9443-E6ADDFF06C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Windows", "FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj", "{1602A3CB-80C2-42BB-B21A-6BEB87ED6EE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Windows", "source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj", "{1602A3CB-80C2-42BB-B21A-6BEB87ED6EE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.WinUWP", "FFImageLoading.Forms.WinUWP\FFImageLoading.Forms.WinUWP.csproj", "{B8BE9FE7-2D07-40B5-8DAE-BA52F944C659}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.WinUWP", "source\FFImageLoading.Forms.WinUWP\FFImageLoading.Forms.WinUWP.csproj", "{B8BE9FE7-2D07-40B5-8DAE-BA52F944C659}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
