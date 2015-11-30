@@ -39,15 +39,15 @@
    </metadata>
     <files>
         <!--Core PCL-->
-        <file src="source/FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Forms.dll" />
-        <file src="source/FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Forms.xml" />
 
         <!--Xamarin.Android-->
-        <file src="source/FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.dll" />
-        <file src="source/FFImageLoading.Forms.Droid/bin/Release/FFImageLoading.Forms.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.Droid.dll" />
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Droid/bin/Release/FFImageLoading.Forms.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Forms.Droid.dll" />
 
         <!--Xamarin.iOS Unified-->
-        <file src="source/FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.dll" />
-        <file src="source/FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.dll" />
+        <file src="FFImageLoading.Forms/bin/Release/FFImageLoading.Forms.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.dll" />
     </files>
 </package>

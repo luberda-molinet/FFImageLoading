@@ -1,9 +1,9 @@
 all: FFImageLoading Transformations Forms
 
 package:
-	nuget pack Xamarin.FFImageLoading.nuspec
-	nuget pack Xamarin.FFImageLoading.Transformations.nuspec
-	nuget pack Xamarin.FFImageLoading.Forms.nuspec
+	nuget pack source/Xamarin.FFImageLoading.nuspec
+	nuget pack source/Xamarin.FFImageLoading.Transformations.nuspec
+	nuget pack source/Xamarin.FFImageLoading.Forms.nuspec
 
 FFImageLoading:
 	xbuild source/FFImageLoading.Common/FFImageLoading-contrib.csproj /p:Configuration=Release /p:BuildingInsideVisualStudio=true

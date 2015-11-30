@@ -28,19 +28,19 @@
    </metadata>
 	<files>
             <!--Core PCL-->
-            <file src="source/FFImageLoading.Common/bin/Release/FFImageLoading.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.dll" />
-            <file src="source/FFImageLoading.Common/bin/Release/FFImageLoading.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.xml" />
+            <file src="FFImageLoading.Common/bin/Release/FFImageLoading.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.dll" />
+            <file src="FFImageLoading.Common/bin/Release/FFImageLoading.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.xml" />
 
 		<!--Xamarin.Android-->
-		<file src="source/FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Droid.dll" />
-		<file src="source/FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.xml" target="lib/MonoAndroid10/FFImageLoading.Droid.xml" />
-            <file src="source/FFImageLoading.Droid/bin/Release/FFImageLoading.dll" target="lib/MonoAndroid10/FFImageLoading.dll" />
-            <file src="source/FFImageLoading.Droid/bin/Release/FFImageLoading.xml" target="lib/MonoAndroid10/FFImageLoading.xml" />
+		<file src="FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.dll" target="lib/MonoAndroid10/FFImageLoading.Droid.dll" />
+		<file src="FFImageLoading.Droid/bin/Release/FFImageLoading.Droid.xml" target="lib/MonoAndroid10/FFImageLoading.Droid.xml" />
+            <file src="FFImageLoading.Droid/bin/Release/FFImageLoading.dll" target="lib/MonoAndroid10/FFImageLoading.dll" />
+            <file src="FFImageLoading.Droid/bin/Release/FFImageLoading.xml" target="lib/MonoAndroid10/FFImageLoading.xml" />
 
 		<!--Xamarin.iOS Unified-->
-		<file src="source/FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Touch.dll" />
-		<file src="source/FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Touch.xml" />
-            <file src="source/FFImageLoading.Touch/bin/Release/FFImageLoading.dll" target="lib/Xamarin.iOS10/FFImageLoading.dll" />
-            <file src="source/FFImageLoading.Touch/bin/Release/FFImageLoading.xml" target="lib/Xamarin.iOS10/FFImageLoading.xml" />
+		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Touch.dll" />
+		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Touch.xml" />
+            <file src="FFImageLoading.Touch/bin/Release/FFImageLoading.dll" target="lib/Xamarin.iOS10/FFImageLoading.dll" />
+            <file src="FFImageLoading.Touch/bin/Release/FFImageLoading.xml" target="lib/Xamarin.iOS10/FFImageLoading.xml" />
 	</files>
 </package>
