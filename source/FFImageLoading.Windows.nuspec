@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+   <metadata minClientVersion="2.8.1">
+   
+       <id>FFImageLoading.Windows</id>
+       <version>2.0.0-alpha1</version>
+       <title>FFImageLoading Plugin for Windows</title>
+       <authors>Fabien Molinet, Daniel Luberda</authors>
+       <owners></owners>
+       <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>
+       <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
+       <requireLicenseAcceptance>false</requireLicenseAcceptance>
+       
+       <description>
+Library to load images quickly and easily.
+
+Features:
+
+- Configurable disk and memory caching
+- Deduplication of similar download/load requests
+- Error and loading placeholders support
+- Images can be automatically downsampled to specified size (less memory usage)
+- WebP support
+- Image loading Fade-In animations support
+- Can retry image downloads (RetryCount, RetryDelay)
+- On Android transparency is disabled by default (configurable). Saves 50% of memory
+- Transformations support built-in and custom native platform ITransformation implementations
+       </description>
+       
+       <summary>Library to load images quickly and easily on Windows.</summary>
+       <tags>windows, winrt, uwp, image, cache, caching, memory, bitmap, lru, load, loading, save, effects, photo</tags>
+       
+       <dependencies>
+       
+ 		<group targetFramework="portable-netcore45+wpa81+wp8">
+		    <dependency id="Microsoft.Net.Http" version="2.2.29" />
+ 		</group> 	
+ 			
+       </dependencies>
+
+	</metadata>
+	
+	<files>
+	
+        <!--Windows-->
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Windows.dll" />
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Windows.xml" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.xml" />
+
+	</files>
+	
+</package>

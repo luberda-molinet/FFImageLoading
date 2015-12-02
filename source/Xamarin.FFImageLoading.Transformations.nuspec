@@ -1,50 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-   <metadata minClientVersion="2.8.1">
+	<metadata minClientVersion="2.8.1">
+   
        <id>Xamarin.FFImageLoading.Transformations</id>
-       <version>1.1.7</version>
-       <title>FFImageLoading image transformations</title>
+       <version>2.0.0-alpha1</version>
+       <title>FFImageLoading Transformations</title>
        <authors>Molinet Fabien, Daniel Luberda</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
        <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>
        <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+       
        <description>
-       	Transformations for Xamarin FFImageLoading library.
-            These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
+Transformations for FFImageLoading library.
 
-            Currently available transformations are: blur, circle image, round image, change colors, grayscale, sepia.
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
+- FlipTransformation
 
-            Don't forget to add the package in the Droid and Touch projects. This way the correct native implementation is injected.
+These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
+Don't forget to add the package in the Droid and Touch projects. This way the correct native implementation is injected.
        </description>
+       
        <summary>Xamarin image transformations for FFImageLoading.</summary>
-       <tags>xamarin, android, ios, bitmap, image, webp, transformation, blur, round, circle</tags>
+       <tags>xamarin, android, ios, bitmap, image, webp, transformation, blur, round, circle, effects, corners</tags>
+       
        <dependencies>
-          <group targetFramework="portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
+       
+          <group targetFramework="portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
+            <dependency id="Xamarin.FFImageLoading" version="2.0.0-alpha1" />
           </group>
 
           <group targetFramework="MonoAndroid10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
+            <dependency id="Xamarin.FFImageLoading" version="2.0.0-alpha1" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
-            <dependency id="Xamarin.FFImageLoading" version="1.1.7" />
+            <dependency id="Xamarin.FFImageLoading" version="2.0.0-alpha1" />
           </group>
+
+          <group targetFramework="portable-netcore45+wpa81+wp8">
+            <dependency id="FFImageLoading.Windows" version="2.0.0-alpha1" />
+          </group>       
+              
         </dependencies>
-   </metadata>
+        
+	</metadata>
+	
 	<files>
-            <!--Core PCL-->
-            <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.dll" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.dll" />
-            <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.xml" target="lib/portable-net45+win+wp80+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.xml" />
+
+		<!--Core PCL-->
+        <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.dll" target="lib/portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.xml" target="lib/portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.xml" />
             
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Transformations.Droid/bin/Release/FFImageLoading.Transformations.dll" target="lib/MonoAndroid10/FFImageLoading.Transformations.dll" />
-            <file src="FFImageLoading.Transformations.Droid/bin/Release/FFImageLoading.Transformations.xml" target="lib/MonoAndroid10/FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Droid/bin/Release/FFImageLoading.Transformations.xml" target="lib/MonoAndroid10/FFImageLoading.Transformations.xml" />
             
-		<!--Xamarin.iOS Unified-->
+		<!--Xamarin.iOS -->
 		<file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.dll" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.dll" />
-            <file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.xml" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.xml" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.xml" />
+        
+        <!--Windows-->
+        <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.xml" />
+
 	</files>
+	
 </package>
