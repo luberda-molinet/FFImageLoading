@@ -127,15 +127,15 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\..\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
       <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
       <Name>FFImageLoading-contrib.Droid</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
       <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
       <Name>FFImageLoading.Transformations.Droid</Name>
     </ProjectReference>

@@ -119,12 +119,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DLToolkit.PageFactory.Forms, Version=1.0.5779.27266, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\packages\DLToolkit.PageFactory.Forms.1.0.4\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
+    <Reference Include="DLToolkit.PageFactory.Forms, Version=1.0.5810.36009, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\DLToolkit.PageFactory.Forms.1.0.5\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DLToolkit.PageFactory.Shared, Version=1.0.5779.27266, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\packages\DLToolkit.PageFactory.Shared.1.0.4\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Shared.dll</HintPath>
+    <Reference Include="DLToolkit.PageFactory.Shared, Version=1.0.5810.36008, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\DLToolkit.PageFactory.Shared.1.0.5\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Shared.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.Extensions, Version=1.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -157,23 +157,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FFImageLoading.Forms.WinRT\FFImageLoading.Forms.WinRT.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Forms.WinRT\FFImageLoading.Forms.WinRT.csproj">
       <Project>{0cd66811-bd69-4479-a4f1-c038af475765}</Project>
       <Name>FFImageLoading.Forms.WinRT</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3d6c1f12-68d7-44c2-a7de-8e7942627a01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj">
       <Project>{1602a3cb-80c2-42bb-b21a-6beb87ed6ee2}</Project>
       <Name>FFImageLoading.Transformations.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
       <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
       <Name>FFImageLoading-contrib.Windows</Name>
     </ProjectReference>
