@@ -56,7 +56,7 @@ namespace FFImageLoading.Transformations
 			if (rad == 0)
 				rad = (float)(Math.Min(desiredWidth, desiredHeight) / 2);
 
-			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, source.GetConfig());
+			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, Bitmap.Config.Argb8888);
 
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())

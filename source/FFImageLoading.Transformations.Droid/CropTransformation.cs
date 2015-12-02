@@ -62,7 +62,7 @@ namespace FFImageLoading.Transformations
 			float cropX = (float)(((sourceWidth - desiredWidth) / 2) + xOffset);
 			float cropY = (float)(((sourceHeight - desiredHeight) / 2) + yOffset);
 
-			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, source.GetConfig());
+			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, Bitmap.Config.Argb8888);
 
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())
