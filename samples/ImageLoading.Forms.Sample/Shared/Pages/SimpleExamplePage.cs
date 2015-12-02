@@ -22,7 +22,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				RetryCount = 0,
 				RetryDelay = 250,
 				TransparencyEnabled = false,
-				Source = "http://lorempixel.com/output/city-q-c-600-600-5.jpg",
+				Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg",
 			};
 
 			Content =  cachedImage;
