@@ -30,7 +30,7 @@ namespace FFImageLoading.Transformations
 		{
 			if ((int)Android.OS.Build.VERSION.SdkInt >= 17)
 			{
-				Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
+				Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, source.GetConfig());
 
 				using (Canvas canvas = new Canvas(bitmap))
 				{
