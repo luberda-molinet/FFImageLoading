@@ -288,8 +288,8 @@ namespace FFImageLoading.Work
 
                 if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
                 {
-                    BitmapHolder imageIn = await bytes.ToBitmapHolderAsync();
-
+                    BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize);
+                    
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
                         if (CancellationToken.IsCancellationRequested)
@@ -318,7 +318,7 @@ namespace FFImageLoading.Work
                 }
                 else
                 {
-                    writableBitmap = await bytes.ToBitmapImageAsync();
+                    writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize);
                 }
 
                 return writableBitmap;

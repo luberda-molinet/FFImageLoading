@@ -44,14 +44,24 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale)
         {
             if (imageBytes == null)
                 return null;
 
-            using (var image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream())
+            IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream();
+
+            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                var decoder = await BitmapDecoder.CreateAsync(image);
+                var oldStream = image;
+                image = await oldStream.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
+                oldStream.Dispose();
+            }
+
+            using (image)
+            {
+                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+
                 image.Seek(0);
 
                 WriteableBitmap bitmap = null;
@@ -66,14 +76,23 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes)
+        public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes, Tuple<int, int> downscale)
         {
             if (imageBytes == null)
                 return null;
 
-            using (var image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream())
+            IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream();
+
+            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                var decoder = await BitmapDecoder.CreateAsync(image);
+                var oldStream = image;
+                image = await oldStream.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
+                oldStream.Dispose();
+            }
+
+            using (image)
+            {
+                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
 
                 image.Seek(0);
                 int[] array = null;
@@ -113,56 +132,36 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        //public static unsafe void BlockCopy(Array src, int srcOffset, WriteableBitmap dest, int destOffset, int count)
-        //{
-        //    int length = dest.PixelWidth * dest.PixelHeight;
-        //    var pixels = new int[length];
+        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height)
+        {
+            IRandomAccessStream resizedStream = imageStream;
+            var decoder = await BitmapDecoder.CreateAsync(imageStream);
+            if (decoder.OrientedPixelHeight > height || decoder.OrientedPixelWidth > width)
+            {
+                resizedStream = new InMemoryRandomAccessStream();
+                BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                double widthRatio = (double)width / decoder.OrientedPixelWidth;
+                double heightRatio = (double)height / decoder.OrientedPixelHeight;
 
-        //    var data = dest.PixelBuffer.ToArray();
-        //    fixed (byte* srcPtr = data)
-        //    {
-        //        fixed (int* dstPtr = pixels)
-        //        {
-        //            for (var i = 0; i < length; i++)
-        //            {
-        //                dstPtr[i] = (srcPtr[i * 4 + 3] << 24)
-        //                          | (srcPtr[i * 4 + 2] << 16)
-        //                          | (srcPtr[i * 4 + 1] << 8)
-        //                          | srcPtr[i * 4 + 0];
-        //            }
-        //        }
-        //    }
+                double scaleRatio = Math.Min(widthRatio, heightRatio);
 
-        //    System.Buffer.BlockCopy(src, srcOffset, pixels, destOffset, count);
-        //}
+                if (width == 0)
+                    scaleRatio = heightRatio;
 
-        ///// <summary>
-        ///// Method compressing image stored in stream
-        ///// </summary>
-        ///// <param name="sourceStream">stream with the image</param>
-        ///// <param name="quality">new quality of the image 0.0 - 1.0</param>
-        ///// <returns></returns>
-        //public static async Task<IRandomAccessStream> CompressImageAsync(IRandomAccessStream sourceStream, double newQuality)
-        //{
-        //    // create bitmap decoder from source stream
-        //    BitmapDecoder bmpDecoder = await BitmapDecoder.CreateAsync(sourceStream);
+                if (height == 0)
+                    scaleRatio = widthRatio;
 
-        //    // bitmap transform if you need any
-        //    BitmapTransform bmpTransform = new BitmapTransform() { ScaledHeight = newHeight, ScaledWidth = newWidth, InterpolationMode = BitmapInterpolationMode.Cubic };
+                uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
+                uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
 
-        //    PixelDataProvider pixelData = await bmpDecoder.GetPixelDataAsync(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Straight, bmpTransform, ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
-        //    InMemoryRandomAccessStream destStream = new InMemoryRandomAccessStream(); // destination stream
+                encoder.BitmapTransform.ScaledHeight = aspectHeight;
+                encoder.BitmapTransform.ScaledWidth = aspectWidth;
+  
+                await encoder.FlushAsync();
+                resizedStream.Seek(0);
+            }
 
-        //    // define new quality for the image
-        //    var propertySet = new BitmapPropertySet();
-        //    var quality = new BitmapTypedValue(newQuality, PropertyType.Single);
-        //    propertySet.Add("ImageQuality", quality);
-
-        //    // create encoder with desired quality
-        //    BitmapEncoder bmpEncoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, destFileStream, propertySet);
-        //    bmpEncoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Straight, newHeight, newWidth, 300, 300, pixelData.DetachPixelData());
-        //    await bmpEncoder.FlushAsync();
-        //    return destStream;
-        //}
+            return resizedStream;
+        }
     }
 }
