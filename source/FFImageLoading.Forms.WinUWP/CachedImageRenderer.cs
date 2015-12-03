@@ -195,11 +195,11 @@ namespace FFImageLoading.Forms.WinUWP
                 {
                     if (Element.DownsampleHeight > Element.DownsampleWidth)
                     {
-                        imageLoader.DownSample(height: (int)Element.DownsampleWidth);
+                        imageLoader.DownSample(height: (int)Element.DownsampleHeight);
                     }
                     else
                     {
-                        imageLoader.DownSample(width: (int)Element.DownsampleHeight);
+                        imageLoader.DownSample(width: (int)Element.DownsampleWidth);
                     }
                 }
 

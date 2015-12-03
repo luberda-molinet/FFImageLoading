@@ -195,15 +195,15 @@ namespace FFImageLoading.Forms.Touch
 				// Downsample
 				if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 				{
-					if (Element.DownsampleHeight > Element.DownsampleWidth)
-					{
-						imageLoader.DownSample(height: (int)Element.DownsampleWidth);
-					}
-					else
-					{
-						imageLoader.DownSample(width: (int)Element.DownsampleHeight);
-					}
-				}
+                    if (Element.DownsampleHeight > Element.DownsampleWidth)
+                    {
+                        imageLoader.DownSample(height: (int)Element.DownsampleHeight);
+                    }
+                    else
+                    {
+                        imageLoader.DownSample(width: (int)Element.DownsampleWidth);
+                    }
+                }
 
 				// RetryCount
 				if (Element.RetryCount > 0)
