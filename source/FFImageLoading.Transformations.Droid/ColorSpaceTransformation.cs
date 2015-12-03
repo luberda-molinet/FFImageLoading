@@ -67,7 +67,7 @@ namespace FFImageLoading.Transformations
 			int width = source.Width;
 			int height = source.Height;
 
-			Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+			Bitmap bitmap = Bitmap.CreateBitmap(width, height, source.GetConfig());
 
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())
