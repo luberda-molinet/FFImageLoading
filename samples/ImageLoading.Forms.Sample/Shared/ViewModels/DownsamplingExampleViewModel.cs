@@ -10,13 +10,13 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			DownsampleHeight200ExampleCommand = new PageFactoryCommand(() => {
 				DownsampleHeight = 200f;
 				DownsampleWidth = 0f;
-				ImagePath = GetRandomImageUrl(width: 800, height: 600);
+				ImagePath = GetRandomImageUrl(width: 1000, height: 500);
 			});
 
 			DownsampleWidth200ExampleCommand = new PageFactoryCommand(() => {
 				DownsampleHeight = 0f;
 				DownsampleWidth = 200f;	
-				ImagePath = GetRandomImageUrl(width: 800, height: 600);
+				ImagePath = GetRandomImageUrl(width: 1000, height: 500);
 			});
 		}
 
