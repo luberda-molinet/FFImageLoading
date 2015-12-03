@@ -9,6 +9,7 @@ using Foundation;
 using FFImageLoading.Work.DataResolver;
 using System.Linq;
 using System.IO;
+using FFImageLoading.Extensions;
 
 namespace FFImageLoading.Work
 {
@@ -304,11 +305,32 @@ namespace FFImageLoading.Work
 					// Special case to handle WebP decoding on iOS
 					if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
 					{
-						return new WebP.Touch.WebPCodec().Decode(bytes);
+						var webpImage = new WebP.Touch.WebPCodec().Decode(bytes);
+
+						if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+						{
+							UIImage resizedImage = webpImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
+							webpImage.Dispose();
+							return resizedImage;
+						}
+
+						return webpImage;
 					}
 
 					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-					var imageIn = new UIImage(NSData.FromArray(bytes), scale);
+
+					UIImage imageIn = null;
+
+					if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+					{
+						var tempImage = new UIImage(NSData.FromArray(bytes), scale);
+						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
+						tempImage.Dispose();
+					}
+					else
+					{
+						imageIn = new UIImage(NSData.FromArray(bytes), scale);
+					}
 
 					if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
 					{

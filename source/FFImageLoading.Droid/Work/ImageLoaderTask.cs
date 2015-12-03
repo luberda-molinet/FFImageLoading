@@ -637,6 +637,13 @@ namespace FFImageLoading.Work
 			// Raw height and width of image
 			float height = options.OutHeight;
 			float width = options.OutWidth;
+
+			if (reqWidth == 0)
+				reqWidth = (int)((reqHeight / height) * width);
+
+			if (reqHeight == 0)
+				reqHeight = (int)((reqWidth / width) * height);
+
 			double inSampleSize = 1D;
 
 			if (height > reqHeight || width > reqWidth)
