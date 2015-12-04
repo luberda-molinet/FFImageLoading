@@ -9,7 +9,6 @@ using FFImageLoading;
 using Foundation;
 using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
-using System.Collections.Generic;
 using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 
@@ -31,33 +30,33 @@ namespace FFImageLoading.Forms.Touch
 		public static new void Init()
 		{
 			// needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
-			var dummy = new FFImageLoading.Forms.Touch.CachedImageRenderer();
+			var dummy = new CachedImageRenderer();
 
-            CachedImage.CacheCleared += CachedImageCacheCleared;
-            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
-        }
+			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
+			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+		}
 
-        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
-        {
-            ImageService.Invalidate(e.Key, e.CacheType);
-        }
+		private static void InvalidateCache(string key, Cache.CacheType cacheType)
+		{
+			ImageService.Invalidate(key, cacheType);
+		}
 
-        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
-        {
-            switch (e.CacheType)
-            {
-                case Cache.CacheType.Memory:
-                    ImageService.InvalidateMemoryCache();
-                    break;
-                case Cache.CacheType.Disk:
-                    ImageService.InvalidateDiskCache();
-                    break;
-                case Cache.CacheType.All:
-                    ImageService.InvalidateMemoryCache();
-                    ImageService.InvalidateDiskCache();
-                    break;
-            }
-        }
+		private static void ClearCache(Cache.CacheType cacheType)
+		{
+			switch (cacheType)
+			{
+				case Cache.CacheType.Memory:
+					ImageService.InvalidateMemoryCache();
+					break;
+				case Cache.CacheType.Disk:
+					ImageService.InvalidateDiskCache();
+					break;
+				case Cache.CacheType.All:
+					ImageService.InvalidateMemoryCache();
+					ImageService.InvalidateDiskCache();
+					break;
+			}
+		}
 
         protected override void Dispose(bool disposing)
 		{

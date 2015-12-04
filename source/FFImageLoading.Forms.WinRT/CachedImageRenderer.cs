@@ -29,33 +29,31 @@ namespace FFImageLoading.Forms.WinRT
         /// </summary>
         public static void Init()
         {
-            new ImageRenderer();
+			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
+			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+		}
 
-            CachedImage.CacheCleared += CachedImageCacheCleared;
-            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
-        }
+		private static void InvalidateCache(string key, Cache.CacheType cacheType)
+		{
+			ImageService.Invalidate(key, cacheType);
+		}
 
-        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
-        {
-            ImageService.Invalidate(e.Key, e.CacheType);
-        }
-
-        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
-        {
-            switch (e.CacheType)
-            {
-                case Cache.CacheType.Memory:
-                    ImageService.InvalidateMemoryCache();
-                    break;
-                case Cache.CacheType.Disk:
-                    ImageService.InvalidateDiskCache();
-                    break;
-                case Cache.CacheType.All:
-                    ImageService.InvalidateMemoryCache();
-                    ImageService.InvalidateDiskCache();
-                    break;
-            }
-        }
+		private static void ClearCache(Cache.CacheType cacheType)
+		{
+			switch (cacheType)
+			{
+				case Cache.CacheType.Memory:
+					ImageService.InvalidateMemoryCache();
+					break;
+				case Cache.CacheType.Disk:
+					ImageService.InvalidateDiskCache();
+					break;
+				case Cache.CacheType.All:
+					ImageService.InvalidateMemoryCache();
+					ImageService.InvalidateDiskCache();
+					break;
+			}
+		}
 
         private bool measured;
 

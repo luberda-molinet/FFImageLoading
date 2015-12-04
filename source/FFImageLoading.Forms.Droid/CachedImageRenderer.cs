@@ -28,18 +28,18 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
-            CachedImage.CacheCleared += CachedImageCacheCleared;
-            CachedImage.CacheInvalidated += CachedImageCacheInvalidated;
+			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
+			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
         }
 
-        private static void CachedImageCacheInvalidated(object sender, CachedImageEvents.CacheInvalidatedEventArgs e)
+		private static void InvalidateCache(string key, Cache.CacheType cacheType)
         {
-            ImageService.Invalidate(e.Key, e.CacheType);
+            ImageService.Invalidate(key, cacheType);
         }
 
-        private static void CachedImageCacheCleared(object sender, CachedImageEvents.CacheClearedEventArgs e)
+		private static void ClearCache(Cache.CacheType cacheType)
         {
-            switch (e.CacheType)
+			switch (cacheType)
             {
                 case Cache.CacheType.Memory:
                     ImageService.InvalidateMemoryCache();

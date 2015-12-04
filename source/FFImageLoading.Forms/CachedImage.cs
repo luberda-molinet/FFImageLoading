@@ -396,8 +396,8 @@ namespace FFImageLoading.Forms
 				this.Cancelled (this, EventArgs.Empty);
 			}
 		}
-			
-		internal static event EventHandler<CachedImageEvents.CacheClearedEventArgs> CacheCleared;
+
+		internal static Action<Cache.CacheType> InternalClearCache;
 
         /// <summary>
         /// Clears image cache
@@ -405,13 +405,12 @@ namespace FFImageLoading.Forms
         /// <param name="cacheType">Cache type to invalidate</param>
         public static void ClearCache(Cache.CacheType cacheType)
         {
-			if (CacheCleared != null)
+			if (InternalClearCache != null)
             {
-                CacheCleared(typeof(CachedImage), new CachedImageEvents.CacheClearedEventArgs(cacheType));
+				InternalClearCache(cacheType);
             }
         }
-
-        internal static event EventHandler<CachedImageEvents.CacheInvalidatedEventArgs> CacheInvalidated;
+		internal static Action<string, Cache.CacheType> InternalInvalidateCache;
 
         /// <summary>
         /// Invalidates cache for a specified key
@@ -420,9 +419,9 @@ namespace FFImageLoading.Forms
         /// <param name="cacheType">Cache type to invalidate</param>
         public static void InvalidateCache(string key, Cache.CacheType cacheType)
         {
-            if (CacheInvalidated != null)
+			if (InternalInvalidateCache != null)
             {
-                CacheInvalidated(typeof(CachedImage), new CachedImageEvents.CacheInvalidatedEventArgs(key, cacheType));
+				InternalInvalidateCache(key, cacheType);
             }
         }
 
