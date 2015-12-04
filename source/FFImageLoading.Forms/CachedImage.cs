@@ -1,6 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading.Forms
 {
@@ -326,7 +327,7 @@ namespace FFImageLoading.Forms
 			base.OnBindingContextChanged();
 		}
 
-		public void InvalidateViewMeasure()
+		internal void InvalidateViewMeasure()
 		{
 			// this.OnPropertyChanged(Image.SourceProperty.PropertyName);
 			InvalidateMeasure();
@@ -383,7 +384,7 @@ namespace FFImageLoading.Forms
 			return new SizeRequest(new Size(num3, num4));
 		}
 			
-		public event EventHandler Cancelled;
+		internal event EventHandler Cancelled;
 
         /// <summary>
         /// Cancels image loading tasks
@@ -394,8 +395,8 @@ namespace FFImageLoading.Forms
 				this.Cancelled (this, EventArgs.Empty);
 			}
 		}
-
-        public static event EventHandler<CachedImageEvents.CacheClearedEventArgs> CacheCleared;
+			
+		internal static event EventHandler<CachedImageEvents.CacheClearedEventArgs> CacheCleared;
 
         /// <summary>
         /// Clears image cache
@@ -403,13 +404,13 @@ namespace FFImageLoading.Forms
         /// <param name="cacheType">Cache type to invalidate</param>
         public static void ClearCache(Cache.CacheType cacheType)
         {
-            if (CacheCleared != null)
+			if (CacheCleared != null)
             {
                 CacheCleared(typeof(CachedImage), new CachedImageEvents.CacheClearedEventArgs(cacheType));
             }
         }
 
-        public static event EventHandler<CachedImageEvents.CacheInvalidatedEventArgs> CacheInvalidated;
+        internal static event EventHandler<CachedImageEvents.CacheInvalidatedEventArgs> CacheInvalidated;
 
         /// <summary>
         /// Invalidates cache for a specified key
@@ -423,6 +424,34 @@ namespace FFImageLoading.Forms
                 CacheInvalidated(typeof(CachedImage), new CachedImageEvents.CacheInvalidatedEventArgs(key, cacheType));
             }
         }
+
+		internal Func<int, int, int, byte[]> InternalGetImageAsJPG; 
+
+		/// <summary>
+		/// Gets the image as JPG.
+		/// </summary>
+		/// <returns>The image as JPG.</returns>
+		public byte[] GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		{
+			if (InternalGetImageAsJPG == null)
+				return null;
+
+			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
+		}
+
+		internal Func<int, int, int, byte[]> InternalGetImageAsPNG; 
+
+		/// <summary>
+		/// Gets the image as PNG.
+		/// </summary>
+		/// <returns>The image as PNG.</returns>
+		public byte[] GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		{
+			if (InternalGetImageAsPNG == null)
+				return null;
+
+			return InternalGetImageAsPNG(quality, desiredWidth, desiredHeight);
+		}
     }
 }
 

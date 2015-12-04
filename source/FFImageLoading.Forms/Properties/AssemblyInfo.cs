@@ -22,6 +22,11 @@ using System.Runtime.CompilerServices;
 // The following attributes are used to specify the signing key for the assembly,
 // if desired. See the Mono documentation for more information about signing.
 
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Droid")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Touch")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.WinRT")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.WinUWP")]
+
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 

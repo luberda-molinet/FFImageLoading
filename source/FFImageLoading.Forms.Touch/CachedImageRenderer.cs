@@ -10,6 +10,7 @@ using Foundation;
 using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
 using System.Collections.Generic;
+using FFImageLoading.Extensions;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -94,6 +95,8 @@ namespace FFImageLoading.Forms.Touch
 				SetOpacity();
 
 				e.NewElement.Cancelled += Cancel;
+				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, byte[]>(GetImageAsJPG);
+				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, byte[]>(GetImageAsPNG);
 			}
 			base.OnElementChanged(e);
 		}
@@ -230,7 +233,7 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 
-		void ImageLoadingFinished(CachedImage element)
+		private void ImageLoadingFinished(CachedImage element)
 		{
 			if (element != null && !_isDisposed)
 			{
@@ -240,13 +243,50 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 
-		public void Cancel(object sender, EventArgs args)
+		private void Cancel(object sender, EventArgs args)
 		{
 			if (_currentTask != null && !_currentTask.IsCancelled) {
 				_currentTask.Cancel ();
 			}
 		}
+			
+		private byte[] GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		{
+			return GetImageAsByte(false, quality, desiredWidth, desiredHeight);
+		}
 
+		private byte[] GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		{
+			return GetImageAsByte(true, quality, desiredWidth, desiredHeight);
+		}
+
+		private byte[] GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		{
+			if (Control == null || Control.Image == null)
+				return null;
+
+			UIImage image = Control.Image;
+
+			if (desiredWidth != 0 || desiredHeight != 0)
+			{
+				image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight);
+			}
+
+			NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+
+			if (imageData == null || imageData.Length == 0)
+				return null;
+
+			var encoded = imageData.ToArray();
+			imageData.Dispose();
+
+			if (desiredWidth != 0 || desiredHeight != 0)
+			{
+				image.Dispose();
+			}
+
+			return encoded;
+		}
 	}
 }
 
