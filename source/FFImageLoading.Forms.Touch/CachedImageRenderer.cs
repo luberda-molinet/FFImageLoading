@@ -146,6 +146,7 @@ namespace FFImageLoading.Forms.Touch
 
 			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
+			Cancel(this, EventArgs.Empty);
 			TaskParameter imageLoader = null;
 
 			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);

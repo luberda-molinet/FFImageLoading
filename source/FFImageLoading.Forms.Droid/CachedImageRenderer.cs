@@ -130,6 +130,7 @@ namespace FFImageLoading.Forms.Droid
 
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
+					Cancel(this, EventArgs.Empty);
 					TaskParameter imageLoader = null;
 
 					var ffSource = ImageSourceBinding.GetImageSourceBinding(source);

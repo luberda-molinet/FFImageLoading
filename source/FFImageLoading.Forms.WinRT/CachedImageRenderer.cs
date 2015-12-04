@@ -147,6 +147,7 @@ namespace FFImageLoading.Forms.WinRT
 
             Xamarin.Forms.ImageSource source = Element.Source;
 
+			Cancel(this, EventArgs.Empty);
             TaskParameter imageLoader = null;
 
             var ffSource = await ImageSourceBinding.GetImageSourceBinding(source);
