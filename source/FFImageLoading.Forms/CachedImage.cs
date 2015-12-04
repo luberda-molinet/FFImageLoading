@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace FFImageLoading.Forms
 {
@@ -425,13 +426,13 @@ namespace FFImageLoading.Forms
             }
         }
 
-		internal Func<int, int, int, byte[]> InternalGetImageAsJPG; 
+		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsJPG; 
 
 		/// <summary>
 		/// Gets the image as JPG.
 		/// </summary>
 		/// <returns>The image as JPG.</returns>
-		public byte[] GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		public Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			if (InternalGetImageAsJPG == null)
 				return null;
@@ -439,13 +440,13 @@ namespace FFImageLoading.Forms
 			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
 		}
 
-		internal Func<int, int, int, byte[]> InternalGetImageAsPNG; 
+		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsPNG; 
 
 		/// <summary>
 		/// Gets the image as PNG.
 		/// </summary>
 		/// <returns>The image as PNG.</returns>
-		public byte[] GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		public Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			if (InternalGetImageAsPNG == null)
 				return null;

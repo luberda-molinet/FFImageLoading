@@ -12,6 +12,7 @@ using FFImageLoading.Views;
 using Android.Graphics.Drawables;
 using Android.Graphics;
 using System.IO;
+using System.Threading.Tasks;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -84,8 +85,8 @@ namespace FFImageLoading.Forms.Droid
 			if (e.NewElement != null)
 			{
 				e.NewElement.Cancelled += Cancel;
-				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, byte[]>(GetImageAsJPG);
-				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, byte[]>(GetImageAsPNG);
+				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
+				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
 			}
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
@@ -237,17 +238,17 @@ namespace FFImageLoading.Forms.Droid
 			}
 		}
 
-		private byte[] GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			return GetImageAsByte(Bitmap.CompressFormat.Jpeg, quality, desiredWidth, desiredHeight);
 		}
 
-		private byte[] GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			return GetImageAsByte(Bitmap.CompressFormat.Png, quality, desiredWidth, desiredHeight);
 		}
 
-		private byte[] GetImageAsByte(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
+		private async Task<byte[]> GetImageAsByte(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
 		{
 			if (Control == null)
 				return null;
@@ -280,7 +281,7 @@ namespace FFImageLoading.Forms.Droid
 
 			using (var stream = new MemoryStream())
 			{
-				bitmap.Compress(format, quality, stream);
+				await bitmap.CompressAsync(format, quality, stream);
 				var compressed = stream.ToArray();
 
 				if (desiredWidth != 0 || desiredHeight != 0)

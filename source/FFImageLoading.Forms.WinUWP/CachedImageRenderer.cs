@@ -8,6 +8,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Xamarin.Forms.Platform.UWP;
 using Xamarin.Forms;
+using Windows.Graphics.Imaging;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Storage.Streams;
+using System.IO;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinUWP
@@ -94,6 +99,8 @@ namespace FFImageLoading.Forms.WinUWP
             if (e.NewElement != null)
             {
                 e.NewElement.Cancelled += Cancel;
+                e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
+                e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
             }
 
             UpdateSource();
@@ -246,7 +253,7 @@ namespace FFImageLoading.Forms.WinUWP
             }
         }
 
-        void ImageLoadingFinished(CachedImage element)
+        private void ImageLoadingFinished(CachedImage element)
         {
             if (element != null)
             {
@@ -256,11 +263,106 @@ namespace FFImageLoading.Forms.WinUWP
             }
         }
 
-        public void Cancel(object sender, EventArgs args)
+        private void Cancel(object sender, EventArgs args)
         {
             if (_currentTask != null && !_currentTask.IsCancelled)
             {
                 _currentTask.Cancel();
+            }
+        }
+
+        private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+        {
+            return GetImageAsByte(BitmapEncoder.JpegEncoderId, quality, desiredWidth, desiredHeight);
+        }
+
+        private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+        {
+            return GetImageAsByte(BitmapEncoder.PngEncoderId, quality, desiredWidth, desiredHeight);
+        }
+
+        private async Task<byte[]> GetImageAsByte(Guid format, int quality, int desiredWidth, int desiredHeight)
+        {
+            if (Control == null || Control.Source == null)
+                return null;
+
+            var bitmap = Control.Source as WriteableBitmap;
+
+            if (bitmap == null)
+                return null;
+
+            byte[] pixels = null;
+            uint pixelsWidth = (uint)bitmap.PixelWidth;
+            uint pixelsHeight = (uint)bitmap.PixelHeight;
+
+            if (desiredWidth != 0 || desiredHeight != 0)
+            {
+                double widthRatio = (double)desiredWidth / (double)bitmap.PixelWidth;
+                double heightRatio = (double)desiredHeight / (double)bitmap.PixelHeight;
+
+                double scaleRatio = Math.Min(widthRatio, heightRatio);
+
+                if (desiredWidth == 0)
+                    scaleRatio = heightRatio;
+
+                if (desiredHeight == 0)
+                    scaleRatio = widthRatio;
+
+                uint aspectWidth = (uint)((double)bitmap.PixelWidth * scaleRatio);
+                uint aspectHeight = (uint)((double)bitmap.PixelHeight * scaleRatio);
+
+                using (var tempStream = new InMemoryRandomAccessStream())
+                {
+                    byte[] tempPixels;
+
+                    using (var sourceStream = bitmap.PixelBuffer.AsStream())
+                    {
+                        tempPixels = new byte[sourceStream.Length];
+                        await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length);
+                    }
+
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                        pixelsWidth, pixelsHeight, 96, 96, tempPixels);
+                    await encoder.FlushAsync();
+                    tempStream.Seek(0);
+
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
+                    BitmapTransform transform = new BitmapTransform() { ScaledWidth = aspectWidth, ScaledHeight = aspectHeight };
+                    PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
+                        BitmapPixelFormat.Bgra8,
+                        BitmapAlphaMode.Premultiplied,
+                        transform,
+                        ExifOrientationMode.RespectExifOrientation,
+                        ColorManagementMode.DoNotColorManage);
+
+                    pixels = pixelData.DetachPixelData();
+                    pixelsWidth = aspectWidth;
+                    pixelsHeight = aspectHeight;
+                }
+            }
+            else
+            {
+                using (var stream = bitmap.PixelBuffer.AsStream())
+                {
+                    pixels = new byte[stream.Length];
+                    await stream.ReadAsync(pixels, 0, pixels.Length);
+                }
+            }
+
+            using (var stream = new InMemoryRandomAccessStream())
+            {
+                var encoder = await BitmapEncoder.CreateAsync(format, stream);
+
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                    pixelsWidth, pixelsHeight, 96, 96, pixels);
+                await encoder.FlushAsync();
+                stream.Seek(0);
+
+                var bytes = new byte[stream.Size];
+                await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+
+                return bytes;
             }
         }
     }

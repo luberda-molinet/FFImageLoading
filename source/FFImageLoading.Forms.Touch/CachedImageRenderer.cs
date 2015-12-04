@@ -11,6 +11,7 @@ using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
 using System.Collections.Generic;
 using FFImageLoading.Extensions;
+using System.Threading.Tasks;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -95,8 +96,8 @@ namespace FFImageLoading.Forms.Touch
 				SetOpacity();
 
 				e.NewElement.Cancelled += Cancel;
-				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, byte[]>(GetImageAsJPG);
-				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, byte[]>(GetImageAsPNG);
+				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
+				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
 			}
 			base.OnElementChanged(e);
 		}
@@ -250,17 +251,17 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 			
-		private byte[] GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			return GetImageAsByte(false, quality, desiredWidth, desiredHeight);
 		}
 
-		private byte[] GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			return GetImageAsByte(true, quality, desiredWidth, desiredHeight);
 		}
 
-		private byte[] GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		private async Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
 			if (Control == null || Control.Image == null)
 				return null;
