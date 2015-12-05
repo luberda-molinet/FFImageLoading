@@ -193,6 +193,52 @@ namespace FFImageLoading.Forms
 		}
 
 		/// <summary>
+		/// The downsample to view size property.
+		/// </summary>
+		public static readonly BindableProperty DownsampleToViewSizeProperty = BindableProperty.Create<CachedImage, bool> (w => w.DownsampleToViewSize, false);
+
+		/// <summary>
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+		/// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
+		/// If the view height or width will not return > 0 - it'll fall back 
+		/// to using DownsampleWidth / DownsampleHeight properties values
+		/// </summary>
+		/// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
+		public bool DownsampleToViewSize
+		{
+			get
+			{
+				return (bool)GetValue(DownsampleToViewSizeProperty); 
+			}
+			set
+			{
+				SetValue(DownsampleToViewSizeProperty, value); 
+			}
+		}
+
+		/// <summary>
+		/// The downsample use dip units property.
+		/// </summary>
+		public static readonly BindableProperty DownsampleUseDipUnitsProperty = BindableProperty.Create<CachedImage, bool> (w => w.DownsampleUseDipUnits, false);
+
+		/// <summary>
+		/// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
+		/// will use density independent pixels for downsampling
+		/// </summary>
+		/// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
+		public bool DownsampleUseDipUnits
+		{
+			get
+			{
+				return (bool)GetValue(DownsampleUseDipUnitsProperty); 
+			}
+			set
+			{
+				SetValue(DownsampleUseDipUnitsProperty, value); 
+			}
+		}
+
+		/// <summary>
 		/// The cache duration property.
 		/// </summary>
 		public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create<CachedImage, TimeSpan> (w => w.CacheDuration, TimeSpan.FromDays(90));

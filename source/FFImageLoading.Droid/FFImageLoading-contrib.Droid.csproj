@@ -91,6 +91,7 @@
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Cache\ImageCacheHelper.cs" />
+    <Compile Include="Extensions\UnitsExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

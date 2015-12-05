@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
 using System.IO;
+using FFImageLoading.Extensions;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinRT
@@ -197,15 +198,39 @@ namespace FFImageLoading.Forms.WinRT
                 }
 
                 // Downsample
-                if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
+                if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
                 {
-                    if (Element.DownsampleHeight > Element.DownsampleWidth)
+                    if (Element.Height > Element.Width)
                     {
-                        imageLoader.DownSample(height: (int)Element.DownsampleHeight);
+                        imageLoader.DownSample(height: Element.Height.PointsToPixels());
                     }
                     else
                     {
-                        imageLoader.DownSample(width: (int)Element.DownsampleWidth);
+                        imageLoader.DownSample(width: Element.Width.PointsToPixels());
+                    }
+                }
+                else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
+                {
+                    if (Element.HeightRequest > Element.WidthRequest)
+                    {
+                        imageLoader.DownSample(height: Element.HeightRequest.PointsToPixels());
+                    }
+                    else
+                    {
+                        imageLoader.DownSample(width: Element.WidthRequest.PointsToPixels());
+                    }
+                }
+                else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
+                {
+                    if (Element.DownsampleHeight > Element.DownsampleWidth)
+                    {
+                        imageLoader.DownSample(height: Element.DownsampleUseDipUnits
+                            ? Element.DownsampleHeight.PointsToPixels() : (int)Element.DownsampleHeight);
+                    }
+                    else
+                    {
+                        imageLoader.DownSample(width: Element.DownsampleUseDipUnits
+                            ? Element.DownsampleWidth.PointsToPixels() : (int)Element.DownsampleWidth);
                     }
                 }
 

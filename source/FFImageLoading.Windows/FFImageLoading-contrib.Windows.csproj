@@ -88,6 +88,7 @@
     <Compile Include="DataResolver\ResourceDataResolver.cs" />
     <Compile Include="DataResolver\UrlDataResolver.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="FFImageSourceBinding.cs" />
     <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />

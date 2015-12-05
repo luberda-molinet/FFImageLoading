@@ -197,17 +197,41 @@ namespace FFImageLoading.Forms.Touch
 				}
 
 				// Downsample
-				if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
+				if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
 				{
-                    if (Element.DownsampleHeight > Element.DownsampleWidth)
-                    {
-                        imageLoader.DownSample(height: (int)Element.DownsampleHeight);
-                    }
-                    else
-                    {
-                        imageLoader.DownSample(width: (int)Element.DownsampleWidth);
-                    }
-                }
+					if (Element.Height > Element.Width)
+					{
+						imageLoader.DownSample(height: Element.Height.PointsToPixels());
+					}
+					else
+					{
+						imageLoader.DownSample(width: Element.Width.PointsToPixels());
+					}
+				}
+				else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
+				{
+					if (Element.HeightRequest > Element.WidthRequest)
+					{
+						imageLoader.DownSample(height: Element.HeightRequest.PointsToPixels());
+					}
+					else
+					{
+						imageLoader.DownSample(width: Element.WidthRequest.PointsToPixels());
+					}
+				}
+				else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
+				{
+					if (Element.DownsampleHeight > Element.DownsampleWidth)
+					{
+						imageLoader.DownSample(height: Element.DownsampleUseDipUnits 
+							? Element.DownsampleHeight.PointsToPixels() : (int)Element.DownsampleHeight);
+					}
+					else
+					{
+						imageLoader.DownSample(width: Element.DownsampleUseDipUnits 
+							? Element.DownsampleWidth.PointsToPixels() : (int)Element.DownsampleWidth);
+					}
+				}
 
 				// RetryCount
 				if (Element.RetryCount > 0)

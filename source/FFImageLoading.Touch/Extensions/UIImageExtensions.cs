@@ -29,15 +29,7 @@ namespace FFImageLoading.Extensions
 
 			var newSize = new CGSize(aspectWidth, aspectHeight);
 
-			//Determine whether the screen is retina
-			if (UIScreen.MainScreen.Scale == 2.0) 
-			{
-				UIGraphics.BeginImageContextWithOptions(newSize, false, (nfloat)2.0);
-			}
-			else
-			{
-				UIGraphics.BeginImageContextWithOptions(newSize, false, (nfloat)0.0);
-			}
+			UIGraphics.BeginImageContextWithOptions(newSize, false, (nfloat)1.0);
 
 			try
 			{
