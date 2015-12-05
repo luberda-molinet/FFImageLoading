@@ -53,9 +53,7 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                var oldStream = image;
-                image = await oldStream.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
-                oldStream.Dispose();
+                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
             }
 
             using (image)
@@ -85,9 +83,7 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                var oldStream = image;
-                image = await oldStream.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
-                oldStream.Dispose();
+                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
             }
 
             using (image)
@@ -138,27 +134,30 @@ namespace FFImageLoading.Extensions
             var decoder = await BitmapDecoder.CreateAsync(imageStream);
             if (decoder.OrientedPixelHeight > height || decoder.OrientedPixelWidth > width)
             {
-                resizedStream = new InMemoryRandomAccessStream();
-                BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
-                double widthRatio = (double)width / decoder.OrientedPixelWidth;
-                double heightRatio = (double)height / decoder.OrientedPixelHeight;
+                using (imageStream)
+                {
+                    resizedStream = new InMemoryRandomAccessStream();
+                    BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                    double widthRatio = (double)width / decoder.OrientedPixelWidth;
+                    double heightRatio = (double)height / decoder.OrientedPixelHeight;
 
-                double scaleRatio = Math.Min(widthRatio, heightRatio);
+                    double scaleRatio = Math.Min(widthRatio, heightRatio);
 
-                if (width == 0)
-                    scaleRatio = heightRatio;
+                    if (width == 0)
+                        scaleRatio = heightRatio;
 
-                if (height == 0)
-                    scaleRatio = widthRatio;
+                    if (height == 0)
+                        scaleRatio = widthRatio;
 
-                uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
-                uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
+                    uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
+                    uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
 
-                encoder.BitmapTransform.ScaledHeight = aspectHeight;
-                encoder.BitmapTransform.ScaledWidth = aspectWidth;
-  
-                await encoder.FlushAsync();
-                resizedStream.Seek(0);
+                    encoder.BitmapTransform.ScaledHeight = aspectHeight;
+                    encoder.BitmapTransform.ScaledWidth = aspectWidth;
+
+                    await encoder.FlushAsync();
+                    resizedStream.Seek(0);
+                }
             }
 
             return resizedStream;

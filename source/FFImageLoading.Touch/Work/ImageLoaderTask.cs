@@ -307,7 +307,9 @@ namespace FFImageLoading.Work
 					{
 						var webpImage = new WebP.Touch.WebPCodec().Decode(bytes);
 
-						if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+						if (Parameters.DownSampleSize != null
+							&& ((Parameters.DownSampleSize.Item1 > 0 && webpImage.Size.Width > Parameters.DownSampleSize.Item1) 
+								|| (Parameters.DownSampleSize.Item2 > 0 && webpImage.Size.Height > Parameters.DownSampleSize.Item2)))
 						{
 							UIImage resizedImage = webpImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
 							webpImage.Dispose();
@@ -319,17 +321,15 @@ namespace FFImageLoading.Work
 
 					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
 
-					UIImage imageIn = null;
+					UIImage imageIn = new UIImage(NSData.FromArray(bytes), scale);
 
-					if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+					if (Parameters.DownSampleSize != null
+						&& ((Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1) 
+							|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
 					{
 						var tempImage = new UIImage(NSData.FromArray(bytes), scale);
 						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
 						tempImage.Dispose();
-					}
-					else
-					{
-						imageIn = new UIImage(NSData.FromArray(bytes), scale);
 					}
 
 					if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
