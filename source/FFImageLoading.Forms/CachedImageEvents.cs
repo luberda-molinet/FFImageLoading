@@ -1,34 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms
 {
-    public class CachedImageEvents
-    {
-        public class CacheClearedEventArgs : EventArgs
-        {
-            public CacheClearedEventArgs(Cache.CacheType cacheType)
-            {
-                CacheType = cacheType;
-            }
+	public static class CachedImageEvents
+	{
+		public class ErrorEventArgs : EventArgs
+		{
+			public ErrorEventArgs(Exception exception)
+			{
+				Exception = exception;
+			}
 
-            public Cache.CacheType CacheType { get; set; }
-        }
+			public Exception Exception { get; private set; }
+		}
 
-        public class CacheInvalidatedEventArgs : EventArgs
-        {
-            public CacheInvalidatedEventArgs(string key, Cache.CacheType cacheType)
-            {
-                Key = key;
-                CacheType = cacheType;
-            }
+		public class SuccessEventArgs : EventArgs
+		{
+			public SuccessEventArgs(ImageSize imageSize, LoadingResult loadingResult)
+			{
+				ImageSize = imageSize;
+				LoadingResult = loadingResult;
+			}
 
-            public Cache.CacheType CacheType { get; set; }
+			public ImageSize ImageSize { get; private set; }
 
-            public string Key { get; set; }
-        }
-    }
+			public LoadingResult LoadingResult { get; private set; }
+		}
+
+		public class FinishEventArgs : EventArgs
+		{
+			public FinishEventArgs(IScheduledWork scheduledWork)
+			{
+				ScheduledWork = scheduledWork;
+			}
+
+			public IScheduledWork ScheduledWork { get; private set; }
+		}
+	}
 }
+

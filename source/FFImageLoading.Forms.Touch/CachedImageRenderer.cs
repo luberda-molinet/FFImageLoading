@@ -229,7 +229,19 @@ namespace FFImageLoading.Forms.Touch
 					imageLoader.Transform(Element.Transformations);
 				}
 
-				imageLoader.Finish((work) => ImageLoadingFinished(Element));
+				var element = Element;
+
+				imageLoader.Finish((work) => {
+					element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
+					ImageLoadingFinished(element);
+				});
+
+				imageLoader.Success((imageSize, loadingResult) => 
+					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
+
+				imageLoader.Error((exception) => 
+					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+				
 				_currentTask = imageLoader.Into(Control);	
 			}
 		}

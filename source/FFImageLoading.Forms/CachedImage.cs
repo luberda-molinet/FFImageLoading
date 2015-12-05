@@ -452,6 +452,39 @@ namespace FFImageLoading.Forms
 
 			return InternalGetImageAsPNG(quality, desiredWidth, desiredHeight);
 		}
+
+		/// <summary>
+		/// Occurs when after image loading success.
+		/// </summary>
+		public event EventHandler<CachedImageEvents.SuccessEventArgs> Success;
+
+		internal void OnSuccess(CachedImageEvents.SuccessEventArgs e) 
+		{
+			var handler = Success;
+			if (handler != null) handler(this, e);
+		}
+
+		/// <summary>
+		/// Occurs when after image loading error.
+		/// </summary>
+		public event EventHandler<CachedImageEvents.ErrorEventArgs> Error;
+
+		internal void OnError(CachedImageEvents.ErrorEventArgs e) 
+		{
+			var handler = Error;
+			if (handler != null) handler(this, e);
+		}
+
+		/// <summary>
+		/// Occurs after image loading.
+		/// </summary>
+		public event EventHandler<CachedImageEvents.FinishEventArgs> Finish;
+
+		internal void OnFinish(CachedImageEvents.FinishEventArgs e) 
+		{
+			var handler = Finish;
+			if (handler != null) handler(this, e);
+		}
     }
 }
 
