@@ -9,7 +9,7 @@
 	<ContentPage.Content>
 		<ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
 			WidthRequest="300" HeightRequest="300"
-			DownsampleToViewSize="false"
+			DownsampleToViewSize="true"
 			Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg">
 		</ffimageloading:CachedImage>
 	</ContentPage.Content>
