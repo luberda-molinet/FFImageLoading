@@ -15,6 +15,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 			var cachedImage = new CachedImage() {
 				WidthRequest = 400,
 				HeightRequest = 400,
+				DownsampleToViewSize = true,
 				HorizontalOptions = LayoutOptions.Center,
 				VerticalOptions = LayoutOptions.Center,
 				CacheDuration = TimeSpan.FromDays(30),

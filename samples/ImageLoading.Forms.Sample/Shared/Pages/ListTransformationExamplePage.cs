@@ -40,6 +40,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					WidthRequest = 200,
 					HeightRequest = 200,
 					DownsampleHeight = 200,
+					DownsampleUseDipUnits = true,
 					TransparencyEnabled = false,
 					Aspect = Aspect.AspectFill,
 					CacheDuration = TimeSpan.FromDays(30),

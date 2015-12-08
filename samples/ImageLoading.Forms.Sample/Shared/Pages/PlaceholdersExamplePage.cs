@@ -17,6 +17,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				VerticalOptions = LayoutOptions.Center,
 				WidthRequest = 200,
 				HeightRequest = 200,
+				DownsampleToViewSize = true,
 				CacheDuration = TimeSpan.FromDays(30),
 				RetryCount = 0,
 				TransparencyEnabled = false,
