@@ -238,7 +238,10 @@ namespace FFImageLoading.Work
 			{
 				lock (_pauseWorkLock)
 				{
-					_pendingTasks.Add(currentPendingTask);
+					lock(_pendingTasksLock)
+					{
+						_pendingTasks.Add(currentPendingTask);
+					}
 				}
 
 				Run(currentPendingTask);
