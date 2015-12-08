@@ -25,6 +25,7 @@ namespace FFImageLoading.Cache
     public class DiskCache : IDiskCache
     {
         private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(initialCount: 1);
+		private static readonly SemaphoreSlim fileWriteLock = new SemaphoreSlim(initialCount: 1);
 
         enum JournalOp
         {
@@ -277,12 +278,20 @@ namespace FFImageLoading.Cache
 
             bool existed = entries.ContainsKey(key);
 
-            var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
+			try
+			{
+				await fileWriteLock.WaitAsync();
+				var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
 
-            using (var fs = await file.OpenStreamForWriteAsync())
-            {
-                await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
-            }
+				using (var fs = await file.OpenStreamForWriteAsync())
+				{
+					await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
+				}
+			}
+			finally
+			{
+				fileWriteLock.Release();
+			}
 
             await AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created,
                 key,

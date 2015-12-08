@@ -38,6 +38,7 @@ namespace FFImageLoading.Cache
         string journalPath;
         string version;
 		object lockJournal;
+		readonly SemaphoreSlim fileWriteLock = new SemaphoreSlim(initialCount: 1);
 
         struct CacheEntry
         {
@@ -215,11 +216,19 @@ namespace FFImageLoading.Cache
 			bool existed = entries.ContainsKey (key);
 			string filepath = Path.Combine(basePath, key);
 
-			using (var fs = FileStore.GetOutputStream(filepath))
+			try
 			{
-				await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
+				await fileWriteLock.WaitAsync();
+				using (var fs = FileStore.GetOutputStream(filepath))
+				{
+					await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
+				}
 			}
-
+			finally
+			{
+				fileWriteLock.Release();
+			}
+				
 			AppendToJournal (existed ? JournalOp.Modified : JournalOp.Created,
 				key,
 				DateTime.UtcNow,
