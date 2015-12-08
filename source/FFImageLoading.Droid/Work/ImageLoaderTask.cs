@@ -93,7 +93,8 @@ namespace FFImageLoading.Work
 				var drawable = new AsyncDrawable(Context.Resources, null, this);
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						imageView.SetImageDrawable(drawable);
+						if (imageView != null && imageView.Handle != IntPtr.Zero)
+							imageView.SetImageDrawable(drawable);
 					}).ConfigureAwait(false);
 			}
 
@@ -164,8 +165,10 @@ namespace FFImageLoading.Work
 					{
 						if (CancellationToken.IsCancellationRequested)
 							return;
-
-						SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
+						
+						if (imageView != null && imageView.Handle != IntPtr.Zero)
+							SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
+						
 						Completed = true;
 						Parameters.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
 					}).ConfigureAwait(false);
@@ -250,7 +253,9 @@ namespace FFImageLoading.Work
 						if (CancellationToken.IsCancellationRequested)
 							return;
 
-						SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
+						if (imageView != null && imageView.Handle != IntPtr.Zero)
+							SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
+						
 						Completed = true;
 						Parameters.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
 					}).ConfigureAwait(false);
@@ -483,7 +488,9 @@ namespace FFImageLoading.Work
 				drawable = new AsyncDrawable(Context.Resources, null, this);
 				await MainThreadDispatcher.PostAsync(() =>
 				{
-					imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
+					if (imageView != null && imageView.Handle != IntPtr.Zero)
+						imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
+						
 				}).ConfigureAwait(false);
 
 				try
@@ -510,8 +517,10 @@ namespace FFImageLoading.Work
 			{
 				if (CancellationToken.IsCancellationRequested)
 					return;
-
-				SetImageDrawable(imageView, drawable, false);
+					
+				if (imageView != null && imageView.Handle != IntPtr.Zero)
+					SetImageDrawable(imageView, drawable, false);
+					
 			}).ConfigureAwait(false);
 
 			return true;
@@ -553,11 +562,14 @@ namespace FFImageLoading.Work
 						if (ffDrawable != null)
 							ffDrawable.StopFadeAnimation();
 
-						imageView.SetImageDrawable(value);
-						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+						if (imageView != null && imageView.Handle != IntPtr.Zero)
 						{
-							imageView.LayoutParameters.Height = value.IntrinsicHeight;
-							imageView.LayoutParameters.Width = value.IntrinsicWidth;
+							imageView.SetImageDrawable(value);
+							if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+							{
+								imageView.LayoutParameters.Height = value.IntrinsicHeight;
+								imageView.LayoutParameters.Width = value.IntrinsicWidth;
+							}	
 						}
 					}).ConfigureAwait(false);
 
