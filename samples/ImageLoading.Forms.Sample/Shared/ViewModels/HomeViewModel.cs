@@ -16,6 +16,10 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				PageFactory.GetMessagablePageFromCache<SimpleExampleViewModel>()
 				.PushPage());
 
+			OpenXamlBasicExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<XamlSimpleExampleViewModel>()
+				.PushPage());
+
 			OpenListExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<ListExampleViewModel>()
 				.SendMessageToViewModel("Reload")
@@ -45,6 +49,12 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					Section = "Basic",
 					Title = "Basic example",
 					Command = OpenBasicExampleCommand
+				},
+
+				new MenuItem() {
+					Section = "Basic",
+					Title = "Basic XAML example",
+					Command = OpenXamlBasicExampleCommand
 				},
 
 				new MenuItem() {
@@ -163,6 +173,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 		}
 
 		public IPageFactoryCommand OpenBasicExampleCommand { get; private set; }
+
+		public IPageFactoryCommand OpenXamlBasicExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenListExampleCommand { get; private set; }
 
