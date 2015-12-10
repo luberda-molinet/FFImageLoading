@@ -64,6 +64,7 @@ namespace FFImageLoading.Cache
 						{
 							// Here it is safe to recycle, these items aren't supposed to be displayed anymore
 							item.Recycle();
+							item.Dispose();
 						}
 					}
 
@@ -132,46 +133,30 @@ namespace FFImageLoading.Cache
 
 		public Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options)
 		{
-			Bitmap bitmap = null;
-
-			var bitmapToRemove = new List<WeakReference>();
 			if (_reusableBitmaps != null && !_reusableBitmaps.IsEmpty)
 			{
 				foreach (var weakReference in _reusableBitmaps)
 				{
+					_reusableBitmaps.TryRemove(weakReference);
 					var item = weakReference.Get() as Bitmap;
-					if (item != null && item.IsMutable)
+
+					if (item != null && item.Handle != System.IntPtr.Zero)
 					{
-						if (CanUseForInBitmap(item, options))
+						if (item.IsMutable && CanUseForInBitmap(item, options))
 						{
-							bitmap = item;
-							bitmapToRemove.Add(weakReference);
-							break;
+							// reuse the bitmap
+							return item;
+						}
+						else
+						{
+							item.Recycle();
+							item.Dispose();
 						}
 					}
-					else
-					{
-						bitmapToRemove.Add(weakReference);
-					}
 				}
 			}
 
-			if (_reusableBitmaps != null && bitmapToRemove.Count > 0)
-			{
-				foreach (var weakReference in bitmapToRemove)
-				{
-					_reusableBitmaps.TryRemove(weakReference);
-
-					var item = weakReference.Get() as Bitmap;
-					// We need to inform .NET GC that the Bitmap is no longer in use
-					if (item != bitmap && item != null)
-					{
-						item.Dispose();
-					}
-				}
-			}
-
-			return bitmap;
+			return null;
 		}
 
 		protected override void EntryRemoved(bool evicted, Object key, Object oldValue, Object newValue)

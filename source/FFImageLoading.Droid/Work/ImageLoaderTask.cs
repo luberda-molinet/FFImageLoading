@@ -693,7 +693,7 @@ namespace FFImageLoading.Work
 			// Try and find a bitmap to use for inBitmap
 			var inBitmap = ImageCache.Instance.GetBitmapFromReusableSet(options);
 
-			if (inBitmap != null)
+			if (inBitmap != null && inBitmap.Handle != IntPtr.Zero)
 			{
 				options.InBitmap = inBitmap;
 			}
