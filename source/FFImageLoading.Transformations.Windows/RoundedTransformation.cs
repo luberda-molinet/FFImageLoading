@@ -75,69 +75,51 @@ namespace FFImageLoading.Transformations
 
             int atx = 0;
             int aty = 0;
-            int j = 0;
-            int k = 0;
-            int index = 0;
-
-            bool shouldDraw = false;
 
             int transparentColor = Colors.Transparent.ToInt();
 
-            for (k = 0; k < h; k++)
+            for (int k = 0; k < h; k++)
             {
-                for (j = 0; j < w; j++)
+                for (int j = 0; j < w; j++)
                 {
-                    shouldDraw = false;
-
                     atx = x + j;
                     aty = y + k;
 
                     if (atx <= x + rad && aty <= y + rad)
                     { //top left corner
-                        if (CheckCorner(x + rad, y + rad, rad, 1, atx, aty))
-                        {
-                            shouldDraw = true;
-                        }
+                        if (!CheckRoundedCorner(x + rad, y + rad, rad, Corner.TopLeftCorner, atx, aty))
+                            source.Pixels[aty * w + atx] = transparentColor;
                     }
                     else if (atx >= x + w - rad && aty <= y + rad)
                     { // top right corner
-                        if (CheckCorner(x + w - rad, y + rad, rad, 2, atx, aty))
-                        {
-                            shouldDraw = true;
-                        }
+                        if (!CheckRoundedCorner(x + w - rad, y + rad, rad, Corner.TopRightCorner, atx, aty))
+                            source.Pixels[aty * w + atx] = transparentColor;
                     }
                     else if (atx >= x + w - rad && aty >= y + h - rad)
                     { // bottom right corner
-                        if (CheckCorner(x + w - rad, y + h - rad, rad, 3, atx, aty))
-                        {
-                            shouldDraw = true;
-                        }
+                        if (!CheckRoundedCorner(x + w - rad, y + h - rad, rad, Corner.BottomRightCorner, atx, aty))
+                            source.Pixels[aty * w + atx] = transparentColor;
                     }
                     else if (atx <= x + rad && aty >= y + h - rad)
                     { // bottom left corner
-                        if (CheckCorner(x + rad, y + h - rad, rad, 4, atx, aty))
-                        {
-                            shouldDraw = true;
-                        }
+                        if (!CheckRoundedCorner(x + rad, y + h - rad, rad, Corner.BottomLeftCorner, atx, aty))
+                            source.Pixels[aty * w + atx] = transparentColor;
                     }
-                    else
-                    { // its not in a corner
-                        shouldDraw = true;
-                    }
-
-                    if (!shouldDraw)
-                    {
-                        source.Pixels[aty * w + atx] = transparentColor;
-                    }
-
-                    index++;
                 }
             }
 
             x++;
         }
 
-        private static bool CheckCorner(int h, int k, int r, int which, int xC, int yC)
+        private enum Corner
+        {
+            TopLeftCorner,
+            TopRightCorner,
+            BottomRightCorner,
+            BottomLeftCorner,
+        }
+
+        private static bool CheckRoundedCorner(int h, int k, int r, Corner which, int xC, int yC)
         {
             int x = 0;
             int y = r;
@@ -147,52 +129,28 @@ namespace FFImageLoading.Transformations
             {
                 switch (which)
                 {
-                    case 1:
+                    case Corner.TopLeftCorner:
                         {   //Testing if its outside the top left corner
-                            if (xC <= h - x && yC <= k - y)
-                            {
-                                return false;
-                            }
-                            else if (xC <= h - y && yC <= k - x)
-                            {
-                                return false;
-                            }
+                            if (xC <= h - x && yC <= k - y) return false;
+                            else if (xC <= h - y && yC <= k - x) return false;
                             break;
                         }
-                    case 2:
+                    case Corner.TopRightCorner:
                         {   //Testing if its outside the top right corner
-                            if (xC >= h + y && yC <= k - x)
-                            {
-                                return false;
-                            }
-                            else if (xC >= h + x && yC <= k - y)
-                            {
-                                return false;
-                            }
+                            if (xC >= h + y && yC <= k - x) return false;
+                            else if (xC >= h + x && yC <= k - y) return false;
                             break;
                         }
-                    case 3:
+                    case Corner.BottomRightCorner:
                         {   //Testing if its outside the bottom right corner
-                            if (xC >= h + x && yC >= k + y)
-                            {
-                                return false;
-                            }
-                            else if (xC >= h + y && yC >= k + x)
-                            {
-                                return false;
-                            }
+                            if (xC >= h + x && yC >= k + y) return false;
+                            else if (xC >= h + y && yC >= k + x) return false;
                             break;
                         }
-                    case 4:
+                    case Corner.BottomLeftCorner:
                         {   //Testing if its outside the bottom left corner
-                            if (xC <= h - y && yC >= k + x)
-                            {
-                                return false;
-                            }
-                            else if (xC <= h - x && yC >= k + y)
-                            {
-                                return false;
-                            }
+                            if (xC <= h - y && yC >= k + x) return false;
+                            else if (xC <= h - x && yC >= k + y) return false;
                             break;
                         }
                 }
@@ -200,8 +158,9 @@ namespace FFImageLoading.Transformations
                 x++;
 
                 if (p < 0)
+                {
                     p += ((4 * x) + 6);
-
+                }  
                 else
                 {
                     y--;
