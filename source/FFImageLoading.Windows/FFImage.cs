@@ -1,4 +1,5 @@
-﻿using FFImageLoading.Work;
+﻿using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
@@ -93,15 +94,39 @@ namespace FFImageLoading
                 }
 
                 // Downsample
-                if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
+                if (DownsampleToViewSize && (Width > 0 || Height > 0))
                 {
-                    if (DownsampleHeight > DownsampleWidth)
+                    if (Height > Width)
                     {
-                        imageLoader.DownSample(height: (int)DownsampleWidth);
+                        imageLoader.DownSample(height: Height.PointsToPixels());
                     }
                     else
                     {
-                        imageLoader.DownSample(width: (int)DownsampleHeight);
+                        imageLoader.DownSample(width: Width.PointsToPixels());
+                    }
+                }
+                else if (DownsampleToViewSize && (MinWidth > 0 || MinHeight > 0))
+                {
+                    if (MinHeight > MinWidth)
+                    {
+                        imageLoader.DownSample(height: MinHeight.PointsToPixels());
+                    }
+                    else
+                    {
+                        imageLoader.DownSample(width: MinWidth.PointsToPixels());
+                    }
+                }
+                else if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
+                {
+                    if (DownsampleHeight > DownsampleWidth)
+                    {
+                        imageLoader.DownSample(height: DownsampleUseDipUnits
+                            ? DownsampleHeight.PointsToPixels() : (int)DownsampleHeight);
+                    }
+                    else
+                    {
+                        imageLoader.DownSample(width: DownsampleUseDipUnits
+                            ? DownsampleWidth.PointsToPixels() : (int)DownsampleWidth);
                     }
                 }
 
@@ -231,6 +256,48 @@ namespace FFImageLoading
             set
             {
                 SetValue(DownsampleHeightProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty DownsampleToViewSizeProperty = DependencyProperty.Register("DownsampleToViewSize",
+            typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
+
+        /// <summary>
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+        /// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
+        /// If the view height or width will not return > 0 - it'll fall back 
+        /// to using DownsampleWidth / DownsampleHeight properties values
+        /// </summary>
+        /// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
+        public bool DownsampleToViewSize
+        {
+            get
+            {
+                return (bool)GetValue(DownsampleToViewSizeProperty);
+            }
+            set
+            {
+                SetValue(DownsampleToViewSizeProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register("DownsampleUseDipUnits",
+            typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
+
+        /// <summary>
+        /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
+        /// will use density independent pixels for downsampling
+        /// </summary>
+        /// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
+        public bool DownsampleUseDipUnits
+        {
+            get
+            {
+                return (bool)GetValue(DownsampleUseDipUnitsProperty);
+            }
+            set
+            {
+                SetValue(DownsampleUseDipUnitsProperty, value);
             }
         }
 

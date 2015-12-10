@@ -17,7 +17,7 @@
         CacheDuration="30"
         RetryCount="3"
         RetryDelay="250"
-        DownsampleHeight="300"
+        DownsampleToViewSize="True"
         Source="http://lorempixel.com/output/city-q-c-600-600-5.jpg">
     </ff:FFImage>
 
