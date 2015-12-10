@@ -34,7 +34,7 @@ namespace FFImageLoading.Work
 			_imageScale = imageScale;
 			DownloadCache = downloadCache;
 		}
-			
+
 		protected IDownloadCache DownloadCache { get; private set; }
 
 		/// <summary>
@@ -99,7 +99,7 @@ namespace FFImageLoading.Work
 
 			if (CancellationToken.IsCancellationRequested)
 				return GenerateResult.Canceled;
-					
+
 			if (_getNativeControl() == null)
 				return GenerateResult.InvalidTarget;
 
@@ -147,7 +147,7 @@ namespace FFImageLoading.Work
 				if (nativeControl == null)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
-	            var value = ImageCache.Instance.Get(GetKey());
+				var value = ImageCache.Instance.Get(GetKey());
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
@@ -166,7 +166,7 @@ namespace FFImageLoading.Work
 
 				if (Parameters.OnSuccess != null)
 					Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
-				
+
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
@@ -301,33 +301,25 @@ namespace FFImageLoading.Work
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
-				
+
+					UIImage imageIn = null;
+
 					// Special case to handle WebP decoding on iOS
 					if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
 					{
-						var webpImage = new WebP.Touch.WebPCodec().Decode(bytes);
-
-						if (Parameters.DownSampleSize != null
-							&& ((Parameters.DownSampleSize.Item1 > 0 && webpImage.Size.Width > Parameters.DownSampleSize.Item1) 
-								|| (Parameters.DownSampleSize.Item2 > 0 && webpImage.Size.Height > Parameters.DownSampleSize.Item2)))
-						{
-							UIImage resizedImage = webpImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
-							webpImage.Dispose();
-							return resizedImage;
-						}
-
-						return webpImage;
+						imageIn = new WebP.Touch.WebPCodec().Decode(bytes);
 					}
-
-					nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-
-					UIImage imageIn = new UIImage(NSData.FromArray(bytes), scale);
+					else
+					{
+						nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
+						imageIn = new UIImage(NSData.FromArray(bytes), scale);
+					}
 
 					if (Parameters.DownSampleSize != null
 						&& ((Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1) 
 							|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
 					{
-						var tempImage = new UIImage(NSData.FromArray(bytes), scale);
+						var tempImage = imageIn;
 						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
 						tempImage.Dispose();
 					}
@@ -389,7 +381,7 @@ namespace FFImageLoading.Work
 
 			if (image == null)
 				return false;
-			
+
 			var view = _getNativeControl();
 			if (view == null)
 				return false;
@@ -402,7 +394,7 @@ namespace FFImageLoading.Work
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return;
-				
+
 					_doWithImage(image, false);
 				});
 
