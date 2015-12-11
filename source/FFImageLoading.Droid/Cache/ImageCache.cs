@@ -137,21 +137,29 @@ namespace FFImageLoading.Cache
 			{
 				foreach (var weakReference in _reusableBitmaps)
 				{
-					_reusableBitmaps.TryRemove(weakReference);
+					bool removed = _reusableBitmaps.TryRemove(weakReference);
 					var item = weakReference.Get() as Bitmap;
 
-					if (item != null && item.Handle != System.IntPtr.Zero)
+					if (item != null && item.Handle != System.IntPtr.Zero && item.IsMutable)
 					{
-						if (item.IsMutable && CanUseForInBitmap(item, options))
+						if (CanUseForInBitmap(item, options))
 						{
 							// reuse the bitmap
 							return item;
 						}
 						else
 						{
-							item.Recycle();
-							item.Dispose();
+							if (removed)
+							{
+								// the bitmap isn't usable yet, put it back in reusableBitmaps
+								_reusableBitmaps.TryAdd(weakReference);
+							}
 						}
+					}
+					else
+					{
+						item.Recycle();
+						item.Dispose();
 					}
 				}
 			}
