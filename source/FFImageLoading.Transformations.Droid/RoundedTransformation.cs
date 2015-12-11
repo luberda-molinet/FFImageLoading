@@ -55,6 +55,8 @@ namespace FFImageLoading.Transformations
 
 			if (rad == 0)
 				rad = (float)(Math.Min(desiredWidth, desiredHeight) / 2);
+			else
+				rad = (float)(rad * (desiredWidth + desiredHeight) / 2 / 500);
 
 			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, Bitmap.Config.Argb8888);
 

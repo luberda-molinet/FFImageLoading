@@ -56,6 +56,8 @@ namespace FFImageLoading.Transformations
 
 			if (rad == 0)
 				rad = (nfloat)(Math.Min(desiredWidth, desiredHeight) / 2);
+			else
+				rad = (nfloat)(rad * (desiredWidth + desiredHeight) / 2 / 500);
 
 			UIGraphics.BeginImageContextWithOptions(new CGSize(desiredWidth, desiredHeight), false, (nfloat)0.0);
 

@@ -66,7 +66,7 @@ namespace FFImageLoading.Transformations
 
             if (rad == 0)
                 rad = (int)(Math.Min(desiredWidth, desiredHeight) / 2);
-            else rad = (int)(rad * (desiredWidth + desiredHeight) / 2 / 600);
+            else rad = (int)(rad * (desiredWidth + desiredHeight) / 2 / 500);
 
             int x = 0;
             int y = 0;
