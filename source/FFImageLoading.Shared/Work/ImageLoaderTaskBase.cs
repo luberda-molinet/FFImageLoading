@@ -76,7 +76,7 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(path))
 				return null; // If path is null then something is wrong, we should not append transformations key
 
-			return path + TransformationsKey;
+			return path + TransformationsKey + DownsamplingKey;
 		}
 
 		public void Cancel()
@@ -208,9 +208,20 @@ namespace FFImageLoading.Work
 			get
 			{
 				if (Parameters.Transformations == null || Parameters.Transformations.Count == 0)
-					return "";
+					return string.Empty;
 
 				return ";" + Parameters.Transformations.Select(t => t.Key).Aggregate((a, b) => a + ";" + b);
+			}
+		}
+
+		protected string DownsamplingKey
+		{
+			get
+			{
+				if (Parameters.DownSampleSize == null)
+					return string.Empty;
+
+				return string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
 			}
 		}
 
