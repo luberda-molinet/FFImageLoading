@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml;
 
 namespace FFImageLoading
 {
@@ -38,17 +39,32 @@ namespace FFImageLoading
 
                 if (isFadeAnimationEnabled && !fromCache)
                 {
-                    refView.Source = img;
-
-                    //TODO !!!!!!!!!!!!!!
                     // fade animation
-                    //DoubleAnimation fadeoutAnimation = new DoubleAnimation();
-                    //fadeoutAnimation.Duration = TimeSpan.FromMilliseconds(500);
-                    //fadeoutAnimation.From = 1.0d;
-                    //fadeoutAnimation.To = 0.0d;
-                    //Storyboard storyboard = new Storyboard();
-                    //storyboard.Children.Add(fadeoutAnimation);
-                    //refView.BeginAnimation(Image.OpacityProperty, fadeoutAnimation);
+                    var currentOpacity = refView.Opacity;
+
+                    DoubleAnimation fadeOut = new DoubleAnimation();
+                    fadeOut.Duration = TimeSpan.FromMilliseconds(100);
+                    fadeOut.From = currentOpacity;
+                    fadeOut.To = 0.0d;
+
+                    DoubleAnimation fadeIn = new DoubleAnimation();
+                    fadeIn.Duration = TimeSpan.FromMilliseconds(300);
+                    fadeIn.From = 0.0d;
+                    fadeIn.To = currentOpacity;
+
+                    Storyboard fadeOutStoryboard = new Storyboard();
+                    Storyboard.SetTargetProperty(fadeOut, "Image.Opacity");
+                    Storyboard.SetTarget(fadeOut, refView);
+                    fadeOutStoryboard.Children.Add(fadeOut);
+
+                    Storyboard fadeInStoryboard = new Storyboard();
+                    Storyboard.SetTargetProperty(fadeIn, "Image.Opacity");
+                    Storyboard.SetTarget(fadeIn, refView);
+                    fadeInStoryboard.Children.Add(fadeIn);
+
+                    fadeOutStoryboard.Begin();
+                    refView.Source = img;
+                    fadeInStoryboard.Begin();
                 }
                 else
                 {
