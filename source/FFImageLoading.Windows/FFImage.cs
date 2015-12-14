@@ -17,9 +17,16 @@ namespace FFImageLoading
 
         public FFImage()
 		{
-            internalImage = new Image();
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            HorizontalAlignment = HorizontalAlignment.Stretch;
+            VerticalContentAlignment = VerticalAlignment.Stretch;
             VerticalAlignment = VerticalAlignment.Stretch;
+
+            internalImage = new Image() {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Opacity = 1.0f,
+            };
             Content = internalImage;
         }
 
@@ -34,16 +41,17 @@ namespace FFImageLoading
 
         private static void SourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
-                return;
-
             ((FFImage)d).SourcePropertyChanged((string)e.NewValue);
         }
 
         private async void SourcePropertyChanged(string source)
         {
+            System.Diagnostics.Debug.WriteLine("Source changed: {0}", source);
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
                 return;
+
+            if (_currentTask != null)
+                _currentTask.Cancel();
 
             TaskParameter imageLoader = null;
 
@@ -53,7 +61,7 @@ namespace FFImageLoading
             {
                 if (internalImage != null)
                 {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => {
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                         internalImage.Source = null;
                     });
                 } 
@@ -136,13 +144,8 @@ namespace FFImageLoading
                     imageLoader.Retry(RetryCount, RetryDelay);
                 }
 
-                // TransparencyChannel
-                if (TransparencyEnabled.HasValue)
-                    imageLoader.TransparencyChannel(TransparencyEnabled.Value);
-
                 // FadeAnimation
-                if (FadeAnimationEnabled.HasValue)
-                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value);
+                imageLoader.FadeAnimation(FadeAnimationEnabled);
 
                 // Transformations
                 if (Transformations != null)
@@ -323,40 +326,19 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The transparency enabled property.
-        /// </summary>
-        public static readonly DependencyProperty TransparencyEnabledProperty = DependencyProperty.Register("TransparencyEnabled",
-            typeof(bool?), typeof(FFImage), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.
-        /// </summary>
-        public bool? TransparencyEnabled
-        {
-            get
-            {
-                return (bool?)GetValue(TransparencyEnabledProperty);
-            }
-            set
-            {
-                SetValue(TransparencyEnabledProperty, value);
-            }
-        }
-
-        /// <summary>
         /// The fade animation enabled property.
         /// </summary>
         public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register("FadeAnimationEnabled",
-            typeof(bool?), typeof(FFImage), new PropertyMetadata(null));
+            typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
         /// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
         /// </summary>
-        public bool? FadeAnimationEnabled
+        public bool FadeAnimationEnabled
         {
             get
             {
-                return (bool?)GetValue(FadeAnimationEnabledProperty);
+                return (bool)GetValue(FadeAnimationEnabledProperty);
             }
             set
             {
