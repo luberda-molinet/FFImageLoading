@@ -25,11 +25,19 @@ namespace FFImageLoading.Work.StreamResolver
 				var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
 				return Task.FromResult(result);
 			}
-			catch (FileNotFoundException e)
+			catch (Java.IO.FileNotFoundException)
 			{
 				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
 			}
-			catch (IOException e)
+			catch (Java.IO.IOException)
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
+			}
+			catch (FileNotFoundException)
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
+			}
+			catch (IOException)
 			{
 				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
 			}

@@ -321,7 +321,7 @@ namespace FFImageLoading.Work
 					{
 						if (streamWithResult.Result == LoadingResult.NotFound)
 						{
-							Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()), null);
+							Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()));
 						}
 						return null;
 					}
