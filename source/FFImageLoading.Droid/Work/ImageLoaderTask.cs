@@ -704,7 +704,7 @@ namespace FFImageLoading.Work
 			ImageView imageView;
 			_imageWeakReference.TryGetTarget(out imageView);
 
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return null;
 
 			var task = imageView.GetImageLoaderTask();
