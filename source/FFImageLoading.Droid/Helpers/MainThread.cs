@@ -1,17 +1,21 @@
 ﻿using System;
 using Android.OS;
-using Android.App;
 using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher: IMainThreadDispatcher
     {
+		Handler _handler;
+
+		public MainThreadDispatcher()
+		{
+			_handler = new Handler(Looper.MainLooper);
+		}
+
         public void Post(Action action)
         {
-            // Post on main thread
-            Handler handler = new Handler(Looper.MainLooper);
-            handler.Post(action);
+            _handler.Post(action);
         }
 
         public Task PostAsync(Action action)
