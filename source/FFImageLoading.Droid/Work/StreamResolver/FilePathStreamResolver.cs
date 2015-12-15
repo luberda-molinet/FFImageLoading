@@ -13,6 +13,11 @@ namespace FFImageLoading.Work.StreamResolver
 		
 		public Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
+			if (!FileStore.Exists(identifier))
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
+			}
+
 			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk);
 			return Task.FromResult(result);
 		}

@@ -312,8 +312,19 @@ namespace FFImageLoading.Work
 						streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
 					}
 
-					if (streamWithResult == null || streamWithResult.Item == null)
+					if (streamWithResult == null)
+					{
 						return null;
+					}
+
+					if (streamWithResult.Item == null)
+					{
+						if (streamWithResult.Result == LoadingResult.NotFound)
+						{
+							Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()), null);
+						}
+						return null;
+					}
 
 					stream = streamWithResult.Item;
 

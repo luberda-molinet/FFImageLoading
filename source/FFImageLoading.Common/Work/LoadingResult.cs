@@ -4,6 +4,8 @@ namespace FFImageLoading.Work
 {
 	public enum LoadingResult
 	{
+		NotFound = -1,
+
 		MemoryCache = 1,
 		DiskCache = 2,
 		Internet = 3,

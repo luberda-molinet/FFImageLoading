@@ -20,8 +20,19 @@ namespace FFImageLoading.Work.StreamResolver
 
 		public Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
-			var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
-			return Task.FromResult(result);
+			try
+			{
+				var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
+				return Task.FromResult(result);
+			}
+			catch (FileNotFoundException e)
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
+			}
+			catch (IOException e)
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
+			}
 		}
 
 		public void Dispose() {

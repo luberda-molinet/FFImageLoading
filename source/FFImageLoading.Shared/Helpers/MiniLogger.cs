@@ -10,9 +10,14 @@ namespace FFImageLoading.Helpers
 			DebugInternal(message);
         }
 
+		public void Error(string errorMessage)
+		{
+			Console.WriteLine(errorMessage);
+		}
+
         public void Error(string errorMessage, Exception ex)
         {
-            Console.WriteLine(errorMessage + Environment.NewLine + ex.ToString());
+			Error(errorMessage + Environment.NewLine + ex.ToString());
         }
 
 		[Conditional("DEBUG")]

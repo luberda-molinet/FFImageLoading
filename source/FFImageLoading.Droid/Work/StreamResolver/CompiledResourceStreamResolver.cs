@@ -34,7 +34,11 @@ namespace FFImageLoading.Work.StreamResolver
 			Stream stream = null;
 			if (resourceId != 0)
 			{
-				stream = Context.Resources.OpenRawResource (resourceId);
+				stream = Context.Resources.OpenRawResource(resourceId);
+			}
+			else
+			{
+				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
 			}
 
 			var result = WithLoadingResult.Encapsulate(stream, LoadingResult.CompiledResource);
