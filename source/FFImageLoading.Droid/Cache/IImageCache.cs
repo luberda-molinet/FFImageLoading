@@ -4,13 +4,9 @@ using Android.Graphics;
 
 namespace FFImageLoading.Cache
 {
-    public interface IImageCache
+	public interface IImageCache : IMemoryCache<BitmapDrawable>
     {
-        BitmapDrawable Get(string key);
         Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options);
-        void Add(string key, BitmapDrawable bitmap);
-		void Clear();
-		void Remove(string key);
     }
 }
 

@@ -7,11 +7,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Cache
 {
-    interface IImageCache
+    interface IImageCache : IMemoryCache<WriteableBitmap>
     {
-        WriteableBitmap Get(string key);
-        void Add(string key, WriteableBitmap bitmap);
-        void Remove(string key);
-        void Clear();
     }
 }

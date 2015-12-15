@@ -3,12 +3,8 @@ using UIKit;
 
 namespace FFImageLoading.Cache
 {
-    public interface IImageCache
+	public interface IImageCache : IMemoryCache<UIImage>
     {
-        UIImage Get(string key);
-        void Add(string key, UIImage bitmap);
-		void Clear();
-		void Remove(string key);
     }
 }
 

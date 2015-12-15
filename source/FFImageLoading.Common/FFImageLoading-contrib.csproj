@@ -73,6 +73,7 @@
     <Compile Include="Transformations\FFColorMatrix.cs" />
     <Compile Include="Cache\CacheType.cs" />
     <Compile Include="Helpers\IImageCacheHelper.cs" />
+    <Compile Include="Cache\IMemoryCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
