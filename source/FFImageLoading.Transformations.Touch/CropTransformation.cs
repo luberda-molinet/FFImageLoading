@@ -1,5 +1,6 @@
 ﻿using System;
-using Android.Graphics;
+using UIKit;
+using CoreGraphics;
 
 namespace FFImageLoading.Transformations
 {
@@ -35,15 +36,15 @@ namespace FFImageLoading.Transformations
 				_zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override UIImage Transform(UIImage source)
 		{
 			return ToCropped(source, _zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio);
 		}
 
-		public static Bitmap ToCropped(Bitmap source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
+		public static UIImage ToCropped(UIImage source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
 		{
-			double sourceWidth = source.Width;
-			double sourceHeight = source.Height;
+			double sourceWidth = source.Size.Width;
+			double sourceHeight = source.Size.Height;
 
 			double desiredWidth = sourceWidth;
 			double desiredHeight = sourceHeight;
@@ -58,6 +59,9 @@ namespace FFImageLoading.Transformations
 
 			if (zoomFactor < 1f)
 				zoomFactor = 1f;
+
+			xOffset = xOffset * desiredWidth;
+			yOffset = yOffset * desiredHeight;
 
 			desiredWidth =  desiredWidth / zoomFactor;
 			desiredHeight = desiredHeight / zoomFactor;
@@ -77,26 +81,31 @@ namespace FFImageLoading.Transformations
 			if (cropY + desiredHeight > sourceHeight)
 				cropY = (float)(sourceHeight - desiredHeight);
 
-			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, source.GetConfig());
+			UIGraphics.BeginImageContextWithOptions(new CGSize(desiredWidth, desiredHeight), false, (nfloat)0.0);
 
-			using (Canvas canvas = new Canvas(bitmap))
-			using (Paint paint = new Paint())
-			using (BitmapShader shader = new BitmapShader(source, Shader.TileMode.Clamp, Shader.TileMode.Clamp))
-			using (Matrix matrix = new Matrix())
+			try
 			{
-				if (cropX != 0 || cropY != 0)
+				using (var context = UIGraphics.GetCurrentContext())
 				{
-					matrix.SetTranslate(-cropX, -cropY);
-					shader.SetLocalMatrix(matrix);
+					var clippedRect = new CGRect(0, 0, desiredWidth, desiredHeight);
+					context.BeginPath();
+
+					using (var path = UIBezierPath.FromRect(clippedRect))
+					{
+						context.AddPath(path.CGPath);
+						context.Clip();
+					}
+
+					var drawRect = new CGRect(-cropX, -cropY, sourceWidth, sourceHeight);
+					source.Draw(drawRect);
+					var modifiedImage = UIGraphics.GetImageFromCurrentImageContext();
+
+					return modifiedImage;
 				}
-
-				paint.SetShader(shader);
-				paint.AntiAlias = false;
-
-				RectF rectF = new RectF(0, 0, (int)desiredWidth, (int)desiredHeight);
-				canvas.DrawRect(rectF, paint);
-
-				return bitmap;				
+			}
+			finally
+			{
+				UIGraphics.EndImageContext();
 			}
 		}
 	}

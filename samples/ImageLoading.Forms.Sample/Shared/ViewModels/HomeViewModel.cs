@@ -34,6 +34,11 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				PageFactory.GetMessagablePageFromCache<PlaceholdersExampleViewModel>()
 				.PushPage());
 
+			OpenCropTransformationExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<CropTransformationViewModel>()
+				.SendMessageToViewModel("Reload")
+				.PushPage());
+
 			OpenTransformationExampleCommand = new PageFactoryCommand<Type>((transformationType) => 
 				PageFactory.GetMessagablePageFromCache<TransformationExampleViewModel>()
 				.SendMessageToViewModel("LoadTransformation", this, transformationType)
@@ -79,6 +84,12 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					Section = "Basic",
 					Title = "Downsampling examples",
 					Command = OpenDownsamplingExampleCommand
+				},
+
+				new MenuItem() {
+					Section = "Transformations",
+					Title = "CropTransformation",
+					Command = OpenCropTransformationExampleCommand,
 				},
 
 				new MenuItem() {
@@ -181,6 +192,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 		public IPageFactoryCommand OpenListTransformationsExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenPlaceholdersExampleCommand { get; private set; }
+
+		public IPageFactoryCommand OpenCropTransformationExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenTransformationExampleCommand { get; private set; }
 
