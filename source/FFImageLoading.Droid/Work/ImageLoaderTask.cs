@@ -321,9 +321,17 @@ namespace FFImageLoading.Work
 					{
 						try
 						{
-							lock (_decodingLock)
+							if (streamWithResult.Result == LoadingResult.Internet)
 							{
+								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
 								BitmapFactory.DecodeStream(stream, null, options);
+							}
+							else
+							{
+								lock (_decodingLock)
+								{
+									BitmapFactory.DecodeStream(stream, null, options);
+								}
 							}
 
 							if (!stream.CanSeek)
@@ -390,9 +398,17 @@ namespace FFImageLoading.Work
 						Bitmap bitmap;
 						try
 						{
-							lock (_decodingLock)
+							if (streamWithResult.Result == LoadingResult.Internet)
 							{
+								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
 								bitmap = BitmapFactory.DecodeStream(stream, null, options);
+							}
+							else
+							{
+								lock (_decodingLock)
+								{
+									bitmap = BitmapFactory.DecodeStream(stream, null, options);
+								}
 							}
 						}
 						catch (Java.Lang.Throwable vme)
@@ -424,8 +440,13 @@ namespace FFImageLoading.Work
 									try
 									{
 										var old = bitmap;
-										var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
-										bitmap = bitmapHolder.ToNative();
+
+										// Applying a transformation is both CPU and memory intensive
+										lock (_decodingLock)
+										{
+											var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+											bitmap = bitmapHolder.ToNative();
+										}
 
 										// Transformation succeeded, so garbage the source
 										old.Recycle();
