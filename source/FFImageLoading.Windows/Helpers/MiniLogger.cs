@@ -10,10 +10,13 @@ namespace FFImageLoading.Helpers
             DebugInternal(message);
         }
 
+        public void Error(string errorMessage)
+        {
+            System.Diagnostics.Debug.WriteLine(errorMessage);
+        }
+
         public void Error(string errorMessage, Exception ex)
         {
-            // TODO WinRT doesn't have Console!
-            // Console.WriteLine(errorMessage + Environment.NewLine + ex.ToString());
             System.Diagnostics.Debug.WriteLine(errorMessage + Environment.NewLine + ex.ToString());
         }
 
