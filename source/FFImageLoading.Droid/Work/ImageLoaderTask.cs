@@ -611,7 +611,6 @@ namespace FFImageLoading.Work
 						if (imageView == null || imageView.Handle == IntPtr.Zero)
 							return;
 
-						//var newDrawable = new SelfDisposingBitmapDrawable(Context.Resources, ffDrawable.Bitmap);
 						imageView.SetImageDrawable(value);
 
 						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
