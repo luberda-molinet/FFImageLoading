@@ -59,6 +59,9 @@ namespace FFImageLoading.Transformations
 			if (zoomFactor < 1f)
 				zoomFactor = 1f;
 
+			xOffset = xOffset * desiredWidth;
+			yOffset = yOffset * desiredHeight;
+
 			desiredWidth =  desiredWidth / zoomFactor;
 			desiredHeight = desiredHeight / zoomFactor;
 
