@@ -11,13 +11,8 @@ namespace FFImageLoading.Transformations
 		private double _cropWidthRatio;
 		private double _cropHeightRatio;
 
-		public CropTransformation(double zoomFactor, double xOffset, double yOffset)
+		public CropTransformation(double zoomFactor, double xOffset, double yOffset) : this(zoomFactor, xOffset, yOffset, 1f, 1f)
 		{
-			_zoomFactor = zoomFactor;
-			_xOffset = xOffset;
-			_yOffset = yOffset;
-			_cropWidthRatio = 1f;
-			_cropHeightRatio = 1f;
 		}
 
 		public CropTransformation(double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
@@ -27,6 +22,9 @@ namespace FFImageLoading.Transformations
 			_yOffset = yOffset;
 			_cropWidthRatio = cropWidthRatio;
 			_cropHeightRatio = cropHeightRatio;
+
+			if (zoomFactor < 1f)
+				_zoomFactor = 1f;
 		}
 
 		public override string Key
@@ -55,9 +53,6 @@ namespace FFImageLoading.Transformations
 				desiredWidth = (cropWidthRatio * sourceHeight / cropHeightRatio);
 			else if (currentRatio < desiredRatio)
 				desiredHeight = (cropHeightRatio * sourceWidth / cropWidthRatio);
-
-			if (zoomFactor < 1f)
-				zoomFactor = 1f;
 
 			xOffset = xOffset * desiredWidth;
 			yOffset = yOffset * desiredHeight;
