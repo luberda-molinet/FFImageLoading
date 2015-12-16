@@ -71,7 +71,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
-    <Compile Include="Cache\LruCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Extensions\ImageViewExtensions.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="Views\ImageViewAsync.cs" />
     <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="Work\IAsyncDrawable.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Work\StreamResolver\ApplicationBundleStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\FilePathStreamResolver.cs" />
@@ -92,9 +90,19 @@
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
+    <Compile Include="Cache\ReuseBitmapDrawableCache.cs" />
+    <Compile Include="Drawables\BitmapDrawableExtensions.cs" />
+    <Compile Include="Drawables\SelfDisposingBitmapDrawable.cs" />
+    <Compile Include="Collections\StrongLruCache.cs" />
+    <Compile Include="Collections\ByteBoundStrongLruCache.cs" />
+    <Compile Include="Drawables\FFBitmapDrawable.cs" />
+    <Compile Include="Drawables\AsyncDrawable.cs" />
+    <Compile Include="Drawables\IAsyncDrawable.cs" />
+    <Compile Include="Drawables\SelfDisposingAsyncDrawable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
+    <Folder Include="Drawables\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

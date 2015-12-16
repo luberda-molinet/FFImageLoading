@@ -1,6 +1,7 @@
 ﻿using System;
+using FFImageLoading.Work;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Drawables
 {
 	public interface IAsyncDrawable
 	{
