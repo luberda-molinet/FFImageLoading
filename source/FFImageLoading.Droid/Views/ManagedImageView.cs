@@ -4,6 +4,7 @@ using Android.Util;
 using Android.Widget;
 using System;
 using Android.Runtime;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Views
 {
@@ -32,22 +33,38 @@ namespace FFImageLoading.Views
 
 		public override void SetImageDrawable(Drawable drawable)
 		{
-			var previousDrawable = Drawable;
+			var previous = Drawable;
 
 			base.SetImageDrawable(drawable);
 
-			NotifyDrawable(previousDrawable, false);
-			NotifyDrawable(drawable, true);
+			UpdateDrawableDisplayedState(drawable, true);
+			UpdateDrawableDisplayedState(previous, false);
 		}
 
-		private static void NotifyDrawable(Drawable drawable, bool isDisplayed)
+		public override void SetImageResource(int resId)
 		{
-			var layerDrawable = drawable as LayerDrawable;
-			if (layerDrawable != null)
-			{
-				for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
-				{
-					NotifyDrawable(layerDrawable.GetDrawable(i), isDisplayed);
+			var previous = Drawable;
+			// Ultimately calls SetImageDrawable, where the state will be updated.
+			base.SetImageResource(resId);
+			UpdateDrawableDisplayedState(previous, false);
+		}
+
+		public override void SetImageURI(global::Android.Net.Uri uri)
+		{
+			var previous = Drawable;
+			// Ultimately calls SetImageDrawable, where the state will be updated.
+			base.SetImageURI(uri);
+			UpdateDrawableDisplayedState(previous, false);
+		}
+
+		private void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
+		{
+			if (drawable is SelfDisposingBitmapDrawable) {
+				((SelfDisposingBitmapDrawable)drawable).SetIsDisplayed(isDisplayed);
+			} else if (drawable is LayerDrawable) {
+				var layerDrawable = (LayerDrawable)drawable;
+				for (var i = 0; i < layerDrawable.NumberOfLayers; i++) {
+					UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
 				}
 			}
 		}

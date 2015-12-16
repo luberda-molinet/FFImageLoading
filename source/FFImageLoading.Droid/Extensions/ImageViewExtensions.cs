@@ -1,6 +1,7 @@
 using Android.Widget;
 using FFImageLoading.Work;
 using System;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Extensions
 {
@@ -18,7 +19,7 @@ namespace FFImageLoading.Extensions
 			
 			var drawable = imageView.Drawable;
 
-			var asyncDrawable = drawable as AsyncDrawable;
+			var asyncDrawable = drawable as IAsyncDrawable;
 			if (asyncDrawable != null)
 			{
 				return asyncDrawable.GetImageLoaderTask();
