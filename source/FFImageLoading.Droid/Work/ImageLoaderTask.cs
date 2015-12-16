@@ -87,6 +87,9 @@ namespace FFImageLoading.Work
 			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
 				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 
+			if (IsCancelled)
+				return true; // stop processing if cancelled
+
 			bool hasDrawable = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, imageView, true).ConfigureAwait(false);
 			if (!hasDrawable)
 			{
@@ -608,7 +611,9 @@ namespace FFImageLoading.Work
 						if (imageView == null || imageView.Handle == IntPtr.Zero)
 							return;
 
+						//var newDrawable = new SelfDisposingBitmapDrawable(Context.Resources, ffDrawable.Bitmap);
 						imageView.SetImageDrawable(value);
+
 						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 						{
 							imageView.LayoutParameters.Height = value.IntrinsicHeight;
