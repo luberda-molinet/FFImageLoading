@@ -11,23 +11,23 @@ using FFImageLoading.Helpers;
 using Android.Content;
 using Android.App;
 using Android.Content.PM;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-	public class ImageCache : LruCache<BitmapDrawable>, IImageCache
+	public class ImageCache : IImageCache
 	{
-		private ConcurrentDictionary<string, bool> _references;
-		private readonly ConcurrentSet<WeakReference> _reusableBitmaps;
 		private static IImageCache _instance;
-		private static object _clearLock;
+		private readonly ReuseBitmapDrawableCache _cache;
 
-        private ImageCache(int maxCacheSize) : base(GetMaxCacheSize())
+        private ImageCache(int maxCacheSize)
 		{
-			if (Utils.HasHoneycomb())
-				_reusableBitmaps = new ConcurrentSet<WeakReference>();
+			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
 
-			_references = new ConcurrentDictionary<string, bool>();
-			_clearLock = new object();
+			// consider low treshold as a third of maxCacheSize
+			int lowTreshold = safeMaxCacheSize / 3;
+
+			_cache = new ReuseBitmapDrawableCache(safeMaxCacheSize, lowTreshold, safeMaxCacheSize);
 		}
 
         public static IImageCache Instance
@@ -51,178 +51,54 @@ namespace FFImageLoading.Cache
 
 		public void Clear()
 		{
-			bool didClean = false;
-
-			lock (_clearLock)
-			{
-				if (_reusableBitmaps != null && _reusableBitmaps.Count > 0)
-				{
-					foreach (var weakReference in _reusableBitmaps)
-					{
-						var item = weakReference.Get() as Bitmap;
-						if (item != null && item.Handle != System.IntPtr.Zero && !item.IsRecycled)
-						{
-							// Here it is safe to recycle, these items aren't supposed to be displayed anymore
-							item.Recycle();
-							item.Dispose();
-						}
-					}
-
-					_reusableBitmaps.Clear();
-					didClean = true;
-				}
-
-				if (Size() > 0)
-				{
-					if (_references != null && _references.Count > 0)
-					{
-						foreach (var pair in _references)
-						{
-							var drawable = Get(pair.Key) as BitmapDrawable;
-							if (drawable != null && drawable.Handle != System.IntPtr.Zero)
-							{
-								var item = drawable.Bitmap;
-								if (item != null && item.Handle != System.IntPtr.Zero && !item.IsRecycled)
-								{
-									item.Dispose();
-								}
-								drawable.Dispose();
-							}
-						}
-					}
-
-					EvictAll();
-					didClean = true;
-				}
-
-				if (_references != null && _references.Count > 0)
-				{
-					_references.Clear();
-				}
-
-				if (didClean)
-				{
-					// Force immediate Garbage collection. Please note that is resource intensive.
-					System.GC.Collect();
-					System.GC.WaitForPendingFinalizers ();
-					System.GC.WaitForPendingFinalizers (); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
-					System.GC.Collect ();
-				}
-			}
-
-			if (didClean)
-			{
-				// Can't use minilogger here, we would have too many dependencies
-				System.Diagnostics.Debug.WriteLine("ImageCache cleared and forcing immediate garbage collection.");
-			}
+			_cache.Clear();
 		}
 
-		public void Add(string key, BitmapDrawable bitmap)
+		public SelfDisposingBitmapDrawable Get(string key)
 		{
-            if (string.IsNullOrWhiteSpace(key) || bitmap == null || _references.ContainsKey(key))
+			SelfDisposingBitmapDrawable drawable = null;
+			if (_cache.TryGetValue(key, out drawable))
+				return drawable;
+			return null;
+		}
+
+		public void Add(string key, SelfDisposingBitmapDrawable bitmap)
+		{
+            if (string.IsNullOrWhiteSpace(key) || bitmap == null || _cache.ContainsKey(key))
 				return;
 			
-			_references.GetOrAdd(key, true);
-			Put(key, bitmap);
+			_cache.Add(key, bitmap);
 		}
 
 		public void Remove(string key)
 		{
-			base.Remove(key);
-		}
-
-		public Bitmap GetBitmapFromReusableSet(BitmapFactory.Options options)
-		{
-			if (_reusableBitmaps != null && !_reusableBitmaps.IsEmpty)
-			{
-				foreach (var weakReference in _reusableBitmaps)
-				{
-					bool removed = _reusableBitmaps.TryRemove(weakReference);
-					var item = weakReference.Get() as Bitmap;
-
-					if (item != null && item.Handle != System.IntPtr.Zero)
-					{
-						if (item.IsMutable)
-						{
-							if (CanUseForInBitmap(item, options))
-							{
-								// reuse the bitmap
-								return item;
-							}
-							else
-							{
-								if (removed)
-								{
-									// the bitmap isn't usable yet, put it back in reusableBitmaps
-									_reusableBitmaps.TryAdd(weakReference);
-								}
-							}
-						}
-						else
-						{
-							item.Recycle();
-							item.Dispose();
-						}		
-					}
-				}
-			}
-
-			return null;
-		}
-
-		protected override void EntryRemoved(bool evicted, Object key, Object oldValue, Object newValue)
-		{
-			var drawable = oldValue as BitmapDrawable;
-			if (drawable == null)
-				return;
-
-			var bitmap = drawable.Bitmap;
-			if (bitmap != null && bitmap.Handle != System.IntPtr.Zero)
-			{
-				if (Utils.HasHoneycomb())
-				{
-					_reusableBitmaps.TryAdd(new WeakReference(bitmap));
-				}
-			}
-
-			// We need to inform .NET GC that the Bitmap is no longer in use in .NET world.
-			// It might get reused by Java world, and we can access it later again since we still have a Java weakreference to it
-			drawable.Dispose();
-			bitmap.Dispose();
+			_cache.Remove(key);
 		}
 
 		/// <summary>
-		/// Return the byte usage per pixel of a bitmap based on its configuration.
+		/// Attempts to find a bitmap suitable for reuse based on the given dimensions.
+		/// Note that any returned instance will have SetIsRetained(true) called on it
+		/// to ensure that it does not release its resources prematurely as it is leaving
+		/// cache management. This means you must call SetIsRetained(false) when you no
+		/// longer need the instance.
 		/// </summary>
-		/// <param name="config">The bitmap configuration</param>
-		/// <returns>The byte usage per pixel</returns>
-		private static int GetBytesPerPixel(Bitmap.Config config)
+		/// <returns>A SelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
+		/// when finished using it.</returns>
+		/// <param name="options">Bitmap creation options.</param>
+		public SelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
 		{
-			if (config == Bitmap.Config.Argb8888)
-			{
-				return 4;
-			}
-			else if (config == Bitmap.Config.Rgb565)
-			{
-				return 2;
-			}
-			else if (config == Bitmap.Config.Argb4444)
-			{
-				return 2;
-			}
-			else if (config == Bitmap.Config.Alpha8)
-			{
-				return 1;
-			}
-			return 1;
+			if (_cache.Count == 0)
+				return null;
+
+			return _cache.GetReusableBitmapDrawable(options.OutWidth, options.OutHeight, options.InSampleSize);
 		}
 
-        private static int GetMaxCacheSize()
+		private static int GetMaxCacheSize(int maxCacheSize)
         {
-            if (ImageService.Config.MaxCacheSize <= 0)
+			if (maxCacheSize <= 0)
                 return GetCacheSizeInPercent(0.2f); // 20%
 
-            return Math.Min(GetCacheSizeInPercent(0.2f), ImageService.Config.MaxCacheSize);
+			return Math.Min(GetCacheSizeInPercent(0.2f), maxCacheSize);
         }
 
 		/// <summary>
@@ -247,32 +123,6 @@ namespace FFImageLoading.Cache
 
 			int availableMemory = 1024 * 1024 * memoryClass;
 			return (int)Math.Round(percent * availableMemory);
-		}
-
-		private bool CanUseForInBitmap(Bitmap item, BitmapFactory.Options options)
-		{
-			if (!Utils.HasKitKat())
-			{
-				// On earlier versions, the dimensions must match exactly and the inSampleSize must be 1
-				return item.Width == options.OutWidth && item.Height == options.OutHeight && options.InSampleSize == 1;
-			}
-
-			if (options.InSampleSize == 0)
-				options.InSampleSize = 1; // to avoid division by zero
-			
-			// From Android 4.4 (KitKat) onward we can re-use if the byte size of the new bitmap
-			// is smaller than the reusable bitmap candidate allocation byte count.
-			int width = options.OutWidth/options.InSampleSize;
-			int height = options.OutHeight/options.InSampleSize;
-			int byteCount = width*height*GetBytesPerPixel(item.GetConfig());
-			return byteCount <= item.AllocationByteCount;
-		}
-
-		protected override int SizeOf(Object key, Object value)
-		{
-		    var size = GetBitmapSize((BitmapDrawable) value);
-
-			return size == 0 ? 1 : size;
 		}
 	}
 }

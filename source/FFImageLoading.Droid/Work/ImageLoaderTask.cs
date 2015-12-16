@@ -17,6 +17,7 @@ using Android.Runtime;
 using System;
 using FFImageLoading.Work.StreamResolver;
 using System.Linq;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Work
 {
@@ -131,7 +132,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
-			WithLoadingResult<BitmapDrawable> drawableWithResult = null;
+			WithLoadingResult<SelfDisposingBitmapDrawable> drawableWithResult = null;
 			if (!string.IsNullOrWhiteSpace(Parameters.Path))
 			{
 				try
@@ -285,12 +286,12 @@ namespace FFImageLoading.Work
 			return GenerateResult.Success;
 		}
 
-		protected virtual async Task<WithLoadingResult<BitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, Stream originalStream = null)
+		protected virtual async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, Stream originalStream = null)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			return await Task.Run<WithLoadingResult<BitmapDrawable>>(async() =>
+			return await Task.Run<WithLoadingResult<SelfDisposingBitmapDrawable>>(async() =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
@@ -472,7 +473,7 @@ namespace FFImageLoading.Work
 
 							if (isLoadingPlaceHolder)
 							{
-								return WithLoadingResult.Encapsulate<BitmapDrawable>(new AsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
+								return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
 							}
 							else
 							{
@@ -482,13 +483,13 @@ namespace FFImageLoading.Work
 									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
 								}
 
-								return WithLoadingResult.Encapsulate<BitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
+								return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
 							}
 						}
 						finally
 						{
-							if (bitmap != null)
-								bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
+							//if (bitmap != null)
+							//	bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
 						}
 					}
 					finally
@@ -515,10 +516,10 @@ namespace FFImageLoading.Work
 
 			BitmapDrawable drawable = ImageCache.Instance.Get(GetKey(placeholderPath));
 
-			if (drawable != null)
+			if (drawable != null && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled)
 			{
 				// We should wrap drawable in an AsyncDrawable, nothing is deferred
-				drawable = new AsyncDrawable(Context.Resources, drawable.Bitmap, this);
+				drawable = new SelfDisposingAsyncDrawable(Context.Resources, drawable.Bitmap, this);
 			}
 			else
 			{
@@ -657,7 +658,7 @@ namespace FFImageLoading.Work
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates
 		// having a width and height equal to or larger than the requested width and height.
-		private async Task<WithLoadingResult<BitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
+		private async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
 		{
 			if (string.IsNullOrWhiteSpace(sourcePath)) return null;
 
@@ -674,7 +675,6 @@ namespace FFImageLoading.Work
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
 			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.Item);
-
 			return drawableWithResult;
 		}
 
@@ -723,11 +723,23 @@ namespace FFImageLoading.Work
 
 
 			// Try and find a bitmap to use for inBitmap
-			var inBitmap = ImageCache.Instance.GetBitmapFromReusableSet(options);
-
-			if (inBitmap != null && inBitmap.Handle != IntPtr.Zero)
+			SelfDisposingBitmapDrawable bitmapDrawable = null;
+			try
 			{
-				options.InBitmap = inBitmap;
+				bitmapDrawable = ImageCache.Instance.GetBitmapDrawableFromReusableSet(options);
+				var bitmap = bitmapDrawable == null ? null : bitmapDrawable.Bitmap;
+
+				if (bitmap != null && bitmap.Handle != IntPtr.Zero)
+				{
+					options.InBitmap = bitmapDrawable.Bitmap;
+				}
+			}
+			finally
+			{
+				if (bitmapDrawable != null)
+				{
+					bitmapDrawable.SetIsRetained(false);
+				}
 			}
 		}
 
@@ -758,114 +770,5 @@ namespace FFImageLoading.Work
 		}
 	}
 
-	public class AsyncDrawable : BitmapDrawable, IAsyncDrawable
-	{
-		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
 
-		public AsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
-			: base(res, bitmap)
-		{
-			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
-		}
-
-		public AsyncDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
-
-		public ImageLoaderTask GetImageLoaderTask()
-		{
-			if (_imageLoaderTaskReference == null)
-				return null;
-
-			ImageLoaderTask task;
-			_imageLoaderTaskReference.TryGetTarget(out task);
-			return task;
-		}
-	}
-
-	public class FFBitmapDrawable : BitmapDrawable
-	{
-		private readonly float _fadingTime;
-		private readonly long _startTimeMillis;
-		private int _alpha = 0xFF;
-		private Drawable _placeholder;
-		private volatile bool _animating;
-
-		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime, bool fadeEnabled)
-			: base(res, bitmap)
-		{
-			_placeholder = placeholder;
-			_fadingTime = fadingTime;
-			_animating = fadeEnabled;
-			_startTimeMillis = SystemClock.UptimeMillis();
-		}
-
-		public FFBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
-
-		public override void Draw(Canvas canvas)
-		{
-			if (!_animating)
-			{
-				base.SetAlpha(_alpha);
-				base.Draw(canvas);
-			}
-			else
-			{
-				var uptime = SystemClock.UptimeMillis();
-				float normalized = (uptime - _startTimeMillis) / _fadingTime;
-				if (normalized >= 1f)
-				{
-					_animating = false;
-					_placeholder = null;
-					base.Draw(canvas);
-				}
-				else
-				{
-					if (_placeholder != null)
-					{
-						_placeholder.Draw(canvas);
-					}
-
-					int partialAlpha = (int)(_alpha * normalized);
-					base.SetAlpha(partialAlpha);
-					base.Draw(canvas);
-					base.SetAlpha(_alpha);
-				}
-			}
-		}
-
-
-		public void StopFadeAnimation()
-		{
-			_animating = false;
-			_placeholder = null;
-		}
-
-		public override void SetAlpha(int alpha)
-		{
-			_alpha = alpha;
-
-			if (_placeholder != null)
-			{
-				_placeholder.SetAlpha(alpha);
-			}
-			base.SetAlpha(alpha);
-		}
-
-		public override void SetColorFilter(Color color, PorterDuff.Mode mode)
-		{
-			if (_placeholder != null)
-			{
-				_placeholder.SetColorFilter(color, mode);
-			}
-			base.SetColorFilter(color, mode);
-		}
-
-		protected override void OnBoundsChange(Rect bounds)
-		{
-			if (_placeholder != null)
-			{
-				_placeholder.SetBounds(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-			}
-			base.OnBoundsChange(bounds);
-		}
-	}
 }
