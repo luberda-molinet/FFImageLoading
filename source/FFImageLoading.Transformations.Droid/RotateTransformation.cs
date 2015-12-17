@@ -39,7 +39,7 @@ namespace FFImageLoading.Transformations
 			if (ccw)
 				degrees = 360d - degrees;
 
-			Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, source.GetConfig());
+			Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())
 			using (BitmapShader shader = new BitmapShader(source, Shader.TileMode.Clamp, Shader.TileMode.Clamp))
