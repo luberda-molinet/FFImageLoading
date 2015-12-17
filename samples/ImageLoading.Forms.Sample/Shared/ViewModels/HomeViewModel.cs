@@ -94,6 +94,13 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 				new MenuItem() {
 					Section = "Transformations",
+					Title = "RotateTransformation",
+					Command = OpenTransformationExampleCommand,
+					CommandParameter = typeof(RotateTransformation),
+				},
+
+				new MenuItem() {
+					Section = "Transformations",
 					Title = "CircleTransformation",
 					Command = OpenTransformationExampleCommand,
 					CommandParameter = typeof(CircleTransformation),

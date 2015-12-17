@@ -8,6 +8,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 {
 	public class TransformationExampleViewModel : BaseExampleViewModel
 	{
+		private readonly Random random = new Random();
+
 		public TransformationExampleViewModel()
 		{
 			ErrorImagePath = "error.png";
@@ -21,6 +23,14 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 		public void ReloadTransformation(Type transformationType)
 		{
+			// RotateTransformation
+			if (transformationType == typeof(RotateTransformation))
+			{
+				Transformations = new List<ITransformation>() { 
+					new RotateTransformation(random.Next(60, 270), random.Next(2) == 0, random.Next(2) == 0) 
+				};
+			}
+
 			// CircleTransformation
 			if (transformationType == typeof(CircleTransformation))
 			{

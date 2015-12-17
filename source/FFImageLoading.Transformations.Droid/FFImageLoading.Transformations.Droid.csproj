@@ -79,6 +79,7 @@
       <Link>CornerTransformType.cs</Link>
     </Compile>
     <Compile Include="CropTransformation.cs" />
+    <Compile Include="RotateTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
