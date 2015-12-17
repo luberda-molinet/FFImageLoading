@@ -29,7 +29,20 @@ namespace FFImageLoading.Forms.Sample.Pages
             if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
                 listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
-			Content = listView;
+			var button = new Button() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Text = "Duplicate list items",
+				Command = ViewModel.DuplicateListItemsCommand
+			};
+
+			Content = new StackLayout() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				VerticalOptions = LayoutOptions.FillAndExpand,
+				Children = {
+					listView, 
+					button,
+				}
+			};
 		}
 
 		class TransformationExampleCell : ViewCell
