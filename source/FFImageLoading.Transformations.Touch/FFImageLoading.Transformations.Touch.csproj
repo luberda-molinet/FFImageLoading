@@ -77,7 +77,6 @@
       <Link>CornerTransformType.cs</Link>
     </Compile>
     <Compile Include="CropTransformation.cs" />
-    <Compile Include="RotateTransformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
