@@ -1,5 +1,4 @@
 ﻿using System;
-using Windows.UI.Xaml.Media.Imaging;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
@@ -15,7 +14,7 @@ namespace FFImageLoading.Transformations
 
         public override string Key
         {
-            get { return string.Format("BlurredTransformation, radius = {0}", _radius); }
+            get { return string.Format("BlurredTransformation,radius={0}", _radius); }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)

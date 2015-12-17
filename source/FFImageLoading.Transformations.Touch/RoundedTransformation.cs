@@ -10,11 +10,8 @@ namespace FFImageLoading.Transformations
 		private double _cropWidthRatio;
 		private double _cropHeightRatio;
 
-		public RoundedTransformation(double radius)
+		public RoundedTransformation(double radius) : this(radius, 1d, 1d)
 		{
-			_radius = radius;
-			_cropWidthRatio = 1f;
-			_cropHeightRatio = 1f;
 		}
 
 		public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio)
@@ -26,7 +23,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("RoundedTransformation, radius = {0}, cropWidthRatio = {1}, cropHeightRatio = {2}", 
+			get { return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2}", 
 				_radius, _cropWidthRatio, _cropHeightRatio); }
 		}
 

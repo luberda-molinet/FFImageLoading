@@ -13,38 +13,20 @@ namespace FFImageLoading.Transformations
 		private double _cropHeightRatio;
 		private CornerTransformType _cornersTransformType;
 
-		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType)
+		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType) 
+			: this(cornersSize, cornersSize, cornersSize, cornersSize, cornersTransformType, 1d, 1d)
 		{
-			_topLeftCornerSize = cornersSize;
-			_topRightCornerSize = cornersSize;
-			_bottomLeftCornerSize = cornersSize;
-			_bottomRightCornerSize = cornersSize;
-			_cornersTransformType = cornersTransformType;
-			_cropWidthRatio = 1f;
-			_cropHeightRatio = 1f;
 		}
 
 		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
-			CornerTransformType cornersTransformType)
+			CornerTransformType cornersTransformType) 
+			: this(topLeftCornerSize, topRightCornerSize, bottomLeftCornerSize, bottomRightCornerSize, cornersTransformType, 1d, 1d)
 		{
-			_topLeftCornerSize = topLeftCornerSize;
-			_topRightCornerSize = topRightCornerSize;
-			_bottomLeftCornerSize = bottomLeftCornerSize;
-			_bottomRightCornerSize = bottomRightCornerSize;
-			_cornersTransformType = cornersTransformType;
-			_cropWidthRatio = 1f;
-			_cropHeightRatio = 1f;
 		}
 
 		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
+			: this(cornersSize, cornersSize, cornersSize, cornersSize, cornersTransformType, cropWidthRatio, cropHeightRatio)
 		{
-			_topLeftCornerSize = cornersSize;
-			_topRightCornerSize = cornersSize;
-			_bottomLeftCornerSize = cornersSize;
-			_bottomRightCornerSize = cornersSize;
-			_cornersTransformType = cornersTransformType;
-			_cropWidthRatio = cropWidthRatio;
-			_cropHeightRatio = cropHeightRatio;
 		}
 
 		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
@@ -61,7 +43,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("CornersTransformation, cornersSizes = {0}/{1}/{2}/{3}, cornersTransformType = {4}, cropWidthRatio = {5}, cropHeightRatio = {6}, ", 
+			get { return string.Format("CornersTransformation,cornersSizes={0},{1},{2},{3},cornersTransformType={4},cropWidthRatio={5},cropHeightRatio={6},", 
 				_topLeftCornerSize, _topRightCornerSize, _bottomRightCornerSize, _bottomLeftCornerSize, _cornersTransformType, _cropWidthRatio, _cropHeightRatio); }
 		}
 

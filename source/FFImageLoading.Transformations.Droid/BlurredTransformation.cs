@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Work;
 using Android.Graphics;
 using Android.Content;
 
@@ -18,7 +17,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("BlurredTransformation, radius = {0}", _radius); }
+			get { return string.Format("BlurredTransformation,radius={0}", _radius); }
 		}
 
 		protected override Bitmap Transform(Bitmap source)

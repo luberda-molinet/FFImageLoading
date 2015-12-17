@@ -26,7 +26,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("RotateTransformation, degrees = {0}, ccw = {1}, resize = {2}", _degrees, _ccw, _resize); }
+			get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", _degrees, _ccw, _resize); }
 		}
 
 		protected override Bitmap Transform(Bitmap source)

@@ -1,6 +1,4 @@
-﻿using System;
-using FFImageLoading.Work;
-using UIKit;
+﻿using UIKit;
 using CoreGraphics;
 using CoreImage;
 
@@ -17,7 +15,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("BlurredTransformation, radius = {0}", _radius); }
+			get { return string.Format("BlurredTransformation,radius={0}", _radius); }
 		}
 
 		protected override UIImage Transform(UIImage source)

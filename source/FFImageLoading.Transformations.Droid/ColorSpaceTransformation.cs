@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Work;
 using Android.Graphics;
 using System.Linq;
 
@@ -8,6 +7,7 @@ namespace FFImageLoading.Transformations
 	public class ColorSpaceTransformation : TransformationBase
 	{
 		ColorMatrix _colorMatrix;
+		float[][] _rgbawMatrix;
 
 		public ColorSpaceTransformation(float[][] rgbawMatrix)
 		{
@@ -15,6 +15,7 @@ namespace FFImageLoading.Transformations
 				throw new ArgumentException("Wrong size of RGBAW color matrix");
 
 			_colorMatrix = new ColorMatrix();
+			_rgbawMatrix = rgbawMatrix;
 			UpdateColorMatrix(rgbawMatrix);
 		}
 
@@ -25,7 +26,15 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return "ColorSpaceTransformation"; }
+			get
+			{
+				if (_rgbawMatrix == null)
+					return string.Format("ColorSpaceTransformation,colorMatrix={0}", 
+						string.Join(",", _colorMatrix.GetArray()));
+
+				return string.Format("ColorSpaceTransformation,rgbawMatrix={0}",
+					string.Join(",", _rgbawMatrix.Select(x => string.Join(",", x)).ToArray()));
+			}
 		}
 
 		void UpdateColorMatrix(float[][] rgbawMatrix)

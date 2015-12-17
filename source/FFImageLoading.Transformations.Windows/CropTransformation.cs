@@ -1,9 +1,4 @@
 ﻿using FFImageLoading.Work;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FFImageLoading.Transformations
 {
@@ -35,7 +30,7 @@ namespace FFImageLoading.Transformations
         {
             get
             {
-                return string.Format("CropTransformation, zoomFactor = {0}, xOffset = {1}, yOffset = {2}, cropWidthRatio = {3}, cropHeightRatio = {4}",
+                return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}",
               _zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio);
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Work;
 using UIKit;
 using CoreGraphics;
 using CoreImage;
@@ -11,6 +10,7 @@ namespace FFImageLoading.Transformations
 	{
 		CGColorSpace _colorSpace;
 		CIColorMatrix _colorMatrix;
+		float[][] _rgbawMatrix;
 
 		public ColorSpaceTransformation(float[][] rgbawMatrix)
 		{
@@ -19,6 +19,7 @@ namespace FFImageLoading.Transformations
 
 			_colorSpace = null;
 			_colorMatrix = new CIColorMatrix();
+			_rgbawMatrix = rgbawMatrix;
 			UpdateColorMatrix(rgbawMatrix);
 		}
 
@@ -30,7 +31,14 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return "ColorSpaceTransformation"; }
+			get
+			{
+				if (_rgbawMatrix == null)
+					return string.Format("ColorSpaceTransformation,colorSpace={0}", _colorSpace.GetHashCode());
+
+				return string.Format("ColorSpaceTransformation,rgbawMatrix={0}",
+					string.Join(",", _rgbawMatrix.Select(x => string.Join(",", x)).ToArray()));
+			}
 		}
 
 		void UpdateColorMatrix(float[][] ma)

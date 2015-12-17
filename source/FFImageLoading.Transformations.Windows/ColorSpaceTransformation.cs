@@ -19,7 +19,11 @@ namespace FFImageLoading.Transformations
 
         public override string Key
         {
-            get { return "ColorSpaceTransformation"; }
+            get
+            {
+                return string.Format("ColorSpaceTransformation,rgbawMatrix={0}",
+                    string.Join(",", _rgbawMatrix.Select(x => string.Join(",", x)).ToArray()));
+            }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)

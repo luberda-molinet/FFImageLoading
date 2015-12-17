@@ -1,7 +1,6 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
-using System.Drawing;
 
 namespace FFImageLoading.Transformations
 {
@@ -28,7 +27,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("RotateTransformation, degrees = {0}, ccw = {1}, resize = {2}", _degrees, _ccw, _resize); }
+			get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", _degrees, _ccw, _resize); }
 		}
 
 		protected override UIImage Transform(UIImage source)

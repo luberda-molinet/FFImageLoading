@@ -1,5 +1,4 @@
 ﻿using FFImageLoading.Work;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Transformations
 {
@@ -14,7 +13,7 @@ namespace FFImageLoading.Transformations
 
         public override string Key
         {
-            get { return string.Format("FlipTransformation, Type=", _flipType.ToString()); }
+            get { return string.Format("FlipTransformation,Type={0}", _flipType); }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)

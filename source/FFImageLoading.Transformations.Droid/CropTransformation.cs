@@ -1,5 +1,4 @@
-﻿using System;
-using Android.Graphics;
+﻿using Android.Graphics;
 
 namespace FFImageLoading.Transformations
 {
@@ -29,7 +28,7 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("CropTransformation, zoomFactor = {0}, xOffset = {1}, yOffset = {2}, cropWidthRatio = {3}, cropHeightRatio = {4}", 
+			get { return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}", 
 				_zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio); }
 		}
 

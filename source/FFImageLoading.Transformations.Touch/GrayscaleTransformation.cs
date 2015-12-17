@@ -1,6 +1,4 @@
-﻿using System;
-using FFImageLoading.Work;
-using CoreGraphics;
+﻿using CoreGraphics;
 using UIKit;
 
 namespace FFImageLoading.Transformations
