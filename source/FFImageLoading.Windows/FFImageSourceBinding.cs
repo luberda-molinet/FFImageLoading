@@ -18,7 +18,7 @@ namespace FFImageLoading
 
         internal static async Task<FFImageSourceBinding> GetImageSourceBinding(string source)
         {
-            if (source == null)
+            if (string.IsNullOrWhiteSpace(source))
             {
                 return null;
             }
