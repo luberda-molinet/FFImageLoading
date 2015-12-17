@@ -26,9 +26,9 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 - On Android transparency is disabled by default (configurable). Saves 50% of memory
 - Transformations support
   - BlurredTransformation
-  - CircleTransformation, RoundedTransformation, CornersTransformation
+  - CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
   - ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
-  - FlipTransformation
+  - FlipTransformation, RotateTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
 
 ### History
