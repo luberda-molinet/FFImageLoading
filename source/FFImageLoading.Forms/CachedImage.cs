@@ -113,7 +113,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The retry count property.
 		/// </summary>
-		public static readonly BindableProperty RetryCountProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryCount, 0);
+		public static readonly BindableProperty RetryCountProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryCount, 3);
 
 		/// <summary>
 		/// If image loading fails automatically retry it a number of times, with a specific delay. Sets number of retries.
