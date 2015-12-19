@@ -3,7 +3,7 @@
    <metadata minClientVersion="2.8.1">
    
        <id>FFImageLoading.Windows</id>
-       <version>2.0.0-alpha8</version>
+       <version>2.0.0</version>
        <title>FFImageLoading Plugin for Windows</title>
        <authors>Fabien Molinet, Daniel Luberda</authors>
        <owners></owners>
