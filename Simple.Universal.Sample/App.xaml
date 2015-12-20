@@ -1,0 +1,8 @@
+﻿<Application
+    x:Class="Simple.Universal.Sample.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Simple.Universal.Sample"
+    RequestedTheme="Light">
+
+</Application>

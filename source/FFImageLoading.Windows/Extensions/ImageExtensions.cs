@@ -64,10 +64,10 @@ namespace FFImageLoading.Extensions
 
                 WriteableBitmap bitmap = null;
 
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    bitmap.SetSource(image);
+                    await bitmap.SetSourceAsync(image);
                 });
 
                 return bitmap;
