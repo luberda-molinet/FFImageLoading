@@ -148,7 +148,7 @@ namespace FFImageLoading
                 imageLoader.FadeAnimation(FadeAnimationEnabled);
 
                 // Transformations
-                if (Transformations != null)
+                if (Transformations.Count != 0)
                 {
                     imageLoader.Transform(Transformations);
                 }
@@ -392,7 +392,7 @@ namespace FFImageLoading
         /// The transformations property.
         /// </summary>
         public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register("Transformations",
-            typeof(List<FFImageLoading.Work.ITransformation>), typeof(FFImage), new PropertyMetadata(null));
+            typeof(List<FFImageLoading.Work.ITransformation>), typeof(FFImage), new PropertyMetadata(new List<FFImageLoading.Work.ITransformation>()));
 
         /// <summary>
         /// Gets or sets the transformations.

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Simple.Universal.Sample"
     xmlns:ff="using:FFImageLoading"
+    xmlns:fft="using:FFImageLoading.Transformations"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -18,5 +19,10 @@
         RetryDelay="250"
         DownsampleToViewSize="True"
         Source="http://loremflickr.com/600/600/nature?filename=simple.jpg">
+
+        <ff:FFImage.Transformations>
+            <fft:SepiaTransformation />
+        </ff:FFImage.Transformations>
+        
     </ff:FFImage>
 </Page>
