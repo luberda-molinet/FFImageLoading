@@ -9,20 +9,36 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ff:FFImage Name="image"
-        VerticalAlignment="Stretch" 
-        HorizontalAlignment="Stretch"
-        LoadingPlaceholder="loading.png"
-        ErrorPlaceholder="error.png"
-        CacheDuration="30"
-        RetryCount="3"
-        RetryDelay="250"
-        DownsampleToViewSize="True"
-        Source="http://loremflickr.com/600/600/nature?filename=simple.jpg">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <ff:FFImage.Transformations>
-            <fft:SepiaTransformation />
-        </ff:FFImage.Transformations>
-        
-    </ff:FFImage>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="0">
+            <Button Click="Button1_Click"
+                    Content="Transformations #1" />
+            <Button Click="Button2_Click"
+                    Content="Transformations #2" />
+        </StackPanel>
+
+        <ff:FFImage Name="Image"
+                    Grid.Row="1"
+                    VerticalAlignment="Stretch" 
+                    HorizontalAlignment="Stretch"
+                    TransformPlaceholders="False"
+                    LoadingPlaceholder="loading.png"
+                    ErrorPlaceholder="error.png"
+                    CacheDuration="30"
+                    RetryCount="3"
+                    RetryDelay="250"
+                    DownsampleToViewSize="True"
+                    Source="http://loremflickr.com/600/600/nature?filename=simple.jpg">
+            
+            <ff:FFImage.Transformations>
+                <fft:CircleTransformation />
+            </ff:FFImage.Transformations>            
+        </ff:FFImage>
+    </Grid>   
 </Page>
