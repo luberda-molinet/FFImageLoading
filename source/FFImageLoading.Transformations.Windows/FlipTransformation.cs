@@ -33,7 +33,7 @@ namespace FFImageLoading.Transformations
             var i = 0;
             BitmapHolder result = new BitmapHolder(new int[bmp.Pixels.Length], w, h);
 
-            if (flipMode == FlipType.Horizontal)
+            if (flipMode == FlipType.Vertical)
             {
                 var rp = result.Pixels;
                 for (var y = h - 1; y >= 0; y--)
@@ -46,7 +46,7 @@ namespace FFImageLoading.Transformations
                     }
                 }
             }
-            else if (flipMode == FlipType.Vertical)
+            else
             {
                 var rp = result.Pixels;
                 for (var y = 0; y < h; y++)
