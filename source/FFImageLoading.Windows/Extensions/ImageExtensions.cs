@@ -94,6 +94,7 @@ namespace FFImageLoading.Extensions
                 int[] array = null;
 
                 WriteableBitmap bitmap = null;
+                var completionSource = new TaskCompletionSource<BitmapHolder>();
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
@@ -103,9 +104,12 @@ namespace FFImageLoading.Extensions
 
                     array = new int[bitmap.PixelWidth * bitmap.PixelHeight];
                     CopyPixels(bytes, array);
+
+                    var bitmapHolder = new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    completionSource.SetResult(bitmapHolder);
                 });
 
-                return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                return completionSource.Task.Result;
             }
         }
 
