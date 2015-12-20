@@ -36,11 +36,12 @@ namespace FFImageLoading
         /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
 		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
 		/// <param name="fadeAnimationEnabled">Defines if fading should be performed while loading images.</param>
+        /// <param name="transformPlaceholders">Defines if transforms should be applied to placeholders.</param>
 		/// <param name="httpHeadersTimeout">Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.</param>
 		/// <param name="httpReadTimeout">Maximum time in seconds to wait before the HTTP request is cancelled.</param>
 		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null,
-			int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+            bool? transformPlaceholders = true, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
 		)
         {
 			lock (_initializeLock)
@@ -72,14 +73,14 @@ namespace FFImageLoading
 
 				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache,
 					loadWithTransparencyChannel ?? false, fadeAnimationEnabled ?? true,
-					httpHeadersTimeout, httpReadTimeout
+					true, httpHeadersTimeout, httpReadTimeout
 				);
 			}
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled = true,
-			int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+            bool transformPlaceholders = true, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
 		)
         {
 			if (_initialized)
@@ -90,7 +91,7 @@ namespace FFImageLoading
 				if (_initialized)
 					return;
 			
-				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel, fadeAnimationEnabled, httpHeadersTimeout, httpReadTimeout);
+				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel, fadeAnimationEnabled, transformPlaceholders, httpHeadersTimeout, httpReadTimeout);
 				Config = GetDefaultConfiguration(userDefinedConfig);
 
 				_initialized = true;
@@ -120,6 +121,7 @@ namespace FFImageLoading
                 downloadCache,
 				userDefinedConfig.LoadWithTransparencyChannel,
 				userDefinedConfig.FadeAnimationEnabled,
+                userDefinedConfig.TransformPlaceholders,
 				userDefinedConfig.HttpHeadersTimeout,
 				userDefinedConfig.HttpReadTimeout
             );

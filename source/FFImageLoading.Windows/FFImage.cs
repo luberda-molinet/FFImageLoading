@@ -152,6 +152,9 @@ namespace FFImageLoading
                 // FadeAnimation
                 imageLoader.FadeAnimation(FadeAnimationEnabled);
 
+                // TransformPlaceholders
+                imageLoader.TransformPlaceholders(TransformPlaceholders);
+
                 // Transformations
                 if (Transformations.Count != 0)
                 {
@@ -348,6 +351,28 @@ namespace FFImageLoading
             set
             {
                 SetValue(FadeAnimationEnabledProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// The transform placeholders property.
+        /// </summary>
+        /// 
+        public static readonly DependencyProperty TransformPlaceholdersProperty =
+            DependencyProperty.Register("TransformPlaceholders", typeof(bool), typeof(FFImage), new PropertyMetadata(true));
+
+        /// <summary>
+        /// Indicates if transforms should be applied to placeholders.  By default this value comes from ImageService.Config.TransformPlaceholders.
+        /// </summary>
+        public bool TransformPlaceholders
+        {
+            get
+            {
+                return (bool)GetValue(TransformPlaceholdersProperty);
+            }
+            set
+            {
+                SetValue(TransformPlaceholdersProperty, value);
             }
         }
 

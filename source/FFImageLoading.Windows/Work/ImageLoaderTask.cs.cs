@@ -286,7 +286,16 @@ namespace FFImageLoading.Work
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
 
-                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+                bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
+                    Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+
+                bool transform = true;
+                if (transformPlaceholdersEnabled)
+                    transform = true;
+                else if (source == ImageSource.CompiledResource || source == ImageSource.ApplicationBundle)
+                    transform = false;
+
+                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 && transform)
                 {
                     BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize);
                     

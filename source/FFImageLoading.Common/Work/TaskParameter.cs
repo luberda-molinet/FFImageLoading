@@ -146,7 +146,9 @@ namespace FFImageLoading.Work
 
 		public bool? FadeAnimationEnabled { get; private set; }
 
-		public TaskParameter Transform(ITransformation transformation)
+        public bool? TransformPlaceholdersEnabled { get; private set; }
+
+        public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)
 				throw new NullReferenceException("The transformation argument was null.");
@@ -222,13 +224,24 @@ namespace FFImageLoading.Work
 			return this;
 		}
 
-		/// <summary>
-		/// If image loading fails automatically retry it a number of times, with a specific delay.
-		/// </summary>
-		/// <returns>The TaskParameter instance for chaining the call.</returns>
-		/// <param name="retryCount">Number of retries</param>
-		/// <param name="millisecondDelay">Delay in milliseconds between each trial</param>
-		public TaskParameter Retry(int retryCount = 0, int millisecondDelay = 0)
+        /// <summary>
+        /// Indicates if transforms should be applied to placeholders.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="enabled">If set to <c>true</c> enabled.</param>
+        public TaskParameter TransformPlaceholders(bool enabled)
+        {
+            TransformPlaceholdersEnabled = enabled;
+            return this;
+        }
+
+        /// <summary>
+        /// If image loading fails automatically retry it a number of times, with a specific delay.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="retryCount">Number of retries</param>
+        /// <param name="millisecondDelay">Delay in milliseconds between each trial</param>
+        public TaskParameter Retry(int retryCount = 0, int millisecondDelay = 0)
 		{
 			RetryCount = retryCount;
 			RetryDelayInMs = millisecondDelay;
