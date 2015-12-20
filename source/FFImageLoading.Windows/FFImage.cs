@@ -44,18 +44,23 @@ namespace FFImageLoading
             ((FFImage)d).SourcePropertyChanged((string)e.NewValue);
         }
 
-        private async void SourcePropertyChanged(string source)
+        private void SourcePropertyChanged(string source)
         {
             System.Diagnostics.Debug.WriteLine("Source changed: {0}", source);
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
                 return;
 
+            LoadImage();
+        }
+
+        private async void LoadImage()
+        {
             if (_currentTask != null)
                 _currentTask.Cancel();
 
             TaskParameter imageLoader = null;
 
-            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(source);
+            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source);
 
             if (ffSource == null)
             {
@@ -64,7 +69,7 @@ namespace FFImageLoading
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                         internalImage.Source = null;
                     });
-                } 
+                }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
             {
@@ -392,7 +397,17 @@ namespace FFImageLoading
         /// The transformations property.
         /// </summary>
         public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register("Transformations",
-            typeof(List<FFImageLoading.Work.ITransformation>), typeof(FFImage), new PropertyMetadata(new List<FFImageLoading.Work.ITransformation>()));
+            typeof(List<FFImageLoading.Work.ITransformation>), typeof(FFImage), new PropertyMetadata(new List<FFImageLoading.Work.ITransformation>(), TransformationsPropertyChanged));
+
+        private static void TransformationsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FFImage)d).TransformationsPropertyChanged((List<FFImageLoading.Work.ITransformation>)e.NewValue);
+        }
+
+        private void TransformationsPropertyChanged(List<FFImageLoading.Work.ITransformation> transformations)
+        {
+            LoadImage();
+        }
 
         /// <summary>
         /// Gets or sets the transformations.
