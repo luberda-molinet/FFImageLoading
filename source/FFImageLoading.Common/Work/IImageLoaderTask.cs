@@ -52,7 +52,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		Task<GenerateResult> LoadFromStreamAsync(Stream stream);
+		Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder);
     }
 }
 
