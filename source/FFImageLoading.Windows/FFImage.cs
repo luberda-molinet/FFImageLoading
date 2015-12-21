@@ -28,6 +28,8 @@ namespace FFImageLoading
                 Opacity = 1.0f,
             };
             Content = internalImage;
+
+			Transformations = new List<FFImageLoading.Work.ITransformation>();
         }
 
         public string Source
