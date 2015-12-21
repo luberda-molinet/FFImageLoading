@@ -156,7 +156,7 @@ namespace FFImageLoading
                 imageLoader.TransformPlaceholders(TransformPlaceholders);
 
                 // Transformations
-                if (Transformations.Count != 0)
+                if (Transformations != null && Transformations.Count != 0)
                 {
                     imageLoader.Transform(Transformations);
                 }
