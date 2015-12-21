@@ -238,7 +238,7 @@ namespace FFImageLoading.Forms.Droid
 							imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
 
 						// Transformations
-						if (Element.Transformations != null)
+						if (Element.Transformations != null && Element.Transformations.Count > 0)
 						{
 							imageLoader.Transform(Element.Transformations);
 						}

@@ -2,6 +2,7 @@
 <pf:PFContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
 	x:Class="FFImageLoading.Forms.Sample.Pages.XamlSimpleExamplePage"
 	xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+	xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
 	xmlns:pf="clr-namespace:DLToolkit.PageFactory"
     xmlns:local="clr-namespace:FFImageLoading.Forms.Sample"
     x:TypeArguments="local:ViewModels.XamlSimpleExampleViewModel"
@@ -11,6 +12,9 @@
 			WidthRequest="300" HeightRequest="300"
 			DownsampleToViewSize="true"
 			Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg">
+			<ffimageloading:CachedImage.Transformations>
+				<fftransformations:GrayscaleTransformation />
+			</ffimageloading:CachedImage.Transformations>
 		</ffimageloading:CachedImage>
 	</ContentPage.Content>
 </pf:PFContentPage>

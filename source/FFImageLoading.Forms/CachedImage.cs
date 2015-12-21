@@ -11,6 +11,11 @@ namespace FFImageLoading.Forms
 	/// </summary>
 	public class CachedImage : View
 	{
+		public CachedImage()
+		{
+			Transformations = new List<FFImageLoading.Work.ITransformation>();	
+		}
+
 		/// <summary>
 		/// The aspect property.
 		/// </summary>
@@ -364,7 +369,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transformations property.
 		/// </summary>
-		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, null);
+		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, new List<FFImageLoading.Work.ITransformation>());
 
 		/// <summary>
 		/// Gets or sets the transformations.
