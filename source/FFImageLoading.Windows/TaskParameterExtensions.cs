@@ -37,6 +37,10 @@ namespace FFImageLoading
                 var isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
                     parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
 
+                bool imageChanged = (img != refView.Source);
+                if (!imageChanged)
+                    return;
+
                 if (isFadeAnimationEnabled && !fromCache)
                 {
 					// fade animation

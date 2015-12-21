@@ -64,10 +64,10 @@ namespace FFImageLoading.Extensions
 
                 WriteableBitmap bitmap = null;
 
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    bitmap.SetSource(image);
+                    await bitmap.SetSourceAsync(image);
                 });
 
                 return bitmap;
@@ -94,18 +94,22 @@ namespace FFImageLoading.Extensions
                 int[] array = null;
 
                 WriteableBitmap bitmap = null;
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                var completionSource = new TaskCompletionSource<BitmapHolder>();
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    bitmap.SetSource(image);
+                    await bitmap.SetSourceAsync(image);
 
                     var bytes = bitmap.PixelBuffer.ToArray();
 
                     array = new int[bitmap.PixelWidth * bitmap.PixelHeight];
                     CopyPixels(bytes, array);
+
+                    var bitmapHolder = new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    completionSource.SetResult(bitmapHolder);
                 });
 
-                return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                return completionSource.Task.Result;
             }
         }
 

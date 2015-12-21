@@ -10,7 +10,7 @@ namespace FFImageLoading.Config
     {
         public Configuration(int maxCacheSize, HttpClient httpClient, IWorkScheduler scheduler, IMiniLogger logger,
 			IDiskCache diskCache, IDownloadCache downloadCache, bool loadWithTransparencyChannel, bool fadeAnimationEnabled,
-			int httpHeadersTimeout, int httpReadTimeout
+			bool transformPlaceholders, int httpHeadersTimeout, int httpReadTimeout
 		)
         {
             MaxCacheSize = maxCacheSize;
@@ -21,7 +21,8 @@ namespace FFImageLoading.Config
             DownloadCache = downloadCache;
 			LoadWithTransparencyChannel = loadWithTransparencyChannel;
 			FadeAnimationEnabled = fadeAnimationEnabled;
-			HttpHeadersTimeout = httpHeadersTimeout;
+            TransformPlaceholders = transformPlaceholders;
+            HttpHeadersTimeout = httpHeadersTimeout;
 			HttpReadTimeout = httpReadTimeout;
         }
 
@@ -73,11 +74,17 @@ namespace FFImageLoading.Config
 		/// <value><c>true</c> if fade animation enabled; otherwise, <c>false</c>.</value>
 		public bool FadeAnimationEnabled { get; private set; }
 
-		/// <summary>
-		/// Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.
-		/// </summary>
-		/// <value>The http connect timeout.</value>
-		public int HttpHeadersTimeout { get; private set; }
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> transforming place is enabled.
+        /// </summary>
+        /// <value><c>true</c> if transform should be applied to placeholder images; otherwise, <c>false</c>.</value>
+        public bool TransformPlaceholders { get; private set; }
+
+        /// <summary>
+        /// Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.
+        /// </summary>
+        /// <value>The http connect timeout.</value>
+        public int HttpHeadersTimeout { get; private set; }
 
 		/// <summary>
 		/// Maximum time in seconds to wait before the HTTP request is cancelled.
