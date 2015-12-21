@@ -12,9 +12,10 @@ namespace FFImageLoading.Work.DataResolver
 			switch (source)
 			{
 				case ImageSource.ApplicationBundle:
-				case ImageSource.CompiledResource:
 				case ImageSource.Filepath:
 					return new FilePathDataResolver(source);
+				case ImageSource.CompiledResource:
+					return new AssetCatalogDataResolver();
 				case ImageSource.Url:
 					return new UrlDataResolver(parameter, downloadCache);
 				default:

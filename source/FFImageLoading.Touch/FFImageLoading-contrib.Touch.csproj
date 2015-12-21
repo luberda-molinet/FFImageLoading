@@ -80,6 +80,7 @@
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
+    <Compile Include="Work\DataResolver\AssetCatalogDataResolver.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
