@@ -145,6 +145,19 @@ namespace FFImageLoading
                     }
                 }
 
+                // Downsample mode
+                if(DownsampleMode != null)
+                {
+                    InterpolationMode mode = InterpolationMode.Linear;
+                    if (DownsampleMode == "NearestNeighbor")
+                        mode = InterpolationMode.NearestNeighbor;
+                    else if (DownsampleMode == "Cubic")
+                        mode = InterpolationMode.Cubic;
+                    else if (DownsampleMode == "Fant")
+                        mode = InterpolationMode.Fant;
+                    imageLoader.DownSampleMode(mode);
+                }                
+
                 // RetryCount
                 if (RetryCount > 0)
                 {
@@ -291,6 +304,28 @@ namespace FFImageLoading
             set
             {
                 SetValue(DownsampleToViewSizeProperty, value);
+            }
+        }
+
+        //// <summary>
+        /// The downsample interpolation mode property.
+        /// </summary>
+        public static readonly DependencyProperty DownsampleModeProperty =
+            DependencyProperty.Register("DownsampleMode", typeof(string), typeof(FFImage), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Set interpolation (resizing) algorithm.
+        /// </summary>
+        /// <value>InterpolationMode enumeration converted to string. Linear by default.</value>
+        public string DownsampleMode
+        {
+            get
+            {
+                return (string)GetValue(DownsampleModeProperty);
+            }
+            set
+            {
+                SetValue(DownsampleModeProperty, value);
             }
         }
 

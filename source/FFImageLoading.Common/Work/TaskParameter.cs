@@ -17,6 +17,14 @@ namespace FFImageLoading.Work
 		Stream = 20
 	}
 
+    public enum InterpolationMode
+    {
+        NearestNeighbor = 0,
+        Linear = 1,
+        Cubic = 2,
+        Fant = 3
+    }
+
 	public class TaskParameter: IDisposable
 	{
 		private bool _disposed;
@@ -75,9 +83,10 @@ namespace FFImageLoading.Work
 		private TaskParameter()
 		{
             Transformations = new List<ITransformation>();
+            DownSampleInterpolationMode = InterpolationMode.Linear;
 
-			// default values so we don't have a null value
-			OnSuccess = (s,r) =>
+            // default values so we don't have a null value
+            OnSuccess = (s,r) =>
 			{
 			};
 
@@ -122,7 +131,9 @@ namespace FFImageLoading.Work
 
 		public Tuple<int, int> DownSampleSize { get; private set; }
 
-		public ImageSource LoadingPlaceholderSource { get; private set; }
+        public InterpolationMode DownSampleInterpolationMode { get; private set; }
+
+        public ImageSource LoadingPlaceholderSource { get; private set; }
 
 		public string LoadingPlaceholderPath { get; private set; }
 
@@ -201,6 +212,17 @@ namespace FFImageLoading.Work
 			DownSampleSize = Tuple.Create(width, height);
 			return this;
 		}
+
+        /// <summary>
+        /// Set mode for downsampling. Speed-wise: nearest neighbour > linear > cubic > fant.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="mode">Optional mode parameter, if not set, defaults to linear.</param>
+        public TaskParameter DownSampleMode(InterpolationMode mode)
+        {
+            DownSampleInterpolationMode = mode;
+            return this;
+        }
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.

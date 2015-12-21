@@ -44,7 +44,7 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale, InterpolationMode mode)
         {
             if (imageBytes == null)
                 return null;
@@ -53,7 +53,7 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
+                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode);
             }
 
             using (image)
@@ -74,7 +74,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes, Tuple<int, int> downscale)
+        public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes, Tuple<int, int> downscale, InterpolationMode mode)
         {
             if (imageBytes == null)
                 return null;
@@ -83,7 +83,7 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2);
+                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode);
             }
 
             using (image)
@@ -118,7 +118,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height)
+        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height, InterpolationMode mode)
         {
             IRandomAccessStream resizedStream = imageStream;
             var decoder = await BitmapDecoder.CreateAsync(imageStream);
@@ -142,6 +142,8 @@ namespace FFImageLoading.Extensions
                     uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
                     uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
 
+                    // it's okay. Windows's BitmapInterpolationMode has the same numerical values as ours InterpolationMode.
+                    encoder.BitmapTransform.InterpolationMode = (BitmapInterpolationMode)mode;
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;
 
