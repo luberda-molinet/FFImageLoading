@@ -162,7 +162,7 @@ namespace FFImageLoading.Work
 					{
 						try 
 						{
-							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
+							generatingImageSucceeded = await LoadFromStreamAsync(stream, false).ConfigureAwait(false);
 						} 
 						catch (Exception ex2) 
 						{
@@ -199,7 +199,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream);
+		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder);
 
 		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 

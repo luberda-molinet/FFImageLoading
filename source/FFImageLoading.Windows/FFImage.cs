@@ -28,6 +28,8 @@ namespace FFImageLoading
                 Opacity = 1.0f,
             };
             Content = internalImage;
+
+			Transformations = new List<FFImageLoading.Work.ITransformation>();
         }
 
         public string Source
@@ -156,7 +158,7 @@ namespace FFImageLoading
                 imageLoader.TransformPlaceholders(TransformPlaceholders);
 
                 // Transformations
-                if (Transformations.Count != 0)
+                if (Transformations != null && Transformations.Count != 0)
                 {
                     imageLoader.Transform(Transformations);
                 }
