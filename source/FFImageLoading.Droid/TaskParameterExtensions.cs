@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Work;
 using FFImageLoading.Views;
 using FFImageLoading.Helpers;
+using FFImageLoading.Cache;
 
 
 namespace FFImageLoading
@@ -17,7 +18,7 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
-            var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, imageView);
+			var task = CreateTask(parameters, imageView);
             ImageService.LoadImage(task);
             return task;
         }
@@ -47,6 +48,26 @@ namespace FFImageLoading
 
             return tcs.Task;
         }
+
+		/// <summary>
+		/// Invalidate the image corresponding to given parameters from given caches.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		/// <param name="cacheType">Cache type.</param>
+		public static void Invalidate(this TaskParameter parameters, CacheType cacheType)
+		{
+			using (var task = CreateTask(parameters, null))
+			{
+				var key = task.GetKey();
+				ImageService.Invalidate(key, cacheType);
+			}
+		}
+
+		private static ImageLoaderTask CreateTask(this TaskParameter parameters, ImageViewAsync imageView)
+		{
+			var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, imageView);
+			return task;
+		}
     }
 }
 
