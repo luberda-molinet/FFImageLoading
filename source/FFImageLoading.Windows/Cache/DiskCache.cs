@@ -37,7 +37,7 @@ namespace FFImageLoading.Cache
 
         const string JournalFileName = "FFImageLoadingCache.journal";
         const string Magic = "MONOID";
-        const int BufferSize = 4096; // default value of .NET framework for CopyToAsync buffer size
+		const int BufferSize = 81920; // default value of .NET framework for CopyToAsync buffer size
         readonly Encoding encoding = Encoding.UTF8;
 
         string version;

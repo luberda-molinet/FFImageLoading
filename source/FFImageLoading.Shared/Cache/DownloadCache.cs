@@ -14,7 +14,7 @@ namespace FFImageLoading.Cache
     {
         private readonly MD5Helper _md5Helper;
         private readonly IDiskCache _diskCache;
-		private const int BufferSize = 4096; // default value of .NET framework for CopyToAsync buffer size
+		private const int BufferSize = 81920; // default value of .NET framework for CopyToAsync buffer size
 
         public DownloadCache(HttpClient httpClient, IDiskCache diskCache)
         {
