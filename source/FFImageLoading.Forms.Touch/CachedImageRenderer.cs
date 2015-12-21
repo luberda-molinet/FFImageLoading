@@ -247,6 +247,10 @@ namespace FFImageLoading.Forms.Touch
 				if (Element.FadeAnimationEnabled.HasValue)
 					imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
+				// TransformPlaceholders
+				if (Element.TransformPlaceholders.HasValue)
+					imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
+
 				// Transformations
 				if (Element.Transformations != null)
 				{
