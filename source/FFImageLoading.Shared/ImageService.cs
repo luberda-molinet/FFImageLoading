@@ -18,6 +18,7 @@ namespace FFImageLoading
 
         private static volatile bool _initialized;
 		private static object _initializeLock = new object();
+		private static readonly MD5Helper _md5Helper = new MD5Helper();
 
         /// <summary>
         /// Gets FFImageLoading configuration
@@ -275,7 +276,8 @@ namespace FFImageLoading
 
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
 			{
-				Config.DiskCache.Remove(key);
+				string hash = _md5Helper.MD5(key);
+				Config.DiskCache.Remove(hash);
 			}
 		}
     }

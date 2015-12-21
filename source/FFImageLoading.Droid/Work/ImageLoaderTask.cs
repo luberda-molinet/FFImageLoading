@@ -33,7 +33,11 @@ namespace FFImageLoading.Work
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
 			DownloadCache = downloadCache;
-			_imageWeakReference = new WeakReference<ImageView>(imageView);
+
+			if (imageView != null)
+			{
+				_imageWeakReference = new WeakReference<ImageView>(imageView);
+			}
 		}
 
 		/// <summary>
