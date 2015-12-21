@@ -233,8 +233,12 @@ namespace FFImageLoading.Forms.Droid
 						if (Element.FadeAnimationEnabled.HasValue)
 							imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
+						// TransformPlaceholders
+						if (Element.TransformPlaceholders.HasValue)
+							imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
+
 						// Transformations
-						if (Element.Transformations != null)
+						if (Element.Transformations != null && Element.Transformations.Count > 0)
 						{
 							imageLoader.Transform(Element.Transformations);
 						}

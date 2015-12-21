@@ -89,27 +89,13 @@ namespace FFImageLoading.Extensions
             using (image)
             {
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+                PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
-                image.Seek(0);
-                int[] array = null;
+                var bytes = pixelDataProvider.DetachPixelData();
+                int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
+                CopyPixels(bytes, array);
 
-                WriteableBitmap bitmap = null;
-                var completionSource = new TaskCompletionSource<BitmapHolder>();
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
-                {
-                    bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    await bitmap.SetSourceAsync(image);
-
-                    var bytes = bitmap.PixelBuffer.ToArray();
-
-                    array = new int[bitmap.PixelWidth * bitmap.PixelHeight];
-                    CopyPixels(bytes, array);
-
-                    var bitmapHolder = new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    completionSource.SetResult(bitmapHolder);
-                });
-
-                return completionSource.Task.Result;
+                return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
             }
         }
 

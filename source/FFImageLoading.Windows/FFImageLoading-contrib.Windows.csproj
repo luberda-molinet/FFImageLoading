@@ -97,8 +97,8 @@
     <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs.cs" />
     <Compile Include="FFImage.cs" />
+    <Compile Include="Work\ImageLoaderTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -33,7 +33,11 @@ namespace FFImageLoading.Work
 			: base(mainThreadDispatcher, miniLogger, parameters)
 		{
 			DownloadCache = downloadCache;
-			_imageWeakReference = new WeakReference<ImageView>(imageView);
+
+			if (imageView != null)
+			{
+				_imageWeakReference = new WeakReference<ImageView>(imageView);
+			}
 		}
 
 		/// <summary>
@@ -140,7 +144,7 @@ namespace FFImageLoading.Work
 			{
 				try
 				{
-					drawableWithResult = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
+					drawableWithResult = await RetrieveDrawableAsync(Parameters.Path, Parameters.Source, false, false).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
@@ -228,7 +232,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
+		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
 		{
 			if (stream == null)
 				return GenerateResult.Failed;
@@ -240,7 +244,7 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return GenerateResult.InvalidTarget;
 
-			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
+			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
 			if (resultWithDrawable == null || resultWithDrawable.Item == null)
 			{
 				// Show error placeholder
@@ -289,7 +293,7 @@ namespace FFImageLoading.Work
 			return GenerateResult.Success;
 		}
 
-		protected virtual async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, Stream originalStream = null)
+		protected virtual async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, bool isPlaceholder, Stream originalStream = null)
 		{
 			if (CancellationToken.IsCancellationRequested)
 				return null;
@@ -445,7 +449,11 @@ namespace FFImageLoading.Work
 							if (bitmap == null || CancellationToken.IsCancellationRequested)
 								return null;
 
-							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+							bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
+								Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+
+							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
+								&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 							{
 								foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 								{
@@ -539,7 +547,7 @@ namespace FFImageLoading.Work
 
 				try
 				{
-					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder).ConfigureAwait(false);
+					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder, true).ConfigureAwait(false);
 					drawable = drawableWithResult == null ? null : drawableWithResult.Item;
 				}
 				catch (Exception ex)
@@ -662,7 +670,7 @@ namespace FFImageLoading.Work
 
 		// bitmaps using the decode* methods from {@link android.graphics.BitmapFactory}. This implementation calculates
 		// having a width and height equal to or larger than the requested width and height.
-		private async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder)
+		private async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder, bool isPlaceholder)
 		{
 			if (string.IsNullOrWhiteSpace(sourcePath)) return null;
 
@@ -673,7 +681,7 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
 				return null;
 
-			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder).ConfigureAwait(false);
+			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
 			if (drawableWithResult == null || drawableWithResult.Item == null)
 				return null;
 

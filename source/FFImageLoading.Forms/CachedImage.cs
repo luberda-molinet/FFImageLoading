@@ -11,6 +11,11 @@ namespace FFImageLoading.Forms
 	/// </summary>
 	public class CachedImage : View
 	{
+		public CachedImage()
+		{
+			Transformations = new List<FFImageLoading.Work.ITransformation>();	
+		}
+
 		/// <summary>
 		/// The aspect property.
 		/// </summary>
@@ -341,9 +346,30 @@ namespace FFImageLoading.Forms
 		}
 
 		/// <summary>
+		/// The TransformPlaceholders property.
+		/// </summary>
+		public static readonly BindableProperty TransformPlaceholdersProperty = BindableProperty.Create<CachedImage, bool?> (w => w.TransformPlaceholders, null);
+
+		/// <summary>
+		/// Indicates if transforms should be applied to placeholders. By default this value comes from ImageService.Config.TransformPlaceholders.
+		/// </summary>
+		/// <value>The transform placeholders.</value>
+		public bool? TransformPlaceholders
+		{
+			get
+			{
+				return (bool?)GetValue(TransformPlaceholdersProperty);
+			}
+			set
+			{
+				SetValue(TransformPlaceholdersProperty, value);
+			}
+		}
+
+		/// <summary>
 		/// The transformations property.
 		/// </summary>
-		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, null);
+		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, new List<FFImageLoading.Work.ITransformation>());
 
 		/// <summary>
 		/// Gets or sets the transformations.

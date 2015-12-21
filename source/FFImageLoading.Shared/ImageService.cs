@@ -18,6 +18,7 @@ namespace FFImageLoading
 
         private static volatile bool _initialized;
 		private static object _initializeLock = new object();
+		private static readonly MD5Helper _md5Helper = new MD5Helper();
 
         /// <summary>
         /// Gets FFImageLoading configuration
@@ -41,7 +42,7 @@ namespace FFImageLoading
 		/// <param name="httpReadTimeout">Maximum time in seconds to wait before the HTTP request is cancelled.</param>
 		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null,
-            bool? transformPlaceholders = true, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+            bool? transformPlaceholders = null, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
 		)
         {
 			lock (_initializeLock)
@@ -73,7 +74,7 @@ namespace FFImageLoading
 
 				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache,
 					loadWithTransparencyChannel ?? false, fadeAnimationEnabled ?? true,
-					true, httpHeadersTimeout, httpReadTimeout
+                    transformPlaceholders ?? true, httpHeadersTimeout, httpReadTimeout
 				);
 			}
         }
@@ -275,7 +276,8 @@ namespace FFImageLoading
 
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
 			{
-				Config.DiskCache.Remove(key);
+				string hash = _md5Helper.MD5(key);
+				Config.DiskCache.Remove(hash);
 			}
 		}
     }

@@ -65,7 +65,7 @@ namespace FFImageLoading.Work
 
             try
             {
-                imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source).ConfigureAwait(false);
+                imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
                 image = imageWithResult == null ? null : imageWithResult.Item;
             }
             catch (Exception ex)
@@ -155,7 +155,7 @@ namespace FFImageLoading.Work
             }
         }
 
-		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
+		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
 		{
 			if (stream == null)
 				return GenerateResult.Failed;
@@ -167,7 +167,7 @@ namespace FFImageLoading.Work
             WriteableBitmap image = null;
 			try
 			{
-				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, stream).ConfigureAwait(false);
+				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, isPlaceholder, stream).ConfigureAwait(false);
 				image = imageWithResult == null ? null : imageWithResult.Item;
 			}
 			catch (Exception ex)
@@ -221,7 +221,8 @@ namespace FFImageLoading.Work
 		}
 
 
-        protected virtual async Task<WithLoadingResult<WriteableBitmap>> GetImageAsync(string sourcePath, ImageSource source, Stream originalStream = null)
+        protected virtual async Task<WithLoadingResult<WriteableBitmap>> GetImageAsync(string sourcePath, ImageSource source, 
+            bool isPlaceholder, Stream originalStream = null)
         {
             if (CancellationToken.IsCancellationRequested)
                 return null;
@@ -279,7 +280,7 @@ namespace FFImageLoading.Work
 
                 WriteableBitmap writableBitmap = null;
 
-                // Special case to handle WebP decoding on iOS
+                // Special case to handle WebP decoding
                 if (sourcePath.ToLowerInvariant().EndsWith(".webp"))
                 {
                     //TODO 
@@ -289,13 +290,8 @@ namespace FFImageLoading.Work
                 bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
                     Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
-                bool transform = true;
-                if (transformPlaceholdersEnabled)
-                    transform = true;
-                else if (source == ImageSource.CompiledResource || source == ImageSource.ApplicationBundle)
-                    transform = false;
-
-                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 && transform)
+                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
+                && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
                 {
                     BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize);
                     
@@ -347,7 +343,7 @@ namespace FFImageLoading.Work
             {
                 try
                 {
-                    var imageWithResult = await RetrieveImageAsync(placeholderPath, source).ConfigureAwait(false);
+                    var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
                     image = imageWithResult == null ? null : imageWithResult.Item;
                 }
                 catch (Exception ex)
@@ -379,7 +375,7 @@ namespace FFImageLoading.Work
             return true;
         }
 
-        private async Task<WithLoadingResult<WriteableBitmap>> RetrieveImageAsync(string sourcePath, ImageSource source)
+        private async Task<WithLoadingResult<WriteableBitmap>> RetrieveImageAsync(string sourcePath, ImageSource source, bool isPlaceholder)
         {
             // If the image cache is available and this task has not been cancelled by another
             // thread and the ImageView that was originally bound to this task is still bound back
@@ -388,7 +384,7 @@ namespace FFImageLoading.Work
             if (CancellationToken.IsCancellationRequested || _getNativeControl() == null || ImageService.ExitTasksEarly)
                 return null;
 
-            var imageWithResult = await GetImageAsync(sourcePath, source).ConfigureAwait(false);
+            var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
 
             if (imageWithResult == null || imageWithResult.Item == null)
                 return null;

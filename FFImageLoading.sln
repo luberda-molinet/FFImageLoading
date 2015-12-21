@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib", "source\FFImageLoading.Common\FFImageLoading-contrib.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
 EndProject
@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.WinUWP", "source\FFImageLoading.Forms.WinUWP\FFImageLoading.Forms.WinUWP.csproj", "{B8BE9FE7-2D07-40B5-8DAE-BA52F944C659}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Universal.Sample", "Simple.Universal.Sample\Simple.Universal.Sample.csproj", "{4B964916-47F4-4876-8A6B-9048B8A0D148}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Universal.Sample", "samples\Simple.WinUniversal.Sample\Simple.Universal.Sample.csproj", "{4B964916-47F4-4876-8A6B-9048B8A0D148}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
