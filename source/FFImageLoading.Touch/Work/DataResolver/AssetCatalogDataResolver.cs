@@ -12,17 +12,11 @@ namespace FFImageLoading.Work.DataResolver
 	{
 		public async Task<UIImageData> GetData(string identifier, CancellationToken token)
 		{
-			using (var asset = new NSDataAsset(identifier))
-			{
-				using (var stream = asset.Data.AsStream())
+			return await Task.Run(() =>
 				{
-					using (var memoryStream = new MemoryStream())
-					{
-						await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-						return new UIImageData() { Data = memoryStream.ToArray(), Result = LoadingResult.CompiledResource, ResultIdentifier = identifier };
-					}
-				}
-			}
+					var image = UIImage.FromBundle(identifier);
+					return new UIImageData() { Image = image, Result = LoadingResult.CompiledResource, ResultIdentifier = identifier };
+				}).ConfigureAwait(false);
 		}
 
 		public void Dispose() {

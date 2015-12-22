@@ -252,6 +252,7 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
+			UIImage image = null;
 			byte[] bytes = null;
 			string path = sourcePath;
 			LoadingResult? result = null;
@@ -283,13 +284,14 @@ namespace FFImageLoading.Work
 						if (data == null)
 							return null;
 
+						image = data.Image;
 						bytes = data.Data;
 						path = data.ResultIdentifier;
 						result = data.Result;
 					}
 				}
 			}
-			catch (System.OperationCanceledException oex)
+			catch (System.OperationCanceledException)
 			{
 				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
 				return null;
@@ -302,25 +304,28 @@ namespace FFImageLoading.Work
 				return null;
 			}
 
-			if (bytes == null)
+			if (bytes == null && image == null)
 				return null;
 
-			var image = await Task.Run(() =>
+			var imageToDisplay = await Task.Run(() =>
 				{
 					if (CancellationToken.IsCancellationRequested)
 						return null;
 
-					UIImage imageIn = null;
+					UIImage imageIn = image;
 
-					// Special case to handle WebP decoding on iOS
-					if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+					if (imageIn == null)
 					{
-						imageIn = new WebP.Touch.WebPCodec().Decode(bytes);
-					}
-					else
-					{
-						nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-						imageIn = new UIImage(NSData.FromArray(bytes), scale);
+						// Special case to handle WebP decoding on iOS
+						if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+						{
+							imageIn = new WebP.Touch.WebPCodec().Decode(bytes);
+						}
+						else
+						{
+							nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
+							imageIn = new UIImage(NSData.FromArray(bytes), scale);
+						}
 					}
 
 					if (Parameters.DownSampleSize != null
@@ -362,7 +367,7 @@ namespace FFImageLoading.Work
 					return imageIn;
 				}).ConfigureAwait(false);
 
-			return WithLoadingResult.Encapsulate(image, result.Value);
+			return WithLoadingResult.Encapsulate(imageToDisplay, result.Value);
 		}
 
 		/// <summary>
