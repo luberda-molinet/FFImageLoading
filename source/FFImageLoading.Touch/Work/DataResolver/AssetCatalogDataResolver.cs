@@ -5,6 +5,7 @@ using FFImageLoading.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using UIKit;
+using Foundation;
 
 namespace FFImageLoading.Work.DataResolver
 {
@@ -14,8 +15,10 @@ namespace FFImageLoading.Work.DataResolver
 		{
 			return await Task.Run(() =>
 				{
-					var image = UIImage.FromBundle(identifier);
-					return new UIImageData() { Image = image, Result = LoadingResult.CompiledResource, ResultIdentifier = identifier };
+					NSObject ob = new NSObject();
+					UIImage image = null;
+					ob.InvokeOnMainThread( ()=> { image = UIImage.FromBundle(identifier); });
+					return new UIImageData() { Image = image, Result = LoadingResult.CompiledResource, ResultIdentifier = identifier };					
 				}).ConfigureAwait(false);
 		}
 
