@@ -158,7 +158,7 @@ namespace FFImageLoading.Cache
 			if (!Utils.HasKitKat())
 			{
 				// On earlier versions, the dimensions must match exactly and the inSampleSize must be 1
-				return item.Width == width && item.Height == height && inSampleSize == 1;
+				return item.Width == width && item.Height == height && GetBytesPerPixel(item.GetConfig()) == GetBytesPerPixel(bitmapConfig) && inSampleSize == 1;
 			}
 
 			// From Android 4.4 (KitKat) onward we can re-use if the byte size of the new bitmap
