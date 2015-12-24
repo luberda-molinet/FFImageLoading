@@ -96,7 +96,7 @@ namespace FFImageLoading.Cache
 		/// <param name="width">Width of the image to be written to the bitmap allocation.</param>
 		/// <param name="height">Height of the image to be written to the bitmap allocation.</param>
 		/// <param name="inSampleSize">DownSample factor.</param>
-		public SelfDisposingBitmapDrawable GetReusableBitmapDrawable(int width, int height, int inSampleSize)
+		public SelfDisposingBitmapDrawable GetReusableBitmapDrawable(int width, int height, Bitmap.Config bitmapConfig, int inSampleSize)
 		{
 			if (reuse_pool == null) return null;
 
@@ -121,7 +121,7 @@ namespace FFImageLoading.Cache
 
 						if (!bd.IsRetained && bd.Bitmap.IsMutable)
 						{
-							if (CanUseForInBitmap(bd.Bitmap, width, height, inSampleSize))
+							if (CanUseForInBitmap(bd.Bitmap, width, height, bitmapConfig, inSampleSize))
 							{
 								reuseDrawable = bd;
 								break;
@@ -153,7 +153,7 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		private bool CanUseForInBitmap(Bitmap item, int width, int height, int inSampleSize)
+		private bool CanUseForInBitmap(Bitmap item, int width, int height, Bitmap.Config bitmapConfig, int inSampleSize)
 		{
 			if (!Utils.HasKitKat())
 			{
@@ -171,7 +171,7 @@ namespace FFImageLoading.Cache
 
 			int newWidth = width/inSampleSize;
 			int newHeight = height/inSampleSize;
-			int byteCount = newWidth*newHeight*GetBytesPerPixel(item.GetConfig());
+			int byteCount = newWidth*newHeight*GetBytesPerPixel(bitmapConfig);
 			return byteCount <= item.AllocationByteCount;
 		}
 

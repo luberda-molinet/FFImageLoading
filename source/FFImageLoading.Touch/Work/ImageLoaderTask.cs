@@ -278,7 +278,7 @@ namespace FFImageLoading.Work
 				}
 				else
 				{
-					using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache))
+					using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache, MainThreadDispatcher))
 					{
 						var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
 						if (data == null)
