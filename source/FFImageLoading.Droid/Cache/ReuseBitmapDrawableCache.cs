@@ -171,7 +171,18 @@ namespace FFImageLoading.Cache
 
 			int newWidth = width/inSampleSize;
 			int newHeight = height/inSampleSize;
-			int byteCount = newWidth*newHeight*GetBytesPerPixel(bitmapConfig);
+
+			if (inSampleSize > 1)
+			{
+				if (newWidth % 2 != 0)
+					newWidth += 1;
+
+				if (newHeight % 2 != 0)
+					newHeight += 1;	
+			}
+
+			int byteCount = newWidth * newHeight * GetBytesPerPixel(bitmapConfig);
+
 			return byteCount <= item.AllocationByteCount;
 		}
 
