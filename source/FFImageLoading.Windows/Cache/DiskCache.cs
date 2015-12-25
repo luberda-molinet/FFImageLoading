@@ -487,7 +487,7 @@ namespace FFImageLoading.Cache
 
             try
             {
-				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false);)
+				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
                 using (var writer = new StreamWriter(stream, encoding))
                 {
 					await writer.WriteAsync((char)op).ConfigureAwait(false);
