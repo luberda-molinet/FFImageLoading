@@ -28,7 +28,8 @@ namespace FFImageLoading.Drawables
 
 		public override void Draw(Canvas canvas)
 		{
-			try {
+			try 
+			{
 				if (!_animating)
 				{
 					base.SetAlpha(_alpha);
@@ -46,9 +47,11 @@ namespace FFImageLoading.Drawables
 					}
 					else
 					{
-						if (_placeholder != null)
+						var placeholderBitmap = _placeholder as BitmapDrawable;
+						if (placeholderBitmap != null && placeholderBitmap.Handle != IntPtr.Zero && placeholderBitmap.Bitmap != null 
+							&& placeholderBitmap.Handle != IntPtr.Zero && !placeholderBitmap.Bitmap.IsRecycled)
 						{
-							_placeholder.Draw(canvas);
+							_placeholder.Draw(canvas);	
 						}
 
 						int partialAlpha = (int)(_alpha * normalized);
@@ -57,7 +60,8 @@ namespace FFImageLoading.Drawables
 						base.SetAlpha(_alpha);
 					}
 				}
-			} catch (Exception ex)
+			} 
+			catch (Exception ex)
 			{
 				Console.WriteLine(ex.ToString());
 			}

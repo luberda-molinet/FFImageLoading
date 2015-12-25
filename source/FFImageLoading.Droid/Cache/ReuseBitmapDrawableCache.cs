@@ -119,7 +119,7 @@ namespace FFImageLoading.Cache
 					foreach (var k in reuse_keys) {
 						var bd = reuse_pool.Peek(k);
 
-						if (!bd.IsRetained && bd.Bitmap.IsMutable)
+						if (bd != null && bd.Handle != IntPtr.Zero && !bd.IsRetained && bd.Bitmap.IsMutable && !bd.Bitmap.IsRecycled)
 						{
 							if (CanUseForInBitmap(bd.Bitmap, width, height, bitmapConfig, inSampleSize))
 							{
@@ -326,8 +326,8 @@ namespace FFImageLoading.Cache
 				return;
 			}
 
-			if (value.Bitmap == null) {
-				Log.Warn(TAG, "Attempt to add Drawable with null bitmap, refusing to cache");
+			if (value.Bitmap == null || value.Bitmap.Handle == IntPtr.Zero || value.Bitmap.IsRecycled) {
+				Log.Warn(TAG, "Attempt to add Drawable with null or recycled bitmap, refusing to cache");
 				return;
 			}
 
