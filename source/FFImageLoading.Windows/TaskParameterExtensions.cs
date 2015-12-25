@@ -5,7 +5,12 @@ using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
+<<<<<<< HEAD
 using Windows.UI.Xaml.Media.Imaging;
+=======
+using Windows.UI.Xaml;
+using FFImageLoading.Cache;
+>>>>>>> molinch/master
 
 namespace FFImageLoading
 {

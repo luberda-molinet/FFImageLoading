@@ -22,9 +22,11 @@ using System.IO;
 
 namespace FFImageLoading.Cache
 {
+    /// <summary>
+    /// Disk cache Windows implementation.
+    /// </summary>
     public class DiskCache : IDiskCache
     {
-        private static readonly SemaphoreSlim initLock = new SemaphoreSlim(initialCount: 1);
         private static readonly SemaphoreSlim journalLock = new SemaphoreSlim(initialCount: 1);
 		private static readonly SemaphoreSlim fileWriteLock = new SemaphoreSlim(initialCount: 1);
 
@@ -40,10 +42,12 @@ namespace FFImageLoading.Cache
         const int BufferSize = 4096; // default value of .NET framework for CopyToAsync buffer size
         readonly Encoding encoding = Encoding.UTF8;
 
+        Task initTask = null;
         string version;
         string cacheFolderName;
-        StorageFolder cacheFolder = null;
-        StorageFile journalFile = null;
+        StorageFolder cacheFolder;
+        StorageFile journalFile;
+        ConcurrentDictionary<string, Task> fileWritePendingTasks;
 
         struct CacheEntry
         {
@@ -63,19 +67,27 @@ namespace FFImageLoading.Cache
         {
             this.entries = new ConcurrentDictionary<string, CacheEntry>();
             this.version = version;
+            this.cacheFolder = null;
+            this.journalFile = null;
             this.cacheFolderName = cacheFolderName;
-            Init();
+            this.fileWritePendingTasks = new ConcurrentDictionary<string, Task>();
+
+            initTask = Init();
         }
 
+        /// <summary>
+        /// Creates new cache default instance.
+        /// </summary>
+        /// <returns>The cache.</returns>
+        /// <param name="cacheName">Cache name.</param>
+        /// <param name="version">Version.</param>
         public static DiskCache CreateCache(string cacheName, string version = "1.0")
         {
             return new DiskCache(cacheName, version);
         }
 
-        async void Init()
+        async Task Init()
         {
-            await initLock.WaitAsync();
-
             try
             {
                 cacheFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
@@ -101,8 +113,7 @@ namespace FFImageLoading.Cache
             }
             finally
             {
-                initLock.Release();
-                await CleanCallback();
+                var task = CleanCallback();
             }
         }
 
@@ -199,14 +210,220 @@ namespace FFImageLoading.Cache
             }
         }
 
-        bool EnsureHeader(StreamReader reader)
+        /// <summary>
+        /// Gets the base path.
+        /// </summary>
+        /// <returns>The base path.</returns>
+        public async Task<string> GetBasePathAsync()
         {
-            var m = reader.ReadLine();
-            var v = reader.ReadLine();
+            await initTask;
+            return cacheFolder.Path;
+        }
 
-            System.Diagnostics.Debug.WriteLine("{0} / {1} ||| {2} / {3}", m, Magic, v, version);
+        /// <summary>
+        /// Adds the file to cache and file saving queue if not exists.
+        /// </summary>
+        /// <param name="key">Key.</param>
+        /// <param name="bytes">Bytes.</param>
+        /// <param name="duration">Duration.</param>
+        public async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
+        {
+            await initTask;
 
-            return m == Magic && v == version;
+            var sanitizedKey = SanitizeKey(key);
+
+            var task = new Task(async () => {
+                try
+                {
+                    await fileWriteLock.WaitAsync();
+
+                    bool existed = entries.ContainsKey(sanitizedKey);
+
+                    if (!existed)
+                    {
+                        var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
+
+                        using (var fs = await file.OpenStreamForWriteAsync())
+                        {
+                            await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+                        }
+                    }
+
+                    await AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
+                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
+
+                    Task finishedTask;
+                    fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
+                }
+                finally
+                {
+                    fileWriteLock.Release();
+                }
+            });
+
+            if (fileWritePendingTasks.TryAdd(sanitizedKey, task))
+            {
+                task.Start();
+            }
+        }
+
+        /// <summary>
+        /// Tries to get cached file as byte array.
+        /// </summary>
+        /// <returns>The get async.</returns>
+        /// <param name="key">Key.</param>
+        /// <param name="token">Token.</param>
+        public async Task<byte[]> TryGetAsync(string key, CancellationToken token)
+        {
+            await initTask;
+
+            key = SanitizeKey(key);
+            await WaitForPendingWriteIfExists(key);
+            
+            if (!entries.ContainsKey(key))
+                return null;
+
+            try
+            {
+                StorageFile file = null;
+
+                try
+                {
+                    file = await cacheFolder.GetFileAsync(key);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
+                if (file == null)
+                    return null;
+
+                using (var fs = await file.OpenStreamForReadAsync())
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await fs.CopyToAsync(ms, BufferSize, token).ConfigureAwait(false);
+                        return ms.ToArray();
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Tries to get cached file as stream.
+        /// </summary>
+        /// <returns>The get async.</returns>
+        /// <param name="key">Key.</param>
+        public async Task<Stream> TryGetStreamAsync(string key)
+        {
+            await initTask;
+
+            key = SanitizeKey(key);
+            await WaitForPendingWriteIfExists(key);
+
+            if (!entries.ContainsKey(key))
+                return null;
+
+            try
+            {
+                var file = await cacheFolder.GetFileAsync(key);
+
+                if (file == null)
+                    return null;
+
+                return await file.OpenStreamForReadAsync();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Removes the specified cache entry.
+        /// </summary>
+        /// <param name="key">Key.</param>
+        public async Task RemoveAsync(string key)
+        {
+            await initTask;
+
+            key = SanitizeKey(key);
+
+            await WaitForPendingWriteIfExists(key);
+
+            key = SanitizeKey(key);
+            await WaitForPendingWriteIfExists(key);
+            await journalLock.WaitAsync();
+
+            CacheEntry oldCacheEntry;
+            if (entries.TryRemove(key, out oldCacheEntry))
+            {
+                try
+                {
+                    var file = await cacheFolder.GetFileAsync(key);
+                    await file.DeleteAsync();
+                }
+                catch
+                {
+                }
+
+                await AppendToJournal(JournalOp.Deleted, key);
+            }
+        }
+
+        /// <summary>
+        /// Clears all cache entries.
+        /// </summary>
+        public async Task ClearAsync()
+        {
+            await initTask;
+
+            while (fileWritePendingTasks.Count != 0)
+            {
+                await Task.Delay(20);
+            }
+
+            await journalLock.WaitAsync();
+
+            try
+            {
+                var entriesToRemove = entries.ToList();
+
+                foreach (var kvp in entriesToRemove)
+                {
+                    CacheEntry oldCacheEntry;
+                    if (entries.TryRemove(kvp.Key, out oldCacheEntry))
+                    {
+                        try
+                        {
+                            var file = await cacheFolder.GetFileAsync(kvp.Key);
+                            await file.DeleteAsync();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+                
+                journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting);
+            }
+            finally
+            {
+                journalLock.Release();
+            }
+        }
+
+        async Task WaitForPendingWriteIfExists(string key)
+        {
+            while (fileWritePendingTasks.ContainsKey(key))
+            {
+                await Task.Delay(20);
+            }
         }
 
         JournalOp ParseOp(string line)
@@ -241,127 +458,6 @@ namespace FFImageLoading.Cache
                 throw new InvalidOperationException("Corrupted duration");
             else
                 duration = TimeSpan.FromMilliseconds(timespan);
-        }
-
-        public string BasePath
-        {
-            get
-            {
-                return cacheFolder == null ? null : cacheFolder.Path;
-            }
-        }
-
-        public async Task AddOrUpdateAsync(string key, Stream stream, CancellationToken token, TimeSpan duration)
-        {
-            await initLock.WaitAsync();
-
-            try
-            {
-                key = SanitizeKey(key);
-
-                bool existed = entries.ContainsKey(key);
-
-                try
-                {
-                    await fileWriteLock.WaitAsync();
-                    var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
-
-                    using (var fs = await file.OpenStreamForWriteAsync())
-                    {
-                        await stream.CopyToAsync(fs, BufferSize, token).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    fileWriteLock.Release();
-                }
-
-                await AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created,
-                    key,
-                    DateTime.UtcNow,
-                    duration);
-                entries[key] = new CacheEntry(DateTime.UtcNow, duration);
-            }
-            finally
-            {
-                initLock.Release();
-            }
-        }
-
-        public async Task<byte[]> TryGetAsync(string key, CancellationToken token)
-        {
-            await initLock.WaitAsync();
-
-            try
-            {
-                key = SanitizeKey(key);
-                if (!entries.ContainsKey(key))
-                    return null;
-
-                try
-                {
-                    StorageFile file = null;
-
-                    try
-                    {
-                        file = await cacheFolder.GetFileAsync(key);
-                    }
-                    catch (Exception)
-                    {
-                        return null;
-                    }
-
-                    if (file == null)
-                        return null;
-
-                    using (var fs = await file.OpenStreamForReadAsync())
-                    {
-                        using (var ms = new MemoryStream())
-                        {
-                            await fs.CopyToAsync(ms, BufferSize, token).ConfigureAwait(false);
-                            return ms.ToArray();
-                        }
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-            finally
-            {
-                initLock.Release();
-            }
-        }
-
-        public async Task<Stream> TryGetStream(string key)
-        {
-            await initLock.WaitAsync();
-
-            try
-            {
-                key = SanitizeKey(key);
-                if (!entries.ContainsKey(key))
-                    return null;
-
-                try
-                {
-                    var file = await cacheFolder.GetFileAsync(key);
-
-                    if (file == null)
-                        return null;
-
-                    return await file.OpenStreamForReadAsync();
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-            finally
-            {
-                initLock.Release();
-            }
         }
 
         async Task AppendToJournal(JournalOp op, string key)
@@ -415,67 +511,6 @@ namespace FFImageLoading.Cache
             return new string(key
                 .Where(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
                 .ToArray());
-        }
-
-        public async void Remove(string key)
-        {
-            await initLock.WaitAsync();
-            await journalLock.WaitAsync();
-
-            try
-            {
-                CacheEntry oldCacheEntry;
-                if (entries.TryRemove(key, out oldCacheEntry))
-                {
-                    try
-                    {
-                        var file = await cacheFolder.GetFileAsync(key);
-                        await file.DeleteAsync();
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-            finally
-            {
-                journalLock.Release();
-                initLock.Release();
-            }
-        }
-
-        public async void Clear()
-        {
-            await initLock.WaitAsync();
-            await journalLock.WaitAsync();
-
-            try
-            {
-                var entriesToRemove = entries.ToList();
-
-                foreach (var kvp in entriesToRemove)
-                {
-                    CacheEntry oldCacheEntry;
-                    if (entries.TryRemove(kvp.Key, out oldCacheEntry))
-                    {
-                        try
-                        {
-                            var file = await cacheFolder.GetFileAsync(kvp.Key);
-                            await file.DeleteAsync();
-                        }
-                        catch
-                        {
-                        }
-                    }
-                }
-                
-                journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting);
-            }
-            finally
-            {
-                journalLock.Release();
-                initLock.Release();
-            }
         }
     }
 }

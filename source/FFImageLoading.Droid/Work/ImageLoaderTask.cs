@@ -472,8 +472,12 @@ namespace FFImageLoading.Work
 										}
 
 										// Transformation succeeded, so garbage the source
-										old.Recycle();
-										old.Dispose();
+										if (old != null && !old.IsRecycled) 
+										{
+											old.Recycle();
+											old.Dispose();
+										}
+
 									}
 									catch (Exception ex)
 									{

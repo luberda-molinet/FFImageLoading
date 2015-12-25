@@ -259,7 +259,7 @@ namespace FFImageLoading
 		public static void InvalidateDiskCache()
 		{
 			InitializeIfNeeded();
-			Config.DiskCache.Clear();
+			Config.DiskCache.ClearAsync();
 		}
 
 		/// <summary>
@@ -277,7 +277,7 @@ namespace FFImageLoading
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
 			{
 				string hash = _md5Helper.MD5(key);
-				Config.DiskCache.Remove(hash);
+				Config.DiskCache.RemoveAsync(hash);
 			}
 		}
     }
