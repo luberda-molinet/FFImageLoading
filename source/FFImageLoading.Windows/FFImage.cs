@@ -29,7 +29,8 @@ namespace FFImageLoading
             };
             Content = internalImage;
 
-			Transformations = new List<FFImageLoading.Work.ITransformation>();
+			Transformations = new List<ITransformation>();
+            DownsampleMode = InterpolationMode.Bilinear;
         }
 
         public string Source
@@ -303,7 +304,7 @@ namespace FFImageLoading
         /// The downsample interpolation mode property.
         /// </summary>
         public static readonly DependencyProperty DownsampleModeProperty =
-            DependencyProperty.Register("DownsampleMode", typeof(InterpolationMode), typeof(FFImage), new PropertyMetadata(null));
+            DependencyProperty.Register("DownsampleMode", typeof(InterpolationMode), typeof(FFImage), new PropertyMetadata(InterpolationMode.Bilinear));
 
         /// <summary>
         /// Set interpolation (resizing) algorithm.

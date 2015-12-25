@@ -333,7 +333,7 @@ namespace FFImageLoading.Work
 							|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
 					{
 						var tempImage = imageIn;
-						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2);
+						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2, Parameters.DownSampleInterpolationMode);
 						tempImage.Dispose();
 					}
 
