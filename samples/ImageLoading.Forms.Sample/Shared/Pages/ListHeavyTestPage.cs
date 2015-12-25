@@ -22,7 +22,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				HasUnevenRows = false,
 				RowHeight = 110,
 			};
-			listView.SetBinding<ListExampleViewModel>(ListView.ItemsSourceProperty, v => v.Items);
+			listView.SetBinding<ListHeavyTestViewModel>(ListView.ItemsSourceProperty, v => v.Items);
 
 			if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
 				listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
@@ -41,18 +41,18 @@ namespace FFImageLoading.Forms.Sample.Pages
 			public ListExampleCell()
 			{
 				image1 = new CachedImage() {
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					HeightRequest = 100,
-					DownsampleToViewSize = true,
-					TransparencyEnabled = false,
-					Aspect = Aspect.AspectFill,
-					CacheDuration = TimeSpan.FromDays(30),
-					RetryCount = 3,
-					RetryDelay = 500,
-					TransformPlaceholders= false,
-					LoadingPlaceholder = "loading.png",
-					ErrorPlaceholder = "error.png",
-				};
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    HeightRequest = 100,
+                    DownsampleToViewSize = true,
+                    TransparencyEnabled = false,
+                    Aspect = Aspect.AspectFill,
+                    CacheDuration = TimeSpan.FromDays(30),
+                    RetryCount = 3,
+                    RetryDelay = 500,
+                    TransformPlaceholders = false,
+                    LoadingPlaceholder = "loading.png",
+                    ErrorPlaceholder = "error.png",
+                };
 
 				image2 = new CachedImage() {
 					HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -111,27 +111,27 @@ namespace FFImageLoading.Forms.Sample.Pages
 					Padding = 5,
 				};
 
-				AbsoluteLayout.SetLayoutFlags (image1, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds (image1, new Rectangle(0d, 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image1, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image1, new Rectangle(0d, 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags (image2, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds (image2, new Rectangle(0.25d/(1d-0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image2, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image2, new Rectangle(0.25d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags (image3, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds (image3, new Rectangle(0.50d/(1d-0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image3, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image3, new Rectangle(0.50d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags (image4, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds (image4, new Rectangle(0.75d/(1d-0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image4, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image4, new Rectangle(0.75d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				root.Children.Add(image1);
-				root.Children.Add(image2);
-				root.Children.Add(image3);
-				root.Children.Add(image4);
+                root.Children.Add(image1);
+                root.Children.Add(image2);
+                root.Children.Add(image3);
+                root.Children.Add(image4);
 
-				View = root;	
-			}
+                View = root;	
+            }
 
-			protected override void OnBindingContextChanged()
+            protected override void OnBindingContextChanged()
 			{
 				base.OnBindingContextChanged();
 

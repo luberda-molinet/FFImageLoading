@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using FFImageLoading.Forms.Sample.Models;
+using Xamarin.Forms;
 
 namespace FFImageLoading.Forms.Sample.ViewModels
 {
@@ -68,9 +69,19 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				"https://farm9.staticflickr.com/8877/18600339506_7c440f9928_z_d.jpg",
 			};
 
-			for (int j = 0; j < 10; j++)
+            var howMuch = images.Length;
+            var howManyTimes = 10;
+
+            if (Device.OS == TargetPlatform.WinPhone || Device.OS == TargetPlatform.Windows)
+            {
+                howMuch = 10;
+                howManyTimes = 3    ;
+            }
+                
+
+			for (int j = 0; j < howManyTimes; j++)
 			{
-				for (int i = 0; i < images.Length; i++ )
+				for (int i = 0; i < howMuch; i++ )
 				{
 					var item = new ListHeavyItem() {
 						Image1Url = images[i],
