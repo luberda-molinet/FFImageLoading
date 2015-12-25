@@ -23,7 +23,6 @@ namespace FFImageLoading.Forms.WinUWP
     /// </summary>
     public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
     {
-     {
         private IScheduledWork _currentTask;
 
         /// <summary>
