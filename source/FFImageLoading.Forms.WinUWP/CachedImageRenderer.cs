@@ -23,6 +23,7 @@ namespace FFImageLoading.Forms.WinUWP
     /// </summary>
     public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
     {
+     {
         private IScheduledWork _currentTask;
 
         /// <summary>
@@ -30,31 +31,31 @@ namespace FFImageLoading.Forms.WinUWP
         /// </summary>
         public static void Init()
         {
-			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
-		}
+            CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
+            CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+        }
 
-		private static void InvalidateCache(string key, Cache.CacheType cacheType)
-		{
-			ImageService.Invalidate(key, cacheType);
-		}
+        private static void InvalidateCache(string key, Cache.CacheType cacheType)
+        {
+            ImageService.Invalidate(key, cacheType);
+        }
 
-		private static void ClearCache(Cache.CacheType cacheType)
-		{
-			switch (cacheType)
-			{
-				case Cache.CacheType.Memory:
-					ImageService.InvalidateMemoryCache();
-					break;
-				case Cache.CacheType.Disk:
-					ImageService.InvalidateDiskCache();
-					break;
-				case Cache.CacheType.All:
-					ImageService.InvalidateMemoryCache();
-					ImageService.InvalidateDiskCache();
-					break;
-			}
-		}
+        private static void ClearCache(Cache.CacheType cacheType)
+        {
+            switch (cacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
+        }
 
         private bool measured;
 
@@ -146,7 +147,7 @@ namespace FFImageLoading.Forms.WinUWP
 
             Xamarin.Forms.ImageSource source = Element.Source;
 
-			Cancel(this, EventArgs.Empty);
+            Cancel(this, EventArgs.Empty);
             TaskParameter imageLoader = null;
 
             var ffSource = await ImageSourceBinding.GetImageSourceBinding(source);
@@ -248,9 +249,9 @@ namespace FFImageLoading.Forms.WinUWP
                 if (Element.FadeAnimationEnabled.HasValue)
                     imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
-				// TransformPlaceholders
-				if (Element.TransformPlaceholders.HasValue)
-					imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
+                // TransformPlaceholders
+                if (Element.TransformPlaceholders.HasValue)
+                    imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
 
                 // Transformations
                 if (Element.Transformations != null && Element.Transformations.Count > 0)
@@ -258,19 +259,19 @@ namespace FFImageLoading.Forms.WinUWP
                     imageLoader.Transform(Element.Transformations);
                 }
 
-				var element = Element;
+                var element = Element;
 
-				imageLoader.Finish((work) => {
-					element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
-					ImageLoadingFinished(element);
-				});
+                imageLoader.Finish((work) => {
+                    element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
+                    ImageLoadingFinished(element);
+                });
 
-				imageLoader.Success((imageSize, loadingResult) => 
-					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
+                imageLoader.Success((imageSize, loadingResult) =>
+                    element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
 
-				imageLoader.Error((exception) => 
-					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
-				
+                imageLoader.Error((exception) =>
+                    element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+
                 _currentTask = imageLoader.Into(Control);
             }
         }
@@ -299,7 +300,7 @@ namespace FFImageLoading.Forms.WinUWP
             {
                 ((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
                 ((IVisualElementController)element).NativeSizeChanged();
-				element.InvalidateViewMeasure();
+                element.InvalidateViewMeasure();
             }
         }
 
@@ -360,7 +361,7 @@ namespace FFImageLoading.Forms.WinUWP
                         tempPixels = new byte[sourceStream.Length];
                         await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length);
                     }
-  
+
                     var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                         pixelsWidth, pixelsHeight, 96, 96, tempPixels);
@@ -393,12 +394,12 @@ namespace FFImageLoading.Forms.WinUWP
             using (var stream = new InMemoryRandomAccessStream())
             {
                 var encoder = await BitmapEncoder.CreateAsync(format, stream);
-                
+
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                     pixelsWidth, pixelsHeight, 96, 96, pixels);
                 await encoder.FlushAsync();
                 stream.Seek(0);
-                
+
                 var bytes = new byte[stream.Size];
                 await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
 
