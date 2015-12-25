@@ -74,6 +74,8 @@
     <Compile Include="Cache\CacheType.cs" />
     <Compile Include="Helpers\IImageCacheHelper.cs" />
     <Compile Include="Cache\IMemoryCache.cs" />
+    <Compile Include="Work\ImageSource.cs" />
+    <Compile Include="Work\InterpolationMode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

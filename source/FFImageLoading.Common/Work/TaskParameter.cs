@@ -6,25 +6,6 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-	public enum ImageSource
-	{
-		Url = 3,
-
-		Filepath = 10,
-		ApplicationBundle = 11,
-		CompiledResource = 12,
-
-		Stream = 20
-	}
-
-    public enum InterpolationMode
-    {
-        NearestNeighbor = 0,
-        Linear = 1,
-        Cubic = 2,
-        Fant = 3
-    }
-
 	public class TaskParameter: IDisposable
 	{
 		private bool _disposed;
@@ -83,7 +64,7 @@ namespace FFImageLoading.Work
 		private TaskParameter()
 		{
             Transformations = new List<ITransformation>();
-            DownSampleInterpolationMode = InterpolationMode.Linear;
+            DownSampleInterpolationMode = InterpolationMode.Bilinear;
 
             // default values so we don't have a null value
             OnSuccess = (s,r) =>
@@ -214,7 +195,9 @@ namespace FFImageLoading.Work
 		}
 
         /// <summary>
-        /// Set mode for downsampling. Speed-wise: nearest neighbour > linear > cubic > fant.
+        /// Set mode for downsampling. Speed-wise: nearest neighbour > linear > cubic.\
+		/// Default: bilinear
+		/// On Android it's always ignored as Android uses bitmap insamplesize downsampling (bilinear)
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="mode">Optional mode parameter, if not set, defaults to linear.</param>
