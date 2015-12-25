@@ -23,7 +23,12 @@ namespace FFImageLoading.DataResolver
 
             try
             {
-                file = await StorageFile.GetFileFromPathAsync(identifier);
+                var filePath = Path.GetDirectoryName(identifier);
+
+                if (!string.IsNullOrWhiteSpace(filePath))
+                {
+                    file = await StorageFile.GetFileFromPathAsync(identifier);
+                }
             }
             catch (Exception)
             {
