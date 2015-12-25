@@ -62,7 +62,7 @@ namespace FFImageLoading
 
             TaskParameter imageLoader = null;
 
-            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source);
+			var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -70,7 +70,7 @@ namespace FFImageLoading
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                         internalImage.Source = null;
-                    });
+					}).ConfigureAwait(false);
                 }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -95,7 +95,7 @@ namespace FFImageLoading
                 // LoadingPlaceholder
                 if (LoadingPlaceholder != null)
                 {
-                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder);
+					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -103,7 +103,7 @@ namespace FFImageLoading
                 // ErrorPlaceholder
                 if (ErrorPlaceholder != null)
                 {
-                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder);
+					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }

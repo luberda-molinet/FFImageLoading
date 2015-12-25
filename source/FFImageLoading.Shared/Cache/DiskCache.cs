@@ -130,7 +130,7 @@ namespace FFImageLoading.Cache
 				var task = new Task(async() => {
 					try
 					{
-						await fileWriteLock.WaitAsync();
+						await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
 						bool existed = entries.ContainsKey(sanitizedKey);
 						string filepath = Path.Combine(basePath, sanitizedKey);
@@ -170,7 +170,7 @@ namespace FFImageLoading.Cache
 		{
 			key = SanitizeKey (key);
 
-			await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
 			string filepath = Path.Combine(basePath, key);
 
@@ -189,7 +189,7 @@ namespace FFImageLoading.Cache
 		{
 			while(fileWritePendingTasks.Count != 0)
 			{
-				await Task.Delay(20);
+				await Task.Delay(20).ConfigureAwait(false);
 			}
 
 			lock (lockJournal)
@@ -210,7 +210,7 @@ namespace FFImageLoading.Cache
 		{
 			key = SanitizeKey (key);
 
-			await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
 			if (!entries.ContainsKey(key))
 				return null;
@@ -245,7 +245,7 @@ namespace FFImageLoading.Cache
 		{
 			key = SanitizeKey(key);
 
-			await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
 			if (!entries.ContainsKey(key))
 				return null;
@@ -265,7 +265,7 @@ namespace FFImageLoading.Cache
 		{
 			while (fileWritePendingTasks.ContainsKey(key))
 			{
-				await Task.Delay(20);
+				await Task.Delay(20).ConfigureAwait(false);
 			}
 		}
 

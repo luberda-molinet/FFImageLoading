@@ -149,7 +149,7 @@ namespace FFImageLoading.Forms.WinRT
 			Cancel(this, EventArgs.Empty);
             TaskParameter imageLoader = null;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source);
+			var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -184,7 +184,7 @@ namespace FFImageLoading.Forms.WinRT
                 // LoadingPlaceholder
                 if (Element.LoadingPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -192,7 +192,7 @@ namespace FFImageLoading.Forms.WinRT
                 // ErrorPlaceholder
                 if (Element.ErrorPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -358,23 +358,23 @@ namespace FFImageLoading.Forms.WinRT
                     using (var sourceStream = bitmap.PixelBuffer.AsStream())
                     {
                         tempPixels = new byte[sourceStream.Length];
-                        await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length);
+						await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
                     }
   
-                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
+					var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream).ConfigureAwait(false);
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                         pixelsWidth, pixelsHeight, 96, 96, tempPixels);
-                    await encoder.FlushAsync();
+					await encoder.FlushAsync().ConfigureAwait(false);
                     tempStream.Seek(0);
 
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
+					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream).ConfigureAwait(false);
                     BitmapTransform transform = new BitmapTransform() { ScaledWidth = aspectWidth, ScaledHeight = aspectHeight };
                     PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                         BitmapPixelFormat.Bgra8,
                         BitmapAlphaMode.Premultiplied,
                         transform,
                         ExifOrientationMode.RespectExifOrientation,
-                        ColorManagementMode.DoNotColorManage);
+						ColorManagementMode.DoNotColorManage).ConfigureAwait(false);
 
                     pixels = pixelData.DetachPixelData();
                     pixelsWidth = aspectWidth;
@@ -386,21 +386,21 @@ namespace FFImageLoading.Forms.WinRT
                 using (var stream = bitmap.PixelBuffer.AsStream())
                 {
                     pixels = new byte[stream.Length];
-                    await stream.ReadAsync(pixels, 0, pixels.Length);
+					await stream.ReadAsync(pixels, 0, pixels.Length).ConfigureAwait(false);
                 }
             }
 
             using (var stream = new InMemoryRandomAccessStream())
             {
-                var encoder = await BitmapEncoder.CreateAsync(format, stream);
+				var encoder = await BitmapEncoder.CreateAsync(format, stream).ConfigureAwait(false);
                 
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                     pixelsWidth, pixelsHeight, 96, 96, pixels);
-                await encoder.FlushAsync();
+				await encoder.FlushAsync().ConfigureAwait(false);
                 stream.Seek(0);
                 
                 var bytes = new byte[stream.Size];
-                await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+				await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None).ConfigureAwait(false);
 
                 return bytes;
             }

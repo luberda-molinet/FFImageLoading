@@ -90,8 +90,8 @@ namespace FFImageLoading.Cache
         {
             try
             {
-                cacheFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
-                await InitializeWithJournal();
+				cacheFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
+				await InitializeWithJournal().ConfigureAwait(false);
             }
             catch
             {
@@ -99,7 +99,7 @@ namespace FFImageLoading.Cache
 
                 try
                 {
-                    folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(cacheFolderName);
+					folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(cacheFolderName).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -107,8 +107,8 @@ namespace FFImageLoading.Cache
 
                 if (folder != null)
                 {
-                    await folder.DeleteAsync();
-                    await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.ReplaceExisting);
+					await folder.DeleteAsync().ConfigureAwait(false);
+					await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
                 }
             }
             finally
@@ -119,13 +119,13 @@ namespace FFImageLoading.Cache
 
         async Task InitializeWithJournal()
         {
-            await journalLock.WaitAsync();
+			await journalLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
                 try
                 {
-                    journalFile = await cacheFolder.GetFileAsync(JournalFileName);
+					journalFile = await cacheFolder.GetFileAsync(JournalFileName).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -134,7 +134,7 @@ namespace FFImageLoading.Cache
                 
                 if (journalFile == null)
                 {
-                    journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting);
+					journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
 
                     return;
                 }
@@ -142,10 +142,10 @@ namespace FFImageLoading.Cache
                 {
                     string line = null;
 
-                    using (var stream = await journalFile.OpenStreamForReadAsync())
+					using (var stream = await journalFile.OpenStreamForReadAsync().ConfigureAwait(false))
                     using (var reader = new StreamReader(stream, encoding))
                     {
-                        while ((line = await reader.ReadLineAsync()) != null)
+						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                         {
                             try
                             {
@@ -200,8 +200,8 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        var file = await cacheFolder.GetFileAsync(kvp.Key);
-                        await file.DeleteAsync();
+						var file = await cacheFolder.GetFileAsync(kvp.Key).ConfigureAwait(false);
+						await file.DeleteAsync().ConfigureAwait(false);
                     }
                     catch
                     {
@@ -216,7 +216,7 @@ namespace FFImageLoading.Cache
         /// <returns>The base path.</returns>
         public async Task<string> GetBasePathAsync()
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
             return cacheFolder.Path;
         }
 
@@ -228,28 +228,28 @@ namespace FFImageLoading.Cache
         /// <param name="duration">Duration.</param>
         public async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
 
             var sanitizedKey = SanitizeKey(key);
 
             var task = new Task(async () => {
                 try
                 {
-                    await fileWriteLock.WaitAsync();
+					await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
                     bool existed = entries.ContainsKey(sanitizedKey);
 
                     if (!existed)
                     {
-                        var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
+						var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
 
-                        using (var fs = await file.OpenStreamForWriteAsync())
+						using (var fs = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
                         {
                             await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
                         }
                     }
 
-                    await AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
+					await AppendToJournalAsync(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration).ConfigureAwait(false);
                     entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
 
                     Task finishedTask;
@@ -275,10 +275,10 @@ namespace FFImageLoading.Cache
         /// <param name="token">Token.</param>
         public async Task<byte[]> TryGetAsync(string key, CancellationToken token)
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
 
             key = SanitizeKey(key);
-            await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
             
             if (!entries.ContainsKey(key))
                 return null;
@@ -289,7 +289,7 @@ namespace FFImageLoading.Cache
 
                 try
                 {
-                    file = await cacheFolder.GetFileAsync(key);
+					file = await cacheFolder.GetFileAsync(key).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -299,7 +299,7 @@ namespace FFImageLoading.Cache
                 if (file == null)
                     return null;
 
-                using (var fs = await file.OpenStreamForReadAsync())
+				using (var fs = await file.OpenStreamForReadAsync().ConfigureAwait(false))
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -321,22 +321,22 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         public async Task<Stream> TryGetStreamAsync(string key)
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
 
             key = SanitizeKey(key);
-            await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
             if (!entries.ContainsKey(key))
                 return null;
 
             try
             {
-                var file = await cacheFolder.GetFileAsync(key);
+				var file = await cacheFolder.GetFileAsync(key).ConfigureAwait(false);
 
                 if (file == null)
                     return null;
 
-                return await file.OpenStreamForReadAsync();
+				return await file.OpenStreamForReadAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -350,29 +350,29 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         public async Task RemoveAsync(string key)
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
 
             key = SanitizeKey(key);
 
-            await WaitForPendingWriteIfExists(key);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
             key = SanitizeKey(key);
-            await WaitForPendingWriteIfExists(key);
-            await journalLock.WaitAsync();
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
+			await journalLock.WaitAsync().ConfigureAwait(false);
 
             CacheEntry oldCacheEntry;
             if (entries.TryRemove(key, out oldCacheEntry))
             {
                 try
                 {
-                    var file = await cacheFolder.GetFileAsync(key);
-                    await file.DeleteAsync();
+					var file = await cacheFolder.GetFileAsync(key).ConfigureAwait(false);
+					await file.DeleteAsync().ConfigureAwait(false);
                 }
                 catch
                 {
                 }
 
-                await AppendToJournal(JournalOp.Deleted, key);
+				await AppendToJournalAsync(JournalOp.Deleted, key).ConfigureAwait(false);
             }
         }
 
@@ -381,14 +381,14 @@ namespace FFImageLoading.Cache
         /// </summary>
         public async Task ClearAsync()
         {
-            await initTask;
+			await initTask.ConfigureAwait(false);
 
             while (fileWritePendingTasks.Count != 0)
             {
-                await Task.Delay(20);
+				await Task.Delay(20).ConfigureAwait(false);
             }
 
-            await journalLock.WaitAsync();
+			await journalLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
@@ -401,8 +401,8 @@ namespace FFImageLoading.Cache
                     {
                         try
                         {
-                            var file = await cacheFolder.GetFileAsync(kvp.Key);
-                            await file.DeleteAsync();
+							var file = await cacheFolder.GetFileAsync(kvp.Key).ConfigureAwait(false);
+							await file.DeleteAsync().ConfigureAwait(false);
                         }
                         catch
                         {
@@ -410,7 +410,7 @@ namespace FFImageLoading.Cache
                     }
                 }
                 
-                journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting);
+				journalFile = await cacheFolder.CreateFileAsync(JournalFileName, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
             }
             finally
             {
@@ -422,7 +422,7 @@ namespace FFImageLoading.Cache
         {
             while (fileWritePendingTasks.ContainsKey(key))
             {
-                await Task.Delay(20);
+				await Task.Delay(20).ConfigureAwait(false);
             }
         }
 
@@ -460,19 +460,19 @@ namespace FFImageLoading.Cache
                 duration = TimeSpan.FromMilliseconds(timespan);
         }
 
-        async Task AppendToJournal(JournalOp op, string key)
+        async Task AppendToJournalAsync(JournalOp op, string key)
         {
-            await journalLock.WaitAsync();
+			await journalLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
-                using (var stream = await journalFile.OpenStreamForWriteAsync())
+				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
                 using (var writer = new StreamWriter(stream, encoding))
                 {
-                    await writer.WriteAsync((char)op);
-                    await writer.WriteAsync(' ');
-                    await writer.WriteAsync(key);
-                    await writer.WriteLineAsync();
+					await writer.WriteAsync((char)op).ConfigureAwait(false);
+					await writer.WriteAsync(' ').ConfigureAwait(false);
+					await writer.WriteAsync(key).ConfigureAwait(false);
+					await writer.WriteLineAsync().ConfigureAwait(false);
                 }
             }
             finally
@@ -481,23 +481,23 @@ namespace FFImageLoading.Cache
             }
         }
 
-        async Task AppendToJournal(JournalOp op, string key, DateTime origin, TimeSpan ttl)
+        async Task AppendToJournalAsync(JournalOp op, string key, DateTime origin, TimeSpan ttl)
         {
-            await journalLock.WaitAsync();
+			await journalLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
-                using (var stream = await journalFile.OpenStreamForWriteAsync())
+				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false);)
                 using (var writer = new StreamWriter(stream, encoding))
                 {
-                    await writer.WriteAsync((char)op);
-                    await writer.WriteAsync(' ');
-                    await writer.WriteAsync(key);
-                    await writer.WriteAsync(' ');
-                    await writer.WriteAsync(origin.Ticks.ToString());
-                    await writer.WriteAsync(' ');
-                    await writer.WriteAsync(((long)ttl.TotalMilliseconds).ToString());
-                    await writer.WriteLineAsync();
+					await writer.WriteAsync((char)op).ConfigureAwait(false);
+					await writer.WriteAsync(' ').ConfigureAwait(false);
+					await writer.WriteAsync(key).ConfigureAwait(false);
+					await writer.WriteAsync(' ').ConfigureAwait(false);
+					await writer.WriteAsync(origin.Ticks.ToString()).ConfigureAwait(false);
+					await writer.WriteAsync(' ').ConfigureAwait(false);
+					await writer.WriteAsync(((long)ttl.TotalMilliseconds).ToString()).ConfigureAwait(false);
+					await writer.WriteLineAsync().ConfigureAwait(false);
                 }
             }
             finally

@@ -322,7 +322,7 @@ namespace FFImageLoading.Forms.Droid
 
 			using (var stream = new MemoryStream())
 			{
-				await bitmap.CompressAsync(format, quality, stream);
+				await bitmap.CompressAsync(format, quality, stream).ConfigureAwait(false);
 				var compressed = stream.ToArray();
 
 				if (desiredWidth != 0 || desiredHeight != 0)

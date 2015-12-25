@@ -452,8 +452,8 @@ namespace FFImageLoading.Work
 							bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 								Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
-							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
-								&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
+							    && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 							{
 								foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 								{
@@ -472,7 +472,7 @@ namespace FFImageLoading.Work
 										}
 
 										// Transformation succeeded, so garbage the source
-										if (old != null && !old.IsRecycled) 
+										if (old != null && !old.IsRecycled)
 										{
 											old.Recycle();
 											old.Dispose();
@@ -512,7 +512,7 @@ namespace FFImageLoading.Work
 						if (stream != null)
 							stream.Dispose();
 					}
-				});
+				}).ConfigureAwait(false);
 		}
 
 		/// <summary>

@@ -27,7 +27,7 @@ namespace FFImageLoading.Helpers
             if (action == null)
                 return;
 
-            await dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
+			await dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action()).ConfigureAwait(false);
         }
 
         public Task PostAsync(Action action)
