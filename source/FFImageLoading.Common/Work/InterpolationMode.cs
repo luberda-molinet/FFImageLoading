@@ -4,8 +4,10 @@ namespace FFImageLoading.Work
 {
 	public enum InterpolationMode
 	{
-		NearestNeighbor = 0,
-		Bilinear = 1,
-		Bicubic = 2,
+		Default = 0,
+		None = 1,
+		Low = 2,
+		Medium = 3,
+		High = 4,
 	}
 }
