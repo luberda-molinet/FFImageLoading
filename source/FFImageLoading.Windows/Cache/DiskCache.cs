@@ -226,13 +226,13 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         /// <param name="bytes">Bytes.</param>
         /// <param name="duration">Duration.</param>
-        public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
+        public void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
         {
 			var sanitizedKey = SanitizeKey(key);
 
 			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
-				await Task.Run(async () =>
+				Task.Run(async () =>
 				{
 					await initTask.ConfigureAwait(false);
 
@@ -254,17 +254,17 @@ namespace FFImageLoading.Cache
 
 						await AppendToJournalAsync(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration).ConfigureAwait(false);
 	                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
-
-	                    byte finishedTask;
-	                    fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 	                }
 					catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
 					{
-						Console.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
-						Console.WriteLine(ex.ToString());
+                        //TODO WinRT doesn't have Console
+						System.Diagnostics.Debug.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
+                        System.Diagnostics.Debug.WriteLine(ex.ToString());
 					}
 	                finally
 	                {
+						byte finishedTask;
+						fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 	                    fileWriteLock.Release();
 	                }
 	            });
