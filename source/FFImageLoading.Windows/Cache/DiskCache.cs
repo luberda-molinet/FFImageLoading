@@ -234,7 +234,8 @@ namespace FFImageLoading.Cache
 
 			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
-				await Task.Run(async () =>
+				#pragma warning disable 4014
+				Task.Run(async () =>
 				{
 					await initTask.ConfigureAwait(false);
 
@@ -270,6 +271,7 @@ namespace FFImageLoading.Cache
 	                    fileWriteLock.Release();
 	                }
 	            });
+				#pragma warning restore 4014
 			}
         }
 
