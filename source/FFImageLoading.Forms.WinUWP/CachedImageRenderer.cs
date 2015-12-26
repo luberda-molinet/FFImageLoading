@@ -149,7 +149,7 @@ namespace FFImageLoading.Forms.WinUWP
             Cancel(this, EventArgs.Empty);
             TaskParameter imageLoader = null;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source);
+            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -184,7 +184,7 @@ namespace FFImageLoading.Forms.WinUWP
                 // LoadingPlaceholder
                 if (Element.LoadingPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -192,7 +192,7 @@ namespace FFImageLoading.Forms.WinUWP
                 // ErrorPlaceholder
                 if (Element.ErrorPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -260,7 +260,8 @@ namespace FFImageLoading.Forms.WinUWP
 
                 var element = Element;
 
-                imageLoader.Finish((work) => {
+                imageLoader.Finish((work) =>
+                {
                     element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
                     ImageLoadingFinished(element);
                 });
@@ -358,7 +359,7 @@ namespace FFImageLoading.Forms.WinUWP
                     using (var sourceStream = bitmap.PixelBuffer.AsStream())
                     {
                         tempPixels = new byte[sourceStream.Length];
-                        await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length);
+                        await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
                     }
 
                     var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
@@ -368,7 +369,12 @@ namespace FFImageLoading.Forms.WinUWP
                     tempStream.Seek(0);
 
                     BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
-                    BitmapTransform transform = new BitmapTransform() { ScaledWidth = aspectWidth, ScaledHeight = aspectHeight };
+                    BitmapTransform transform = new BitmapTransform()
+                    {
+                        ScaledWidth = aspectWidth,
+                        ScaledHeight = aspectHeight,
+                        InterpolationMode = BitmapInterpolationMode.Linear
+                    };
                     PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                         BitmapPixelFormat.Bgra8,
                         BitmapAlphaMode.Premultiplied,
@@ -386,7 +392,7 @@ namespace FFImageLoading.Forms.WinUWP
                 using (var stream = bitmap.PixelBuffer.AsStream())
                 {
                     pixels = new byte[stream.Length];
-                    await stream.ReadAsync(pixels, 0, pixels.Length);
+                    await stream.ReadAsync(pixels, 0, pixels.Length).ConfigureAwait(false);
                 }
             }
 

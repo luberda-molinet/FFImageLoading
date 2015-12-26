@@ -20,7 +20,7 @@
                 RetryCount="3"
                 RetryDelay="250"
                 DownsampleToViewSize="True"
-                DownsampleMode="Bilinear"
+                DownsampleMode="Default"
                 Source="http://loremflickr.com/600/600/nature?filename=simple.jpg">
 
         <ff:FFImage.Transformations>

@@ -30,7 +30,7 @@ namespace FFImageLoading
 
                 try
                 {
-					file = await StorageFile.GetFileFromPathAsync(source).ConfigureAwait(false);
+					file = await StorageFile.GetFileFromPathAsync(source);
                 }
                 catch (Exception)
                 {

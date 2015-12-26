@@ -27,7 +27,7 @@ namespace FFImageLoading.DataResolver
 
                 if (!string.IsNullOrWhiteSpace(filePath))
                 {
-					file = await StorageFile.GetFileFromPathAsync(identifier).ConfigureAwait(false);
+					file = await StorageFile.GetFileFromPathAsync(identifier);
                 }
             }
             catch (Exception)
@@ -52,12 +52,12 @@ namespace FFImageLoading.DataResolver
         public static async Task<byte[]> ReadFile(StorageFile file)
         {
             byte[] fileBytes = null;
-			using (IRandomAccessStreamWithContentType stream = await file.OpenReadAsync().ConfigureAwait(false))
+			using (IRandomAccessStreamWithContentType stream = await file.OpenReadAsync())
             {
                 fileBytes = new byte[stream.Size];
                 using (DataReader reader = new DataReader(stream))
                 {
-					await reader.LoadAsync((uint)stream.Size).ConfigureAwait(false);
+					await reader.LoadAsync((uint)stream.Size);
                     reader.ReadBytes(fileBytes);
                 }
             }

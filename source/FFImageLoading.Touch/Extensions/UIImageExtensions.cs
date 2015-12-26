@@ -38,12 +38,16 @@ namespace FFImageLoading.Extensions
 
 				using (var context = UIGraphics.GetCurrentContext())
 				{
-					context.InterpolationQuality = CGInterpolationQuality.Medium;
-
-					if (interpolationMode == InterpolationMode.NearestNeighbor)
+					if (interpolationMode == InterpolationMode.None)
+						context.InterpolationQuality = CGInterpolationQuality.None;
+					else if (interpolationMode == InterpolationMode.Low)
 						context.InterpolationQuality = CGInterpolationQuality.Low;
-					else if (interpolationMode == InterpolationMode.Bicubic)
+					else if (interpolationMode == InterpolationMode.Medium)
+						context.InterpolationQuality = CGInterpolationQuality.Medium;
+					else if (interpolationMode == InterpolationMode.High)
 						context.InterpolationQuality = CGInterpolationQuality.High;
+					else
+						context.InterpolationQuality = CGInterpolationQuality.Low;
 					
 					var resizedImage = UIGraphics.GetImageFromCurrentImageContext();
 
