@@ -368,7 +368,11 @@ namespace FFImageLoading.Forms.WinRT
                     tempStream.Seek(0);
 
 					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
-                    BitmapTransform transform = new BitmapTransform() { ScaledWidth = aspectWidth, ScaledHeight = aspectHeight };
+                    BitmapTransform transform = new BitmapTransform() {
+                        ScaledWidth = aspectWidth,
+                        ScaledHeight = aspectHeight,
+                        InterpolationMode = BitmapInterpolationMode.Linear
+                    };
                     PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                         BitmapPixelFormat.Bgra8,
                         BitmapAlphaMode.Premultiplied,
