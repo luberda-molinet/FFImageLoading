@@ -119,7 +119,7 @@ namespace FFImageLoading.Cache
 					foreach (var k in reuse_keys) {
 						var bd = reuse_pool.Peek(k);
 
-						if (bd != null && bd.Handle != IntPtr.Zero && !bd.IsRetained && bd.Bitmap.IsMutable && !bd.Bitmap.IsRecycled)
+						if (bd != null && bd.Handle != IntPtr.Zero && !bd.IsRetained && bd.Bitmap.IsMutable && !bd.Bitmap.IsRecycled && bd.HasValidBitmap)
 						{
 							if (CanUseForInBitmap(bd.Bitmap, width, height, bitmapConfig, inSampleSize))
 							{
@@ -169,11 +169,12 @@ namespace FFImageLoading.Cache
 				inSampleSize = 1;
 			}
 
-			int newWidth = width/inSampleSize;
-			int newHeight = height/inSampleSize;
+			int newWidth = (int)Math.Ceiling(width/(float)inSampleSize);
+			int newHeight = (int)Math.Ceiling(height/(float)inSampleSize);
 
 			if (inSampleSize > 1)
 			{
+				// Android docs: the decoder uses a final value based on powers of 2, any other value will be rounded down to the nearest power of 2.
 				if (newWidth % 2 != 0)
 					newWidth += 1;
 
