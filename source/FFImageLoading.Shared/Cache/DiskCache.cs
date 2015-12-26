@@ -122,12 +122,13 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		/// <param name="bytes">Bytes.</param>
 		/// <param name="duration">Duration.</param>
-		public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
+		public void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
 		{
 			var sanitizedKey = SanitizeKey(key);
 
 			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
+				#pragma warning disable 4014
 				Task.Run(async () =>
 					{
 						try
@@ -147,9 +148,6 @@ namespace FFImageLoading.Cache
 
 							AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
 							entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);	
-
-							byte finishedTask;
-							fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 						}
 						catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
 						{
@@ -158,9 +156,12 @@ namespace FFImageLoading.Cache
 						}
 						finally
 						{
+							byte finishedTask;
+							fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 							fileWriteLock.Release();
 						}
 				});
+				#pragma warning restore 4014
 			}
 		}
 
