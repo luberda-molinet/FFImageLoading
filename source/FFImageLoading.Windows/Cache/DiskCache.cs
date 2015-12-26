@@ -226,13 +226,15 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         /// <param name="bytes">Bytes.</param>
         /// <param name="duration">Duration.</param>
-        public void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
+        public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
         {
-			var sanitizedKey = SanitizeKey(key);
+            await initTask.ConfigureAwait(false);
+
+            var sanitizedKey = SanitizeKey(key);
 
 			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
-				Task.Run(async () =>
+				await Task.Run(async () =>
 				{
 					await initTask.ConfigureAwait(false);
 
