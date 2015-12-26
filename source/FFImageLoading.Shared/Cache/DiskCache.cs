@@ -43,7 +43,7 @@ namespace FFImageLoading.Cache
         string version;
 		object lockJournal;
 		readonly SemaphoreSlim fileWriteLock;
-		ConcurrentDictionary<string, Task> fileWritePendingTasks;
+		ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
 
         struct CacheEntry
         {
@@ -78,7 +78,7 @@ namespace FFImageLoading.Cache
             this.version = version;
 			this.lockJournal = new object();
 			this.fileWriteLock = new SemaphoreSlim(initialCount: 1);
-			this.fileWritePendingTasks = new ConcurrentDictionary<string, Task>();
+			this.fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
 
             try 
 			{
@@ -113,7 +113,7 @@ namespace FFImageLoading.Cache
 		/// <returns>The base path.</returns>
 		public Task<string> GetBasePathAsync()
 		{
-			return Task.Run(() => basePath);
+			return Task.FromResult(basePath);
 		}
 
 		/// <summary>
@@ -122,44 +122,46 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		/// <param name="bytes">Bytes.</param>
 		/// <param name="duration">Duration.</param>
-		public Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
+		public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
 		{
-			return Task.Run(() => {
-				var sanitizedKey = SanitizeKey(key);
+			var sanitizedKey = SanitizeKey(key);
 
-				var task = new Task(async() => {
-					try
+			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+			{
+				Task.Run(async () =>
 					{
-						await fileWriteLock.WaitAsync().ConfigureAwait(false);
-
-						bool existed = entries.ContainsKey(sanitizedKey);
-						string filepath = Path.Combine(basePath, sanitizedKey);
-
-						if (!existed)
+						try
 						{
-							using (var fs = FileStore.GetOutputStream(filepath))
+							await fileWriteLock.WaitAsync().ConfigureAwait(false);
+
+							bool existed = entries.ContainsKey(sanitizedKey);
+							string filepath = Path.Combine(basePath, sanitizedKey);
+
+							if (!existed)
 							{
-								await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-							}						
+								using (var fs = FileStore.GetOutputStream(filepath))
+								{
+									await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+								}						
+							}
+
+							AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
+							entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);	
+
+							byte finishedTask;
+							fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 						}
-
-						AppendToJournal (existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
-						entries[sanitizedKey] = new CacheEntry (DateTime.UtcNow, duration);	
-
-						Task finishedTask;
-						fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
-					}
-					finally
-					{
-						fileWriteLock.Release();
-					}	
+						catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
+						{
+							Console.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
+							Console.WriteLine(ex.ToString());
+						}
+						finally
+						{
+							fileWriteLock.Release();
+						}
 				});
-
-				if (fileWritePendingTasks.TryAdd(sanitizedKey, task))
-				{
-					task.Start();
-				}	
-			});
+			}
 		}
 
 		/// <summary>

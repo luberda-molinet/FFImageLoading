@@ -47,7 +47,7 @@ namespace FFImageLoading.Cache
         string cacheFolderName;
         StorageFolder cacheFolder;
         StorageFile journalFile;
-        ConcurrentDictionary<string, Task> fileWritePendingTasks;
+		ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
 
         struct CacheEntry
         {
@@ -70,7 +70,7 @@ namespace FFImageLoading.Cache
             this.cacheFolder = null;
             this.journalFile = null;
             this.cacheFolderName = cacheFolderName;
-            this.fileWritePendingTasks = new ConcurrentDictionary<string, Task>();
+            this.fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
 
             initTask = Init();
         }
@@ -226,45 +226,49 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         /// <param name="bytes">Bytes.</param>
         /// <param name="duration">Duration.</param>
-        public async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
+        public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
         {
-			await initTask.ConfigureAwait(false);
+			var sanitizedKey = SanitizeKey(key);
 
-            var sanitizedKey = SanitizeKey(key);
+			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+			{
+				await Task.Run(async () =>
+				{
+					await initTask.ConfigureAwait(false);
 
-            var task = new Task(async () => {
-                try
-                {
-					await fileWriteLock.WaitAsync().ConfigureAwait(false);
+	            	try
+	                {
+						await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                    bool existed = entries.ContainsKey(sanitizedKey);
+	                    bool existed = entries.ContainsKey(sanitizedKey);
 
-                    if (!existed)
-                    {
-						var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
+	                    if (!existed)
+	                    {
+							var file = await cacheFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
 
-						using (var fs = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
-                        {
-                            await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-                        }
-                    }
+							using (var fs = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
+	                        {
+	                            await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+	                        }
+	                    }
 
-					await AppendToJournalAsync(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration).ConfigureAwait(false);
-                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
+						await AppendToJournalAsync(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration).ConfigureAwait(false);
+	                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
 
-                    Task finishedTask;
-                    fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
-                }
-                finally
-                {
-                    fileWriteLock.Release();
-                }
-            });
-
-            if (fileWritePendingTasks.TryAdd(sanitizedKey, task))
-            {
-                task.Start();
-            }
+	                    byte finishedTask;
+	                    fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
+	                }
+					catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
+					{
+						Console.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
+						Console.WriteLine(ex.ToString());
+					}
+	                finally
+	                {
+	                    fileWriteLock.Release();
+	                }
+	            });
+			}
         }
 
         /// <summary>

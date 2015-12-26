@@ -78,7 +78,7 @@ namespace FFImageLoading.Cache
 				var memoryStream = new MemoryStream(responseBytes, false);
 				memoryStream.Position = 0;
 
-				await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration.Value).ConfigureAwait(false);
+				_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
 
 				return memoryStream;
 			}

@@ -9,7 +9,7 @@ namespace FFImageLoading.Cache
     {
 		Task<string> GetBasePathAsync();
 
-		Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration);
+		void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration);
 
 		Task<byte[]> TryGetAsync(string key, CancellationToken token);
 
