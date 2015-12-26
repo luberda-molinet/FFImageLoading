@@ -361,20 +361,20 @@ namespace FFImageLoading.Forms.WinRT
 						await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
                     }
   
-					var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream).ConfigureAwait(false);
+					var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                         pixelsWidth, pixelsHeight, 96, 96, tempPixels);
-					await encoder.FlushAsync().ConfigureAwait(false);
+					await encoder.FlushAsync();
                     tempStream.Seek(0);
 
-					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream).ConfigureAwait(false);
+					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
                     BitmapTransform transform = new BitmapTransform() { ScaledWidth = aspectWidth, ScaledHeight = aspectHeight };
                     PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                         BitmapPixelFormat.Bgra8,
                         BitmapAlphaMode.Premultiplied,
                         transform,
                         ExifOrientationMode.RespectExifOrientation,
-						ColorManagementMode.DoNotColorManage).ConfigureAwait(false);
+						ColorManagementMode.DoNotColorManage);
 
                     pixels = pixelData.DetachPixelData();
                     pixelsWidth = aspectWidth;
@@ -392,15 +392,15 @@ namespace FFImageLoading.Forms.WinRT
 
             using (var stream = new InMemoryRandomAccessStream())
             {
-				var encoder = await BitmapEncoder.CreateAsync(format, stream).ConfigureAwait(false);
+				var encoder = await BitmapEncoder.CreateAsync(format, stream);
                 
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                     pixelsWidth, pixelsHeight, 96, 96, pixels);
-				await encoder.FlushAsync().ConfigureAwait(false);
+				await encoder.FlushAsync();
                 stream.Seek(0);
                 
                 var bytes = new byte[stream.Size];
-				await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None).ConfigureAwait(false);
+				await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
 
                 return bytes;
             }

@@ -58,7 +58,7 @@ namespace FFImageLoading.Extensions
 
             using (image)
             {
-				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image).ConfigureAwait(false);
+				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
 
                 image.Seek(0);
 
@@ -68,7 +68,7 @@ namespace FFImageLoading.Extensions
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     await bitmap.SetSourceAsync(image);
-				}).ConfigureAwait(false);
+				});
 
                 return bitmap;
             }
@@ -88,8 +88,8 @@ namespace FFImageLoading.Extensions
 
             using (image)
             {
-				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image).ConfigureAwait(false);
-				PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync().ConfigureAwait(false);
+				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+				PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
                 var bytes = pixelDataProvider.DetachPixelData();
                 int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
@@ -121,13 +121,13 @@ namespace FFImageLoading.Extensions
         public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height, InterpolationMode mode)
         {
             IRandomAccessStream resizedStream = imageStream;
-			var decoder = await BitmapDecoder.CreateAsync(imageStream).ConfigureAwait(false);
+			var decoder = await BitmapDecoder.CreateAsync(imageStream);
             if (decoder.OrientedPixelHeight > height || decoder.OrientedPixelWidth > width)
             {
                 using (imageStream)
                 {
                     resizedStream = new InMemoryRandomAccessStream();
-					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder).ConfigureAwait(false);
+					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
                     double widthRatio = (double)width / decoder.OrientedPixelWidth;
                     double heightRatio = (double)height / decoder.OrientedPixelHeight;
 
@@ -147,7 +147,7 @@ namespace FFImageLoading.Extensions
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;
 
-					await encoder.FlushAsync().ConfigureAwait(false);
+					await encoder.FlushAsync();
                     resizedStream.Seek(0);
                 }
             }

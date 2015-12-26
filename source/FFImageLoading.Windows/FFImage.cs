@@ -70,7 +70,7 @@ namespace FFImageLoading
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                         internalImage.Source = null;
-					}).ConfigureAwait(false);
+					});
                 }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)

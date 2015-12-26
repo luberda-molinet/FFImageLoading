@@ -52,7 +52,7 @@ namespace FFImageLoading.Forms.WinRT
 
                     if (!string.IsNullOrWhiteSpace(filePath))
                     {
-						file = await StorageFile.GetFileFromPathAsync(fileImageSource.File).ConfigureAwait(false);
+						file = await StorageFile.GetFileFromPathAsync(fileImageSource.File);
                     }
                 }
                 catch (Exception)
