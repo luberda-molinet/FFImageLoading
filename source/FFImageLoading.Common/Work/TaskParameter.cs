@@ -64,7 +64,6 @@ namespace FFImageLoading.Work
 		private TaskParameter()
 		{
             Transformations = new List<ITransformation>();
-            DownSampleInterpolationMode = InterpolationMode.Default;
 
             // default values so we don't have a null value
             OnSuccess = (s,r) =>
