@@ -62,7 +62,7 @@ namespace FFImageLoading
 
             TaskParameter imageLoader = null;
 
-			var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source).ConfigureAwait(false);
+            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source);
 
             if (ffSource == null)
             {
@@ -95,7 +95,7 @@ namespace FFImageLoading
                 // LoadingPlaceholder
                 if (LoadingPlaceholder != null)
                 {
-					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder).ConfigureAwait(false);
+                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -103,7 +103,7 @@ namespace FFImageLoading
                 // ErrorPlaceholder
                 if (ErrorPlaceholder != null)
                 {
-					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder).ConfigureAwait(false);
+                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -146,10 +146,7 @@ namespace FFImageLoading
                 }
 
                 // Downsample mode
-                if(DownsampleMode != null)
-                {
-                    imageLoader.DownSampleMode(DownsampleMode);
-                }                
+                imageLoader.DownSampleMode(DownsampleMode);
 
                 // RetryCount
                 if (RetryCount > 0)

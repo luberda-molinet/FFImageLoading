@@ -129,15 +129,15 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj">
       <Project>{1602a3cb-80c2-42bb-b21a-6beb87ed6ee2}</Project>
       <Name>FFImageLoading.Transformations.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\source\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
+    <ProjectReference Include="..\..\source\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
       <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
       <Name>FFImageLoading-contrib.Windows</Name>
     </ProjectReference>
