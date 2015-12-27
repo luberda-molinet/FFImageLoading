@@ -267,7 +267,11 @@ namespace FFImageLoading.Work
 			}
 			else
 			{
-				//TODO FMT: We should call Finish callback in that case
+				var task = currentPendingTask.ImageLoadingTask;
+				if (task.Parameters.OnFinish != null)
+					task.Parameters.OnFinish(task);
+
+				task.Dispose();
 			}
 		}
 
