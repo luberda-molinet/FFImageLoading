@@ -29,7 +29,8 @@ namespace FFImageLoading
             };
             Content = internalImage;
 
-			Transformations = new List<FFImageLoading.Work.ITransformation>();
+			Transformations = new List<ITransformation>();
+            DownsampleMode = InterpolationMode.Default;
         }
 
         public string Source
@@ -48,7 +49,6 @@ namespace FFImageLoading
 
         private void SourcePropertyChanged(string source)
         {
-            System.Diagnostics.Debug.WriteLine("Source changed: {0}", source);
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
                 return;
 
@@ -62,7 +62,7 @@ namespace FFImageLoading
 
             TaskParameter imageLoader = null;
 
-            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source);
+			var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -70,7 +70,7 @@ namespace FFImageLoading
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                         internalImage.Source = null;
-                    });
+					});
                 }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -95,7 +95,7 @@ namespace FFImageLoading
                 // LoadingPlaceholder
                 if (LoadingPlaceholder != null)
                 {
-                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder);
+					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(LoadingPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -103,7 +103,7 @@ namespace FFImageLoading
                 // ErrorPlaceholder
                 if (ErrorPlaceholder != null)
                 {
-                    var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder);
+					var placeholderSource = await FFImageSourceBinding.GetImageSourceBinding(ErrorPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -148,14 +148,7 @@ namespace FFImageLoading
                 // Downsample mode
                 if(DownsampleMode != null)
                 {
-                    InterpolationMode mode = InterpolationMode.Linear;
-                    if (DownsampleMode == "NearestNeighbor")
-                        mode = InterpolationMode.NearestNeighbor;
-                    else if (DownsampleMode == "Cubic")
-                        mode = InterpolationMode.Cubic;
-                    else if (DownsampleMode == "Fant")
-                        mode = InterpolationMode.Fant;
-                    imageLoader.DownSampleMode(mode);
+                    imageLoader.DownSampleMode(DownsampleMode);
                 }                
 
                 // RetryCount
@@ -311,17 +304,17 @@ namespace FFImageLoading
         /// The downsample interpolation mode property.
         /// </summary>
         public static readonly DependencyProperty DownsampleModeProperty =
-            DependencyProperty.Register("DownsampleMode", typeof(string), typeof(FFImage), new PropertyMetadata(null));
+            DependencyProperty.Register("DownsampleMode", typeof(InterpolationMode), typeof(FFImage), new PropertyMetadata(InterpolationMode.Default));
 
         /// <summary>
         /// Set interpolation (resizing) algorithm.
         /// </summary>
-        /// <value>InterpolationMode enumeration converted to string. Linear by default.</value>
-        public string DownsampleMode
+        /// <value>InterpolationMode enumeration. Bilinear by default.</value>
+        public InterpolationMode DownsampleMode
         {
             get
             {
-                return (string)GetValue(DownsampleModeProperty);
+                return (InterpolationMode)GetValue(DownsampleModeProperty);
             }
             set
             {
@@ -468,6 +461,9 @@ namespace FFImageLoading
 
         private void TransformationsPropertyChanged(List<FFImageLoading.Work.ITransformation> transformations)
         {
+            if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+                return;
+
             LoadImage();
         }
 

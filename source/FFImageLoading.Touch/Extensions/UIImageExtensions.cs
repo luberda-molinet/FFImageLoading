@@ -1,6 +1,7 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Extensions
 {
@@ -11,7 +12,7 @@ namespace FFImageLoading.Extensions
             return (nuint)(image.CGImage.BytesPerRow * image.CGImage.Height);
         }
 
-		public static UIImage ResizeUIImage(this UIImage image, double desiredWidth, double desiredHeight)
+		public static UIImage ResizeUIImage(this UIImage image, double desiredWidth, double desiredHeight, InterpolationMode interpolationMode)
 		{
 			double widthRatio = desiredWidth / image.Size.Width;
 			double heightRatio = desiredHeight / image.Size.Height;
@@ -37,6 +38,17 @@ namespace FFImageLoading.Extensions
 
 				using (var context = UIGraphics.GetCurrentContext())
 				{
+					if (interpolationMode == InterpolationMode.None)
+						context.InterpolationQuality = CGInterpolationQuality.None;
+					else if (interpolationMode == InterpolationMode.Low)
+						context.InterpolationQuality = CGInterpolationQuality.Low;
+					else if (interpolationMode == InterpolationMode.Medium)
+						context.InterpolationQuality = CGInterpolationQuality.Medium;
+					else if (interpolationMode == InterpolationMode.High)
+						context.InterpolationQuality = CGInterpolationQuality.High;
+					else
+						context.InterpolationQuality = CGInterpolationQuality.Low;
+					
 					var resizedImage = UIGraphics.GetImageFromCurrentImageContext();
 
 					return resizedImage;

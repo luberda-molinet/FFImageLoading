@@ -61,13 +61,14 @@ namespace FFImageLoading.Forms.Touch
         protected override void Dispose(bool disposing)
 		{
 			if (_isDisposed)
-			{
 				return;
-			}
 
-			UIImage image;
-			if (disposing && base.Control != null && (image = base.Control.Image) != null)
+			if (disposing && Control != null)
 			{
+				UIImage image = Control.Image;
+				if (image != null)
+					image.Dispose();
+
 				image.Dispose();
 			}
 
@@ -129,7 +130,8 @@ namespace FFImageLoading.Forms.Touch
 
 		private void SetImage(CachedImage oldElement = null)
 		{
-			Xamarin.Forms.ImageSource source = base.Element.Source; 
+			Xamarin.Forms.ImageSource source = Element.Source; 
+
 			if (oldElement != null)
 			{
 				Xamarin.Forms.ImageSource source2 = oldElement.Source;
@@ -287,7 +289,8 @@ namespace FFImageLoading.Forms.Touch
 
 		private void Cancel(object sender, EventArgs args)
 		{
-			if (_currentTask != null && !_currentTask.IsCancelled) {
+			if (_currentTask != null && !_currentTask.IsCancelled) 
+			{
 				_currentTask.Cancel ();
 			}
 		}
@@ -302,32 +305,34 @@ namespace FFImageLoading.Forms.Touch
 			return GetImageAsByte(true, quality, desiredWidth, desiredHeight);
 		}
 
-		private async Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		private Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
-			if (Control == null || Control.Image == null)
-				return null;
+			return Task.Run(() => {
+				if (Control == null || Control.Image == null)
+					return null;
 
-			UIImage image = Control.Image;
+				UIImage image = Control.Image;
 
-			if (desiredWidth != 0 || desiredHeight != 0)
-			{
-				image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight);
-			}
+				if (desiredWidth != 0 || desiredHeight != 0)
+				{
+					image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
+				}
 
-			NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+				NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
 
-			if (imageData == null || imageData.Length == 0)
-				return null;
+				if (imageData == null || imageData.Length == 0)
+					return null;
 
-			var encoded = imageData.ToArray();
-			imageData.Dispose();
+				var encoded = imageData.ToArray();
+				imageData.Dispose();
 
-			if (desiredWidth != 0 || desiredHeight != 0)
-			{
-				image.Dispose();
-			}
+				if (desiredWidth != 0 || desiredHeight != 0)
+				{
+					image.Dispose();
+				}
 
-			return encoded;
+				return encoded;	
+			});
 		}
 	}
 }

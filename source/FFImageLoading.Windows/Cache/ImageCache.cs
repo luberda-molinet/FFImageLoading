@@ -28,9 +28,9 @@ namespace FFImageLoading.Cache
             var weakRef = new WeakReference<WriteableBitmap>(bitmap);
             if (!_reusableBitmaps.TryAdd(key, weakRef))
             {
-                WeakReference<WriteableBitmap> removed;
-                _reusableBitmaps.TryRemove(key, out removed);
-                Add(key, bitmap);
+                //WeakReference<WriteableBitmap> removed;
+                //_reusableBitmaps.TryRemove(key, out removed);
+                //Add(key, bitmap);
             }
         }
 
@@ -55,21 +55,14 @@ namespace FFImageLoading.Cache
 
         void CleanAbandonedItems()
         {
-            List<string> deadKeys = new List<string>();
-
             foreach (var item in _reusableBitmaps)
             {
                 WriteableBitmap bitmap = null;
                 if (!item.Value.TryGetTarget(out bitmap) || bitmap == null)
                 {
-                    deadKeys.Add(item.Key);
+                    WeakReference<WriteableBitmap> removed;
+                    _reusableBitmaps.TryRemove(item.Key, out removed);
                 }      
-            }
-
-            foreach (var item in deadKeys)
-            {
-                WeakReference<WriteableBitmap> removed;
-                _reusableBitmaps.TryRemove(item, out removed);
             }
         }
 

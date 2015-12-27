@@ -38,11 +38,12 @@ namespace FFImageLoading
 		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
 		/// <param name="fadeAnimationEnabled">Defines if fading should be performed while loading images.</param>
         /// <param name="transformPlaceholders">Defines if transforms should be applied to placeholders.</param>
+		/// <param name="downsampleInterpolationMode">Defines default downsample interpolation mode.</param>
 		/// <param name="httpHeadersTimeout">Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.</param>
 		/// <param name="httpReadTimeout">Maximum time in seconds to wait before the HTTP request is cancelled.</param>
 		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null,
-            bool? transformPlaceholders = null, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+			bool? transformPlaceholders = null, InterpolationMode? downsampleInterpolationMode = null, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
 		)
         {
 			lock (_initializeLock)
@@ -69,19 +70,22 @@ namespace FFImageLoading
 					downloadCache = downloadCache ?? Config.DownloadCache;
 					loadWithTransparencyChannel = loadWithTransparencyChannel ?? Config.LoadWithTransparencyChannel;
 					fadeAnimationEnabled = fadeAnimationEnabled ?? Config.FadeAnimationEnabled;
+					transformPlaceholders = transformPlaceholders ?? Config.TransformPlaceholders;
+					downsampleInterpolationMode = downsampleInterpolationMode ?? Config.DownsampleInterpolationMode;
 				}
 
 
 				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache,
 					loadWithTransparencyChannel ?? false, fadeAnimationEnabled ?? true,
-                    transformPlaceholders ?? true, httpHeadersTimeout, httpReadTimeout
+					transformPlaceholders ?? true, downsampleInterpolationMode ?? InterpolationMode.Default, 
+					httpHeadersTimeout, httpReadTimeout
 				);
 			}
         }
 
         private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled = true,
-            bool transformPlaceholders = true, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+			bool transformPlaceholders = true, InterpolationMode downsampleInterpolationMode = InterpolationMode.Default, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
 		)
         {
 			if (_initialized)
@@ -92,7 +96,9 @@ namespace FFImageLoading
 				if (_initialized)
 					return;
 			
-				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, loadWithTransparencyChannel, fadeAnimationEnabled, transformPlaceholders, httpHeadersTimeout, httpReadTimeout);
+				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, 
+					loadWithTransparencyChannel, fadeAnimationEnabled, transformPlaceholders, downsampleInterpolationMode, 
+					httpHeadersTimeout, httpReadTimeout);
 				Config = GetDefaultConfiguration(userDefinedConfig);
 
 				_initialized = true;
@@ -123,6 +129,7 @@ namespace FFImageLoading
 				userDefinedConfig.LoadWithTransparencyChannel,
 				userDefinedConfig.FadeAnimationEnabled,
                 userDefinedConfig.TransformPlaceholders,
+				userDefinedConfig.DownsampleInterpolationMode,
 				userDefinedConfig.HttpHeadersTimeout,
 				userDefinedConfig.HttpReadTimeout
             );
@@ -259,7 +266,7 @@ namespace FFImageLoading
 		public static void InvalidateDiskCache()
 		{
 			InitializeIfNeeded();
-			Config.DiskCache.Clear();
+			Config.DiskCache.ClearAsync();
 		}
 
 		/// <summary>
@@ -277,7 +284,7 @@ namespace FFImageLoading
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
 			{
 				string hash = _md5Helper.MD5(key);
-				Config.DiskCache.Remove(hash);
+				Config.DiskCache.RemoveAsync(hash);
 			}
 		}
     }

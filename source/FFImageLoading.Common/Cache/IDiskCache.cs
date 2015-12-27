@@ -7,17 +7,17 @@ namespace FFImageLoading.Cache
 {
     public interface IDiskCache
     {
-        string BasePath { get; }
+		Task<string> GetBasePathAsync();
 
-		Task AddOrUpdateAsync (string key, Stream stream, CancellationToken token, TimeSpan duration);
+		void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration);
 
-		Task<byte[]> TryGetAsync (string key, CancellationToken token);
+		Task<byte[]> TryGetAsync(string key, CancellationToken token);
 
-		Task<Stream> TryGetStream (string key);
+		Task<Stream> TryGetStreamAsync(string key);
 
-		void Remove (string key);
+		Task RemoveAsync(string key);
 
-		void Clear();
+		Task ClearAsync();
     }
 }
 

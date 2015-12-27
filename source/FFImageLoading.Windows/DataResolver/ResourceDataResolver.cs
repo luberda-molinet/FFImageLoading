@@ -25,7 +25,7 @@ namespace FFImageLoading.DataResolver
             try
             {
                 string resPath = @"Assets\" + identifier.TrimStart('\\', '/');
-                file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(resPath);
+				file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(resPath);
             }
             catch (Exception)
             {
@@ -33,7 +33,7 @@ namespace FFImageLoading.DataResolver
 
             if (file != null)
             {
-                bytes = await FilePathDataResolver.ReadFile(file);
+				bytes = await FilePathDataResolver.ReadFile(file).ConfigureAwait(false);
             }
 
             return new ResolverImageData()

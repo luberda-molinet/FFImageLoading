@@ -8,7 +8,6 @@ using FFImageLoading.Work;
 using FFImageLoading.Forms.Droid;
 using FFImageLoading.Forms;
 using Android.Runtime;
-using FFImageLoading.Views;
 using Android.Graphics.Drawables;
 using Android.Graphics;
 using System.IO;
@@ -22,7 +21,7 @@ namespace FFImageLoading.Forms.Droid
 	/// CachedImage Implementation
 	/// </summary>
 	[Preserve(AllMembers=true)]
-	public class CachedImageRenderer : ViewRenderer<CachedImage, ImageViewAsync>
+	public class CachedImageRenderer : ViewRenderer<CachedImage, CachedImageView>
 	{
 		/// <summary>
 		///   Used for registration with dependency service
@@ -80,15 +79,19 @@ namespace FFImageLoading.Forms.Droid
 			{
 				CachedImageView nativeControl = new CachedImageView(Context);
 				SetNativeControl(nativeControl);
-			} else {
+			} 
+			else 
+			{
 				e.OldElement.Cancelled -= Cancel;
 			}
+
 			if (e.NewElement != null)
 			{
 				e.NewElement.Cancelled += Cancel;
 				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
 				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
 			}
+
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
 		}
@@ -122,11 +125,11 @@ namespace FFImageLoading.Forms.Droid
 			if (previous == null || !object.Equals(previous.Source, Element.Source))
 			{
 				Xamarin.Forms.ImageSource source = Element.Source;
-				CachedImageView formsImageView = Control as CachedImageView;
+				var imageView = Control;
 
-				if (formsImageView == null)
+				if (imageView == null)
 					return;
-					
+
 				((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
@@ -138,9 +141,9 @@ namespace FFImageLoading.Forms.Droid
 
 					if (ffSource == null)
 					{
-						if (Control != null)
-							Control.SetImageDrawable(null);	
-						
+						if (imageView != null)
+							imageView.SetImageDrawable(null);	
+
 						ImageLoadingFinished(Element);
 					}
 					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -207,24 +210,24 @@ namespace FFImageLoading.Forms.Droid
 						}
 						else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 						{
-                            if (Element.DownsampleHeight > Element.DownsampleWidth)
-                            {
+							if (Element.DownsampleHeight > Element.DownsampleWidth)
+							{
 								imageLoader.DownSample(height: Element.DownsampleUseDipUnits 
 									? Element.DownsampleHeight.DpToPixels() : (int)Element.DownsampleHeight);
-                            }
-                            else
-                            {
+							}
+							else
+							{
 								imageLoader.DownSample(width: Element.DownsampleUseDipUnits 
 									? Element.DownsampleWidth.DpToPixels() : (int)Element.DownsampleWidth);
-                            }
-                        }
+							}
+						}
 
 						// RetryCount
 						if (Element.RetryCount > 0)
 						{
 							imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 						}
-							
+
 						// TransparencyChannel
 						if (Element.TransparencyEnabled.HasValue)
 							imageLoader.TransparencyChannel(Element.TransparencyEnabled.Value);
@@ -256,7 +259,7 @@ namespace FFImageLoading.Forms.Droid
 						imageLoader.Error((exception) => 
 							element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
 
-						_currentTask = imageLoader.Into(Control);	
+						_currentTask = imageLoader.Into(imageView);	
 					}
 				}
 			}
@@ -274,8 +277,9 @@ namespace FFImageLoading.Forms.Droid
 
 		private void Cancel(object sender, EventArgs args)
 		{
-			if (_currentTask != null && !_currentTask.IsCancelled) {
-				_currentTask.Cancel ();
+			if (_currentTask != null && !_currentTask.IsCancelled) 
+			{
+				_currentTask.Cancel();
 			}
 		}
 
@@ -322,7 +326,7 @@ namespace FFImageLoading.Forms.Droid
 
 			using (var stream = new MemoryStream())
 			{
-				await bitmap.CompressAsync(format, quality, stream);
+				await bitmap.CompressAsync(format, quality, stream).ConfigureAwait(false);
 				var compressed = stream.ToArray();
 
 				if (desiredWidth != 0 || desiredHeight != 0)
@@ -334,8 +338,6 @@ namespace FFImageLoading.Forms.Droid
 				return compressed;
 			}
 		}
-
-
 	}
 }
 

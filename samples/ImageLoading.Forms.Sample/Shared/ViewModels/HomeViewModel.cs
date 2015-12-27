@@ -30,6 +30,11 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				.SendMessageToViewModel("Reload")
 				.PushPage());
 
+			OpenHeavyListTransformationsExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<ListHeavyTestViewModel>()
+				.SendMessageToViewModel("Reload")
+				.PushPage());
+
 			OpenPlaceholdersExampleCommand = new PageFactoryCommand(() => 
 				PageFactory.GetMessagablePageFromCache<PlaceholdersExampleViewModel>()
 				.PushPage());
@@ -72,6 +77,12 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					Section = "Lists",
 					Title = "List transformations example",
 					Command = OpenListTransformationsExampleCommand
+				},
+
+				new MenuItem() {
+					Section = "Lists",
+					Title = "Heavy Grid List example",
+					Command = OpenHeavyListTransformationsExampleCommand
 				},
 
 				new MenuItem() {
@@ -198,6 +209,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 		public IPageFactoryCommand OpenListTransformationsExampleCommand { get; private set; }
 
+		public IPageFactoryCommand OpenHeavyListTransformationsExampleCommand { get; private set; }
+
 		public IPageFactoryCommand OpenPlaceholdersExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenCropTransformationExampleCommand { get; private set; }
@@ -205,6 +218,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 		public IPageFactoryCommand OpenTransformationExampleCommand { get; private set; }
 
 		public IPageFactoryCommand OpenDownsamplingExampleCommand { get; private set; }
+
+
 	}
 }
 
