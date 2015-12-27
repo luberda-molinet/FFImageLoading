@@ -53,12 +53,12 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode);
+				image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
             }
 
             using (image)
             {
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
 
                 image.Seek(0);
 
@@ -68,7 +68,7 @@ namespace FFImageLoading.Extensions
                 {
                     bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     await bitmap.SetSourceAsync(image);
-                });
+				});
 
                 return bitmap;
             }
@@ -83,13 +83,13 @@ namespace FFImageLoading.Extensions
 
             if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode);
+				image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
             }
 
             using (image)
             {
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
-                PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+				PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
                 var bytes = pixelDataProvider.DetachPixelData();
                 int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
@@ -118,16 +118,16 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height, InterpolationMode mode)
+        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, uint width, uint height, InterpolationMode interpolationMode)
         {
             IRandomAccessStream resizedStream = imageStream;
-            var decoder = await BitmapDecoder.CreateAsync(imageStream);
+			var decoder = await BitmapDecoder.CreateAsync(imageStream);
             if (decoder.OrientedPixelHeight > height || decoder.OrientedPixelWidth > width)
             {
                 using (imageStream)
                 {
                     resizedStream = new InMemoryRandomAccessStream();
-                    BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
                     double widthRatio = (double)width / decoder.OrientedPixelWidth;
                     double heightRatio = (double)height / decoder.OrientedPixelHeight;
 
@@ -142,12 +142,21 @@ namespace FFImageLoading.Extensions
                     uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
                     uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
 
-                    // it's okay. Windows's BitmapInterpolationMode has the same numerical values as ours InterpolationMode.
-                    encoder.BitmapTransform.InterpolationMode = (BitmapInterpolationMode)mode;
+                    if (interpolationMode == InterpolationMode.None)
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.NearestNeighbor;
+                    else if (interpolationMode == InterpolationMode.Low)
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
+                    else if (interpolationMode == InterpolationMode.Medium)
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Cubic;
+                    else if (interpolationMode == InterpolationMode.High)
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Fant;
+                    else
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
+
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;
 
-                    await encoder.FlushAsync();
+					await encoder.FlushAsync();
                     resizedStream.Seek(0);
                 }
             }

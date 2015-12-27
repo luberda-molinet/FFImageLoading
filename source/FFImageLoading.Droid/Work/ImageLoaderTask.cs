@@ -452,8 +452,8 @@ namespace FFImageLoading.Work
 							bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 								Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
-							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
-								&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
+							    && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 							{
 								foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 								{
@@ -472,8 +472,12 @@ namespace FFImageLoading.Work
 										}
 
 										// Transformation succeeded, so garbage the source
-										old.Recycle();
-										old.Dispose();
+										if (old != null && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
+										{
+											old.Recycle();
+											old.Dispose();
+										}
+
 									}
 									catch (Exception ex)
 									{
@@ -508,7 +512,7 @@ namespace FFImageLoading.Work
 						if (stream != null)
 							stream.Dispose();
 					}
-				});
+				}).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -606,6 +610,10 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
 
+				value.SetIsRetained(true);
+
+				try
+				{
 				Logger.Debug(string.Format("Image from cache: {0}", key));
 				await MainThreadDispatcher.PostAsync(() =>
 					{
@@ -636,6 +644,11 @@ namespace FFImageLoading.Work
 				if (Parameters.OnSuccess != null)
 					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 				return CacheResult.Found; // found and loaded from cache
+			}
+				finally
+				{
+					value.SetIsRetained(false);
+				}
 			}
 			catch (Exception ex)
 			{

@@ -35,7 +35,7 @@ namespace FFImageLoading.IO
         {
             using (var fs = GetOutputStream(path)) {
                 using (var memory = new MemoryStream(data)) {
-                    await memory.CopyToAsync(fs);
+					await memory.CopyToAsync(fs).ConfigureAwait(false);
                 }
             }
         }

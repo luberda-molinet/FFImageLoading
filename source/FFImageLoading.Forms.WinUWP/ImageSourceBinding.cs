@@ -48,7 +48,12 @@ namespace FFImageLoading.Forms.WinUWP
 
                 try
                 {
-                    file = await StorageFile.GetFileFromPathAsync(fileImageSource.File);
+                    var filePath = System.IO.Path.GetDirectoryName(fileImageSource.File);
+
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        file = await StorageFile.GetFileFromPathAsync(fileImageSource.File);
+                    }
                 }
                 catch (Exception)
                 {

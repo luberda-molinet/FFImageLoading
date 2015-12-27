@@ -90,7 +90,7 @@ namespace FFImageLoading.Cache
 			if (_cache.Count == 0)
 				return null;
 
-			return _cache.GetReusableBitmapDrawable(options.OutWidth, options.OutHeight, options.InSampleSize);
+			return _cache.GetReusableBitmapDrawable(options.OutWidth, options.OutHeight, options.InPreferredConfig, options.InSampleSize);
 		}
 
 		private static int GetMaxCacheSize(int maxCacheSize)

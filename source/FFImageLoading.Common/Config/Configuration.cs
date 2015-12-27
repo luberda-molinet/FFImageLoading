@@ -10,7 +10,7 @@ namespace FFImageLoading.Config
     {
         public Configuration(int maxCacheSize, HttpClient httpClient, IWorkScheduler scheduler, IMiniLogger logger,
 			IDiskCache diskCache, IDownloadCache downloadCache, bool loadWithTransparencyChannel, bool fadeAnimationEnabled,
-			bool transformPlaceholders, int httpHeadersTimeout, int httpReadTimeout
+			bool transformPlaceholders, InterpolationMode downsampleInterpolationMode, int httpHeadersTimeout, int httpReadTimeout
 		)
         {
             MaxCacheSize = maxCacheSize;
@@ -22,6 +22,7 @@ namespace FFImageLoading.Config
 			LoadWithTransparencyChannel = loadWithTransparencyChannel;
 			FadeAnimationEnabled = fadeAnimationEnabled;
             TransformPlaceholders = transformPlaceholders;
+			DownsampleInterpolationMode = downsampleInterpolationMode;
             HttpHeadersTimeout = httpHeadersTimeout;
 			HttpReadTimeout = httpReadTimeout;
         }
@@ -79,6 +80,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value><c>true</c> if transform should be applied to placeholder images; otherwise, <c>false</c>.</value>
         public bool TransformPlaceholders { get; private set; }
+
+		/// <summary>
+		/// Gets a value indicating this <see cref="FFImageLoading.Config.Configuration" downsample interpolation mode/> .
+		/// </summary>
+		/// <value>downsample interpolation mode</value>
+		public InterpolationMode DownsampleInterpolationMode { get; private set; }
 
         /// <summary>
         /// Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.

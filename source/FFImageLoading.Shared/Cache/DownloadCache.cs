@@ -14,7 +14,7 @@ namespace FFImageLoading.Cache
     {
         private readonly MD5Helper _md5Helper;
         private readonly IDiskCache _diskCache;
-		private const int BufferSize = 4096; // default value of .NET framework for CopyToAsync buffer size
+		private const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
 
         public DownloadCache(HttpClient httpClient, IDiskCache diskCache)
         {
@@ -28,7 +28,8 @@ namespace FFImageLoading.Cache
 		public async Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null)
         {
             string filename = _md5Helper.MD5(url);
-            string filepath = _diskCache.BasePath == null ? filename : Path.Combine(_diskCache.BasePath, filename);
+			string basePath = await _diskCache.GetBasePathAsync().ConfigureAwait(false);
+			string filepath = basePath == null ? filename : Path.Combine(basePath, filename);
 			byte[] data = await _diskCache.TryGetAsync(filename, token).ConfigureAwait(false);
 			if (data != null)
 				return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
@@ -42,8 +43,9 @@ namespace FFImageLoading.Cache
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null)
 		{
 			string filename = _md5Helper.MD5(url);
-			string filepath = _diskCache.BasePath == null ? filename : Path.Combine(_diskCache.BasePath, filename);
-			var diskStream = await _diskCache.TryGetStream(filename);
+			string basePath = await _diskCache.GetBasePathAsync().ConfigureAwait(false);
+			string filepath = basePath == null ? filename : Path.Combine(basePath, filename);
+			var diskStream = await _diskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
 			if (diskStream != null)
 				return new CacheStream(diskStream, true);
 
@@ -70,32 +72,15 @@ namespace FFImageLoading.Cache
 
 				var cancelReadToken = new CancellationTokenSource();
 				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
-				var linkedReadToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token);
 
-				using (var httpStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-				{
-					int defaultCapacity = BufferSize;
-					if (response.Content.Headers != null && response.Content.Headers.ContentLength != null)
-					{
-						defaultCapacity = (int)response.Content.Headers.ContentLength.Value;
-					}
+				var responseBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-					var memoryStream = new MemoryStream(defaultCapacity);
-					await httpStream.CopyToAsync(memoryStream, BufferSize, linkedReadToken.Token).ConfigureAwait(false);
+				var memoryStream = new MemoryStream(responseBytes, false);
+				memoryStream.Position = 0;
 
-					if (memoryStream.Length == 0)
-					{
-						// this is a strange situation so let's not cache this too long: here 5 minutes
-						duration = new TimeSpan(0, 5, 0);
-					}
+				_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
 
-					memoryStream.Position = 0; // return to the beginning of the MemoryStream
-					// this ensures the fullpath exists
-					await _diskCache.AddOrUpdateAsync(filename, memoryStream, token, duration.Value).ConfigureAwait(false);
-
-					memoryStream.Position = 0; // return to the beginning of the MemoryStream
-					return memoryStream;
-				}
+				return memoryStream;
 			}
 		}
     }

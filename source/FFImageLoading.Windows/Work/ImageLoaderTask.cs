@@ -293,7 +293,7 @@ namespace FFImageLoading.Work
                 if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
                 && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
                 {
-                    BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode);
+					BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
                     
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
@@ -319,11 +319,11 @@ namespace FFImageLoading.Work
                     await MainThreadDispatcher.PostAsync(async () =>
                     {
                         writableBitmap = await imageIn.ToBitmapImageAsync();
-                    });
+					}).ConfigureAwait(false);
                 }
                 else
                 {
-                    writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode);
+					writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
                 }
 
                 return writableBitmap;
