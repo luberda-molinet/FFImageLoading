@@ -126,9 +126,14 @@ namespace FFImageLoading.Work
                 if (IsCancelled)
                     return CacheResult.NotFound; // not sure what to return in that case
 
+                int pixelWidth = 0;
+                int pixelHeight = 0;
+
                 await MainThreadDispatcher.PostAsync(() =>
                 {
                     _doWithImage(value, true);
+                    pixelWidth = value.PixelWidth;
+                    pixelHeight = value.PixelHeight;
                 }).ConfigureAwait(false);
 
                 if (IsCancelled)
@@ -137,7 +142,7 @@ namespace FFImageLoading.Work
                 Completed = true;
 
                 if (Parameters.OnSuccess != null)
-                    Parameters.OnSuccess(new ImageSize(value.PixelWidth, value.PixelHeight), LoadingResult.MemoryCache);
+                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
 
                 return CacheResult.Found; // found and loaded from cache
             }
