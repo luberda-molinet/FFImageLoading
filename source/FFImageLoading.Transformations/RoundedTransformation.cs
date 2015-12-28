@@ -17,6 +17,11 @@ namespace FFImageLoading.Transformations
 			throw new Exception(DoNotReference);
 		}
 
+		public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
+		{
+			throw new Exception(DoNotReference);
+		}
+
 		public IBitmap Transform(IBitmap source)
 		{
 			throw new Exception(DoNotReference);

@@ -1,6 +1,7 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
+using FFImageLoading.Transformations.Extensions;
 
 namespace FFImageLoading.Transformations
 {
@@ -10,29 +11,38 @@ namespace FFImageLoading.Transformations
 		private double _cropWidthRatio;
 		private double _cropHeightRatio;
 
+		private double _borderSize;
+		private string _borderHexColor;
+
 		public RoundedTransformation(double radius) : this(radius, 1d, 1d)
 		{
 		}
 
-		public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio)
+		public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio) : this(radius, cropWidthRatio, cropHeightRatio, 0d, null)
+		{
+		}
+
+		public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
 		{
 			_radius = radius;
 			_cropWidthRatio = cropWidthRatio;
 			_cropHeightRatio = cropHeightRatio;
+			_borderSize = borderSize;
+			_borderHexColor = borderHexColor;
 		}
 
 		public override string Key
 		{
-			get { return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2}", 
-				_radius, _cropWidthRatio, _cropHeightRatio); }
+			get { return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}", 
+				_radius, _cropWidthRatio, _cropHeightRatio, _borderSize, _borderHexColor); }
 		}
 
 		protected override UIImage Transform(UIImage source)
 		{
-			return ToRounded(source, (nfloat)_radius, _cropWidthRatio, _cropHeightRatio);
+			return ToRounded(source, (nfloat)_radius, _cropWidthRatio, _cropHeightRatio, _borderSize, _borderHexColor);
 		}
 
-		public static UIImage ToRounded(UIImage source, nfloat rad, double cropWidthRatio, double cropHeightRatio)
+		public static UIImage ToRounded(UIImage source, nfloat rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
 		{
 			double sourceWidth = source.Size.Width;
 			double sourceHeight = source.Size.Height;
@@ -62,7 +72,8 @@ namespace FFImageLoading.Transformations
 			{
 				using (var context = UIGraphics.GetCurrentContext())
 				{
-					var clippedRect = new CGRect(0, 0, desiredWidth, desiredHeight);
+					var clippedRect = new CGRect(0d, 0d, desiredWidth, desiredHeight);
+
 					context.BeginPath();
 
 					using (var path = UIBezierPath.FromRoundedRect(clippedRect, rad))
@@ -73,6 +84,34 @@ namespace FFImageLoading.Transformations
 
 					var drawRect = new CGRect(-cropX, -cropY, sourceWidth, sourceHeight);
 					source.Draw(drawRect);
+
+					if (borderSize > 0d) 
+					{
+						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
+						UIColor borderColor = UIColor.Clear;
+
+						try
+						{
+							borderColor = UIColor.Clear.FromHexString(borderHexColor);
+						}
+						catch(Exception)
+						{
+						}
+
+						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d), 
+							(desiredWidth - borderSize), (desiredHeight - borderSize));
+
+						context.BeginPath();
+
+						using (var path = UIBezierPath.FromRoundedRect(borderRect, rad))
+						{
+							context.SetStrokeColor(borderColor.CGColor);
+							context.SetLineWidth((nfloat)borderSize);
+							context.AddPath(path.CGPath);
+							context.StrokePath();
+						}
+					}
+
 					var modifiedImage = UIGraphics.GetImageFromCurrentImageContext();
 
 					return modifiedImage;

@@ -10,23 +10,32 @@ namespace FFImageLoading.Transformations
         private double _cropWidthRatio;
         private double _cropHeightRatio;
 
+        private double _borderSize;
+        private string _borderHexColor;
+
         public RoundedTransformation(double radius) : this(radius, 1d, 1d)
         {
         }
 
-        public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio)
+        public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio) : this(radius, cropWidthRatio, cropHeightRatio, 0d, null)
+        {
+        }
+
+        public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
         {
             _radius = radius;
             _cropWidthRatio = cropWidthRatio;
             _cropHeightRatio = cropHeightRatio;
+            _borderSize = borderSize;
+            _borderHexColor = borderHexColor;
         }
 
         public override string Key
         {
             get
             {
-                return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2}",
-              _radius, _cropWidthRatio, _cropHeightRatio);
+                return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}",
+              _radius, _cropWidthRatio, _cropHeightRatio, _borderSize, _borderHexColor);
             }
         }
 
