@@ -188,15 +188,20 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				// Post on main thread
-				await MainThreadDispatcher.PostAsync(() =>
+                int pixelWidth = 0;
+                int pixelHeight = 0;
+
+                // Post on main thread
+                await MainThreadDispatcher.PostAsync(() =>
 					{
 						if (CancellationToken.IsCancellationRequested)
 							return;
 
 						_doWithImage(image, false);
-						Completed = true;
-                        Parameters.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
+                        pixelWidth = image.PixelWidth;
+                        pixelHeight = image.PixelHeight;
+                        Completed = true;
+                        Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
                     }).ConfigureAwait(false);
 
 				if (!Completed)
