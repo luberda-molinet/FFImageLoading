@@ -87,7 +87,7 @@ namespace FFImageLoading.Transformations
 
 					if (borderSize > 0d) 
 					{
-						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
+						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 1000d);
 						UIColor borderColor = UIColor.Clear;
 
 						try

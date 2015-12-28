@@ -24,7 +24,7 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            RoundedTransformation.ToRounded(source, 0, 1f, 1f);
+            RoundedTransformation.ToRounded(source, 0, 1f, 1f, _borderSize, _borderHexColor);
             return source;
         }
     }
