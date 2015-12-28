@@ -258,7 +258,6 @@ namespace FFImageLoading.Forms.Touch
 				{
 					imageLoader.Transform(Element.Transformations);
 				}
-				imageLoader.TransformPlaceholders(false);
 
 				var element = Element;
 
