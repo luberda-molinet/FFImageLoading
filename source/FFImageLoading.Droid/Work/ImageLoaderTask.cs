@@ -163,8 +163,7 @@ namespace FFImageLoading.Work
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 				return GenerateResult.Failed;
 			}
-
-			Exception trappedException = null;
+				
 			try
 			{
 				if (CancellationToken.IsCancellationRequested)
@@ -190,15 +189,8 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex2)
 			{
-				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			}
-
-			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			if (trappedException != null)
-			{
-				// Show error placeholder
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
-				throw trappedException;
+				throw ex2;
 			}
 
 			return GenerateResult.Success;
@@ -252,8 +244,7 @@ namespace FFImageLoading.Work
 
 				return GenerateResult.Failed;
 			}
-
-			Exception trappedException = null;
+				
 			try
 			{
 				if (CancellationToken.IsCancellationRequested)
@@ -279,15 +270,9 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex2)
 			{
-				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			}
-
-			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			if (trappedException != null)
-			{
 				// Show error placeholder
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
-				throw trappedException;
+				throw ex2;
 			}
 
 			return GenerateResult.Success;

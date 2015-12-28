@@ -86,7 +86,6 @@ namespace FFImageLoading.Work
             if (_getNativeControl() == null)
                 return GenerateResult.InvalidTarget;
 
-            Exception trappedException = null;
             try
             {
                 // Post on main thread
@@ -105,14 +104,8 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex2)
             {
-                trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-            }
-
-            // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-            if (trappedException != null)
-            {
-                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-                throw trappedException;
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+				throw ex2;
             }
 
             return GenerateResult.Success;
@@ -188,7 +181,6 @@ namespace FFImageLoading.Work
 			if (_getNativeControl() == null)
 				return GenerateResult.InvalidTarget;
 
-			Exception trappedException = null;
 			try
 			{
 				// Post on main thread
@@ -207,14 +199,8 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex2)
 			{
-				trappedException = ex2; // All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			}
-
-			// All this stupid stuff is necessary to compile with c# 5, since we can't await in a catch block...
-			if (trappedException != null)
-			{
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				throw trappedException;
+				throw ex2;
 			}
 
 			return GenerateResult.Success;
