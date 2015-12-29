@@ -341,7 +341,8 @@ namespace FFImageLoading.Work
 								imageIn = bitmapHolder.ToNative();
 
 								// Transformation succeeded, so garbage the source
-								old.Dispose();
+								if (old != null)
+									old.Dispose();
 							}
 							catch (Exception ex)
 							{
