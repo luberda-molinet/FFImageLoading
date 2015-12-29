@@ -33,9 +33,6 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
   - FlipTransformation, RotateTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
 
-### History
-We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused. We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
-
 ## Documentation
 
 - **General**
