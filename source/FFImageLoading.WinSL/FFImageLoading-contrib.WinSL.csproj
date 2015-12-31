@@ -164,35 +164,67 @@
     <Compile Include="..\FFImageLoading.Shared\Work\ImageLoaderTaskBase.cs">
       <Link>Work\ImageLoaderTaskBase.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Cache\DiskCache.cs">
+      <Link>Cache\DiskCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Cache\IImageCache.cs">
+      <Link>Cache\IImageCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Cache\ImageCache.cs">
+      <Link>Cache\ImageCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\DataResolverFactory.cs">
+      <Link>DataResolver\DataResolverFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\FilePathDataResolver.cs">
+      <Link>DataResolver\FilePathDataResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\IDataResolver.cs">
+      <Link>DataResolver\IDataResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\ResolverImageData.cs">
+      <Link>DataResolver\ResolverImageData.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\ResourceDataResolver.cs">
+      <Link>DataResolver\ResourceDataResolver.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Windows\DataResolver\UrlDataResolver.cs">
       <Link>DataResolver\UrlDataResolver.cs</Link>
     </Compile>
-    <Compile Include="Cache\DiskCache.cs" />
-    <Compile Include="Cache\IImageCache.cs" />
-    <Compile Include="Cache\ImageCache.cs" />
+    <Compile Include="..\FFImageLoading.Windows\FFImage.cs">
+      <Link>FFImage.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\FFImageSourceBinding.cs">
+      <Link>FFImageSourceBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Helpers\MainThreadDispatcher.cs">
+      <Link>Helpers\MainThreadDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Helpers\MD5Helper.cs">
+      <Link>Helpers\MD5Helper.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\TaskParameterExtensions.cs">
+      <Link>TaskParameterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Transformations\TransformationBase.cs">
+      <Link>Tranformations\TransformationBase.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Work\BitmapHolder.cs">
+      <Link>Work\BitmapHolder.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Work\ImageLoaderTask.cs">
+      <Link>Work\ImageLoaderTask.cs</Link>
+    </Compile>
     <Compile Include="Concurrency\ConcerruntDictionary.cs" />
     <Compile Include="Concurrency\ConcurrentHashtable.cs" />
     <Compile Include="Concurrency\Hasher.cs" />
     <Compile Include="Concurrency\Segment.cs" />
     <Compile Include="Concurrency\Segmentrange.cs" />
     <Compile Include="Concurrency\TinyReaderWriterLock.cs" />
-    <Compile Include="DataResolver\DataResolverFactory.cs" />
-    <Compile Include="DataResolver\FilePathDataResolver.cs" />
-    <Compile Include="DataResolver\IDataResolver.cs" />
-    <Compile Include="DataResolver\ResolverImageData.cs" />
-    <Compile Include="DataResolver\ResourceDataResolver.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
-    <Compile Include="FFImage.cs" />
-    <Compile Include="FFImageSourceBinding.cs" />
-    <Compile Include="Helpers\MainThreadDispatcher.cs" />
-    <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="Helpers\RandomStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="Tranformations\TransformationBase.cs" />
-    <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">

@@ -90,7 +90,7 @@
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="FFImageSourceBinding.cs" />
-    <Compile Include="Helpers\MainThread.cs" />
+    <Compile Include="Helpers\MainThreadDispatcher.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="Helpers\MiniLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

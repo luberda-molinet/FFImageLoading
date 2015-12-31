@@ -1,7 +1,6 @@
 ﻿using FFImageLoading.Work;
 using System;
 using System.Linq;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Transformations
 {

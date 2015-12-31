@@ -154,24 +154,46 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\BlurredTransformation.cs">
+      <Link>BlurredTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\CircleTransformation.cs">
+      <Link>CircleTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\ColorSpaceTransformation.cs">
+      <Link>ColorSpaceTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\CornersTransformation.cs">
+      <Link>CornersTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\CropTransformation.cs">
+      <Link>CropTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\FlipTransformation.cs">
+      <Link>FlipTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\GrayscaleTransformation.cs">
+      <Link>GrayscaleTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\Helpers\Helpers.cs">
+      <Link>Helpers\Helpers.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\RotateTransformation.cs">
+      <Link>RotateTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\RoundedTransformation.cs">
+      <Link>RoundedTransformation.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\SepiaTransformation.cs">
+      <Link>SepiaTransformation.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
       <Link>CornerTransformType.cs</Link>
     </Compile>
     <Compile Include="..\FFImageLoading.Transformations\FlipType.cs">
       <Link>FlipType.cs</Link>
     </Compile>
-    <Compile Include="BlurredTransformation.cs" />
-    <Compile Include="CircleTransformation.cs" />
-    <Compile Include="ColorSpaceTransformation.cs" />
-    <Compile Include="CornersTransformation.cs" />
-    <Compile Include="CropTransformation.cs" />
-    <Compile Include="FlipTransformation.cs" />
-    <Compile Include="GrayScaleTransformation.cs" />
-    <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RotateTransformation.cs" />
-    <Compile Include="RoundedTransformation.cs" />
-    <Compile Include="SepiaTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">

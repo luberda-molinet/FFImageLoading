@@ -1,7 +1,12 @@
-﻿using System;
+﻿#if SILVERLIGHT
+using FFImageLoading.Concurrency;
+using System.Windows.Media.Imaging;
+#else
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Windows.UI.Xaml.Media.Imaging;
+#endif
+
+using System;
 
 namespace FFImageLoading.Cache
 {

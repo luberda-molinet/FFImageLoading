@@ -1,11 +1,8 @@
 ﻿using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Windows.ApplicationModel.Core;
@@ -16,7 +13,7 @@ namespace FFImageLoading.Extensions
 {
     public static class ImageExtensions
     {
-        public static WriteableBitmap ToBitmapImage(this BitmapHolder holder)
+        public static Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder)
         {
             if (holder == null || holder.Pixels == null)
                 return null;
@@ -29,7 +26,7 @@ namespace FFImageLoading.Extensions
 
             writeableBitmap.Invalidate();
 
-            return writeableBitmap;
+            return Task.FromResult(writeableBitmap);
         }
 
         public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale, InterpolationMode mode)

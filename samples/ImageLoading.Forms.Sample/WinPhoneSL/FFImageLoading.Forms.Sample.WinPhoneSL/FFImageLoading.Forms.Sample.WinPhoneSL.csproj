@@ -234,6 +234,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Transformations.WinSL\FFImageLoading.Transformations.WinSL.csproj">
+      <Project>{6248ba47-1014-4968-bdfd-33bbb46a3ca2}</Project>
+      <Name>FFImageLoading.Transformations.WinSL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Shared\FFImageLoading.Forms.Sample.csproj">
       <Project>{3a682234-5918-4f58-b02b-598a59c6a7bd}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>

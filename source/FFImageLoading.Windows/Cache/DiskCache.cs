@@ -14,11 +14,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.IO;
 
 using Windows.Storage;
 
+#if SILVERLIGHT
+using FFImageLoading.Concurrency;
+#else
 using System.Collections.Concurrent;
-using System.IO;
+#endif
 
 namespace FFImageLoading.Cache
 {
@@ -234,7 +238,7 @@ namespace FFImageLoading.Cache
 
 			if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
-				#pragma warning disable 4014
+#pragma warning disable 4014
 				Task.Run(async () =>
 				{
 					await initTask.ConfigureAwait(false);
@@ -271,7 +275,7 @@ namespace FFImageLoading.Cache
 	                    fileWriteLock.Release();
 	                }
 	            });
-				#pragma warning restore 4014
+#pragma warning restore 4014
 			}
         }
 

@@ -4,10 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
 using FFImageLoading.Extensions;
 using FFImageLoading.DataResolver;
+
+#if SILVERLIGHT
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+#else
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
+#endif
 
 namespace FFImageLoading.Work
 {
