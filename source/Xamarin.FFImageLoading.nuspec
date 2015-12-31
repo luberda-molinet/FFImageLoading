@@ -38,6 +38,9 @@ Features:
        	
  		<group targetFramework="Xamarin.iOS10">
 		    <dependency id="WebP.Touch" version="1.0.1" />
+ 		</group>
+       	
+ 		<group targetFramework="wp8">
  		</group>	
  			
        </dependencies>
@@ -61,6 +64,11 @@ Features:
 		<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Touch.xml" />
     	<file src="FFImageLoading.Touch/bin/Release/FFImageLoading.dll" target="lib/Xamarin.iOS10/FFImageLoading.dll" />
         <file src="FFImageLoading.Touch/bin/Release/FFImageLoading.xml" target="lib/Xamarin.iOS10/FFImageLoading.xml" />
+		
+		<!--WP8 SL-->
+		<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.WinSL.dll" target="lib/wp8/FFImageLoading.WinSL.dll" />
+    	<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.dll" target="lib/wp8/FFImageLoading.dll" />
+    	<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.xml" target="lib/wp8/FFImageLoading.xml" />
         
 	</files>
 	

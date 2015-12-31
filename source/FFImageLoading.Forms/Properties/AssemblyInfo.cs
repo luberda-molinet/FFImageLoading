@@ -25,6 +25,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.Droid")]
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.Touch")]
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.WinRT")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.WinSL")]
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.WinUWP")]
 
 //[assembly: AssemblyDelaySign(false)]

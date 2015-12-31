@@ -41,7 +41,11 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
             <dependency id="Xamarin.FFImageLoading" version="2.0.2" />
           </group>
 
-          <group targetFramework="portable-netcore45+wpa81+wp8">
+          <group targetFramework="wp8">
+            <dependency id="Xamarin.FFImageLoading" version="2.0.2" />
+          </group>
+		  
+          <group targetFramework="portable-netcore45+wpa81">
             <dependency id="FFImageLoading.Windows" version="2.0.2" />
           </group>       
               
@@ -62,10 +66,13 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
 		<!--Xamarin.iOS -->
 		<file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.dll" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.dll" />
         <file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.xml" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.xml" />
+            
+		<!-- WP8 -->
+		<file src="FFImageLoading.Transformations.WinSL/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/wp8/FFImageLoading.Transformations.dll" />
         
-        <!--Windows-->
-        <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.xml" />
+    <!--Windows-->
+    <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.dll" />
+    <file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Transformations.xml" />
 
 	</files>
 	
