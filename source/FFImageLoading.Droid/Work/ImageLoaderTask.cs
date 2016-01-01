@@ -30,7 +30,7 @@ namespace FFImageLoading.Work
 		private WeakReference<Drawable> _loadingPlaceholderWeakReference;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
-			: base(mainThreadDispatcher, miniLogger, parameters)
+			: base(mainThreadDispatcher, miniLogger, parameters, true)
 		{
 			DownloadCache = downloadCache;
 

@@ -17,7 +17,7 @@ namespace FFImageLoading.Work
         private readonly Action<WriteableBitmap, bool> _doWithImage;
 
         public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool> doWithImage)
-            : base(mainThreadDispatcher, miniLogger, parameters)
+            : base(mainThreadDispatcher, miniLogger, parameters, false)
         {
             _getNativeControl = getNativeControl;
             _doWithImage = doWithImage;
