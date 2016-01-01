@@ -44,6 +44,11 @@ namespace FFImageLoading.Work
             SetPixel(x, y, ToInt(color));
         }
 
+		public void FreePixels()
+		{
+			Pixels = null;
+		}
+
         static int ToInt(Color color)
         {
             var col = 0;

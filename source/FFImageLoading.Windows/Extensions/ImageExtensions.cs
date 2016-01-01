@@ -49,29 +49,30 @@ namespace FFImageLoading.Extensions
             if (imageBytes == null)
                 return null;
 
-            IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream();
+			using (IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream())
+			{
+				if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+				{
+					image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
+				}
 
-            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
-            {
-				image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
-            }
+				using (image)
+				{
+					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
 
-            using (image)
-            {
-				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+					image.Seek(0);
 
-                image.Seek(0);
+					WriteableBitmap bitmap = null;
 
-                WriteableBitmap bitmap = null;
+					await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
+						{
+							bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+							await bitmap.SetSourceAsync(image);
+						});
 
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
-                {
-                    bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    await bitmap.SetSourceAsync(image);
-				});
-
-                return bitmap;
-            }
+					return bitmap;
+				}
+			}
         }
 
         public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes, Tuple<int, int> downscale, InterpolationMode mode)
@@ -79,24 +80,25 @@ namespace FFImageLoading.Extensions
             if (imageBytes == null)
                 return null;
 
-            IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream();
+			using (IRandomAccessStream image = imageBytes.AsBuffer().AsStream().AsRandomAccessStream())
+			{
+				if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+				{
+					image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
+				}
 
-            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
-            {
-				image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
-            }
+				using (image)
+				{
+					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+					PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
-            using (image)
-            {
-				BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
-				PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+					var bytes = pixelDataProvider.DetachPixelData();
+					int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
+					CopyPixels(bytes, array);
 
-                var bytes = pixelDataProvider.DetachPixelData();
-                int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
-                CopyPixels(bytes, array);
-
-                return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
-            }
+					return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+				}
+			}
         }
 
         private static unsafe void CopyPixels(byte[] data, int[] pixels)

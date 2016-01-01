@@ -302,9 +302,12 @@ namespace FFImageLoading.Work
 
                             IBitmap bitmapHolder = transformation.Transform(imageIn);
                             imageIn = bitmapHolder.ToNative();
-
-                            // old = null;
-                            // PLEASE NOTE! In Windows we could reuse int array (less memory usage) so we don't need that
+							
+							if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
+							{
+								old.FreePixels();
+								old = null;
+							}
                         }
                         catch (Exception ex)
                         {
