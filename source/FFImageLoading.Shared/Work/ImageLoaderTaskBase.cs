@@ -10,8 +10,11 @@ namespace FFImageLoading.Work
 {
 	public abstract class ImageLoaderTaskBase: IImageLoaderTask, IDisposable
 	{
-		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters)
+		bool _clearCacheOnOutOfMemory;
+
+		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
 		{
+			_clearCacheOnOutOfMemory = clearCacheOnOutOfMemory;
 			CancellationToken = new CancellationTokenSource();
 			Parameters = parameters;
 			NumberOfRetryNeeded = parameters.RetryCount;
@@ -130,8 +133,16 @@ namespace FFImageLoading.Work
 							}
 							catch (OutOfMemoryException oom)
 							{
-								Logger.Error("Received an OutOfMemory we will clear the cache", oom);
-								ImageCache.Instance.Clear();
+								if(_clearCacheOnOutOfMemory)
+								{
+									Logger.Error("Received an OutOfMemoryException we will clear the cache", oom);
+									ImageCache.Instance.Clear();
+								}
+								else
+								{
+									Logger.Error("Received an OutOfMemoryException", oom);
+								}
+									
 								ex = oom;
 							}
 							catch (Exception ex2)

@@ -27,7 +27,7 @@ namespace FFImageLoading.Work
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
-			: base(mainThreadDispatcher, miniLogger, parameters)
+			: base(mainThreadDispatcher, miniLogger, parameters, true)
 		{
 			_getNativeControl = getNativeControl;
 			_doWithImage = doWithImage;
