@@ -104,8 +104,8 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex2)
             {
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				throw ex2;
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                throw ex2;
             }
 
             return GenerateResult.Success;
@@ -153,76 +153,76 @@ namespace FFImageLoading.Work
             }
         }
 
-		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
-		{
-			if (stream == null)
-				return GenerateResult.Failed;
+        public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
+        {
+            if (stream == null)
+                return GenerateResult.Failed;
 
-			if (CancellationToken.IsCancellationRequested)
-				return GenerateResult.Canceled;
+            if (CancellationToken.IsCancellationRequested)
+                return GenerateResult.Canceled;
 
-			WithLoadingResult<WriteableBitmap> imageWithResult = null;
+            WithLoadingResult<WriteableBitmap> imageWithResult = null;
             WriteableBitmap image = null;
-			try
-			{
-				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, isPlaceholder, stream).ConfigureAwait(false);
-				image = imageWithResult == null ? null : imageWithResult.Item;
-			}
-			catch (Exception ex)
-			{
-				Logger.Error("An error occured while retrieving image.", ex);
-				image = null;
-			}
+            try
+            {
+                imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, isPlaceholder, stream).ConfigureAwait(false);
+                image = imageWithResult == null ? null : imageWithResult.Item;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("An error occured while retrieving image.", ex);
+                image = null;
+            }
 
-			if (image == null)
-			{
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				return GenerateResult.Failed;
-			}
+            if (image == null)
+            {
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                return GenerateResult.Failed;
+            }
 
-			if (CancellationToken.IsCancellationRequested)
-				return GenerateResult.Canceled;
+            if (CancellationToken.IsCancellationRequested)
+                return GenerateResult.Canceled;
 
-			if (_getNativeControl() == null)
-				return GenerateResult.InvalidTarget;
+            if (_getNativeControl() == null)
+                return GenerateResult.InvalidTarget;
 
-			try
-			{
+            try
+            {
                 int pixelWidth = 0;
                 int pixelHeight = 0;
 
                 // Post on main thread
                 await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (CancellationToken.IsCancellationRequested)
-							return;
+                {
+                    if (CancellationToken.IsCancellationRequested)
+                        return;
 
-						_doWithImage(image, false);
-                        pixelWidth = image.PixelWidth;
-                        pixelHeight = image.PixelHeight;
-                        Completed = true;
-                        Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
-                    }).ConfigureAwait(false);
+                    _doWithImage(image, false);
+                    pixelWidth = image.PixelWidth;
+                    pixelHeight = image.PixelHeight;
+                    Completed = true;
+                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
+                }).ConfigureAwait(false);
 
-				if (!Completed)
-					return GenerateResult.Failed;
-			}
-			catch (Exception ex2)
-			{
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				throw ex2;
-			}
+                if (!Completed)
+                    return GenerateResult.Failed;
+            }
+            catch (Exception ex2)
+            {
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                throw ex2;
+            }
 
-			return GenerateResult.Success;
-		}
+            return GenerateResult.Success;
+        }
 
 
-        protected virtual async Task<WithLoadingResult<WriteableBitmap>> GetImageAsync(string sourcePath, ImageSource source, 
+        protected virtual async Task<WithLoadingResult<WriteableBitmap>> GetImageAsync(string sourcePath, ImageSource source,
             bool isPlaceholder, Stream originalStream = null)
         {
             if (CancellationToken.IsCancellationRequested)
                 return null;
-            
+
             byte[] bytes = null;
             string path = sourcePath;
             LoadingResult? result = null;
@@ -283,14 +283,14 @@ namespace FFImageLoading.Work
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
 
-                bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
+                bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
                     Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
-                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
+                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
                 && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
                 {
-					BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
-                    
+                    BitmapHolder imageIn = await bytes.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
+
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
                         if (CancellationToken.IsCancellationRequested)
@@ -302,7 +302,7 @@ namespace FFImageLoading.Work
 
                             IBitmap bitmapHolder = transformation.Transform(imageIn);
                             imageIn = bitmapHolder.ToNative();
-							
+
 							if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
 							{
 								old.FreePixels();
@@ -315,29 +315,26 @@ namespace FFImageLoading.Work
                         }
                     }
 
-                    await MainThreadDispatcher.PostAsync(async () =>
-                    {
-                        writableBitmap = await imageIn.ToBitmapImageAsync();
-					}).ConfigureAwait(false);
+                    writableBitmap = await imageIn.ToBitmapImageAsync();
                 }
                 else
                 {
-					writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
+                    writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode);
                 }
 
                 return writableBitmap;
             }).ConfigureAwait(false);
-   
+
             return WithLoadingResult.Encapsulate(image, result.Value);
         }
-
+        
         private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
         {
             if (string.IsNullOrWhiteSpace(placeholderPath))
                 return false;
 
             WriteableBitmap image = ImageCache.Instance.Get(GetKey(placeholderPath));
- 
+
             if (image == null)
             {
                 try
@@ -387,7 +384,7 @@ namespace FFImageLoading.Work
 
             if (imageWithResult == null || imageWithResult.Item == null)
                 return null;
-            
+
             // FMT: even if it was canceled, if we have the bitmap we add it to the cache
             ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);
 
