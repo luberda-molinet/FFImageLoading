@@ -206,19 +206,6 @@ namespace FFImageLoading.Work
 			return TryLoadingFromCacheAsync(imageView);
 		}
 
-//		public async Task<Bitmap> LoadFromStream(Stream stream)
-//		{
-//			// Otherwise load image normally
-//			var drawableWithResult = await GetDrawableAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-//			if (drawableWithResult == null || drawableWithResult.Item == null)
-//				return null;
-//
-//			// If we have the bitmap we add it to the cache
-//			ImageCache.Instance.Add(GetKey(), drawableWithResult.Item);
-//
-//			return drawableWithResult.Item.Bitmap;
-//		}
-
 		/// <summary>
 		/// Loads the image from given stream asynchronously.
 		/// </summary>
@@ -485,11 +472,6 @@ namespace FFImageLoading.Work
 
 								return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
 							}
-						}
-						finally
-						{
-							//if (bitmap != null)
-							//	bitmap.Dispose(); // .NET space no longer needs to care about the Bitmap. It should exist in Java world only so we break the relationship .NET/Java for the object.
 						}
 					}
 					finally
@@ -779,6 +761,4 @@ namespace FFImageLoading.Work
 			imageView.SetImageDrawable(drawable);
 		}
 	}
-
-
 }
