@@ -416,62 +416,59 @@ namespace FFImageLoading.Work
 							return null;
 						}
 
-						try
+						if (bitmap == null || CancellationToken.IsCancellationRequested)
+							return null;
+
+						bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
+							Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+
+						if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
+							&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 						{
-							if (bitmap == null || CancellationToken.IsCancellationRequested)
-								return null;
-
-							bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
-								Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
-
-							if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
-							    && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+							foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 							{
-								foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+								if (CancellationToken.IsCancellationRequested)
+									return null;
+
+								try
 								{
-									if (CancellationToken.IsCancellationRequested)
-										return null;
+									var old = bitmap;
 
-									try
+									// Applying a transformation is both CPU and memory intensive
+									lock (_decodingLock)
 									{
-										var old = bitmap;
-
-										// Applying a transformation is both CPU and memory intensive
-										lock (_decodingLock)
-										{
-											var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
-											bitmap = bitmapHolder.ToNative();
-										}
-
-										// Transformation succeeded, so garbage the source
-										if (old != null && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
-										{
-											old.Recycle();
-											old.Dispose();
-										}
-
+										var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+										bitmap = bitmapHolder.ToNative();
 									}
-									catch (Exception ex)
+
+									// Transformation succeeded, so garbage the source
+									if (old != null && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
 									{
-										Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+										old.Recycle();
+										old.Dispose();
 									}
+
+								}
+								catch (Exception ex)
+								{
+									Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
 								}
 							}
+						}
 
-							if (isLoadingPlaceHolder)
+						if (isLoadingPlaceHolder)
+						{
+							return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
+						}
+						else
+						{
+							Drawable placeholderDrawable = null;
+							if (_loadingPlaceholderWeakReference != null)
 							{
-								return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
+								_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
 							}
-							else
-							{
-								Drawable placeholderDrawable = null;
-								if (_loadingPlaceholderWeakReference != null)
-								{
-									_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
-								}
 
-								return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
-							}
+							return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
 						}
 					}
 					finally
