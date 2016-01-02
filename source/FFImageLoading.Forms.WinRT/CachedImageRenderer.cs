@@ -1,37 +1,54 @@
-﻿using FFImageLoading.Forms;
+using FFImageLoading.Forms;
 using FFImageLoading.Work;
+using FFImageLoading.Extensions;
 using System;
 using System.ComponentModel;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Xamarin.Forms;
 using Windows.Graphics.Imaging;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
 using System.IO;
-using FFImageLoading.Extensions;
 
 #if WINDOWS_UWP
-using Xamarin.Forms.Platform.UWP;
 using FFImageLoading.Forms.WinUWP;
+using Xamarin.Forms.Platform.UWP;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
+
+#elif SILVERLIGHT
+using FFImageLoading.Forms.WinSL;
+using Xamarin.Forms.Platform.WinPhone;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+
 #else
-using Xamarin.Forms.Platform.WinRT;
 using FFImageLoading.Forms.WinRT;
+using Xamarin.Forms.Platform.WinRT;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
 #endif
 
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 #if WINDOWS_UWP
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinUWP
+#elif SILVERLIGHT
+[assembly: Xamarin.Forms.ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+namespace FFImageLoading.Forms.WinSL
 #else
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinRT
 #endif
 {
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
-    public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
+    public class CachedImageRenderer : ViewRenderer<CachedImage, Image>
     {
         private IScheduledWork _currentTask;
 
@@ -40,44 +57,44 @@ namespace FFImageLoading.Forms.WinRT
         /// </summary>
         public static void Init()
         {
-			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
-		}
+            CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
+            CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+        }
 
-		private static void InvalidateCache(string key, Cache.CacheType cacheType)
-		{
-			ImageService.Invalidate(key, cacheType);
-		}
+        private static void InvalidateCache(string key, Cache.CacheType cacheType)
+        {
+            ImageService.Invalidate(key, cacheType);
+        }
 
-		private static void ClearCache(Cache.CacheType cacheType)
-		{
-			switch (cacheType)
-			{
-				case Cache.CacheType.Memory:
-					ImageService.InvalidateMemoryCache();
-					break;
-				case Cache.CacheType.Disk:
-					ImageService.InvalidateDiskCache();
-					break;
-				case Cache.CacheType.All:
-					ImageService.InvalidateMemoryCache();
-					ImageService.InvalidateDiskCache();
-					break;
-			}
-		}
+        private static void ClearCache(Cache.CacheType cacheType)
+        {
+            switch (cacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
+        }
 
         private bool measured;
 
-        public override SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
+        public override Xamarin.Forms.SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
         {
             var bitmapSource = Control.Source as BitmapSource;
 
             if (bitmapSource == null)
-                return new SizeRequest();
+                return new Xamarin.Forms.SizeRequest();
 
             measured = true;
 
-            return new SizeRequest(new Size()
+            return new Xamarin.Forms.SizeRequest(new Xamarin.Forms.Size()
             {
                 Width = bitmapSource.PixelWidth,
                 Height = bitmapSource.PixelHeight
@@ -93,9 +110,9 @@ namespace FFImageLoading.Forms.WinRT
 
             if (Control == null)
             {
-                Windows.UI.Xaml.Controls.Image control = new Windows.UI.Xaml.Controls.Image()
+                Image control = new Image()
                 {
-                    Stretch = GetStretch(Aspect.AspectFill)
+                    Stretch = GetStretch(Xamarin.Forms.Aspect.AspectFill)
                 };
                 control.ImageOpened += OnImageOpened;
                 SetNativeControl(control);
@@ -116,6 +133,9 @@ namespace FFImageLoading.Forms.WinRT
             UpdateAspect();
         }
 
+#if SILVERLIGHT
+// TODO unsubscribe event!!!
+#else
         protected override void Dispose(bool disposing)
         {
             if (Control != null)
@@ -124,6 +144,7 @@ namespace FFImageLoading.Forms.WinRT
             }
             base.Dispose(disposing);
         }
+#endif
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -146,20 +167,20 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (measured)
             {
-                ((IVisualElementController)Element).NativeSizeChanged();
+                ((Xamarin.Forms.IVisualElementController)Element).NativeSizeChanged();
             }
         }
 
         private async void UpdateSource()
         {
-            ((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
+            ((Xamarin.Forms.IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
             Xamarin.Forms.ImageSource source = Element.Source;
 
-			Cancel(this, EventArgs.Empty);
+            Cancel(this, EventArgs.Empty);
             TaskParameter imageLoader = null;
 
-			var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
+            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -194,7 +215,7 @@ namespace FFImageLoading.Forms.WinRT
                 // LoadingPlaceholder
                 if (Element.LoadingPlaceholder != null)
                 {
-					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder).ConfigureAwait(false);
+                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -202,7 +223,7 @@ namespace FFImageLoading.Forms.WinRT
                 // ErrorPlaceholder
                 if (Element.ErrorPlaceholder != null)
                 {
-					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder).ConfigureAwait(false);
+                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -258,29 +279,30 @@ namespace FFImageLoading.Forms.WinRT
                 if (Element.FadeAnimationEnabled.HasValue)
                     imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
 
-				// TransformPlaceholders
-				if (Element.TransformPlaceholders.HasValue)
-					imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
+                // TransformPlaceholders
+                if (Element.TransformPlaceholders.HasValue)
+                    imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
 
                 // Transformations
-				if (Element.Transformations != null && Element.Transformations.Count > 0)
+                if (Element.Transformations != null && Element.Transformations.Count > 0)
                 {
                     imageLoader.Transform(Element.Transformations);
                 }
 
-				var element = Element;
+                var element = Element;
 
-				imageLoader.Finish((work) => {
-					element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
-					ImageLoadingFinished(element);
-				});
+                imageLoader.Finish((work) =>
+                {
+                    element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
+                    ImageLoadingFinished(element);
+                });
 
-				imageLoader.Success((imageSize, loadingResult) => 
-					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
+                imageLoader.Success((imageSize, loadingResult) =>
+                    element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
 
-				imageLoader.Error((exception) => 
-					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
-				
+                imageLoader.Error((exception) =>
+                    element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+
                 _currentTask = imageLoader.Into(Control);
             }
         }
@@ -290,13 +312,13 @@ namespace FFImageLoading.Forms.WinRT
             Control.Stretch = GetStretch(Element.Aspect);
         }
 
-        private static Stretch GetStretch(Aspect aspect)
+        private static Stretch GetStretch(Xamarin.Forms.Aspect aspect)
         {
             switch (aspect)
             {
-                case Aspect.AspectFill:
+                case Xamarin.Forms.Aspect.AspectFill:
                     return Stretch.UniformToFill;
-                case Aspect.Fill:
+                case Xamarin.Forms.Aspect.Fill:
                     return Stretch.Fill;
                 default:
                     return Stretch.Uniform;
@@ -307,9 +329,9 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (element != null)
             {
-                ((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
-                ((IVisualElementController)element).NativeSizeChanged();
-				element.InvalidateViewMeasure();
+                ((Xamarin.Forms.IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
+                ((Xamarin.Forms.IVisualElementController)element).NativeSizeChanged();
+                element.InvalidateViewMeasure();
             }
         }
 
@@ -363,22 +385,17 @@ namespace FFImageLoading.Forms.WinRT
 
                 using (var tempStream = new InMemoryRandomAccessStream())
                 {
-                    byte[] tempPixels;
+                    byte[] tempPixels = await GetBytesFromBitmapAsync(bitmap);
 
-                    using (var sourceStream = bitmap.PixelBuffer.AsStream())
-                    {
-                        tempPixels = new byte[sourceStream.Length];
-						await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
-                    }
-  
-					var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                         pixelsWidth, pixelsHeight, 96, 96, tempPixels);
-					await encoder.FlushAsync();
+                    await encoder.FlushAsync();
                     tempStream.Seek(0);
 
-					BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
-                    BitmapTransform transform = new BitmapTransform() {
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
+                    BitmapTransform transform = new BitmapTransform()
+                    {
                         ScaledWidth = aspectWidth,
                         ScaledHeight = aspectHeight,
                         InterpolationMode = BitmapInterpolationMode.Linear
@@ -388,7 +405,7 @@ namespace FFImageLoading.Forms.WinRT
                         BitmapAlphaMode.Premultiplied,
                         transform,
                         ExifOrientationMode.RespectExifOrientation,
-						ColorManagementMode.DoNotColorManage);
+                        ColorManagementMode.DoNotColorManage);
 
                     pixels = pixelData.DetachPixelData();
                     pixelsWidth = aspectWidth;
@@ -397,27 +414,39 @@ namespace FFImageLoading.Forms.WinRT
             }
             else
             {
-                using (var stream = bitmap.PixelBuffer.AsStream())
-                {
-                    pixels = new byte[stream.Length];
-					await stream.ReadAsync(pixels, 0, pixels.Length).ConfigureAwait(false);
-                }
+                pixels = await GetBytesFromBitmapAsync(bitmap);
             }
 
             using (var stream = new InMemoryRandomAccessStream())
             {
-				var encoder = await BitmapEncoder.CreateAsync(format, stream);
-                
+                var encoder = await BitmapEncoder.CreateAsync(format, stream);
+
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                     pixelsWidth, pixelsHeight, 96, 96, pixels);
-				await encoder.FlushAsync();
+                await encoder.FlushAsync();
                 stream.Seek(0);
-                
+
                 var bytes = new byte[stream.Size];
-				await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+                await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
 
                 return bytes;
             }
+        }
+
+        private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
+        {
+#if SILVERLIGHT
+            return await Task.FromResult(bitmap.ToByteArray());
+#else
+            byte[] tempPixels;
+            using (var sourceStream = bitmap.PixelBuffer.AsStream())
+            {
+                tempPixels = new byte[sourceStream.Length];
+				await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
+            }
+
+            return tempPixels;
+#endif
         }
     }
 }

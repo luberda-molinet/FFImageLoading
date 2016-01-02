@@ -4,9 +4,17 @@ using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+
+#if SILVERLIGHT
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+#else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+#endif
 
 namespace FFImageLoading
 {
@@ -49,7 +57,7 @@ namespace FFImageLoading
 
         private void SourcePropertyChanged(string source)
         {
-            if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+            if (IsInDesignMode)
                 return;
 
             LoadImage();
@@ -458,7 +466,7 @@ namespace FFImageLoading
 
         private void TransformationsPropertyChanged(List<FFImageLoading.Work.ITransformation> transformations)
         {
-            if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+            if (IsInDesignMode)
                 return;
 
             LoadImage();
@@ -483,6 +491,18 @@ namespace FFImageLoading
         public void Dispose()
         {
             internalImage.Source = null;
+        }
+
+        private bool IsInDesignMode
+        {
+            get
+            {
+#if SILVERLIGHT
+                return Application.Current.RootVisual != null && DesignerProperties.GetIsInDesignMode(Application.Current.RootVisual);
+#else
+                return Windows.ApplicationModel.DesignMode.DesignModeEnabled;
+#endif
+            }
         }
     }
 }

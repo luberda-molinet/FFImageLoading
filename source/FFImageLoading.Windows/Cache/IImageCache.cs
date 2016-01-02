@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if SILVERLIGHT
+using System.Windows.Media.Imaging;
+#else
 using Windows.UI.Xaml.Media.Imaging;
+#endif
+
 
 namespace FFImageLoading.Cache
 {

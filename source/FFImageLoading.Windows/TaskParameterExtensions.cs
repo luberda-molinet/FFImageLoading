@@ -3,10 +3,18 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using System;
 using System.Threading.Tasks;
+
+#if SILVERLIGHT
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
+using System.Windows;
+#else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml;
+#endif
 
 namespace FFImageLoading
 {
@@ -53,8 +61,12 @@ namespace FFImageLoading
 
 					Storyboard fadeInStoryboard = new Storyboard();
 
-					Storyboard.SetTargetProperty(fade, "Image.Opacity");
-					Storyboard.SetTarget(fade, refView);
+#if SILVERLIGHT
+                    Storyboard.SetTargetProperty(fade, new PropertyPath("Image.Opacity"));
+#else
+                    Storyboard.SetTargetProperty(fade, "Image.Opacity");
+#endif
+                    Storyboard.SetTarget(fade, refView);
 					fadeInStoryboard.Children.Add(fade);
 					fadeInStoryboard.Begin();
 					refView.Source = img;

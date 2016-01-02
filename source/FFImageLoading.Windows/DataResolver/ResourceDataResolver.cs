@@ -1,6 +1,5 @@
 ﻿using FFImageLoading.Work;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;

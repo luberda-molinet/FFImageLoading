@@ -1,6 +1,4 @@
-﻿using System;
-using Windows.UI;
-using Windows.UI.Xaml.Media.Imaging;
+﻿using Windows.UI;
 
 namespace FFImageLoading.Work
 {

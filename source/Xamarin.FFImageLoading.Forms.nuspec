@@ -3,7 +3,7 @@
     <metadata>
     
     	<id>Xamarin.FFImageLoading.Forms</id>
-        <version>2.0.2</version>
+        <version>2.0.3-alpha1</version>
         <title>FFImageLoading Plugin for Xamarin Forms</title>
         <authors>Daniel Luberda, Fabien Molinet</authors>
         <owners></owners>
@@ -37,21 +37,26 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <dependencies>
         
           <group targetFramework="portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="2.0.2" />
+            <dependency id="Xamarin.FFImageLoading" version="2.0.3-alpha1" />
           </group>
 
           <group targetFramework="MonoAndroid10">
-            <dependency id="Xamarin.FFImageLoading" version="2.0.2" />
+            <dependency id="Xamarin.FFImageLoading" version="2.0.3-alpha1" />
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>
 
           <group targetFramework="Xamarin.iOS10">
-            <dependency id="Xamarin.FFImageLoading" version="2.0.2" />
+            <dependency id="Xamarin.FFImageLoading" version="2.0.3-alpha1" />
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>
+		  
+          <group targetFramework="wp8">
+            <dependency id="Xamarin.FFImageLoading" version="2.0.3-alpha1" />
+            <dependency id="Xamarin.Forms" version="1.4.4.6392" />
+          </group>   
 
-          <group targetFramework="portable-netcore45+wpa81+wp8">
-            <dependency id="FFImageLoading.Windows" version="2.0.2" />
+          <group targetFramework="portable-netcore45+wpa81">
+            <dependency id="FFImageLoading.Windows" version="2.0.3-alpha1" />
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>         
 
@@ -76,11 +81,17 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <file src="FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.dll" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.dll" />
         <file src="FFImageLoading.Forms.Touch/bin/Release/FFImageLoading.Forms.Touch.xml" target="lib/Xamarin.iOS10/FFImageLoading.Forms.Touch.xml" />
         
+        <!--Windows SL-->
+        <file src="FFImageLoading.Forms.WinSL/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/wp8/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinSL/bin/Windows Release/FFImageLoading.Forms.xml" target="lib/wp8/FFImageLoading.xml.xml" />
+        <file src="FFImageLoading.Forms.WinSL/bin/Windows Release/FFImageLoading.Forms.WinSL.dll" target="lib/wp8/FFImageLoading.Forms.WinSL.dll" />
+        <file src="FFImageLoading.Forms.WinSL/bin/Windows Release/FFImageLoading.Forms.WinSL.xml" target="lib/wp8/FFImageLoading.Forms.WinSL.xml" />
+        
         <!--Windows WinRT-->
-        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.xml.xml" />
-        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Forms.WinRT.dll" />
-        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/portable-netcore45+wpa81/FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.xml" target="lib/portable-netcore45+wpa81/FFImageLoading.xml.xml" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.dll" target="lib/portable-netcore45+wpa81/FFImageLoading.Forms.WinRT.dll" />
+        <file src="FFImageLoading.Forms.WinRT/bin/Windows Release/FFImageLoading.Forms.WinRT.xml" target="lib/portable-netcore45+wpa81/FFImageLoading.Forms.WinRT.xml" />
 
     </files>
     

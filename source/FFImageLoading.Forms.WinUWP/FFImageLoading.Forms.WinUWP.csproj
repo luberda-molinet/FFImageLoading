@@ -110,7 +110,9 @@
     <Compile Include="..\FFImageLoading.Forms.WinRT\CachedImageRenderer.cs">
       <Link>CachedImageRenderer.cs</Link>
     </Compile>
-    <Compile Include="ImageSourceBinding.cs" />
+    <Compile Include="..\FFImageLoading.Forms.WinRT\ImageSourceBinding.cs">
+      <Link>ImageSourceBinding.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Properties\FFImageLoading.Forms.WinUWP.rd.xml" />
   </ItemGroup>

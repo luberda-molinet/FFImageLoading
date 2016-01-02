@@ -1,12 +1,17 @@
-﻿using FFImageLoading.Work;
-using System;
+﻿using System;
 using Xamarin.Forms;
 using Windows.Storage;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 
+#if WINDOWS_UWP
+namespace FFImageLoading.Forms.WinUWP
+#elif SILVERLIGHT
+namespace FFImageLoading.Forms.WinSL
+#else
 namespace FFImageLoading.Forms.WinRT
+#endif
 {
     public class ImageSourceBinding
     {

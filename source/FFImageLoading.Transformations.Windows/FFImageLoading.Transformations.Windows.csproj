@@ -65,7 +65,7 @@
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
-      <Project>{610543A5-D06F-4BCA-9443-E6ADDFF06C71}</Project>
+      <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
       <Name>FFImageLoading-contrib.Windows</Name>
     </ProjectReference>
   </ItemGroup>
@@ -88,6 +88,9 @@
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <TargetPlatform Include="Windows, Version=8.1" />
