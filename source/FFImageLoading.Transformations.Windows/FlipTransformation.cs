@@ -18,10 +18,7 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            var transformed = ToFlipped(source, _flipType);
-            
-            source = null; // Free resource as we return a new WriteableBitmap
-            return transformed;
+            return ToFlipped(source, _flipType);
         }
 
         public static BitmapHolder ToFlipped(BitmapHolder bmp, FlipType flipMode)

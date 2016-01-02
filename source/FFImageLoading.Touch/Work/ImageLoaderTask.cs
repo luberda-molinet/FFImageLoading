@@ -27,7 +27,7 @@ namespace FFImageLoading.Work
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
-			: base(mainThreadDispatcher, miniLogger, parameters)
+			: base(mainThreadDispatcher, miniLogger, parameters, true)
 		{
 			_getNativeControl = getNativeControl;
 			_doWithImage = doWithImage;
@@ -341,7 +341,7 @@ namespace FFImageLoading.Work
 								imageIn = bitmapHolder.ToNative();
 
 								// Transformation succeeded, so garbage the source
-								if (old != null)
+								if (old != null && old != imageIn && old.Handle != imageIn.Handle)
 									old.Dispose();
 							}
 							catch (Exception ex)
@@ -353,6 +353,8 @@ namespace FFImageLoading.Work
 
 					return imageIn;
 				}).ConfigureAwait(false);
+
+			bytes = null;
 
 			return WithLoadingResult.Encapsulate(imageToDisplay, result.Value);
 		}

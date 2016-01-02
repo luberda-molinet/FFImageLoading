@@ -8,7 +8,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 |:----:|:----:|:----:|:----:|
 | [Nuget](https://www.nuget.org/packages/Xamarin.FFImageLoading/) | [Nuget](https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms/) | [Nuget](https://www.nuget.org/packages/FFImageLoading.Windows/) | [Nuget](https://www.nuget.org/packages/Xamarin.FFImageLoading.Transformations/) |
 
-<a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_list.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_transformations.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders1.png" width="150"/></a> <a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/android_placeholders2.png" width="150"/></a>
+<a href="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/ffimageloading_large.png"><img src="https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/ffimageloading.png"/></a>
 
 **Xamarin.Forms Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample), **Android Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample), **Windows Demo:** [link](https://github.com/molinch/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample)
 
@@ -32,9 +32,6 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
   - ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
   - FlipTransformation, RotateTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
-
-### History
-We developed this library while working on an app that displays tons of pictures, very quickly, and that are mostly not reused. We tried to use Picasso with C# bindings, we got good performances but many memory issues too. We then chose to go C# all the way: we believed it would be easier for us to debug and maintain. It is the case.
 
 ## Documentation
 

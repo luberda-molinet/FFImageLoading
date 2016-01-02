@@ -37,12 +37,10 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            ToCropped(source, _zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio);
-
-            return source;
+            return ToCropped(source, _zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio);
         }
 
-        public static void ToCropped(BitmapHolder source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
+        public static BitmapHolder ToCropped(BitmapHolder source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
         {
             double sourceWidth = source.Width;
             double sourceHeight = source.Height;
@@ -92,19 +90,13 @@ namespace FFImageLoading.Transformations
                 Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * Helpers.SizeOfArgb);
             }
 
-            source.SetPixels(result, width, height);
+            return new BitmapHolder(result, width, height);
         }
 
-        public static void ToCropped(BitmapHolder source, int x, int y, int width, int height)
+        public static BitmapHolder ToCropped(BitmapHolder source, int x, int y, int width, int height)
         {
             var srcWidth = source.Width;
             var srcHeight = source.Height;
-
-            // If the rectangle is completely out of the bitmap
-            if (x > srcWidth || y > srcHeight)
-            {
-                return;
-            }
 
             // Clamp to boundaries
             if (x < 0) x = 0;
@@ -122,7 +114,7 @@ namespace FFImageLoading.Transformations
                 Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * Helpers.SizeOfArgb);
             }
 
-            source.SetPixels(result, width, height);
+            return new BitmapHolder(result, width, height);
         }
     }
 }

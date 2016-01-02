@@ -52,10 +52,8 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            ToTransformedCorners(source, _topLeftCornerSize, _topRightCornerSize, _bottomLeftCornerSize, _bottomRightCornerSize,
+            return ToTransformedCorners(source, _topLeftCornerSize, _topRightCornerSize, _bottomLeftCornerSize, _bottomRightCornerSize,
                 _cornersTransformType, _cropWidthRatio, _cropHeightRatio);
-
-            return source;
         }
 
         public static BitmapHolder ToTransformedCorners(BitmapHolder source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
@@ -78,9 +76,15 @@ namespace FFImageLoading.Transformations
             double cropX = ((sourceWidth - desiredWidth) / 2);
             double cropY = ((sourceHeight - desiredHeight) / 2);
 
+            BitmapHolder bitmap = null;
+
             if (cropX != 0 || cropY != 0)
             {
-                CropTransformation.ToCropped(source, (int)cropX, (int)cropY, (int)(desiredWidth), (int)(desiredHeight));
+                bitmap = CropTransformation.ToCropped(source, (int)cropX, (int)cropY, (int)(desiredWidth), (int)(desiredHeight));
+            }
+            else
+            {
+                bitmap = new BitmapHolder(source.Pixels, source.Width, source.Height);
             }
 
             topLeftCornerSize = topLeftCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
@@ -93,8 +97,8 @@ namespace FFImageLoading.Transformations
             int bottomLeftSize = (int)bottomLeftCornerSize;
             int bottomRightSize = (int)bottomRightCornerSize;
 
-            int w = source.Width;
-            int h = source.Height;
+            int w = bitmap.Width;
+            int h = bitmap.Height;
 
             int transparentColor = Colors.Transparent.ToInt();
 
@@ -105,27 +109,27 @@ namespace FFImageLoading.Transformations
                     if (x <= topLeftSize && y <= topLeftSize)
                     { //top left corner
                         if (!CheckCorner(topLeftSize, topLeftSize, topLeftSize, cornersTransformType, Corner.TopLeftCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x >= w - topRightSize && y <= topRightSize && topRightSize > 0)
                     { // top right corner
                         if (!CheckCorner(w - topRightSize, topRightSize, topRightSize, cornersTransformType, Corner.TopRightCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x >= w - bottomRightSize && y >= h - bottomRightSize && bottomRightSize > 0)
                     { // bottom right corner
                         if (!CheckCorner(w - bottomRightSize, h - bottomRightSize, bottomRightSize, cornersTransformType, Corner.BottomRightCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x <= bottomLeftSize && y >= h - bottomLeftSize && bottomLeftSize > 0)
                     { // bottom left corner
                         if (!CheckCorner(bottomLeftSize, h - bottomLeftSize, bottomLeftSize, cornersTransformType, Corner.BottomLeftCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                 }
             }
 
-            return source;
+            return bitmap;
         }
 
         private enum Corner

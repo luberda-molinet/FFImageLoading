@@ -31,12 +31,7 @@ namespace FFImageLoading.Cache
         public void Add(string key, WriteableBitmap bitmap)
         {
             var weakRef = new WeakReference<WriteableBitmap>(bitmap);
-            if (!_reusableBitmaps.TryAdd(key, weakRef))
-            {
-                //WeakReference<WriteableBitmap> removed;
-                //_reusableBitmaps.TryRemove(key, out removed);
-                //Add(key, bitmap);
-            }
+            _reusableBitmaps.TryAdd(key, weakRef);
         }
 
 
@@ -78,7 +73,7 @@ namespace FFImageLoading.Cache
             // Force immediate Garbage collection. Please note that is resource intensive.
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            GC.WaitForPendingFinalizers(); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
+            GC.WaitForPendingFinalizers();
             GC.Collect();
         }
 

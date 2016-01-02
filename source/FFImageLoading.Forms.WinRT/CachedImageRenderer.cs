@@ -1,39 +1,45 @@
-﻿#if SILVERLIGHT
-
-using FFImageLoading.Forms.WinSL;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Xamarin.Forms.Platform.WinPhone;
-
-#else
-
-using FFImageLoading.Forms.WinRT;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Xamarin.Forms.Platform.WinRT;
-using Windows.UI.Xaml.Controls;
-
-#endif
-
 using FFImageLoading.Forms;
 using FFImageLoading.Work;
 using FFImageLoading.Extensions;
+using System;
+using System.ComponentModel;
 using Windows.Graphics.Imaging;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
-using System;
-using System.ComponentModel;
 using System.IO;
 
-#if SILVERLIGHT
-[assembly: Xamarin.Forms.ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+#if WINDOWS_UWP
+using FFImageLoading.Forms.WinUWP;
+using Xamarin.Forms.Platform.UWP;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
+
+#elif SILVERLIGHT
+using FFImageLoading.Forms.WinSL;
+using Xamarin.Forms.Platform.WinPhone;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+
+#else
+using FFImageLoading.Forms.WinRT;
+using Xamarin.Forms.Platform.WinRT;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
+#endif
+
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+#if WINDOWS_UWP
+namespace FFImageLoading.Forms.WinUWP
+#elif SILVERLIGHT
 namespace FFImageLoading.Forms.WinSL
 #else
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinRT
 #endif
 {
@@ -126,6 +132,7 @@ namespace FFImageLoading.Forms.WinRT
         }
 
 #if SILVERLIGHT
+// TODO unsubscribe event!!!
 #else
         protected override void Dispose(bool disposing)
         {

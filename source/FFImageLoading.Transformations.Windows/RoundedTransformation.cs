@@ -41,12 +41,10 @@ namespace FFImageLoading.Transformations
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            ToRounded(source, (int)_radius, _cropWidthRatio, _cropHeightRatio, _borderSize, _borderHexColor);
-
-            return source;
+            return ToRounded(source, (int)_radius, _cropWidthRatio, _cropHeightRatio, _borderSize, _borderHexColor);
         }
 
-        public static void ToRounded(BitmapHolder source, int rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
+        public static BitmapHolder ToRounded(BitmapHolder source, int rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
         {
             double sourceWidth = source.Width;
             double sourceHeight = source.Height;
@@ -65,9 +63,15 @@ namespace FFImageLoading.Transformations
             double cropX = ((sourceWidth - desiredWidth) / 2);
             double cropY = ((sourceHeight - desiredHeight) / 2);
 
+            BitmapHolder bitmap = null;
+
             if (cropX != 0 || cropY != 0)
             {
-                CropTransformation.ToCropped(source, (int)cropX, (int)cropY, (int)(desiredWidth), (int)(desiredHeight));
+                bitmap = CropTransformation.ToCropped(source, (int)cropX, (int)cropY, (int)(desiredWidth), (int)(desiredHeight));
+            }
+            else
+            {
+                bitmap = new BitmapHolder(source.Pixels, source.Width, source.Height);
             }
 
             if (rad == 0)
@@ -86,22 +90,22 @@ namespace FFImageLoading.Transformations
                     if (x <= rad && y <= rad)
                     { //top left corner
                         if (!CheckRoundedCorner(rad, rad, rad, Corner.TopLeftCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x >= w - rad && y <= rad)
                     { // top right corner
                         if (!CheckRoundedCorner(w - rad, rad, rad, Corner.TopRightCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x >= w - rad && y >= h - rad)
                     { // bottom right corner
                         if (!CheckRoundedCorner(w - rad, h - rad, rad, Corner.BottomRightCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                     else if (x <= rad && y >= h - rad)
                     { // bottom left corner
                         if (!CheckRoundedCorner(rad, h - rad, rad, Corner.BottomLeftCorner, x, y))
-                            source.Pixels[y * w + x] = transparentColor;
+                            bitmap.Pixels[y * w + x] = transparentColor;
                     }
                 }
             }
@@ -126,9 +130,11 @@ namespace FFImageLoading.Transformations
 
                 for (int i = 2; i < intBorderSize; i++)
                 {
-                    CircleAA(source, i, borderColor);
+                    CircleAA(bitmap, i, borderColor);
                 }
             }
+
+            return bitmap;
         }
 
         private enum Corner
