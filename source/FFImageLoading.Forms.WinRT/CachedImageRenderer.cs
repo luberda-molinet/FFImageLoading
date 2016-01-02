@@ -1,12 +1,10 @@
 ﻿using FFImageLoading.Forms;
-using FFImageLoading.Forms.WinRT;
 using FFImageLoading.Work;
 using System;
 using System.ComponentModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Xamarin.Forms.Platform.WinRT;
 using Xamarin.Forms;
 using Windows.Graphics.Imaging;
 using System.Threading.Tasks;
@@ -15,8 +13,20 @@ using Windows.Storage.Streams;
 using System.IO;
 using FFImageLoading.Extensions;
 
+#if WINDOWS_UWP
+using Xamarin.Forms.Platform.UWP;
+using FFImageLoading.Forms.WinUWP;
+#else
+using Xamarin.Forms.Platform.WinRT;
+using FFImageLoading.Forms.WinRT;
+#endif
+
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+#if WINDOWS_UWP
+namespace FFImageLoading.Forms.WinUWP
+#else
 namespace FFImageLoading.Forms.WinRT
+#endif
 {
     /// <summary>
     /// CachedImage Implementation

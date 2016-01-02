@@ -97,7 +97,7 @@ namespace FFImageLoading.Transformations
                 for (y = 0; y < h; y++)
                 {
                     // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                    source.Pixels[yi] = (int)((0xff000000 & source.Pixels[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum]);
+                    source.Pixels[yi] = (int)((0xff000000 & (uint)source.Pixels[yi]) | (uint)(dv[rsum] << 16) | (uint)(dv[gsum] << 8) | (uint)dv[bsum]);
                     if (x == 0)
                     {
                         vmin[y] = Math.Min(y + radius + 1, hm) * w;

@@ -107,7 +107,9 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachedImageRenderer.cs" />
+    <Compile Include="..\FFImageLoading.Forms.WinRT\CachedImageRenderer.cs">
+      <Link>CachedImageRenderer.cs</Link>
+    </Compile>
     <Compile Include="ImageSourceBinding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Properties\FFImageLoading.Forms.WinUWP.rd.xml" />

@@ -26,14 +26,12 @@ namespace FFImageLoading.Transformations
 
         public override string Key
         {
-            get { return string.Format("RotateTransformation, degrees = {0}, ccw = {1}, resize = {2}", _degrees, _ccw, _resize); }
+            get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", _degrees, _ccw, _resize); }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            ToRotated(source, _degrees, _ccw, _resize);
-
-            return source;
+            return ToRotated(source, _degrees, _ccw, _resize);
         }
 
         public static BitmapHolder ToRotated(BitmapHolder source, double degrees, bool ccw, bool resize)
@@ -194,9 +192,7 @@ namespace FFImageLoading.Transformations
                 }
             }
 
-            source.SetPixels(newp, newWidth, newHeight);
-
-            return source;
+            return new BitmapHolder(newp, newWidth, newHeight);
         }
     }
 }
