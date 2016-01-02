@@ -30,7 +30,12 @@ namespace FFImageLoading
 
                 try
                 {
-					file = await StorageFile.GetFileFromPathAsync(source);
+                    var filePath = System.IO.Path.GetDirectoryName(source);
+
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        file = await StorageFile.GetFileFromPathAsync(source);
+                    }
                 }
                 catch (Exception)
                 {

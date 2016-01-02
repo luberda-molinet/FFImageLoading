@@ -25,7 +25,7 @@ namespace FFImageLoading.Work
 
         public int[] Pixels { get; private set; }
 
-        public void SetPixels(int[] pixels, int width, int height)
+        internal void SetPixels(int[] pixels, int width, int height)
         {
             Pixels = null;
             Pixels = pixels;
@@ -43,6 +43,11 @@ namespace FFImageLoading.Work
         {
             SetPixel(x, y, ToInt(color));
         }
+
+		public void FreePixels()
+		{
+			Pixels = null;
+		}
 
         static int ToInt(Color color)
         {
