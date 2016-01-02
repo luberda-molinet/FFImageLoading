@@ -316,11 +316,15 @@ namespace FFImageLoading.Work
                     }
 
                     writableBitmap = await imageIn.ToBitmapImageAsync();
+                    imageIn.FreePixels();
+                    imageIn = null;
                 }
                 else
                 {
                     writableBitmap = await bytes.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleInterpolationMode);
                 }
+
+                bytes = null;
 
                 return writableBitmap;
             }).ConfigureAwait(false);
