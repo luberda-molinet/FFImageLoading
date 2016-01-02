@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 
-#if SILVERLIGHT
+#if WINDOWS_UWP
+namespace FFImageLoading.Forms.WinUWP
+#elif SILVERLIGHT
 namespace FFImageLoading.Forms.WinSL
 #else
 namespace FFImageLoading.Forms.WinRT
