@@ -199,6 +199,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\BadgeLogo.png" />
+    <Content Include="Assets\error.png" />
+    <Content Include="Assets\loading.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\SquareTile150x150.png" />
@@ -234,19 +236,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Transformations.WinSL\FFImageLoading.Transformations.WinSL.csproj">
-      <Project>{6248ba47-1014-4968-bdfd-33bbb46a3ca2}</Project>
-      <Name>FFImageLoading.Transformations.WinSL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Shared\FFImageLoading.Forms.Sample.csproj">
-      <Project>{3a682234-5918-4f58-b02b-598a59c6a7bd}</Project>
-      <Name>FFImageLoading.Forms.Sample</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
-      <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
-      <Name>FFImageLoading-contrib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\source\FFImageLoading.Forms.WinSL\FFImageLoading.Forms.WinSL.csproj">
       <Project>{90e46704-cc6f-41db-a101-cc3413577650}</Project>
       <Name>FFImageLoading.Forms.WinSL</Name>
@@ -255,9 +244,18 @@
       <Project>{3d6c1f12-68d7-44c2-a7de-8e7942627a01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Transformations.WinSL\FFImageLoading.Transformations.WinSL.csproj">
+      <Project>{347fff77-a0bf-4cab-bc92-2849a5c838c2}</Project>
+      <Name>FFImageLoading.Transformations.WinSL</Name>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\source\FFImageLoading.WinSL\FFImageLoading-contrib.WinSL.csproj">
       <Project>{3f6353cc-a79b-4c13-a73b-025b247cb806}</Project>
       <Name>FFImageLoading-contrib.WinSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+      <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
+      <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +271,9 @@
       <HintPath>..\..\..\..\packages\WPtoolkit.4.2013.08.16\lib\wp8\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Shared">
+      <HintPath>..\..\Shared\bin\Windows Debug\Shared.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\sl4-windowsphone71\System.Net.Http.dll</HintPath>
       <Private>True</Private>
@@ -284,6 +285,9 @@
     <Reference Include="System.Net.Http.Primitives">
       <HintPath>..\..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\sl4-windowsphone71\System.Net.Http.Primitives.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\Windows Phone\v8.0\Libraries\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Core">
       <HintPath>..\..\..\..\packages\Xamarin.Forms.1.5.0.6447\lib\WP80\Xamarin.Forms.Core.dll</HintPath>

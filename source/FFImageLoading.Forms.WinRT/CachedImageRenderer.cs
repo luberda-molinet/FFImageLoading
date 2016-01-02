@@ -34,12 +34,14 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls;
 #endif
 
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 #if WINDOWS_UWP
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinUWP
 #elif SILVERLIGHT
+[assembly: Xamarin.Forms.ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinSL
 #else
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinRT
 #endif
 {

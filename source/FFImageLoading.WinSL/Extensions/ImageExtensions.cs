@@ -13,20 +13,25 @@ namespace FFImageLoading.Extensions
 {
     public static class ImageExtensions
     {
-        public static Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder)
+        public static async Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder)
         {
             if (holder == null || holder.Pixels == null)
                 return null;
 
-            var writeableBitmap = new WriteableBitmap(holder.Width, holder.Height);
+            WriteableBitmap writeableBitmap = null;
 
-            for (int x = 0; x < holder.Width; x++)
-                for (int y = 0; y < holder.Height; y++)
-                    writeableBitmap.SetPixel(x, y, holder.Pixels[x + y * holder.Width]);
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+            {
+                writeableBitmap = new WriteableBitmap(holder.Width, holder.Height);
 
-            writeableBitmap.Invalidate();
+                for (int x = 0; x < holder.Width; x++)
+                    for (int y = 0; y < holder.Height; y++)
+                        writeableBitmap.SetPixel(x, y, holder.Pixels[x + y * holder.Width]);
 
-            return Task.FromResult(writeableBitmap);
+                writeableBitmap.Invalidate();
+            });
+
+            return writeableBitmap;
         }
 
         public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale, InterpolationMode mode)
@@ -34,28 +39,43 @@ namespace FFImageLoading.Extensions
             if (imageBytes == null)
                 return null;
 
-            IRandomAccessStream image = new RandomStream(imageBytes.AsBuffer().AsStream());
-
-            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+            using (var imageStream = imageBytes.AsBuffer().AsStream())
+            using (IRandomAccessStream image = new RandomStream(imageStream))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
-            }
-
-            using (image)
-            {
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
-
-                image.Seek(0);
-
-                WriteableBitmap bitmap = null;
-
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
                 {
-                    bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                    bitmap.SetSource(image.AsStream());
-                });
+                    using (var downscaledImage = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false))
+                    {
+                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
+                        downscaledImage.Seek(0);
+                        WriteableBitmap resizedBitmap = null;
 
-                return bitmap;
+                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                        {
+                            resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                            using (var s = downscaledImage.AsStream())
+                            {
+                                resizedBitmap.SetSource(s);
+                            }
+                        });
+
+                        return resizedBitmap;
+                    }
+                }
+                else
+                {
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+                    image.Seek(0);
+                    WriteableBitmap bitmap = null;
+
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                    {
+                        bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                        bitmap.SetSource(imageStream);
+                    });
+
+                    return bitmap;
+                }
             }
         }
 
@@ -64,23 +84,34 @@ namespace FFImageLoading.Extensions
             if (imageBytes == null)
                 return null;
 
-            IRandomAccessStream image = new RandomStream(imageBytes.AsBuffer().AsStream());
-
-            if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+            using (var imageStream = imageBytes.AsBuffer().AsStream())
+            using (IRandomAccessStream image = new RandomStream(imageStream))
             {
-                image = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false);
-            }
+                if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+                {
+                    using (var downscaledImage = await image.ResizeImage((uint)downscale.Item1, (uint)downscale.Item2, mode).ConfigureAwait(false))
+                    {
+                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
+                        PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
-            using (image)
-            {
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
-                PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+                        var bytes = pixelDataProvider.DetachPixelData();
+                        int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
+                        CopyPixels(bytes, array);
 
-                var bytes = pixelDataProvider.DetachPixelData();
-                int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
-                CopyPixels(bytes, array);
+                        return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    }
+                }
+                else
+                {
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
+                    PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
-                return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    var bytes = pixelDataProvider.DetachPixelData();
+                    int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
+                    CopyPixels(bytes, array);
+
+                    return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                }
             }
         }
 
@@ -101,14 +132,14 @@ namespace FFImageLoading.Extensions
         {
             IRandomAccessStream resizedStream = imageStream;
             var decoder = await BitmapDecoder.CreateAsync(imageStream);
-            if (decoder.OrientedPixelHeight > height || decoder.OrientedPixelWidth > width)
+            if (decoder.PixelHeight > height || decoder.PixelWidth > width)
             {
                 using (imageStream)
                 {
                     resizedStream = new InMemoryRandomAccessStream();
                     BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
-                    double widthRatio = (double)width / decoder.OrientedPixelWidth;
-                    double heightRatio = (double)height / decoder.OrientedPixelHeight;
+                    double widthRatio = (double)width / decoder.PixelWidth;
+                    double heightRatio = (double)height / decoder.PixelHeight;
 
                     double scaleRatio = Math.Min(widthRatio, heightRatio);
 
@@ -118,8 +149,8 @@ namespace FFImageLoading.Extensions
                     if (height == 0)
                         scaleRatio = widthRatio;
 
-                    uint aspectHeight = (uint)Math.Floor(decoder.OrientedPixelHeight * scaleRatio);
-                    uint aspectWidth = (uint)Math.Floor(decoder.OrientedPixelWidth * scaleRatio);
+                    uint aspectHeight = (uint)Math.Floor(decoder.PixelHeight * scaleRatio);
+                    uint aspectWidth = (uint)Math.Floor(decoder.PixelWidth * scaleRatio);
 
                     if (interpolationMode == InterpolationMode.None)
                         encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.NearestNeighbor;

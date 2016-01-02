@@ -130,6 +130,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Windows Release\FFImageLoading.WinSL.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|x86'">
     <OutputPath>bin\x86\Windows Release\</OutputPath>
@@ -215,7 +216,7 @@
     <Compile Include="..\FFImageLoading.Windows\Work\ImageLoaderTask.cs">
       <Link>Work\ImageLoaderTask.cs</Link>
     </Compile>
-    <Compile Include="Concurrency\ConcerruntDictionary.cs" />
+    <Compile Include="Concurrency\ConcurrentDictionary.cs" />
     <Compile Include="Concurrency\ConcurrentHashtable.cs" />
     <Compile Include="Concurrency\Hasher.cs" />
     <Compile Include="Concurrency\Segment.cs" />
