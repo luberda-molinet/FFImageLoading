@@ -139,6 +139,8 @@ namespace FFImageLoading.Work
 
         public bool? TransformPlaceholdersEnabled { get; private set; }
 
+		public string CustomCacheKey { get; private set; }
+
         public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)
@@ -249,6 +251,17 @@ namespace FFImageLoading.Work
 		{
 			RetryCount = retryCount;
 			RetryDelayInMs = millisecondDelay;
+			return this;
+		}
+
+		/// <summary>
+		/// Uses this cache key, in addition with the real key, to cache into memory/disk
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="customCacheKey">Custom cache key.</param>
+		public TaskParameter CacheKey(string customCacheKey)
+		{
+			CustomCacheKey = customCacheKey;
 			return this;
 		}
 
