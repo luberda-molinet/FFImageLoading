@@ -72,7 +72,7 @@ namespace FFImageLoading.Work
 		/// <value>The cache key.</value>
 		public virtual string GetKey(string path = null)
 		{
-			if (HasCustomCacheKey)
+			if (HasCustomCacheKey && path == null)
 				return Parameters.CustomCacheKey;
 
 			string baseKey = null;
