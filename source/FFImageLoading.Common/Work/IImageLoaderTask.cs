@@ -21,6 +21,13 @@ namespace FFImageLoading.Work
         string GetKey(string path = null);
 
 		/// <summary>
+		/// Indicates if memory cache should be used for the request
+		/// </summary>
+		/// <returns><c>true</c>, if memory cache should be used, <c>false</c> otherwise.</returns>
+		/// <param name="path">Path.</param>
+		bool CanUseMemoryCache(string path = null);
+
+		/// <summary>
 		/// Gets the parameters used to retrieve the image.
 		/// </summary>
 		/// <value>The parameters to retrieve the image.</value>
@@ -52,7 +59,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder);
+		Task<GenerateResult> LoadFromStreamAsync(Stream stream);
     }
 }
 

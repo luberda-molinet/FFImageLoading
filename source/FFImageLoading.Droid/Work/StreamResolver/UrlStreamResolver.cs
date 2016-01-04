@@ -21,7 +21,7 @@ namespace FFImageLoading.Work.StreamResolver
 		
 		public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
 		{
-			var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration).ConfigureAwait(false);
+			var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
 			return WithLoadingResult.Encapsulate(cachedStream.ImageStream,
 				cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
 		}

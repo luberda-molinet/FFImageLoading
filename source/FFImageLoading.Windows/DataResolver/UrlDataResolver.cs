@@ -20,7 +20,7 @@ namespace FFImageLoading.DataResolver
 
         public async Task<ResolverImageData> GetData(string identifier, CancellationToken token)
         {
-            var downloadedData = await DownloadCache.GetAsync(identifier, token, Parameters.CacheDuration).ConfigureAwait(false);
+            var downloadedData = await DownloadCache.GetAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
             var bytes = downloadedData.Bytes;
             var path = downloadedData.CachedPath;
             var result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;

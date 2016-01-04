@@ -169,6 +169,13 @@ namespace FFImageLoading.Forms.Droid
 
 					if (imageLoader != null)
 					{
+						// CustomKeyFactory
+						if (Element.CacheKeyFactory != null)
+						{
+							var bindingContext = Element.BindingContext;
+							imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
+						}
+
 						// LoadingPlaceholder
 						if (Element.LoadingPlaceholder != null)
 						{

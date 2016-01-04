@@ -185,7 +185,12 @@ namespace FFImageLoading.Work
 					pendingTask.ImageLoadingTask.CancelIfNeeded();
 			}
 
-			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
+			bool loadedFromCache = false;
+			if (task.CanUseMemoryCache())
+			{
+				loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
+			}
+
 			if (loadedFromCache)
 			{
 				if (task.Parameters.OnFinish != null)
@@ -220,7 +225,7 @@ namespace FFImageLoading.Work
 				}
 			}
 
-			if (alreadyRunningTaskForSameKey == null)
+			if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
 			{
 				Run(currentPendingTask);
 			}

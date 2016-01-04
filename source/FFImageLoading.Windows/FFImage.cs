@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using FFImageLoading.Cache;
 
 #if SILVERLIGHT
 using System.ComponentModel;
@@ -100,6 +101,13 @@ namespace FFImageLoading
 
             if (imageLoader != null)
             {
+				// CustomKeyFactory
+				if (CacheKeyFactory != null)
+				{
+                    var dataContext = DataContext;
+                    imageLoader.CacheKey(CacheKeyFactory.GetKey(Source, dataContext));
+                }
+
                 // LoadingPlaceholder
                 if (LoadingPlaceholder != null)
                 {
@@ -487,6 +495,12 @@ namespace FFImageLoading
                 SetValue(TransformationsProperty, value);
             }
         }
+
+		/// <summary>
+		/// Gets or sets the cache custom key factory.
+		/// </summary>
+		/// <value>The cache key factory.</value>
+		public ICacheKeyFactory CacheKeyFactory { get; set; }
 
         public void Dispose()
         {

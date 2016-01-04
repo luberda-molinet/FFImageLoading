@@ -211,7 +211,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
+		public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
 		{
 			if (stream == null)
 				return GenerateResult.Failed;
@@ -223,15 +223,15 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return GenerateResult.InvalidTarget;
 
-			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
-			if (resultWithDrawable == null || resultWithDrawable.Item == null)
-			{
-				// Show error placeholder
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
+				if (resultWithDrawable == null || resultWithDrawable.Item == null)
+				{
+					// Show error placeholder
+					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 
-				return GenerateResult.Failed;
-			}
-				
+					return GenerateResult.Failed;
+				}
+
 			try
 			{
 				if (CancellationToken.IsCancellationRequested)
@@ -578,37 +578,37 @@ namespace FFImageLoading.Work
 
 				try
 				{
-				Logger.Debug(string.Format("Image from cache: {0}", key));
-				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (IsCancelled)
-							return;
-
-						var ffDrawable = value as FFBitmapDrawable;
-						if (ffDrawable != null)
-							ffDrawable.StopFadeAnimation();
-
-						if (imageView == null || imageView.Handle == IntPtr.Zero)
-							return;
-
-						imageView.SetImageDrawable(value);
-
-						if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+					Logger.Debug(string.Format("Image from cache: {0}", key));
+					await MainThreadDispatcher.PostAsync(() =>
 						{
-							imageView.LayoutParameters.Height = value.IntrinsicHeight;
-							imageView.LayoutParameters.Width = value.IntrinsicWidth;
-						}	
-					}).ConfigureAwait(false);
+							if (IsCancelled)
+								return;
 
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
+							var ffDrawable = value as FFBitmapDrawable;
+							if (ffDrawable != null)
+								ffDrawable.StopFadeAnimation();
 
-				Completed = true;
+							if (imageView == null || imageView.Handle == IntPtr.Zero)
+								return;
 
-				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
-				return CacheResult.Found; // found and loaded from cache
-			}
+							imageView.SetImageDrawable(value);
+
+							if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
+							{
+								imageView.LayoutParameters.Height = value.IntrinsicHeight;
+								imageView.LayoutParameters.Width = value.IntrinsicWidth;
+							}
+						}).ConfigureAwait(false);
+
+					if (IsCancelled)
+						return CacheResult.NotFound; // not sure what to return in that case
+
+					Completed = true;
+
+					if (Parameters.OnSuccess != null)
+						Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
+					return CacheResult.Found; // found and loaded from cache
+				}
 				finally
 				{
 					value.SetIsRetained(false);
