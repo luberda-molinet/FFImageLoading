@@ -387,6 +387,12 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the cache custom key factory.
+		/// </summary>
+		/// <value>The cache key factory.</value>
+		public ICacheKeyFactory CacheKeyFactory { get; set; }
+
 		//
 		// Methods
 		//

@@ -159,7 +159,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder)
+        public override async Task<GenerateResult> LoadFromStreamAsync(Stream stream)
         {
             if (stream == null)
                 return GenerateResult.Failed;
@@ -171,7 +171,7 @@ namespace FFImageLoading.Work
             WriteableBitmap image = null;
             try
             {
-                imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, isPlaceholder, stream).ConfigureAwait(false);
+                imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
                 image = imageWithResult == null ? null : imageWithResult.Item;
             }
             catch (Exception ex)

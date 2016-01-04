@@ -72,14 +72,32 @@ namespace FFImageLoading.Work
 		/// <value>The cache key.</value>
 		public virtual string GetKey(string path = null)
 		{
+			if (HasCustomCacheKey && path == null)
+				return Parameters.CustomCacheKey + TransformationsKey + DownsamplingKey;
+
+			string baseKey = null;
 			if (Parameters.Stream != null)
-				return "Stream" + Parameters.Stream.GetHashCode();
+			{
+				baseKey = "Stream" + Parameters.Stream.GetHashCode();
+			}
+			else
+			{
+				baseKey = path ?? Parameters.Path;
+				if (string.IsNullOrWhiteSpace(baseKey))
+					return null; // If path is null then something is wrong, we should not append transformations key
+			}
 
-			path = path ?? Parameters.Path;
-			if (string.IsNullOrWhiteSpace(path))
-				return null; // If path is null then something is wrong, we should not append transformations key
+			return baseKey + TransformationsKey + DownsamplingKey;
+		}
 
-			return path + TransformationsKey + DownsamplingKey;
+		/// <summary>
+		/// Indicates if memory cache should be used for the request
+		/// </summary>
+		/// <returns><c>true</c>, if memory cache should be used, <c>false</c> otherwise.</returns>
+		/// <param name="path">Path.</param>
+		public bool CanUseMemoryCache(string path = null)
+		{
+			return GetKey(path) != null && (Parameters.Stream == null || HasCustomCacheKey);
 		}
 
 		public void Cancel()
@@ -173,7 +191,7 @@ namespace FFImageLoading.Work
 					{
 						try 
 						{
-							generatingImageSucceeded = await LoadFromStreamAsync(stream, false).ConfigureAwait(false);
+							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
 						} 
 						catch (Exception ex2) 
 						{
@@ -210,7 +228,7 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>An awaitable task.</returns>
 		/// <param name="stream">The stream to get data from.</param>
-		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream, bool isPlaceholder);
+		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream);
 
 		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 
@@ -233,6 +251,14 @@ namespace FFImageLoading.Work
 					return string.Empty;
 
 				return string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
+			}
+		}
+
+		protected bool HasCustomCacheKey
+		{
+			get
+			{
+				return !String.IsNullOrWhiteSpace(Parameters.CustomCacheKey);
 			}
 		}
 

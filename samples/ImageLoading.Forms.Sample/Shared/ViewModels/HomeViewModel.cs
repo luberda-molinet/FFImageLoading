@@ -53,6 +53,11 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 				PageFactory.GetMessagablePageFromCache<DownsamplingExampleViewModel>()
 				.PushPage());
 
+			OpenCustomCacheKeyExampleCommand = new PageFactoryCommand(() => 
+				PageFactory.GetMessagablePageFromCache<CustomCacheKeyViewModel>()
+				.SendMessageToViewModel("Reload")
+				.PushPage());
+
 			var menuItems = new List<MenuItem>() {
 				
 				new MenuItem() {
@@ -95,6 +100,12 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					Section = "Basic",
 					Title = "Downsampling examples",
 					Command = OpenDownsamplingExampleCommand
+				},
+
+				new MenuItem() {
+					Section = "Advanced",
+					Title = "Custom CacheKey example",
+					Command = OpenCustomCacheKeyExampleCommand
 				},
 
 				new MenuItem() {
@@ -219,7 +230,7 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 
 		public IPageFactoryCommand OpenDownsamplingExampleCommand { get; private set; }
 
-
+		public IPageFactoryCommand OpenCustomCacheKeyExampleCommand { get; private set; }
 	}
 }
 
