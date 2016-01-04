@@ -73,7 +73,7 @@ namespace FFImageLoading.Work
 		public virtual string GetKey(string path = null)
 		{
 			if (HasCustomCacheKey && path == null)
-				return Parameters.CustomCacheKey;
+				return Parameters.CustomCacheKey + TransformationsKey + DownsamplingKey;
 
 			string baseKey = null;
 			if (Parameters.Stream != null)
