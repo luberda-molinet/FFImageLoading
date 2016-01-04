@@ -11,6 +11,7 @@ using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
 using FFImageLoading.Extensions;
 using System.Threading.Tasks;
+using FFImageLoading.Helpers;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -304,34 +305,34 @@ namespace FFImageLoading.Forms.Touch
 			return GetImageAsByte(true, quality, desiredWidth, desiredHeight);
 		}
 
-		private Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		private async Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
-			return Task.Run(() => {
-				if (Control == null || Control.Image == null)
-					return null;
+			if (Control == null || Control.Image == null)
+				return null;
 
-				UIImage image = Control.Image;
+			UIImage image = Control.Image;
 
-				if (desiredWidth != 0 || desiredHeight != 0)
-				{
+			if (desiredWidth != 0 || desiredHeight != 0)
+			{
+				await MainThreadDispatcher.Instance.PostAsync(() => {
 					image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
-				}
+				});
+			}
 
-				NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+			NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
 
-				if (imageData == null || imageData.Length == 0)
-					return null;
+			if (imageData == null || imageData.Length == 0)
+				return null;
 
-				var encoded = imageData.ToArray();
-				imageData.Dispose();
+			var encoded = imageData.ToArray();
+			imageData.Dispose();
 
-				if (desiredWidth != 0 || desiredHeight != 0)
-				{
-					image.Dispose();
-				}
+			if (desiredWidth != 0 || desiredHeight != 0)
+			{
+				image.Dispose();
+			}
 
-				return encoded;	
-			});
+			return encoded;	
 		}
 	}
 }

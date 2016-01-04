@@ -6,6 +6,19 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher: IMainThreadDispatcher
     {
+		static MainThreadDispatcher instance;
+
+		public static MainThreadDispatcher Instance
+		{
+			get
+			{
+				if (instance == null)
+					instance = new MainThreadDispatcher();
+
+				return instance;
+			}
+		}
+
         public void Post(Action action)
         {
             UIApplication.SharedApplication.BeginInvokeOnMainThread(action);
