@@ -319,9 +319,7 @@ namespace FFImageLoading.Forms.Touch
 
 			if (desiredWidth != 0 || desiredHeight != 0)
 			{
-				await MainThreadDispatcher.Instance.PostAsync(() => {
-					image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
-				});
+				image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
 			}
 
 			NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
