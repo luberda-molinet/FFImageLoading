@@ -104,8 +104,9 @@ namespace FFImageLoading
 				// CustomKeyFactory
 				if (CacheKeyFactory != null)
 				{
-					imageLoader.CacheKey(CacheKeyFactory.GetKey(Source));
-				}
+                    var dataContext = DataContext;
+                    imageLoader.CacheKey(CacheKeyFactory.GetKey(Source, dataContext));
+                }
 
                 // LoadingPlaceholder
                 if (LoadingPlaceholder != null)

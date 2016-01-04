@@ -5,7 +5,7 @@ namespace FFImageLoading.Forms
 {
 	public interface ICacheKeyFactory
 	{
-		string GetKey(ImageSource imageSource);
+		string GetKey(ImageSource imageSource, object bindingContext);
 	}
 }
 

@@ -215,7 +215,8 @@ namespace FFImageLoading.Forms.WinRT
 				// CustomKeyFactory
 				if (Element.CacheKeyFactory != null)
 				{
-					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source));
+					var bindingContext = Element.BindingContext;
+					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
 				}
 
                 // LoadingPlaceholder

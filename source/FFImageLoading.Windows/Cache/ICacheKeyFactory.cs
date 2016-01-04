@@ -4,7 +4,7 @@ namespace FFImageLoading.Cache
 {
 	public interface ICacheKeyFactory
 	{
-		string GetKey(string imageSource);
+		string GetKey(string imageSource, object dataContext);
 	}
 }
 
