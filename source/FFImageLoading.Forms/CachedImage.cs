@@ -503,6 +503,7 @@ namespace FFImageLoading.Forms
 		/// Gets the image as JPG.
 		/// </summary>
 		/// <returns>The image as JPG.</returns>
+		[Obsolete("Use GetImageAsJpgAsync")]
 		public Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			if (InternalGetImageAsJPG == null)
@@ -511,18 +512,44 @@ namespace FFImageLoading.Forms
 			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
 		}
 
-		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsPNG; 
+		/// <summary>
+		/// Gets the image as JPG.
+		/// </summary>
+		/// <returns>The image as JPG.</returns>
+		public Task<byte[]> GetImageAsJpgAsync(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		{
+			if (InternalGetImageAsJPG == null)
+				return null;
+
+			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
+		}
+
+		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsPNG;
 
 		/// <summary>
-		/// Gets the image as PNG.
+		/// Gets the image as PNG
+		/// <c>quality</c> parameter is ignored for PNG's.
 		/// </summary>
 		/// <returns>The image as PNG.</returns>
+		[Obsolete("Use GetImageAsPngAsync")]
 		public Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			if (InternalGetImageAsPNG == null)
 				return null;
 
 			return InternalGetImageAsPNG(quality, desiredWidth, desiredHeight);
+		}
+
+		/// <summary>
+		/// Gets the image as PNG
+		/// </summary>
+		/// <returns>The image as PNG.</returns>
+		public Task<byte[]> GetImageAsPngAsync(int desiredWidth = 0, int desiredHeight = 0)
+		{
+			if (InternalGetImageAsPNG == null)
+				return null;
+
+			return InternalGetImageAsPNG(0, desiredWidth, desiredHeight);
 		}
 
 		/// <summary>
