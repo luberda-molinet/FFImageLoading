@@ -307,10 +307,15 @@ namespace FFImageLoading.Forms.Touch
 
 		private async Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
-			if (Control == null || Control.Image == null)
-				return null;
+			UIImage image = null;
 
-			UIImage image = Control.Image;
+			await MainThreadDispatcher.Instance.PostAsync(() => {
+				if (Control != null)
+					image = Control.Image;
+			});
+
+			if (image == null)
+				return null;
 
 			if (desiredWidth != 0 || desiredHeight != 0)
 			{
