@@ -89,17 +89,14 @@ namespace FFImageLoading.Forms.Touch
 					ClipsToBounds = true
 				});
 			}
-			if (e.OldElement != null)
-			{
-				e.OldElement.Cancelled -= Cancel;
-			}
+
 			if (e.NewElement != null)
 			{
 				SetAspect();
 				SetImage(e.OldElement);
 				SetOpacity();
 
-				e.NewElement.Cancelled += Cancel;
+				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
@@ -151,7 +148,7 @@ namespace FFImageLoading.Forms.Touch
 
 			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
-			Cancel(this, EventArgs.Empty);
+			Cancel();
 			TaskParameter imageLoader = null;
 
 			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
@@ -297,7 +294,7 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 
-		private void Cancel(object sender, EventArgs args)
+		private void Cancel()
 		{
 			if (_currentTask != null && !_currentTask.IsCancelled) 
 			{

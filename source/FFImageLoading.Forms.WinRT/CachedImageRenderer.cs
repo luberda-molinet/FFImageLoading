@@ -123,13 +123,9 @@ namespace FFImageLoading.Forms.WinRT
                 SetNativeControl(control);
             }
 
-            if (e.OldElement != null)
-            {
-                e.OldElement.Cancelled -= Cancel;
-            }
             if (e.NewElement != null)
             {
-                e.NewElement.Cancelled += Cancel;
+				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
             }
@@ -188,7 +184,7 @@ namespace FFImageLoading.Forms.WinRT
 
             Xamarin.Forms.ImageSource source = Element.Source;
 
-            Cancel(this, EventArgs.Empty);
+            Cancel();
             TaskParameter imageLoader = null;
 
             var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
@@ -353,7 +349,7 @@ namespace FFImageLoading.Forms.WinRT
             }
         }
 
-        private void Cancel(object sender, EventArgs args)
+        private void Cancel()
         {
             if (_currentTask != null && !_currentTask.IsCancelled)
             {

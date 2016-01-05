@@ -81,14 +81,10 @@ namespace FFImageLoading.Forms.Droid
 				CachedImageView nativeControl = new CachedImageView(Context);
 				SetNativeControl(nativeControl);
 			} 
-			else 
-			{
-				e.OldElement.Cancelled -= Cancel;
-			}
 
 			if (e.NewElement != null)
 			{
-				e.NewElement.Cancelled += Cancel;
+				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
@@ -135,7 +131,7 @@ namespace FFImageLoading.Forms.Droid
 
 				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 				{
-					Cancel(this, EventArgs.Empty);
+					Cancel();
 					TaskParameter imageLoader = null;
 
 					var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
@@ -283,7 +279,7 @@ namespace FFImageLoading.Forms.Droid
 			}
 		}
 
-		private void Cancel(object sender, EventArgs args)
+		private void Cancel()
 		{
 			if (_currentTask != null && !_currentTask.IsCancelled) 
 			{

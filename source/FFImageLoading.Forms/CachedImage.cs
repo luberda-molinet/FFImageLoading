@@ -464,15 +464,16 @@ namespace FFImageLoading.Forms
 			return new SizeRequest(new Size(num3, num4));
 		}
 			
-		internal event EventHandler Cancelled;
+		internal Action InternalCancel;
 
         /// <summary>
         /// Cancels image loading tasks
         /// </summary>
 		public void Cancel()
 		{
-			if (this.Cancelled != null) {
-				this.Cancelled (this, EventArgs.Empty);
+			if (InternalCancel != null) 
+			{
+				InternalCancel();
 			}
 		}
 
