@@ -49,7 +49,11 @@ namespace FFImageLoading.Forms.WinRT
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
+#if SILVERLIGHT
+    public class CachedImageRenderer : ViewRenderer<CachedImage, Image>, IDisposable
+#else
     public class CachedImageRenderer : ViewRenderer<CachedImage, Image>
+#endif
     {
         private IScheduledWork _currentTask;
 
@@ -135,7 +139,13 @@ namespace FFImageLoading.Forms.WinRT
         }
 
 #if SILVERLIGHT
-// TODO unsubscribe event!!!
+        public void Dispose()
+        {
+            if (Control != null)
+            {
+                Control.ImageOpened -= OnImageOpened;
+            }
+        }
 #else
         protected override void Dispose(bool disposing)
         {
