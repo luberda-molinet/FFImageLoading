@@ -187,26 +187,29 @@ namespace FFImageLoading.Work
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+		/// Uses pixels units for width/height
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
 		/// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
 		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
 		public TaskParameter DownSample(int width = 0, int height = 0)
 		{
-			DownSample(false, width, height);
+			DownSampleUseDipUnits = false;
+			DownSampleSize = Tuple.Create(width, height);
+
 			return this;
 		}
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+		/// Uses device independent points units for width/height
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
-		/// <param name="useDipUnits">If set to <c>true</c>, Downsample will use DIP units (device independent points).</param>
 		/// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
 		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
-		public TaskParameter DownSample(bool useDipUnits, int width = 0, int height = 0)
+		public TaskParameter DownSampleInDip(int width = 0, int height = 0)
 		{
-			DownSampleUseDipUnits = useDipUnits;
+			DownSampleUseDipUnits = true;
 			DownSampleSize = Tuple.Create(width, height);
 
 			return this;
