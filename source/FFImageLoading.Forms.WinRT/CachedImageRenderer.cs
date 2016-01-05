@@ -1,6 +1,7 @@
 using FFImageLoading.Forms;
 using FFImageLoading.Work;
 using FFImageLoading.Extensions;
+using FFImageLoading.Forms.Args;
 using System;
 using System.ComponentModel;
 using Windows.Graphics.Imaging;
@@ -125,8 +126,8 @@ namespace FFImageLoading.Forms.WinRT
             if (e.NewElement != null)
             {
                 e.NewElement.Cancelled += Cancel;
-                e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
-                e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
+				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
             }
 
             UpdateSource();
@@ -350,17 +351,17 @@ namespace FFImageLoading.Forms.WinRT
             }
         }
 
-        private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
-            return GetImageAsByte(BitmapEncoder.JpegEncoderId, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(BitmapEncoder.JpegEncoderId, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-        private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
-            return GetImageAsByte(BitmapEncoder.PngEncoderId, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(BitmapEncoder.PngEncoderId, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
-        private async Task<byte[]> GetImageAsByte(Guid format, int quality, int desiredWidth, int desiredHeight)
+        private async Task<byte[]> GetImageAsByteAsync(Guid format, int quality, int desiredWidth, int desiredHeight)
         {
             if (Control == null || Control.Source == null)
                 return null;

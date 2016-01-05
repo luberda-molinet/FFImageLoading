@@ -12,6 +12,7 @@ using FFImageLoading.Forms.Touch;
 using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
+using FFImageLoading.Forms.Args;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -31,7 +32,9 @@ namespace FFImageLoading.Forms.Touch
 		public static new void Init()
 		{
 			// needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
+			#pragma warning disable 0219
 			var dummy = new CachedImageRenderer();
+			#pragma warning restore 0219
 
 			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
 			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
@@ -97,8 +100,8 @@ namespace FFImageLoading.Forms.Touch
 				SetOpacity();
 
 				e.NewElement.Cancelled += Cancel;
-				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
-				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
+				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
 			base.OnElementChanged(e);
 		}
@@ -302,17 +305,17 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 			
-		private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
 		{
-			return GetImageAsByte(false, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
 		{
-			return GetImageAsByte(true, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private async Task<byte[]> GetImageAsByte(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		private async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
 			UIImage image = null;
 

@@ -3,6 +3,7 @@ using Xamarin.Forms;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using FFImageLoading.Forms.Args;
 
 namespace FFImageLoading.Forms
 {
@@ -503,7 +504,7 @@ namespace FFImageLoading.Forms
             }
         }
 
-		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsJPG; 
+		internal Func<GetImageAsJpgArgs, Task<byte[]>> InternalGetImageAsJPG; 
 
 		/// <summary>
 		/// Gets the image as JPG.
@@ -515,22 +516,30 @@ namespace FFImageLoading.Forms
 			if (InternalGetImageAsJPG == null)
 				return null;
 
-			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
+			return InternalGetImageAsJPG(new GetImageAsJpgArgs() {
+				Quality = quality,
+				DesiredWidth = desiredWidth,
+				DesiredHeight = desiredHeight,
+			});
 		}
 
 		/// <summary>
 		/// Gets the image as JPG.
 		/// </summary>
 		/// <returns>The image as JPG.</returns>
-		public Task<byte[]> GetImageAsJpgAsync(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		public Task<byte[]> GetImageAsJpgAsync(int quality = 90, int desiredWidth = 0, int desiredHeight = 0)
 		{
 			if (InternalGetImageAsJPG == null)
 				return null;
 
-			return InternalGetImageAsJPG(quality, desiredWidth, desiredHeight);
+			return InternalGetImageAsJPG(new GetImageAsJpgArgs() {
+				Quality = quality,
+				DesiredWidth = desiredWidth,
+				DesiredHeight = desiredHeight,
+			});
 		}
 
-		internal Func<int, int, int, Task<byte[]>> InternalGetImageAsPNG;
+		internal Func<GetImageAsPngArgs, Task<byte[]>> InternalGetImageAsPNG;
 
 		/// <summary>
 		/// Gets the image as PNG
@@ -543,7 +552,10 @@ namespace FFImageLoading.Forms
 			if (InternalGetImageAsPNG == null)
 				return null;
 
-			return InternalGetImageAsPNG(quality, desiredWidth, desiredHeight);
+			return InternalGetImageAsPNG(new GetImageAsPngArgs() {
+				DesiredWidth = desiredWidth,
+				DesiredHeight = desiredHeight,
+			});
 		}
 
 		/// <summary>
@@ -555,7 +567,10 @@ namespace FFImageLoading.Forms
 			if (InternalGetImageAsPNG == null)
 				return null;
 
-			return InternalGetImageAsPNG(0, desiredWidth, desiredHeight);
+			return InternalGetImageAsPNG(new GetImageAsPngArgs() {
+				DesiredWidth = desiredWidth,
+				DesiredHeight = desiredHeight,
+			});
 		}
 
 		/// <summary>

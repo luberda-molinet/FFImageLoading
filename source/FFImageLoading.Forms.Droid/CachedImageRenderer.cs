@@ -13,6 +13,7 @@ using Android.Graphics;
 using System.IO;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
+using FFImageLoading.Forms.Args;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -88,8 +89,8 @@ namespace FFImageLoading.Forms.Droid
 			if (e.NewElement != null)
 			{
 				e.NewElement.Cancelled += Cancel;
-				e.NewElement.InternalGetImageAsJPG = new Func<int, int, int, Task<byte[]>>(GetImageAsJPG);
-				e.NewElement.InternalGetImageAsPNG = new Func<int, int, int, Task<byte[]>>(GetImageAsPNG);
+				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
 
 			UpdateBitmap(e.OldElement);
@@ -290,17 +291,17 @@ namespace FFImageLoading.Forms.Droid
 			}
 		}
 
-		private Task<byte[]> GetImageAsJPG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
 		{
-			return GetImageAsByte(Bitmap.CompressFormat.Jpeg, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(Bitmap.CompressFormat.Jpeg, args.Quality, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private Task<byte[]> GetImageAsPNG(int quality, int desiredWidth = 0, int desiredHeight = 0)
+		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
 		{
-			return GetImageAsByte(Bitmap.CompressFormat.Png, quality, desiredWidth, desiredHeight);
+			return GetImageAsByteAsync(Bitmap.CompressFormat.Png, 90, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private async Task<byte[]> GetImageAsByte(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
+		private async Task<byte[]> GetImageAsByteAsync(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
 		{
 			if (Control == null)
 				return null;
