@@ -319,7 +319,17 @@ namespace FFImageLoading.Work
 							|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
 					{
 						var tempImage = imageIn;
-						imageIn = tempImage.ResizeUIImage(Parameters.DownSampleSize.Item1, Parameters.DownSampleSize.Item2, Parameters.DownSampleInterpolationMode);
+
+						int downsampleWidth = Parameters.DownSampleSize.Item1;
+						int downsampleHeight = Parameters.DownSampleSize.Item2;
+
+						if (Parameters.DownSampleUseDipUnits)
+						{
+							downsampleWidth = downsampleWidth.PointsToPixels();
+							downsampleHeight = downsampleHeight.PointsToPixels();
+						}
+
+						imageIn = tempImage.ResizeUIImage(downsampleWidth, downsampleHeight, Parameters.DownSampleInterpolationMode);
 						tempImage.Dispose();
 					}
 

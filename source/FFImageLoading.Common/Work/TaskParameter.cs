@@ -111,6 +111,8 @@ namespace FFImageLoading.Work
 
 		public Tuple<int, int> DownSampleSize { get; private set; }
 
+		public bool DownSampleUseDipUnits { get; private set; }
+
         public InterpolationMode DownSampleInterpolationMode { get; private set; }
 
         public ImageSource LoadingPlaceholderSource { get; private set; }
@@ -191,7 +193,22 @@ namespace FFImageLoading.Work
 		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
 		public TaskParameter DownSample(int width = 0, int height = 0)
 		{
+			DownSample(false, width, height);
+			return this;
+		}
+
+		/// <summary>
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="useDipUnits">If set to <c>true</c>, Downsample will use DIP units (device independent points).</param>
+		/// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
+		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
+		public TaskParameter DownSample(bool useDipUnits, int width = 0, int height = 0)
+		{
+			DownSampleUseDipUnits = useDipUnits;
 			DownSampleSize = Tuple.Create(width, height);
+
 			return this;
 		}
 

@@ -371,7 +371,17 @@ namespace FFImageLoading.Work
 							if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
 							{
 								// Calculate inSampleSize
-								options.InSampleSize = CalculateInSampleSize(options, (int)Parameters.DownSampleSize.Item1, (int)Parameters.DownSampleSize.Item2);
+
+								int downsampleWidth = Parameters.DownSampleSize.Item1;
+								int downsampleHeight = Parameters.DownSampleSize.Item2;
+
+								if (Parameters.DownSampleUseDipUnits)
+								{
+									downsampleWidth = downsampleWidth.DpToPixels();
+									downsampleHeight = downsampleHeight.DpToPixels();
+								}
+
+								options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight);
 							}
 
 							// If we're running on Honeycomb or newer, try to use inBitmap
