@@ -68,7 +68,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MvvmCross", "MvvmCross", "{1AFB4004-0EB7-4518-9B65-F1008B7962FC}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Cross", "FFImageLoading.Cross\FFImageLoading.Cross.shproj", "{3C58B37D-EDB7-4778-AA48-F3AD9A571059}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Cross", "source\FFImageLoading.Cross\FFImageLoading.Cross.shproj", "{3C58B37D-EDB7-4778-AA48-F3AD9A571059}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
