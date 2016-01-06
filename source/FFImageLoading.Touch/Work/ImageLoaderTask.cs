@@ -23,7 +23,10 @@ namespace FFImageLoading.Work
 
 		static ImageLoaderTask()
 		{
-			_screenScale = UIScreen.MainScreen.Scale;
+			UIScreen.MainScreen.InvokeOnMainThread(() =>
+				{
+					_screenScale = UIScreen.MainScreen.Scale;
+				});
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)

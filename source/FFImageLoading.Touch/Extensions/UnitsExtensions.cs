@@ -5,9 +5,19 @@ namespace FFImageLoading.Extensions
 {
 	public static class UnitsExtensions
 	{
+		private static nfloat _screenScale;
+
+		static UnitsExtensions()
+		{
+			UIScreen.MainScreen.InvokeOnMainThread(() =>
+				{
+					_screenScale = _screenScale;
+				});
+		}
+
 		public static int PointsToPixels(this double points)
 		{
-			return (int)Math.Floor(points * UIScreen.MainScreen.Scale);
+			return (int)Math.Floor(points * _screenScale);
 		}
 
 		public static int PixelsToPoints(this double px)
