@@ -3,7 +3,7 @@
    <metadata minClientVersion="2.8.1">
    
        <id>FFImageLoading.Windows</id>
-       <version>2.0.3-alpha1</version>
+       <version>2.0.3</version>
        <title>FFImageLoading Plugin for Windows</title>
        <authors>Fabien Molinet, Daniel Luberda</authors>
        <owners></owners>
@@ -33,11 +33,11 @@ Features:
        
        <dependencies>
        
- 		<group targetFramework="portable-netcore45+wpa81+wp8">
+ 		<group targetFramework="portable-netcore45+wpa81">
 		    <dependency id="Microsoft.Net.Http" version="2.2.29" />
  		</group> 	
  			
- 		<group targetFramework="wp8">
+ 		<group targetFramework="portable-wp8">
 		    <dependency id="Microsoft.Net.Http" version="2.2.29" />
  		</group>
  		 			
@@ -48,16 +48,16 @@ Features:
 	<files>
 	
         <!--Windows-->
-		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Windows.dll" />
-		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.Windows.xml" />
-        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.dll" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.xml" target="lib/portable-netcore45+wpa81+wp8/FFImageLoading.xml" />
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.dll" target="lib/portable-netcore45+wpa81/FFImageLoading.Windows.dll" />
+		<file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.Windows.xml" target="lib/portable-netcore45+wpa81/FFImageLoading.Windows.xml" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.dll" target="lib/portable-netcore45+wpa81/FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows/bin/Windows Release/FFImageLoading.xml" target="lib/portable-netcore45+wpa81/FFImageLoading.xml" />
 
 		<!--Windows SL-->
-		<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.WinSL.dll" target="lib/wp8/FFImageLoading.WinSL.dll" />
-		<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.WinSL.xml" target="lib/wp8/FFImageLoading.WinSL.xml" />
-        <file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.dll" target="lib/wp8/FFImageLoading.dll" />
-        <file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.xml" target="lib/wp8/FFImageLoading.xml" />
+		<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.WinSL.dll" target="lib/portable-wp8/FFImageLoading.WinSL.dll" />
+		<file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.WinSL.xml" target="lib/portable-wp8/FFImageLoading.WinSL.xml" />
+        <file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.dll" target="lib/portable-wp8/FFImageLoading.dll" />
+        <file src="FFImageLoading.WinSL/bin/Windows Release/FFImageLoading.xml" target="lib/portable-wp8/FFImageLoading.xml" />
 		
 	</files>
 	
