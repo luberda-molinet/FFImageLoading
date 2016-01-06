@@ -20,5 +20,15 @@ namespace FFImageLoading.Extensions
             var scale = (double)Application.Current.Host.Content.ScaleFactor / 100.0f;
             return (int)Math.Floor(px / scale);
         }
+
+        public static int PointsToPixels(this int points)
+        {
+            return PointsToPixels((double)points);
+        }
+
+        public static int PixelsToPoints(this int px)
+        {
+            return PixelsToPoints((double)px);
+        }
     }
 }
