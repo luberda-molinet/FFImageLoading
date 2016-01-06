@@ -63,9 +63,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading-contrib</Name>
+      <Name>FFImageLoading</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

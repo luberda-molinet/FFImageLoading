@@ -15,7 +15,7 @@
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Forms.Sample.Droid</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -118,10 +118,6 @@
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Droid\FFImageLoading-contrib.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading-contrib.Droid</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Droid\FFImageLoading.Forms.Droid.csproj">
       <Project>{7014FEB6-0338-4A47-B600-4A1B48127C5C}</Project>
       <Name>FFImageLoading.Forms.Droid</Name>
@@ -130,13 +126,17 @@
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading-contrib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
       <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
       <Name>FFImageLoading.Transformations.Droid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
+      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
+      <Name>FFImageLoading.Droid</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

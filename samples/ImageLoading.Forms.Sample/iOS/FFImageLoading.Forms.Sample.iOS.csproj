@@ -176,21 +176,21 @@
       <Project>{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}</Project>
       <Name>FFImageLoading.Forms.Touch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Touch\FFImageLoading-contrib.Touch.csproj">
-      <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
-      <Name>FFImageLoading-contrib.Touch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading-contrib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Touch\FFImageLoading.Transformations.Touch.csproj">
       <Project>{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}</Project>
       <Name>FFImageLoading.Transformations.Touch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Touch\FFImageLoading.Touch.csproj">
+      <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
+      <Name>FFImageLoading.Touch</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

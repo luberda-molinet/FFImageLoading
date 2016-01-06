@@ -28,6 +28,28 @@
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Touch.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <OutputPath>bin\Windows Debug\</OutputPath>
+    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
+    <DocumentationFile>bin\Release\FFImageLoading.Touch.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
+    <OutputPath>bin\Windows Release\</OutputPath>
+    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
+    <DocumentationFile>bin\Release\FFImageLoading.Touch.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -35,28 +57,30 @@
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Net.Http" />
     <Reference Include="WebP.Touch">
-      <HintPath>..\..\..\..\..\..\packages\WebP.Touch.1.0.1\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
+      <HintPath>..\..\packages\WebP.Touch.1.0.1\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Extensions\UIImageExtensions.cs" />
     <Compile Include="Work\ImageLoaderTask.cs" />
-    <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Work\DataResolver\FilePathDataResolver.cs" />
     <Compile Include="Work\DataResolver\IDataResolver.cs" />
     <Compile Include="Work\DataResolver\UrlDataResolver.cs" />
     <Compile Include="Work\DataResolver\UIImageData.cs" />
     <Compile Include="Work\DataResolver\DataResolverFactory.cs" />
+    <Compile Include="Work\BitmapHolder.cs" />
+    <Compile Include="Transformations\TransformationBase.cs" />
+    <Compile Include="Cache\ImageCacheHelper.cs" />
+    <Compile Include="Extensions\UnitsExtensions.cs" />
+    <Compile Include="Work\DataResolver\AssetCatalogDataResolver.cs" />
+    <Compile Include="Helpers\MainThreadDispatcher.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

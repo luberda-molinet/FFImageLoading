@@ -60,13 +60,13 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading-contrib</Name>
+      <Name>FFImageLoading</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
-      <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
-      <Name>FFImageLoading-contrib.Windows</Name>
+    <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj">
+      <Project>{610543A5-D06F-4BCA-9443-E6ADDFF06C71}</Project>
+      <Name>FFImageLoading.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
