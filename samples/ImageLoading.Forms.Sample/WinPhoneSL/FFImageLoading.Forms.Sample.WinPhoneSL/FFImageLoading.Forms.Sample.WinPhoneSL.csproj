@@ -255,7 +255,7 @@
       <Project>{3f6353cc-a79b-4c13-a73b-025b247cb806}</Project>
       <Name>FFImageLoading-contrib.WinSL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
