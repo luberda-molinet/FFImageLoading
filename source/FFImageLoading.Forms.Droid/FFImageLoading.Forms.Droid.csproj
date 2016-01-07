@@ -87,6 +87,7 @@
     <Compile Include="CachedImageRenderer.cs" />
     <Compile Include="CachedImageView.cs" />
     <Compile Include="ImageSourceBinding.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -111,5 +112,8 @@
       <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
       <Name>FFImageLoading.Droid</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

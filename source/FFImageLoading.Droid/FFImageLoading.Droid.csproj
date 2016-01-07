@@ -99,10 +99,12 @@
     <Compile Include="Drawables\AsyncDrawable.cs" />
     <Compile Include="Drawables\IAsyncDrawable.cs" />
     <Compile Include="Drawables\SelfDisposingAsyncDrawable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Drawables\" />
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
