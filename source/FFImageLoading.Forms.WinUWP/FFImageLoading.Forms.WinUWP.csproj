@@ -117,7 +117,7 @@
     <Content Include="Properties\FFImageLoading.Forms.WinUWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading-contrib.csproj">
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
       <Name>FFImageLoading-contrib</Name>
     </ProjectReference>
@@ -125,7 +125,7 @@
       <Project>{3d6c1f12-68d7-44c2-a7de-8e7942627a01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading-contrib.Windows.csproj">
+    <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj">
       <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
       <Name>FFImageLoading-contrib.Windows</Name>
     </ProjectReference>

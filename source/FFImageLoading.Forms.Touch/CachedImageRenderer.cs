@@ -72,8 +72,6 @@ namespace FFImageLoading.Forms.Touch
 				UIImage image = Control.Image;
 				if (image != null)
 					image.Dispose();
-
-				image.Dispose();
 			}
 
 			_isDisposed = true;
