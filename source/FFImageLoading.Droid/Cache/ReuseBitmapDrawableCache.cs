@@ -438,7 +438,7 @@ namespace FFImageLoading.Cache
 		public void Clear()
 		{
 			lock (monitor) {
-				foreach (var k in displayed_cache.Keys) {
+				foreach (var k in displayed_cache.Keys.ToList()) { // FMT: we need to make a copy of the list since it's altered during enumeration
 					var tmp = displayed_cache[k];
 					if (tmp != null)
 					{
@@ -447,7 +447,7 @@ namespace FFImageLoading.Cache
 				}
 				displayed_cache.Clear();
 
-				foreach (var k in reuse_pool.Keys) {
+				foreach (var k in reuse_pool.Keys.ToList()) { // FMT: we need to make a copy of the list since it's altered during enumeration
 					ProcessRemoval(reuse_pool[k], evicted: true);
 				}
 				reuse_pool.Clear();
