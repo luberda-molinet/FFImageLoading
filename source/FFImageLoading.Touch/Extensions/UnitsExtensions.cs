@@ -11,7 +11,7 @@ namespace FFImageLoading.Extensions
 		{
 			UIScreen.MainScreen.InvokeOnMainThread(() =>
 				{
-					_screenScale = _screenScale;
+					_screenScale = UIScreen.MainScreen.Scale;
 				});
 		}
 
