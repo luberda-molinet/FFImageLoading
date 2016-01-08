@@ -51,7 +51,7 @@ namespace FFImageLoading.Work.DataResolver
 				return GetDataInternal(identifier, token);
 			}
 
-			return null;
+			return Task.FromResult((UIImageData)null);
 		}
 
 		public void Dispose() {
