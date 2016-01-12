@@ -20,7 +20,6 @@ namespace FFImageLoading.Forms.Sample.Pages
 				WidthRequest = 300,
 				HorizontalOptions = LayoutOptions.Center,
 				VerticalOptions = LayoutOptions.Center,
-				//DownsampleToViewSize = true,
 			};
 
 			var button = new Button() {
@@ -35,6 +34,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 						Stream = new Func<CancellationToken, Task<Stream>>(async (arg) => new MemoryStream(bytes))
 					};
 
+					cachedImage.CacheKeyFactory = new CustomCacheKeyFactory();
 					cachedImage.Source = streamSource;
 
 				})
@@ -51,7 +51,6 @@ namespace FFImageLoading.Forms.Sample.Pages
 
 			// First we load an image from http source
 			cachedImage.Source = "http://loremflickr.com/600/600/nature?filename=stream.jpg";
-			cachedImage.CacheKeyFactory = new CustomCacheKeyFactory();
 		}
 
 		class CustomCacheKeyFactory : ICacheKeyFactory
