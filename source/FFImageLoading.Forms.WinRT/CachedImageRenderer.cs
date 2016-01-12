@@ -64,6 +64,7 @@ namespace FFImageLoading.Forms.WinRT
         {
             CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
             CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
         }
 
         private static void InvalidateCache(string key, Cache.CacheType cacheType)
@@ -87,6 +88,11 @@ namespace FFImageLoading.Forms.WinRT
                     break;
             }
         }
+
+		private static void SetPauseWork(bool pauseWork)
+		{
+			ImageService.SetPauseWork(pauseWork);
+		}
 
         private bool measured;
 

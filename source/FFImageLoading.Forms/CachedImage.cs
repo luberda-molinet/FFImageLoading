@@ -463,7 +463,7 @@ namespace FFImageLoading.Forms
 			} 
 			return new SizeRequest(new Size(num3, num4));
 		}
-			
+
 		internal Action InternalCancel;
 
         /// <summary>
@@ -478,6 +478,16 @@ namespace FFImageLoading.Forms
 		}
 
 		internal static Action<Cache.CacheType> InternalClearCache;
+
+		public static void SetPauseWork(bool pauseWork)
+		{
+			if (InternalSetPauseWork != null)
+			{
+				InternalSetPauseWork(pauseWork);
+			}
+		}
+
+		internal static Action<bool> InternalSetPauseWork;
 
         /// <summary>
         /// Clears image cache
