@@ -82,6 +82,8 @@
     <Compile Include="Models\ListHeavyItem.cs" />
     <Compile Include="Pages\CustomCacheKeyPage.cs" />
     <Compile Include="ViewModels\CustomCacheKeyViewModel.cs" />
+    <Compile Include="Pages\StreamTest.cs" />
+    <Compile Include="ViewModels\StreamTestViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

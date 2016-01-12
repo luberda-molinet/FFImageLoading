@@ -12,106 +12,96 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 	{
 		public HomeViewModel()
 		{
-			OpenBasicExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<SimpleExampleViewModel>()
-				.PushPage());
-
-			OpenXamlBasicExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<XamlSimpleExampleViewModel>()
-				.PushPage());
-
-			OpenListExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<ListExampleViewModel>()
-				.SendMessageToViewModel("Reload")
-				.PushPage());
-
-			OpenListTransformationsExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<ListTransformationExampleViewModel>()
-				.SendMessageToViewModel("Reload")
-				.PushPage());
-
-			OpenHeavyListTransformationsExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<ListHeavyTestViewModel>()
-				.SendMessageToViewModel("Reload")
-				.PushPage());
-
-			OpenPlaceholdersExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<PlaceholdersExampleViewModel>()
-				.PushPage());
-
-			OpenCropTransformationExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<CropTransformationViewModel>()
-				.SendMessageToViewModel("Reload")
-				.PushPage());
-
 			OpenTransformationExampleCommand = new PageFactoryCommand<Type>((transformationType) => 
 				PageFactory.GetMessagablePageFromCache<TransformationExampleViewModel>()
 				.SendMessageToViewModel("LoadTransformation", this, transformationType)
 				.PushPage());
-
-			OpenDownsamplingExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<DownsamplingExampleViewModel>()
-				.PushPage());
-
-			OpenCustomCacheKeyExampleCommand = new PageFactoryCommand(() => 
-				PageFactory.GetMessagablePageFromCache<CustomCacheKeyViewModel>()
-				.SendMessageToViewModel("Reload")
-				.PushPage());
-
+			
 			var menuItems = new List<MenuItem>() {
 				
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Basic example",
-					Command = OpenBasicExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<SimpleExampleViewModel>()
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Basic XAML example",
-					Command = OpenXamlBasicExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<XamlSimpleExampleViewModel>()
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Lists",
 					Title = "List example",
-					Command = OpenListExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<ListExampleViewModel>()
+							.SendMessageToViewModel("Reload")
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Lists",
 					Title = "List transformations example",
-					Command = OpenListTransformationsExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<ListTransformationExampleViewModel>()
+							.SendMessageToViewModel("Reload")
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Lists",
 					Title = "Heavy Grid List example",
-					Command = OpenHeavyListTransformationsExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<ListHeavyTestViewModel>()
+							.SendMessageToViewModel("Reload")
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Placeholders examples",
-					Command = OpenPlaceholdersExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<PlaceholdersExampleViewModel>()
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Downsampling examples",
-					Command = OpenDownsamplingExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<DownsamplingExampleViewModel>()
+							.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Advanced",
 					Title = "Custom CacheKey example",
-					Command = OpenCustomCacheKeyExampleCommand
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<CustomCacheKeyViewModel>()
+							.SendMessageToViewModel("Reload")
+							.PushPage())
+				},
+
+				new MenuItem() {
+					Section = "Advanced",
+					Title = "Stream with custom cache key example",
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<StreamTestViewModel>()
+						.PushPage())
 				},
 
 				new MenuItem() {
 					Section = "Transformations",
 					Title = "CropTransformation",
-					Command = OpenCropTransformationExampleCommand,
+					Command = new PageFactoryCommand(() => 
+						PageFactory.GetMessagablePageFromCache<CropTransformationViewModel>()
+						.SendMessageToViewModel("Reload")
+						.PushPage()),
 				},
 
 				new MenuItem() {
@@ -200,6 +190,8 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 			set { SetField(value); }
 		}
 
+		public IPageFactoryCommand OpenTransformationExampleCommand { get; private set; }
+
 		public class Grouping<K, T> : ObservableCollection<T>
 		{
 			public K Key { get; private set; }
@@ -211,26 +203,6 @@ namespace FFImageLoading.Forms.Sample.ViewModels
 					this.Items.Add(item);
 			}
 		}
-
-		public IPageFactoryCommand OpenBasicExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenXamlBasicExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenListExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenListTransformationsExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenHeavyListTransformationsExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenPlaceholdersExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenCropTransformationExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenTransformationExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenDownsamplingExampleCommand { get; private set; }
-
-		public IPageFactoryCommand OpenCustomCacheKeyExampleCommand { get; private set; }
 	}
 }
 

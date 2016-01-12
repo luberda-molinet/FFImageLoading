@@ -30,7 +30,7 @@ namespace FFImageLoading
         /// Initialize ImageService default values. This can only be done once: during app start.
         /// </summary>
         /// <param name="maxCacheSize">Max cache size. If zero then 20% of the memory will be used.</param>
-        /// <param name="httpClient">.NET HttpClient to use. If null then a ModernHttpClient is instanciated.</param>
+		/// <param name="httpClient">.NET HttpClient to use. If null then a.NET HttpClient is instanciated.</param>
         /// <param name="scheduler">Work scheduler used to organize/schedule loading tasks.</param>
         /// <param name="logger">Basic logger. If null a very simple implementation that prints to console is used.</param>
         /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
