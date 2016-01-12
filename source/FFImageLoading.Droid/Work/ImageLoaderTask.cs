@@ -223,14 +223,19 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return GenerateResult.InvalidTarget;
 
-				var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
-				if (resultWithDrawable == null || resultWithDrawable.Item == null)
-				{
-					// Show error placeholder
-					await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
+			if (resultWithDrawable == null || resultWithDrawable.Item == null)
+			{
+				// Show error placeholder
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 
-					return GenerateResult.Failed;
-				}
+				return GenerateResult.Failed;
+			}
+
+			if (CanUseMemoryCache())
+			{
+				ImageCache.Instance.Add(GetKey(), resultWithDrawable.Item);
+			}
 
 			try
 			{

@@ -204,6 +204,11 @@ namespace FFImageLoading.Work
 				return GenerateResult.Failed;
 			}
 
+			if (CanUseMemoryCache())
+			{
+				ImageCache.Instance.Add(GetKey(), image);
+			}
+
 			if (CancellationToken.IsCancellationRequested)
 				return GenerateResult.Canceled;
 
