@@ -21,7 +21,6 @@ namespace FFImageLoading.Forms.Sample.Pages
 				HorizontalOptions = LayoutOptions.Center,
 				VerticalOptions = LayoutOptions.Center,
 				//DownsampleToViewSize = true,
-				CacheKeyFactory = new CustomCacheKeyFactory(),
 			};
 
 			var button = new Button() {
@@ -52,6 +51,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 
 			// First we load an image from http source
 			cachedImage.Source = "http://loremflickr.com/600/600/nature?filename=stream.jpg";
+			cachedImage.CacheKeyFactory = new CustomCacheKeyFactory();
 		}
 
 		class CustomCacheKeyFactory : ICacheKeyFactory
