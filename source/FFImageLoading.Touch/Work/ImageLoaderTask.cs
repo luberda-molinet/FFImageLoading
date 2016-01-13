@@ -68,9 +68,12 @@ namespace FFImageLoading.Work
 		/// </summary>
 		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
 		{
-			var cacheResult = await TryLoadingFromCacheAsync().ConfigureAwait(false);
-			if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
-				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
+			if (CanUseMemoryCache())
+			{
+				var cacheResult = await TryLoadingFromCacheAsync().ConfigureAwait(false);
+				if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
+					return true; // stop processing if loaded from cache OR if loading from cached raised an exception
+			}
 
 			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
 			return false;

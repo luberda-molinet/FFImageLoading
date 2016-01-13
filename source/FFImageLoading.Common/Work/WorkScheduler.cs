@@ -185,12 +185,7 @@ namespace FFImageLoading.Work
 					pendingTask.ImageLoadingTask.CancelIfNeeded();
 			}
 
-			bool loadedFromCache = false;
-			if (task.CanUseMemoryCache())
-			{
-				loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
-			}
-
+			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
 			if (loadedFromCache)
 			{
 				if (task.Parameters.OnFinish != null)
