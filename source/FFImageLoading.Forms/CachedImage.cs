@@ -479,6 +479,10 @@ namespace FFImageLoading.Forms
 
 		internal static Action<Cache.CacheType> InternalClearCache;
 
+		/// <summary>
+		/// Pauses image loading (enable or disable).
+		/// </summary>
+		/// <param name="pauseWork">If set to <c>true</c> pauses image loading.</param>
 		public static void SetPauseWork(bool pauseWork)
 		{
 			if (InternalSetPauseWork != null)
@@ -486,7 +490,7 @@ namespace FFImageLoading.Forms
 				InternalSetPauseWork(pauseWork);
 			}
 		}
-
+			
 		internal static Action<bool> InternalSetPauseWork;
 
         /// <summary>
