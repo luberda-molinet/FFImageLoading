@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using Android.Graphics;
+﻿using Android.Graphics;
 using Android.Graphics.Drawables;
-using Java.Lang;
-using Java.Lang.Ref;
 using Exception = System.Exception;
 using Math = System.Math;
-using System.Collections.Concurrent;
-using FFImageLoading.Collections;
 using FFImageLoading.Helpers;
 using Android.Content;
 using Android.App;
 using Android.Content.PM;
 using FFImageLoading.Drawables;
+using System;
 
 namespace FFImageLoading.Cache
 {
@@ -64,7 +60,7 @@ namespace FFImageLoading.Cache
 
 		public void Add(string key, SelfDisposingBitmapDrawable bitmap)
 		{
-            if (string.IsNullOrWhiteSpace(key) || bitmap == null || _cache.ContainsKey(key))
+			if (string.IsNullOrWhiteSpace(key) || bitmap == null || bitmap.Handle == IntPtr.Zero || !bitmap.HasValidBitmap || _cache.ContainsKey(key))
 				return;
 			
 			_cache.Add(key, bitmap);
@@ -116,6 +112,7 @@ namespace FFImageLoading.Cache
 			var am = (ActivityManager) context.GetSystemService(Context.ActivityService);
 			bool largeHeap = (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
 			int memoryClass = am.MemoryClass;
+
 			if (largeHeap && Utils.HasHoneycomb())
 			{
 				memoryClass = am.LargeMemoryClass;

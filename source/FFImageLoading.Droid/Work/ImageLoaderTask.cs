@@ -460,7 +460,7 @@ namespace FFImageLoading.Work
 									}
 
 									// Transformation succeeded, so garbage the source
-									if (old != null && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
+									if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
 									{
 										old.Recycle();
 										old.Dispose();
@@ -513,7 +513,8 @@ namespace FFImageLoading.Work
 
 			BitmapDrawable drawable = ImageCache.Instance.Get(GetKey(placeholderPath));
 
-			if (drawable != null && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled)
+			if (drawable != null && drawable.Handle != IntPtr.Zero 
+				&& drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled)
 			{
 				// We should wrap drawable in an AsyncDrawable, nothing is deferred
 				drawable = new SelfDisposingAsyncDrawable(Context.Resources, drawable.Bitmap, this);
@@ -736,7 +737,7 @@ namespace FFImageLoading.Work
 				bitmapDrawable = ImageCache.Instance.GetBitmapDrawableFromReusableSet(options);
 				var bitmap = bitmapDrawable == null ? null : bitmapDrawable.Bitmap;
 
-				if (bitmap != null && bitmap.Handle != IntPtr.Zero)
+				if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
 				{
 					options.InBitmap = bitmapDrawable.Bitmap;
 				}

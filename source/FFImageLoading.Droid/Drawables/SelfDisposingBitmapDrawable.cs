@@ -188,7 +188,7 @@ namespace FFImageLoading.Drawables
         public virtual bool HasValidBitmap {
             get {
                 lock (monitor) {
-                    return Bitmap != null && !is_bitmap_disposed && !Bitmap.IsRecycled;
+					return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !is_bitmap_disposed && !Bitmap.IsRecycled;
                 }
             }
         }

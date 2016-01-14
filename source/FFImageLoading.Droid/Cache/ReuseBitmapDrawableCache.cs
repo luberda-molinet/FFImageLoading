@@ -119,7 +119,7 @@ namespace FFImageLoading.Cache
 					foreach (var k in reuse_keys) {
 						var bd = reuse_pool.Peek(k);
 
-						if (bd != null && bd.Handle != IntPtr.Zero && !bd.IsRetained && bd.Bitmap.IsMutable && !bd.Bitmap.IsRecycled && bd.HasValidBitmap)
+						if (bd != null && bd.Handle != IntPtr.Zero && bd.HasValidBitmap && !bd.IsRetained && bd.Bitmap.IsMutable)
 						{
 							if (CanUseForInBitmap(bd.Bitmap, width, height, bitmapConfig, inSampleSize))
 							{
@@ -327,14 +327,14 @@ namespace FFImageLoading.Cache
 				return;
 			}
 
-			if (value.Bitmap == null || value.Bitmap.Handle == IntPtr.Zero || value.Bitmap.IsRecycled) {
+			if (!value.HasValidBitmap) {
 				Log.Warn(TAG, "Attempt to add Drawable with null or recycled bitmap, refusing to cache");
 				return;
 			}
 
 			lock (monitor) {
 				if (!displayed_cache.ContainsKey(key) && !reuse_pool.ContainsKey(key)) {
-					reuse_pool.Add(key, (SelfDisposingBitmapDrawable)value);
+					reuse_pool.Add(key, value);
 					OnEntryAdded(key, value);
 				}
 			}
