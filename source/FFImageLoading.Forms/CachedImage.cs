@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
+using System.Windows.Input;
 
 namespace FFImageLoading.Forms
 {
@@ -589,36 +590,117 @@ namespace FFImageLoading.Forms
 		}
 
 		/// <summary>
-		/// Occurs when after image loading success.
+		/// Occurs after image loading success.
 		/// </summary>
 		public event EventHandler<CachedImageEvents.SuccessEventArgs> Success;
+
+		/// <summary>
+		/// The SuccessCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty SuccessCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.SuccessCommand, null);
+
+		/// <summary>
+		/// Gets or sets the SuccessCommand.
+		/// Occurs after image loading success.
+		/// Command parameter: CachedImageEvents.SuccessEventArgs
+		/// </summary>
+		/// <value>The success command.</value>
+		public ICommand SuccessCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(SuccessCommandProperty); 
+			}
+			set
+			{
+				SetValue(SuccessCommandProperty, value); 
+			}
+		}
 
 		internal void OnSuccess(CachedImageEvents.SuccessEventArgs e) 
 		{
 			var handler = Success;
 			if (handler != null) handler(this, e);
+
+			var successCommand = SuccessCommand;
+			if (successCommand != null && successCommand.CanExecute(e))
+				successCommand.Execute(e);
 		}
 
 		/// <summary>
-		/// Occurs when after image loading error.
+		/// Occurs after image loading error.
 		/// </summary>
 		public event EventHandler<CachedImageEvents.ErrorEventArgs> Error;
+
+		/// <summary>
+		/// The ErrorCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty ErrorCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.ErrorCommand, null);
+
+		/// <summary>
+		/// Gets or sets the ErrorCommand.
+		/// Occurs after image loading error.
+		/// Command parameter: CachedImageEvents.ErrorEventArgs
+		/// </summary>
+		/// <value>The error command.</value>
+		public ICommand ErrorCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(ErrorCommandProperty); 
+			}
+			set
+			{
+				SetValue(ErrorCommandProperty, value); 
+			}
+		}
 
 		internal void OnError(CachedImageEvents.ErrorEventArgs e) 
 		{
 			var handler = Error;
 			if (handler != null) handler(this, e);
+
+			var errorCommand = ErrorCommand;
+			if (errorCommand != null && errorCommand.CanExecute(e))
+				errorCommand.Execute(e);
 		}
 
 		/// <summary>
-		/// Occurs after image loading.
+		/// Occurs after every image loading.
 		/// </summary>
 		public event EventHandler<CachedImageEvents.FinishEventArgs> Finish;
+
+		/// <summary>
+		/// The FinishCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty FinishCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.FinishCommand, null);
+
+		/// <summary>
+		/// Gets or sets the FinishCommand.
+		/// Occurs after every image loading.
+		/// Command parameter: CachedImageEvents.FinishEventArgs
+		/// </summary>
+		/// <value>The finish command.</value>
+		public ICommand FinishCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(FinishCommandProperty); 
+			}
+			set
+			{
+				SetValue(FinishCommandProperty, value); 
+			}
+		}
 
 		internal void OnFinish(CachedImageEvents.FinishEventArgs e) 
 		{
 			var handler = Finish;
 			if (handler != null) handler(this, e);
+
+			var finishCommand = FinishCommand;
+			if (finishCommand != null && finishCommand.CanExecute(e))
+				finishCommand.Execute(e);
 		}
     }
 }
