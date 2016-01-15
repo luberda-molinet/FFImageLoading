@@ -180,7 +180,6 @@ namespace FFImageLoading.Cache
                             }
                             catch
                             {
-                                break;
                             }
                         }
                     }
