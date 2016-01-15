@@ -152,7 +152,7 @@ namespace FFImageLoading.Cache
                     {
                         stream.Seek(0, SeekOrigin.Begin);
 
-						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)).Trim() != null)
                         {
                             try
                             {
