@@ -41,7 +41,7 @@ namespace FFImageLoading.Cache
             Deleted = 'd'
         }
 
-        const string JournalFileName = "FFImageLoadingCache.journal";
+        const string JournalFileName = "FFImageLoading.journal";
         const string Magic = "MONOID";
 		const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
         readonly Encoding encoding = Encoding.UTF8;
