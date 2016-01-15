@@ -22,12 +22,19 @@ namespace FFImageLoading.Helpers
 
         public async void Post(Action action)
         {
-            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
-
             if (action == null)
                 return;
 
-			await dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
+            // already in UI thread:
+            if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+            {
+                action();
+            }
+            // not in UI thread, ensuring UI thread:
+            else
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
+            }
         }
 
         public Task PostAsync(Action action)
