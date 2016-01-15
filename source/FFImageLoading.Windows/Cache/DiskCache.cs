@@ -45,6 +45,7 @@ namespace FFImageLoading.Cache
         const string Magic = "MONOID";
 		const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
         readonly Encoding encoding = Encoding.UTF8;
+        readonly Encoding encodingWrite = new UTF8Encoding(false);
 
         Task initTask = null;
         string version;
@@ -149,11 +150,13 @@ namespace FFImageLoading.Cache
                     using (var stream = await journalFile.OpenStreamForReadAsync().ConfigureAwait(false))
                     using (var reader = new StreamReader(stream, encoding))
                     {
+                        stream.Seek(0, SeekOrigin.Begin);
+
 						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                         {
                             try
                             {
-                                var op = ParseOp(line);
+                                JournalOp op = ParseOp(line);
                                 string key;
                                 DateTime origin;
                                 TimeSpan duration;
@@ -479,7 +482,7 @@ namespace FFImageLoading.Cache
             try
             {
 				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
-                using (var writer = new StreamWriter(stream, encoding))
+                using (var writer = new StreamWriter(stream, encodingWrite))
                 {
                     stream.Seek(0, SeekOrigin.End);
 					await writer.WriteAsync((char)op).ConfigureAwait(false);
@@ -501,7 +504,7 @@ namespace FFImageLoading.Cache
             try
             {
 				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
-                using (var writer = new StreamWriter(stream, encoding))
+                using (var writer = new StreamWriter(stream, encodingWrite))
                 {
                     stream.Seek(0, SeekOrigin.End);
                     await writer.WriteAsync((char)op).ConfigureAwait(false);
