@@ -146,7 +146,7 @@ namespace FFImageLoading.Cache
                 {
                     string line = null;
 
-					using (var stream = await journalFile.OpenStreamForReadAsync().ConfigureAwait(false))
+                    using (var stream = await journalFile.OpenStreamForReadAsync().ConfigureAwait(false))
                     using (var reader = new StreamReader(stream, encoding))
                     {
 						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
@@ -481,6 +481,7 @@ namespace FFImageLoading.Cache
 				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
                 using (var writer = new StreamWriter(stream, encoding))
                 {
+                    stream.Seek(0, SeekOrigin.End);
 					await writer.WriteAsync((char)op).ConfigureAwait(false);
 					await writer.WriteAsync(' ').ConfigureAwait(false);
 					await writer.WriteAsync(key).ConfigureAwait(false);
@@ -502,7 +503,8 @@ namespace FFImageLoading.Cache
 				using (var stream = await journalFile.OpenStreamForWriteAsync().ConfigureAwait(false))
                 using (var writer = new StreamWriter(stream, encoding))
                 {
-					await writer.WriteAsync((char)op).ConfigureAwait(false);
+                    stream.Seek(0, SeekOrigin.End);
+                    await writer.WriteAsync((char)op).ConfigureAwait(false);
 					await writer.WriteAsync(' ').ConfigureAwait(false);
 					await writer.WriteAsync(key).ConfigureAwait(false);
 					await writer.WriteAsync(' ').ConfigureAwait(false);
