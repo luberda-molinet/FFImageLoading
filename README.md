@@ -1,6 +1,6 @@
 # FFImageLoading - Fast & Furious Image Loading
 
-Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms and Windows (WinRT, UWP).
+Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms and Windows (WinRT, UWP, Silverlight).
 
 *Authors: Fabien Molinet, Daniel Luberda*
 
@@ -15,7 +15,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 
 ## Features
 
-- Xamarin.iOS (min iOS 7), Xamarin.Android (min Android 4), Xamarin.Forms and Windows (WinRT, UWP) support
+- Xamarin.iOS (min iOS 7), Xamarin.Android (min Android 4), Xamarin.Forms and Windows (WinRT, UWP, Silverlight) support
 - Configurable disk and memory caching
 - Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
 - Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
