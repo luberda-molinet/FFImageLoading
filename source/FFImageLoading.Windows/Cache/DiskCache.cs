@@ -94,7 +94,7 @@ namespace FFImageLoading.Cache
         {
             try
             {
-				cacheFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+				cacheFolder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
 				await InitializeWithJournal().ConfigureAwait(false);
             }
             catch
