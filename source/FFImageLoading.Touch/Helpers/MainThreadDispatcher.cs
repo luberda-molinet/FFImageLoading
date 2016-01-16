@@ -1,6 +1,7 @@
 ﻿using System;
 using UIKit;
 using System.Threading.Tasks;
+using Foundation;
 
 namespace FFImageLoading.Helpers
 {
@@ -21,7 +22,14 @@ namespace FFImageLoading.Helpers
 
         public void Post(Action action)
         {
-            UIApplication.SharedApplication.BeginInvokeOnMainThread(action);
+			if (NSThread.Current.IsMainThread)
+			{
+				action();
+			}
+			else	
+			{
+				UIApplication.SharedApplication.BeginInvokeOnMainThread(action);	
+			}
         }
 
         public Task PostAsync(Action action)

@@ -78,7 +78,6 @@
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
-    <Compile Include="Helpers\MainThread.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Work\StreamResolver\ApplicationBundleStreamResolver.cs" />
@@ -100,6 +99,7 @@
     <Compile Include="Drawables\IAsyncDrawable.cs" />
     <Compile Include="Drawables\SelfDisposingAsyncDrawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\MainThreadDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
