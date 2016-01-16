@@ -2,9 +2,9 @@
 using FFImageLoading.Work;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using FFImageLoading.Cache;
+using FFImageLoading.Helpers;
 
 #if SILVERLIGHT
 using System.ComponentModel;
@@ -77,7 +77,7 @@ namespace FFImageLoading
             {
                 if (internalImage != null)
                 {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    await MainThreadDispatcher.Instance.PostAsync(() => {
                         internalImage.Source = null;
 					});
                 }

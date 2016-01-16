@@ -1,9 +1,9 @@
-﻿using FFImageLoading.Work;
+﻿using FFImageLoading.Helpers;
+using FFImageLoading.Work;
 using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
@@ -19,7 +19,7 @@ namespace FFImageLoading.Extensions
 
             WriteableBitmap writeableBitmap = null;
 
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+            await MainThreadDispatcher.Instance.PostAsync(() =>
             {
                 writeableBitmap = holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
@@ -72,7 +72,7 @@ namespace FFImageLoading.Extensions
                         downscaledImage.Seek(0);
                         WriteableBitmap resizedBitmap = null;
 
-                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
+                        await MainThreadDispatcher.Instance.PostAsync(async () =>
                         {
                             resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                             await resizedBitmap.SetSourceAsync(downscaledImage);
@@ -87,7 +87,7 @@ namespace FFImageLoading.Extensions
                     image.Seek(0);
                     WriteableBitmap bitmap = null;
 
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () =>
+                    await MainThreadDispatcher.Instance.PostAsync(async () =>
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         await bitmap.SetSourceAsync(image);
