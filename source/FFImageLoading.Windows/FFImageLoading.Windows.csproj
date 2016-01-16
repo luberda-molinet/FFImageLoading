@@ -78,6 +78,11 @@
     <Compile Include="..\FFImageLoading.Shared\Work\ImageLoaderTaskBase.cs">
       <Link>Work\ImageLoaderTaskBase.cs</Link>
     </Compile>
+    <Compile Include="Args\ErrorEventArgs.cs" />
+    <Compile Include="Args\FinishEventArgs.cs" />
+    <Compile Include="Args\GetImageAsJpgArgs.cs" />
+    <Compile Include="Args\GetImageAsPngArgs.cs" />
+    <Compile Include="Args\SuccessEventArgs.cs" />
     <Compile Include="Cache\DiskCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
@@ -117,6 +122,7 @@
     <TargetPlatform Include="Windows, Version=8.1" />
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

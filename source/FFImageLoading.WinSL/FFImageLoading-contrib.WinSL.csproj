@@ -167,6 +167,21 @@
     <Compile Include="..\FFImageLoading.Shared\Work\ImageLoaderTaskBase.cs">
       <Link>Work\ImageLoaderTaskBase.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Args\ErrorEventArgs.cs">
+      <Link>Args\ErrorEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Args\FinishEventArgs.cs">
+      <Link>Args\FinishEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Args\GetImageAsJpgArgs.cs">
+      <Link>Args\GetImageAsJpgArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Args\GetImageAsPngArgs.cs">
+      <Link>Args\GetImageAsPngArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Args\SuccessEventArgs.cs">
+      <Link>Args\SuccessEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Windows\Cache\DiskCache.cs">
       <Link>Cache\DiskCache.cs</Link>
     </Compile>

@@ -2,19 +2,25 @@
 using FFImageLoading.Work;
 using System;
 using System.Collections.Generic;
-using Windows.UI.Core;
 using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
+using System.Windows.Input;
+using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 #if SILVERLIGHT
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 namespace FFImageLoading
@@ -40,6 +46,19 @@ namespace FFImageLoading
 
 			Transformations = new List<ITransformation>();
             DownsampleMode = InterpolationMode.Default;
+        }
+
+        public Image Image
+        {
+            get
+            {
+                return internalImage;
+            }
+            set
+            {
+                internalImage = value;
+                Content = internalImage;
+            }
         }
 
         public string Source
@@ -181,6 +200,15 @@ namespace FFImageLoading
                 {
                     imageLoader.Transform(Transformations);
                 }
+
+                imageLoader.Finish((work) => 
+                    OnFinish(new Args.FinishEventArgs(work)));
+
+                imageLoader.Success((imageSize, loadingResult) =>
+                    OnSuccess(new Args.SuccessEventArgs(imageSize, loadingResult)));
+
+                imageLoader.Error((exception) =>
+                    OnError(new Args.ErrorEventArgs(exception)));
 
                 _currentTask = imageLoader.Into(internalImage);
             }
@@ -496,11 +524,293 @@ namespace FFImageLoading
             }
         }
 
-		/// <summary>
-		/// Gets or sets the cache custom key factory.
-		/// </summary>
-		/// <value>The cache key factory.</value>
-		public ICacheKeyFactory CacheKeyFactory { get; set; }
+        /// <summary>
+        /// Cancels image loading tasks
+        /// </summary>
+        public void Cancel()
+        {
+            if (_currentTask != null && !_currentTask.IsCancelled)
+            {
+                _currentTask.Cancel();
+            }
+        }
+
+        /// <summary>
+        /// Gets the image as JPG.
+        /// </summary>
+        /// <returns>The image as JPG.</returns>
+        public Task<byte[]> GetImageAsJpgAsync(int quality = 90, int desiredWidth = 0, int desiredHeight = 0)
+        {
+            return GetImageAsByteAsync(BitmapEncoder.JpegEncoderId, quality, desiredWidth, desiredHeight);
+        }
+
+        /// <summary>
+        /// Gets the image as PNG
+        /// </summary>
+        /// <returns>The image as PNG.</returns>
+        public Task<byte[]> GetImageAsPngAsync(int desiredWidth = 0, int desiredHeight = 0)
+        {
+            return GetImageAsByteAsync(BitmapEncoder.PngEncoderId, 90, desiredWidth, desiredHeight);
+        }
+
+        private async Task<byte[]> GetImageAsByteAsync(Guid format, int quality, int desiredWidth, int desiredHeight)
+        {
+            if (internalImage == null || internalImage.Source == null)
+                return null;
+
+            var bitmap = internalImage.Source as WriteableBitmap;
+
+            if (bitmap == null)
+                return null;
+
+            byte[] pixels = null;
+            uint pixelsWidth = (uint)bitmap.PixelWidth;
+            uint pixelsHeight = (uint)bitmap.PixelHeight;
+
+            if (desiredWidth != 0 || desiredHeight != 0)
+            {
+                double widthRatio = (double)desiredWidth / (double)bitmap.PixelWidth;
+                double heightRatio = (double)desiredHeight / (double)bitmap.PixelHeight;
+
+                double scaleRatio = Math.Min(widthRatio, heightRatio);
+
+                if (desiredWidth == 0)
+                    scaleRatio = heightRatio;
+
+                if (desiredHeight == 0)
+                    scaleRatio = widthRatio;
+
+                uint aspectWidth = (uint)((double)bitmap.PixelWidth * scaleRatio);
+                uint aspectHeight = (uint)((double)bitmap.PixelHeight * scaleRatio);
+
+                using (var tempStream = new InMemoryRandomAccessStream())
+                {
+                    byte[] tempPixels = await GetBytesFromBitmapAsync(bitmap);
+
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, tempStream);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                        pixelsWidth, pixelsHeight, 96, 96, tempPixels);
+                    await encoder.FlushAsync();
+                    tempStream.Seek(0);
+
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(tempStream);
+                    BitmapTransform transform = new BitmapTransform()
+                    {
+                        ScaledWidth = aspectWidth,
+                        ScaledHeight = aspectHeight,
+                        InterpolationMode = BitmapInterpolationMode.Linear
+                    };
+                    PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
+                        BitmapPixelFormat.Bgra8,
+                        BitmapAlphaMode.Premultiplied,
+                        transform,
+                        ExifOrientationMode.RespectExifOrientation,
+                        ColorManagementMode.DoNotColorManage);
+
+                    pixels = pixelData.DetachPixelData();
+                    pixelsWidth = aspectWidth;
+                    pixelsHeight = aspectHeight;
+                }
+            }
+            else
+            {
+                pixels = await GetBytesFromBitmapAsync(bitmap);
+            }
+
+            using (var stream = new InMemoryRandomAccessStream())
+            {
+                var encoder = await BitmapEncoder.CreateAsync(format, stream);
+
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                    pixelsWidth, pixelsHeight, 96, 96, pixels);
+                await encoder.FlushAsync();
+                stream.Seek(0);
+
+                var bytes = new byte[stream.Size];
+                await stream.ReadAsync(bytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+
+                return bytes;
+            }
+        }
+
+        private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
+        {
+#if SILVERLIGHT
+            return await Task.FromResult(bitmap.ToByteArray());
+#else
+            byte[] tempPixels;
+            using (var sourceStream = bitmap.PixelBuffer.AsStream())
+            {
+                tempPixels = new byte[sourceStream.Length];
+                await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
+            }
+
+            return tempPixels;
+#endif
+        }
+
+        /// <summary>
+        /// Gets or sets the cache custom key factory.
+        /// </summary>
+        /// <value>The cache key factory.</value>
+        public ICacheKeyFactory CacheKeyFactory { get; set; }
+
+        /// <summary>
+        /// Pauses image loading (enable or disable).
+        /// </summary>
+        /// <param name="pauseWork">If set to <c>true</c> pauses image loading.</param>
+        public static void SetPauseWork(bool pauseWork)
+        {
+            ImageService.SetPauseWork(pauseWork);
+        }
+
+        /// <summary>
+        /// Clears image cache
+        /// </summary>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static void ClearCache(CacheType cacheType)
+        {
+            switch (cacheType)
+            {
+                case CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case CacheType.Disk:
+                    ImageService.InvalidateDiskCache();
+                    break;
+                case CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    ImageService.InvalidateDiskCache();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Invalidates cache for a specified key
+        /// </summary>
+        /// <param name="key">Key to invalidate</param>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static void InvalidateCache(string key, CacheType cacheType)
+        {
+            ImageService.Invalidate(key, cacheType);
+        }
+
+        /// <summary>
+        /// Occurs after image loading success.
+        /// </summary>
+        public event EventHandler<Args.SuccessEventArgs> Success;
+
+        /// <summary>
+        /// The SuccessCommandProperty.
+        /// </summary>
+        public static readonly DependencyProperty SuccessCommandProperty = DependencyProperty.Register("SuccessCommand",
+            typeof(ICommand), typeof(FFImage), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the SuccessCommand.
+        /// Occurs after image loading success.
+        /// Command parameter: CachedImageEvents.SuccessEventArgs
+        /// </summary>
+        /// <value>The success command.</value>
+        public ICommand SuccessCommand
+        {
+            get
+            {
+                return (ICommand)GetValue(SuccessCommandProperty);
+            }
+            set
+            {
+                SetValue(SuccessCommandProperty, value);
+            }
+        }
+
+        internal void OnSuccess(Args.SuccessEventArgs e)
+        {
+            var handler = Success;
+            if (handler != null) handler(this, e);
+
+            var successCommand = SuccessCommand;
+            if (successCommand != null && successCommand.CanExecute(e))
+                successCommand.Execute(e);
+        }
+
+        /// <summary>
+        /// Occurs after image loading error.
+        /// </summary>
+        public event EventHandler<Args.ErrorEventArgs> Error;
+
+        /// <summary>
+        /// The ErrorCommandProperty.
+        /// </summary>
+        public static readonly DependencyProperty ErrorCommandProperty = DependencyProperty.Register("ErrorCommand",
+            typeof(ICommand), typeof(FFImage), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the ErrorCommand.
+        /// Occurs after image loading error.
+        /// Command parameter: CachedImageEvents.ErrorEventArgs
+        /// </summary>
+        /// <value>The error command.</value>
+        public ICommand ErrorCommand
+        {
+            get
+            {
+                return (ICommand)GetValue(ErrorCommandProperty);
+            }
+            set
+            {
+                SetValue(ErrorCommandProperty, value);
+            }
+        }
+
+        internal void OnError(Args.ErrorEventArgs e)
+        {
+            var handler = Error;
+            if (handler != null) handler(this, e);
+
+            var errorCommand = ErrorCommand;
+            if (errorCommand != null && errorCommand.CanExecute(e))
+                errorCommand.Execute(e);
+        }
+
+        /// <summary>
+        /// Occurs after every image loading.
+        /// </summary>
+        public event EventHandler<Args.FinishEventArgs> Finish;
+
+        /// <summary>
+        /// The FinishCommandProperty.
+        /// </summary>
+        public static readonly DependencyProperty FinishCommandProperty = DependencyProperty.Register("FinishCommand",
+            typeof(ICommand), typeof(FFImage), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the FinishCommand.
+        /// Occurs after every image loading.
+        /// Command parameter: CachedImageEvents.FinishEventArgs
+        /// </summary>
+        /// <value>The finish command.</value>
+        public ICommand FinishCommand
+        {
+            get
+            {
+                return (ICommand)GetValue(FinishCommandProperty);
+            }
+            set
+            {
+                SetValue(FinishCommandProperty, value);
+            }
+        }
+
+        internal void OnFinish(Args.FinishEventArgs e)
+        {
+            var handler = Finish;
+            if (handler != null) handler(this, e);
+
+            var finishCommand = FinishCommand;
+            if (finishCommand != null && finishCommand.CanExecute(e))
+                finishCommand.Execute(e);
+        }
 
         public void Dispose()
         {
