@@ -2,7 +2,7 @@
 
 namespace FFImageLoading.Forms.Args
 {
-	internal class GetImageAsPngArgs
+	public class GetImageAsPngArgs
 	{
 		public int DesiredWidth { get; set; }
 

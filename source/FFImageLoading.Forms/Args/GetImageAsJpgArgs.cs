@@ -2,7 +2,7 @@
 
 namespace FFImageLoading.Forms.Args
 {
-	internal class GetImageAsJpgArgs
+	public class GetImageAsJpgArgs
 	{
 		public int Quality { get; set; }
 

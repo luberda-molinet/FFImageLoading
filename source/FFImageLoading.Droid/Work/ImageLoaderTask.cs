@@ -652,7 +652,7 @@ namespace FFImageLoading.Work
 					return await resolver.GetStream(path, CancellationToken.Token).ConfigureAwait(false);
 				}
 			}
-			catch (System.OperationCanceledException oex)
+			catch (System.OperationCanceledException)
 			{
 				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
 				return null;
