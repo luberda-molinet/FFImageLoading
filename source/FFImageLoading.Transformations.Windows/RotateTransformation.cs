@@ -36,6 +36,9 @@ namespace FFImageLoading.Transformations
 
         public static BitmapHolder ToRotated(BitmapHolder source, double degrees, bool ccw, bool resize)
         {
+			if (degrees == 0 || degrees % 360 == 0)
+				return source;
+			
             if (ccw)
                 degrees = 360d - degrees;
 
@@ -70,7 +73,7 @@ namespace FFImageLoading.Transformations
             iWidth = source.Width;
             iHeight = source.Height;
 
-            if (resize)
+			if (!resize || (degrees % 180 == 0))
             {
                 newWidth = iWidth;
                 newHeight = iHeight;

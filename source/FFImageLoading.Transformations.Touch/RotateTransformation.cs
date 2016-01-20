@@ -37,12 +37,15 @@ namespace FFImageLoading.Transformations
 
 		public static UIImage ToRotated(UIImage source, double degrees, bool ccw, bool resize)
 		{
+			if (degrees == 0 || degrees % 360 == 0)
+				return source;
+
 			if (ccw)
 				degrees = 360d - degrees;
 
 			CGRect boundingRect = new CGRect(0, 0, source.Size.Width, source.Size.Height);
 
-			if (resize)
+			if (resize && (degrees % 180 != 0))
 				boundingRect = GetBoundingRectAfterRotation(new CGRect(0, 0, source.Size.Width, source.Size.Height), degrees);
 
 			UIGraphics.BeginImageContextWithOptions(new CGSize(boundingRect.Size.Width, boundingRect.Size.Height), false, (nfloat)0.0);
