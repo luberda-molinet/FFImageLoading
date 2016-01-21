@@ -70,7 +70,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MvvmCross", "MvvmCross", "{
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Cross", "source\FFImageLoading.Cross\FFImageLoading.Cross.shproj", "{3C58B37D-EDB7-4778-AA48-F3AD9A571059}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListView.Universal.Sample", "ListView.Universal.Sample\ListView.Universal.Sample.csproj", "{0809A72B-DF7A-49AD-90DF-77B04A0F4F29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListView.Universal.Sample", "samples\ListView.Universal.Sample\ListView.Universal.Sample.csproj", "{0809A72B-DF7A-49AD-90DF-77B04A0F4F29}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
