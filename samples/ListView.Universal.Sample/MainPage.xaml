@@ -15,9 +15,11 @@
                   Loaded="ListView_Loaded">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
-                    <ff:FFImage Height="300"
-                                Width="300"
+                    <ff:FFImage Height="200"
+                                Width="200"
                                 DownsampleToViewSize="True"
+                                LoadingPlaceholder="loading.png"
+                                ErrorPlaceholder="error.png"
                                 Source="{x:Bind}" />
                 </DataTemplate>
             </ListView.ItemTemplate>
