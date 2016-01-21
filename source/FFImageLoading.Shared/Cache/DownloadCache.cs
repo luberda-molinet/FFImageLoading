@@ -61,28 +61,26 @@ namespace FFImageLoading.Cache
 			int headersTimeout = ImageService.Config.HttpHeadersTimeout;
 			int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
 
-			var cancelHeadersToken = new CancellationTokenSource();
-			cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(headersTimeout));
-			var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token);
+            using (var cancelHeadersToken = new CancellationTokenSource(TimeSpan.FromSeconds(headersTimeout)))
+            using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
+            using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
+            {
+                if (!response.IsSuccessStatusCode || response.Content == null)
+                    return null;
 
-			using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
-			{
-				if (!response.IsSuccessStatusCode || response.Content == null)
-					return null;
+                using (var cancelReadToken = new CancellationTokenSource(TimeSpan.FromSeconds(readTimeout)))
+                {
+                    var responseBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-				var cancelReadToken = new CancellationTokenSource();
-				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
+                    var memoryStream = new MemoryStream(responseBytes, false);
+                    memoryStream.Position = 0;
 
-				var responseBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                    _diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
 
-				var memoryStream = new MemoryStream(responseBytes, false);
-				memoryStream.Position = 0;
-
-				_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
-
-				return memoryStream;
-			}
-		}
+                    return memoryStream;
+                }
+            }
+        }
     }
 }
 
