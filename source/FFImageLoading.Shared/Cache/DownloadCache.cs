@@ -36,8 +36,12 @@ namespace FFImageLoading.Cache
 
 			using (var memoryStream = await DownloadAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false))
 			{
-				return new DownloadedData(filepath, memoryStream == null ? null : memoryStream.GetBuffer());
-			}
+#if WINDOWS
+                return new DownloadedData(filepath, memoryStream == null ? null : memoryStream.ToArray());
+#else
+                return new DownloadedData(filepath, memoryStream == null ? null : memoryStream.GetBuffer());
+#endif           
+            }
         }
 
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null)
@@ -74,9 +78,13 @@ namespace FFImageLoading.Cache
 				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
 
 				var responseBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+#if WINDOWS
+                var memoryStream = new MemoryStream(responseBytes, 0, responseBytes.Length, false);
+#else
+                var memoryStream = new MemoryStream(responseBytes, 0, responseBytes.Length, false, true);
+#endif
 
-				var memoryStream = new MemoryStream(responseBytes, 0, responseBytes.Length, false, true);
-				memoryStream.Position = 0;
+                memoryStream.Position = 0;
 
 				_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
 
