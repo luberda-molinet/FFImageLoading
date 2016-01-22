@@ -34,10 +34,8 @@ namespace FFImageLoading.Cache
 			if (data != null)
 				return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
 
-			using (var memoryStream = await DownloadAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false))
-			{
-				return new DownloadedData(filepath, memoryStream == null ? null : memoryStream.GetBuffer());
-			}
+			var bytes = await DownloadBytesAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false);
+			return new DownloadedData(filepath, bytes);
         }
 
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null)
@@ -49,15 +47,35 @@ namespace FFImageLoading.Cache
 			if (diskStream != null)
 				return new CacheStream(diskStream, true);
 
-			var memoryStream = await DownloadAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false);
+			var memoryStream = await DownloadStreamAndCacheAsync(url, filename, filepath, token, duration).ConfigureAwait(false);
 			return new CacheStream(memoryStream, false);
 		}
 
-		private async Task<MemoryStream> DownloadAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration)
+		private async Task<MemoryStream> DownloadStreamAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration)
 		{
-			if (duration == null)
-				duration = new TimeSpan(30, 0, 0, 0); // by default we cache data 30 days
+			var responseBytes = await DownloadAsync(url, filename, filepath, token).ConfigureAwait(false);
+			if (responseBytes == null)
+				return null;
 
+			var memoryStream = new MemoryStream(responseBytes, false);
+			memoryStream.Position = 0;
+
+			_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+			return memoryStream;
+		}
+
+		private async Task<byte[]> DownloadBytesAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration)
+		{
+			var responseBytes = await DownloadAsync(url, filename, filepath, token).ConfigureAwait(false);
+			if (responseBytes == null)
+				return null;
+
+			_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+			return responseBytes;
+		}
+
+		private async Task<byte[]> DownloadAsync(string url, string filename, string filepath, CancellationToken token)
+		{
 			int headersTimeout = ImageService.Config.HttpHeadersTimeout;
 			int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
 
@@ -73,14 +91,7 @@ namespace FFImageLoading.Cache
 				var cancelReadToken = new CancellationTokenSource();
 				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
 
-				var responseBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-
-				var memoryStream = new MemoryStream(responseBytes, 0, responseBytes.Length, false, true);
-				memoryStream.Position = 0;
-
-				_diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration.Value);
-
-				return memoryStream;
+				return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 			}
 		}
     }
