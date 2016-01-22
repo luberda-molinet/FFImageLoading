@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Windows.Storage;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 #if SILVERLIGHT
 using FFImageLoading.Concurrency;
@@ -313,14 +314,8 @@ namespace FFImageLoading.Cache
                 if (file == null)
                     return null;
 
-				using (var fs = await file.OpenStreamForReadAsync().ConfigureAwait(false))
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        await fs.CopyToAsync(ms, BufferSize, token).ConfigureAwait(false);
-                        return ms.ToArray();
-                    }
-                }
+                var buffer = await FileIO.ReadBufferAsync(file);
+                return buffer.ToArray();
             }
             catch
             {
