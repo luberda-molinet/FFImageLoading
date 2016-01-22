@@ -35,7 +35,8 @@ namespace FFImageLoading.Work
 		public void Dispose()
 		{
 			Finish();
-		}
+            CancellationToken.Dispose();
+        }
 
 		#endregion
 
