@@ -1,12 +1,12 @@
 ﻿using FFImageLoading.Cache;
-using FFImageLoading.Extensions;
 using FFImageLoading.Work;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace FFImageLoading.DataResolver
 {
-    public class UrlDataResolver : IDataResolver
+    public class UrlDataResolver : IStreamResolver
     {
 
         protected TaskParameter Parameters { get; private set; }
@@ -18,18 +18,11 @@ namespace FFImageLoading.DataResolver
             DownloadCache = downloadCache;
         }
 
-        public async Task<ResolverImageData> GetData(string identifier, CancellationToken token)
+        public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
         {
-            var downloadedData = await DownloadCache.GetAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
-            var bytes = downloadedData.Bytes;
-            var path = downloadedData.CachedPath;
-            var result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;
-
-            return new ResolverImageData() {
-                Data = bytes,
-                Result = result,
-                ResultIdentifier = path
-            };
+            var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
+            return WithLoadingResult.Encapsulate(cachedStream.ImageStream,
+                cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet);
         }
 
         public void Dispose()

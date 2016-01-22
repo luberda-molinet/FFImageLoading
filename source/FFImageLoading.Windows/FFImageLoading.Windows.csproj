@@ -88,7 +88,7 @@
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="DataResolver\DataResolverFactory.cs" />
     <Compile Include="DataResolver\FilePathDataResolver.cs" />
-    <Compile Include="DataResolver\IDataResolver.cs" />
+    <Compile Include="DataResolver\IStreamResolver.cs" />
     <Compile Include="DataResolver\ResolverImageData.cs" />
     <Compile Include="DataResolver\ResourceDataResolver.cs" />
     <Compile Include="DataResolver\UrlDataResolver.cs" />

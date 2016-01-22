@@ -56,12 +56,11 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this byte[] imageBytes, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode)
         {
-            if (imageBytes == null)
+            if (imageStream == null)
                 return null;
 
-            using (var imageStream = imageBytes.AsBuffer().AsStream())
             using (IRandomAccessStream image = imageStream.AsRandomAccessStream())
             {
                 if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
@@ -98,16 +97,15 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public async static Task<BitmapHolder> ToBitmapHolderAsync(this byte[] imageBytes, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode)
+        public async static Task<BitmapHolder> ToBitmapHolderAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode)
         {
-            if (imageBytes == null)
+            if (imageStream == null)
                 return null;
 
-            using (var imageStream = imageBytes.AsBuffer().AsStream())
             using (IRandomAccessStream image = imageStream.AsRandomAccessStream())
             {
-				if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
-				{
+                if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
+                {
                     using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
@@ -119,7 +117,7 @@ namespace FFImageLoading.Extensions
 
                         return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     }
-				}
+                }
                 else
                 {
                     BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);

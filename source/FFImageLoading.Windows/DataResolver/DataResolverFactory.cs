@@ -6,7 +6,7 @@ namespace FFImageLoading.DataResolver
 {
     public static class DataResolverFactory
     {
-        public static IDataResolver GetResolver(ImageSource source, TaskParameter parameter, IDownloadCache downloadCache)
+        public static IStreamResolver GetResolver(ImageSource source, TaskParameter parameter, IDownloadCache downloadCache)
         {
             switch (source)
             {

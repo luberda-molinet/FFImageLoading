@@ -200,8 +200,8 @@
     <Compile Include="..\FFImageLoading.Windows\DataResolver\FilePathDataResolver.cs">
       <Link>DataResolver\FilePathDataResolver.cs</Link>
     </Compile>
-    <Compile Include="..\FFImageLoading.Windows\DataResolver\IDataResolver.cs">
-      <Link>DataResolver\IDataResolver.cs</Link>
+    <Compile Include="..\FFImageLoading.Windows\DataResolver\IStreamResolver.cs">
+      <Link>DataResolver\IStreamResolver.cs</Link>
     </Compile>
     <Compile Include="..\FFImageLoading.Windows\DataResolver\ResolverImageData.cs">
       <Link>DataResolver\ResolverImageData.cs</Link>
