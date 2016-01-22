@@ -24,7 +24,9 @@ namespace FFImageLoading.DataResolver
             try
             {
                 string resPath = @"Assets\" + identifier.TrimStart('\\', '/');
-				file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(resPath);
+                var imgUri = new Uri("ms-appx:///" + resPath);
+                file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+                // OLD WAY: file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(resPath);
             }
             catch (Exception)
             {
