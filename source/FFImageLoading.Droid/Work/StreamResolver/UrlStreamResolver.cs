@@ -23,14 +23,13 @@ namespace FFImageLoading.Work.StreamResolver
 		{
 			var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
 			return WithLoadingResult.Encapsulate(cachedStream.ImageStream,
-				cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Disk);
+				cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet);
 		}
 
 		public void Dispose() {
 			Parameters = null;
 			DownloadCache = null;
 		}
-		
 	}
 }
 
