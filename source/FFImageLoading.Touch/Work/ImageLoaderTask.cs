@@ -10,6 +10,7 @@ using FFImageLoading.Work.DataResolver;
 using System.Linq;
 using System.IO;
 using FFImageLoading.Extensions;
+using CoreFoundation;
 
 namespace FFImageLoading.Work
 {
@@ -19,14 +20,11 @@ namespace FFImageLoading.Work
 		private readonly Action<UIImage, bool> _doWithImage;
 		private readonly nfloat _imageScale;
 
-		private static nfloat _screenScale;
-
 		static ImageLoaderTask()
 		{
-			UIScreen.MainScreen.InvokeOnMainThread(() =>
-				{
-					_screenScale = UIScreen.MainScreen.Scale;
-				});
+			// do not remove!
+			// kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
+			ScaleHelper.Scale;
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
@@ -249,135 +247,147 @@ namespace FFImageLoading.Work
 			if (CancellationToken.IsCancellationRequested)
 				return null;
 
-			UIImage image = null;
-			byte[] bytes = null;
-			string path = sourcePath;
-			LoadingResult? result = null;
-
-			try
+			return await Task.Run(async () =>
 			{
-				if (originalStream != null)
+				LoadingResult? result = null;
+				UIImage image = null;
+				byte[] bytes = null;
+				string path = sourcePath;
+
+				try
 				{
-					try
+					if (originalStream != null)
 					{
-						using (var ms = new MemoryStream())
+						try
 						{
-							await originalStream.CopyToAsync(ms).ConfigureAwait(false);
-							bytes = ms.ToArray();
+							// check is stream is memorystream
+							var ms = originalStream as MemoryStream;
+							if (ms != null)
+							{
+								bytes = ms.ToArray();
+							}
+							else if (originalStream.CanSeek)
+							{
+								bytes = new byte[originalStream.Length];
+								await originalStream.ReadAsync(bytes, 0, (int)originalStream.Length, CancellationToken.Token).ConfigureAwait(false);
+							}
+							else
+							{
+								using (var ms2 = new MemoryStream())
+								{
+									await originalStream.CopyToAsync(ms2).ConfigureAwait(false);
+									bytes = ms2.ToArray();
+								}
+							}
+
 							path = sourcePath;
 							result = LoadingResult.Stream;
 						}
-					}
-					finally
-					{
-						originalStream.Dispose();
-					}
-				}
-				else
-				{
-					using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache, MainThreadDispatcher))
-					{
-						var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
-						if (data == null)
-							return null;
-
-						image = data.Image;
-						bytes = data.Data;
-						path = data.ResultIdentifier;
-						result = data.Result;
-					}
-				}
-			}
-			catch (System.OperationCanceledException)
-			{
-				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
-				return null;
-			}
-			catch (Exception ex)
-			{
-				var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
-				Logger.Error(message, ex);
-				Parameters.OnError(ex);
-				return null;
-			}
-
-			if (bytes == null && image == null)
-				return null;
-
-			var imageToDisplay = await Task.Run(() =>
-				{
-					if (CancellationToken.IsCancellationRequested)
-						return null;
-
-					UIImage imageIn = image;
-
-					if (imageIn == null)
-					{
-						// Special case to handle WebP decoding on iOS
-						if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+						finally
 						{
-							imageIn = new WebP.Touch.WebPCodec().Decode(bytes);
-						}
-						else
-						{
-							nfloat scale = _imageScale >= 1 ? _imageScale : _screenScale;
-							imageIn = new UIImage(NSData.FromArray(bytes), scale);
+							originalStream.Dispose();
 						}
 					}
-
-					if (Parameters.DownSampleSize != null
-						&& ((Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1) 
-							|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
+					else
 					{
-						var tempImage = imageIn;
-
-						int downsampleWidth = Parameters.DownSampleSize.Item1;
-						int downsampleHeight = Parameters.DownSampleSize.Item2;
-
-						if (Parameters.DownSampleUseDipUnits)
+						using (var resolver = DataResolverFactory.GetResolver(source, Parameters, DownloadCache, MainThreadDispatcher))
 						{
-							downsampleWidth = downsampleWidth.PointsToPixels();
-							downsampleHeight = downsampleHeight.PointsToPixels();
-						}
-
-						imageIn = tempImage.ResizeUIImage(downsampleWidth, downsampleHeight, Parameters.DownSampleInterpolationMode);
-						tempImage.Dispose();
-					}
-
-					bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
-						Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
-
-					if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
-						&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
-					{
-						foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
-						{
-							if (CancellationToken.IsCancellationRequested)
+							var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
+							if (data == null)
 								return null;
 
-							try
-							{
-								var old = imageIn;
-								var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
-								imageIn = bitmapHolder.ToNative();
-
-								// Transformation succeeded, so garbage the source
-								if (old != null && old != imageIn && old.Handle != imageIn.Handle)
-									old.Dispose();
-							}
-							catch (Exception ex)
-							{
-								Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-							}
+							image = data.Image;
+							bytes = data.Data;
+							path = data.ResultIdentifier;
+							result = data.Result;
 						}
 					}
+				}
+				catch (System.OperationCanceledException)
+				{
+					Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
+					return null;
+				}
+				catch (Exception ex)
+				{
+					var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
+					Logger.Error(message, ex);
+					Parameters.OnError(ex);
+					return null;
+				}
 
-					return imageIn;
-				}).ConfigureAwait(false);
+				if (bytes == null && image == null)
+					return null;
 
-			bytes = null;
+				if (CancellationToken.IsCancellationRequested)
+					return null;
 
-			return WithLoadingResult.Encapsulate(imageToDisplay, result.Value);
+				UIImage imageIn = image;
+
+				if (imageIn == null)
+				{
+					// Special case to handle WebP decoding on iOS
+					if (sourcePath.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+					{
+						imageIn = new WebP.Touch.WebPCodec().Decode(bytes);
+					}
+					else
+					{
+						nfloat scale = _imageScale >= 1 ? _imageScale : ScaleHelper.Scale;;
+						imageIn = new UIImage(NSData.FromArray(bytes), scale);
+					}
+				}
+
+				if (Parameters.DownSampleSize != null
+					&& ((Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1) 
+						|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
+				{
+					var tempImage = imageIn;
+
+					int downsampleWidth = Parameters.DownSampleSize.Item1;
+					int downsampleHeight = Parameters.DownSampleSize.Item2;
+
+					if (Parameters.DownSampleUseDipUnits)
+					{
+						downsampleWidth = downsampleWidth.PointsToPixels();
+						downsampleHeight = downsampleHeight.PointsToPixels();
+					}
+
+					imageIn = tempImage.ResizeUIImage(downsampleWidth, downsampleHeight, Parameters.DownSampleInterpolationMode);
+					tempImage.Dispose();
+				}
+
+				bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
+					Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+
+				if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
+					&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+				{
+					foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+					{
+						if (CancellationToken.IsCancellationRequested)
+							return null;
+
+						try
+						{
+							var old = imageIn;
+							var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
+							imageIn = bitmapHolder.ToNative();
+
+							// Transformation succeeded, so garbage the source
+							if (old != null && old != imageIn && old.Handle != imageIn.Handle)
+								old.Dispose();
+						}
+						catch (Exception ex)
+						{
+							Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+						}
+					}
+				}
+
+				bytes = null;
+				return WithLoadingResult.Encapsulate(imageIn, result.Value);
+			}).ConfigureAwait(false);
 		}
 
 		/// <summary>

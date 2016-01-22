@@ -5,21 +5,14 @@ using FFImageLoading.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using UIKit;
+using CoreFoundation;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Work.DataResolver
 {
 	public class FilePathDataResolver : IDataResolver
 	{
-		private static int _screenScale;
 		private readonly ImageSource _source;
-
-		static FilePathDataResolver()
-		{
-			UIScreen.MainScreen.InvokeOnMainThread(() =>
-				{
-					_screenScale = (int)UIScreen.MainScreen.Scale;
-				});
-		}
 
 		public FilePathDataResolver(ImageSource source)
 		{
@@ -28,7 +21,7 @@ namespace FFImageLoading.Work.DataResolver
 
 		public Task<UIImageData> GetData(string identifier, CancellationToken token)
 		{
-			int scale = _screenScale;
+			int scale = (int)ScaleHelper.Scale;
 			if (scale > 1)
 			{
 				var filename = Path.GetFileNameWithoutExtension(identifier);
@@ -59,7 +52,7 @@ namespace FFImageLoading.Work.DataResolver
 
 		private async Task<UIImageData> GetDataInternal(string identifier, CancellationToken token)
 		{
-			var bytes = await FileStore.ReadBytesAsync(identifier).ConfigureAwait(false);
+			var bytes = await FileStore.ReadBytesAsync(identifier, token).ConfigureAwait(false);
 			var result = (LoadingResult)(int)_source; // Some values of ImageSource and LoadingResult are shared
 			return new UIImageData() { Data = bytes, Result = result, ResultIdentifier = identifier };
 		}
