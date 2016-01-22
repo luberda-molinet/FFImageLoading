@@ -10,7 +10,14 @@ namespace FFImageLoading.Work
 {
 	public abstract class ImageLoaderTaskBase: IImageLoaderTask, IDisposable
 	{
-		bool _clearCacheOnOutOfMemory;
+		private static int _streamIndex;
+		private static int GetNextStreamIndex()
+		{
+			return Interlocked.Increment(ref _streamIndex);
+		}
+
+		private bool _clearCacheOnOutOfMemory;
+		private string _streamKey;
 
 		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
 		{
@@ -78,7 +85,10 @@ namespace FFImageLoading.Work
 			string baseKey = null;
 			if (Parameters.Stream != null)
 			{
-				baseKey = "Stream" + Parameters.Stream.GetHashCode();
+				if (_streamKey == null)
+					_streamKey = "Stream" + GetNextStreamIndex();
+
+				baseKey = _streamKey;
 			}
 			else
 			{

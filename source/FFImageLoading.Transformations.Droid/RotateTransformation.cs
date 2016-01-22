@@ -36,6 +36,9 @@ namespace FFImageLoading.Transformations
 
 		public static Bitmap ToRotated(Bitmap source, double degrees, bool ccw, bool resize)
 		{
+			if (degrees == 0 || degrees % 360 == 0)
+				return source;
+
 			if (ccw)
 				degrees = 360d - degrees;
 
@@ -55,7 +58,7 @@ namespace FFImageLoading.Transformations
 				float targetWidth = source.Width;
 				float targetHeight = source.Height;
 
-				if (resize)
+				if (resize && (degrees % 180 != 0))
 				{
 					double cosR = Math.Cos(DegreesToRadians(targetRotation));
 					double sinR = Math.Sin(DegreesToRadians(targetRotation));
