@@ -245,12 +245,34 @@ namespace FFImageLoading.Work
             {
                 if (originalStream != null)
                 {
-                    using (var ms = new MemoryStream())
+                    try
                     {
-                        await originalStream.CopyToAsync(ms).ConfigureAwait(false);
-                        bytes = ms.ToArray();
+                        // check if stream is a MemoryStream
+                        var ms = originalStream as MemoryStream;
+                        if (ms != null)
+                        {
+                            bytes = ms.ToArray();
+                        }
+                        else if (originalStream.CanSeek)
+                        {
+                            bytes = new byte[originalStream.Length];
+                            await originalStream.ReadAsync(bytes, 0, (int)originalStream.Length, CancellationToken.Token).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            using (var ms2 = new MemoryStream())
+                            {
+                                await originalStream.CopyToAsync(ms2).ConfigureAwait(false);
+                                bytes = ms2.ToArray();
+                            }
+                        }
+
                         path = sourcePath;
                         result = LoadingResult.Stream;
+                    }
+                    finally
+                    {
+                        originalStream.Dispose();
                     }
                 }
                 else
