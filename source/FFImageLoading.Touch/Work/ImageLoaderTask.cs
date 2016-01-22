@@ -2,15 +2,12 @@
 using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using UIKit;
-using System.Threading;
 using System.Threading.Tasks;
-using FFImageLoading.IO;
 using Foundation;
 using FFImageLoading.Work.DataResolver;
 using System.Linq;
 using System.IO;
 using FFImageLoading.Extensions;
-using CoreFoundation;
 
 namespace FFImageLoading.Work
 {
@@ -24,7 +21,9 @@ namespace FFImageLoading.Work
 		{
 			// do not remove!
 			// kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
-			ScaleHelper.Scale;
+			#pragma warning disable 0219
+			var ignore = ScaleHelper.Scale;
+			#pragma warning restore 0219
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, nfloat imageScale)
