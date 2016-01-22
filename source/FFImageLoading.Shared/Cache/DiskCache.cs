@@ -224,14 +224,7 @@ namespace FFImageLoading.Cache
 				if (!FileStore.Exists(filepath))
 					return null;
 
-				using (var fs = FileStore.GetInputStream(filepath))
-				{
-					using (var ms = new MemoryStream())
-					{
-						await fs.CopyToAsync(ms, BufferSize, token).ConfigureAwait(false);
-						return ms.ToArray();
-					}
-				}
+				return await FileStore.ReadBytesAsync(filepath, token).ConfigureAwait(false);
 			}
 			catch
 			{

@@ -1,23 +1,15 @@
 ﻿using System;
 using UIKit;
+using CoreFoundation;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Extensions
 {
 	public static class UnitsExtensions
 	{
-		private static nfloat _screenScale;
-
-		static UnitsExtensions()
-		{
-			UIScreen.MainScreen.InvokeOnMainThread(() =>
-				{
-					_screenScale = UIScreen.MainScreen.Scale;
-				});
-		}
-
 		public static int PointsToPixels(this double points)
 		{
-			return (int)Math.Floor(points * _screenScale);
+			return (int)Math.Floor(points * ScaleHelper.Scale);
 		}
 
 		public static int PixelsToPoints(this double px)
@@ -25,7 +17,7 @@ namespace FFImageLoading.Extensions
 			if (px == 0d)
 				return 0;
 
-			return (int)Math.Floor(px / UIScreen.MainScreen.Scale);
+			return (int)Math.Floor(px / ScaleHelper.Scale);
 		}
 
 		public static int PointsToPixels(this int points)

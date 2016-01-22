@@ -2,6 +2,7 @@
 using UIKit;
 using System.Threading.Tasks;
 using Foundation;
+using CoreFoundation;
 
 namespace FFImageLoading.Helpers
 {
@@ -28,7 +29,7 @@ namespace FFImageLoading.Helpers
 			}
 			else	
 			{
-				UIApplication.SharedApplication.BeginInvokeOnMainThread(action);	
+				DispatchQueue.MainQueue.DispatchAsync(action);
 			}
         }
 
