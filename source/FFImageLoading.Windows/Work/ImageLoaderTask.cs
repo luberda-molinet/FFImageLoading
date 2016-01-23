@@ -353,27 +353,17 @@ namespace FFImageLoading.Work
 
                         try
                         {
-                            //if (streamWithResult.Result == LoadingResult.Internet)
-                            {
-                                imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
-                            }
-                            //else
-                            //{
-                            //    try
-                            //    {
-                            //        await _decodingLock.WaitAsync();
-                            //        imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
-                            //    }
-                            //    finally
-                            //    {
-                            //        _decodingLock.Release();
-                            //    }
-                            //}
+                            await _decodingLock.WaitAsync();
+                            imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
                             Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
                             return null;
+                        }
+                        finally
+                        {
+                            _decodingLock.Release();
                         }
 
                         foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
@@ -385,8 +375,16 @@ namespace FFImageLoading.Work
                             {
                                 var old = imageIn;
 
-                                IBitmap bitmapHolder = transformation.Transform(imageIn);
-                                imageIn = bitmapHolder.ToNative();
+                                try
+                                {
+                                    await _decodingLock.WaitAsync();
+                                    IBitmap bitmapHolder = transformation.Transform(imageIn);
+                                    imageIn = bitmapHolder.ToNative();
+                                }
+                                finally
+                                {
+                                    _decodingLock.Release();
+                                }
 
                                 if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
                                 {
@@ -408,27 +406,17 @@ namespace FFImageLoading.Work
                     {
                         try
                         {
-                            //if (streamWithResult.Result == LoadingResult.Internet)
-                            {
-                                writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
-                            }
-                            //else
-                            //{
-                            //    try
-                            //    {
-                            //        await _decodingLock.WaitAsync();
-                            //        writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
-                            //    }
-                            //    finally
-                            //    {
-                            //        _decodingLock.Release();
-                            //    }
-                            //}
+                            await _decodingLock.WaitAsync();
+                            writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
                         }
                         catch (Exception ex)
                         {
                             Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
                             return null;
+                        }
+                        finally
+                        {
+                            _decodingLock.Release();
                         }
                     }
 
