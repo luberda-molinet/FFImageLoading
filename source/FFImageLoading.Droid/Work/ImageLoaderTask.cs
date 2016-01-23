@@ -320,18 +320,19 @@ namespace FFImageLoading.Work
 					{
 						try
 						{
-							if (streamWithResult.Result == LoadingResult.Internet)
-							{
-								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
-								BitmapFactory.DecodeStream(stream, null, options);
-							}
-							else
-							{
+// NOTE: CURRENTLY NOT NEEDED							
+//							if (streamWithResult.Result == LoadingResult.Internet)
+//							{
+//								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
+//								BitmapFactory.DecodeStream(stream, null, options);
+//							}
+//							else
+//							{
 								lock (_decodingLock)
 								{
 									BitmapFactory.DecodeStream(stream, null, options);
 								}
-							}
+//							}
 
 							if (!stream.CanSeek)
 							{
@@ -407,18 +408,19 @@ namespace FFImageLoading.Work
 						Bitmap bitmap;
 						try
 						{
-							if (streamWithResult.Result == LoadingResult.Internet)
-							{
-								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
-								bitmap = BitmapFactory.DecodeStream(stream, null, options);
-							}
-							else
-							{
+// NOTE: CURRENTLY NOT NEEDED
+//							if (streamWithResult.Result == LoadingResult.Internet)
+//							{
+//								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
+//								bitmap = BitmapFactory.DecodeStream(stream, null, options);
+//							}
+//							else
+//							{
 								lock (_decodingLock)
 								{
 									bitmap = BitmapFactory.DecodeStream(stream, null, options);
 								}
-							}
+//							}
 						}
 						catch (Java.Lang.Throwable vme)
 						{
