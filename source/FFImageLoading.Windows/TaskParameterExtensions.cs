@@ -54,7 +54,7 @@ namespace FFImageLoading
                 {
 					// fade animation
 					DoubleAnimation fade = new DoubleAnimation();
-					fade.Duration = TimeSpan.FromMilliseconds(400);
+					fade.Duration = TimeSpan.FromMilliseconds(500);
 					fade.From = 0f;
 					fade.To = 1f;
 					fade.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut }; 
