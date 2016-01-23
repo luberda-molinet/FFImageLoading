@@ -197,20 +197,23 @@ namespace FFImageLoading.Work
 				}
 				else
 				{
-					using (var stream = await Parameters.Stream(CancellationToken.Token).ConfigureAwait(false))
+					try 
 					{
-						try 
+						using (var stream = await Parameters.Stream(CancellationToken.Token).ConfigureAwait(false))
 						{
 							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
-						} 
-						catch (Exception ex2) 
-						{
-							Logger.Error("An error occured", ex2);
-							ex = ex2;
 						}
 					}
+					catch (TaskCanceledException cex)
+					{
+						generatingImageSucceeded = GenerateResult.Canceled;
+					}
+					catch (Exception ex2) 
+					{
+						Logger.Error("An error occured", ex2);
+						ex = ex2;
+					}
 				}
-
 
 				if (!IsCancelled && !Completed && generatingImageSucceeded == GenerateResult.Failed)
 				{
