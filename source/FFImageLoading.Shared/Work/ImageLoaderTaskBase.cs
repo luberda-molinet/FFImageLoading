@@ -18,6 +18,7 @@ namespace FFImageLoading.Work
 
 		private bool _clearCacheOnOutOfMemory;
 		private string _streamKey;
+		private bool _isDisposed;
 
 		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
 		{
@@ -34,8 +35,12 @@ namespace FFImageLoading.Work
 
 		public void Dispose()
 		{
-			Finish();
-            CancellationToken.Dispose();
+			if (!_isDisposed)
+			{
+				Finish();
+				CancellationToken.Dispose();
+				_isDisposed = true;
+			}
         }
 
 		#endregion
@@ -123,7 +128,7 @@ namespace FFImageLoading.Work
 		{
 			get
 			{
-				return CancellationToken.IsCancellationRequested;
+				return _isDisposed || CancellationToken.IsCancellationRequested;
 			}
 		}
 
@@ -200,16 +205,16 @@ namespace FFImageLoading.Work
 				{
 					using (var stream = await Parameters.Stream(CancellationToken.Token).ConfigureAwait(false))
 					{
-						try 
-						{
+					try 
+					{
 							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
-						} 
-						catch (Exception ex2) 
-						{
-							Logger.Error("An error occured", ex2);
-							ex = ex2;
 						}
+					catch (Exception ex2) 
+					{
+						Logger.Error("An error occured", ex2);
+						ex = ex2;
 					}
+				}
 				}
 
 
