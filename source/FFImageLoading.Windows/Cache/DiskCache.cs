@@ -153,11 +153,13 @@ namespace FFImageLoading.Cache
                     {
                         stream.Seek(0, SeekOrigin.Begin);
 
-						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)).Trim() != null)
+						while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                         {
                             try
                             {
-                                JournalOp op = ParseOp(line);
+                                var trimmedLine = line.Trim();
+
+                                JournalOp op = ParseOp(trimmedLine);
                                 string key;
                                 DateTime origin;
                                 TimeSpan duration;
@@ -165,15 +167,15 @@ namespace FFImageLoading.Cache
                                 switch (op)
                                 {
                                     case JournalOp.Created:
-                                        ParseEntry(line, out key, out origin, out duration);
+                                        ParseEntry(trimmedLine, out key, out origin, out duration);
                                         entries.TryAdd(key, new CacheEntry(origin, duration));
                                         break;
                                     case JournalOp.Modified:
-                                        ParseEntry(line, out key, out origin, out duration);
+                                        ParseEntry(trimmedLine, out key, out origin, out duration);
                                         entries[key] = new CacheEntry(origin, duration);
                                         break;
                                     case JournalOp.Deleted:
-                                        ParseEntry(line, out key);
+                                        ParseEntry(trimmedLine, out key);
                                         CacheEntry oldEntry;
                                         entries.TryRemove(key, out oldEntry);
                                         break;
