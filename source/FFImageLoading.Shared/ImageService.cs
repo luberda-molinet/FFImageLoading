@@ -104,13 +104,13 @@ namespace FFImageLoading
 			if (_initialized)
 				return;
 
-			if (userDefinedConfig == null)
-				userDefinedConfig = new Configuration();
-
 			lock (_initializeLock)
 			{
 				if (_initialized)
 					return;
+
+				if (userDefinedConfig == null)
+					userDefinedConfig = new Configuration();
 
 				var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
 
