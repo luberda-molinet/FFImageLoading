@@ -150,7 +150,7 @@ namespace FFImageLoading.Work
 		{
 			try
 			{
-				if (Completed || CancellationToken.IsCancellationRequested || ImageService.ExitTasksEarly)
+				if (Completed || IsCancelled || ImageService.ExitTasksEarly)
 					return;
 
 				GenerateResult generatingImageSucceeded = GenerateResult.Failed;

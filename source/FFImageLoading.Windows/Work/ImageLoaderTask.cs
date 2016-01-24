@@ -89,7 +89,7 @@ namespace FFImageLoading.Work
                 return GenerateResult.Failed;
             }
 
-            if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
                 return GenerateResult.Canceled;
 
             if (_getNativeControl() == null)
@@ -100,7 +100,7 @@ namespace FFImageLoading.Work
                 // Post on main thread
                 await MainThreadDispatcher.PostAsync(() =>
                 {
-                    if (CancellationToken.IsCancellationRequested)
+					if (IsCancelled)
                         return;
 
                     _doWithImage(image, false);
@@ -167,7 +167,7 @@ namespace FFImageLoading.Work
             if (stream == null)
                 return GenerateResult.Failed;
 
-            if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
                 return GenerateResult.Canceled;
 
             WithLoadingResult<WriteableBitmap> imageWithResult = null;
@@ -194,7 +194,7 @@ namespace FFImageLoading.Work
 				ImageCache.Instance.Add(GetKey(), image);
 			}
 
-            if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
                 return GenerateResult.Canceled;
 
             if (_getNativeControl() == null)
@@ -208,7 +208,7 @@ namespace FFImageLoading.Work
                 // Post on main thread
                 await MainThreadDispatcher.PostAsync(() =>
                 {
-                    if (CancellationToken.IsCancellationRequested)
+					if (IsCancelled)
                         return;
 
                     _doWithImage(image, false);
@@ -234,7 +234,7 @@ namespace FFImageLoading.Work
         protected virtual async Task<WithLoadingResult<WriteableBitmap>> GetImageAsync(string sourcePath, ImageSource source,
             bool isPlaceholder, Stream originalStream = null)
         {
-            if (CancellationToken.IsCancellationRequested)
+            if (IsCancelled)
                 return null;
 
             var image = await Task.Run(async () =>
@@ -275,7 +275,7 @@ namespace FFImageLoading.Work
                 if (imageStream == null)
                     return null;
 
-                if (CancellationToken.IsCancellationRequested)
+                if (IsCancelled)
                     return null;
 
                 WriteableBitmap writableBitmap = null;
@@ -299,7 +299,7 @@ namespace FFImageLoading.Work
 
                         foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                         {
-                            if (CancellationToken.IsCancellationRequested)
+                            if (IsCancelled)
                                 return null;
 
                             try
@@ -370,13 +370,13 @@ namespace FFImageLoading.Work
             if (view == null)
                 return false;
 
-            if (CancellationToken.IsCancellationRequested)
+            if (IsCancelled)
                 return false;
 
             // Post on main thread but don't wait for it
             MainThreadDispatcher.Post(() =>
             {
-                if (CancellationToken.IsCancellationRequested)
+                if (IsCancelled)
                     return;
 
                 _doWithImage(image, false);
@@ -391,7 +391,7 @@ namespace FFImageLoading.Work
             // thread and the ImageView that was originally bound to this task is still bound back
             // to this task and our "exit early" flag is not set then try and fetch the bitmap from
             // the cache
-            if (CancellationToken.IsCancellationRequested || _getNativeControl() == null || ImageService.ExitTasksEarly)
+            if (IsCancelled || _getNativeControl() == null || ImageService.ExitTasksEarly)
                 return null;
 
             var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
