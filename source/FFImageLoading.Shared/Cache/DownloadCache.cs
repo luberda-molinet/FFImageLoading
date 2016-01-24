@@ -77,21 +77,22 @@ namespace FFImageLoading.Cache
 		private async Task<byte[]> DownloadAsync(string url, string filename, string filepath, CancellationToken token)
 		{
 			int headersTimeout = ImageService.Config.HttpHeadersTimeout;
-			int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
+			// Not used for the moment
+			// int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
 
-			var cancelHeadersToken = new CancellationTokenSource();
-			cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(headersTimeout));
-			var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token);
-
-			using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
+			using (var cancelHeadersToken = new CancellationTokenSource())
 			{
-				if (!response.IsSuccessStatusCode || response.Content == null)
-					return null;
+				cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(headersTimeout));
+				using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
+				{
+					using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
+					{
+						if (!response.IsSuccessStatusCode || response.Content == null)
+							return null;
 
-				var cancelReadToken = new CancellationTokenSource();
-				cancelReadToken.CancelAfter(TimeSpan.FromSeconds(readTimeout));
-
-				return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+						return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+					}
+				}
 			}
 		}
     }

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{4B964916-47F4-4876-8A6B-9048B8A0D148}</ProjectGuid>
+    <ProjectGuid>{0809A72B-DF7A-49AD-90DF-77B04A0F4F29}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Simple.Universal.Sample</RootNamespace>
-    <AssemblyName>Simple.Universal.Sample</AssemblyName>
+    <RootNamespace>ListView.Universal.Sample</RootNamespace>
+    <AssemblyName>ListView.Universal.Sample</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
@@ -16,7 +16,7 @@
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Simple.Universal.Sample_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>ListView.Universal.Sample_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -39,7 +39,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -85,7 +85,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
@@ -104,7 +104,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Simple.Universal.Sample_TemporaryKey.pfx" />
+    <None Include="ListView.Universal.Sample_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\error.png" />
@@ -131,15 +131,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
-      <Name>FFImageLoading-contrib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj">
-      <Project>{1602a3cb-80c2-42bb-b21a-6beb87ed6ee2}</Project>
-      <Name>FFImageLoading.Transformations.Windows</Name>
+      <Name>FFImageLoading</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\FFImageLoading.Windows\FFImageLoading.Windows.csproj">
       <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
-      <Name>FFImageLoading-contrib.Windows</Name>
+      <Name>FFImageLoading.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

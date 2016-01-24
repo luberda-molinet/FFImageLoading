@@ -169,13 +169,13 @@ namespace FFImageLoading.Work
 				
 			try
 			{
-				if (CancellationToken.IsCancellationRequested)
+				if (IsCancelled)
 					return GenerateResult.Canceled;
 
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						if (CancellationToken.IsCancellationRequested)
+						if (IsCancelled)
 							return;
 						
 						if (imageView == null || imageView.Handle == IntPtr.Zero)
@@ -219,7 +219,7 @@ namespace FFImageLoading.Work
 			if (stream == null)
 				return GenerateResult.Failed;
 
-			if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
 				return GenerateResult.Canceled;
 
 			var imageView = GetAttachedImageView();
@@ -242,13 +242,13 @@ namespace FFImageLoading.Work
 
 			try
 			{
-				if (CancellationToken.IsCancellationRequested)
+				if (IsCancelled)
 					return GenerateResult.Canceled;
 
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						if (CancellationToken.IsCancellationRequested)
+						if (IsCancelled)
 							return;
 
 						if (imageView == null || imageView.Handle == IntPtr.Zero)
@@ -275,12 +275,12 @@ namespace FFImageLoading.Work
 
 		protected virtual async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, bool isPlaceholder, Stream originalStream = null)
 		{
-			if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
 				return null;
 
 			return await Task.Run<WithLoadingResult<SelfDisposingBitmapDrawable>>(async() =>
 				{
-					if (CancellationToken.IsCancellationRequested)
+					if (IsCancelled)
 						return null;
 
 					// First decode with inJustDecodeBounds=true to check dimensions
@@ -363,7 +363,7 @@ namespace FFImageLoading.Work
 							return null;
 						}
 
-						if (CancellationToken.IsCancellationRequested)
+						if (IsCancelled)
 							return null;
 
 						options.InPurgeable = true;
@@ -402,7 +402,7 @@ namespace FFImageLoading.Work
 							Logger.Error("Something wrong happened while adding decoding options to image: " + path, ex);
 						}
 
-						if (CancellationToken.IsCancellationRequested)
+						if (IsCancelled)
 							return null;
 
 						Bitmap bitmap;
@@ -436,7 +436,7 @@ namespace FFImageLoading.Work
 							return null;
 						}
 
-						if (bitmap == null || CancellationToken.IsCancellationRequested)
+						if (bitmap == null || IsCancelled)
 							return null;
 
 						bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
@@ -447,7 +447,7 @@ namespace FFImageLoading.Work
 						{
 							foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 							{
-								if (CancellationToken.IsCancellationRequested)
+								if (IsCancelled)
 									return null;
 
 								try
@@ -551,12 +551,12 @@ namespace FFImageLoading.Work
 
 			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(drawable);
 
-			if (CancellationToken.IsCancellationRequested)
+			if (IsCancelled)
 				return false;
 
 			await MainThreadDispatcher.PostAsync(() =>
 			{
-				if (CancellationToken.IsCancellationRequested)
+				if (IsCancelled)
 					return;
 					
 				if (imageView == null || imageView.Handle == IntPtr.Zero)
@@ -676,7 +676,7 @@ namespace FFImageLoading.Work
 			// thread and the ImageView that was originally bound to this task is still bound back
 			// to this task and our "exit early" flag is not set then try and fetch the bitmap from
 			// the cache
-			if (CancellationToken.IsCancellationRequested || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
+			if (IsCancelled || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
 				return null;
 
 			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
