@@ -39,7 +39,9 @@ namespace FFImageLoading
 				if (isFadeAnimationEnabled && !fromCache)
 				{
 					// fade animation
-					UIView.Transition(refView, 0.4f, UIViewAnimationOptions.TransitionCrossDissolve,
+					UIView.Transition(refView, 0.4f, 
+						UIViewAnimationOptions.TransitionCrossDissolve 
+						| UIViewAnimationOptions.BeginFromCurrentState,
 						() => { refView.Image = img; },
 						() => {  });
 				}
