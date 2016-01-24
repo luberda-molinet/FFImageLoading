@@ -13,9 +13,6 @@ namespace FFImageLoading
 {
     public static class ImageService
     {
-		private const int HttpHeadersTimeout = 15;
-		private const int HttpReadTimeout = 30;
-
         private static volatile bool _initialized;
 		private static object _initializeLock = new object();
 		private static readonly MD5Helper _md5Helper = new MD5Helper();
@@ -25,6 +22,43 @@ namespace FFImageLoading
         /// </summary>
         /// <value>The configuration used by FFImageLoading.</value>
         public static Configuration Config { get; private set; }
+
+		public static void Initialize(Configuration configuration)
+		{
+			lock (_initializeLock)
+			{
+				_initialized = false;
+
+				if (Config != null)
+				{
+					// If DownloadCache is not updated but HttpClient is then we inform DownloadCache
+					if (configuration.HttpClient != null && configuration.DownloadCache == null)
+					{
+						configuration.DownloadCache = Config.DownloadCache;
+						configuration.DownloadCache.DownloadHttpClient = configuration.HttpClient;
+					}
+
+					// Redefine these if they were provided only
+					configuration.HttpClient = configuration.HttpClient ?? Config.HttpClient;
+					configuration.Scheduler = configuration.Scheduler ?? Config.Scheduler;
+					configuration.Logger = configuration.Logger ?? Config.Logger;
+					configuration.DownloadCache = configuration.DownloadCache ?? Config.DownloadCache;
+					configuration.LoadWithTransparencyChannel = configuration.LoadWithTransparencyChannel;
+					configuration.FadeAnimationEnabled = configuration.FadeAnimationEnabled;
+					configuration.TransformPlaceholders = configuration.TransformPlaceholders;
+					configuration.DownsampleInterpolationMode = configuration.DownsampleInterpolationMode;
+
+					// Skip configuration for maxCacheSize and diskCache. They cannot be redefined.
+					if (configuration.Logger != null)
+						configuration.Logger.Debug("Skip configuration for maxCacheSize and diskCache. They cannot be redefined.");
+					configuration.MaxCacheSize = Config.MaxCacheSize;
+					configuration.DiskCache = Config.DiskCache;
+				}
+
+
+				InitializeIfNeeded(configuration);
+			}
+		}
 
         /// <summary>
         /// Initialize ImageService default values. This can only be done once: during app start.
@@ -41,98 +75,65 @@ namespace FFImageLoading
 		/// <param name="downsampleInterpolationMode">Defines default downsample interpolation mode.</param>
 		/// <param name="httpHeadersTimeout">Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.</param>
 		/// <param name="httpReadTimeout">Maximum time in seconds to wait before the HTTP request is cancelled.</param>
-		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
+		[Obsolete("Use Initialize(Configuration configuration) overload")]
+		public static void Initializee(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
 			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null,
-			bool? transformPlaceholders = null, InterpolationMode? downsampleInterpolationMode = null, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
+			bool? transformPlaceholders = null, InterpolationMode? downsampleInterpolationMode = null, int httpHeadersTimeout = 15, int httpReadTimeout = 30
 		)
         {
-			lock (_initializeLock)
-			{
-				_initialized = false;
+			var cfg = new Configuration();
 
-				if (Config != null)
-				{
-					// If DownloadCache is not updated but HttpClient is then we inform DownloadCache
-					if (httpClient != null && downloadCache == null)
-					{
-						downloadCache = Config.DownloadCache;
-						downloadCache.DownloadHttpClient = httpClient;
-					}
+			if (httpClient != null) cfg.HttpClient = httpClient;
+			if (scheduler != null) cfg.Scheduler = scheduler;
+			if (logger != null) cfg.Logger = logger;
+			if (diskCache != null) cfg.DiskCache = diskCache;
+			if (downloadCache != null) cfg.DownloadCache = downloadCache;
+			if (loadWithTransparencyChannel.HasValue) cfg.LoadWithTransparencyChannel = loadWithTransparencyChannel.Value;
+			if (fadeAnimationEnabled.HasValue) cfg.FadeAnimationEnabled = fadeAnimationEnabled.Value;
+			if (transformPlaceholders.HasValue) cfg.TransformPlaceholders = transformPlaceholders.Value;
+			if (downsampleInterpolationMode.HasValue) cfg.DownsampleInterpolationMode = downsampleInterpolationMode.Value;
+			cfg.HttpHeadersTimeout = httpHeadersTimeout;
+			cfg.HttpReadTimeout = httpReadTimeout;
+			if (maxCacheSize.HasValue) cfg.MaxCacheSize = maxCacheSize.Value;
 
-					logger.Debug("Skip configuration for maxCacheSize and diskCache. They cannot be redefined.");
-					maxCacheSize = Config.MaxCacheSize;
-					diskCache = Config.DiskCache;
-
-					// Redefine these if they were provided only
-					httpClient = httpClient ?? Config.HttpClient;
-					scheduler = scheduler ?? Config.Scheduler;
-					logger = logger ?? Config.Logger;
-					downloadCache = downloadCache ?? Config.DownloadCache;
-					loadWithTransparencyChannel = loadWithTransparencyChannel ?? Config.LoadWithTransparencyChannel;
-					fadeAnimationEnabled = fadeAnimationEnabled ?? Config.FadeAnimationEnabled;
-					transformPlaceholders = transformPlaceholders ?? Config.TransformPlaceholders;
-					downsampleInterpolationMode = downsampleInterpolationMode ?? Config.DownsampleInterpolationMode;
-				}
-
-
-				InitializeIfNeeded(maxCacheSize ?? 0, httpClient, scheduler, logger, diskCache, downloadCache,
-					loadWithTransparencyChannel ?? false, fadeAnimationEnabled ?? true,
-					transformPlaceholders ?? true, downsampleInterpolationMode ?? InterpolationMode.Default, 
-					httpHeadersTimeout, httpReadTimeout
-				);
-			}
+			Initialize(cfg);
         }
 
-        private static void InitializeIfNeeded(int maxCacheSize = 0, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool loadWithTransparencyChannel = false, bool fadeAnimationEnabled = true,
-			bool transformPlaceholders = true, InterpolationMode downsampleInterpolationMode = InterpolationMode.Default, int httpHeadersTimeout = HttpHeadersTimeout, int httpReadTimeout = HttpReadTimeout
-		)
+		private static void InitializeIfNeeded(Configuration userDefinedConfig = null)
         {
 			if (_initialized)
 				return;
+
+			if (userDefinedConfig == null)
+				userDefinedConfig = new Configuration();
 
 			lock (_initializeLock)
 			{
 				if (_initialized)
 					return;
-			
-				var userDefinedConfig = new Configuration(maxCacheSize, httpClient, scheduler, logger, diskCache, downloadCache, 
-					loadWithTransparencyChannel, fadeAnimationEnabled, transformPlaceholders, downsampleInterpolationMode, 
-					httpHeadersTimeout, httpReadTimeout);
-				Config = GetDefaultConfiguration(userDefinedConfig);
+
+				var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
+
+				if (userDefinedConfig.HttpReadTimeout > 0)
+				{
+					httpClient.Timeout = TimeSpan.FromSeconds(userDefinedConfig.HttpReadTimeout);
+				}
+
+				var logger = userDefinedConfig.Logger ?? new MiniLogger();
+				var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger);
+				var diskCache = userDefinedConfig.DiskCache ?? DiskCache.CreateCache(typeof(ImageService).Name);
+				var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(httpClient, diskCache);
+
+				userDefinedConfig.HttpClient = httpClient;
+				userDefinedConfig.Scheduler = scheduler;
+				userDefinedConfig.Logger = logger;
+				userDefinedConfig.DiskCache = diskCache;
+				userDefinedConfig.DownloadCache = downloadCache;
+
+				Config = userDefinedConfig;
 
 				_initialized = true;
 			}
-        }
-
-        private static Configuration GetDefaultConfiguration(Configuration userDefinedConfig)
-        {
-			var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
-
-			if (userDefinedConfig.HttpReadTimeout > 0)
-			{
-				httpClient.Timeout = TimeSpan.FromSeconds(userDefinedConfig.HttpReadTimeout);
-			}
-
-            var logger = userDefinedConfig.Logger ?? new MiniLogger();
-            var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger);
-            var diskCache = userDefinedConfig.DiskCache ?? DiskCache.CreateCache(typeof(ImageService).Name);
-            var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(httpClient, diskCache);
-
-            return new Configuration(
-                userDefinedConfig.MaxCacheSize,
-                httpClient,
-                scheduler,
-                logger,
-                diskCache,
-                downloadCache,
-				userDefinedConfig.LoadWithTransparencyChannel,
-				userDefinedConfig.FadeAnimationEnabled,
-                userDefinedConfig.TransformPlaceholders,
-				userDefinedConfig.DownsampleInterpolationMode,
-				userDefinedConfig.HttpHeadersTimeout,
-				userDefinedConfig.HttpReadTimeout
-            );
         }
 
         private static IWorkScheduler Scheduler
