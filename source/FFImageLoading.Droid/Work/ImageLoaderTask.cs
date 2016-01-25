@@ -439,6 +439,9 @@ namespace FFImageLoading.Work
 						if (bitmap == null || IsCancelled)
 							return null;
 
+						// APPLY EXIF ORIENTATION IF NEEDED
+						bitmap = bitmap.ToExifRotatedBitmap(source, path);
+
 						bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 							Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 

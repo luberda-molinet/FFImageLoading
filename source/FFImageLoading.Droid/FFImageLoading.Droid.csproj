@@ -99,6 +99,7 @@
     <Compile Include="Drawables\SelfDisposingAsyncDrawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />
+    <Compile Include="Extensions\ExifExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
