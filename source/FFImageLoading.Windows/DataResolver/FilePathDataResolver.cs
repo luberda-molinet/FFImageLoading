@@ -35,7 +35,10 @@ namespace FFImageLoading.DataResolver
             {
             }
 
-            return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.Disk);
+            if (file != null)
+                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.Disk);
+
+            return WithLoadingResult.Encapsulate<Stream>(null, LoadingResult.Disk);
         }
 
         public void Dispose()

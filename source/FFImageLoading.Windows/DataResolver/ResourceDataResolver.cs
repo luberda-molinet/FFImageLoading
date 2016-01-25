@@ -22,16 +22,32 @@ namespace FFImageLoading.DataResolver
 
             try
             {
-                string resPath = @"Assets\" + identifier.TrimStart('\\', '/');
+                string resPath = identifier.TrimStart('\\', '/');
+
+                if (!resPath.StartsWith(@"Assets\") && !resPath.StartsWith("Assets/"))
+                {
+                    resPath = @"Assets\" + resPath;
+                }
+
                 var imgUri = new Uri("ms-appx:///" + resPath);
                 file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
-                // OLD WAY: file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(resPath);
             }
             catch (Exception)
             {
+                try
+                {
+                    var imgUri = new Uri("ms-appx:///" + identifier);
+                    file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+                }
+                catch (Exception)
+                {
+                }
             }
 
-            return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.CompiledResource);
+            if (file != null)
+                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.CompiledResource);
+
+            return WithLoadingResult.Encapsulate<Stream>(null, LoadingResult.CompiledResource);
         }
 
         public void Dispose()

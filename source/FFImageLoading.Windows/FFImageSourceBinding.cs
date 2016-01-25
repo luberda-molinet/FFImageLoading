@@ -32,7 +32,7 @@ namespace FFImageLoading
                 {
                     var filePath = System.IO.Path.GetDirectoryName(source);
 
-                    if (!string.IsNullOrWhiteSpace(filePath))
+                    if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
                         file = await StorageFile.GetFileFromPathAsync(source);
                     }

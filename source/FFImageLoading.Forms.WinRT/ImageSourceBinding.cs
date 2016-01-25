@@ -55,7 +55,7 @@ namespace FFImageLoading.Forms.WinRT
                 {
                     var filePath = System.IO.Path.GetDirectoryName(fileImageSource.File);
 
-                    if (!string.IsNullOrWhiteSpace(filePath))
+                    if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
 						file = await StorageFile.GetFileFromPathAsync(fileImageSource.File);
                     }
