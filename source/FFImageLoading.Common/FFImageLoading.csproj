@@ -79,7 +79,6 @@
     <Compile Include="Cache\IMemoryCache.cs" />
     <Compile Include="Work\ImageSource.cs" />
     <Compile Include="Work\InterpolationMode.cs" />
-    <Compile Include="Config\MultiplatformConfiguration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
