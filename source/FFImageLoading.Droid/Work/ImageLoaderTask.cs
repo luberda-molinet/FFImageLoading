@@ -375,6 +375,13 @@ namespace FFImageLoading.Work
 							options.InPreferredConfig = Bitmap.Config.Rgb565;
 						}
 
+						// CHECK IF BITMAP IS EXIF ROTATED
+						int exifRotation = 0;
+						if (source == ImageSource.Filepath)
+						{
+							exifRotation = path.GetExifRotationDegrees();
+						}
+
 						try
 						{
 							if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
@@ -383,6 +390,13 @@ namespace FFImageLoading.Work
 
 								int downsampleWidth = Parameters.DownSampleSize.Item1;
 								int downsampleHeight = Parameters.DownSampleSize.Item2;
+
+								// if image is rotated, swap width/height
+								if (exifRotation == 90 || exifRotation == 270) 
+								{
+									downsampleWidth = Parameters.DownSampleSize.Item2;
+									downsampleHeight = Parameters.DownSampleSize.Item1;
+								}
 
 								if (Parameters.DownSampleUseDipUnits)
 								{
@@ -440,7 +454,8 @@ namespace FFImageLoading.Work
 							return null;
 
 						// APPLY EXIF ORIENTATION IF NEEDED
-						bitmap = bitmap.ToExifRotatedBitmap(source, path);
+						if (exifRotation != 0)
+							bitmap = bitmap.ToRotatedBitmap(exifRotation);
 
 						bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 							Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
