@@ -4,8 +4,13 @@ namespace FFImageLoading.Work
 {
 	public enum LoadingResult
 	{
+		// Errors
 		NotFound = -1,
+		InvalidTarget = -2,
+		Canceled = -3,
+		Failed = -4,
 
+		// Success results
 		MemoryCache = 1,
 		DiskCache = 2,
 		Internet = 3,

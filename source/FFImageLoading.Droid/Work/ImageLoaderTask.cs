@@ -104,7 +104,7 @@ namespace FFImageLoading.Work
 				var drawable = new AsyncDrawable(Context.Resources, null, this);
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						if (imageView == null || imageView.Handle == IntPtr.Zero)
+						if (imageView.Handle == IntPtr.Zero)
 							return;
 
 						imageView.SetImageDrawable(drawable);
@@ -142,8 +142,12 @@ namespace FFImageLoading.Work
 		/// </summary>
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
-			WithLoadingResult<SelfDisposingBitmapDrawable> drawableWithResult = null;
-			if (!string.IsNullOrWhiteSpace(Parameters.Path))
+			WithLoadingResult<SelfDisposingBitmapDrawable> drawableWithResult;
+			if (string.IsNullOrWhiteSpace(Parameters.Path))
+			{
+				drawableWithResult = new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
+			}
+			else
 			{
 				try
 				{
@@ -152,7 +156,7 @@ namespace FFImageLoading.Work
 				catch (Exception ex)
 				{
 					Logger.Error("An error occured while retrieving drawable.", ex);
-					drawableWithResult = null;
+					drawableWithResult = new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 				}
 			}
 
@@ -160,11 +164,11 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return GenerateResult.InvalidTarget;
 
-			if (drawableWithResult == null)
+			if (drawableWithResult.HasError)
 			{
 				// Show error placeholder
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
-				return GenerateResult.Failed;
+				return drawableWithResult.GenerateResult;
 			}
 				
 			try
@@ -178,7 +182,7 @@ namespace FFImageLoading.Work
 						if (IsCancelled)
 							return;
 						
-						if (imageView == null || imageView.Handle == IntPtr.Zero)
+						if (imageView.Handle == IntPtr.Zero)
 							return;
 						
 						SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
@@ -227,12 +231,12 @@ namespace FFImageLoading.Work
 				return GenerateResult.InvalidTarget;
 
 			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
-			if (resultWithDrawable == null || resultWithDrawable.Item == null)
+			if (resultWithDrawable.HasError)
 			{
 				// Show error placeholder
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
 
-				return GenerateResult.Failed;
+				return resultWithDrawable.GenerateResult;
 			}
 
 			if (CanUseMemoryCache())
@@ -251,7 +255,7 @@ namespace FFImageLoading.Work
 						if (IsCancelled)
 							return;
 
-						if (imageView == null || imageView.Handle == IntPtr.Zero)
+						if (imageView.Handle == IntPtr.Zero)
 							return;
 						
 						SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
@@ -276,12 +280,12 @@ namespace FFImageLoading.Work
 		protected virtual async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> GetDrawableAsync(string path, ImageSource source, bool isLoadingPlaceHolder, bool isPlaceholder, Stream originalStream = null)
 		{
 			if (IsCancelled)
-				return null;
+				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 			return await Task.Run<WithLoadingResult<SelfDisposingBitmapDrawable>>(async() =>
 				{
 					if (IsCancelled)
-						return null;
+						return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 					// First decode with inJustDecodeBounds=true to check dimensions
 					var options = new BitmapFactory.Options
@@ -290,7 +294,7 @@ namespace FFImageLoading.Work
 					};
 
 					Stream stream = null;
-					WithLoadingResult<Stream> streamWithResult = null;
+					WithLoadingResult<Stream> streamWithResult;
 					if (originalStream != null)
 					{
 						streamWithResult = new WithLoadingResult<Stream>(originalStream, LoadingResult.Stream);
@@ -300,18 +304,13 @@ namespace FFImageLoading.Work
 						streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
 					}
 
-					if (streamWithResult == null)
-					{
-						return null;
-					}
-
-					if (streamWithResult.Item == null)
+					if (streamWithResult.HasError)
 					{
 						if (streamWithResult.Result == LoadingResult.NotFound)
 						{
 							Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()));
 						}
-						return null;
+						return new WithLoadingResult<SelfDisposingBitmapDrawable>(streamWithResult.Result);
 					}
 
 					stream = streamWithResult.Item;
@@ -336,20 +335,22 @@ namespace FFImageLoading.Work
 
 							if (!stream.CanSeek)
 							{
-								if (originalStream != null)
+								if (stream == originalStream)
 								{
 									// If we cannot seek the original stream then there's not much we can do
-									return null;
+									return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 								}
 								else
 								{
 									// Assets stream can't be seeked to origin position
 									stream.Dispose();
 									streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-									stream = streamWithResult == null ? null : streamWithResult.Item;
+									if (streamWithResult.HasError)
+									{
+										return new WithLoadingResult<SelfDisposingBitmapDrawable>(streamWithResult.Result);
+									}
 
-									if (stream == null)
-										return null;
+									stream = streamWithResult.Item;
 								}
 							}
 							else
@@ -360,11 +361,11 @@ namespace FFImageLoading.Work
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-							return null;
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 						}
 
 						if (IsCancelled)
-							return null;
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 						options.InPurgeable = true;
 						options.InJustDecodeBounds = false;
@@ -403,7 +404,7 @@ namespace FFImageLoading.Work
 						}
 
 						if (IsCancelled)
-							return null;
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 						Bitmap bitmap;
 						try
@@ -428,16 +429,19 @@ namespace FFImageLoading.Work
 							{
 								ImageCache.Instance.Clear(); // Clear will also force a Garbage collection
 							}
-							return null;
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 						}
 						catch (Exception ex)
 						{
 							Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-							return null;
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 						}
 
-						if (bitmap == null || IsCancelled)
-							return null;
+						if (bitmap == null)
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
+
+						if (IsCancelled)
+							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 						bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 							Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
@@ -448,7 +452,7 @@ namespace FFImageLoading.Work
 							foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 							{
 								if (IsCancelled)
-									return null;
+									return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
 								try
 								{
@@ -527,7 +531,7 @@ namespace FFImageLoading.Work
 				drawable = new AsyncDrawable(Context.Resources, null, this);
 				await MainThreadDispatcher.PostAsync(() =>
 				{
-					if (imageView == null || imageView.Handle == IntPtr.Zero)
+					if (imageView.Handle == IntPtr.Zero)
 						return;
 						
 					imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
@@ -537,7 +541,7 @@ namespace FFImageLoading.Work
 				try
 				{
 					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder, true).ConfigureAwait(false);
-					drawable = drawableWithResult == null ? null : drawableWithResult.Item;
+					drawable = drawableWithResult.Item;
 				}
 				catch (Exception ex)
 				{
@@ -559,7 +563,7 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return;
 					
-				if (imageView == null || imageView.Handle == IntPtr.Zero)
+				if (imageView.Handle == IntPtr.Zero)
 					return;
 					
 				SetImageDrawable(imageView, drawable, false);
@@ -609,7 +613,7 @@ namespace FFImageLoading.Work
 							if (ffDrawable != null)
 								ffDrawable.StopFadeAnimation();
 
-							if (imageView == null || imageView.Handle == IntPtr.Zero)
+							if (imageView.Handle == IntPtr.Zero)
 								return;
 
 							imageView.SetImageDrawable(value);
@@ -645,7 +649,8 @@ namespace FFImageLoading.Work
 
 		private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
 		{
-			if (string.IsNullOrWhiteSpace(path)) return null;
+			if (string.IsNullOrWhiteSpace(path))
+				return new WithLoadingResult<Stream>(LoadingResult.Failed);
 
 			try
 			{
@@ -657,12 +662,12 @@ namespace FFImageLoading.Work
 			catch (System.OperationCanceledException)
 			{
 				Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
-				return null;
+				return new WithLoadingResult<Stream>(LoadingResult.Canceled);
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("Unable to retrieve image data", ex);
-				return null;
+				return new WithLoadingResult<Stream>(LoadingResult.Failed);
 			}
 		}
 
@@ -670,18 +675,22 @@ namespace FFImageLoading.Work
 		// having a width and height equal to or larger than the requested width and height.
 		private async Task<WithLoadingResult<SelfDisposingBitmapDrawable>> RetrieveDrawableAsync(string sourcePath, ImageSource source, bool isLoadingPlaceHolder, bool isPlaceholder)
 		{
-			if (string.IsNullOrWhiteSpace(sourcePath)) return null;
+			if (string.IsNullOrWhiteSpace(sourcePath))
+				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Failed);
 
 			// If the image cache is available and this task has not been cancelled by another
 			// thread and the ImageView that was originally bound to this task is still bound back
 			// to this task and our "exit early" flag is not set then try and fetch the bitmap from
 			// the cache
-			if (IsCancelled || GetAttachedImageView() == null || ImageService.ExitTasksEarly)
-				return null;
+			if (IsCancelled || ImageService.ExitTasksEarly)
+				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
+
+			if (GetAttachedImageView() == null)
+				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.InvalidTarget);
 
 			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
-			if (drawableWithResult == null || drawableWithResult.Item == null)
-				return null;
+			if (drawableWithResult.HasError)
+				return drawableWithResult;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
 			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.Item);
