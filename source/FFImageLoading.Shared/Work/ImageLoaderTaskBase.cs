@@ -119,7 +119,11 @@ namespace FFImageLoading.Work
 		public void Cancel()
 		{
 			ImageService.RemovePendingTask(this);
-			CancellationToken.Cancel();
+
+			if (!_isDisposed)
+			{
+				CancellationToken.Cancel();
+			}
 			Finish();
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
