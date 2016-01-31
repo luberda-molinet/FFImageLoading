@@ -117,7 +117,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, false);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -157,18 +157,17 @@ namespace FFImageLoading.Work
 					}).ConfigureAwait(false);
 
 				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
+				return CacheResult.NotFound; // not sure what to return in that case
 
 				Completed = true;
 
-				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
+				Parameters?.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
 
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
 			{
-				Parameters.OnError(ex);
+				Parameters?.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
 		}
@@ -227,7 +226,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, false);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -313,7 +312,7 @@ namespace FFImageLoading.Work
 				{
 					var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
 					Logger.Error(message, ex);
-					Parameters.OnError(ex);
+					Parameters?.OnError(ex);
 					return new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				}
 

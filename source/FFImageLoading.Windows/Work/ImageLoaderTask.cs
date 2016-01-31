@@ -109,7 +109,7 @@ namespace FFImageLoading.Work
 
                     _doWithImage(image, false);
                     Completed = true;
-                    Parameters.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -154,14 +154,13 @@ namespace FFImageLoading.Work
 
                 Completed = true;
 
-                if (Parameters.OnSuccess != null)
-                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
+                Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
 
                 return CacheResult.Found; // found and loaded from cache
             }
             catch (Exception ex)
             {
-                Parameters.OnError(ex);
+                Parameters?.OnError(ex);
                 return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
             }
         }
@@ -220,7 +219,7 @@ namespace FFImageLoading.Work
                     pixelWidth = image.PixelWidth;
                     pixelHeight = image.PixelHeight;
                     Completed = true;
-                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
