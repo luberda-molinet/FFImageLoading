@@ -623,14 +623,15 @@ namespace FFImageLoading.Work
 								imageView.LayoutParameters.Height = value.IntrinsicHeight;
 								imageView.LayoutParameters.Width = value.IntrinsicWidth;
 							}
+
+							Completed = true;
+
+							Parameters?.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 						}).ConfigureAwait(false);
 
-					if (IsCancelled)
+					if (!Completed)
 						return CacheResult.NotFound; // not sure what to return in that case
 
-					Completed = true;
-
-					Parameters?.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 					return CacheResult.Found; // found and loaded from cache
 				}
 				finally

@@ -153,15 +153,16 @@ namespace FFImageLoading.Work
 
 				await MainThreadDispatcher.PostAsync(() =>
 					{
+						if (IsCancelled)
+							return;
+						
 						_doWithImage(value, true);
+						Completed = true;
+						Parameters?.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
 					}).ConfigureAwait(false);
 
-				if (IsCancelled)
-				return CacheResult.NotFound; // not sure what to return in that case
-
-				Completed = true;
-
-				Parameters?.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
+				if (!Completed)
+					return CacheResult.NotFound; // not sure what to return in that case
 
 				return CacheResult.Found; // found and loaded from cache
 			}
