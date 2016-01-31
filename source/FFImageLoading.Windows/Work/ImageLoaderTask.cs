@@ -265,171 +265,168 @@ namespace FFImageLoading.Work
             if (IsCancelled)
                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-            return await Task.Run<WithLoadingResult<WriteableBitmap>>(async() =>
+            if (IsCancelled)
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+
+            Stream stream = null;
+            WithLoadingResult<Stream> streamWithResult;
+            if (originalStream != null)
             {
-                if (IsCancelled)
-                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+                streamWithResult = new WithLoadingResult<Stream>(originalStream, LoadingResult.Stream);
+            }
+            else
+            {
+                streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
+            }
 
-                Stream stream = null;
-                WithLoadingResult<Stream> streamWithResult;
-                if (originalStream != null)
+            if (streamWithResult.HasError)
+            {
+                if (streamWithResult.Result == LoadingResult.NotFound)
                 {
-                    streamWithResult = new WithLoadingResult<Stream>(originalStream, LoadingResult.Stream);
-                }
-                else
-                {
-                    streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-                }
-
-                if (streamWithResult.HasError)
-                {
-                    if (streamWithResult.Result == LoadingResult.NotFound)
-                    {
-                        Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()));
-                    }
-
-                    return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
+                    Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()));
                 }
 
-                stream = streamWithResult.Item;
+                return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
+            }
 
-                if (IsCancelled)
-                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+            stream = streamWithResult.Item;
 
+            if (IsCancelled)
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+
+            try
+            {
                 try
                 {
-                    try
+                    if (stream.Position != 0 && !stream.CanSeek)
                     {
-                        if (stream.Position != 0 && !stream.CanSeek)
+                        if (originalStream != null)
                         {
-                            if (originalStream != null)
-                            {
-                                // If we cannot seek the original stream then there's not much we can do
-                                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                            }
-                            else
-                            {
-                                // Assets stream can't be seeked to origin position
-                                stream.Dispose();
-                                streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-
-                                if (streamWithResult.HasError)
-                                {
-                                    return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
-                                }
-
-                                stream = streamWithResult.Item;
-                            }
+                            // If we cannot seek the original stream then there's not much we can do
+                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                         }
                         else
                         {
-                            stream.Seek(0, SeekOrigin.Begin);
-                        }
+                            // Assets stream can't be seeked to origin position
+                            stream.Dispose();
+                            streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
 
-                        if (IsCancelled)
-                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                    }
-
-                    WriteableBitmap writableBitmap = null;
-
-                    // Special case to handle WebP decoding
-                    if (path.ToLowerInvariant().EndsWith(".webp"))
-                    {
-                        //TODO
-                        Logger.Error("Webp is not implemented on Windows");
-                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                    }
-
-                    bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
-                        Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
-
-                    if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
-                    && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
-                    {
-                        BitmapHolder imageIn = null;
-
-                        try
-                        {
-                            await _decodingLock.WaitAsync();
-                            imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                        }
-                        finally
-                        {
-                            _decodingLock.Release();
-                        }
-
-                        foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
-                        {
-                            if (IsCancelled)
-                                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
-
-                            try
+                            if (streamWithResult.HasError)
                             {
-                                var old = imageIn;
-
-                                try
-                                {
-                                    await _decodingLock.WaitAsync();
-                                    IBitmap bitmapHolder = transformation.Transform(imageIn);
-                                    imageIn = bitmapHolder.ToNative();
-                                }
-                                finally
-                                {
-                                    _decodingLock.Release();
-                                }
-
-                                if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
-                                {
-                                    old.FreePixels();
-                                    old = null;
-                                }
+                                return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
                             }
-                            catch (Exception ex)
-                            {
-                                Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-                            }
+
+                            stream = streamWithResult.Item;
                         }
-
-                        writableBitmap = await imageIn.ToBitmapImageAsync();
-                        imageIn.FreePixels();
-                        imageIn = null;
                     }
                     else
                     {
+                        stream.Seek(0, SeekOrigin.Begin);
+                    }
+
+                    if (IsCancelled)
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
+                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+                }
+
+                WriteableBitmap writableBitmap = null;
+
+                // Special case to handle WebP decoding
+                if (path.ToLowerInvariant().EndsWith(".webp"))
+                {
+                    //TODO
+                    Logger.Error("Webp is not implemented on Windows");
+                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+                }
+
+                bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
+                    Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+
+                if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
+                && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+                {
+                    BitmapHolder imageIn = null;
+
+                    try
+                    {
+                        await _decodingLock.WaitAsync();
+                        imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+                    }
+                    finally
+                    {
+                        _decodingLock.Release();
+                    }
+
+                    foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                    {
+                        if (IsCancelled)
+                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+
                         try
                         {
-                            await _decodingLock.WaitAsync();
-                            writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
+                            var old = imageIn;
+
+                            try
+                            {
+                                await _decodingLock.WaitAsync();
+                                IBitmap bitmapHolder = transformation.Transform(imageIn);
+                                imageIn = bitmapHolder.ToNative();
+                            }
+                            finally
+                            {
+                                _decodingLock.Release();
+                            }
+
+                            if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
+                            {
+                                old.FreePixels();
+                                old = null;
+                            }
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                        }
-                        finally
-                        {
-                            _decodingLock.Release();
+                            Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
                         }
                     }
 
-                    return WithLoadingResult.Encapsulate(writableBitmap, streamWithResult.Result);
+                    writableBitmap = await imageIn.ToBitmapImageAsync();
+                    imageIn.FreePixels();
+                    imageIn = null;
                 }
-                finally
+                else
                 {
-                    if (stream != null)
-                        stream.Dispose();
+                    try
+                    {
+                        await _decodingLock.WaitAsync();
+                        writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+                    }
+                    finally
+                    {
+                        _decodingLock.Release();
+                    }
                 }
-            }).ConfigureAwait(false);
+
+                return WithLoadingResult.Encapsulate(writableBitmap, streamWithResult.Result);
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Dispose();
+            }
         }
         
         private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
