@@ -8,6 +8,8 @@ using FFImageLoading.Cache;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace FFImageLoading
 {
@@ -16,6 +18,7 @@ namespace FFImageLoading
         private static volatile bool _initialized;
 		private static object _initializeLock = new object();
 		private static readonly MD5Helper _md5Helper = new MD5Helper();
+		private static readonly ConcurrentDictionary<string, string> _fullKeyToKey = new ConcurrentDictionary<string, string>();
 
         /// <summary>
         /// Gets FFImageLoading configuration
@@ -250,6 +253,7 @@ namespace FFImageLoading
         public static void LoadImage(IImageLoaderTask task)
         {
             Scheduler.LoadImage(task);
+			AddRequestToHistory(task);
         }
 
 		/// <summary>
@@ -273,13 +277,24 @@ namespace FFImageLoading
 		/// <summary>
 		/// Invalidates the cache for given key.
 		/// </summary>
-		public static void Invalidate(string key, CacheType cacheType)
+		/// <param name="key">Concerns images with this key</param>
+		/// <param name="cacheType">Memory cache, Disk cache or both</param>
+		/// <param name="removeSimilar">If similar keys should be removed, ie: typically keys with extra transformations</param>
+		public static void Invalidate(string key, CacheType cacheType, bool removeSimilar=false)
 		{
 			InitializeIfNeeded();
 
 			if (cacheType == CacheType.All || cacheType == CacheType.Memory)
 			{
 				ImageCache.Instance.Remove(key);
+
+				if (removeSimilar)
+				{
+					foreach (var otherKey in _fullKeyToKey.Where(pair => pair.Value == key).Select(pair => pair.Key))
+					{
+						ImageCache.Instance.Remove(otherKey);
+					}
+				}
 			}
 
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
@@ -287,6 +302,22 @@ namespace FFImageLoading
 				string hash = _md5Helper.MD5(key);
 				Config.DiskCache.RemoveAsync(hash);
 			}
+		}
+
+		private static void AddRequestToHistory(IImageLoaderTask task)
+		{
+			AddRequestToHistory(task.Parameters.Path, task.GetKey());
+			AddRequestToHistory(task.Parameters.CustomCacheKey, task.GetKey());
+			AddRequestToHistory(task.Parameters.LoadingPlaceholderPath, task.GetKey(task.Parameters.LoadingPlaceholderPath));
+			AddRequestToHistory(task.Parameters.ErrorPlaceholderPath, task.GetKey(task.Parameters.ErrorPlaceholderPath));
+		}
+
+		private static void AddRequestToHistory(string baseKey, string fullKey)
+		{
+			if (string.IsNullOrWhiteSpace(baseKey) || string.IsNullOrWhiteSpace(fullKey))
+				return;
+
+			_fullKeyToKey.TryAdd(fullKey, baseKey);
 		}
     }
 }

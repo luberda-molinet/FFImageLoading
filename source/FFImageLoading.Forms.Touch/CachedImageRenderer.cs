@@ -37,13 +37,13 @@ namespace FFImageLoading.Forms.Touch
 			#pragma warning restore 0219
 
 			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
 		}
 
-		private static void InvalidateCache(string key, Cache.CacheType cacheType)
+		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
 		{
-			ImageService.Invalidate(key, cacheType);
+			ImageService.Invalidate(key, cacheType, removeSimilar);
 		}
 
 		private static void ClearCache(Cache.CacheType cacheType)

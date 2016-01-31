@@ -498,25 +498,25 @@ namespace FFImageLoading.Forms
         /// Clears image cache
         /// </summary>
         /// <param name="cacheType">Cache type to invalidate</param>
-        public static void ClearCache(Cache.CacheType cacheType)
+		public static void ClearCache(Cache.CacheType cacheType)
         {
 			if (InternalClearCache != null)
             {
 				InternalClearCache(cacheType);
             }
         }
-		internal static Action<string, Cache.CacheType> InternalInvalidateCache;
+		internal static Action<string, Cache.CacheType, bool> InternalInvalidateCache;
 
         /// <summary>
         /// Invalidates cache for a specified key
         /// </summary>
         /// <param name="key">Key to invalidate</param>
         /// <param name="cacheType">Cache type to invalidate</param>
-        public static void InvalidateCache(string key, Cache.CacheType cacheType)
+		public static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar=false)
         {
 			if (InternalInvalidateCache != null)
             {
-				InternalInvalidateCache(key, cacheType);
+				InternalInvalidateCache(key, cacheType, removeSimilar);
             }
         }
 
