@@ -49,10 +49,7 @@ namespace FFImageLoading.Work
 		{
 			if (Parameters != null)
 			{
-				if (Parameters.OnFinish != null)
-				{
-					Parameters.OnFinish(this); // should call dispose
-				}
+				Parameters?.OnFinish(this); // should call dispose
 				Parameters.Dispose(); // but to be safer let's call it here anyway
 			}
 		}
@@ -230,7 +227,7 @@ namespace FFImageLoading.Work
 					if (ex == null)
 						ex = new Exception("FFImageLoading is unable to generate image.");
 
-					Parameters.OnError(ex);
+					Parameters?.OnError(ex);
 				}
 			}
 			finally
