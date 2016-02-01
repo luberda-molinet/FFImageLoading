@@ -168,40 +168,43 @@ namespace FFImageLoading.Work
 			if (task == null)
 				return;
 
-			if (task.IsCancelled)
+			Task.Run(async () =>
 			{
-				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
-				return;
-			}
+				if (task.IsCancelled)
+				{
+					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+					return;
+				}
 
-			List<PendingTask> pendingTasksCopy;
-			lock (_pendingTasksLock)
-			{
-				pendingTasksCopy = _pendingTasks.ToList();
-			}
-			foreach (var pendingTask in pendingTasksCopy)
-			{
-				if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
-					pendingTask.ImageLoadingTask.CancelIfNeeded();
-			}
+				List<PendingTask> pendingTasksCopy;
+				lock (_pendingTasksLock)
+				{
+					pendingTasksCopy = _pendingTasks.ToList();
+				}
+				foreach (var pendingTask in pendingTasksCopy)
+				{
+					if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+						pendingTask.ImageLoadingTask.CancelIfNeeded();
+				}
 
-			bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
-			if (loadedFromCache)
-			{
-				if (task.Parameters.OnFinish != null)
-					task.Parameters.OnFinish(task);
+				bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
+				if (loadedFromCache)
+				{
+					if (task.Parameters.OnFinish != null)
+						task.Parameters.OnFinish(task);
+					
+					task.Dispose();
+					return; // image successfully loaded from cache
+				}
 				
-				task.Dispose();
-				return; // image successfully loaded from cache
-			}
-			
-			if (task.IsCancelled || _pauseWork)
-			{
-				task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
-				return;
-			}
+				if (task.IsCancelled || _pauseWork)
+				{
+					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+					return;
+				}
 
-			QueueAndGenerateImage(task);
+				QueueAndGenerateImage(task);
+			});
 		}
 
 		private void QueueAndGenerateImage(IImageLoaderTask task)
