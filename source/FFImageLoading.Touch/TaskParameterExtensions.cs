@@ -28,18 +28,24 @@ namespace FFImageLoading
                 return refView;
             };
 
-			Action<UIImage, bool> doWithImage = (img, fromCache) => {
+			Action<UIImage, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
                 UIImageView refView = getNativeControl();
                 if (refView == null)
                     return;
 
-				var isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ? 
+				bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
 					parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
 
-				if (isFadeAnimationEnabled && !fromCache)
+				bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
+					parameters.FadeAnimationForCachedImages.Value : ImageService.Config.FadeAnimationForCachedImages);
+
+				if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
 				{
 					// fade animation
-					UIView.Transition(refView, 0.4f, 
+					double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
+						parameters.FadeAnimationDuration.Value : ImageService.Config.FadeAnimationDuration)) / 1000;
+					
+					UIView.Transition(refView, fadeDuration, 
 						UIViewAnimationOptions.TransitionCrossDissolve 
 						| UIViewAnimationOptions.BeginFromCurrentState,
 						() => { refView.Image = img; },
@@ -70,7 +76,7 @@ namespace FFImageLoading
                 return refView;
             };
 
-			Action<UIImage, bool> doWithImage = (img, fromCache) => {
+			Action<UIImage, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
                 UIButton refView = getNativeControl();
                 if (refView == null)
                     return;
@@ -117,7 +123,7 @@ namespace FFImageLoading
 			}
 		}
 
-        private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool> doWithImage, float imageScale = -1f)
+        private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, float imageScale = -1f)
         {
             var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
                 getNativeControl, doWithImage, imageScale);

@@ -12,10 +12,10 @@ namespace FFImageLoading.Drawables
 		private readonly float _fadingTime;
 		private readonly long _startTimeMillis;
 		private int _alpha = 0xFF;
-		private Drawable _placeholder;
+		private BitmapDrawable _placeholder;
 		private volatile bool _animating;
 
-		public FFBitmapDrawable(Resources res, Bitmap bitmap, Drawable placeholder, float fadingTime, bool fadeEnabled)
+		public FFBitmapDrawable(Resources res, Bitmap bitmap, BitmapDrawable placeholder, float fadingTime, bool fadeEnabled)
 			: base(res, bitmap)
 		{
 			_placeholder = placeholder;
@@ -47,9 +47,8 @@ namespace FFImageLoading.Drawables
 					}
 					else
 					{
-						var placeholderBitmap = _placeholder as BitmapDrawable;
-						if (placeholderBitmap != null && placeholderBitmap.Handle != IntPtr.Zero && placeholderBitmap.Bitmap != null 
-							&& placeholderBitmap.Handle != IntPtr.Zero && !placeholderBitmap.Bitmap.IsRecycled)
+						if (_placeholder != null && _placeholder.Handle != IntPtr.Zero && _placeholder.Bitmap != null 
+							&& _placeholder.Handle != IntPtr.Zero && !_placeholder.Bitmap.IsRecycled)
 						{
 							_placeholder.Draw(canvas);	
 						}

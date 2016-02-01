@@ -139,6 +139,10 @@ namespace FFImageLoading.Work
 
 		public bool? FadeAnimationEnabled { get; private set; }
 
+		public bool? FadeAnimationForCachedImages { get; private set; }
+
+		public int? FadeAnimationDuration { get; private set; }
+
         public bool? TransformPlaceholdersEnabled { get; private set; }
 
 		public string CustomCacheKey { get; private set; }
@@ -244,9 +248,14 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
 		/// <param name="enabled">If set to <c>true</c> enabled.</param>
-		public TaskParameter FadeAnimation(bool enabled)
+		/// <param name = "enabledForCachedImages">Enables animation for local or cached images</param>
+		/// <param name = "duration">Fade animation duration in ms</param>
+		public TaskParameter FadeAnimation(bool enabled, bool? enabledForCachedImages = null, int? duration = null)
 		{
 			FadeAnimationEnabled = enabled;
+			FadeAnimationForCachedImages = enabledForCachedImages;
+			FadeAnimationDuration = duration;
+
 			return this;
 		}
 

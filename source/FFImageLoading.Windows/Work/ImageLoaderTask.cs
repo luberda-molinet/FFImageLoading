@@ -21,11 +21,11 @@ namespace FFImageLoading.Work
     public class ImageLoaderTask : ImageLoaderTaskBase
     {
         private readonly Func<Image> _getNativeControl;
-        private readonly Action<WriteableBitmap, bool> _doWithImage;
+        private readonly Action<WriteableBitmap, bool, bool> _doWithImage;
 
         private static SemaphoreSlim _decodingLock = new SemaphoreSlim(initialCount: 1);
 
-        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool> doWithImage)
+        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
             : base(mainThreadDispatcher, miniLogger, parameters, false)
         {
             _getNativeControl = getNativeControl;
@@ -66,7 +66,7 @@ namespace FFImageLoading.Work
 	                return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 			}
 
-            await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource).ConfigureAwait(false);
+            await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
             return false;
         }
 
@@ -89,7 +89,7 @@ namespace FFImageLoading.Work
 
             if (image == null)
             {
-                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
                 return imageWithResult.GenerateResult;
             }
 
@@ -107,7 +107,7 @@ namespace FFImageLoading.Work
 					if (IsCancelled)
                         return;
 
-                    _doWithImage(image, false);
+                    _doWithImage(image, imageWithResult.Result.IsLocalOrCachedResult(), false);
                     Completed = true;
                     Parameters?.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
                 }).ConfigureAwait(false);
@@ -117,7 +117,7 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex2)
             {
-                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
                 throw ex2;
             }
 
@@ -147,7 +147,7 @@ namespace FFImageLoading.Work
 					if (IsCancelled)
 						return;
 						
-                    _doWithImage(value, true);
+                    _doWithImage(value, true, false);
                     pixelWidth = value.PixelWidth;
                     pixelHeight = value.PixelHeight;
 
@@ -192,7 +192,7 @@ namespace FFImageLoading.Work
 
             if (image == null)
             {
-                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
                 return imageWithResult.GenerateResult;
             }
 
@@ -218,7 +218,7 @@ namespace FFImageLoading.Work
 					if (IsCancelled)
                         return;
 
-                    _doWithImage(image, false);
+                    _doWithImage(image, true, false);
                     pixelWidth = image.PixelWidth;
                     pixelHeight = image.PixelHeight;
                     Completed = true;
@@ -230,7 +230,7 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex2)
             {
-                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
+                await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
                 throw ex2;
             }
 
@@ -431,12 +431,14 @@ namespace FFImageLoading.Work
             }
         }
         
-        private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source)
+        private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
         {
             if (string.IsNullOrWhiteSpace(placeholderPath))
                 return false;
 
             WriteableBitmap image = ImageCache.Instance.Get(GetKey(placeholderPath));
+
+            bool isLocalOrFromCache = false;
 
             if (image == null)
             {
@@ -444,6 +446,7 @@ namespace FFImageLoading.Work
                 {
                     var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
                     image = imageWithResult.Item;
+                    isLocalOrFromCache = imageWithResult.Result.IsLocalOrCachedResult();
                 }
                 catch (Exception ex)
                 {
@@ -468,7 +471,7 @@ namespace FFImageLoading.Work
                 if (IsCancelled)
                     return;
 
-                _doWithImage(image, false);
+                _doWithImage(image, isLocalOrFromCache, isLoadingPlaceholder);
             });
 
             return true;

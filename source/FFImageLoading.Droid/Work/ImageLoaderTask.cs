@@ -23,11 +23,10 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private const float FADE_TRANSITION_MILISECONDS = 400f;
 		private static object _decodingLock = new object();
 
 		private readonly WeakReference<ImageView> _imageWeakReference;
-		private WeakReference<Drawable> _loadingPlaceholderWeakReference;
+		private WeakReference<BitmapDrawable> _loadingPlaceholderWeakReference;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
 			: base(mainThreadDispatcher, miniLogger, parameters, true)
@@ -114,19 +113,6 @@ namespace FFImageLoading.Work
 			return false;
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether a fade in transition is used to show the image.
-		/// </summary>
-		/// <value><c>true</c> if a fade in transition is used; otherwise, <c>false</c>.</value>
-		public bool UseFadeInBitmap 
-		{ 
-			get
-			{
-				return Parameters.FadeAnimationEnabled.HasValue ? 
-					Parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
-			}
-		}
-
 		protected IDownloadCache DownloadCache { get; private set; }
 
 		protected Context Context
@@ -185,7 +171,7 @@ namespace FFImageLoading.Work
 						if (imageView.Handle == IntPtr.Zero)
 							return;
 						
-						SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
+						SetImageDrawable(imageView, drawableWithResult.Item);
 						
 						Completed = true;
 						Parameters?.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
@@ -258,7 +244,7 @@ namespace FFImageLoading.Work
 						if (imageView.Handle == IntPtr.Zero)
 							return;
 						
-						SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
+						SetImageDrawable(imageView, resultWithDrawable.Item);
 						
 						Completed = true;
 						Parameters?.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
@@ -504,13 +490,33 @@ namespace FFImageLoading.Work
 				}
 				else
 				{
-					Drawable placeholderDrawable = null;
+					bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled.HasValue ?
+						Parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+
+					bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (Parameters.FadeAnimationForCachedImages.HasValue ?
+						Parameters.FadeAnimationForCachedImages.Value : ImageService.Config.FadeAnimationForCachedImages);
+
+					int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
+						Parameters.FadeAnimationDuration.Value : ImageService.Config.FadeAnimationDuration;
+
+					bool isLocalOrCached = streamWithResult.Result.IsLocalOrCachedResult();
+
+					BitmapDrawable placeholderDrawable = null;
 					if (_loadingPlaceholderWeakReference != null)
 					{
 						_loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable);
 					}
 
-					return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, FADE_TRANSITION_MILISECONDS, UseFadeInBitmap), streamWithResult.Result);
+					if (isLocalOrCached)
+					{
+						return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(
+							new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, 
+								fadeDuration, isFadeAnimationEnabled && isFadeAnimationEnabledForCached), streamWithResult.Result);
+					}
+
+					return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(
+						new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, 
+							fadeDuration, isFadeAnimationEnabled), streamWithResult.Result);
 				}
 			}
 			finally
@@ -570,7 +576,7 @@ namespace FFImageLoading.Work
 			if (drawable == null)
 				return false;
 
-			_loadingPlaceholderWeakReference = new WeakReference<Drawable>(drawable);
+			_loadingPlaceholderWeakReference = new WeakReference<BitmapDrawable>(drawable);
 
 			if (IsCancelled)
 				return false;
@@ -583,7 +589,7 @@ namespace FFImageLoading.Work
 				if (imageView.Handle == IntPtr.Zero)
 					return;
 					
-				SetImageDrawable(imageView, drawable, false);
+				SetImageDrawable(imageView, drawable);
 					
 			}).ConfigureAwait(false);
 
@@ -793,7 +799,7 @@ namespace FFImageLoading.Work
 				: null;
 		}
 
-		private void SetImageDrawable(ImageView imageView, Drawable drawable, bool fadeIn)
+		private void SetImageDrawable(ImageView imageView, Drawable drawable)
 		{
 			if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
 			{

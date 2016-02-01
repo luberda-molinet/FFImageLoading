@@ -38,23 +38,28 @@ namespace FFImageLoading
                 return refView;
             };
 
-            Action<WriteableBitmap, bool> doWithImage = (img, fromCache) => {
+            Action<WriteableBitmap, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
                 Image refView = getNativeControl();
                 if (refView == null)
                     return;
-
-                var isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
-                    parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
 
                 bool imageChanged = (img != refView.Source);
                 if (!imageChanged)
                     return;
 
-                if (isFadeAnimationEnabled && !fromCache)
+                bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
+                    parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+
+                bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
+                    parameters.FadeAnimationForCachedImages.Value : ImageService.Config.FadeAnimationForCachedImages);
+
+                if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
                 {
-					// fade animation
-					DoubleAnimation fade = new DoubleAnimation();
-					fade.Duration = TimeSpan.FromMilliseconds(500);
+                    // fade animation
+                    int fadeDuration = parameters.FadeAnimationDuration.HasValue ?
+                        parameters.FadeAnimationDuration.Value : ImageService.Config.FadeAnimationDuration;
+                    DoubleAnimation fade = new DoubleAnimation();
+                    fade.Duration = TimeSpan.FromMilliseconds(fadeDuration);
 					fade.From = 0f;
 					fade.To = 1f;
 					fade.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut }; 
@@ -105,7 +110,7 @@ namespace FFImageLoading
 			}
 		}
 
-        private static IScheduledWork Into(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool> doWithImage)
+        private static IScheduledWork Into(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
         {
             var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
                 getNativeControl, doWithImage);

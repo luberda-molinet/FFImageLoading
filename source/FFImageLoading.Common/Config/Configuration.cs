@@ -17,6 +17,8 @@ namespace FFImageLoading.Config
 			MaxCacheSize = 0; 
 			LoadWithTransparencyChannel = false;
 			FadeAnimationEnabled = true;
+			FadeAnimationForCachedImages = false;
+			FadeAnimationDuration = 500;
 			TransformPlaceholders = true;
 			DownsampleInterpolationMode = InterpolationMode.Default;
 			HttpHeadersTimeout = 15;
@@ -27,31 +29,31 @@ namespace FFImageLoading.Config
 		/// Gets or sets the http client used for web requests.
 		/// </summary>
 		/// <value>The http client used for web requests.</value>
-        public HttpClient HttpClient { get; set; }
+		public HttpClient HttpClient { get; set; }
 
-        /// <summary>
+		/// <summary>
 		/// Gets or sets the scheduler used to organize/schedule image loading tasks.
-        /// </summary>
-        /// <value>The scheduler used to organize/schedule image loading tasks.</value>
-        public IWorkScheduler Scheduler { get; set; }
+		/// </summary>
+		/// <value>The scheduler used to organize/schedule image loading tasks.</value>
+		public IWorkScheduler Scheduler { get; set; }
 
-        /// <summary>
+		/// <summary>
 		/// Gets or sets the logger used to receive debug/error messages.
-        /// </summary>
-        /// <value>The logger.</value>
-        public IMiniLogger Logger { get; set; }
+		/// </summary>
+		/// <value>The logger.</value>
+		public IMiniLogger Logger { get; set; }
 
-        /// <summary>
+		/// <summary>
 		/// Gets or sets the disk cache.
-        /// </summary>
-        /// <value>The disk cache.</value>
-        public IDiskCache DiskCache { get; set; }
+		/// </summary>
+		/// <value>The disk cache.</value>
+		public IDiskCache DiskCache { get; set; }
 
-        /// <summary>
+		/// <summary>
 		/// Gets or sets the download cache. Download cache is responsible for retrieving data from the web, or taking from the disk cache.
-        /// </summary>
-        /// <value>The download cache.</value>
-        public IDownloadCache DownloadCache { get; set; }
+		/// </summary>
+		/// <value>The download cache.</value>
+		public IDownloadCache DownloadCache { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
@@ -64,6 +66,19 @@ namespace FFImageLoading.Config
 		/// </summary>
 		/// <value><c>true</c> if fade animation enabled; otherwise, <c>false</c>.</value>
 		public bool FadeAnimationEnabled { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating wheter fade animation for
+		/// cached or local images should be enabled.
+		/// </summary>
+		/// <value><c>true</c> if fade animation for cached or local images; otherwise, <c>false</c>.</value>
+		public bool FadeAnimationForCachedImages { get; set; }
+
+		/// <summary>
+		/// Gets or sets the default duration of the fade animation in ms.
+		/// </summary>
+		/// <value>The duration of the fade animation.</value>
+		public int FadeAnimationDuration { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> transforming place is enabled.
