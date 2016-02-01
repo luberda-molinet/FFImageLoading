@@ -131,6 +131,7 @@ namespace FFImageLoading.Forms.WinRT
 
             if (e.NewElement != null)
             {
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
 				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -354,6 +355,11 @@ namespace FFImageLoading.Forms.WinRT
                 element.InvalidateViewMeasure();
             }
         }
+
+		private void ReloadImage()
+		{
+			UpdateSource();
+		}
 
         private void Cancel()
         {

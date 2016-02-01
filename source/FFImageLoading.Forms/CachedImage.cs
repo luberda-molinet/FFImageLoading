@@ -465,6 +465,19 @@ namespace FFImageLoading.Forms
 			return new SizeRequest(new Size(num3, num4));
 		}
 
+		internal Action InternalReloadImage;
+			
+		/// <summary>
+		/// Reloads the image.
+		/// </summary>
+		public void ReloadImage()
+		{
+			if (InternalReloadImage != null && Source != null)
+			{
+				InternalReloadImage();
+			}
+		}
+
 		internal Action InternalCancel;
 
         /// <summary>

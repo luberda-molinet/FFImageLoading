@@ -100,6 +100,7 @@ namespace FFImageLoading.Forms.Touch
 				SetImage(e.OldElement);
 				SetOpacity();
 
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
 				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -296,6 +297,11 @@ namespace FFImageLoading.Forms.Touch
 				((IVisualElementController)element).NativeSizeChanged();
 				element.InvalidateViewMeasure();
 			}
+		}
+
+		private void ReloadImage()
+		{
+			SetImage(null);
 		}
 
 		private void Cancel()
