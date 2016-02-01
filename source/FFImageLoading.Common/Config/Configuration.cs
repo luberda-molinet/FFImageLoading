@@ -17,7 +17,7 @@ namespace FFImageLoading.Config
 			MaxCacheSize = 0; 
 			LoadWithTransparencyChannel = false;
 			FadeAnimationEnabled = true;
-			FadeAnimationForCachedImages = false;
+			FadeAnimationForCachedImages = true;
 			FadeAnimationDuration = 500;
 			TransformPlaceholders = true;
 			DownsampleInterpolationMode = InterpolationMode.Default;
