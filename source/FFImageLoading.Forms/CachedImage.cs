@@ -512,6 +512,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         /// <param name="key">Key to invalidate</param>
         /// <param name="cacheType">Cache type to invalidate</param>
+		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+		/// (downsampling and transformations variants)</param>
 		public static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar=false)
         {
 			if (InternalInvalidateCache != null)
@@ -519,6 +521,29 @@ namespace FFImageLoading.Forms
 				InternalInvalidateCache(key, cacheType, removeSimilar);
             }
         }
+
+		/// <summary>
+		/// Invalidates cache for a specified image source.
+		/// </summary>
+		/// <param name="source">Image source.</param>
+		/// <param name="cacheType">Cache type.</param>
+		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+		/// (downsampling and transformations variants)</param>
+		public static void InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar=false)
+		{
+			if (InternalInvalidateCache != null)
+			{
+				var fileImageSource = source as FileImageSource;
+
+				if (fileImageSource != null)
+					InternalInvalidateCache(fileImageSource.File, cacheType, removeSimilar);
+
+				var uriImageSource = source as UriImageSource;
+
+				if (uriImageSource != null)
+					InternalInvalidateCache(uriImageSource.Uri.ToString(), cacheType, removeSimilar);
+			}
+		}
 
 		internal Func<GetImageAsJpgArgs, Task<byte[]>> InternalGetImageAsJPG; 
 
