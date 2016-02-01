@@ -69,6 +69,10 @@ namespace FFImageLoading.Forms.Droid
 			AutoPackage = false;
 		}
 
+		public CachedImageRenderer(IntPtr javaReference, JniHandleOwnership transfer) : this()
+		{
+		}
+
 		protected override void Dispose(bool disposing)
 		{
 			if (!_isDisposed)
