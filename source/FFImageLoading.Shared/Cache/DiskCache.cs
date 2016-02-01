@@ -200,6 +200,7 @@ namespace FFImageLoading.Cache
 				Directory.Delete(basePath, true);
 				Directory.CreateDirectory (basePath);
 				entries.Clear();
+				CreateJournalFile();
 			}
 		}
 
@@ -265,17 +266,22 @@ namespace FFImageLoading.Cache
 			}
 		}
 
+		void CreateJournalFile()
+		{
+			using(var writer = new StreamWriter(journalPath, false, encoding))
+			{
+				writer.WriteLine(Magic);
+				writer.WriteLine(version);
+			}
+		}
+
         void InitializeWithJournal()
         {
 			lock (lockJournal)
 			{
 				if(!File.Exists(journalPath))
 				{
-					using(var writer = new StreamWriter(journalPath, false, encoding))
-					{
-						writer.WriteLine(Magic);
-						writer.WriteLine(version);
-					}
+					CreateJournalFile();
 					return;
 				}
 

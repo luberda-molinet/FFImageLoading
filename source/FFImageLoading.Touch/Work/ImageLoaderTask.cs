@@ -81,23 +81,24 @@ namespace FFImageLoading.Work
 		/// </summary>
 		protected override async Task<GenerateResult> TryGeneratingImageAsync()
 		{
-			WithLoadingResult<UIImage> imageWithResult = null;
+			WithLoadingResult<UIImage> imageWithResult;
 			UIImage image = null;
 			try
 			{
 				imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-				image = imageWithResult == null ? null : imageWithResult.Item;
+				image = imageWithResult.Item;
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("An error occured while retrieving image.", ex);
+				imageWithResult = new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				image = null;
 			}
 
 			if (image == null)
 			{
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				return GenerateResult.Failed;
+				return imageWithResult.GenerateResult;
 			}
 
 			if (IsCancelled)
@@ -116,7 +117,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, false);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -152,22 +153,22 @@ namespace FFImageLoading.Work
 
 				await MainThreadDispatcher.PostAsync(() =>
 					{
+						if (IsCancelled)
+							return;
+						
 						_doWithImage(value, true);
+						Completed = true;
+						Parameters?.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
 					}).ConfigureAwait(false);
 
-				if (IsCancelled)
+				if (!Completed)
 					return CacheResult.NotFound; // not sure what to return in that case
-
-				Completed = true;
-
-				if (Parameters.OnSuccess != null)
-					Parameters.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
 
 				return CacheResult.Found; // found and loaded from cache
 			}
 			catch (Exception ex)
 			{
-				Parameters.OnError(ex);
+				Parameters?.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
 		}
@@ -185,23 +186,24 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return GenerateResult.Canceled;
 
-			WithLoadingResult<UIImage> imageWithResult = null;
+			WithLoadingResult<UIImage> imageWithResult;
 			UIImage image = null;
 			try
 			{
 				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
-				image = imageWithResult == null ? null : imageWithResult.Item;
+				image = imageWithResult.Item;
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("An error occured while retrieving image.", ex);
+				imageWithResult = new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				image = null;
 			}
 
 			if (image == null)
 			{
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-				return GenerateResult.Failed;
+				return imageWithResult.GenerateResult;
 			}
 
 			if (CanUseMemoryCache())
@@ -225,7 +227,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, false);
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -244,7 +246,7 @@ namespace FFImageLoading.Work
 			bool isPlaceholder, Stream originalStream = null)
 		{
 			if (IsCancelled)
-				return null;
+				return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
 			return await Task.Run(async () =>
 			{
@@ -293,7 +295,7 @@ namespace FFImageLoading.Work
 						{
 							var data = await resolver.GetData(path, CancellationToken.Token).ConfigureAwait(false);
 							if (data == null)
-								return null;
+								return new WithLoadingResult<UIImage>(LoadingResult.Failed);
 
 							image = data.Image;
 							bytes = data.Data;
@@ -305,21 +307,26 @@ namespace FFImageLoading.Work
 				catch (System.OperationCanceledException)
 				{
 					Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
-					return null;
+					return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 				}
 				catch (Exception ex)
 				{
 					var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
 					Logger.Error(message, ex);
-					Parameters.OnError(ex);
-					return null;
+					Parameters?.OnError(ex);
+					return new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				}
 
 				if (bytes == null && image == null)
-					return null;
+				{
+					if (result != null && (int)result<0) // it's below zero if it's an error
+						return new WithLoadingResult<UIImage>(result.Value);
+					else
+						return new WithLoadingResult<UIImage>(LoadingResult.Failed);
+				}
 
 				if (IsCancelled)
-					return null;
+					return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
 				UIImage imageIn = image;
 
@@ -365,7 +372,7 @@ namespace FFImageLoading.Work
 					foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 					{
 						if (IsCancelled)
-							return null;
+							return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
 						try
 						{
@@ -406,7 +413,7 @@ namespace FFImageLoading.Work
 				try
 				{
 					var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
-					image = imageWithResult == null ? null : imageWithResult.Item;
+					image = imageWithResult.Item;
 				}
 				catch (Exception ex)
 				{
@@ -443,12 +450,17 @@ namespace FFImageLoading.Work
 			// thread and the ImageView that was originally bound to this task is still bound back
 			// to this task and our "exit early" flag is not set then try and fetch the bitmap from
 			// the cache
-			if (IsCancelled || _getNativeControl() == null || ImageService.ExitTasksEarly)
-				return null;
+			if (IsCancelled || ImageService.ExitTasksEarly)
+				return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
+
+			if (_getNativeControl() == null)
+				return new WithLoadingResult<UIImage>(LoadingResult.InvalidTarget);
 
 			var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
-			if (imageWithResult == null || imageWithResult.Item == null)
-				return null;
+			if (imageWithResult.HasError)
+			{
+				return imageWithResult;
+			}
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
 			ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);

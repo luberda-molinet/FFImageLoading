@@ -72,24 +72,25 @@ namespace FFImageLoading.Work
 
         protected override async Task<GenerateResult> TryGeneratingImageAsync()
         {
-            WithLoadingResult<WriteableBitmap> imageWithResult = null;
+            WithLoadingResult<WriteableBitmap> imageWithResult;
             WriteableBitmap image = null;
 
             try
             {
                 imageWithResult = await RetrieveImageAsync(Parameters.Path, Parameters.Source, false).ConfigureAwait(false);
-                image = imageWithResult == null ? null : imageWithResult.Item;
+                image = imageWithResult.Item;
             }
             catch (Exception ex)
             {
                 Logger.Error("An error occured while retrieving image.", ex);
+                imageWithResult = new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                 image = null;
             }
 
             if (image == null)
             {
                 await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-                return GenerateResult.Failed;
+                return imageWithResult.GenerateResult;
             }
 
 			if (IsCancelled)
@@ -108,7 +109,7 @@ namespace FFImageLoading.Work
 
                     _doWithImage(image, false);
                     Completed = true;
-                    Parameters.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -143,24 +144,26 @@ namespace FFImageLoading.Work
 
                 await MainThreadDispatcher.PostAsync(() =>
                 {
+					if (IsCancelled)
+						return;
+						
                     _doWithImage(value, true);
                     pixelWidth = value.PixelWidth;
                     pixelHeight = value.PixelHeight;
+
+					Completed = true;
+
+					Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
                 }).ConfigureAwait(false);
 
-                if (IsCancelled)
+                if (!Completed)
                     return CacheResult.NotFound; // not sure what to return in that case
-
-                Completed = true;
-
-                if (Parameters.OnSuccess != null)
-                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
 
                 return CacheResult.Found; // found and loaded from cache
             }
             catch (Exception ex)
             {
-                Parameters.OnError(ex);
+                Parameters?.OnError(ex);
                 return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
             }
         }
@@ -173,23 +176,24 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
                 return GenerateResult.Canceled;
 
-            WithLoadingResult<WriteableBitmap> imageWithResult = null;
+            WithLoadingResult<WriteableBitmap> imageWithResult;
             WriteableBitmap image = null;
             try
             {
                 imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
-                image = imageWithResult == null ? null : imageWithResult.Item;
+                image = imageWithResult.Item;
             }
             catch (Exception ex)
             {
                 Logger.Error("An error occured while retrieving image.", ex);
+                imageWithResult = new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                 image = null;
             }
 
             if (image == null)
             {
                 await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource).ConfigureAwait(false);
-                return GenerateResult.Failed;
+                return imageWithResult.GenerateResult;
             }
 
 			if (CanUseMemoryCache())
@@ -218,7 +222,7 @@ namespace FFImageLoading.Work
                     pixelWidth = image.PixelWidth;
                     pixelHeight = image.PixelHeight;
                     Completed = true;
-                    Parameters.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -235,7 +239,8 @@ namespace FFImageLoading.Work
 
         private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
         {
-            if (string.IsNullOrWhiteSpace(path)) return null;
+            if (string.IsNullOrWhiteSpace(path))
+                return new WithLoadingResult<Stream>(LoadingResult.Failed);
 
             try
             {
@@ -247,12 +252,12 @@ namespace FFImageLoading.Work
             catch (OperationCanceledException)
             {
                 Logger.Debug(string.Format("Image request for {0} got cancelled.", path));
-                return null;
+                return new WithLoadingResult<Stream>(LoadingResult.Canceled);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unable to retrieve image data", ex);
-                return null;
+                return new WithLoadingResult<Stream>(LoadingResult.Failed);
             }
         }
 
@@ -260,15 +265,15 @@ namespace FFImageLoading.Work
             bool isPlaceholder, Stream originalStream = null)
         {
             if (IsCancelled)
-                return null;
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-            return await Task.Run(async() =>
+            return await Task.Run<WithLoadingResult<WriteableBitmap>>(async() =>
             {
-                if (CancellationToken.IsCancellationRequested)
-                    return null;
+                if (IsCancelled)
+                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
                 Stream stream = null;
-                WithLoadingResult<Stream> streamWithResult = null;
+                WithLoadingResult<Stream> streamWithResult;
                 if (originalStream != null)
                 {
                     streamWithResult = new WithLoadingResult<Stream>(originalStream, LoadingResult.Stream);
@@ -278,24 +283,20 @@ namespace FFImageLoading.Work
                     streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
                 }
 
-                if (streamWithResult == null)
-                {
-                    return null;
-                }
-
-                if (streamWithResult.Item == null)
+                if (streamWithResult.HasError)
                 {
                     if (streamWithResult.Result == LoadingResult.NotFound)
                     {
                         Logger.Error(string.Format("Not found: {0} from {1}", path, source.ToString()));
                     }
-                    return null;
+
+                    return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
                 }
 
                 stream = streamWithResult.Item;
 
                 if (IsCancelled)
-                    return null;
+                    return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
                 try
                 {
@@ -306,17 +307,20 @@ namespace FFImageLoading.Work
                             if (originalStream != null)
                             {
                                 // If we cannot seek the original stream then there's not much we can do
-                                return null;
+                                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                             }
                             else
                             {
                                 // Assets stream can't be seeked to origin position
                                 stream.Dispose();
                                 streamWithResult = await GetStreamAsync(path, source).ConfigureAwait(false);
-                                stream = streamWithResult == null ? null : streamWithResult.Item;
 
-                                if (stream == null)
-                                    return null;
+                                if (streamWithResult.HasError)
+                                {
+                                    return new WithLoadingResult<WriteableBitmap>(streamWithResult.Result);
+                                }
+
+                                stream = streamWithResult.Item;
                             }
                         }
                         else
@@ -324,13 +328,13 @@ namespace FFImageLoading.Work
                             stream.Seek(0, SeekOrigin.Begin);
                         }
 
-                        if (CancellationToken.IsCancellationRequested)
-                            return null;
+                        if (IsCancelled)
+                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
                     }
                     catch (Exception ex)
                     {
                         Logger.Error("Something wrong happened while asynchronously retrieving image size from file: " + path, ex);
-                        return null;
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                     }
 
                     WriteableBitmap writableBitmap = null;
@@ -340,7 +344,7 @@ namespace FFImageLoading.Work
                     {
                         //TODO
                         Logger.Error("Webp is not implemented on Windows");
-                        return null;
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                     }
 
                     bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
@@ -359,7 +363,7 @@ namespace FFImageLoading.Work
                         catch (Exception ex)
                         {
                             Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-                            return null;
+                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                         }
                         finally
                         {
@@ -369,7 +373,7 @@ namespace FFImageLoading.Work
                         foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                         {
                             if (IsCancelled)
-                                return null;
+                                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
                             try
                             {
@@ -412,7 +416,7 @@ namespace FFImageLoading.Work
                         catch (Exception ex)
                         {
                             Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
-                            return null;
+                            return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                         }
                         finally
                         {
@@ -442,7 +446,7 @@ namespace FFImageLoading.Work
                 try
                 {
                     var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
-                    image = imageWithResult == null ? null : imageWithResult.Item;
+                    image = imageWithResult.Item;
                 }
                 catch (Exception ex)
                 {
@@ -475,17 +479,23 @@ namespace FFImageLoading.Work
 
         private async Task<WithLoadingResult<WriteableBitmap>> RetrieveImageAsync(string sourcePath, ImageSource source, bool isPlaceholder)
         {
+            if (string.IsNullOrWhiteSpace(sourcePath))
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+
             // If the image cache is available and this task has not been cancelled by another
             // thread and the ImageView that was originally bound to this task is still bound back
             // to this task and our "exit early" flag is not set then try and fetch the bitmap from
             // the cache
-            if (IsCancelled || _getNativeControl() == null || ImageService.ExitTasksEarly)
-                return null;
+            if (IsCancelled || ImageService.ExitTasksEarly)
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+
+            if (_getNativeControl() == null)
+                return new WithLoadingResult<WriteableBitmap>(LoadingResult.InvalidTarget);
 
             var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
 
-            if (imageWithResult == null || imageWithResult.Item == null)
-                return null;
+            if (imageWithResult.HasError)
+                return imageWithResult;
 
             // FMT: even if it was canceled, if we have the bitmap we add it to the cache
             ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);

@@ -49,10 +49,7 @@ namespace FFImageLoading.Work
 		{
 			if (Parameters != null)
 			{
-				if (Parameters.OnFinish != null)
-				{
-					Parameters.OnFinish(this); // should call dispose
-				}
+				Parameters?.OnFinish(this); // should call dispose
 				Parameters.Dispose(); // but to be safer let's call it here anyway
 			}
 		}
@@ -119,7 +116,11 @@ namespace FFImageLoading.Work
 		public void Cancel()
 		{
 			ImageService.RemovePendingTask(this);
-			CancellationToken.Cancel();
+
+			if (!_isDisposed)
+			{
+				CancellationToken.Cancel();
+			}
 			Finish();
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
@@ -226,7 +227,7 @@ namespace FFImageLoading.Work
 					if (ex == null)
 						ex = new Exception("FFImageLoading is unable to generate image.");
 
-					Parameters.OnError(ex);
+					Parameters?.OnError(ex);
 				}
 			}
 			finally
