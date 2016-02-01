@@ -8,8 +8,14 @@ using FFImageLoading.Cache;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 using System.Linq;
+
+
+#if SILVERLIGHT
+using FFImageLoading.Concurrency;
+#else
+using System.Collections.Concurrent;
+#endif
 
 namespace FFImageLoading
 {
