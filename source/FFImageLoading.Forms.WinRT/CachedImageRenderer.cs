@@ -63,13 +63,13 @@ namespace FFImageLoading.Forms.WinRT
         public static void Init()
         {
             CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-            CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType>(InvalidateCache);
+            CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
         }
 
-        private static void InvalidateCache(string key, Cache.CacheType cacheType)
+		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
         {
-            ImageService.Invalidate(key, cacheType);
+            ImageService.Invalidate(key, cacheType, removeSimilar);
         }
 
         private static void ClearCache(Cache.CacheType cacheType)
@@ -131,6 +131,7 @@ namespace FFImageLoading.Forms.WinRT
 
             if (e.NewElement != null)
             {
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
 				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -354,6 +355,11 @@ namespace FFImageLoading.Forms.WinRT
                 element.InvalidateViewMeasure();
             }
         }
+
+		private void ReloadImage()
+		{
+			UpdateSource();
+		}
 
         private void Cancel()
         {

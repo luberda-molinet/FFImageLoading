@@ -188,7 +188,7 @@ namespace FFImageLoading.Work
 						SetImageDrawable(imageView, drawableWithResult.Item, UseFadeInBitmap);
 						
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
+						Parameters?.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -261,7 +261,7 @@ namespace FFImageLoading.Work
 						SetImageDrawable(imageView, resultWithDrawable.Item, UseFadeInBitmap);
 						
 						Completed = true;
-						Parameters.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
+						Parameters?.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -620,15 +620,15 @@ namespace FFImageLoading.Work
 								imageView.LayoutParameters.Height = value.IntrinsicHeight;
 								imageView.LayoutParameters.Width = value.IntrinsicWidth;
 							}
+
+							Completed = true;
+
+							Parameters?.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 						}).ConfigureAwait(false);
 
-					if (IsCancelled)
+					if (!Completed)
 						return CacheResult.NotFound; // not sure what to return in that case
 
-					Completed = true;
-
-					if (Parameters.OnSuccess != null)
-						Parameters.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
 					return CacheResult.Found; // found and loaded from cache
 				}
 				finally
@@ -638,8 +638,7 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex)
 			{
-				if (Parameters.OnError != null)
-					Parameters.OnError(ex);
+				Parameters?.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
 		}
