@@ -88,13 +88,7 @@ namespace FFImageLoading.Work
 				OnError = (e) => {};
 				OnFinish = (sw) => {};
 
-				// clear transformations list
-				if (Transformations != null)
-				{
-					Transformations.Clear();
-					Transformations = null;
-				}
-
+				Transformations = null;
 				Stream = null;
 
 				_disposed = true;

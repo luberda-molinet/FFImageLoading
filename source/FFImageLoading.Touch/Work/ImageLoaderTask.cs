@@ -328,6 +328,7 @@ namespace FFImageLoading.Work
 				return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
 			UIImage imageIn = image;
+			NSData nsdata = null;
 
 			if (imageIn == null)
 			{
@@ -339,24 +340,20 @@ namespace FFImageLoading.Work
 				else
 				{
 					nfloat scale = _imageScale >= 1 ? _imageScale : ScaleHelper.Scale;
-					NSData data = NSData.FromArray(bytes);
-					lock (_imageInLock)
-					{
-						imageIn = new UIImage(data, scale);	
-					}
+					nsdata = NSData.FromArray(bytes);
+					if (nsdata == null)
+						return new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				}
 			}
 
 			bytes = null;
 
-			if (Parameters.DownSampleSize != null
-				&& ((Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1) 
-					|| (Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2)))
+			// We rely on ImageIO for all datasources except AssetCatalog, this way we don't generate temporary UIImage
+			// furthermore we can do all the work in a thread safe way and in threadpool
+			if (nsdata != null)
 			{
-				var tempImage = imageIn;
-
-				int downsampleWidth = Parameters.DownSampleSize.Item1;
-				int downsampleHeight = Parameters.DownSampleSize.Item2;
+				int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
+				int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
 
 				if (Parameters.DownSampleUseDipUnits)
 				{
@@ -364,10 +361,14 @@ namespace FFImageLoading.Work
 					downsampleHeight = downsampleHeight.PointsToPixels();
 				}
 
-				imageIn = tempImage.ResizeUIImage(downsampleWidth, downsampleHeight, Parameters.DownSampleInterpolationMode);
-				tempImage.Dispose();
+				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill);
 			}
-
+			else if (Parameters.DownSampleSize != null && imageIn != null)
+			{
+				// if we already have the UIImage in memory it doesn't really matter to resize it
+				// furthermore this will only happen for AssetCatalog images (yet)
+			}
+			
 			bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 				Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
