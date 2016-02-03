@@ -352,8 +352,8 @@ namespace FFImageLoading.Work
 			// furthermore we can do all the work in a thread safe way and in threadpool
 			if (nsdata != null)
 			{
-				int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 100;
-				int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 100;
+				int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
+				int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
 
 				if (Parameters.DownSampleUseDipUnits)
 				{
@@ -363,28 +363,10 @@ namespace FFImageLoading.Work
 
 				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill);
 			}
-			// This will only happen for AssetCatalog images
 			else if (Parameters.DownSampleSize != null && imageIn != null)
 			{
-				if (
-					(Parameters.DownSampleSize.Item1 > 0 && imageIn.Size.Width > Parameters.DownSampleSize.Item1)
-					||
-					(Parameters.DownSampleSize.Item2 > 0 && imageIn.Size.Height > Parameters.DownSampleSize.Item2))
-				{
-					var tempImage = imageIn;
-
-					int downsampleWidth = Parameters.DownSampleSize.Item1;
-					int downsampleHeight = Parameters.DownSampleSize.Item2;
-
-					if (Parameters.DownSampleUseDipUnits)
-					{
-						downsampleWidth = downsampleWidth.PointsToPixels();
-						downsampleHeight = downsampleHeight.PointsToPixels();
-					}
-
-					imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill);
-					tempImage.Dispose();
-				}
+				// if we already have the UIImage in memory it doesn't really matter to resize it
+				// furthermore this will only happen for AssetCatalog images (yet)
 			}
 			
 			bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
