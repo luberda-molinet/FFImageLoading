@@ -62,7 +62,8 @@ namespace FFImageLoading.Extensions
 						ShouldAllowFloat = true,
 						CreateThumbnailWithTransform = true,
 						CreateThumbnailFromImageAlways = true,
-						MaxPixelSize = maxPixelSize
+						MaxPixelSize = maxPixelSize,
+						ShouldCache = false,
 				};
 
 				// Get thumbnail
