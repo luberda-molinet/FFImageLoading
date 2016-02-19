@@ -103,7 +103,7 @@ namespace FFImageLoading.Views
 
 		protected override bool SetFrame(int l, int t, int r, int b)
 		{
-			if (!AdjustViewBounds && Drawable != null && Drawable.IntrinsicWidth != 0)
+			if (Drawable != null && Drawable.IntrinsicWidth != 0)
 			{
 				bool bottomAlignmentDefined = AlignMode != AlignMode.None;
 				if (ScaleToFit || bottomAlignmentDefined)
