@@ -5,37 +5,60 @@ namespace FFImageLoading.Transformations.Extensions
 {
 	public static class ColorExtensions
 	{
-		public static UIColor FromHexString (this UIColor color, string hexValue, float alpha = 1.0f)
+		public static UIColor FromHexString(this string c)
 		{
-			var colorString = hexValue.Replace ("#", "");
-			if (alpha > 1.0f) {
-				alpha = 1.0f;
-			} else if (alpha < 0.0f) {
-				alpha = 0.0f;
-			}
+			if (string.IsNullOrWhiteSpace(c) || !c.StartsWith("#"))
+				throw new ArgumentException ("Invalid color string.", "c");
 
-			float red, green, blue;
-
-			switch (colorString.Length) 
+			switch (c.Length)
 			{
-				case 3 : // #RGB
+				case 9:
 					{
-						red = Convert.ToInt32(string.Format("{0}{0}", colorString.Substring(0, 1)), 16) / 255f;
-						green = Convert.ToInt32(string.Format("{0}{0}", colorString.Substring(1, 1)), 16) / 255f;
-						blue = Convert.ToInt32(string.Format("{0}{0}", colorString.Substring(2, 1)), 16) / 255f;
-						return UIColor.FromRGBA(red, green, blue, alpha);
+						var cuint = Convert.ToUInt32(c.Substring(1), 16);
+						var a = (byte)(cuint >> 24);
+						var r = (byte)((cuint >> 16) & 0xff);
+						var g = (byte)((cuint >> 8) & 0xff);
+						var b = (byte)(cuint & 0xff);
+
+						return UIColor.FromRGBA(r, g, b, a);
 					}
-				case 6 : // #RRGGBB
+				case 7:
 					{
-						red = Convert.ToInt32(colorString.Substring(0, 2), 16) / 255f;
-						green = Convert.ToInt32(colorString.Substring(2, 2), 16) / 255f;
-						blue = Convert.ToInt32(colorString.Substring(4, 2), 16) / 255f;
-						return UIColor.FromRGBA(red, green, blue, alpha);
-					}   
+						var cuint = Convert.ToUInt32(c.Substring(1), 16);
+						var r = (byte)((cuint >> 16) & 0xff);
+						var g = (byte)((cuint >> 8) & 0xff);
+						var b = (byte)(cuint & 0xff);
 
-				default :
-					throw new ArgumentOutOfRangeException(string.Format("Invalid color value {0} is invalid. It should be a hex value of the form #RBG, #RRGGBB", hexValue));
+						return UIColor.FromRGBA(r, g, b, (byte)255);
+					}
+				case 5:
+					{
+						var cuint = Convert.ToUInt16(c.Substring(1), 16);
+						var a = (byte)(cuint >> 12);
+						var r = (byte)((cuint >> 8) & 0xf);
+						var g = (byte)((cuint >> 4) & 0xf);
+						var b = (byte)(cuint & 0xf);
+						a = (byte)(a << 4 | a);
+						r = (byte)(r << 4 | r);
+						g = (byte)(g << 4 | g);
+						b = (byte)(b << 4 | b);
 
+						return UIColor.FromRGBA(r, g, b, a);
+					}
+				case 4:
+					{
+						var cuint = Convert.ToUInt16(c.Substring(1), 16);
+						var r = (byte)((cuint >> 8) & 0xf);
+						var g = (byte)((cuint >> 4) & 0xf);
+						var b = (byte)(cuint & 0xf);
+						r = (byte)(r << 4 | r);
+						g = (byte)(g << 4 | g);
+						b = (byte)(b << 4 | b);
+
+						return UIColor.FromRGBA(r, g, b, (byte)255);
+					}
+				default:
+					throw new FormatException(string.Format("The {0} string passed in the c argument is not a recognized Color format.", c));
 			}
 		}
 	}

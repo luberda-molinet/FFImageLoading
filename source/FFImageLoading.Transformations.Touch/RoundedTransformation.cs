@@ -92,7 +92,7 @@ namespace FFImageLoading.Transformations
 
 						try
 						{
-							borderColor = UIColor.Clear.FromHexString(borderHexColor);
+							borderColor = borderHexColor.FromHexString();
 						}
 						catch(Exception)
 						{
