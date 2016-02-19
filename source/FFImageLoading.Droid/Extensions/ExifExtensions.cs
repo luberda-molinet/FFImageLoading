@@ -38,7 +38,7 @@ namespace FFImageLoading.Extensions
 			int width = sourceBitmap.Width;
 			int height = sourceBitmap.Height;
 
-			if (rotationDegrees == 90 || rotationDegrees == 270) 
+			if (rotationDegrees == 90 || rotationDegrees == 270)
 			{
 				width = sourceBitmap.Height;
 				height = sourceBitmap.Width;
@@ -54,14 +54,23 @@ namespace FFImageLoading.Extensions
 				// paint.Dither = true;
 				// paint.FilterBitmap = true;
 
-				matrix.PostRotate(rotationDegrees);
+				canvas.Save(Android.Graphics.SaveFlags.Matrix);
+
+				if (rotationDegrees == 90)
+					canvas.Rotate(rotationDegrees, width / 2, width / 2);
+				else if (rotationDegrees == 270)
+					canvas.Rotate(rotationDegrees, height / 2, height / 2);
+				else
+					canvas.Rotate(rotationDegrees, width / 2, height / 2);
+
 				canvas.DrawBitmap(sourceBitmap, matrix, paint);
+				canvas.Restore();
 			}
 
 			if (sourceBitmap != null && sourceBitmap.Handle != IntPtr.Zero && !sourceBitmap.IsRecycled)
 			{
 				sourceBitmap.Recycle();
-				sourceBitmap.Dispose();	
+				sourceBitmap.Dispose();
 			}
 
 			return bitmap;
