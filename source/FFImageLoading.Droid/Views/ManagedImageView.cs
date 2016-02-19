@@ -10,6 +10,8 @@ namespace FFImageLoading.Views
 {
 	public class ManagedImageView : ImageView
 	{
+		private WeakReference<Drawable> _drawableRef = null;
+
         public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
         }
@@ -29,12 +31,26 @@ namespace FFImageLoading.Views
 			SetImageDrawable(null);
 			base.OnDetachedFromWindow();
 		}
+
+		INSTEAD WE USE Dispose override 
 		*/
+		protected override void Dispose(bool disposing)
+		{
+			Drawable drawable = null; 
+
+			if (_drawableRef != null && _drawableRef.TryGetTarget(out drawable))
+			{
+				UpdateDrawableDisplayedState(drawable, false);
+			}
+
+			base.Dispose(disposing);
+		}
 
 		public override void SetImageDrawable(Drawable drawable)
 		{
 			var previous = Drawable;
 
+			_drawableRef = new WeakReference<Drawable>(drawable);
 			base.SetImageDrawable(drawable);
 
 			UpdateDrawableDisplayedState(drawable, true);
@@ -45,6 +61,7 @@ namespace FFImageLoading.Views
 		{
 			var previous = Drawable;
 			// Ultimately calls SetImageDrawable, where the state will be updated.
+			_drawableRef = null;
 			base.SetImageResource(resId);
 			UpdateDrawableDisplayedState(previous, false);
 		}
@@ -53,20 +70,30 @@ namespace FFImageLoading.Views
 		{
 			var previous = Drawable;
 			// Ultimately calls SetImageDrawable, where the state will be updated.
+			_drawableRef = null;
 			base.SetImageURI(uri);
 			UpdateDrawableDisplayedState(previous, false);
 		}
 
 		private void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
 		{
-			if (drawable is SelfDisposingBitmapDrawable) {
-				((SelfDisposingBitmapDrawable)drawable).SetIsDisplayed(isDisplayed);
-			} else if (drawable is LayerDrawable) {
-				var layerDrawable = (LayerDrawable)drawable;
-				for (var i = 0; i < layerDrawable.NumberOfLayers; i++) {
-					UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
+			var selfDisposingBitmapDrawable = drawable as SelfDisposingBitmapDrawable;
+			if (selfDisposingBitmapDrawable != null)
+			{
+				selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
+			}
+			else
+			{
+				var layerDrawable = drawable as LayerDrawable;
+				if (layerDrawable != null)
+				{
+					for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
+					{
+						UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
+					}
 				}
 			}
 		}
 	}
+
 }
