@@ -163,11 +163,12 @@ namespace FFImageLoading.Work
 		/// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
 		/// </summary>
 		/// <param name="task">Image loading task.</param>
-		public async void LoadImage(IImageLoaderTask task)
+		public void LoadImage(IImageLoaderTask task)
 		{
 			if (task == null)
 				return;
 
+			#pragma warning disable 4014
 			Task.Run(async () =>
 			{
 				if (task.IsCancelled)
@@ -205,6 +206,7 @@ namespace FFImageLoading.Work
 
 				QueueAndGenerateImage(task);
 			});
+			#pragma warning restore 4014
 		}
 
 		private void QueueAndGenerateImage(IImageLoaderTask task)
