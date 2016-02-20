@@ -2,32 +2,18 @@
 
 namespace FFImageLoading.Work
 {
+	[Obsolete]
 	public struct ImageSize
 	{
-		private int _width;
-		private int _height;
-
 		public ImageSize(int width, int height)
 		{
-			_width = width;
-			_height = height;
+			Width = width;
+			Height = height;
 		}
+			
+		public int Width { get; private set; }
 
-		public int Width
-		{
-			get
-			{
-				return _width;
-			}
-		}
-
-		public int Height
-		{
-			get
-			{
-				return _height;
-			}
-		}
+		public int Height { get; private set; }
 	}
 }
 

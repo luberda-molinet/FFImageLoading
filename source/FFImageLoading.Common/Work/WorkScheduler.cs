@@ -163,7 +163,7 @@ namespace FFImageLoading.Work
 		/// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
 		/// </summary>
 		/// <param name="task">Image loading task.</param>
-		public async void LoadImage(IImageLoaderTask task)
+		public void LoadImage(IImageLoaderTask task)
 		{
 			if (task == null)
 				return;

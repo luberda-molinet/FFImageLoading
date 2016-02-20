@@ -174,7 +174,7 @@ namespace FFImageLoading.Work
 						SetImageDrawable(imageView, drawableWithResult.Item);
 						
 						Completed = true;
-						Parameters?.OnSuccess(new ImageSize(drawableWithResult.Item.IntrinsicWidth, drawableWithResult.Item.IntrinsicHeight), drawableWithResult.Result);
+						Parameters?.OnSuccess(drawableWithResult.ImageInformation, drawableWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -227,7 +227,8 @@ namespace FFImageLoading.Work
 
 			if (CanUseMemoryCache())
 			{
-				ImageCache.Instance.Add(GetKey(), resultWithDrawable.Item);
+				//var 
+				ImageCache.Instance.Add(GetKey(), resultWithDrawable.ImageInformation, resultWithDrawable.Item);
 			}
 
 			try
@@ -247,7 +248,7 @@ namespace FFImageLoading.Work
 						SetImageDrawable(imageView, resultWithDrawable.Item);
 						
 						Completed = true;
-						Parameters?.OnSuccess(new ImageSize(resultWithDrawable.Item.IntrinsicWidth, resultWithDrawable.Item.IntrinsicHeight), resultWithDrawable.Result);
+						Parameters?.OnSuccess(resultWithDrawable.ImageInformation, resultWithDrawable.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -540,7 +541,9 @@ namespace FFImageLoading.Work
 			if (imageView == null)
 				return false;
 
-			BitmapDrawable drawable = ImageCache.Instance.Get(GetKey(placeholderPath));
+			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
+
+			BitmapDrawable drawable = cacheEntry == null ? null: cacheEntry.Item1;
 
 			if (drawable != null && drawable.Handle != IntPtr.Zero 
 				&& drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled)
@@ -615,9 +618,12 @@ namespace FFImageLoading.Work
 				if (string.IsNullOrWhiteSpace(key))
 					return CacheResult.NotFound;
 
-				var value = ImageCache.Instance.Get(key);
-				if (value == null)
+				var cacheEntry = ImageCache.Instance.Get(key);
+
+				if (cacheEntry == null)
 					return CacheResult.NotFound; // not available in the cache
+
+				var value = cacheEntry.Item1;
 
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
@@ -649,7 +655,7 @@ namespace FFImageLoading.Work
 
 							Completed = true;
 
-							Parameters?.OnSuccess(new ImageSize(value.IntrinsicWidth, value.IntrinsicHeight), LoadingResult.MemoryCache);
+							Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
 						}).ConfigureAwait(false);
 
 					if (!Completed)
@@ -715,7 +721,7 @@ namespace FFImageLoading.Work
 				return drawableWithResult;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.Item);
+			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.ImageInformation, drawableWithResult.Item);
 			return drawableWithResult;
 		}
 
