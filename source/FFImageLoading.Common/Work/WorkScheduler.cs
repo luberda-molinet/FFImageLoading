@@ -168,6 +168,7 @@ namespace FFImageLoading.Work
 			if (task == null)
 				return;
 
+			#pragma warning disable 4014
 			Task.Run(async () =>
 			{
 				if (task.IsCancelled)
@@ -205,6 +206,7 @@ namespace FFImageLoading.Work
 
 				QueueAndGenerateImage(task);
 			});
+			#pragma warning restore 4014
 		}
 
 		private void QueueAndGenerateImage(IImageLoaderTask task)
