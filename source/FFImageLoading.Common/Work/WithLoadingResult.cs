@@ -4,10 +4,9 @@ namespace FFImageLoading.Work
 {
 	public static class WithLoadingResult
 	{
-		[Obsolete]
 		public static WithLoadingResult<T> Encapsulate<T>(T item, LoadingResult result) where T:class
 		{
-			return new WithLoadingResult<T>(item, result, null);
+			return new WithLoadingResult<T>(item, result);
 		}
 
 		public static WithLoadingResult<T> Encapsulate<T>(T item, LoadingResult result, ImageInformation imageInformation) where T:class
@@ -27,7 +26,6 @@ namespace FFImageLoading.Work
 			ImageInformation = null;
 		}
 
-		[Obsolete]
 		public WithLoadingResult(T item, LoadingResult result)
 		{
 			_result = result;

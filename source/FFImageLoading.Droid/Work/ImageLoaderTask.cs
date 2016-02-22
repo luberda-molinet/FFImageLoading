@@ -227,7 +227,6 @@ namespace FFImageLoading.Work
 
 			if (CanUseMemoryCache())
 			{
-				//var 
 				ImageCache.Instance.Add(GetKey(), resultWithDrawable.ImageInformation, resultWithDrawable.Item);
 			}
 
@@ -349,6 +348,13 @@ namespace FFImageLoading.Work
 				if (IsCancelled)
 					return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
+				// Setting image informations
+				var imageInformation = streamWithResult.ImageInformation ?? new ImageInformation();
+				imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
+				imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
+				imageInformation.SetPath(path);
+				imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
+
 				options.InPurgeable = true;
 				options.InJustDecodeBounds = false;
 
@@ -386,13 +392,12 @@ namespace FFImageLoading.Work
 							downsampleHeight = downsampleHeight.DpToPixels();
 						}
 
-						if (Parameters.DownSampleUseDipUnits)
-						{
-							downsampleWidth = downsampleWidth.DpToPixels();
-							downsampleHeight = downsampleHeight.DpToPixels();
-						}
-
 						options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight);
+
+						if (options.InSampleSize > 1)
+							imageInformation.SetCurrentSize(
+								(int)((double)options.OutWidth / options.InSampleSize), 
+								(int)((double)options.OutHeight / options.InSampleSize));
 
 						// If we're running on Honeycomb or newer, try to use inBitmap
 						if (Utils.HasHoneycomb())
@@ -487,7 +492,8 @@ namespace FFImageLoading.Work
 
 				if (isLoadingPlaceHolder)
 				{
-					return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result);
+					return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(
+						new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this), streamWithResult.Result, imageInformation);
 				}
 				else
 				{
@@ -512,12 +518,14 @@ namespace FFImageLoading.Work
 					{
 						return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(
 							new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, 
-								fadeDuration, isFadeAnimationEnabled && isFadeAnimationEnabledForCached), streamWithResult.Result);
+								fadeDuration, isFadeAnimationEnabled && isFadeAnimationEnabledForCached), 
+								streamWithResult.Result, imageInformation);
 					}
 
 					return WithLoadingResult.Encapsulate<SelfDisposingBitmapDrawable>(
 						new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, 
-							fadeDuration, isFadeAnimationEnabled), streamWithResult.Result);
+							fadeDuration, isFadeAnimationEnabled), 
+							streamWithResult.Result, imageInformation);
 				}
 			}
 			finally
@@ -716,13 +724,13 @@ namespace FFImageLoading.Work
 			if (GetAttachedImageView() == null)
 				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.InvalidTarget);
 
-			var drawableWithResult = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
-			if (drawableWithResult.HasError)
-				return drawableWithResult;
+			var resultWithDrawable = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
+			if (resultWithDrawable.HasError)
+				return resultWithDrawable;
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(sourcePath), drawableWithResult.ImageInformation, drawableWithResult.Item);
-			return drawableWithResult;
+			ImageCache.Instance.Add(GetKey(sourcePath), resultWithDrawable.ImageInformation, resultWithDrawable.Item);
+			return resultWithDrawable;
 		}
 
 		/// <summary>

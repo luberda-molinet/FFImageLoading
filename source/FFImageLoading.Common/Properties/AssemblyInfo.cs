@@ -25,3 +25,7 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
+[assembly: InternalsVisibleTo("FFImageLoading.Droid")]
+[assembly: InternalsVisibleTo("FFImageLoading.Touch")]
+[assembly: InternalsVisibleTo("FFImageLoading.Windows")]
+[assembly: InternalsVisibleTo("FFImageLoading.Shared")]

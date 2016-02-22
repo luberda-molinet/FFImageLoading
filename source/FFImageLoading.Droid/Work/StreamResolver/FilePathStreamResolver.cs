@@ -18,7 +18,11 @@ namespace FFImageLoading.Work.StreamResolver
 				return Task.FromResult(WithLoadingResult.Encapsulate((Stream)null, LoadingResult.NotFound));
 			}
 
-			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk);
+			var imageInformation = new ImageInformation();
+			imageInformation.SetPath(identifier);
+			imageInformation.SetFilePath(identifier);
+
+			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk, imageInformation);
 			return Task.FromResult(result);
 		}
 

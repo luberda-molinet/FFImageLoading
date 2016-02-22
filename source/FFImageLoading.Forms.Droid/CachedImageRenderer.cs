@@ -267,9 +267,9 @@ namespace FFImageLoading.Forms.Droid
 							element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
 							ImageLoadingFinished(element);
 						});
-
-						imageLoader.Success((imageSize, loadingResult) => 
-							element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageSize, loadingResult)));
+                            
+						imageLoader.Success((imageInformation, loadingResult) => 
+                            element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
 
 						imageLoader.Error((exception) => 
 							element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
