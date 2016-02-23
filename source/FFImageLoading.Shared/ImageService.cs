@@ -345,14 +345,15 @@ namespace FFImageLoading
 		{
 			InitializeIfNeeded();
 
-			if (!(await Config.DiskCache.ExistsAsync(string.IsNullOrWhiteSpace(customCacheKey) ? imageUrl : customCacheKey)))
+			string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
+
+			if (!(await Config.DiskCache.ExistsAsync(fileName)))
 			{
-				string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
 				string filePath = await Config.DiskCache.GetFilePathAsync(fileName);
 				await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration);
 
 				return true;
-			}
+			}	
 
 			return false;
 		}
