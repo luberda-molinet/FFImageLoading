@@ -65,7 +65,7 @@ namespace FFImageLoading.Forms.Droid
 
         private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
-            return ImageService.DownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+            return ImageService.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
         }
 
         private bool _isDisposed;

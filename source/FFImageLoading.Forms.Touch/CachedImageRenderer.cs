@@ -72,7 +72,7 @@ namespace FFImageLoading.Forms.Touch
 
         private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
-            return ImageService.DownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+            return ImageService.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
         }
 
         protected override void Dispose(bool disposing)

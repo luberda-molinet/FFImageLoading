@@ -502,7 +502,7 @@ namespace FFImageLoading.Forms
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <param name="duration">Disk cache validity duration.</param>
         /// <param name="customCacheKey">Custom cache key.</param>
-        public static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        public static Task DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
             if (InternalDownloadImageAndAddToDiskCache != null)
             {

@@ -318,7 +318,7 @@ namespace FFImageLoading
 		/// <param name="cancellationToken">Cancellation token.</param>
 		/// <param name="duration">Disk cache validity duration.</param>
 		/// <param name="customCacheKey">Custom cache key.</param>
-		public async static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+		public async static Task DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
 		{
 			string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
 			string filePath = await Config.DiskCache.GetFilePathAsync(fileName);
