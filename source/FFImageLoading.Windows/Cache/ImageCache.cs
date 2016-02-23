@@ -7,17 +7,18 @@ using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 using System;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Cache
 {
     class ImageCache : IImageCache
     {
         private static IImageCache _instance;
-        private readonly ConcurrentDictionary<string, WeakReference<WriteableBitmap>> _reusableBitmaps;
+        private readonly ConcurrentDictionary<string, Tuple<WeakReference<WriteableBitmap>, ImageInformation>> _reusableBitmaps;
 
         private ImageCache(int maxCacheSize)
         {
-            _reusableBitmaps = new ConcurrentDictionary<string, WeakReference<WriteableBitmap>>();
+            _reusableBitmaps = new ConcurrentDictionary<string, Tuple<WeakReference<WriteableBitmap>, ImageInformation>>();
         }
 
         public static IImageCache Instance
@@ -28,29 +29,26 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public void Add(string key, WriteableBitmap bitmap)
+        public void Add(string key, ImageInformation imageInformation, WriteableBitmap bitmap)
         {
             var weakRef = new WeakReference<WriteableBitmap>(bitmap);
-            _reusableBitmaps.TryAdd(key, weakRef);
+            _reusableBitmaps.TryAdd(key, new Tuple<WeakReference<WriteableBitmap>, ImageInformation>(weakRef, imageInformation));
         }
 
 
-        public WriteableBitmap Get(string key)
+        public Tuple<WriteableBitmap, ImageInformation> Get(string key)
         {
             CleanAbandonedItems();
 
-            WeakReference<WriteableBitmap> weakRef;
+            Tuple<WeakReference<WriteableBitmap>, ImageInformation> cacheEntry;
+            WriteableBitmap bitmap = null;
 
-            if (_reusableBitmaps.TryGetValue(key, out weakRef))
+            if (_reusableBitmaps.TryGetValue(key, out cacheEntry) && cacheEntry.Item1.TryGetTarget(out bitmap))
             {
-                WriteableBitmap bitmap = null;
-                weakRef.TryGetTarget(out bitmap);
-                return bitmap;
+                return new Tuple<WriteableBitmap, ImageInformation>(bitmap, cacheEntry.Item2);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         void CleanAbandonedItems()
@@ -58,9 +56,9 @@ namespace FFImageLoading.Cache
             foreach (var item in _reusableBitmaps)
             {
                 WriteableBitmap bitmap = null;
-                if (!item.Value.TryGetTarget(out bitmap) || bitmap == null)
+                if (!item.Value.Item1.TryGetTarget(out bitmap) || bitmap == null)
                 {
-                    WeakReference<WriteableBitmap> removed;
+                    Tuple<WeakReference<WriteableBitmap>, ImageInformation> removed;
                     _reusableBitmaps.TryRemove(item.Key, out removed);
                 }      
             }
@@ -79,7 +77,7 @@ namespace FFImageLoading.Cache
 
         public void Remove(string key)
         {
-            WeakReference<WriteableBitmap> removed;
+            Tuple<WeakReference<WriteableBitmap>, ImageInformation> removed;
             _reusableBitmaps.TryRemove(key, out removed);
         }
     }
