@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
+using System.Threading;
 
 namespace FFImageLoading.Forms
 {
@@ -490,8 +491,28 @@ namespace FFImageLoading.Forms
 				InternalCancel();
 			}
 		}
+            
+        internal static Func<string, CancellationToken, TimeSpan?, string, Task> InternalDownloadImageAndAddToDiskCache;
 
-		internal static Action<Cache.CacheType> InternalClearCache;
+        /// <summary>
+        /// Downloads the image and adds it to disk cache.
+        /// </summary>
+        /// <returns>Task.</returns>
+        /// <param name="imageUrl">Image URL.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="duration">Disk cache validity duration.</param>
+        /// <param name="customCacheKey">Custom cache key.</param>
+        public static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        {
+            if (InternalDownloadImageAndAddToDiskCache != null)
+            {
+                return InternalDownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+            }
+
+            return null;
+        }
+
+        internal static Action<bool> InternalSetPauseWork;
 
 		/// <summary>
 		/// Pauses image loading (enable or disable).
@@ -504,8 +525,8 @@ namespace FFImageLoading.Forms
 				InternalSetPauseWork(pauseWork);
 			}
 		}
-			
-		internal static Action<bool> InternalSetPauseWork;
+
+        internal static Action<Cache.CacheType> InternalClearCache;
 
         /// <summary>
         /// Clears image cache

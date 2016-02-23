@@ -14,6 +14,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
 using FFImageLoading.Forms.Args;
+using System.Threading;
 
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
@@ -32,6 +33,7 @@ namespace FFImageLoading.Forms.Droid
 			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
 			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
+            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
         }
 
 		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
@@ -60,6 +62,11 @@ namespace FFImageLoading.Forms.Droid
 		{
 			ImageService.SetPauseWork(pauseWork);
 		}
+
+        private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        {
+            return ImageService.DownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+        }
 
         private bool _isDisposed;
 		private IScheduledWork _currentTask;

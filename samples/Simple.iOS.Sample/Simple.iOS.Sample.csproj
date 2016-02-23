@@ -81,15 +81,33 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
-    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Contents.json" />
-    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%401x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%402x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%403x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\Contents.json" />
-    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%401x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%402x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Contents.json">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%401x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%402x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\Icon.imageset\Icon-universal%403x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\Contents.json">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%401x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%402x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\placeholder.imageset\placeholder-universal%403x.png">
+      <InProject>false</InProject>
+    </ImageAsset>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.xib" />

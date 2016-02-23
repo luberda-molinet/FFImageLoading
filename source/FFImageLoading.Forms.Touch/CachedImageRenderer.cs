@@ -13,6 +13,7 @@ using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
+using System.Threading;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -39,6 +40,7 @@ namespace FFImageLoading.Forms.Touch
 			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
 			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
+            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
 		}
 
 		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
@@ -67,6 +69,11 @@ namespace FFImageLoading.Forms.Touch
 		{
 			ImageService.SetPauseWork(pauseWork);
 		}
+
+        private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        {
+            return ImageService.DownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+        }
 
         protected override void Dispose(bool disposing)
 		{

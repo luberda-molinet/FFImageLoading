@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
 using System.IO;
+using System.Threading;
 
 #if WINDOWS_UWP
 using FFImageLoading.Forms.WinUWP;
@@ -65,6 +66,7 @@ namespace FFImageLoading.Forms.WinRT
             CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
             CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
+            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
         }
 
 		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
@@ -93,6 +95,11 @@ namespace FFImageLoading.Forms.WinRT
 		{
 			ImageService.SetPauseWork(pauseWork);
 		}
+
+        private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        {
+            return ImageService.DownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+        }
 
         private bool measured;
 

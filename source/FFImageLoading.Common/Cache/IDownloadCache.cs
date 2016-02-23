@@ -15,6 +15,8 @@ namespace FFImageLoading.Cache
 		Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null);
 
 		Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null);
+
+		Task<byte[]> DownloadBytesAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration);
     }
 }
 
