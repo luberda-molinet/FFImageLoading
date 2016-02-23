@@ -16,7 +16,7 @@ namespace FFImageLoading.Work
 		private readonly Func<UIView> _getNativeControl;
 		private readonly Action<UIImage, bool, bool> _doWithImage;
 		private readonly nfloat _imageScale;
-		private static readonly object _imageInLock = new object();
+		// private static readonly object _imageInLock = new object();
 
 		static ImageLoaderTask()
 		{
@@ -118,7 +118,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, imageWithResult.Result.IsLocalOrCachedResult(), false);
 						Completed = true;
-						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -145,7 +145,12 @@ namespace FFImageLoading.Work
 				if (nativeControl == null)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
-				var value = ImageCache.Instance.Get(GetKey());
+				var cacheEntry = ImageCache.Instance.Get(GetKey());
+				if (cacheEntry == null)
+					return CacheResult.NotFound; // not available in the cache
+
+				var value = cacheEntry.Item1;
+
 				if (value == null)
 					return CacheResult.NotFound; // not available in the cache
 
@@ -159,7 +164,7 @@ namespace FFImageLoading.Work
 						
 						_doWithImage(value, true, false);
 						Completed = true;
-						Parameters?.OnSuccess(new ImageSize((int)value.Size.Width, (int)value.Size.Height), LoadingResult.MemoryCache);
+						Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -187,29 +192,29 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return GenerateResult.Canceled;
 
-			WithLoadingResult<UIImage> imageWithResult;
+			WithLoadingResult<UIImage> resultWithImage;
 			UIImage image = null;
 			try
 			{
-				imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
-				image = imageWithResult.Item;
+				resultWithImage = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
+				image = resultWithImage.Item;
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("An error occured while retrieving image.", ex);
-				imageWithResult = new WithLoadingResult<UIImage>(LoadingResult.Failed);
+				resultWithImage = new WithLoadingResult<UIImage>(LoadingResult.Failed);
 				image = null;
 			}
 
 			if (image == null)
 			{
 				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
-				return imageWithResult.GenerateResult;
+				return resultWithImage.GenerateResult;
 			}
 
 			if (CanUseMemoryCache())
 			{
-				ImageCache.Instance.Add(GetKey(), image);
+				ImageCache.Instance.Add(GetKey(), resultWithImage.ImageInformation, image);
 			}
 
 			if (IsCancelled)
@@ -228,7 +233,7 @@ namespace FFImageLoading.Work
 
 						_doWithImage(image, true, false);
 						Completed = true;
-						Parameters?.OnSuccess(new ImageSize((int)image.Size.Width, (int)image.Size.Height), imageWithResult.Result);
+						Parameters?.OnSuccess(resultWithImage.ImageInformation, resultWithImage.Result);
 					}).ConfigureAwait(false);
 
 				if (!Completed)
@@ -253,6 +258,7 @@ namespace FFImageLoading.Work
 			UIImage image = null;
 			byte[] bytes = null;
 			string path = sourcePath;
+			ImageInformation imageInformation = null;
 
 			try
 			{
@@ -300,6 +306,7 @@ namespace FFImageLoading.Work
 						bytes = data.Data;
 						path = data.ResultIdentifier;
 						result = data.Result;
+						imageInformation = data.ImageInformation;
 					}
 				}
 			}
@@ -339,7 +346,7 @@ namespace FFImageLoading.Work
 				}
 				else
 				{
-					nfloat scale = _imageScale >= 1 ? _imageScale : ScaleHelper.Scale;
+					// nfloat scale = _imageScale >= 1 ? _imageScale : ScaleHelper.Scale;
 					nsdata = NSData.FromArray(bytes);
 					if (nsdata == null)
 						return new WithLoadingResult<UIImage>(LoadingResult.Failed);
@@ -347,6 +354,12 @@ namespace FFImageLoading.Work
 			}
 
 			bytes = null;
+
+			// Setting image informations
+			if (imageInformation == null)
+				imageInformation = new ImageInformation();
+			
+			imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(sourcePath));
 
 			// We rely on ImageIO for all datasources except AssetCatalog, this way we don't generate temporary UIImage
 			// furthermore we can do all the work in a thread safe way and in threadpool
@@ -361,7 +374,7 @@ namespace FFImageLoading.Work
 					downsampleHeight = downsampleHeight.PointsToPixels();
 				}
 
-				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill);
+				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation);
 			}
 			else if (Parameters.DownSampleSize != null && imageIn != null)
 			{
@@ -397,7 +410,7 @@ namespace FFImageLoading.Work
 				}
 			}
 				
-			return WithLoadingResult.Encapsulate(imageIn, result.Value);
+			return WithLoadingResult.Encapsulate(imageIn, result.Value, imageInformation);
 		}
 
 		/// <summary>
@@ -413,7 +426,9 @@ namespace FFImageLoading.Work
 
 			bool isLocalOrFromCache = false;
 
-			UIImage image = ImageCache.Instance.Get(GetKey(placeholderPath));
+			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
+			UIImage image = cacheEntry == null ? null: cacheEntry.Item1;
+
 			if (image == null)
 			{
 				try
@@ -463,16 +478,16 @@ namespace FFImageLoading.Work
 			if (_getNativeControl() == null)
 				return new WithLoadingResult<UIImage>(LoadingResult.InvalidTarget);
 
-			var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
-			if (imageWithResult.HasError)
+			var resultWithImage = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
+			if (resultWithImage.HasError)
 			{
-				return imageWithResult;
+				return resultWithImage;
 			}
 
 			// FMT: even if it was canceled, if we have the bitmap we add it to the cache
-			ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);
+			ImageCache.Instance.Add(GetKey(sourcePath), resultWithImage.ImageInformation, resultWithImage.Item);
 
-			return imageWithResult;
+			return resultWithImage;
 		}
 	}
 }

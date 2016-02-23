@@ -352,7 +352,6 @@ namespace FFImageLoading.Work
 				var imageInformation = streamWithResult.ImageInformation ?? new ImageInformation();
 				imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
 				imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
-				imageInformation.SetPath(path);
 				imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
 
 				options.InPurgeable = true;
@@ -632,6 +631,9 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not available in the cache
 
 				var value = cacheEntry.Item1;
+
+				if (value == null)
+					return CacheResult.NotFound; // not available in the cache
 
 				if (IsCancelled)
 					return CacheResult.NotFound; // not sure what to return in that case
