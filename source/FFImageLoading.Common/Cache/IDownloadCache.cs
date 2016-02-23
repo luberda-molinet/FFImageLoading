@@ -8,7 +8,7 @@ namespace FFImageLoading.Cache
 {
     public interface IDownloadCache
     {
-		string GetDiskCacheFilePath(string url, string key = null);
+		Task<string> GetDiskCacheFilePathAsync(string url, string key = null);
 
 		HttpClient DownloadHttpClient { get; set; }
 

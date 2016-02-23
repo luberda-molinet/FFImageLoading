@@ -28,4 +28,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("FFImageLoading.Droid")]
 [assembly: InternalsVisibleTo("FFImageLoading.Touch")]
 [assembly: InternalsVisibleTo("FFImageLoading.Windows")]
+[assembly: InternalsVisibleTo("FFImageLoading.WinSL")]
 [assembly: InternalsVisibleTo("FFImageLoading.Shared")]

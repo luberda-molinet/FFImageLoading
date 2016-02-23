@@ -57,7 +57,7 @@ namespace FFImageLoading.Work.DataResolver
 
 			var imageInformation = new ImageInformation();
 			imageInformation.SetPath(identifier);
-			imageInformation.SetFilePath(null);
+			imageInformation.SetFilePath(identifier);
 
 			return new UIImageData() { 
 				Data = bytes, 

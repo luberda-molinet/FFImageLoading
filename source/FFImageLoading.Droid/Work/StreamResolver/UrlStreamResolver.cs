@@ -25,7 +25,7 @@ namespace FFImageLoading.Work.StreamResolver
 
 			var imageInformation = new ImageInformation();
 			imageInformation.SetPath(identifier);
-			imageInformation.SetFilePath(DownloadCache.GetDiskCacheFilePath(identifier, Parameters.CustomCacheKey));
+			imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
 
 			return WithLoadingResult.Encapsulate(cachedStream.ImageStream,
 				cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet, imageInformation);

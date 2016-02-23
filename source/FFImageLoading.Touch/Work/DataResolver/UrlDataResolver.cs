@@ -27,7 +27,7 @@ namespace FFImageLoading.Work.DataResolver
 
 			var imageInformation = new ImageInformation();
 			imageInformation.SetPath(identifier);
-			imageInformation.SetFilePath(DownloadCache.GetDiskCacheFilePath(identifier, Parameters.CustomCacheKey));
+			imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
 
 			return new UIImageData() { 
 				Data = bytes, 

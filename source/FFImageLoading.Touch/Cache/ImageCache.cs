@@ -49,9 +49,9 @@ namespace FFImageLoading.Cache
         {
 			if (string.IsNullOrWhiteSpace(key) || value == null)
 				return;
-			
-            _cache.SetCost(value, new NSString(key), value.GetMemorySize());
+
 			_imageInformations.TryAdd(key, imageInformation);
+            _cache.SetCost(value, new NSString(key), value.GetMemorySize());
         }
 
 		public void Remove(string key)
@@ -64,6 +64,7 @@ namespace FFImageLoading.Cache
 		public void Clear()
 		{
 			_cache.RemoveAllObjects();
+			_imageInformations.Clear();
 			// Force immediate Garbage collection. Please note that is resource intensive.
 			System.GC.Collect();
 			System.GC.WaitForPendingFinalizers ();

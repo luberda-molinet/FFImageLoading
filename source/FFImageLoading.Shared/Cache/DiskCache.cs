@@ -249,10 +249,10 @@ namespace FFImageLoading.Cache
 			}	
 		}
 
-		public string GetFilePath(string key)
+		public Task<string> GetFilePathAsync(string key)
 		{
 			var sanitizedKey = SanitizeKey(key);
-			return Path.Combine(basePath, sanitizedKey);
+			return Task.FromResult(Path.Combine(basePath, sanitizedKey));
 		}
 
 		async Task WaitForPendingWriteIfExists(string key)

@@ -52,6 +52,7 @@ namespace FFImageLoading.Cache
 		public void Clear()
 		{
 			_cache.Clear();
+			_imageInformations.Clear();
 		}
 
 		public Tuple<SelfDisposingBitmapDrawable, ImageInformation> Get(string key)
@@ -74,8 +75,8 @@ namespace FFImageLoading.Cache
 			if (string.IsNullOrWhiteSpace(key) || bitmap == null || bitmap.Handle == IntPtr.Zero || !bitmap.HasValidBitmap || _cache.ContainsKey(key))
 				return;
 
-			_cache.Add(key, bitmap);
 			_imageInformations.TryAdd(key, imageInformation);
+			_cache.Add(key, bitmap);
 		}
 
 		public void Remove(string key)
