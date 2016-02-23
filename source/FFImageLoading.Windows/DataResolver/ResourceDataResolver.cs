@@ -44,8 +44,15 @@ namespace FFImageLoading.DataResolver
                 }
             }
 
+
             if (file != null)
-                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.CompiledResource);
+            {
+                var imageInformation = new ImageInformation();
+                imageInformation.SetPath(identifier);
+                imageInformation.SetFilePath(file.Path);
+
+                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.CompiledResource, imageInformation);
+            }
 
             return WithLoadingResult.Encapsulate<Stream>(null, LoadingResult.CompiledResource);
         }

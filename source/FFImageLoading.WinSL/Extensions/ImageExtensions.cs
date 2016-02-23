@@ -34,7 +34,7 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool useDipUnits, InterpolationMode mode)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool useDipUnits, InterpolationMode mode, ImageInformation imageInformation = null)
         {
             if (imageStream == null)
                 return null;
@@ -43,7 +43,7 @@ namespace FFImageLoading.Extensions
             {
                 if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
                 {
-                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, useDipUnits).ConfigureAwait(false))
+                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, useDipUnits, imageInformation).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
                         downscaledImage.Seek(0);
@@ -67,6 +67,12 @@ namespace FFImageLoading.Extensions
                     image.Seek(0);
                     WriteableBitmap bitmap = null;
 
+                    if (imageInformation != null)
+                    {
+                        imageInformation.SetCurrentSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                        imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    }
+
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
@@ -78,7 +84,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public async static Task<BitmapHolder> ToBitmapHolderAsync(this Stream imageStream, Tuple<int, int> downscale, bool useDipUnits, InterpolationMode mode)
+        public async static Task<BitmapHolder> ToBitmapHolderAsync(this Stream imageStream, Tuple<int, int> downscale, bool useDipUnits, InterpolationMode mode, ImageInformation imageInformation = null)
         {
             if (imageStream == null)
                 return null;
@@ -87,7 +93,7 @@ namespace FFImageLoading.Extensions
             {
                 if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
                 {
-                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, useDipUnits).ConfigureAwait(false))
+                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, useDipUnits, imageInformation).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
                         PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
@@ -103,6 +109,12 @@ namespace FFImageLoading.Extensions
                 {
                     BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
                     PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+
+                    if (imageInformation != null)
+                    {
+                        imageInformation.SetCurrentSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                        imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    }
 
                     var bytes = pixelDataProvider.DetachPixelData();
                     int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
@@ -126,7 +138,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, int width, int height, InterpolationMode interpolationMode, bool useDipUnits)
+        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, int width, int height, InterpolationMode interpolationMode, bool useDipUnits, ImageInformation imageInformation = null)
         {
             if (useDipUnits)
             {
@@ -170,6 +182,12 @@ namespace FFImageLoading.Extensions
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;
 
+                    if (imageInformation != null)
+                    {
+                        imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                        imageInformation.SetCurrentSize((int)aspectWidth, (int)aspectHeight);
+                    }
+                        
                     await encoder.FlushAsync();
                     resizedStream.Seek(0);
                 }

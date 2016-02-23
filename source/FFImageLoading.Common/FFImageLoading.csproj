@@ -80,6 +80,7 @@
     <Compile Include="Work\ImageSource.cs" />
     <Compile Include="Work\InterpolationMode.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Work\ImageInformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

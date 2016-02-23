@@ -36,7 +36,13 @@ namespace FFImageLoading.DataResolver
             }
 
             if (file != null)
-                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.Disk);
+            {
+                var imageInformation = new ImageInformation();
+                imageInformation.SetPath(identifier);
+                imageInformation.SetFilePath(identifier);
+
+                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.Disk, imageInformation);
+            }
 
             return WithLoadingResult.Encapsulate<Stream>(null, LoadingResult.Disk);
         }

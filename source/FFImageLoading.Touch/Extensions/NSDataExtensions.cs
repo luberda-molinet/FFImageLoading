@@ -4,6 +4,7 @@ using Foundation;
 using CoreGraphics;
 using ImageIO;
 using FFImageLoading.Helpers;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Extensions
 {
@@ -17,7 +18,7 @@ namespace FFImageLoading.Extensions
 		}
 
 		// Shamelessly copied from React-Native: https://github.com/facebook/react-native/blob/2cbc9127560c5f0f89ae5aa6ff863b1818f1c7c3/Libraries/Image/RCTImageUtils.m
-		public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit)
+		public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null)
 		{
 			using (var sourceRef = CGImageSource.FromData(data))
 			{
@@ -32,6 +33,12 @@ namespace FFImageLoading.Extensions
 				if (imageProperties == null)
 				{
 					return null;
+				}
+
+				if (imageinformation != null)
+				{
+					if (imageProperties.PixelWidth.HasValue && imageProperties.PixelHeight.HasValue)
+						imageinformation.SetOriginalSize(imageProperties.PixelWidth.Value, imageProperties.PixelHeight.Value);
 				}
 
 				var sourceSize = new CGSize((nfloat)imageProperties.PixelWidth, (nfloat)imageProperties.PixelHeight);
@@ -76,6 +83,14 @@ namespace FFImageLoading.Extensions
 
 					// Return image
 					var image = new UIImage(imageRef, destScale, UIImageOrientation.Up);
+
+					if (imageinformation != null)
+					{
+						int width = (int)image.Size.Width;
+						int height = (int)image.Size.Height;
+						imageinformation.SetCurrentSize(width.PointsToPixels(), height.PointsToPixels());
+					}
+
 					return image;
 				}
 			}

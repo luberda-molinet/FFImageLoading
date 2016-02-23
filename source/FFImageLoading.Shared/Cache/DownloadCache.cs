@@ -25,11 +25,17 @@ namespace FFImageLoading.Cache
 
 		public HttpClient DownloadHttpClient { get; set; }
 
+		public async Task<string> GetDiskCacheFilePathAsync(string url, string key = null)
+		{
+			string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
+			return await _diskCache.GetFilePathAsync(filename);
+		}
+
 		public async Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null)
         {
 			string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
-			string basePath = await _diskCache.GetBasePathAsync().ConfigureAwait(false);
-			string filepath = basePath == null ? filename : Path.Combine(basePath, filename);
+			string filepath = await _diskCache.GetFilePathAsync(filename);
+
 			byte[] data = await _diskCache.TryGetAsync(filename, token).ConfigureAwait(false);
 			if (data != null)
 				return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
@@ -41,8 +47,8 @@ namespace FFImageLoading.Cache
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null)
 		{
 			string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
-			string basePath = await _diskCache.GetBasePathAsync().ConfigureAwait(false);
-			string filepath = basePath == null ? filename : Path.Combine(basePath, filename);
+			string filepath = await _diskCache.GetFilePathAsync(filename);
+
 			var diskStream = await _diskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
 			if (diskStream != null)
 				return new CacheStream(diskStream, true);

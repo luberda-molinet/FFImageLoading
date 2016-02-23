@@ -23,12 +23,22 @@ namespace FFImageLoading.Work.DataResolver
 		{
 			UIImage image = null;
 			await _mainThreadDispatcher.PostAsync(() => image = UIImage.FromBundle(identifier)).ConfigureAwait(false);
-			return new UIImageData() { Image = image, Result = LoadingResult.CompiledResource, ResultIdentifier = identifier };
+
+			var imageInformation = new ImageInformation();
+			imageInformation.SetPath(identifier);
+			imageInformation.SetFilePath(null);
+
+			return new UIImageData() { 
+				Image = image, 
+				Result = LoadingResult.CompiledResource, 
+				ResultIdentifier = identifier , 
+				ImageInformation = imageInformation
+			};
 		}
 
-		public void Dispose() {
-		}
-		
+		public void Dispose() 
+		{
+		}		
 	}
 }
 

@@ -22,7 +22,12 @@ namespace FFImageLoading.Work.StreamResolver
 		{
 			try
 			{
-				var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), LoadingResult.ApplicationBundle);
+				var imageInformation = new ImageInformation();
+				imageInformation.SetPath(identifier);
+				imageInformation.SetFilePath(null);
+
+				var result = WithLoadingResult.Encapsulate(Context.Assets.Open(identifier, Access.Streaming), 
+					LoadingResult.ApplicationBundle, imageInformation);
 				return Task.FromResult(result);
 			}
 			catch (Java.IO.FileNotFoundException)

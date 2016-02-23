@@ -7,8 +7,6 @@ namespace FFImageLoading.Cache
 {
     public interface IDiskCache
     {
-		Task<string> GetBasePathAsync();
-
 		void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration);
 
 		Task<byte[]> TryGetAsync(string key, CancellationToken token);
@@ -18,6 +16,8 @@ namespace FFImageLoading.Cache
 		Task RemoveAsync(string key);
 
 		Task ClearAsync();
+
+		Task<string> GetFilePathAsync(string key);
     }
 }
 

@@ -2,6 +2,8 @@
 using UIKit;
 using Foundation;
 using FFImageLoading.Extensions;
+using System.Collections.Concurrent;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Cache
 {
@@ -9,10 +11,12 @@ namespace FFImageLoading.Cache
     {
         private readonly NSCache _cache;
         private static IImageCache _instance;
+		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 
         private ImageCache(int maxCacheSize)
         {
             _cache = new NSCache();
+			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
             _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2); // 20% of physical memory
 
             // Can't use minilogger here, we would have too many dependencies
@@ -31,27 +35,36 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public UIImage Get(string key)
+		public Tuple<UIImage, ImageInformation> Get(string key)
         {
-            return (UIImage)_cache.ObjectForKey(new NSString(key));
+			ImageInformation imageInformation = null;
+			_imageInformations.TryGetValue(key, out imageInformation);
+
+			var image = (UIImage)_cache.ObjectForKey(new NSString(key));
+
+			return new Tuple<UIImage, ImageInformation>(image, imageInformation);
         }
 
-        public void Add(string key, UIImage value)
+		public void Add(string key, ImageInformation imageInformation, UIImage value)
         {
 			if (string.IsNullOrWhiteSpace(key) || value == null)
 				return;
-			
+
+			_imageInformations.TryAdd(key, imageInformation);
             _cache.SetCost(value, new NSString(key), value.GetMemorySize());
         }
 
 		public void Remove(string key)
 		{
 			_cache.RemoveObjectForKey(new NSString(key));
-		}
+			ImageInformation imageInformation;
+			_imageInformations.TryRemove(key, out imageInformation);
+		}	
 
 		public void Clear()
 		{
 			_cache.RemoveAllObjects();
+			_imageInformations.Clear();
 			// Force immediate Garbage collection. Please note that is resource intensive.
 			System.GC.Collect();
 			System.GC.WaitForPendingFinalizers ();

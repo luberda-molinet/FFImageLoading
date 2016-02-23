@@ -8,6 +8,8 @@ using Android.App;
 using Android.Content.PM;
 using FFImageLoading.Drawables;
 using System;
+using FFImageLoading.Work;
+using System.Collections.Concurrent;
 
 namespace FFImageLoading.Cache
 {
@@ -15,6 +17,7 @@ namespace FFImageLoading.Cache
 	{
 		private static IImageCache _instance;
 		private readonly ReuseBitmapDrawableCache _cache;
+		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 
         private ImageCache(int maxCacheSize)
 		{
@@ -24,6 +27,7 @@ namespace FFImageLoading.Cache
 			int lowTreshold = safeMaxCacheSize / 3;
 
 			_cache = new ReuseBitmapDrawableCache(safeMaxCacheSize, lowTreshold, safeMaxCacheSize);
+			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 		}
 
         public static IImageCache Instance
@@ -48,27 +52,38 @@ namespace FFImageLoading.Cache
 		public void Clear()
 		{
 			_cache.Clear();
+			_imageInformations.Clear();
 		}
 
-		public SelfDisposingBitmapDrawable Get(string key)
+		public Tuple<SelfDisposingBitmapDrawable, ImageInformation> Get(string key)
 		{
 			SelfDisposingBitmapDrawable drawable = null;
+
 			if (_cache.TryGetValue(key, out drawable))
-				return drawable;
+			{
+				ImageInformation imageInformation = null;
+				_imageInformations.TryGetValue(key, out imageInformation);
+
+				return new Tuple<SelfDisposingBitmapDrawable, ImageInformation>(drawable, imageInformation);
+			}
+
 			return null;
 		}
 
-		public void Add(string key, SelfDisposingBitmapDrawable bitmap)
+		public void Add(string key, ImageInformation imageInformation, SelfDisposingBitmapDrawable bitmap)
 		{
 			if (string.IsNullOrWhiteSpace(key) || bitmap == null || bitmap.Handle == IntPtr.Zero || !bitmap.HasValidBitmap || _cache.ContainsKey(key))
 				return;
-			
+
+			_imageInformations.TryAdd(key, imageInformation);
 			_cache.Add(key, bitmap);
 		}
 
 		public void Remove(string key)
 		{
 			_cache.Remove(key);
+			ImageInformation imageInformation;
+			_imageInformations.TryRemove(key, out imageInformation);
 		}
 
 		/// <summary>

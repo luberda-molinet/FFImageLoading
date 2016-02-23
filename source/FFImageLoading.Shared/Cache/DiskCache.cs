@@ -108,15 +108,6 @@ namespace FFImageLoading.Cache
         }
 
 		/// <summary>
-		/// Gets the base path.
-		/// </summary>
-		/// <returns>The base path.</returns>
-		public Task<string> GetBasePathAsync()
-		{
-			return Task.FromResult(basePath);
-		}
-
-		/// <summary>
 		/// Adds the file to cache and file saving queue if not exists.
 		/// </summary>
 		/// <param name="key">Key.</param>
@@ -256,6 +247,12 @@ namespace FFImageLoading.Cache
 			{
 				return null;
 			}	
+		}
+
+		public Task<string> GetFilePathAsync(string key)
+		{
+			var sanitizedKey = SanitizeKey(key);
+			return Task.FromResult(Path.Combine(basePath, sanitizedKey));
 		}
 
 		async Task WaitForPendingWriteIfExists(string key)

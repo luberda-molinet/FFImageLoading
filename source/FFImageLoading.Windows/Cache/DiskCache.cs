@@ -220,13 +220,16 @@ namespace FFImageLoading.Cache
         }
 
         /// <summary>
-        /// Gets the base path.
+        /// GetFilePath
         /// </summary>
-        /// <returns>The base path.</returns>
-        public async Task<string> GetBasePathAsync()
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public async Task<string> GetFilePathAsync(string key)
         {
-			await initTask.ConfigureAwait(false);
-            return cacheFolder.Path;
+            await initTask.ConfigureAwait(false);
+
+            var sanitizedKey = SanitizeKey(key);
+            return Path.Combine(cacheFolder.Path, sanitizedKey);
         }
 
         /// <summary>

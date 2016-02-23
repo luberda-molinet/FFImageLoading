@@ -11,7 +11,10 @@ namespace FFImageLoading.Args
             LoadingResult = loadingResult;
         }
 
+        [Obsolete("Use ImageInformation property instead")]
         public ImageSize ImageSize { get; private set; }
+
+        public ImageInformation ImageInformation { get; private set; }
 
         public LoadingResult LoadingResult { get; private set; }
     }

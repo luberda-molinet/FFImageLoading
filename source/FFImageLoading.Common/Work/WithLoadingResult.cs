@@ -8,6 +8,11 @@ namespace FFImageLoading.Work
 		{
 			return new WithLoadingResult<T>(item, result);
 		}
+
+		public static WithLoadingResult<T> Encapsulate<T>(T item, LoadingResult result, ImageInformation imageInformation) where T:class
+		{
+			return new WithLoadingResult<T>(item, result, imageInformation);
+		}
 	}
 
 	public struct WithLoadingResult<T> where T:class
@@ -18,12 +23,21 @@ namespace FFImageLoading.Work
 		{
 			_result = result;
 			Item = null;
+			ImageInformation = null;
 		}
 
 		public WithLoadingResult(T item, LoadingResult result)
 		{
 			_result = result;
 			Item = item;
+			ImageInformation = null;
+		}
+
+		public WithLoadingResult(T item, LoadingResult result, ImageInformation imageInformation)
+		{
+			_result = result;
+			Item = item;
+			ImageInformation = imageInformation;
 		}
 
 		public LoadingResult Result
@@ -41,6 +55,8 @@ namespace FFImageLoading.Work
 		}
 
 		public T Item { get; private set; }
+
+		public ImageInformation ImageInformation { get; private set; }
 
 		public bool HasError
 		{

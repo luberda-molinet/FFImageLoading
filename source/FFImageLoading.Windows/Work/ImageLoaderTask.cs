@@ -109,7 +109,7 @@ namespace FFImageLoading.Work
 
                     _doWithImage(image, imageWithResult.Result.IsLocalOrCachedResult(), false);
                     Completed = true;
-                    Parameters?.OnSuccess(new ImageSize(image.PixelWidth, image.PixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -132,7 +132,11 @@ namespace FFImageLoading.Work
                 if (nativeControl == null)
                     return CacheResult.NotFound; // weird situation, dunno what to do
 
-                var value = ImageCache.Instance.Get(GetKey());
+                var cacheEntry = ImageCache.Instance.Get(GetKey());
+                if (cacheEntry == null)
+                    return CacheResult.NotFound; // not available in the cache
+
+                var value = cacheEntry.Item1;
                 if (value == null)
                     return CacheResult.NotFound; // not available in the cache
 
@@ -153,7 +157,7 @@ namespace FFImageLoading.Work
 
 					Completed = true;
 
-					Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), LoadingResult.MemoryCache);
+					Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -176,29 +180,29 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
                 return GenerateResult.Canceled;
 
-            WithLoadingResult<WriteableBitmap> imageWithResult;
+            WithLoadingResult<WriteableBitmap> resultWithImage;
             WriteableBitmap image = null;
             try
             {
-                imageWithResult = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
-                image = imageWithResult.Item;
+                resultWithImage = await GetImageAsync("Stream", ImageSource.Stream, false, stream).ConfigureAwait(false);
+                image = resultWithImage.Item;
             }
             catch (Exception ex)
             {
                 Logger.Error("An error occured while retrieving image.", ex);
-                imageWithResult = new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
+                resultWithImage = new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                 image = null;
             }
 
             if (image == null)
             {
                 await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
-                return imageWithResult.GenerateResult;
+                return resultWithImage.GenerateResult;
             }
 
 			if (CanUseMemoryCache())
 			{
-				ImageCache.Instance.Add(GetKey(), image);
+                ImageCache.Instance.Add(GetKey(), resultWithImage.ImageInformation, image);
 			}
 
 			if (IsCancelled)
@@ -222,7 +226,7 @@ namespace FFImageLoading.Work
                     pixelWidth = image.PixelWidth;
                     pixelHeight = image.PixelHeight;
                     Completed = true;
-                    Parameters?.OnSuccess(new ImageSize(pixelWidth, pixelHeight), imageWithResult.Result);
+                    Parameters?.OnSuccess(resultWithImage.ImageInformation, resultWithImage.Result);
                 }).ConfigureAwait(false);
 
                 if (!Completed)
@@ -345,6 +349,10 @@ namespace FFImageLoading.Work
                     return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                 }
 
+                // Setting image informations
+                var imageInformation = streamWithResult.ImageInformation ?? new ImageInformation();
+                imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
+
                 bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
                     Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
 
@@ -356,7 +364,7 @@ namespace FFImageLoading.Work
                     try
                     {
                         await _decodingLock.WaitAsync();
-                        imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode).ConfigureAwait(false);
+                        imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -409,7 +417,7 @@ namespace FFImageLoading.Work
                     try
                     {
                         await _decodingLock.WaitAsync();
-                        writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode);
+                        writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation);
                     }
                     catch (Exception ex)
                     {
@@ -421,8 +429,8 @@ namespace FFImageLoading.Work
                         _decodingLock.Release();
                     }
                 }
-
-                return WithLoadingResult.Encapsulate(writableBitmap, streamWithResult.Result);
+            
+                return WithLoadingResult.Encapsulate(writableBitmap, streamWithResult.Result, imageInformation);
             }
             finally
             {
@@ -436,7 +444,8 @@ namespace FFImageLoading.Work
             if (string.IsNullOrWhiteSpace(placeholderPath))
                 return false;
 
-            WriteableBitmap image = ImageCache.Instance.Get(GetKey(placeholderPath));
+            var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
+            WriteableBitmap image = cacheEntry == null ? null : cacheEntry.Item1;
 
             bool isLocalOrFromCache = false;
 
@@ -492,15 +501,15 @@ namespace FFImageLoading.Work
             if (_getNativeControl() == null)
                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.InvalidTarget);
 
-            var imageWithResult = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
+            var resultWithImage = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);
 
-            if (imageWithResult.HasError)
-                return imageWithResult;
+            if (resultWithImage.HasError)
+                return resultWithImage;
 
             // FMT: even if it was canceled, if we have the bitmap we add it to the cache
-            ImageCache.Instance.Add(GetKey(sourcePath), imageWithResult.Item);
+            ImageCache.Instance.Add(GetKey(sourcePath), resultWithImage.ImageInformation, resultWithImage.Item);
 
-            return imageWithResult;
+            return resultWithImage;
         }
     }
 }

@@ -54,7 +54,17 @@ namespace FFImageLoading.Work.DataResolver
 		{
 			var bytes = await FileStore.ReadBytesAsync(identifier, token).ConfigureAwait(false);
 			var result = (LoadingResult)(int)_source; // Some values of ImageSource and LoadingResult are shared
-			return new UIImageData() { Data = bytes, Result = result, ResultIdentifier = identifier };
+
+			var imageInformation = new ImageInformation();
+			imageInformation.SetPath(identifier);
+			imageInformation.SetFilePath(identifier);
+
+			return new UIImageData() { 
+				Data = bytes, 
+				Result = result, 
+				ResultIdentifier = identifier,
+				ImageInformation = imageInformation
+			};
 		}
 		
 	}
