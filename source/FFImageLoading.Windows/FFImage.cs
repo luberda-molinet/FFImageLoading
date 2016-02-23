@@ -668,7 +668,17 @@ namespace FFImageLoading
         /// Clears image cache
         /// </summary>
         /// <param name="cacheType">Cache type to invalidate</param>
+        [Obsolete("Use ClearCacheAsync")]
         public static void ClearCache(CacheType cacheType)
+        {
+            ClearCacheAsync(cacheType);
+        }
+
+        /// <summary>
+        /// Clears image cache
+        /// </summary>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static async Task ClearCacheAsync(CacheType cacheType)
         {
             switch (cacheType)
             {
@@ -676,11 +686,11 @@ namespace FFImageLoading
                     ImageService.InvalidateMemoryCache();
                     break;
                 case CacheType.Disk:
-                    ImageService.InvalidateDiskCache();
+                    await ImageService.InvalidateDiskCacheAsync();
                     break;
                 case CacheType.All:
                     ImageService.InvalidateMemoryCache();
-                    ImageService.InvalidateDiskCache();
+                    await ImageService.InvalidateDiskCacheAsync();
                     break;
             }
         }
@@ -690,9 +700,20 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="key">Key to invalidate</param>
         /// <param name="cacheType">Cache type to invalidate</param>
+        [Obsolete("Use InvalidateCacheEntryAsync")]
         public static void InvalidateCache(string key, CacheType cacheType)
         {
-            ImageService.Invalidate(key, cacheType);
+            InvalidateCacheEntryAsync(key, cacheType);
+        }
+
+        /// <summary>
+        /// Invalidates cache for a specified key
+        /// </summary>
+        /// <param name="key">Key to invalidate</param>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static async Task InvalidateCacheEntryAsync(string key, CacheType cacheType)
+        {
+            await ImageService.InvalidateCacheEntryAsync(key, cacheType);
         }
 
         /// <summary>

@@ -526,20 +526,31 @@ namespace FFImageLoading.Forms
 			}
 		}
 
-        internal static Action<Cache.CacheType> InternalClearCache;
+        internal static Func<Cache.CacheType, Task> InternalClearCache;
 
         /// <summary>
         /// Clears image cache
         /// </summary>
         /// <param name="cacheType">Cache type to invalidate</param>
+        [Obsolete("Use ClearCacheAsync")]
 		public static void ClearCache(Cache.CacheType cacheType)
         {
-			if (InternalClearCache != null)
+            ClearCacheAsync(cacheType);
+        }
+
+        /// <summary>
+        /// Clears image cache
+        /// </summary>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        public static async Task ClearCacheAsync(Cache.CacheType cacheType)
+        {
+            if (InternalClearCache != null)
             {
-				InternalClearCache(cacheType);
+                await InternalClearCache(cacheType);
             }
         }
-		internal static Action<string, Cache.CacheType, bool> InternalInvalidateCache;
+
+        internal static Func<string, Cache.CacheType, bool, Task> InternalInvalidateCache;
 
         /// <summary>
         /// Invalidates cache for a specified key
@@ -548,11 +559,25 @@ namespace FFImageLoading.Forms
         /// <param name="cacheType">Cache type to invalidate</param>
 		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
 		/// (downsampling and transformations variants)</param>
+        [Obsolete("Use InvalidateCacheEntryAsync")]
 		public static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar=false)
         {
-			if (InternalInvalidateCache != null)
+            
+            InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+        }
+
+        /// <summary>
+        /// Invalidates cache for a specified key
+        /// </summary>
+        /// <param name="key">Key to invalidate</param>
+        /// <param name="cacheType">Cache type to invalidate</param>
+        /// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+        /// (downsampling and transformations variants)</param>
+        public static async Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar = false)
+        {
+            if (InternalInvalidateCache != null)
             {
-				InternalInvalidateCache(key, cacheType, removeSimilar);
+                await InternalInvalidateCache(key, cacheType, removeSimilar);
             }
         }
 

@@ -37,33 +37,33 @@ namespace FFImageLoading.Forms.Touch
 			var dummy = new CachedImageRenderer();
 			#pragma warning restore 0219
 
-			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
-			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
+            CachedImage.InternalClearCache = new Func<FFImageLoading.Cache.CacheType, Task>(ClearCacheAsync);
+            CachedImage.InternalInvalidateCache = new Func<string, FFImageLoading.Cache.CacheType, bool, Task>(InvalidateCacheEntryAsync);
+            CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
             CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
-		}
+        }
 
-		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
-		{
-			ImageService.Invalidate(key, cacheType, removeSimilar);
-		}
+        private static Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar)
+        {
+            return ImageService.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+        }
 
-		private static void ClearCache(Cache.CacheType cacheType)
-		{
-			switch (cacheType)
-			{
-				case Cache.CacheType.Memory:
-					ImageService.InvalidateMemoryCache();
-					break;
-				case Cache.CacheType.Disk:
-					ImageService.InvalidateDiskCache();
-					break;
-				case Cache.CacheType.All:
-					ImageService.InvalidateMemoryCache();
-					ImageService.InvalidateDiskCache();
-					break;
-			}
-		}
+        private static async Task ClearCacheAsync(Cache.CacheType cacheType)
+        {
+            switch (cacheType)
+            {
+                case Cache.CacheType.Memory:
+                    ImageService.InvalidateMemoryCache();
+                    break;
+                case Cache.CacheType.Disk:
+                    await ImageService.InvalidateDiskCacheAsync();
+                    break;
+                case Cache.CacheType.All:
+                    ImageService.InvalidateMemoryCache();
+                    await ImageService.InvalidateDiskCacheAsync();
+                    break;
+            }
+        }
 
 		private static void SetPauseWork(bool pauseWork)
 		{

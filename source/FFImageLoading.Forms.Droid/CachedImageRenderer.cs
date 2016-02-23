@@ -30,18 +30,18 @@ namespace FFImageLoading.Forms.Droid
 		/// </summary>
 		public static void Init()
 		{
-			CachedImage.InternalClearCache = new Action<FFImageLoading.Cache.CacheType>(ClearCache);
-			CachedImage.InternalInvalidateCache = new Action<string, FFImageLoading.Cache.CacheType, bool>(InvalidateCache);
+            CachedImage.InternalClearCache = new Func<FFImageLoading.Cache.CacheType, Task>(ClearCacheAsync);
+            CachedImage.InternalInvalidateCache = new Func<string, FFImageLoading.Cache.CacheType, bool, Task>(InvalidateCacheEntryAsync);
 			CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
             CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
         }
 
-		private static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar)
+        private static Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar)
         {
-            ImageService.Invalidate(key, cacheType, removeSimilar);
+            return ImageService.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
         }
 
-		private static void ClearCache(Cache.CacheType cacheType)
+		private static async Task ClearCacheAsync(Cache.CacheType cacheType)
         {
 			switch (cacheType)
             {
@@ -49,11 +49,11 @@ namespace FFImageLoading.Forms.Droid
                     ImageService.InvalidateMemoryCache();
                     break;
                 case Cache.CacheType.Disk:
-                    ImageService.InvalidateDiskCache();
+                    await ImageService.InvalidateDiskCacheAsync();
                     break;
                 case Cache.CacheType.All:
                     ImageService.InvalidateMemoryCache();
-                    ImageService.InvalidateDiskCache();
+                    await ImageService.InvalidateDiskCacheAsync();
                     break;
             }
         }
