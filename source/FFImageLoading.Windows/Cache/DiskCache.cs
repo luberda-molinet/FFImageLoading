@@ -233,6 +233,18 @@ namespace FFImageLoading.Cache
         }
 
         /// <summary>
+        /// Checks if cache entry exists/
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="key">Key.</param>
+        public async Task<bool> ExistsAsync(string key)
+        {
+            await initTask.ConfigureAwait(false);
+
+            return entries.ContainsKey(key);
+        }
+
+        /// <summary>
         /// Adds the file to cache and file saving queue if not exists.
         /// </summary>
         /// <param name="key">Key.</param>

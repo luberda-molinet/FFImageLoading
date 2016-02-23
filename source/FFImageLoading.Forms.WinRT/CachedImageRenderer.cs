@@ -66,7 +66,7 @@ namespace FFImageLoading.Forms.WinRT
             CachedImage.InternalClearCache = new Func<FFImageLoading.Cache.CacheType, Task>(ClearCacheAsync);
             CachedImage.InternalInvalidateCache = new Func<string, FFImageLoading.Cache.CacheType, bool, Task>(InvalidateCacheEntryAsync);
             CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
-            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task>(DownloadImageAndAddToDiskCache);
+            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task<bool>>(DownloadImageAndAddToDiskCache);
         }
 
         private static Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar)
@@ -96,7 +96,7 @@ namespace FFImageLoading.Forms.WinRT
 			ImageService.SetPauseWork(pauseWork);
 		}
 
-        private static Task DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        private static Task<bool> DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
             return ImageService.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
         }

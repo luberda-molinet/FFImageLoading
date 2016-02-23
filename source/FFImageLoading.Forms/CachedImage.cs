@@ -492,7 +492,7 @@ namespace FFImageLoading.Forms
 			}
 		}
             
-        internal static Func<string, CancellationToken, TimeSpan?, string, Task> InternalDownloadImageAndAddToDiskCache;
+        internal static Func<string, CancellationToken, TimeSpan?, string, Task<bool>> InternalDownloadImageAndAddToDiskCache;
 
         /// <summary>
         /// Downloads the image and adds it to disk cache.
@@ -502,14 +502,14 @@ namespace FFImageLoading.Forms
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <param name="duration">Disk cache validity duration.</param>
         /// <param name="customCacheKey">Custom cache key.</param>
-        public static Task DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+        public static async Task<bool> DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
             if (InternalDownloadImageAndAddToDiskCache != null)
             {
-                return InternalDownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
+                return await InternalDownloadImageAndAddToDiskCache(imageUrl, cancellationToken, duration, customCacheKey);
             }
 
-            return null;
+            return false;
         }
 
         internal static Action<bool> InternalSetPauseWork;

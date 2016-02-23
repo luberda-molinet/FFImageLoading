@@ -195,6 +195,17 @@ namespace FFImageLoading.Cache
 			}
 		}
 
+
+		/// <summary>
+		/// Checks if cache entry exists/
+		/// </summary>
+		/// <returns>The async.</returns>
+		/// <param name="key">Key.</param>
+		public Task<bool> ExistsAsync(string key)
+		{
+			return Task.FromResult(entries.ContainsKey(key));
+		}
+
 		/// <summary>
 		/// Tries to get cached file as byte array.
 		/// </summary>

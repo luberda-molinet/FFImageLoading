@@ -334,19 +334,27 @@ namespace FFImageLoading
 
 		/// <summary>
 		/// Downloads the image and adds it to disk cache.
+		/// Called only if the cache entry doesn't exist already.
 		/// </summary>
-		/// <returns>Task.</returns>
+		/// <returns>Returns <c>true</c> if added, <c>false</c> otherwise</returns>
 		/// <param name="imageUrl">Image URL.</param>
 		/// <param name="cancellationToken">Cancellation token.</param>
 		/// <param name="duration">Disk cache validity duration.</param>
 		/// <param name="customCacheKey">Custom cache key.</param>
-		public async static Task DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
+		public async static Task<bool> DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
 		{
 			InitializeIfNeeded();
 
-			string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
-			string filePath = await Config.DiskCache.GetFilePathAsync(fileName);
-			await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration);
+			if (!(await Config.DiskCache.ExistsAsync(string.IsNullOrWhiteSpace(customCacheKey) ? imageUrl : customCacheKey)))
+			{
+				string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
+				string filePath = await Config.DiskCache.GetFilePathAsync(fileName);
+				await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		private static void AddRequestToHistory(IImageLoaderTask task)

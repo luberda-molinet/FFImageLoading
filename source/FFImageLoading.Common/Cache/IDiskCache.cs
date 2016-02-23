@@ -17,6 +17,8 @@ namespace FFImageLoading.Cache
 
 		Task ClearAsync();
 
+		Task<bool> ExistsAsync(string key);
+
 		Task<string> GetFilePathAsync(string key);
     }
 }
