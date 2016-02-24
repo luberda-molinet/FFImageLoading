@@ -283,10 +283,10 @@ namespace FFImageLoading
 		/// <summary>
 		/// Invalidates the disk cache.
 		/// </summary>
-		public static async Task InvalidateDiskCacheAsync()
+		public static Task InvalidateDiskCacheAsync()
 		{
 			InitializeIfNeeded();
-			await Config.DiskCache.ClearAsync();
+			return Config.DiskCache.ClearAsync();
 		}
 
 		/// <summary>
@@ -296,9 +296,16 @@ namespace FFImageLoading
 		/// <param name="cacheType">Memory cache, Disk cache or both</param>
 		/// <param name="removeSimilar">If similar keys should be removed, ie: typically keys with extra transformations</param>
 		[Obsolete("Use InvalidateCacheEntryAsync")]
-		public static void Invalidate(string key, CacheType cacheType, bool removeSimilar=false)
+		public static async void Invalidate(string key, CacheType cacheType, bool removeSimilar=false)
 		{
-			InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+			try
+			{
+				await InvalidateCacheEntryAsync(key, cacheType, removeSimilar).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				Config.Logger.Error(string.Format("Could not invalidate cache entry {0}", key), ex);
+			}
 		}
 
 		/// <summary>
@@ -328,7 +335,7 @@ namespace FFImageLoading
 			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
 			{
 				string hash = _md5Helper.MD5(key);
-				await Config.DiskCache.RemoveAsync(hash);
+				await Config.DiskCache.RemoveAsync(hash).ConfigureAwait(false);
 			}
 		}
 
@@ -347,15 +354,12 @@ namespace FFImageLoading
 
 			string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
 
-			if (!(await Config.DiskCache.ExistsAsync(fileName)))
-			{
-				string filePath = await Config.DiskCache.GetFilePathAsync(fileName);
-				await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration);
+			if (await Config.DiskCache.ExistsAsync(fileName).ConfigureAwait(false))
+				return false;
 
-				return true;
-			}	
-
-			return false;
+			string filePath = await Config.DiskCache.GetFilePathAsync(fileName).ConfigureAwait(false);
+			await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration).ConfigureAwait(false);
+			return true;
 		}
 
 		private static void AddRequestToHistory(IImageLoaderTask task)
