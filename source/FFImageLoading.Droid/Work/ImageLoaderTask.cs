@@ -657,12 +657,6 @@ namespace FFImageLoading.Work
 
 							imageView.SetImageDrawable(value);
 
-							if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
-							{
-								imageView.LayoutParameters.Height = value.IntrinsicHeight;
-								imageView.LayoutParameters.Width = value.IntrinsicWidth;
-							}
-
 							Completed = true;
 
 							Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
@@ -813,17 +807,6 @@ namespace FFImageLoading.Work
 			return this == task
 				? imageView
 				: null;
-		}
-
-		private void SetImageDrawable(ImageView imageView, Drawable drawable)
-		{
-			if (Utils.HasJellyBean() && imageView.AdjustViewBounds)
-			{
-				imageView.LayoutParameters.Height = drawable.IntrinsicHeight;
-				imageView.LayoutParameters.Width = drawable.IntrinsicWidth;
-			}
-
-			imageView.SetImageDrawable(drawable);
 		}
 	}
 }
