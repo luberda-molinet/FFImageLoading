@@ -808,5 +808,10 @@ namespace FFImageLoading.Work
 				? imageView
 				: null;
 		}
+
+		private void SetImageDrawable(ImageView imageView, Drawable drawable)
+		{
+			imageView.SetImageDrawable(drawable);
+		}
 	}
 }
