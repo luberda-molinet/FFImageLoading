@@ -49,11 +49,11 @@ namespace FFImageLoading.Forms.Droid
                     ImageService.InvalidateMemoryCache();
                     break;
                 case Cache.CacheType.Disk:
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
                 case Cache.CacheType.All:
                     ImageService.InvalidateMemoryCache();
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
         }

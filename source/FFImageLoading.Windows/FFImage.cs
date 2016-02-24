@@ -686,11 +686,11 @@ namespace FFImageLoading
                     ImageService.InvalidateMemoryCache();
                     break;
                 case CacheType.Disk:
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
                 case CacheType.All:
                     ImageService.InvalidateMemoryCache();
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
         }
