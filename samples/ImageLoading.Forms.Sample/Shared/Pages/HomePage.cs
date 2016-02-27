@@ -1,13 +1,12 @@
 ﻿using System;
-
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
-using FFImageLoading.Forms.Sample.ViewModels;
+using FFImageLoading.Forms.Sample.PageModels;
 using System.Threading.Tasks;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
-	public class HomePage : PFContentPage<HomeViewModel>
+    public class HomePage : ContentPage, IBasePage<HomePageModel>
 	{
 		public HomePage()
 		{
@@ -32,7 +31,7 @@ namespace FFImageLoading.Forms.Sample.Pages
             if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
 			    menuListView.ItemSelected += (sender, e) => { menuListView.SelectedItem = null; };
 
-			menuListView.SetBinding<HomeViewModel>(ListView.ItemsSourceProperty, v => v.MenuItems);
+			menuListView.SetBinding<HomePageModel>(ListView.ItemsSourceProperty, v => v.MenuItems);
 
 			Content = menuListView;
 		}

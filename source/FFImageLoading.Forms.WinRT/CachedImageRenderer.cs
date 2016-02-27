@@ -469,7 +469,11 @@ namespace FFImageLoading.Forms.WinRT
         private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
         {
 #if SILVERLIGHT
-            return await Task.FromResult(bitmap.ToByteArray());
+            using (var ms = new MemoryStream())
+            {
+                bitmap.SaveJpeg(ms, bitmap.PixelWidth, bitmap.PixelHeight, 0, 100);
+                return ms.ToArray();
+            }
 #else
             byte[] tempPixels;
             using (var sourceStream = bitmap.PixelBuffer.AsStream())

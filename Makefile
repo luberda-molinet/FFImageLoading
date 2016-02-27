@@ -22,7 +22,7 @@ Forms:
 	xbuild source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj /nologo /p:Configuration=Release /consoleloggerparameters:ErrorsOnly /verbosity:minimal
 
 clean:
-	rm *.nupkg
+	rm -f *.nupkg
 	rm -rf */bin
 	rm -rf */obj
 	rm -rf */*/bin

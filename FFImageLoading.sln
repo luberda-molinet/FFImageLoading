@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading", "source\FFImageLoading.Common\FFImageLoading.csproj", "{51CA3BE2-DF00-4F49-8054-E5C776992B61}"
 EndProject
@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.WinPhoneSL.Sample", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Windows", "source\FFImageLoading.Windows\FFImageLoading.Windows.csproj", "{610543A5-D06F-4BCA-9443-E6ADDFF06C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading-contrib.WinSL", "source\FFImageLoading.WinSL\FFImageLoading-contrib.WinSL.csproj", "{3F6353CC-A79B-4C13-A73B-025B247CB806}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.WinSL", "source\FFImageLoading.WinSL\FFImageLoading.WinSL.csproj", "{3F6353CC-A79B-4C13-A73B-025B247CB806}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3A682234-5918-4F58-B02B-598A59C6A7BD} = {3A682234-5918-4F58-B02B-598A59C6A7BD}
 	EndProjectSection

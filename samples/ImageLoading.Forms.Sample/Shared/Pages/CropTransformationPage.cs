@@ -1,12 +1,11 @@
 ﻿using System;
-
 using Xamarin.Forms;
-using FFImageLoading.Forms.Sample.ViewModels;
+using FFImageLoading.Forms.Sample.PageModels;
 using DLToolkit.PageFactory;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
-	public class CropTransformationPage : PFContentPage<CropTransformationViewModel>
+    public class CropTransformationPage : ContentPage, IBasePage<CropTransformationPageModel>
 	{
 		public CropTransformationPage()
 		{
@@ -22,53 +21,53 @@ namespace FFImageLoading.Forms.Sample.Pages
 				FadeAnimationEnabled = false,
 			};
 
-			cachedImage.SetBinding<CropTransformationViewModel>(CachedImage.TransformationsProperty, v => v.Transformations);
-			cachedImage.SetBinding<CropTransformationViewModel>(CachedImage.LoadingPlaceholderProperty, v => v.LoadingImagePath);
-			cachedImage.SetBinding<CropTransformationViewModel>(CachedImage.ErrorPlaceholderProperty, v => v.ErrorImagePath);
-			cachedImage.SetBinding<CropTransformationViewModel>(CachedImage.SourceProperty, v => v.ImagePath);
+			cachedImage.SetBinding<CropTransformationPageModel>(CachedImage.TransformationsProperty, v => v.Transformations);
+			cachedImage.SetBinding<CropTransformationPageModel>(CachedImage.LoadingPlaceholderProperty, v => v.LoadingImagePath);
+			cachedImage.SetBinding<CropTransformationPageModel>(CachedImage.ErrorPlaceholderProperty, v => v.ErrorImagePath);
+			cachedImage.SetBinding<CropTransformationPageModel>(CachedImage.SourceProperty, v => v.ImagePath);
 
 			var imagePath = new Label() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
-				XAlign = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
 				FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label))
 			};
-			imagePath.SetBinding<TransformationExampleViewModel>(Label.TextProperty, v => v.ImagePath);
+            imagePath.SetBinding<CropTransformationPageModel>(Label.TextProperty, v => v.ImagePath);
 
 			var cropAddXButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "X+",
-				Command = ViewModel.AddCurrentXOffsetCommad,
 			};
+            cropAddXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentXOffsetCommad);
 
 			var cropSubXButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "X-",
-				Command = ViewModel.SubCurrentXOffsetCommad,
 			};
+            cropSubXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentXOffsetCommad);
 
 			var cropAddYButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Y+",
-				Command = ViewModel.AddCurrentYOffsetCommad,
 			};
+            cropAddYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentYOffsetCommad);
 
 			var cropSubYButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Y-",
-				Command = ViewModel.SubCurrentYOffsetCommad,
 			};
+            cropSubYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentYOffsetCommad);
 
 			var cropAddZoomButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "+",
-				Command = ViewModel.AddCurrentZoomFactorCommad,
 			};
+            cropAddZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentZoomFactorCommad);
 
 			var cropSubZoomButton = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "-",
-				Command = ViewModel.SubCurrentZoomFactorCommad,
 			};
+            cropSubZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentZoomFactorCommad);
 
 			var buttonsLayout1 = new StackLayout() {
 				Orientation = StackOrientation.Horizontal,
@@ -103,7 +102,9 @@ namespace FFImageLoading.Forms.Sample.Pages
 		protected override void OnDisappearing()
 		{
 			base.OnDisappearing();
-			ViewModel.ImagePath = null;
+
+            this.GetPageModel()
+                .FreeResources();
 		}
 	}
 }
