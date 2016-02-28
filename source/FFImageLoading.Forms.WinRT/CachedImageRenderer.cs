@@ -82,11 +82,11 @@ namespace FFImageLoading.Forms.WinRT
                     ImageService.InvalidateMemoryCache();
                     break;
                 case Cache.CacheType.Disk:
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
                 case Cache.CacheType.All:
                     ImageService.InvalidateMemoryCache();
-                    await ImageService.InvalidateDiskCacheAsync();
+                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
         }
@@ -469,7 +469,11 @@ namespace FFImageLoading.Forms.WinRT
         private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
         {
 #if SILVERLIGHT
-            return await Task.FromResult(bitmap.ToByteArray());
+            using (var ms = new MemoryStream())
+            {
+                bitmap.SaveJpeg(ms, bitmap.PixelWidth, bitmap.PixelHeight, 0, 100);
+                return ms.ToArray();
+            }
 #else
             byte[] tempPixels;
             using (var sourceStream = bitmap.PixelBuffer.AsStream())

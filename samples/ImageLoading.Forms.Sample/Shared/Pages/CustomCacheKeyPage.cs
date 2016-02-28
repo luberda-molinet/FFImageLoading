@@ -1,13 +1,12 @@
 ﻿using System;
-
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
-using FFImageLoading.Forms.Sample.ViewModels;
 using FFImageLoading.Forms.Sample.Models;
+using FFImageLoading.Forms.Sample.PageModels;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
-	public class CustomCacheKeyPage : PFContentPage<CustomCacheKeyViewModel>
+    public class CustomCacheKeyPage : ContentPage, IBasePage<CustomCacheKeyPageModel>
 	{
 		public CustomCacheKeyPage()
 		{
@@ -20,7 +19,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				HasUnevenRows = false,
 				RowHeight = 210,
 			};
-			listView.SetBinding<CustomCacheKeyViewModel>(ListView.ItemsSourceProperty, v => v.Items);
+			listView.SetBinding<CustomCacheKeyPageModel>(ListView.ItemsSourceProperty, v => v.Items);
 
 			if (Device.OS == TargetPlatform.Android || Device.OS == TargetPlatform.iOS)
 				listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
@@ -28,8 +27,8 @@ namespace FFImageLoading.Forms.Sample.Pages
 			var button = new Button() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
 				Text = "Duplicate list items",
-				Command = ViewModel.DuplicateListItemsCommand
 			};
+            button.SetBinding<CustomCacheKeyPageModel>(Button.CommandProperty, v => v.DuplicateListItemsCommand);
 
 			Content = new StackLayout() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -40,6 +39,14 @@ namespace FFImageLoading.Forms.Sample.Pages
 				}
 			};
 		}
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            this.GetPageModel()
+                .FreeResources();
+        }
 
 		class CustomCacheKeyFactory : ICacheKeyFactory
 		{
@@ -95,8 +102,8 @@ namespace FFImageLoading.Forms.Sample.Pages
 
 				var fileName = new Label() {
 					LineBreakMode = LineBreakMode.CharacterWrap,
-					YAlign = TextAlignment.Center,
-					XAlign = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center,
+                    HorizontalTextAlignment = TextAlignment.Center,
 				};
 				fileName.SetBinding<ListExampleItem>(Label.TextProperty, v => v.FileName);
 

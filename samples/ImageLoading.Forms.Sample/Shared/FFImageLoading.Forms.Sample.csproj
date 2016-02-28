@@ -53,54 +53,55 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\HomeViewModel.cs" />
-    <Compile Include="ViewModels\ListExampleViewModel.cs" />
-    <Compile Include="ViewModels\PlaceholdersExampleViewModel.cs" />
-    <Compile Include="ViewModels\SimpleExampleViewModel.cs" />
     <Compile Include="Pages\HomePage.cs" />
-    <Compile Include="Pages\ListExamplePage.cs" />
-    <Compile Include="Pages\PlaceholdersExamplePage.cs" />
-    <Compile Include="Pages\SimpleExamplePage.cs" />
     <Compile Include="Models\ListExampleItem.cs" />
     <Compile Include="App.cs" />
-    <Compile Include="Pages\ListTransformationExamplePage.cs" />
-    <Compile Include="ViewModels\ListTransformationExampleViewModel.cs" />
-    <Compile Include="ViewModels\TransformationExampleViewModel.cs" />
-    <Compile Include="Pages\TransformationExamplePage.cs" />
-    <Compile Include="Pages\DownsamplingExamplePage.cs" />
-    <Compile Include="ViewModels\DownsamplingExampleViewModel.cs" />
-    <Compile Include="ViewModels\BaseExampleViewModel.cs" />
     <Compile Include="Models\MenuItem.cs" />
     <Compile Include="Pages\CropTransformationPage.cs" />
-    <Compile Include="ViewModels\CropTransformationViewModel.cs" />
-    <Compile Include="Pages\XamlSimpleExamplePage.xaml.cs">
-      <DependentUpon>XamlSimpleExamplePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ViewModels\XamlSimpleExampleViewModel.cs" />
-    <Compile Include="Pages\ListHeavyTestPage.cs" />
-    <Compile Include="ViewModels\ListHeavyTestViewModel.cs" />
     <Compile Include="Models\ListHeavyItem.cs" />
     <Compile Include="Pages\CustomCacheKeyPage.cs" />
-    <Compile Include="ViewModels\CustomCacheKeyViewModel.cs" />
-    <Compile Include="Pages\StreamTest.cs" />
-    <Compile Include="ViewModels\StreamTestViewModel.cs" />
+    <Compile Include="PageModels\CropTransformationPageModel.cs" />
+    <Compile Include="PageModels\CustomCacheKeyPageModel.cs" />
+    <Compile Include="PageModels\HomePageModel.cs" />
+    <Compile Include="PageModels\CommonPageModel.cs" />
+    <Compile Include="PageModels\DownsamplingPageModel.cs" />
+    <Compile Include="PageModels\ListPageModel.cs" />
+    <Compile Include="PageModels\ListHeavyPageModel.cs" />
+    <Compile Include="PageModels\ListTransformPageModel.cs" />
+    <Compile Include="PageModels\PlaceholdersPageModel.cs" />
+    <Compile Include="PageModels\SimplePageModel.cs" />
+    <Compile Include="PageModels\StreamPageModel.cs" />
+    <Compile Include="PageModels\TransformationPageModel.cs" />
+    <Compile Include="PageModels\SimpleXamlPageModel.cs" />
+    <Compile Include="Pages\DownsamplingPage.cs" />
+    <Compile Include="Pages\ListPage.cs" />
+    <Compile Include="Pages\ListHeavyPage.cs" />
+    <Compile Include="Pages\ListTransformPage.cs" />
+    <Compile Include="Pages\PlaceholdersPage.cs" />
+    <Compile Include="Pages\SimplePage.cs" />
+    <Compile Include="Pages\StreamPage.cs" />
+    <Compile Include="Pages\TransformationPage.cs" />
+    <Compile Include="Pages\SimpleXamlPage.xaml.cs">
+      <DependentUpon>SimpleXamlPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
   <ItemGroup>
-    <Reference Include="DLToolkit.PageFactory.Forms, Version=1.0.5822.10475, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Forms.1.0.6\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
+    <Reference Include="Xamarin.Forms.Core">
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DLToolkit.PageFactory.Shared, Version=1.0.5822.10475, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Shared.1.0.6\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Shared.dll</HintPath>
+    <Reference Include="Xamarin.Forms.Xaml">
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.Forms.Core, Version=1.4.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\packages\Xamarin.Forms.1.4.4.6392\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
+    <Reference Include="Xamarin.Forms.Platform">
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Platform.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.Forms.Platform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\packages\Xamarin.Forms.1.4.4.6392\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Platform.dll</HintPath>
+    <Reference Include="DLToolkit.PageFactory.Shared">
+      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Shared.2.0.1\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Shared.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.Forms.Xaml, Version=1.4.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\packages\Xamarin.Forms.1.4.4.6392\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+    <Reference Include="DLToolkit.PageFactory.Forms">
+      <HintPath>..\..\..\packages\DLToolkit.PageFactory.Forms.2.0.1\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\DLToolkit.PageFactory.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -119,18 +120,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Pages\XamlSimpleExamplePage.xaml">
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\SimpleXamlPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Xamarin.Forms.1.4.4.6392\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets'))" />
-  </Target>
 </Project>

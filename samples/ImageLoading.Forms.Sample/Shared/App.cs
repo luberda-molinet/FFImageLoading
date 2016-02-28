@@ -1,7 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 using DLToolkit.PageFactory;
-using FFImageLoading.Forms.Sample.ViewModels;
+using FFImageLoading.Forms.Sample.PageModels;
 
 namespace FFImageLoading.Forms.Sample
 {
@@ -9,7 +9,7 @@ namespace FFImageLoading.Forms.Sample
 	{
 		public App()
 		{
-            MainPage = new XamarinFormsPageFactory().Init<HomeViewModel, PFNavigationPage>();
+            MainPage = new XamarinFormsPageFactory().Init<HomePageModel, PFNavigationPage>();
         }
 
 		protected override void OnStart()

@@ -25,26 +25,30 @@ namespace FFImageLoading.Views
 			SetWillNotDraw(false);
 		}
 
+		protected override void Dispose(bool disposing)
+		{
+			if (_drawableRef != null)
+			{
+				Drawable drawable = null; 
+
+				if (_drawableRef.TryGetTarget(out drawable))
+				{
+					UpdateDrawableDisplayedState(drawable, false);
+				}	
+
+				_drawableRef = null;
+			}
+
+			base.Dispose(disposing);
+		}
+
 		/* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
 		protected override void OnDetachedFromWindow()
 		{
 			SetImageDrawable(null);
 			base.OnDetachedFromWindow();
 		}
-
-		INSTEAD WE USE Dispose override 
 		*/
-		protected override void Dispose(bool disposing)
-		{
-			Drawable drawable = null; 
-
-			if (_drawableRef != null && _drawableRef.TryGetTarget(out drawable))
-			{
-				UpdateDrawableDisplayedState(drawable, false);
-			}
-
-			base.Dispose(disposing);
-		}
 
 		public override void SetImageDrawable(Drawable drawable)
 		{
