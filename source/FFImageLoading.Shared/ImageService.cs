@@ -25,12 +25,24 @@ namespace FFImageLoading
 		private static object _initializeLock = new object();
 		private static readonly MD5Helper _md5Helper = new MD5Helper();
 		private static readonly ConcurrentDictionary<string, string> _fullKeyToKey = new ConcurrentDictionary<string, string>();
+		private static Configuration _config;
 
         /// <summary>
         /// Gets FFImageLoading configuration
         /// </summary>
         /// <value>The configuration used by FFImageLoading.</value>
-        public static Configuration Config { get; private set; }
+        public static Configuration Config
+		{
+			get
+			{
+				InitializeIfNeeded();
+				return _config;
+			}
+			private set
+			{
+				_config = value;
+			}
+		}
 
 		public static void Initialize(Configuration configuration)
 		{

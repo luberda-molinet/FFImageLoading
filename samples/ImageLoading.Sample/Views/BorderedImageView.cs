@@ -20,8 +20,8 @@ namespace ImageLoading.Sample.Views
 
         private Paint mBorderPaint;
 
-        public BorderedImageView(Context context, System.Drawing.SizeF? predefinedSize = null)
-            : base(context, predefinedSize)
+        public BorderedImageView(Context context)
+            : base(context)
         {
             Init(context, null);
         }
@@ -35,18 +35,6 @@ namespace ImageLoading.Sample.Views
         public BorderedImageView(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
-        }
-
-        public BorderedImageView(Context context, IAttributeSet attrs, System.Drawing.SizeF? predefinedSize)
-            : base(context, attrs, predefinedSize)
-        {
-            Init(context, attrs);
-        }
-
-        public BorderedImageView(Context context)
-            : base(context)
-        {
-            Init(context, null);
         }
 
         private void Init(Context context, IAttributeSet attrs)

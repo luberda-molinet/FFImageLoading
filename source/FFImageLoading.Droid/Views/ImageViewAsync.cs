@@ -10,22 +10,14 @@ namespace FFImageLoading.Views
 	[Register("ffimageloading.views.ImageViewAsync")]
 	public class ImageViewAsync : ManagedImageView
 	{
-		protected SizeF? _predefinedSize;
-
 		public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer)
 			: base(javaReference, transfer)
 		{
 			SetWillNotDraw(false);
 		}
 
-		public ImageViewAsync(Context context, SizeF? predefinedSize = null)
+		public ImageViewAsync(Context context)
 			: base(context)
-		{
-			SetWillNotDraw(false);
-		}
-
-		public ImageViewAsync(Context context, IAttributeSet attrs, SizeF? predefinedSize)
-			: base(context, attrs)
 		{
 			SetWillNotDraw(false);
 		}
@@ -90,10 +82,7 @@ namespace FFImageLoading.Views
 		{
 			if (Drawable == null)
 			{
-				if (_predefinedSize.HasValue)
-					SetMeasuredDimension((int)_predefinedSize.Value.Width, (int)_predefinedSize.Value.Height);
-				else
-					SetMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+				SetMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
 			}
 			else
 			{

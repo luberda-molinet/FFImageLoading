@@ -2,11 +2,11 @@
 using System.Drawing;
 using System.Collections.Generic;
 using FFImageLoading.Work;
-using CoreGraphics;
 
 #if __IOS__
 using Foundation;
 using UIKit;
+using CoreGraphics;
 #elif __ANDROID__
 using Android.Util;
 using Android.Runtime;
@@ -16,7 +16,11 @@ using FFImageLoading.Views;
 
 namespace FFImageLoading.Cross
 {
+	#if __IOS__
 	[Register("MvxImageLoadingView")]
+	#elif __ANDROID__
+	[Register("ffimageloading.cross.MvxImageLoadingView")]
+	#endif
 	public class MvxImageLoadingView
 	#if __IOS__
 		: UIImageView
@@ -29,8 +33,7 @@ namespace FFImageLoading.Cross
 		public MvxImageLoadingView(CGRect frame) : base(frame) { Initialize(); }
 		#elif __ANDROID__
 		public MvxImageLoadingView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { Initialize(); }
-		public MvxImageLoadingView(Context context, SizeF? predefinedSize = null) : base(context) { Initialize(); }
-		public MvxImageLoadingView(Context context, IAttributeSet attrs, SizeF? predefinedSize) : base(context, attrs) { Initialize(); }
+		public MvxImageLoadingView(Context context) : base(context) { Initialize(); }
 		public MvxImageLoadingView(Context context, IAttributeSet attrs) : base(context, attrs) { Initialize(); }
 		#endif
 
@@ -104,18 +107,18 @@ namespace FFImageLoading.Cross
 		{
 			if (disposing)
 			{
-				if (_parameters != null)
-				{
-					CleanParameters();
-				}
+				CleanParameters();
 			}
 			base.Dispose(disposing);
 		}
 
 		private void CleanParameters()
 		{
-			_parameters.Dispose();
-			_parameters = null;
+			if (_parameters != null)
+			{
+				_parameters.Dispose();
+				_parameters = null;
+			}
 			OnSuccess = null;
 			OnError = null;
 			OnFinish = null;
