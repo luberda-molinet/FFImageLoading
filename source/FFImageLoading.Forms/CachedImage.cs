@@ -1,7 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
@@ -10,19 +9,19 @@ using System.Threading;
 namespace FFImageLoading.Forms
 {
 	/// <summary>
-	/// CachedImage - Xamarin.Forms image replacement with caching and downsampling capabilities
+	/// CachedImage - Xamarin.Forms Image replacement with caching and downsampling capabilities
 	/// </summary>
 	public class CachedImage : View
 	{
 		public CachedImage()
 		{
-			Transformations = new List<FFImageLoading.Work.ITransformation>();	
+			Transformations = new List<Work.ITransformation>();
 		}
 
 		/// <summary>
 		/// The aspect property.
 		/// </summary>
-		public static readonly BindableProperty AspectProperty = BindableProperty.Create<CachedImage, Aspect>(w => w.Aspect, Aspect.AspectFit);
+        public static readonly BindableProperty AspectProperty = BindableProperty.Create(nameof(Aspect), typeof(Aspect), typeof(CachedImage), Aspect.AspectFit);
 
 		/// <summary>
 		/// Gets or sets the aspect.
@@ -43,7 +42,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The is loading property key.
 		/// </summary>
-		public static readonly BindablePropertyKey IsLoadingPropertyKey = BindableProperty.CreateReadOnly<CachedImage, bool>(w => w.IsLoading, false);
+        public static readonly BindablePropertyKey IsLoadingPropertyKey = BindableProperty.CreateReadOnly(nameof(IsLoading), typeof(bool), typeof(CachedImage), false);
 
 		/// <summary>
 		/// The is loading property.
@@ -65,7 +64,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The is opaque property.
 		/// </summary>
-		public static readonly BindableProperty IsOpaqueProperty = BindableProperty.Create<CachedImage, bool>(w => w.IsOpaque, false);
+        public static readonly BindableProperty IsOpaqueProperty = BindableProperty.Create(nameof(IsOpaque), typeof(bool), typeof(CachedImage), false);
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance is opaque.
@@ -83,23 +82,19 @@ namespace FFImageLoading.Forms
 			}
 		}
 
-		/// <summary>
-		/// The source property.
-		/// </summary> 
-		public static readonly BindableProperty SourceProperty = BindableProperty.Create<CachedImage, ImageSource>(w => w.Source, null, BindingMode.OneWay, 
-			propertyChanged: (bindable, oldValue, newValue) => {
-			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanged");
+        /// <summary>
+        /// The source property.
+        /// </summary> 
+        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, propertyChanged: OnSourcePropertyChanged);
 
-			if (newValue != null)
-			{
-				BindableObject.SetInheritedBindingContext(newValue, bindable.BindingContext);
-			}
-
-			((CachedImage)bindable).InvalidateMeasure();
-		}, 
-			propertyChanging: (bindable, oldValue, newValue) => {
-			//System.Diagnostics.Debug.WriteLine("@@@ SourceProperty propertyChanging");
-		});
+        static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (newValue != null) 
+            {
+                BindableObject.SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
+            }
+            ((CachedImage)bindable).InvalidateMeasure();
+        }
 			
 		/// <summary>
 		/// Gets or sets the source.
@@ -121,7 +116,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The retry count property.
 		/// </summary>
-		public static readonly BindableProperty RetryCountProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryCount, 3);
+        public static readonly BindableProperty RetryCountProperty = BindableProperty.Create(nameof(RetryCount), typeof(int), typeof(CachedImage), 3);
 
 		/// <summary>
 		/// If image loading fails automatically retry it a number of times, with a specific delay. Sets number of retries.
@@ -141,7 +136,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The retry delay property.
 		/// </summary>
-		public static readonly BindableProperty RetryDelayProperty = BindableProperty.Create<CachedImage, int> (w => w.RetryDelay, 250);
+        public static readonly BindableProperty RetryDelayProperty = BindableProperty.Create(nameof(RetryDelay), typeof(int), typeof(CachedImage), 250);
 
 		/// <summary>
 		/// If image loading fails automatically retry it a number of times, with a specific delay. Sets delay in milliseconds between each trial
@@ -161,7 +156,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The downsample width property.
 		/// </summary>
-		public static readonly BindableProperty DownsampleWidthProperty = BindableProperty.Create<CachedImage, double> (w => w.DownsampleWidth, 0f);
+        public static readonly BindableProperty DownsampleWidthProperty = BindableProperty.Create(nameof(DownsampleWidth), typeof(double), typeof(CachedImage), 0d);
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
@@ -182,7 +177,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The downsample height property.
 		/// </summary>
-		public static readonly BindableProperty DownsampleHeightProperty = BindableProperty.Create<CachedImage, double> (w => w.DownsampleHeight, 0f);
+        public static readonly BindableProperty DownsampleHeightProperty = BindableProperty.Create(nameof(DownsampleHeight), typeof(double), typeof(CachedImage), 0d);
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
@@ -203,7 +198,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The downsample to view size property.
 		/// </summary>
-		public static readonly BindableProperty DownsampleToViewSizeProperty = BindableProperty.Create<CachedImage, bool> (w => w.DownsampleToViewSize, false);
+        public static readonly BindableProperty DownsampleToViewSizeProperty = BindableProperty.Create(nameof(DownsampleToViewSize), typeof(bool), typeof(CachedImage), false);
 
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
@@ -227,7 +222,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The downsample use dip units property.
 		/// </summary>
-		public static readonly BindableProperty DownsampleUseDipUnitsProperty = BindableProperty.Create<CachedImage, bool> (w => w.DownsampleUseDipUnits, false);
+        public static readonly BindableProperty DownsampleUseDipUnitsProperty = BindableProperty.Create(nameof(DownsampleUseDipUnits), typeof(bool), typeof(CachedImage), false);
 
 		/// <summary>
 		/// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
@@ -249,7 +244,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The cache duration property.
 		/// </summary>
-		public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create<CachedImage, TimeSpan> (w => w.CacheDuration, TimeSpan.FromDays(90));
+        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), TimeSpan.FromDays(90));
 
 		/// <summary>
 		/// How long the file will be cached on disk.
@@ -269,7 +264,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transparency enabled property.
 		/// </summary>
-		public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.TransparencyEnabled, null);
+        public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create(nameof(TransparencyEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.
@@ -289,7 +284,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The fade animation enabled property.
 		/// </summary>
-		public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create<CachedImage, bool?> (w => w.FadeAnimationEnabled, null);
+        public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create(nameof(FadeAnimationEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
 		/// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
@@ -309,7 +304,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The loading placeholder property.
 		/// </summary>
-		public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.LoadingPlaceholder, null);
+        public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create(nameof(LoadingPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource));
 
 		/// <summary>
 		/// Gets or sets the loading placeholder image.
@@ -330,7 +325,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The error placeholder property.
 		/// </summary>
-		public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create<CachedImage, ImageSource> (w => w.ErrorPlaceholder, null);
+        public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create(nameof(ErrorPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource));
 
 		/// <summary>
 		/// Gets or sets the error placeholder image.
@@ -351,7 +346,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The TransformPlaceholders property.
 		/// </summary>
-		public static readonly BindableProperty TransformPlaceholdersProperty = BindableProperty.Create<CachedImage, bool?> (w => w.TransformPlaceholders, null);
+        public static readonly BindableProperty TransformPlaceholdersProperty = BindableProperty.Create(nameof(TransformPlaceholders), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
 		/// Indicates if transforms should be applied to placeholders. By default this value comes from ImageService.Config.TransformPlaceholders.
@@ -372,17 +367,17 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transformations property.
 		/// </summary>
-		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create<CachedImage, List<FFImageLoading.Work.ITransformation>> (w => w.Transformations, new List<FFImageLoading.Work.ITransformation>());
+        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>());
 
 		/// <summary>
 		/// Gets or sets the transformations.
 		/// </summary>
 		/// <value>The transformations.</value>
-		public List<FFImageLoading.Work.ITransformation> Transformations
+		public List<Work.ITransformation> Transformations
 		{
 			get
 			{
-				return (List<FFImageLoading.Work.ITransformation>)GetValue(TransformationsProperty); 
+                return (List<Work.ITransformation>)GetValue(TransformationsProperty); 
 			}
 			set
 			{
