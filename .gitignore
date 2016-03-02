@@ -27,3 +27,5 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+
+samples/ListView.Universal.Sample/project.lock.json
