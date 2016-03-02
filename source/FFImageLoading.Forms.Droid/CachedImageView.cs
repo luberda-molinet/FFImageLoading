@@ -26,7 +26,7 @@ namespace FFImageLoading.Forms.Droid
 		}
 
         [Obsolete]
-        public CachedImageView(Context context, IAttributeSet attrs, System.Drawing.SizeF? predefinedStyle) : base(context)
+        public CachedImageView(Context context, IAttributeSet attrs, System.Drawing.SizeF? predefinedStyle) : base(context, attrs)
 		{
 		}
 	}
