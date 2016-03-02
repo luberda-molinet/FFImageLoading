@@ -29,6 +29,7 @@ namespace FFImageLoading.Cross
 	#endif
 	{
 		#if __IOS__
+		public MvxImageLoadingView() { Initialize(); }
 		public MvxImageLoadingView(IntPtr handle) : base(handle) { Initialize(); }
 		public MvxImageLoadingView(CGRect frame) : base(frame) { Initialize(); }
 		#elif __ANDROID__
