@@ -141,6 +141,8 @@ namespace FFImageLoading.Work
 
 		public string CustomCacheKey { get; private set; }
 
+		public int Priority { get; private set; }
+
         public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)
@@ -225,6 +227,28 @@ namespace FFImageLoading.Work
             DownSampleInterpolationMode = mode;
             return this;
         }
+
+		/// <summary>
+		/// Defines the loading priority, the default is LoadingPriority.Normal
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="priority">Priority.</param>
+		public TaskParameter WithPriority(LoadingPriority priority)
+		{
+			Priority = (int)priority;
+			return this;
+		}
+
+		/// <summary>
+		/// Defines the loading priority, the default is 0 (LoadingPriority.Normal)
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="priority">Priority.</param>
+		public TaskParameter WithPriority(int priority)
+		{
+			Priority = priority;
+			return this;
+		}
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.

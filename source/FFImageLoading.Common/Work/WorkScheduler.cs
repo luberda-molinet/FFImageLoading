@@ -328,6 +328,7 @@ namespace FFImageLoading.Work
 				lock (_pendingTasksLock)
 				{
 					currentLotOfPendingTasks = _pendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+					.OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
                     .Take(MaxParallelTasks)
                     .ToList();
 				}
