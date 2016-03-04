@@ -317,6 +317,8 @@ namespace FFImageLoading.Forms.WinRT
                     imageLoader.Transform(Element.Transformations);
                 }
 
+                imageLoader.WithPriority(Element.LoadingPriority);
+
                 var element = Element;
 
                 imageLoader.Finish((work) =>

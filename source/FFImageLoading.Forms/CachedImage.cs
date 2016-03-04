@@ -261,6 +261,26 @@ namespace FFImageLoading.Forms
 			}
 		}
 
+        /// <summary>
+        /// The loading priority property.
+        /// </summary>
+        public static readonly BindableProperty LoadingPriorityProperty = BindableProperty.Create(nameof(LoadingPriority), typeof(Work.LoadingPriority), typeof(CachedImage), Work.LoadingPriority.Normal);
+
+        /// <summary>
+        /// Defines the loading priority, the default is LoadingPriority.Normal
+        /// </summary>
+        public Work.LoadingPriority LoadingPriority
+        {
+            get
+            {
+                return (Work.LoadingPriority)GetValue(LoadingPriorityProperty); 
+            }
+            set
+            {
+                SetValue(LoadingPriorityProperty, value); 
+            }
+        }
+
 		/// <summary>
 		/// The transparency enabled property.
 		/// </summary>

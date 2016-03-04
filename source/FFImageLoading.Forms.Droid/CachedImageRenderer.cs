@@ -268,6 +268,8 @@ namespace FFImageLoading.Forms.Droid
 							imageLoader.Transform(Element.Transformations);
 						}
 
+                        imageLoader.WithPriority(Element.LoadingPriority);
+
 						var element = Element;
 
 						imageLoader.Finish((work) => {
