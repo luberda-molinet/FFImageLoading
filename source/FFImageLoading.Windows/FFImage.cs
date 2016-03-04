@@ -201,6 +201,8 @@ namespace FFImageLoading
                     imageLoader.Transform(Transformations);
                 }
 
+                imageLoader.WithPriority(LoadingPriority);
+
                 imageLoader.Finish((work) => 
                     OnFinish(new Args.FinishEventArgs(work)));
 
@@ -401,6 +403,27 @@ namespace FFImageLoading
             set
             {
                 SetValue(CacheDurationProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// The cache duration property.
+        /// </summary>
+        public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register("LoadingPriority",
+            typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
+
+        /// <summary>
+        /// Defines the loading priority, the default is LoadingPriority.Normal
+        /// </summary>
+        public LoadingPriority LoadingPriority
+        {
+            get
+            {
+                return (LoadingPriority)GetValue(LoadingPriorityProperty); 
+            }
+            set
+            {
+                SetValue(LoadingPriorityProperty, value); 
             }
         }
 
