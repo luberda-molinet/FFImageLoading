@@ -12,17 +12,18 @@ namespace FFImageLoading.Views
 	{
 		private WeakReference<Drawable> _drawableRef = null;
 
-        public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
-
-		public ManagedImageView(Context context) : base(context, null)
+		public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
 		{
+			SetWillNotDraw(false);
+		}
+
+		public ManagedImageView(Context context) : base(context)
+		{
+			SetWillNotDraw(false);
 		}
 
 		public ManagedImageView(Context context, IAttributeSet attrs) : base(context, attrs)
 		{
-			SetWillNotDraw(false);
 		}
 
 		protected override void Dispose(bool disposing)

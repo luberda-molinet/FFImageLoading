@@ -67,8 +67,7 @@ namespace FFImageLoading
             set { SetValue(SourceProperty, value); }
         }
 
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", 
-            typeof(string), typeof(FFImage), new PropertyMetadata(null, SourcePropertyChanged));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(string), typeof(FFImage), new PropertyMetadata(null, SourcePropertyChanged));
 
         private static void SourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -201,11 +200,13 @@ namespace FFImageLoading
                     imageLoader.Transform(Transformations);
                 }
 
+                imageLoader.WithPriority(LoadingPriority);
+
                 imageLoader.Finish((work) => 
                     OnFinish(new Args.FinishEventArgs(work)));
 
-                imageLoader.Success((imageSize, loadingResult) =>
-                    OnSuccess(new Args.SuccessEventArgs(imageSize, loadingResult)));
+                imageLoader.Success((imageInformation, loadingResult) =>
+                            OnSuccess(new Args.SuccessEventArgs(imageInformation, loadingResult)));
 
                 imageLoader.Error((exception) =>
                     OnError(new Args.ErrorEventArgs(exception)));
@@ -214,8 +215,7 @@ namespace FFImageLoading
             }
         }
 
-        public static readonly DependencyProperty StretchProperty = DependencyProperty.Register("Stretch",
-            typeof(Stretch), typeof(FFImage), new PropertyMetadata(default(Stretch), StretchPropertyChanged));
+        public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(nameof(Stretch), typeof(Stretch), typeof(FFImage), new PropertyMetadata(default(Stretch), StretchPropertyChanged));
 
         public Stretch Stretch
         {
@@ -236,8 +236,7 @@ namespace FFImageLoading
         /// <summary>
         /// The retry count property.
         /// </summary>
-        public static readonly DependencyProperty RetryCountProperty = DependencyProperty.Register("RetryCount",
-            typeof(int), typeof(FFImage), new PropertyMetadata(default(int)));
+        public static readonly DependencyProperty RetryCountProperty = DependencyProperty.Register(nameof(RetryCount), typeof(int), typeof(FFImage), new PropertyMetadata(default(int)));
 
         /// <summary>
         /// If image loading fails automatically retry it a number of times, with a specific delay. Sets number of retries.
@@ -257,8 +256,7 @@ namespace FFImageLoading
         /// <summary>
         /// The retry delay property.
         /// </summary>
-        public static readonly DependencyProperty RetryDelayProperty = DependencyProperty.Register("RetryDelay",
-            typeof(int), typeof(FFImage), new PropertyMetadata(250));
+        public static readonly DependencyProperty RetryDelayProperty = DependencyProperty.Register(nameof(RetryDelay), typeof(int), typeof(FFImage), new PropertyMetadata(250));
 
         /// <summary>
         /// If image loading fails automatically retry it a number of times, with a specific delay. Sets delay in milliseconds between each trial
@@ -278,8 +276,7 @@ namespace FFImageLoading
         /// <summary>
         /// The downsample width property.
         /// </summary>
-        public static readonly DependencyProperty DownsampleWidthProperty = DependencyProperty.Register("DownsampleWidth",
-            typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty DownsampleWidthProperty = DependencyProperty.Register(nameof(DownsampleWidth), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
@@ -300,8 +297,7 @@ namespace FFImageLoading
         /// <summary>
         /// The downsample height property.
         /// </summary>
-        public static readonly DependencyProperty DownsampleHeightProperty = DependencyProperty.Register("DownsampleHeight",
-            typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty DownsampleHeightProperty = DependencyProperty.Register(nameof(DownsampleHeight), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
@@ -319,8 +315,7 @@ namespace FFImageLoading
             }
         }
 
-        public static readonly DependencyProperty DownsampleToViewSizeProperty = DependencyProperty.Register("DownsampleToViewSize",
-            typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
+        public static readonly DependencyProperty DownsampleToViewSizeProperty = DependencyProperty.Register(nameof(DownsampleToViewSize), typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
 
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
@@ -344,8 +339,7 @@ namespace FFImageLoading
         //// <summary>
         /// The downsample interpolation mode property.
         /// </summary>
-        public static readonly DependencyProperty DownsampleModeProperty =
-            DependencyProperty.Register("DownsampleMode", typeof(InterpolationMode), typeof(FFImage), new PropertyMetadata(InterpolationMode.Default));
+        public static readonly DependencyProperty DownsampleModeProperty = DependencyProperty.Register(nameof(DownsampleMode), typeof(InterpolationMode), typeof(FFImage), new PropertyMetadata(InterpolationMode.Default));
 
         /// <summary>
         /// Set interpolation (resizing) algorithm.
@@ -363,8 +357,7 @@ namespace FFImageLoading
             }
         }
 
-        public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register("DownsampleUseDipUnits",
-            typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
+        public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register(nameof(DownsampleUseDipUnits), typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
 
         /// <summary>
         /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
@@ -386,8 +379,7 @@ namespace FFImageLoading
         /// <summary>
         /// The cache duration property.
         /// </summary>
-        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register("CacheDuration",
-            typeof(int), typeof(FFImage), new PropertyMetadata(30));
+        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(int), typeof(FFImage), new PropertyMetadata(30));
 
         /// <summary>
         /// How long the file will be cached on disk.
@@ -405,10 +397,29 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// The cache duration property.
+        /// </summary>
+        public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
+
+        /// <summary>
+        /// Defines the loading priority, the default is LoadingPriority.Normal
+        /// </summary>
+        public LoadingPriority LoadingPriority
+        {
+            get
+            {
+                return (LoadingPriority)GetValue(LoadingPriorityProperty); 
+            }
+            set
+            {
+                SetValue(LoadingPriorityProperty, value); 
+            }
+        }
+
+        /// <summary>
         /// The fade animation enabled property.
         /// </summary>
-        public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register("FadeAnimationEnabled",
-            typeof(bool), typeof(FFImage), new PropertyMetadata(true));
+        public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register(nameof(FadeAnimationEnabled), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
         /// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
@@ -429,8 +440,7 @@ namespace FFImageLoading
         /// The transform placeholders property.
         /// </summary>
         /// 
-        public static readonly DependencyProperty TransformPlaceholdersProperty =
-            DependencyProperty.Register("TransformPlaceholders", typeof(bool), typeof(FFImage), new PropertyMetadata(true));
+        public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
         /// Indicates if transforms should be applied to placeholders.  By default this value comes from ImageService.Config.TransformPlaceholders.
@@ -450,8 +460,7 @@ namespace FFImageLoading
         /// <summary>
         /// The loading placeholder property.
         /// </summary>
-        public static readonly DependencyProperty LoadingPlaceholderProperty = DependencyProperty.Register("LoadingPlaceholder",
-            typeof(string), typeof(FFImage), new PropertyMetadata(null));
+        public static readonly DependencyProperty LoadingPlaceholderProperty = DependencyProperty.Register(nameof(LoadingPlaceholder), typeof(string), typeof(FFImage), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the loading placeholder image.
@@ -471,8 +480,7 @@ namespace FFImageLoading
         /// <summary>
         /// The error placeholder property.
         /// </summary>
-        public static readonly DependencyProperty ErrorPlaceholderProperty = DependencyProperty.Register("ErrorPlaceholder",
-            typeof(string), typeof(FFImage), new PropertyMetadata(null));
+        public static readonly DependencyProperty ErrorPlaceholderProperty = DependencyProperty.Register(nameof(ErrorPlaceholder), typeof(string), typeof(FFImage), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the error placeholder image.
@@ -492,15 +500,14 @@ namespace FFImageLoading
         /// <summary>
         /// The transformations property.
         /// </summary>
-        public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register("Transformations",
-            typeof(List<FFImageLoading.Work.ITransformation>), typeof(FFImage), new PropertyMetadata(new List<FFImageLoading.Work.ITransformation>(), TransformationsPropertyChanged));
+        public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register(nameof(Transformations), typeof(List<ITransformation>), typeof(FFImage), new PropertyMetadata(new List<ITransformation>(), TransformationsPropertyChanged));
 
         private static void TransformationsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((FFImage)d).TransformationsPropertyChanged((List<FFImageLoading.Work.ITransformation>)e.NewValue);
+            ((FFImage)d).TransformationsPropertyChanged((List<ITransformation>)e.NewValue);
         }
 
-        private void TransformationsPropertyChanged(List<FFImageLoading.Work.ITransformation> transformations)
+        private void TransformationsPropertyChanged(List<ITransformation> transformations)
         {
             if (IsInDesignMode)
                 return;
@@ -512,11 +519,11 @@ namespace FFImageLoading
         /// Gets or sets the transformations.
         /// </summary>
         /// <value>The transformations.</value>
-        public List<FFImageLoading.Work.ITransformation> Transformations
+        public List<ITransformation> Transformations
         {
             get
             {
-                return (List<FFImageLoading.Work.ITransformation>)GetValue(TransformationsProperty);
+                return (List<ITransformation>)GetValue(TransformationsProperty);
             }
             set
             {
