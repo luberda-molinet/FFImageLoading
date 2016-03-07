@@ -22,7 +22,6 @@ namespace FFImageLoading.Views
 
 		public ManagedImageView(Context context, IAttributeSet attrs) : base(context, attrs)
 		{
-			SetWillNotDraw(false);
 		}
 
 		protected override void Dispose(bool disposing)

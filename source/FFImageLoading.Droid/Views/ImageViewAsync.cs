@@ -13,19 +13,16 @@ namespace FFImageLoading.Views
 		public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer)
 			: base(javaReference, transfer)
 		{
-			SetWillNotDraw(false);
 		}
 
 		public ImageViewAsync(Context context)
 			: base(context)
 		{
-			SetWillNotDraw(false);
 		}
 
 		public ImageViewAsync(Context context, IAttributeSet attrs)
 			: base(context, attrs)
 		{
-			SetWillNotDraw(false);
 		}
 
 		private bool _scaleToFit;
