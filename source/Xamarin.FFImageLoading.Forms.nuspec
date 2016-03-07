@@ -101,8 +101,8 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <!--Windows WinUWP-->
         <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.dll" target="lib/uap10.0/FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.xml" target="lib/uap10.0/FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.dll" target="lib/uap10.0/FFImageLoading.Forms.WinRT.dll" />
-        <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.xml" target="lib/uap10.0/FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.dll" target="lib/uap10.0/FFImageLoading.Forms.WinUWP.dll" />
+        <file src="FFImageLoading.Forms.WinUWP/bin/Windows Release/FFImageLoading.Forms.WinUWP.xml" target="lib/uap10.0/FFImageLoading.Forms.WinUWP.xml" />
 
     </files>
     
