@@ -115,6 +115,12 @@ namespace FFImageLoading.Collections
 
         private void Add(TKey key, TValue value, bool overwrite)
         {
+			if (key == null)
+				throw new ArgumentNullException(nameof(key));
+
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
             var raiseEntryRemovedDueToEviction = false;
             IDictionary<TKey, TValue> evictions = null;
             var valueOverwritten = false;
