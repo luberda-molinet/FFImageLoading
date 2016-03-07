@@ -1,7 +1,6 @@
 using System;
 using Android.Content;
 using Android.Util;
-using System.Drawing;
 using FFImageLoading.Extensions;
 using Android.Runtime;
 
@@ -10,18 +9,15 @@ namespace FFImageLoading.Views
 	[Register("ffimageloading.views.ImageViewAsync")]
 	public class ImageViewAsync : ManagedImageView
 	{
-		public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer)
-			: base(javaReference, transfer)
+		public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
 		{
 		}
 
-		public ImageViewAsync(Context context)
-			: base(context)
+		public ImageViewAsync(Context context) : base(context)
 		{
 		}
 
-		public ImageViewAsync(Context context, IAttributeSet attrs)
-			: base(context, attrs)
+		public ImageViewAsync(Context context, IAttributeSet attrs) : base(context, attrs)
 		{
 		}
 

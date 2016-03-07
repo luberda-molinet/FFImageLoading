@@ -5,9 +5,11 @@ namespace FFImageLoading.Args
 {
     public class SuccessEventArgs : EventArgs
     {
-        public SuccessEventArgs(ImageSize imageSize, LoadingResult loadingResult)
+        public SuccessEventArgs(ImageInformation imageInformation, LoadingResult loadingResult)
         {
-            ImageSize = imageSize;
+            ImageInformation = imageInformation;
+            ImageSize = ImageInformation == null ?
+                new ImageSize() : new ImageSize(imageInformation.OriginalWidth, imageInformation.OriginalHeight);
             LoadingResult = loadingResult;
         }
 

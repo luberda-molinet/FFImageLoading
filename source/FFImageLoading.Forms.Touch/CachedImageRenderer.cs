@@ -279,6 +279,8 @@ namespace FFImageLoading.Forms.Touch
 					imageLoader.Transform(Element.Transformations);
 				}
 
+                imageLoader.WithPriority(Element.LoadingPriority);
+
 				var element = Element;
 
 				imageLoader.Finish((work) => {
