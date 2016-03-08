@@ -141,7 +141,7 @@ namespace FFImageLoading.Work
 			}
 
 			var imageView = GetAttachedImageView();
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return GenerateResult.InvalidTarget;
 
 			if (drawableWithResult.HasError)
@@ -201,7 +201,7 @@ namespace FFImageLoading.Work
 				return GenerateResult.Canceled;
 
 			var imageView = GetAttachedImageView();
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return GenerateResult.InvalidTarget;
 
 			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
@@ -527,7 +527,7 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return false;
 
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
@@ -579,7 +579,7 @@ namespace FFImageLoading.Work
 		{
 			try
 			{
-				if (imageView == null)
+				if (imageView == null || imageView.Handle == IntPtr.Zero)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
 				if (IsCancelled)
