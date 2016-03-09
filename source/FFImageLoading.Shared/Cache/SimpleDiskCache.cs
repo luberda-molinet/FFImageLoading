@@ -77,16 +77,20 @@ namespace FFImageLoading.Cache
 						{
 							await _fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-							bool existed = _entries.ContainsKey(sanitizedKey);
+							CacheEntry oldEntry;
+							if (_entries.TryGetValue(sanitizedKey, out oldEntry))
+							{
+								string oldFilepath = Path.Combine(_cachePath, oldEntry.FileName);
+								if (File.Exists(oldFilepath))
+									File.Delete(oldFilepath);
+							}
+
 							string filename = sanitizedKey + "." + duration.TotalSeconds;
 							string filepath = Path.Combine(_cachePath, filename);
 
-							if (!existed)
+							using (var fs = FileStore.GetOutputStream(filepath))
 							{
-								using (var fs = FileStore.GetOutputStream(filepath))
-								{
-									await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-								}
+								await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 							}
 
 							_entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
