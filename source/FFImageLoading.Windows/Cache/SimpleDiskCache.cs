@@ -30,10 +30,9 @@ namespace FFImageLoading.Cache
         ConcurrentDictionary<string, CacheEntry> entries;
         readonly TimeSpan defaultDuration;
 
-        public SimpleDiskCache(string cacheFolderName, string version)
+        public SimpleDiskCache(string cacheFolderName)
         {
             this.entries = new ConcurrentDictionary<string, CacheEntry>();
-            this.version = version;
             this.cacheFolder = null;
             this.cacheFolderName = cacheFolderName;
             this.fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
@@ -48,9 +47,9 @@ namespace FFImageLoading.Cache
         /// <returns>The cache.</returns>
         /// <param name="cacheName">Cache name.</param>
         /// <param name="version">Version.</param>
-        public static DiskCache CreateCache(string cacheName, string version = "1.0")
+        public static SimpleDiskCache CreateCache(string cacheName)
         {
-            return new DiskCache(cacheName, version);
+            return new SimpleDiskCache(cacheName);
         }
 
         async Task Init()
