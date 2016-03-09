@@ -144,6 +144,11 @@ namespace FFImageLoading.Cache
 		/// </summary>
 		public async Task ClearAsync()
 		{
+			while (_fileWritePendingTasks.Count != 0)
+			{
+				await Task.Delay(20).ConfigureAwait(false);
+			}
+
 			try
 			{
 				await _fileWriteLock.WaitAsync().ConfigureAwait(false);
