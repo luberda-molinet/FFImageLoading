@@ -202,6 +202,7 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public Task<bool> ExistsAsync(string key)
 		{
+			key = SanitizeKey(key);
 			return Task.FromResult(entries.ContainsKey(key));
 		}
 

@@ -119,7 +119,7 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        var file = await cacheFolder.GetFileAsync(kvp.Key);
+                        var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
                         await file.DeleteAsync();
                     }
                     catch
@@ -154,6 +154,8 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         public async Task<bool> ExistsAsync(string key)
         {
+            key = SanitizeKey(key);
+
             await initTask.ConfigureAwait(false);
 
             return entries.ContainsKey(key);
