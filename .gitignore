@@ -29,3 +29,5 @@ bld/
 [Oo]bj/
 
 samples/ListView.Universal.Sample/project.lock.json
+
+*.bak

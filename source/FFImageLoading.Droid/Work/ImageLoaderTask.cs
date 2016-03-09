@@ -83,7 +83,7 @@ namespace FFImageLoading.Work
 		{
 			ImageView imageView;
 			_imageWeakReference.TryGetTarget(out imageView);
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return false;
 
 			if (CanUseMemoryCache())
@@ -101,13 +101,7 @@ namespace FFImageLoading.Work
 			{
 				// Assign the Drawable to the image
 				var drawable = new AsyncDrawable(Context.Resources, null, this);
-				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (imageView.Handle == IntPtr.Zero)
-							return;
-
-						imageView.SetImageDrawable(drawable);
-					}).ConfigureAwait(false);
+				await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false);
 			}
 
 			return false;
@@ -147,7 +141,7 @@ namespace FFImageLoading.Work
 			}
 
 			var imageView = GetAttachedImageView();
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return GenerateResult.InvalidTarget;
 
 			if (drawableWithResult.HasError)
@@ -165,12 +159,6 @@ namespace FFImageLoading.Work
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						if (IsCancelled)
-							return;
-						
-						if (imageView.Handle == IntPtr.Zero)
-							return;
-						
 						SetImageDrawable(imageView, drawableWithResult.Item);
 						
 						Completed = true;
@@ -213,7 +201,7 @@ namespace FFImageLoading.Work
 				return GenerateResult.Canceled;
 
 			var imageView = GetAttachedImageView();
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return GenerateResult.InvalidTarget;
 
 			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
@@ -238,12 +226,6 @@ namespace FFImageLoading.Work
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						if (IsCancelled)
-							return;
-
-						if (imageView.Handle == IntPtr.Zero)
-							return;
-						
 						SetImageDrawable(imageView, resultWithDrawable.Item);
 						
 						Completed = true;
@@ -545,7 +527,7 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			if (imageView == null)
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return false;
 
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
@@ -562,14 +544,7 @@ namespace FFImageLoading.Work
 			{
 				// Here we asynchronously load our placeholder: it is deferred so we need a temporary AsyncDrawable
 				drawable = new AsyncDrawable(Context.Resources, null, this);
-				await MainThreadDispatcher.PostAsync(() =>
-				{
-					if (imageView.Handle == IntPtr.Zero)
-						return;
-						
-					imageView.SetImageDrawable(drawable); // temporary assign this AsyncDrawable
-						
-				}).ConfigureAwait(false);
+				await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false); // temporary assign this AsyncDrawable
 
 				try
 				{
@@ -591,17 +566,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return false;
 
-			await MainThreadDispatcher.PostAsync(() =>
-			{
-				if (IsCancelled)
-					return;
-					
-				if (imageView.Handle == IntPtr.Zero)
-					return;
-					
-				SetImageDrawable(imageView, drawable);
-					
-			}).ConfigureAwait(false);
+			await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false);
 
 			return true;
 		}
@@ -614,7 +579,7 @@ namespace FFImageLoading.Work
 		{
 			try
 			{
-				if (imageView == null)
+				if (imageView == null || imageView.Handle == IntPtr.Zero)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
 				if (IsCancelled)
@@ -652,10 +617,7 @@ namespace FFImageLoading.Work
 							if (ffDrawable != null)
 								ffDrawable.StopFadeAnimation();
 
-							if (imageView.Handle == IntPtr.Zero)
-								return;
-
-							imageView.SetImageDrawable(value);
+							SetImageDrawable(imageView, value);
 
 							Completed = true;
 
@@ -811,6 +773,12 @@ namespace FFImageLoading.Work
 
 		private void SetImageDrawable(ImageView imageView, Drawable drawable)
 		{
+			if (IsCancelled)
+				return;
+
+			if (imageView.Handle == IntPtr.Zero)
+				return;
+			
 			imageView.SetImageDrawable(drawable);
 		}
 	}

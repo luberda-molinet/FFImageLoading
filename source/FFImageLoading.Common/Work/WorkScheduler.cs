@@ -35,6 +35,8 @@ namespace FFImageLoading.Work
 	{
 		protected class PendingTask
 		{
+			public int Position { get; set; }
+
 			public IImageLoaderTask ImageLoadingTask { get; set; }
 
 			public Task FrameworkWrappingTask { get; set; }
@@ -50,6 +52,7 @@ namespace FFImageLoading.Work
 		private bool _exitTasksEarly;
 		private bool _pauseWork;
 		private bool _isRunning;
+		private volatile int _currentPosition;
 
 		public WorkScheduler(IMiniLogger logger)
 		{
@@ -213,7 +216,8 @@ namespace FFImageLoading.Work
 		{
 			_logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
 
-			var currentPendingTask = new PendingTask() { ImageLoadingTask = task };
+			Interlocked.Increment(ref _currentPosition);
+			var currentPendingTask = new PendingTask() { Position = _currentPosition, ImageLoadingTask = task };
 			PendingTask alreadyRunningTaskForSameKey = null;
 			lock (_pauseWorkLock)
 			{
@@ -222,6 +226,8 @@ namespace FFImageLoading.Work
 					alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey() == task.GetKey() && (!t.ImageLoadingTask.IsCancelled));
 					if (alreadyRunningTaskForSameKey == null)
 						_pendingTasks.Add(currentPendingTask);
+					else
+						alreadyRunningTaskForSameKey.Position = _currentPosition;
 				}
 			}
 
@@ -327,8 +333,10 @@ namespace FFImageLoading.Work
 			{
 				lock (_pendingTasksLock)
 				{
-					currentLotOfPendingTasks = _pendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+					currentLotOfPendingTasks = _pendingTasks
+						.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
 					.OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
+						.ThenByDescending(t => t.Position)
                     .Take(MaxParallelTasks)
                     .ToList();
 				}

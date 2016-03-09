@@ -265,26 +265,30 @@ namespace FFImageLoading.Cache
 
 		private void OnEntryNoLongerDisplayed(object sender, EventArgs args)
 		{
-			if (!(sender is SelfDisposingBitmapDrawable)) return;
+			var sdbd = sender as SelfDisposingBitmapDrawable;
 
-			var sdbd = (SelfDisposingBitmapDrawable)sender;
-			lock (monitor) {
-				if (displayed_cache.ContainsKey(sdbd.InCacheKey)) {
-					DemoteDisplayedEntryToReusePool(sdbd);
+			if (sdbd != null) 
+			{
+				lock (monitor) 
+				{
+					if (displayed_cache.ContainsKey(sdbd.InCacheKey))
+						DemoteDisplayedEntryToReusePool(sdbd);
 				}
 			}
 		}
 
 		private void OnEntryDisplayed(object sender, EventArgs args)
 		{
-			if (!(sender is SelfDisposingBitmapDrawable)) return;
+			var sdbd = sender as SelfDisposingBitmapDrawable;
 
-			// see if the sender is in the reuse pool and move it
-			// into the displayed_cache if found.
-			var sdbd = (SelfDisposingBitmapDrawable)sender;
-			lock (monitor) {
-				if (reuse_pool.ContainsKey(sdbd.InCacheKey)) {
-					PromoteReuseEntryToDisplayedCache(sdbd);
+			if (sdbd != null) 
+			{
+				// see if the sender is in the reuse pool and move it
+				// into the displayed_cache if found.
+				lock (monitor) 
+				{
+					if (reuse_pool.ContainsKey(sdbd.InCacheKey))
+						PromoteReuseEntryToDisplayedCache(sdbd);
 				}
 			}
 		}

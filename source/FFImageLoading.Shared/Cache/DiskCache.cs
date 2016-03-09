@@ -116,12 +116,9 @@ namespace FFImageLoading.Cache
 							bool existed = entries.ContainsKey(sanitizedKey);
 							string filepath = Path.Combine(basePath, sanitizedKey);
 
-							if (!existed)
+							using (var fs = FileStore.GetOutputStream(filepath))
 							{
-								using (var fs = FileStore.GetOutputStream(filepath))
-								{
-									await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-								}						
+								await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 							}
 
 							AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
