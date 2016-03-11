@@ -44,19 +44,6 @@ namespace FFImageLoading.Cache
 		object lockJournal;
 		readonly SemaphoreSlim fileWriteLock;
 		ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
-
-        struct CacheEntry
-        {
-            public DateTime Origin;
-            public TimeSpan TimeToLive;
-
-            public CacheEntry (DateTime o, TimeSpan ttl)
-            {
-                Origin = o;
-                TimeToLive = ttl;
-            }
-        }
-
         ConcurrentDictionary<string, CacheEntry> entries = new ConcurrentDictionary<string, CacheEntry> ();
 
 		/// <summary>
@@ -108,11 +95,11 @@ namespace FFImageLoading.Cache
         }
 
 		/// <summary>
-		/// Adds the file to cache and file saving queue if not exists.
+		/// Adds the file to cache and file saving queue if it does not exists.
 		/// </summary>
-		/// <param name="key">Key.</param>
-		/// <param name="bytes">Bytes.</param>
-		/// <param name="duration">Duration.</param>
+		/// <param name="key">Key to store/retrieve the file.</param>
+		/// <param name="bytes">File data in bytes.</param>
+		/// <param name="duration">Specifies how long an item should remain in the cache.</param>
 		public void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
 		{
 			var sanitizedKey = SanitizeKey(key);
@@ -135,7 +122,7 @@ namespace FFImageLoading.Cache
 							}
 
 							AppendToJournal(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration);
-							entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);	
+							entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, sanitizedKey);
 						}
 						catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
 						{
@@ -159,18 +146,30 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public async Task RemoveAsync(string key)
 		{
-			key = SanitizeKey (key);
+			var sanitizedKey = SanitizeKey(key);
 
-			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
+			await WaitForPendingWriteIfExists(sanitizedKey).ConfigureAwait(false);
+			try
+			{
+				await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-			string filepath = Path.Combine(basePath, key);
+				string filepath = Path.Combine(basePath, sanitizedKey);
 
-			if (File.Exists(filepath))
-				File.Delete(filepath);
+				if (File.Exists(filepath))
+					File.Delete(filepath);
 
-			bool existed = entries.ContainsKey (key);
-			if (existed)
-				AppendToJournal(JournalOp.Deleted, key);
+				bool existed = entries.ContainsKey (sanitizedKey);
+				if (existed)
+				{
+					CacheEntry entry;
+					entries.TryRemove(sanitizedKey, out entry);
+					AppendToJournal(JournalOp.Deleted, sanitizedKey);
+				}
+			}
+			finally
+			{
+				fileWriteLock.Release();
+			}
 		}
 
 		/// <summary>
@@ -178,20 +177,23 @@ namespace FFImageLoading.Cache
 		/// </summary>
 		public async Task ClearAsync()
 		{
-			while(fileWritePendingTasks.Count != 0)
+			try
 			{
-				await Task.Delay(20).ConfigureAwait(false);
-			}
+				await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-			lock (lockJournal)
+				lock (lockJournal)
+				{
+					Directory.Delete(basePath, true);
+					Directory.CreateDirectory (basePath);
+					entries.Clear();
+					CreateJournalFile();
+				}
+			}
+			finally
 			{
-				Directory.Delete(basePath, true);
-				Directory.CreateDirectory (basePath);
-				entries.Clear();
-				CreateJournalFile();
+				fileWriteLock.Release();
 			}
 		}
-
 
 		/// <summary>
 		/// Checks if cache entry exists/
@@ -309,11 +311,11 @@ namespace FFImageLoading.Cache
 							{
 								case JournalOp.Created:
 									ParseEntry(line, out key, out origin, out duration);
-									entries.TryAdd(key, new CacheEntry(origin, duration));
+									entries.TryAdd(key, new CacheEntry(origin, duration, key));
 									break;
 								case JournalOp.Modified:
 									ParseEntry(line, out key, out origin, out duration);
-									entries[key] = new CacheEntry(origin, duration);
+									entries[key] = new CacheEntry(origin, duration, key);
 									break;
 								case JournalOp.Deleted:
 									ParseEntry(line, out key);
@@ -348,6 +350,7 @@ namespace FFImageLoading.Cache
 					{
                         File.Delete(Path.Combine(basePath, kvp.Key));
                     } 
+					// Analysis disable once EmptyGeneralCatchClause
 					catch 
 					{
 					}
