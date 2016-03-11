@@ -76,7 +76,7 @@ namespace ImageLoading.Sample
             vh.Title.Text = position.ToString();
 			vh.ItemView.Tag = position;
 
-            ImageService.LoadUrl(item)
+            ImageService.Instance.LoadUrl(item)
                .Retry(3, 200)
                .DownSample(100, 100)
                .LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)

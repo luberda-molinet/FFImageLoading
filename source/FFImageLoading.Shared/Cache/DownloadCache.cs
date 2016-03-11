@@ -82,9 +82,9 @@ namespace FFImageLoading.Cache
 
 		private async Task<byte[]> DownloadAsync(string url, string filename, string filepath, CancellationToken token)
 		{
-			int headersTimeout = ImageService.Config.HttpHeadersTimeout;
+			int headersTimeout = ImageService.Instance.Config.HttpHeadersTimeout;
 			// Not used for the moment
-			// int readTimeout = ImageService.Config.HttpReadTimeout - headersTimeout;
+			// int readTimeout = ImageService.Instance.Config.HttpReadTimeout - headersTimeout;
 
 			using (var cancelHeadersToken = new CancellationTokenSource())
 			{

@@ -37,14 +37,14 @@ namespace ImageLoading.Sample
 
 			txtTitle.Text = position.ToString ();
 
-			ImageService.LoadUrl(image)
+			ImageService.Instance.LoadUrl(image)
                .Retry(3, 200)
                .DownSample(200, 200)
 				.LoadingPlaceholder(Config.LoadingPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
 				.ErrorPlaceholder(Config.ErrorPlaceholderPath, FFImageLoading.Work.ImageSource.ApplicationBundle)
                .Into(logoImage);
 
-			ImageService.LoadUrl(image)
+			ImageService.Instance.LoadUrl(image)
                 .Retry(3, 200)
                 .DownSample(500, 500)
                 .Transform(new BlurredTransformation(10))

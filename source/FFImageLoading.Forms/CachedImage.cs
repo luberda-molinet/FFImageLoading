@@ -287,7 +287,7 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create(nameof(TransparencyEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
-		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Config.LoadWithTransparencyChannel.
+		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.
 		/// </summary>
 		public bool? TransparencyEnabled
 		{
@@ -307,7 +307,7 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create(nameof(FadeAnimationEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
-		/// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
+		/// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Instance.Config.FadeAnimationEnabled.
 		/// </summary>
 		public bool? FadeAnimationEnabled
 		{
@@ -369,7 +369,7 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty TransformPlaceholdersProperty = BindableProperty.Create(nameof(TransformPlaceholders), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
-		/// Indicates if transforms should be applied to placeholders. By default this value comes from ImageService.Config.TransformPlaceholders.
+		/// Indicates if transforms should be applied to placeholders. By default this value comes from ImageService.Instance.Config.TransformPlaceholders.
 		/// </summary>
 		/// <value>The transform placeholders.</value>
 		public bool? TransformPlaceholders

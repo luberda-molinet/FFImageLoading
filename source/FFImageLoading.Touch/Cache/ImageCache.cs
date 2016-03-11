@@ -31,7 +31,7 @@ namespace FFImageLoading.Cache
         {
             get
             {
-                return _instance ?? (_instance = new ImageCache(ImageService.Config.MaxCacheSize));
+                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxCacheSize));
             }
         }
 

@@ -71,7 +71,7 @@ namespace FFImageLoading.Forms.WinRT
 
         private static Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar)
         {
-            return ImageService.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+            return ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
         }
 
         private static async Task ClearCacheAsync(Cache.CacheType cacheType)
@@ -79,26 +79,26 @@ namespace FFImageLoading.Forms.WinRT
             switch (cacheType)
             {
                 case Cache.CacheType.Memory:
-                    ImageService.InvalidateMemoryCache();
+                    ImageService.Instance.InvalidateMemoryCache();
                     break;
                 case Cache.CacheType.Disk:
-                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
+                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
                 case Cache.CacheType.All:
-                    ImageService.InvalidateMemoryCache();
-                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
+                    ImageService.Instance.InvalidateMemoryCache();
+                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
         }
 
 		private static void SetPauseWork(bool pauseWork)
 		{
-			ImageService.SetPauseWork(pauseWork);
+			ImageService.Instance.SetPauseWork(pauseWork);
 		}
 
         private static Task<bool> DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
         {
-            return ImageService.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
+            return ImageService.Instance.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
         }
 
         private bool measured;
@@ -212,23 +212,23 @@ namespace FFImageLoading.Forms.WinRT
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
             {
-                imageLoader = ImageService.LoadUrl(ffSource.Path, Element.CacheDuration);
+                imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, Element.CacheDuration);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
             {
-                imageLoader = ImageService.LoadCompiledResource(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
             {
-                imageLoader = ImageService.LoadFileFromApplicationBundle(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
             {
-                imageLoader = ImageService.LoadFile(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
             {
-                imageLoader = ImageService.LoadStream(ffSource.Stream);
+                imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
             }
 
             if (imageLoader != null)

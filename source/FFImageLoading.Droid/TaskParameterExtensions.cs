@@ -19,7 +19,7 @@ namespace FFImageLoading
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
 			var task = CreateTask(parameters, imageView);
-            ImageService.LoadImage(task);
+            ImageService.Instance.LoadImage(task);
             return task;
         }
 
@@ -59,13 +59,13 @@ namespace FFImageLoading
 			using (var task = CreateTask(parameters, null))
 			{
 				var key = task.GetKey();
-				await ImageService.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
 		private static ImageLoaderTask CreateTask(this TaskParameter parameters, ImageViewAsync imageView)
 		{
-			var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, imageView);
+			var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, imageView);
 			return task;
 		}
     }

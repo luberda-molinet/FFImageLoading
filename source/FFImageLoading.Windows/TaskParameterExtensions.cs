@@ -48,16 +48,16 @@ namespace FFImageLoading
                     return;
 
                 bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
-                    parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+                    parameters.FadeAnimationEnabled.Value : ImageService.Instance.Config.FadeAnimationEnabled;
 
                 bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
-                    parameters.FadeAnimationForCachedImages.Value : ImageService.Config.FadeAnimationForCachedImages);
+                    parameters.FadeAnimationForCachedImages.Value : ImageService.Instance.Config.FadeAnimationForCachedImages);
 
                 if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
                 {
                     // fade animation
                     int fadeDuration = parameters.FadeAnimationDuration.HasValue ?
-                        parameters.FadeAnimationDuration.Value : ImageService.Config.FadeAnimationDuration;
+                        parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration;
                     DoubleAnimation fade = new DoubleAnimation();
                     fade.Duration = TimeSpan.FromMilliseconds(fadeDuration);
 					fade.From = 0f;
@@ -103,18 +103,18 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, null, null))
+			using (var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, null, null))
 			{
 				var key = task.GetKey();
-				await ImageService.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
         private static IScheduledWork Into(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
         {
-            var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
+            var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
                 getNativeControl, doWithImage);
-            ImageService.LoadImage(task);
+            ImageService.Instance.LoadImage(task);
             return task;
         }
 

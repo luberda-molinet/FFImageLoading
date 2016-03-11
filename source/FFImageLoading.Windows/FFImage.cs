@@ -102,19 +102,19 @@ namespace FFImageLoading
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
             {
-                imageLoader = ImageService.LoadUrl(ffSource.Path, TimeSpan.FromDays(CacheDuration));
+                imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, TimeSpan.FromDays(CacheDuration));
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
             {
-                imageLoader = ImageService.LoadCompiledResource(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
             {
-                imageLoader = ImageService.LoadFileFromApplicationBundle(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
             {
-                imageLoader = ImageService.LoadFile(ffSource.Path);
+                imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
             }
 
             if (imageLoader != null)
@@ -422,7 +422,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register(nameof(FadeAnimationEnabled), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
-        /// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Config.FadeAnimationEnabled.
+        /// Indicates if the fade animation effect should be enabled. By default this value comes from ImageService.Instance.Config.FadeAnimationEnabled.
         /// </summary>
         public bool FadeAnimationEnabled
         {
@@ -443,7 +443,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
-        /// Indicates if transforms should be applied to placeholders.  By default this value comes from ImageService.Config.TransformPlaceholders.
+        /// Indicates if transforms should be applied to placeholders.  By default this value comes from ImageService.Instance.Config.TransformPlaceholders.
         /// </summary>
         public bool TransformPlaceholders
         {
@@ -668,7 +668,7 @@ namespace FFImageLoading
         /// <param name="pauseWork">If set to <c>true</c> pauses image loading.</param>
         public static void SetPauseWork(bool pauseWork)
         {
-            ImageService.SetPauseWork(pauseWork);
+            ImageService.Instance.SetPauseWork(pauseWork);
         }
 
         /// <summary>
@@ -680,14 +680,14 @@ namespace FFImageLoading
             switch (cacheType)
             {
                 case CacheType.Memory:
-                    ImageService.InvalidateMemoryCache();
+                    ImageService.Instance.InvalidateMemoryCache();
                     break;
                 case CacheType.Disk:
-                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
+                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
                 case CacheType.All:
-                    ImageService.InvalidateMemoryCache();
-                    await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
+                    ImageService.Instance.InvalidateMemoryCache();
+                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
         }
@@ -699,7 +699,7 @@ namespace FFImageLoading
         /// <param name="cacheType">Cache type to invalidate</param>
         public static async Task InvalidateCacheEntryAsync(string key, CacheType cacheType)
         {
-            await ImageService.InvalidateCacheEntryAsync(key, cacheType);
+            await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType);
         }
 
         /// <summary>

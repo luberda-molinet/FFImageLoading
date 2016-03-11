@@ -354,7 +354,7 @@ namespace FFImageLoading.Work
                 imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
 
                 bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
-                    Parameters.TransformPlaceholdersEnabled.Value : ImageService.Config.TransformPlaceholders;
+                    Parameters.TransformPlaceholdersEnabled.Value : ImageService.Instance.Config.TransformPlaceholders;
 
                 if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
                 && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
@@ -495,7 +495,7 @@ namespace FFImageLoading.Work
             // thread and the ImageView that was originally bound to this task is still bound back
             // to this task and our "exit early" flag is not set then try and fetch the bitmap from
             // the cache
-            if (IsCancelled || ImageService.ExitTasksEarly)
+            if (IsCancelled || ImageService.Instance.ExitTasksEarly)
                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
             if (_getNativeControl() == null)

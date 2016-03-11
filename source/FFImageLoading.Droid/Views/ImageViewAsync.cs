@@ -68,7 +68,7 @@ namespace FFImageLoading.Views
 
 		public void CancelLoading()
 		{
-			ImageService.CancelWorkFor(this.GetImageLoaderTask());
+			ImageService.Instance.CancelWorkFor(this.GetImageLoaderTask());
 		}
 
 		protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)

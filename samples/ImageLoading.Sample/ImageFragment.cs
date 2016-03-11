@@ -38,7 +38,7 @@ namespace ImageLoading.Sample
 			_imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
 			var urlToImage = Config.Images[_position];
 
-			ImageService.LoadUrl(urlToImage)
+			ImageService.Instance.LoadUrl(urlToImage)
 				.Retry(3, 200)
 				.DownSample(300, 300)
 				.Transform(new CircleTransformation())

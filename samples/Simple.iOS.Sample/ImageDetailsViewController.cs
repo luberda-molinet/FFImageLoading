@@ -48,7 +48,7 @@ namespace Simple.iOS.Sample
 
         protected void LoadImage()
         {
-            var taskImage = ImageService.LoadUrl(imageURL)
+            var taskImage = ImageService.Instance.LoadUrl(imageURL)
                                         .ErrorPlaceholder("error@2x.png", ImageSource.ApplicationBundle)
                                         .LoadingPlaceholder("placeholder.png", ImageSource.CompiledResource);
             if(transformation==0)

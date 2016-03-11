@@ -78,8 +78,8 @@ namespace Simple.iOS.Sample
 
         partial void TapReloadAll (Foundation.NSObject sender)
         {
-            ImageService.InvalidateMemoryCache();
-            ImageService.InvalidateDiskCache();
+            ImageService.Instance.InvalidateMemoryCache();
+            ImageService.Instance.InvalidateDiskCache();
             CollectionView.ReloadData();
         }
     }

@@ -12,7 +12,7 @@ namespace FFImageLoading.Cache
 		/// </summary>
 		public void Invalidate()
 		{
-			ImageService.InvalidateMemoryCache();
+			ImageService.Instance.InvalidateMemoryCache();
 		}
 	}
 }

@@ -115,7 +115,7 @@ namespace FFImageLoading.Work
 
 		public void Cancel()
 		{
-			ImageService.RemovePendingTask(this);
+			ImageService.Instance.RemovePendingTask(this);
 
 			if (!_isDisposed)
 			{
@@ -151,7 +151,7 @@ namespace FFImageLoading.Work
 		{
 			try
 			{
-				if (Completed || IsCancelled || ImageService.ExitTasksEarly)
+				if (Completed || IsCancelled || ImageService.Instance.ExitTasksEarly)
 					return;
 
 				GenerateResult generatingImageSucceeded = GenerateResult.Failed;
@@ -232,7 +232,7 @@ namespace FFImageLoading.Work
 			}
 			finally
 			{
-				ImageService.RemovePendingTask(this);
+				ImageService.Instance.RemovePendingTask(this);
 				Finish();
 			}
 		}

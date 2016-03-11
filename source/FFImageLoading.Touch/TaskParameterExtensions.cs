@@ -34,16 +34,16 @@ namespace FFImageLoading
                     return;
 
 				bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
-					parameters.FadeAnimationEnabled.Value : ImageService.Config.FadeAnimationEnabled;
+					parameters.FadeAnimationEnabled.Value : ImageService.Instance.Config.FadeAnimationEnabled;
 
 				bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
-					parameters.FadeAnimationForCachedImages.Value : ImageService.Config.FadeAnimationForCachedImages);
+					parameters.FadeAnimationForCachedImages.Value : ImageService.Instance.Config.FadeAnimationForCachedImages);
 
 				if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
 				{
 					// fade animation
 					double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
-						parameters.FadeAnimationDuration.Value : ImageService.Config.FadeAnimationDuration)) / 1000;
+						parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
 					
 					UIView.Transition(refView, fadeDuration, 
 						UIViewAnimationOptions.TransitionCrossDissolve 
@@ -116,18 +116,18 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, null, null, 1))
+			using (var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, null, null, 1))
 			{
 				var key = task.GetKey();
-				await ImageService.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
         private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, float imageScale = -1f)
         {
-            var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
+            var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
                 getNativeControl, doWithImage, imageScale);
-            ImageService.LoadImage(task);
+            ImageService.Instance.LoadImage(task);
             return task;
         }
 
