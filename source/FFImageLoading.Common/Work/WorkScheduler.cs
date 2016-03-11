@@ -335,7 +335,7 @@ namespace FFImageLoading.Work
 				{
 					currentLotOfPendingTasks = _pendingTasks
 						.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
-					.OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
+						.OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
 						.ThenByDescending(t => t.Position)
                     .Take(MaxParallelTasks)
                     .ToList();
@@ -351,13 +351,15 @@ namespace FFImageLoading.Work
 				}
 			}
 
-			var frameworkTasks = new List<Task>();
-			foreach (var pendingTask in currentLotOfPendingTasks)
+			if (currentLotOfPendingTasks.Count == 1)
 			{
-				frameworkTasks.Add(pendingTask.ImageLoadingTask.RunAsync());
+				await currentLotOfPendingTasks[0].ImageLoadingTask.RunAsync().ConfigureAwait(false);
 			}
-
-			await Task.WhenAll(frameworkTasks).ConfigureAwait(false);
+			else
+			{
+				var frameworkTasks = currentLotOfPendingTasks.Select(p => Task.Run(p.ImageLoadingTask.RunAsync));
+				await Task.WhenAll(frameworkTasks).ConfigureAwait(false);
+			}
 
 			lock (_runningLock)
 			{
