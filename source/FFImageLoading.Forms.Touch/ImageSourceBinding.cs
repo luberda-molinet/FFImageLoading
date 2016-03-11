@@ -45,7 +45,7 @@ namespace FFImageLoading.Forms.Touch
 				if (File.Exists(fileImageSource.File))
 					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
 				
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileImageSource.File);
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
 			}
 
 			var streamImageSource = source as StreamImageSource;
