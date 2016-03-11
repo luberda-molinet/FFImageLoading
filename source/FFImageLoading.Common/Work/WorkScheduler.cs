@@ -52,7 +52,7 @@ namespace FFImageLoading.Work
 		private bool _exitTasksEarly;
 		private bool _pauseWork;
 		private bool _isRunning;
-		private volatile int _currentPosition;
+		private int _currentPosition;
 
 		public WorkScheduler(IMiniLogger logger)
 		{
@@ -216,8 +216,8 @@ namespace FFImageLoading.Work
 		{
 			_logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
 
-			Interlocked.Increment(ref _currentPosition);
-			var currentPendingTask = new PendingTask() { Position = _currentPosition, ImageLoadingTask = task };
+			int position = Interlocked.Increment(ref _currentPosition);
+			var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
 			PendingTask alreadyRunningTaskForSameKey = null;
 			lock (_pauseWorkLock)
 			{
@@ -227,7 +227,7 @@ namespace FFImageLoading.Work
 					if (alreadyRunningTaskForSameKey == null)
 						_pendingTasks.Add(currentPendingTask);
 					else
-						alreadyRunningTaskForSameKey.Position = _currentPosition;
+						alreadyRunningTaskForSameKey.Position = position;
 				}
 			}
 
