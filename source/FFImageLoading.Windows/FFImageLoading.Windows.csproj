@@ -69,6 +69,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FFImageLoading.Shared\Cache\CacheEntry.cs">
+      <Link>Cache\CacheEntry.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Shared\Cache\DownloadCache.cs">
       <Link>Cache\DownloadCache.cs</Link>
     </Compile>
@@ -86,6 +89,7 @@
     <Compile Include="Cache\DiskCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
+    <Compile Include="Cache\SimpleDiskCache.cs" />
     <Compile Include="DataResolver\DataResolverFactory.cs" />
     <Compile Include="DataResolver\FilePathDataResolver.cs" />
     <Compile Include="DataResolver\IStreamResolver.cs" />

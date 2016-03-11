@@ -144,6 +144,11 @@ namespace FFImageLoading.Cache
 		/// </summary>
 		public async Task ClearAsync()
 		{
+			while (_fileWritePendingTasks.Count != 0)
+			{
+				await Task.Delay(20).ConfigureAwait(false);
+			}
+
 			try
 			{
 				await _fileWriteLock.WaitAsync().ConfigureAwait(false);
@@ -165,6 +170,7 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public Task<bool> ExistsAsync(string key)
 		{
+			key = SanitizeKey(key);
 			return Task.FromResult(_entries.ContainsKey(key));
 		}
 
@@ -265,7 +271,7 @@ namespace FFImageLoading.Cache
 		{
 			KeyValuePair<string, CacheEntry>[] kvps;
 			var now = DateTime.UtcNow;
-			kvps = _entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).Take(10).ToArray();
+			kvps = _entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).ToArray();
 
 			// Can't use minilogger here, we would have too many dependencies
 			System.Diagnostics.Debug.WriteLine(string.Format("DiskCacher: Removing {0} elements from the cache", kvps.Length));

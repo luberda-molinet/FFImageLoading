@@ -155,6 +155,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\FFImageLoading.Shared\Cache\CacheEntry.cs">
+      <Link>Cache\CacheEntry.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Shared\Cache\DownloadCache.cs">
       <Link>Cache\DownloadCache.cs</Link>
     </Compile>
@@ -193,6 +196,9 @@
     </Compile>
     <Compile Include="..\FFImageLoading.Windows\Cache\ImageCache.cs">
       <Link>Cache\ImageCache.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Cache\SimpleDiskCache.cs">
+      <Link>Cache\SimpleDiskCache.cs</Link>
     </Compile>
     <Compile Include="..\FFImageLoading.Windows\DataResolver\DataResolverFactory.cs">
       <Link>DataResolver\DataResolverFactory.cs</Link>

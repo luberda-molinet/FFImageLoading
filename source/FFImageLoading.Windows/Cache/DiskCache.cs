@@ -15,9 +15,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
-
 using Windows.Storage;
 using System.Runtime.InteropServices.WindowsRuntime;
+using FFImageLoading.Cache;
 
 #if SILVERLIGHT
 using FFImageLoading.Concurrency;
@@ -54,18 +54,6 @@ namespace FFImageLoading.Cache
         StorageFolder cacheFolder;
         StorageFile journalFile;
 		ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
-
-        struct CacheEntry
-        {
-            public DateTime Origin;
-            public TimeSpan TimeToLive;
-
-            public CacheEntry(DateTime o, TimeSpan ttl)
-            {
-                Origin = o;
-                TimeToLive = ttl;
-            }
-        }
 
         ConcurrentDictionary<string, CacheEntry> entries;
 
@@ -168,11 +156,11 @@ namespace FFImageLoading.Cache
                                 {
                                     case JournalOp.Created:
                                         ParseEntry(trimmedLine, out key, out origin, out duration);
-                                        entries.TryAdd(key, new CacheEntry(origin, duration));
+                                        entries.TryAdd(key, new CacheEntry(origin, duration, null));
                                         break;
                                     case JournalOp.Modified:
                                         ParseEntry(trimmedLine, out key, out origin, out duration);
-                                        entries[key] = new CacheEntry(origin, duration);
+                                        entries[key] = new CacheEntry(origin, duration, null);
                                         break;
                                     case JournalOp.Deleted:
                                         ParseEntry(trimmedLine, out key);
@@ -198,7 +186,7 @@ namespace FFImageLoading.Cache
         {
             KeyValuePair<string, CacheEntry>[] kvps;
             var now = DateTime.UtcNow;
-            kvps = entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).Take(10).ToArray();
+            kvps = entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).ToArray();
 
             System.Diagnostics.Debug.WriteLine(string.Format("DiskCacher: Removing {0} elements from the cache", kvps.Length));
 
@@ -239,6 +227,8 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         public async Task<bool> ExistsAsync(string key)
         {
+            key = SanitizeKey(key);
+
             await initTask.ConfigureAwait(false);
 
             return entries.ContainsKey(key);
@@ -280,7 +270,7 @@ namespace FFImageLoading.Cache
 	                    }
 
 						await AppendToJournalAsync(existed ? JournalOp.Modified : JournalOp.Created, sanitizedKey, DateTime.UtcNow, duration).ConfigureAwait(false);
-	                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration);
+	                    entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, null);
 	                }
 					catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
 					{
