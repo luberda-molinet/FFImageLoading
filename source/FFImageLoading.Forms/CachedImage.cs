@@ -547,16 +547,6 @@ namespace FFImageLoading.Forms
         /// Clears image cache
         /// </summary>
         /// <param name="cacheType">Cache type to invalidate</param>
-        [Obsolete("Use ClearCacheAsync")]
-		public static void ClearCache(Cache.CacheType cacheType)
-        {
-            ClearCacheAsync(cacheType);
-        }
-
-        /// <summary>
-        /// Clears image cache
-        /// </summary>
-        /// <param name="cacheType">Cache type to invalidate</param>
         public static async Task ClearCacheAsync(Cache.CacheType cacheType)
         {
             if (InternalClearCache != null)
@@ -566,20 +556,6 @@ namespace FFImageLoading.Forms
         }
 
         internal static Func<string, Cache.CacheType, bool, Task> InternalInvalidateCache;
-
-        /// <summary>
-        /// Invalidates cache for a specified key
-        /// </summary>
-        /// <param name="key">Key to invalidate</param>
-        /// <param name="cacheType">Cache type to invalidate</param>
-		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
-		/// (downsampling and transformations variants)</param>
-        [Obsolete("Use InvalidateCacheEntryAsync")]
-		public static void InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar=false)
-        {
-            
-            InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
-        }
 
         /// <summary>
         /// Invalidates cache for a specified key

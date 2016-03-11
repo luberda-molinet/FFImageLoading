@@ -81,45 +81,6 @@ namespace FFImageLoading
 			}
 		}
 
-        /// <summary>
-        /// Initialize ImageService default values. This can only be done once: during app start.
-        /// </summary>
-        /// <param name="maxCacheSize">Max cache size. If zero then 20% of the memory will be used.</param>
-		/// <param name="httpClient">.NET HttpClient to use. If null then a.NET HttpClient is instanciated.</param>
-        /// <param name="scheduler">Work scheduler used to organize/schedule loading tasks.</param>
-        /// <param name="logger">Basic logger. If null a very simple implementation that prints to console is used.</param>
-        /// <param name="diskCache">Disk cache. If null a default disk cache is instanciated that uses a journal mechanism.</param>
-        /// <param name="downloadCache">Download cache. If null a default download cache is instanciated, which relies on the DiskCache</param>
-		/// <param name="loadWithTransparencyChannel">Gets a value indicating whether images should be loaded with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.</param>
-		/// <param name="fadeAnimationEnabled">Defines if fading should be performed while loading images.</param>
-        /// <param name="transformPlaceholders">Defines if transforms should be applied to placeholders.</param>
-		/// <param name="downsampleInterpolationMode">Defines default downsample interpolation mode.</param>
-		/// <param name="httpHeadersTimeout">Maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.</param>
-		/// <param name="httpReadTimeout">Maximum time in seconds to wait before the HTTP request is cancelled.</param>
-		[Obsolete("Use Initialize(Configuration configuration) overload")]
-		public static void Initialize(int? maxCacheSize = null, HttpClient httpClient = null, IWorkScheduler scheduler = null, IMiniLogger logger = null,
-			IDiskCache diskCache = null, IDownloadCache downloadCache = null, bool? loadWithTransparencyChannel = null, bool? fadeAnimationEnabled = null,
-			bool? transformPlaceholders = null, InterpolationMode? downsampleInterpolationMode = null, int httpHeadersTimeout = 15, int httpReadTimeout = 30
-		)
-        {
-			var cfg = new Configuration();
-
-			if (httpClient != null) cfg.HttpClient = httpClient;
-			if (scheduler != null) cfg.Scheduler = scheduler;
-			if (logger != null) cfg.Logger = logger;
-			if (diskCache != null) cfg.DiskCache = diskCache;
-			if (downloadCache != null) cfg.DownloadCache = downloadCache;
-			if (loadWithTransparencyChannel.HasValue) cfg.LoadWithTransparencyChannel = loadWithTransparencyChannel.Value;
-			if (fadeAnimationEnabled.HasValue) cfg.FadeAnimationEnabled = fadeAnimationEnabled.Value;
-			if (transformPlaceholders.HasValue) cfg.TransformPlaceholders = transformPlaceholders.Value;
-			if (downsampleInterpolationMode.HasValue) cfg.DownsampleInterpolationMode = downsampleInterpolationMode.Value;
-			cfg.HttpHeadersTimeout = httpHeadersTimeout;
-			cfg.HttpReadTimeout = httpReadTimeout;
-			if (maxCacheSize.HasValue) cfg.MaxCacheSize = maxCacheSize.Value;
-
-			Initialize(cfg);
-        }
-
 		private static void InitializeIfNeeded(Configuration userDefinedConfig = null)
         {
 			if (_initialized)
@@ -286,38 +247,10 @@ namespace FFImageLoading
 		/// <summary>
 		/// Invalidates the disk cache.
 		/// </summary>
-		[Obsolete("Use InvalidateDiskCacheAsync")]
-		public static void InvalidateDiskCache()
-		{
-			InvalidateDiskCacheAsync();
-		}
-
-		/// <summary>
-		/// Invalidates the disk cache.
-		/// </summary>
 		public static Task InvalidateDiskCacheAsync()
 		{
 			InitializeIfNeeded();
 			return Config.DiskCache.ClearAsync();
-		}
-
-		/// <summary>
-		/// Invalidates the cache for given key.
-		/// </summary>
-		/// <param name="key">Concerns images with this key</param>
-		/// <param name="cacheType">Memory cache, Disk cache or both</param>
-		/// <param name="removeSimilar">If similar keys should be removed, ie: typically keys with extra transformations</param>
-		[Obsolete("Use InvalidateCacheEntryAsync")]
-		public static async void Invalidate(string key, CacheType cacheType, bool removeSimilar=false)
-		{
-			try
-			{
-				await InvalidateCacheEntryAsync(key, cacheType, removeSimilar).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				Config.Logger.Error(string.Format("Could not invalidate cache entry {0}", key), ex);
-			}
 		}
 
 		/// <summary>

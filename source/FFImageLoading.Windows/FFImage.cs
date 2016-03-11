@@ -675,16 +675,6 @@ namespace FFImageLoading
         /// Clears image cache
         /// </summary>
         /// <param name="cacheType">Cache type to invalidate</param>
-        [Obsolete("Use ClearCacheAsync")]
-        public static void ClearCache(CacheType cacheType)
-        {
-            ClearCacheAsync(cacheType);
-        }
-
-        /// <summary>
-        /// Clears image cache
-        /// </summary>
-        /// <param name="cacheType">Cache type to invalidate</param>
         public static async Task ClearCacheAsync(CacheType cacheType)
         {
             switch (cacheType)
@@ -700,17 +690,6 @@ namespace FFImageLoading
                     await ImageService.InvalidateDiskCacheAsync().ConfigureAwait(false);
                     break;
             }
-        }
-
-        /// <summary>
-        /// Invalidates cache for a specified key
-        /// </summary>
-        /// <param name="key">Key to invalidate</param>
-        /// <param name="cacheType">Cache type to invalidate</param>
-        [Obsolete("Use InvalidateCacheEntryAsync")]
-        public static void InvalidateCache(string key, CacheType cacheType)
-        {
-            InvalidateCacheEntryAsync(key, cacheType);
         }
 
         /// <summary>

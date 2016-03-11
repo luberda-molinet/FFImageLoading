@@ -69,7 +69,6 @@
     <Compile Include="Work\IBitmap.cs" />
     <Compile Include="Cache\CacheResult.cs" />
     <Compile Include="Work\GenerateResult.cs" />
-    <Compile Include="Work\ImageSize.cs" />
     <Compile Include="Work\LoadingResult.cs" />
     <Compile Include="Cache\CacheStream.cs" />
     <Compile Include="Work\WithLoadingResult.cs" />

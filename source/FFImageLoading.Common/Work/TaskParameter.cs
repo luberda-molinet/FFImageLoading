@@ -331,27 +331,6 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
 		/// <param name="action">Action to invoke when loading succeded. Argument is the size of the image loaded.</param>
-		[Obsolete("use Success(Action<ImageInformation, LoadingResult> method instead")]
-		public TaskParameter Success(Action<ImageSize, LoadingResult> action)
-		{
-			if (action == null)
-				throw new Exception("Given lambda should not be null.");
-
-			OnSuccess = new Action<ImageInformation, LoadingResult>((imageInformation, loadingResult) => {
-
-				if (imageInformation != null)
-					action(new ImageSize(imageInformation.OriginalWidth, imageInformation.OriginalHeight), loadingResult);
-				else
-					action(new ImageSize(), loadingResult);
-			});
-			return this;
-		}
-
-		/// <summary>
-		/// If image loading succeded this callback is called
-		/// </summary>
-		/// <returns>The TaskParameter instance for chaining the call.</returns>
-		/// <param name="action">Action to invoke when loading succeded. Argument is the size of the image loaded.</param>
 		public TaskParameter Success(Action<ImageInformation, LoadingResult> action)
 		{
 			if (action == null)

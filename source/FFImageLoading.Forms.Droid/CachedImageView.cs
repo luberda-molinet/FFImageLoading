@@ -22,18 +22,6 @@ namespace FFImageLoading.Forms.Droid
         {
             SetWillNotDraw(false);
         }
-
-        [Obsolete]
-        public CachedImageView(Context context, System.Drawing.SizeF? predefinedStyle) : base(context)
-        {
-            SetWillNotDraw(false);
-        }
-
-        [Obsolete]
-        public CachedImageView(Context context, IAttributeSet attrs, System.Drawing.SizeF? predefinedStyle) : base(context, attrs)
-        {
-            SetWillNotDraw(false);
-        }
 	}
 }
 

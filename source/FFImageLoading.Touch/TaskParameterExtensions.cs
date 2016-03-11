@@ -114,12 +114,12 @@ namespace FFImageLoading
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
 		/// <param name="cacheType">Cache type.</param>
-		public static void Invalidate(this TaskParameter parameters, CacheType cacheType)
+		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
 			using (var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters, null, null, 1))
 			{
 				var key = task.GetKey();
-				ImageService.Invalidate(key, cacheType);
+				await ImageService.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
