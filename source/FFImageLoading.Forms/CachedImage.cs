@@ -563,6 +563,18 @@ namespace FFImageLoading.Forms
 		}
 
 		/// <summary>
+		/// Invalidates cache for a specified key.
+		/// </summary>
+		/// <param name="source">Image key.</param>
+		/// <param name="cacheType">Cache type.</param>
+		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+		/// (downsampling and transformations variants)</param>
+		public static async Task InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar = false)
+		{
+			await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+		}
+
+		/// <summary>
 		/// Occurs after image loading success.
 		/// </summary>
 		public event EventHandler<CachedImageEvents.SuccessEventArgs> Success;
