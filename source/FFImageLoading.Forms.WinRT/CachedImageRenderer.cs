@@ -63,42 +63,6 @@ namespace FFImageLoading.Forms.WinRT
         /// </summary>
         public static void Init()
         {
-            CachedImage.InternalClearCache = new Func<FFImageLoading.Cache.CacheType, Task>(ClearCacheAsync);
-            CachedImage.InternalInvalidateCache = new Func<string, FFImageLoading.Cache.CacheType, bool, Task>(InvalidateCacheEntryAsync);
-            CachedImage.InternalSetPauseWork = new Action<bool>(SetPauseWork);
-            CachedImage.InternalDownloadImageAndAddToDiskCache = new Func<string, CancellationToken, TimeSpan?, string, Task<bool>>(DownloadImageAndAddToDiskCache);
-        }
-
-        private static Task InvalidateCacheEntryAsync(string key, Cache.CacheType cacheType, bool removeSimilar)
-        {
-            return ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
-        }
-
-        private static async Task ClearCacheAsync(Cache.CacheType cacheType)
-        {
-            switch (cacheType)
-            {
-                case Cache.CacheType.Memory:
-                    ImageService.Instance.InvalidateMemoryCache();
-                    break;
-                case Cache.CacheType.Disk:
-                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
-                    break;
-                case Cache.CacheType.All:
-                    ImageService.Instance.InvalidateMemoryCache();
-                    await ImageService.Instance.InvalidateDiskCacheAsync().ConfigureAwait(false);
-                    break;
-            }
-        }
-
-		private static void SetPauseWork(bool pauseWork)
-		{
-			ImageService.Instance.SetPauseWork(pauseWork);
-		}
-
-        private static Task<bool> DownloadImageAndAddToDiskCache(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
-        {
-            return ImageService.Instance.DownloadImageAndAddToDiskCacheAsync(imageUrl, cancellationToken, duration, customCacheKey);
         }
 
         private bool measured;

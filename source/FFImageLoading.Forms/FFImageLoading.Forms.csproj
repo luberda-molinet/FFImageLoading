@@ -68,6 +68,10 @@
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.BaitAndSwitch\FFImageLoading.BaitAndSwitch.csproj">
+      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
+      <Name>FFImageLoading.BaitAndSwitch</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Args\" />

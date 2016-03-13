@@ -15,6 +15,12 @@ namespace FFImageLoading
     public interface IImageService
     {
 		/// <summary>
+		/// Gets FFImageLoading configuration
+		/// </summary>
+		/// <value>The configuration used by FFImageLoading.</value>
+		Configuration Config { get; }
+
+		/// <summary>
 		/// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
 		/// </summary>
 		/// <param name="configuration">Configuration.</param>
@@ -91,6 +97,13 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="task">Image loading task.</param>
 		void LoadImage(IImageLoaderTask task);
+
+		/// <summary>
+		/// Invalidates selected caches.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="cacheType">Memory cache, Disk cache or both</param>
+		Task InvalidateCacheAsync(CacheType cacheType);
 
 		/// <summary>
 		/// Invalidates the memory cache.

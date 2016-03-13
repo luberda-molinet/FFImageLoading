@@ -28,7 +28,7 @@ namespace FFImageLoading
 		private Configuration _config;
 
 		private static Lazy<ImageService> LazyInstance = new Lazy<ImageService>(() => new ImageService());
-		public static ImageService Instance { get { return LazyInstance.Value; } }
+		public static IImageService Instance { get { return LazyInstance.Value; } }
 
 		private ImageService() { }
 
@@ -248,6 +248,26 @@ namespace FFImageLoading
             Scheduler.LoadImage(task);
 			AddRequestToHistory(task);
         }
+
+		/// <summary>
+		/// Invalidates selected caches.
+		/// </summary>
+		/// <returns>An awaitable task.</returns>
+		/// <param name="cacheType">Memory cache, Disk cache or both</param>
+		public async Task InvalidateCacheAsync(CacheType cacheType)
+		{
+			InitializeIfNeeded();
+
+			if (cacheType == CacheType.All || cacheType == CacheType.Memory)
+			{
+				InvalidateMemoryCache();
+			}
+
+			if (cacheType == CacheType.All || cacheType == CacheType.Disk)
+			{
+				await InvalidateDiskCacheAsync().ConfigureAwait(false);
+			}
+		}
 
 		/// <summary>
 		/// Invalidates the memory cache.

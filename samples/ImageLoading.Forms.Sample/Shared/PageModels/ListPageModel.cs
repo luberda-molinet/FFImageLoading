@@ -12,7 +12,7 @@ namespace FFImageLoading.Forms.Sample.PageModels
 		public ListPageModel()
 		{
 			DuplicateListItemsCommand = new PageFactoryCommand(() => {
-                Items = new ObservableCollection<ListExampleItem>(Items.Concat(Items));
+				Items = new ObservableCollection<ListExampleItem>(Items.Concat(Items));
 			});
 		}
 
