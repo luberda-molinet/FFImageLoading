@@ -569,9 +569,9 @@ namespace FFImageLoading.Forms
 		/// <param name="cacheType">Cache type.</param>
 		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
 		/// (downsampling and transformations variants)</param>
-		public static async Task InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar = false)
+		public static Task InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar = false)
 		{
-			await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+			return ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
 		}
 
 		/// <summary>
