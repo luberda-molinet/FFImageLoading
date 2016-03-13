@@ -63,6 +63,19 @@ namespace FFImageLoading
 			}
 		}
 
+		/// <summary>
+		/// Preload the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		public static void Preload(this TaskParameter parameters)
+		{
+			parameters.Preload = true;
+			using (var task = CreateTask(parameters, null))
+			{
+				ImageService.Instance.LoadImage(task);
+			}
+		}
+
 		private static ImageLoaderTask CreateTask(this TaskParameter parameters, ImageViewAsync imageView)
 		{
 			var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, imageView);

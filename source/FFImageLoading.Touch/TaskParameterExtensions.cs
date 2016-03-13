@@ -116,18 +116,38 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, null, null, 1))
+			using (var task = CreateTask(parameters, null, null, 1))
 			{
 				var key = task.GetKey();
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
+		/// <summary>
+		/// Preload the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		public static void Preload(this TaskParameter parameters)
+		{
+			parameters.Preload = true;
+			using (var task = CreateTask(parameters, null, null, 1))
+			{
+				ImageService.Instance.LoadImage(task);
+			}
+		}
+
+		private static ImageLoaderTask CreateTask(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, float imageScale = -1f)
+		{
+			var task = new ImageLoaderTask(ImageService.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Config.Logger, parameters,
+				getNativeControl, doWithImage, imageScale);
+			return task;
+		}
+
         private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, float imageScale = -1f)
         {
-            var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
-                getNativeControl, doWithImage, imageScale);
-            ImageService.Instance.LoadImage(task);
+			var task = CreateTask(parameters, getNativeControl, doWithImage, imageScale);
+            ImageService.LoadImage(task);
+
             return task;
         }
 

@@ -123,16 +123,5 @@ namespace FFImageLoading
 		/// <param name="cacheType">Memory cache, Disk cache or both</param>
 		/// <param name="removeSimilar">If similar keys should be removed, ie: typically keys with extra transformations</param>
 		Task InvalidateCacheEntryAsync(string key, CacheType cacheType, bool removeSimilar=false);
-
-		/// <summary>
-		/// Downloads the image and adds it to disk cache.
-		/// Called only if the cache entry doesn't exist already.
-		/// </summary>
-		/// <returns>Returns <c>true</c> if added, <c>false</c> otherwise</returns>
-		/// <param name="imageUrl">Image URL.</param>
-		/// <param name="cancellationToken">Cancellation token.</param>
-		/// <param name="duration">Disk cache validity duration.</param>
-		/// <param name="customCacheKey">Custom cache key.</param>
-		Task<bool> DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null);
-    }
+	}
 }

@@ -65,6 +65,9 @@ namespace FFImageLoading.Work
 
 		private bool UsesSameNativeControl(ImageLoaderTask task)
 		{
+			if (_imageWeakReference == null)
+				return false;
+			
 			ImageView currentControl;
 			_imageWeakReference.TryGetTarget(out currentControl);
 

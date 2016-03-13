@@ -101,11 +101,6 @@ namespace FFImageLoading
 			throw new Exception(DoNotReference);
 		}
 
-		public System.Threading.Tasks.Task<bool> DownloadImageAndAddToDiskCacheAsync(string imageUrl, System.Threading.CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
-		{
-			throw new Exception(DoNotReference);
-		}
-
 		public bool ExitTasksEarly
 		{
 			get

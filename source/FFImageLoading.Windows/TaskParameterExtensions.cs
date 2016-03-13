@@ -103,17 +103,29 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, null, null))
+			using (var task = CreateTask(parameters, null, null))
 			{
 				var key = task.GetKey();
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
+		/// <summary>
+		/// Preload the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		public static void Preload(this TaskParameter parameters)
+		{
+			parameters.Preload = true;
+			using (var task = CreateTask(parameters, null, null))
+			{
+				ImageService.Instance.LoadImage(task);
+			}
+		}
+
         private static IScheduledWork Into(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
         {
-            var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
-                getNativeControl, doWithImage);
+			var task = CreateTask(parameters, getNativeControl, doWithImage);
             ImageService.Instance.LoadImage(task);
             return task;
         }
@@ -138,5 +150,12 @@ namespace FFImageLoading
 
             return tcs.Task;
         }
+
+		private static ImageLoaderTask CreateTask(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
+		{
+			var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
+				getNativeControl, doWithImage);
+			return task;
+		}
     }
 }

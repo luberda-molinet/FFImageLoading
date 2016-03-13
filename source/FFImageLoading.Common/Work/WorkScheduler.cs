@@ -179,16 +179,19 @@ namespace FFImageLoading.Work
 					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
 					return;
 				}
-
-				List<PendingTask> pendingTasksCopy;
-				lock (_pendingTasksLock)
+				
+				if (!task.Parameters.Preload)
 				{
-					pendingTasksCopy = _pendingTasks.ToList();
-				}
-				foreach (var pendingTask in pendingTasksCopy)
-				{
-					if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
-						pendingTask.ImageLoadingTask.CancelIfNeeded();
+					List<PendingTask> pendingTasksCopy;
+					lock (_pendingTasksLock)
+					{
+						pendingTasksCopy = _pendingTasks.ToList();
+					}
+					foreach (var pendingTask in pendingTasksCopy)
+					{
+						if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+							pendingTask.ImageLoadingTask.CancelIfNeeded();
+					}
 				}
 
 				bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
