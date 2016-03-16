@@ -82,6 +82,8 @@
     <Compile Include="Work\ImageInformation.cs" />
     <Compile Include="Work\LoadingPriority.cs" />
     <Compile Include="Work\IImageService.cs" />
+    <Compile Include="Work\Target.cs" />
+    <Compile Include="Work\ITarget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
