@@ -1,4 +1,4 @@
-﻿using FFImageLoading.Extensions;
+using FFImageLoading.Extensions;
 using FFImageLoading.Work;
 using System;
 using System.Collections.Generic;
@@ -859,4 +859,3 @@ namespace FFImageLoading
         }
     }
 }
-
