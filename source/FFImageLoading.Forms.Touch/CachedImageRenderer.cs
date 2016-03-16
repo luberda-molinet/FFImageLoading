@@ -243,11 +243,12 @@ namespace FFImageLoading.Forms.Touch
 				}
 
                 imageLoader.WithPriority(Element.LoadingPriority);
-
-			    if (Element.DisableDiskCache)
+			    if (Element.CacheType.HasValue)
 			    {
-			        imageLoader.WithoutDiskCache();
-			    }
+                    imageLoader.WithCache(Element.CacheType.Value);
+                }
+			    
+			    
 
 				var element = Element;
 

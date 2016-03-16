@@ -201,10 +201,7 @@ namespace FFImageLoading
                 }
 
                 imageLoader.WithPriority(LoadingPriority);
-                if (DisableDiskCache)
-                {
-                    imageLoader.WithoutDiskCache();
-                }
+                imageLoader.WithCache(CacheType);
 
                 imageLoader.Finish((work) => 
                     OnFinish(new Args.FinishEventArgs(work)));
@@ -401,7 +398,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The disable disk cache property.
+        /// The Loading Priority property.
         /// </summary>
         public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
 
@@ -421,22 +418,22 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The cache duration property.
+        /// The cache type property.
         /// </summary>
-        public static readonly DependencyProperty DisableDiskCacheProperty = DependencyProperty.Register(nameof(DisableDiskCache), typeof(bool), typeof(FFImage), new PropertyMetadata(false));
+        public static readonly DependencyProperty CacheTypeProperty = DependencyProperty.Register(nameof(CacheType), typeof(CacheType), typeof(FFImage), new PropertyMetadata(CacheType.All));
 
         /// <summary>
-        /// Disable the disk cache
+        /// Set the cache storage type, (Memory, Disk, All). by default cache is set to All.
         /// </summary>
-        public bool DisableDiskCache
+        public CacheType CacheType
         {
             get
             {
-                return (bool)GetValue(DisableDiskCacheProperty);
+                return (CacheType)GetValue(CacheTypeProperty);
             }
             set
             {
-                SetValue(DisableDiskCacheProperty, value);
+                SetValue(CacheTypeProperty, value);
             }
         }
         

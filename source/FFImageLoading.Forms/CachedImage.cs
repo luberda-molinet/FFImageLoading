@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
 using System.Threading;
+using FFImageLoading.Cache;
 
 namespace FFImageLoading.Forms
 {
@@ -689,22 +690,22 @@ namespace FFImageLoading.Forms
 		}
 
         /// <summary>
-        /// The disk cache property.
+        /// The cache type property.
         /// </summary>
-        public static readonly BindableProperty DisableDiskCacheProperty = BindableProperty.Create(nameof(DisableDiskCache), typeof(bool), typeof(CachedImage), false);
+        public static readonly BindableProperty CacheTypeProperty = BindableProperty.Create(nameof(CacheType), typeof(CacheType?), typeof(CachedImage), default(CacheType?));
 
         /// <summary>
-        /// Disable the disk cache
+        /// Set the cache storage type, (Memory, Disk, All). by default cache is set to All.
         /// </summary>
-        public bool DisableDiskCache
+        public CacheType? CacheType
         {
             get
             {
-                return (bool)GetValue(DisableDiskCacheProperty);
+                return (CacheType?)GetValue(CacheTypeProperty);
             }
             set
             {
-                SetValue(DisableDiskCacheProperty, value);
+                SetValue(CacheTypeProperty, value);
             }
         }
     }
