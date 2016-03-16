@@ -421,7 +421,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The cache duration property.
+        /// Disable disk cache property.
         /// </summary>
         public static readonly DependencyProperty DisableDiskCacheProperty = DependencyProperty.Register(nameof(DisableDiskCache), typeof(bool), typeof(FFImage), new PropertyMetadata(false));
 
