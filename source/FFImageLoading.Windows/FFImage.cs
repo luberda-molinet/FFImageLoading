@@ -401,7 +401,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The disable disk cache property.
+        /// The cache duration property.
         /// </summary>
         public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
 
