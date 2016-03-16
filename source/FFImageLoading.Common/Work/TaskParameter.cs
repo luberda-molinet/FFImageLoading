@@ -142,6 +142,7 @@ namespace FFImageLoading.Work
 		public string CustomCacheKey { get; private set; }
 
 		public int Priority { get; private set; }
+        public bool DisableDiskCache { get; private set; }
 
         public TaskParameter Transform(ITransformation transformation)
 		{
@@ -249,6 +250,12 @@ namespace FFImageLoading.Work
 			Priority = priority;
 			return this;
 		}
+
+	    public TaskParameter WithoutDiskCache()
+	    {
+	        DisableDiskCache = true;
+	        return this;
+	    }
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.

@@ -201,6 +201,10 @@ namespace FFImageLoading
                 }
 
                 imageLoader.WithPriority(LoadingPriority);
+                if (DisableDiskCache)
+                {
+                    imageLoader.WithoutDiskCache();
+                }
 
                 imageLoader.Finish((work) => 
                     OnFinish(new Args.FinishEventArgs(work)));
@@ -397,7 +401,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The cache duration property.
+        /// The disable disk cache property.
         /// </summary>
         public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
 
@@ -415,6 +419,27 @@ namespace FFImageLoading
                 SetValue(LoadingPriorityProperty, value); 
             }
         }
+
+        /// <summary>
+        /// The cache duration property.
+        /// </summary>
+        public static readonly DependencyProperty DisableDiskCacheProperty = DependencyProperty.Register(nameof(DisableDiskCache), typeof(bool), typeof(FFImage), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Disable the disk cache
+        /// </summary>
+        public bool DisableDiskCache
+        {
+            get
+            {
+                return (bool)GetValue(DisableDiskCacheProperty);
+            }
+            set
+            {
+                SetValue(DisableDiskCacheProperty, value);
+            }
+        }
+        
 
         /// <summary>
         /// The fade animation enabled property.

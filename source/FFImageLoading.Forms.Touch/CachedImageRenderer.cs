@@ -244,6 +244,11 @@ namespace FFImageLoading.Forms.Touch
 
                 imageLoader.WithPriority(Element.LoadingPriority);
 
+			    if (Element.DisableDiskCache)
+			    {
+			        imageLoader.WithoutDiskCache();
+			    }
+
 				var element = Element;
 
 				imageLoader.Finish((work) => {

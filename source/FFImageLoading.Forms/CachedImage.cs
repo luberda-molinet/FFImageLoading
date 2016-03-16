@@ -687,6 +687,26 @@ namespace FFImageLoading.Forms
 			if (finishCommand != null && finishCommand.CanExecute(e))
 				finishCommand.Execute(e);
 		}
+
+        /// <summary>
+        /// The disk cache property.
+        /// </summary>
+        public static readonly BindableProperty DisableDiskCacheProperty = BindableProperty.Create(nameof(DisableDiskCache), typeof(bool), typeof(CachedImage), false);
+
+        /// <summary>
+        /// Disable the disk cache
+        /// </summary>
+        public bool DisableDiskCache
+        {
+            get
+            {
+                return (bool)GetValue(DisableDiskCacheProperty);
+            }
+            set
+            {
+                SetValue(DisableDiskCacheProperty, value);
+            }
+        }
     }
 }
 
