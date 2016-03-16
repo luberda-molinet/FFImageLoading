@@ -33,8 +33,6 @@ namespace FFImageLoading.Work
 			return IsValid;
 		}
 
-		public abstract void Set(ImageLoaderTask task, UIImage image, bool isLocalOrFromCache, bool isLoadingPlaceholder);
-
 		public override bool UsesSameNativeControl(ImageLoaderTask task)
 		{
 			var otherTarget = task._target as IUIViewTarget;
