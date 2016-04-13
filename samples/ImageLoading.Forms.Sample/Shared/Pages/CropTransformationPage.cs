@@ -2,7 +2,6 @@
 using Xamarin.Forms;
 using FFImageLoading.Forms.Sample.PageModels;
 using DLToolkit.PageFactory;
-using System.Diagnostics;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
@@ -34,23 +33,14 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
             imagePath.SetBinding<CropTransformationPageModel>(Label.TextProperty, v => v.ImagePath);
 
-
 			var pinchGesture = new PinchGestureRecognizer ();
 			pinchGesture.PinchUpdated += (object sender, PinchGestureUpdatedEventArgs e) => {
-				if (e.Status == GestureStatus.Started ||
-					e.Status == GestureStatus.Running ||
-					e.Status == GestureStatus.Completed) {
-					this.GetPageModel().PinchImage(e);
-				}
+				this.GetPageModel().PinchImage(e);
 			};
 
 			var panGesture = new PanGestureRecognizer ();
 			panGesture.PanUpdated += (object sender, PanUpdatedEventArgs e) => {
-				if (e.StatusType == GestureStatus.Started ||
-					e.StatusType == GestureStatus.Running ||
-					e.StatusType == GestureStatus.Completed) {
-					this.GetPageModel().PanImage(e);
-				}
+				this.GetPageModel().PanImage(e);
 			};
 
 			cachedImage.GestureRecognizers.Add (pinchGesture);

@@ -5,7 +5,6 @@ using FFImageLoading.Work;
 using FFImageLoading.Transformations;
 using System.Windows.Input;
 using Xamarin.Forms;
-using System.Diagnostics;
 
 namespace FFImageLoading.Forms.Sample.PageModels
 {
