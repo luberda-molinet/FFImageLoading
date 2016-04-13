@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using FFImageLoading.Forms.Sample.PageModels;
 using DLToolkit.PageFactory;
+using System.Diagnostics;
 
 namespace FFImageLoading.Forms.Sample.Pages
 {
@@ -33,67 +34,33 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
             imagePath.SetBinding<CropTransformationPageModel>(Label.TextProperty, v => v.ImagePath);
 
-			var cropAddXButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "X+",
-			};
-            cropAddXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentXOffsetCommad);
 
-			var cropSubXButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "X-",
-			};
-            cropSubXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentXOffsetCommad);
-
-			var cropAddYButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Y+",
-			};
-            cropAddYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentYOffsetCommad);
-
-			var cropSubYButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Y-",
-			};
-            cropSubYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentYOffsetCommad);
-
-			var cropAddZoomButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "+",
-			};
-            cropAddZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentZoomFactorCommad);
-
-			var cropSubZoomButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "-",
-			};
-            cropSubZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentZoomFactorCommad);
-
-			var buttonsLayout1 = new StackLayout() {
-				Orientation = StackOrientation.Horizontal,
-				Children = {
-					cropAddXButton, 
-					cropSubXButton,
-					cropAddYButton,
-					cropSubYButton,
+			var pinchGesture = new PinchGestureRecognizer ();
+			pinchGesture.PinchUpdated += (object sender, PinchGestureUpdatedEventArgs e) => {
+				if (e.Status == GestureStatus.Started ||
+					e.Status == GestureStatus.Running ||
+					e.Status == GestureStatus.Completed) {
+					this.GetPageModel().PinchImage(e);
 				}
 			};
 
-			var buttonsLayout2 = new StackLayout() {
-				Orientation = StackOrientation.Horizontal,
-				Children = {
-					cropAddZoomButton,
-					cropSubZoomButton
+			var panGesture = new PanGestureRecognizer ();
+			panGesture.PanUpdated += (object sender, PanUpdatedEventArgs e) => {
+				if (e.StatusType == GestureStatus.Started ||
+					e.StatusType == GestureStatus.Running ||
+					e.StatusType == GestureStatus.Completed) {
+					this.GetPageModel().PanImage(e);
 				}
 			};
+
+			cachedImage.GestureRecognizers.Add (pinchGesture);
+			cachedImage.GestureRecognizers.Add (panGesture);
 
 			Content = new ScrollView() {
 				Content = new StackLayout { 
 					Children = {
 						imagePath,
-						cachedImage,
-						buttonsLayout1,
-						buttonsLayout2,
+						cachedImage
 					}
 				}
 			};
