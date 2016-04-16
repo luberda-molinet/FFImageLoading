@@ -33,67 +33,31 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
             imagePath.SetBinding<CropTransformationPageModel>(Label.TextProperty, v => v.ImagePath);
 
-			var cropAddXButton = new Button() {
+			var infoLabel = new Label() {
 				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "X+",
-			};
-            cropAddXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentXOffsetCommad);
-
-			var cropSubXButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "X-",
-			};
-            cropSubXButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentXOffsetCommad);
-
-			var cropAddYButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Y+",
-			};
-            cropAddYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentYOffsetCommad);
-
-			var cropSubYButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "Y-",
-			};
-            cropSubYButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentYOffsetCommad);
-
-			var cropAddZoomButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "+",
-			};
-            cropAddZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.AddCurrentZoomFactorCommad);
-
-			var cropSubZoomButton = new Button() {
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				Text = "-",
-			};
-            cropSubZoomButton.SetBinding<CropTransformationPageModel>(Button.CommandProperty, v => v.SubCurrentZoomFactorCommad);
-
-			var buttonsLayout1 = new StackLayout() {
-				Orientation = StackOrientation.Horizontal,
-				Children = {
-					cropAddXButton, 
-					cropSubXButton,
-					cropAddYButton,
-					cropSubYButton,
-				}
+				HorizontalTextAlignment = TextAlignment.Center,
+				Text = "Use pan or pinch gestures to crop"
 			};
 
-			var buttonsLayout2 = new StackLayout() {
-				Orientation = StackOrientation.Horizontal,
-				Children = {
-					cropAddZoomButton,
-					cropSubZoomButton
-				}
+			var pinchGesture = new PinchGestureRecognizer ();
+			pinchGesture.PinchUpdated += (object sender, PinchGestureUpdatedEventArgs e) => {
+				this.GetPageModel().PinchImage(e);
 			};
+
+			var panGesture = new PanGestureRecognizer ();
+			panGesture.PanUpdated += (object sender, PanUpdatedEventArgs e) => {
+				this.GetPageModel().PanImage(e);
+			};
+
+			cachedImage.GestureRecognizers.Add (pinchGesture);
+			cachedImage.GestureRecognizers.Add (panGesture);
 
 			Content = new ScrollView() {
 				Content = new StackLayout { 
 					Children = {
 						imagePath,
-						cachedImage,
-						buttonsLayout1,
-						buttonsLayout2,
+						infoLabel,
+						cachedImage
 					}
 				}
 			};

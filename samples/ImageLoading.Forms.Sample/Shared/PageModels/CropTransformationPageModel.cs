@@ -4,56 +4,19 @@ using System.Collections.Generic;
 using FFImageLoading.Work;
 using FFImageLoading.Transformations;
 using System.Windows.Input;
+using Xamarin.Forms;
 
 namespace FFImageLoading.Forms.Sample.PageModels
 {
     public class CropTransformationPageModel : CommonPageModel
 	{
+		double mX = 0f;
+		double mY = 0f;
+		double mRatioPan = -0.0015f;
+		double mRatioZoom = 0.8f;
+
 		public CropTransformationPageModel()
 		{
-			AddCurrentZoomFactorCommad = new PageFactoryCommand(() => {
-				
-				if (CurrentZoomFactor + 0.1d >= 1d)
-					CurrentZoomFactor += 0.1d;
-				ReloadImage();
-
-			});
-
-			SubCurrentZoomFactorCommad = new PageFactoryCommand(() => {
-
-				if (CurrentZoomFactor - 0.1d >= 1d)
-					CurrentZoomFactor -= 0.1d;
-				ReloadImage();
-
-			});
-
-			AddCurrentXOffsetCommad = new PageFactoryCommand(() => {
-
-				CurrentXOffset += 0.05d;
-				ReloadImage();
-
-			});
-
-			SubCurrentXOffsetCommad = new PageFactoryCommand(() => {
-
-				CurrentXOffset -= 0.05d;
-				ReloadImage();
-
-			});
-
-			AddCurrentYOffsetCommad = new PageFactoryCommand(() => {
-
-				CurrentYOffset += 0.05d;
-				ReloadImage();
-
-			});
-
-			SubCurrentYOffsetCommad = new PageFactoryCommand(() => {
-
-				CurrentYOffset -= 0.05d;
-				ReloadImage();
-
-			});
 		}
 
         void ReloadImage()
@@ -124,40 +87,37 @@ namespace FFImageLoading.Forms.Sample.PageModels
 			set { SetField(value); }
 		}
 
-		public ICommand AddCurrentZoomFactorCommad
+		public void PanImage(PanUpdatedEventArgs e)
 		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
+			if (e.StatusType == GestureStatus.Completed) 
+			{
+				mX = CurrentXOffset;
+				mY = CurrentYOffset;
+			}
+			else if (e.StatusType == GestureStatus.Running)
+			{
+				CurrentXOffset = (e.TotalX * mRatioPan) + mX;
+				CurrentYOffset = (e.TotalY * mRatioPan) + mY;
+				ReloadImage ();
+			}
 		}
 
-        public ICommand AddCurrentXOffsetCommad
+		public void PinchImage(PinchGestureUpdatedEventArgs e)
 		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
-		}
+			if (e.Status == GestureStatus.Completed) 
+			{
+				mX = CurrentXOffset;
+				mY = CurrentYOffset;
+			}
+			else if (e.Status == GestureStatus.Running) 
+			{
+				CurrentZoomFactor += (e.Scale - 1) * CurrentZoomFactor * mRatioZoom;
+				CurrentZoomFactor = Math.Max (1, CurrentZoomFactor);
 
-        public ICommand AddCurrentYOffsetCommad
-		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
-		}
-
-        public ICommand SubCurrentZoomFactorCommad
-		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
-		}
-
-        public ICommand SubCurrentXOffsetCommad
-		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
-		}
-
-        public ICommand SubCurrentYOffsetCommad
-		{
-            get { return GetField<ICommand>(); }
-			set { SetField(value); }
+				CurrentXOffset = (e.ScaleOrigin.X * mRatioPan) + mX;
+				CurrentYOffset = (e.ScaleOrigin.Y * mRatioPan) + mY;
+				ReloadImage ();
+			}
 		}
 	}
 }
