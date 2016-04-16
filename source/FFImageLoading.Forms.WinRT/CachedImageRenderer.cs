@@ -282,6 +282,10 @@ namespace FFImageLoading.Forms.WinRT
                 }
 
                 imageLoader.WithPriority(Element.LoadingPriority);
+                if (Element.CacheType.HasValue)
+                {
+                    imageLoader.WithCache(Element.CacheType.Value);
+                }
 
                 var element = Element;
 

@@ -1,4 +1,4 @@
-﻿using FFImageLoading.Extensions;
+using FFImageLoading.Extensions;
 using FFImageLoading.Work;
 using System;
 using System.Collections.Generic;
@@ -201,6 +201,7 @@ namespace FFImageLoading
                 }
 
                 imageLoader.WithPriority(LoadingPriority);
+                imageLoader.WithCache(CacheType);
 
                 imageLoader.Finish((work) => 
                     OnFinish(new Args.FinishEventArgs(work)));
@@ -397,7 +398,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// The cache duration property.
+        /// The Loading Priority property.
         /// </summary>
         public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(FFImage), new PropertyMetadata(LoadingPriority.Normal));
 
@@ -415,6 +416,27 @@ namespace FFImageLoading
                 SetValue(LoadingPriorityProperty, value); 
             }
         }
+
+        /// <summary>
+        /// The cache type property.
+        /// </summary>
+        public static readonly DependencyProperty CacheTypeProperty = DependencyProperty.Register(nameof(CacheType), typeof(CacheType), typeof(FFImage), new PropertyMetadata(CacheType.All));
+
+        /// <summary>
+        /// Set the cache storage type, (Memory, Disk, All). by default cache is set to All.
+        /// </summary>
+        public CacheType CacheType
+        {
+            get
+            {
+                return (CacheType)GetValue(CacheTypeProperty);
+            }
+            set
+            {
+                SetValue(CacheTypeProperty, value);
+            }
+        }
+        
 
         /// <summary>
         /// The fade animation enabled property.
@@ -837,4 +859,3 @@ namespace FFImageLoading
         }
     }
 }
-

@@ -6,15 +6,15 @@ using System.Threading;
 
 namespace FFImageLoading.Cache
 {
-    public interface IDownloadCache
-    {
-		Task<string> GetDiskCacheFilePathAsync(string url, string key = null);
+	public interface IDownloadCache
+	{
+		Task<string> GetDiskCacheFilePathAsync (string url, string key = null);
 
 		HttpClient DownloadHttpClient { get; set; }
 
-		Task<DownloadedData> GetAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null);
+		Task<DownloadedData> GetAsync (string url, CancellationToken token, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
 
-		Task<CacheStream> GetStreamAsync(string url, CancellationToken token, TimeSpan? duration = null, string key = null);
+		Task<CacheStream> GetStreamAsync (string url, CancellationToken token, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
 	}
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
@@ -142,6 +143,7 @@ namespace FFImageLoading.Work
 		public string CustomCacheKey { get; private set; }
 
 		public int Priority { get; private set; }
+        public CacheType? CacheType { get; private set; }
 
 		public bool Preload { get; set; }
 
@@ -251,6 +253,12 @@ namespace FFImageLoading.Work
 			Priority = priority;
 			return this;
 		}
+
+        public TaskParameter WithCache(CacheType cacheType)
+        {
+            CacheType = cacheType;
+            return this;
+        }
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.
