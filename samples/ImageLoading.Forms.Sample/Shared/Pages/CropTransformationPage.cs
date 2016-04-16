@@ -33,6 +33,12 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
             imagePath.SetBinding<CropTransformationPageModel>(Label.TextProperty, v => v.ImagePath);
 
+			var infoLabel = new Label() {
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				HorizontalTextAlignment = TextAlignment.Center,
+				Text = "Use pan or pinch gestures to crop"
+			};
+
 			var pinchGesture = new PinchGestureRecognizer ();
 			pinchGesture.PinchUpdated += (object sender, PinchGestureUpdatedEventArgs e) => {
 				this.GetPageModel().PinchImage(e);
@@ -50,6 +56,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 				Content = new StackLayout { 
 					Children = {
 						imagePath,
+						infoLabel,
 						cachedImage
 					}
 				}
