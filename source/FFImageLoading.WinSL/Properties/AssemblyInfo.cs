@@ -6,12 +6,12 @@ using System.Resources;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FFImageLoading.WinSL")]
+[assembly: AssemblyTitle("FFImageLoading.Platform")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FFImageLoading.WinSL")]
-[assembly: AssemblyCopyright("Fabien Molinet, Daniel Luberd, Paul Roy")]
+[assembly: AssemblyProduct("FFImageLoading.Platform")]
+[assembly: AssemblyCopyright("Fabien Molinet, Daniel Luberda, Paul Roy")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

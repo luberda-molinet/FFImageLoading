@@ -58,7 +58,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Windows Release\FFImageLoading.Windows.XML</DocumentationFile>
+    <DocumentationFile>bin\Windows Release\FFImageLoading.Platform.XML</DocumentationFile>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
@@ -109,6 +109,7 @@
     <Compile Include="FFImage.cs" />
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Cache\ICacheKeyFactory.cs" />
+    <Compile Include="Work\ImageTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

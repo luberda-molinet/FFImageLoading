@@ -27,62 +27,8 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, Image imageView)
         {
-            var weakRef = new WeakReference<Image>(imageView);
-
-            Func<Image> getNativeControl = () => {
-                Image refView = null;
-
-                if (!weakRef.TryGetTarget(out refView))
-                    return null;
-
-                return refView;
-            };
-
-            Action<WriteableBitmap, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
-                Image refView = getNativeControl();
-                if (refView == null)
-                    return;
-
-                bool imageChanged = (img != refView.Source);
-                if (!imageChanged)
-                    return;
-
-                bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
-                    parameters.FadeAnimationEnabled.Value : ImageService.Instance.Config.FadeAnimationEnabled;
-
-                bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
-                    parameters.FadeAnimationForCachedImages.Value : ImageService.Instance.Config.FadeAnimationForCachedImages);
-
-                if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
-                {
-                    // fade animation
-                    int fadeDuration = parameters.FadeAnimationDuration.HasValue ?
-                        parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration;
-                    DoubleAnimation fade = new DoubleAnimation();
-                    fade.Duration = TimeSpan.FromMilliseconds(fadeDuration);
-					fade.From = 0f;
-					fade.To = 1f;
-					fade.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut }; 
-
-					Storyboard fadeInStoryboard = new Storyboard();
-
-#if SILVERLIGHT
-                    Storyboard.SetTargetProperty(fade, new PropertyPath("Image.Opacity"));
-#else
-                    Storyboard.SetTargetProperty(fade, "Image.Opacity");
-#endif
-                    Storyboard.SetTarget(fade, refView);
-					fadeInStoryboard.Children.Add(fade);
-					fadeInStoryboard.Begin();
-					refView.Source = img;
-                }
-                else
-                {
-                    refView.Source = img;
-                }
-            };
-
-            return parameters.Into(getNativeControl, doWithImage);
+            var target = new ImageTarget(imageView);
+            return parameters.Into(target);
         }
 
         /// <summary>
@@ -103,7 +49,8 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = CreateTask(parameters, null, null))
+			var target = new Target<WriteableBitmap, ImageLoaderTask>();
+			using (var task = CreateTask(parameters, target))
 			{
 				var key = task.GetKey();
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
@@ -116,16 +63,15 @@ namespace FFImageLoading
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
 		{
-			parameters.Preload = true;
-			using (var task = CreateTask(parameters, null, null))
-			{
-				ImageService.Instance.LoadImage(task);
-			}
-		}
+            parameters.Preload = true;
+            var target = new Target<WriteableBitmap, ImageLoaderTask>();
+            var task = CreateTask(parameters, target);
+            ImageService.Instance.LoadImage(task);
+        }
 
-        private static IScheduledWork Into(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
+        private static IScheduledWork Into(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
         {
-			var task = CreateTask(parameters, getNativeControl, doWithImage);
+            var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
             return task;
         }
@@ -151,11 +97,9 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
-		private static ImageLoaderTask CreateTask(this TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
-		{
-			var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
-				getNativeControl, doWithImage);
-			return task;
-		}
+        private static ImageLoaderTask CreateTask(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
+        {
+            return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, target);
+        }
     }
 }
