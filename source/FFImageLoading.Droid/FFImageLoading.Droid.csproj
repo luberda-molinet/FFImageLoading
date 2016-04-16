@@ -33,13 +33,13 @@
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
     <OutputPath>bin\Windows Debug\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -49,7 +49,7 @@
     <OutputPath>bin\Windows Release\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
