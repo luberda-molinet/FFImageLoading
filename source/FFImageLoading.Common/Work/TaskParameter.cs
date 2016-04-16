@@ -145,6 +145,8 @@ namespace FFImageLoading.Work
 		public int Priority { get; private set; }
         public CacheType? CacheType { get; private set; }
 
+		public bool Preload { get; set; }
+
         public TaskParameter Transform(ITransformation transformation)
 		{
 			if (transformation == null)

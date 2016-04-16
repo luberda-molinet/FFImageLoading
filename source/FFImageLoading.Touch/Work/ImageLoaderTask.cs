@@ -13,8 +13,7 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private readonly Func<UIView> _getNativeControl;
-		private readonly Action<UIImage, bool, bool> _doWithImage;
+		internal readonly ITarget<UIImage, ImageLoaderTask> _target;
 		private readonly nfloat _imageScale;
 		// private static readonly object _imageInLock = new object();
 
@@ -27,11 +26,13 @@ namespace FFImageLoading.Work
 			#pragma warning restore 0219
 		}
 
-		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, nfloat imageScale)
+		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, nfloat imageScale, ITarget<UIImage, ImageLoaderTask> target)
 			: base(mainThreadDispatcher, miniLogger, parameters, true)
 		{
-			_getNativeControl = getNativeControl;
-			_doWithImage = doWithImage;
+			if (target == null)
+				throw new ArgumentNullException(nameof(target));
+			
+			_target = target;
 			_imageScale = imageScale;
 			DownloadCache = downloadCache;
 		}
@@ -45,20 +46,7 @@ namespace FFImageLoading.Work
 		/// <param name="task">Task to check.</param>
 		public override bool UsesSameNativeControl(IImageLoaderTask task)
 		{
-			var loaderTask = task as ImageLoaderTask;
-			if (loaderTask == null)
-				return false;
-			return UsesSameNativeControl(loaderTask);
-		}
-
-		private bool UsesSameNativeControl(ImageLoaderTask task)
-		{
-			var currentControl = _getNativeControl();
-			var control = task._getNativeControl();
-			if (currentControl == null || control == null || currentControl.Handle == IntPtr.Zero || control.Handle == IntPtr.Zero)
-				return false;
-
-			return currentControl.Handle == control.Handle;
+			return _target.UsesSameNativeControl((ImageLoaderTask)task);
 		}
 
 		/// <summary>
@@ -105,7 +93,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return GenerateResult.Canceled;
 
-			if (_getNativeControl() == null)
+			if (!_target.IsTaskValid(this))
 				return GenerateResult.InvalidTarget;
 
 			try
@@ -116,7 +104,7 @@ namespace FFImageLoading.Work
 						if (IsCancelled)
 							return;
 
-						_doWithImage(image, imageWithResult.Result.IsLocalOrCachedResult(), false);
+						_target.Set(this, image, imageWithResult.Result.IsLocalOrCachedResult(), false);
 						Completed = true;
 						Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
 					}).ConfigureAwait(false);
@@ -141,8 +129,7 @@ namespace FFImageLoading.Work
 		{
 			try
 			{
-				var nativeControl = _getNativeControl();
-				if (nativeControl == null)
+				if (!_target.IsValid)
 					return CacheResult.NotFound; // weird situation, dunno what to do
 
 				var cacheEntry = ImageCache.Instance.Get(GetKey());
@@ -162,7 +149,7 @@ namespace FFImageLoading.Work
 						if (IsCancelled)
 							return;
 						
-						_doWithImage(value, true, false);
+						_target.Set(this, value, true, false);
 						Completed = true;
 						Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
 					}).ConfigureAwait(false);
@@ -220,7 +207,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return GenerateResult.Canceled;
 
-			if (_getNativeControl() == null)
+			if (!_target.IsTaskValid(this))
 				return GenerateResult.InvalidTarget;
 
 			try
@@ -231,7 +218,7 @@ namespace FFImageLoading.Work
 						if (IsCancelled)
 							return;
 
-						_doWithImage(image, true, false);
+						_target.Set(this, image, true, false);
 						Completed = true;
 						Parameters?.OnSuccess(resultWithImage.ImageInformation, resultWithImage.Result);
 					}).ConfigureAwait(false);
@@ -424,7 +411,7 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			bool isLocalOrFromCache = false;
+			bool isLocalOrFromCache = true;
 
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
 			UIImage image = cacheEntry == null ? null: cacheEntry.Item1;
@@ -447,21 +434,14 @@ namespace FFImageLoading.Work
 			if (image == null)
 				return false;
 
-			var view = _getNativeControl();
-			if (view == null)
+			if (!_target.IsValid)
 				return false;
 
 			if (IsCancelled)
 				return false;
 
 			// Post on main thread but don't wait for it
-			MainThreadDispatcher.Post(() =>
-				{
-					if (IsCancelled)
-						return;
-
-					_doWithImage(image, isLocalOrFromCache, isLoadingPlaceholder);
-				});
+			MainThreadDispatcher.Post(() => _target.Set(this, image, isLocalOrFromCache, isLoadingPlaceholder));
 
 			return true;
 		}
@@ -475,7 +455,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled || ImageService.Instance.ExitTasksEarly)
 				return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-			if (_getNativeControl() == null)
+			if (!_target.IsTaskValid(this))
 				return new WithLoadingResult<UIImage>(LoadingResult.InvalidTarget);
 
 			var resultWithImage = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);

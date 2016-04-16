@@ -318,29 +318,6 @@ namespace FFImageLoading
 			}
 		}
 
-		/// <summary>
-		/// Downloads the image and adds it to disk cache.
-		/// Called only if the cache entry doesn't exist already.
-		/// </summary>
-		/// <returns>Returns <c>true</c> if added, <c>false</c> otherwise</returns>
-		/// <param name="imageUrl">Image URL.</param>
-		/// <param name="cancellationToken">Cancellation token.</param>
-		/// <param name="duration">Disk cache validity duration.</param>
-		/// <param name="customCacheKey">Custom cache key.</param>
-		public async Task<bool> DownloadImageAndAddToDiskCacheAsync(string imageUrl, CancellationToken cancellationToken, TimeSpan? duration = null, string customCacheKey = null)
-		{
-			InitializeIfNeeded();
-
-			string fileName = string.IsNullOrWhiteSpace(customCacheKey) ? _md5Helper.MD5(imageUrl) : _md5Helper.MD5(customCacheKey);
-
-			if (await Config.DiskCache.ExistsAsync(fileName).ConfigureAwait(false))
-				return false;
-
-			string filePath = await Config.DiskCache.GetFilePathAsync(fileName).ConfigureAwait(false);
-			await Config.DownloadCache.DownloadBytesAndCacheAsync(imageUrl, fileName, filePath, cancellationToken, duration).ConfigureAwait(false);
-			return true;
-		}
-
 		private void AddRequestToHistory(IImageLoaderTask task)
 		{
 			AddRequestToHistory(task.Parameters.Path, task.GetKey());

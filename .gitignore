@@ -27,7 +27,9 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-
-samples/ListView.Universal.Sample/project.lock.json
-
 *.bak
+samples/ListView.Universal.Sample/project.lock.json
+samples/Simple.WinUniversal.Sample/project.lock.json
+source/FFImageLoading.Forms.WinUWP/project.lock.json
+
+source/FFImageLoading.Forms.WinUWP/project.lock.json

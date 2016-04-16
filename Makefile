@@ -18,6 +18,7 @@ Transformations:
 
 Forms:
 	xbuild source/FFImageLoading.Forms/FFImageLoading.Forms.csproj /nologo /p:Configuration=Release /consoleloggerparameters:ErrorsOnly /verbosity:minimal
+	xbuild source/FFImageLoading.BaitAndSwitch/FFImageLoading.BaitAndSwitch.csproj /nologo /p:Configuration=Release /consoleloggerparameters:ErrorsOnly /verbosity:minimal
 	xbuild source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj /nologo /p:Configuration=Release /consoleloggerparameters:ErrorsOnly /verbosity:minimal
 	xbuild source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj /nologo /p:Configuration=Release /consoleloggerparameters:ErrorsOnly /verbosity:minimal
 

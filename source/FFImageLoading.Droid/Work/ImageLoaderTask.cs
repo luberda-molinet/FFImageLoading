@@ -25,18 +25,17 @@ namespace FFImageLoading.Work
 	{
 		private static object _decodingLock = new object();
 
-		private readonly WeakReference<ImageView> _imageWeakReference;
 		private WeakReference<BitmapDrawable> _loadingPlaceholderWeakReference;
+		internal ITarget<BitmapDrawable, ImageLoaderTask> _target;
 
-		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ImageView imageView)
+		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<BitmapDrawable, ImageLoaderTask> target)
 			: base(mainThreadDispatcher, miniLogger, parameters, true)
 		{
-			DownloadCache = downloadCache;
+			if (target == null)
+				throw new ArgumentNullException(nameof(target));
 
-			if (imageView != null)
-			{
-				_imageWeakReference = new WeakReference<ImageView>(imageView);
-			}
+			_target = target;
+			DownloadCache = downloadCache;
 		}
 
 		/// <summary>
@@ -45,8 +44,8 @@ namespace FFImageLoading.Work
 		/// <param name="miniLogger">Logger</param>
 		/// <param name="key">Key.</param>
 		/// <param name="imageView">Image view.</param>
-		protected ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, string key, ImageView imageView)
-			: this(downloadCache, mainThreadDispatcher, miniLogger, TaskParameter.FromFile(key), imageView)
+		protected ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, string key, ITarget<BitmapDrawable, ImageLoaderTask> target)
+			: this(downloadCache, mainThreadDispatcher, miniLogger, TaskParameter.FromFile(key), target)
 		{
 		}
 
@@ -57,23 +56,7 @@ namespace FFImageLoading.Work
 		/// <param name="task">Task to check.</param>
 		public override bool UsesSameNativeControl(IImageLoaderTask task)
 		{
-			var loaderTask = task as ImageLoaderTask;
-			if (loaderTask == null)
-				return false;
-			return UsesSameNativeControl(loaderTask);
-		}
-
-		private bool UsesSameNativeControl(ImageLoaderTask task)
-		{
-			ImageView currentControl;
-			_imageWeakReference.TryGetTarget(out currentControl);
-
-			ImageView control;
-			task._imageWeakReference.TryGetTarget(out control);
-			if (currentControl == null || control == null || currentControl.Handle == IntPtr.Zero || control.Handle == IntPtr.Zero)
-				return false;
-
-			return currentControl.Handle == control.Handle;
+			return _target.UsesSameNativeControl((ImageLoaderTask)task);
 		}
 
 		/// <summary>
@@ -81,14 +64,12 @@ namespace FFImageLoading.Work
 		/// </summary>
 		public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
 		{
-			ImageView imageView;
-			_imageWeakReference.TryGetTarget(out imageView);
-			if (imageView == null || imageView.Handle == IntPtr.Zero)
+			if (!_target.IsValid)
 				return false;
 
 			if (CanUseMemoryCache())
 			{
-				var cacheResult = await TryLoadingFromCacheAsync(imageView).ConfigureAwait(false);
+				var cacheResult = await TryLoadingFromCacheAsync().ConfigureAwait(false);
 				if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
 				return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 
@@ -96,12 +77,12 @@ namespace FFImageLoading.Work
 					return true; // stop processing if cancelled
 			}
 
-			bool hasDrawable = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, imageView, true).ConfigureAwait(false);
+			bool hasDrawable = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
 			if (!hasDrawable)
 			{
 				// Assign the Drawable to the image
 				var drawable = new AsyncDrawable(Context.Resources, null, this);
-				await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false);
+				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, true)).ConfigureAwait(false);
 			}
 
 			return false;
@@ -140,14 +121,13 @@ namespace FFImageLoading.Work
 				}
 			}
 
-			var imageView = GetAttachedImageView();
-			if (imageView == null || imageView.Handle == IntPtr.Zero)
+			if (!_target.IsTaskValid(this))
 				return GenerateResult.InvalidTarget;
 
 			if (drawableWithResult.HasError)
 			{
 				// Show error placeholder
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
 				return drawableWithResult.GenerateResult;
 			}
 				
@@ -159,8 +139,7 @@ namespace FFImageLoading.Work
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						SetImageDrawable(imageView, drawableWithResult.Item);
-						
+						_target.Set(this, drawableWithResult.Item, drawableWithResult.Result.IsLocalOrCachedResult(), false);
 						Completed = true;
 						Parameters?.OnSuccess(drawableWithResult.ImageInformation, drawableWithResult.Result);
 					}).ConfigureAwait(false);
@@ -170,7 +149,7 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex2)
 			{
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
 				throw ex2;
 			}
 
@@ -181,10 +160,70 @@ namespace FFImageLoading.Work
 		/// Tries to load requested image from the cache asynchronously.
 		/// </summary>
 		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		public override Task<CacheResult> TryLoadingFromCacheAsync()
+		public override async Task<CacheResult> TryLoadingFromCacheAsync()
 		{
-			var imageView = GetAttachedImageView();
-			return TryLoadingFromCacheAsync(imageView);
+			try
+			{
+				if (!_target.IsTaskValid(this))
+					return CacheResult.NotFound; // weird situation, dunno what to do
+
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				var key = GetKey();
+
+				if (string.IsNullOrWhiteSpace(key))
+					return CacheResult.NotFound;
+
+				var cacheEntry = ImageCache.Instance.Get(key);
+
+				if (cacheEntry == null)
+					return CacheResult.NotFound; // not available in the cache
+
+				var value = cacheEntry.Item1;
+
+				if (value == null)
+					return CacheResult.NotFound; // not available in the cache
+
+				if (IsCancelled)
+					return CacheResult.NotFound; // not sure what to return in that case
+
+				value.SetIsRetained(true);
+
+				try
+				{
+					Logger.Debug(string.Format("Image from cache: {0}", key));
+					await MainThreadDispatcher.PostAsync(() =>
+						{
+							if (IsCancelled)
+								return;
+
+							var ffDrawable = value as FFBitmapDrawable;
+							if (ffDrawable != null)
+								ffDrawable.StopFadeAnimation();
+
+							_target.Set(this, value, true, false);
+
+							Completed = true;
+
+							Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
+						}).ConfigureAwait(false);
+
+					if (!Completed)
+						return CacheResult.NotFound; // not sure what to return in that case
+
+					return CacheResult.Found; // found and loaded from cache
+				}
+				finally
+				{
+					value.SetIsRetained(false);
+				}
+			}
+			catch (Exception ex)
+			{
+				Parameters?.OnError(ex);
+				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
+			}
 		}
 
 		/// <summary>
@@ -200,15 +239,14 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return GenerateResult.Canceled;
 
-			var imageView = GetAttachedImageView();
-			if (imageView == null || imageView.Handle == IntPtr.Zero)
+			if (!_target.IsTaskValid(this))
 				return GenerateResult.InvalidTarget;
 
 			var resultWithDrawable = await GetDrawableAsync("Stream", ImageSource.Stream, false, false, stream).ConfigureAwait(false);
 			if (resultWithDrawable.HasError)
 			{
 				// Show error placeholder
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
 
 				return resultWithDrawable.GenerateResult;
 			}
@@ -226,7 +264,7 @@ namespace FFImageLoading.Work
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
 					{
-						SetImageDrawable(imageView, resultWithDrawable.Item);
+						_target.Set(this, resultWithDrawable.Item, true, false);
 						
 						Completed = true;
 						Parameters?.OnSuccess(resultWithDrawable.ImageInformation, resultWithDrawable.Result);
@@ -238,7 +276,7 @@ namespace FFImageLoading.Work
 			catch (Exception ex2)
 			{
 				// Show error placeholder
-				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, imageView, false).ConfigureAwait(false);
+				await LoadPlaceHolderAsync(Parameters.ErrorPlaceholderPath, Parameters.ErrorPlaceholderSource, false).ConfigureAwait(false);
 				throw ex2;
 			}
 
@@ -522,14 +560,15 @@ namespace FFImageLoading.Work
 		/// <returns>An awaitable task.</returns>
 		/// <param name="placeholderPath">Full path to the placeholder.</param>
 		/// <param name="source">Source for the path: local, web, assets</param>
-		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, ImageView imageView, bool isLoadingPlaceholder)
+		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
 		{
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			if (imageView == null || imageView.Handle == IntPtr.Zero)
+			if (!_target.IsValid)
 				return false;
 
+			bool isLocalOrFromCache = true;
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
 
 			BitmapDrawable drawable = cacheEntry == null ? null: cacheEntry.Item1;
@@ -544,12 +583,13 @@ namespace FFImageLoading.Work
 			{
 				// Here we asynchronously load our placeholder: it is deferred so we need a temporary AsyncDrawable
 				drawable = new AsyncDrawable(Context.Resources, null, this);
-				await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false); // temporary assign this AsyncDrawable
+				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, isLoadingPlaceholder)).ConfigureAwait(false); // temporary assign this AsyncDrawable
 
 				try
 				{
-					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, isLoadingPlaceholder, true).ConfigureAwait(false);
+					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, true, true).ConfigureAwait(false);
 					drawable = drawableWithResult.Item;
+					isLocalOrFromCache = drawableWithResult.Result.IsLocalOrCachedResult();
 				}
 				catch (Exception ex)
 				{
@@ -566,79 +606,9 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
 				return false;
 
-			await MainThreadDispatcher.PostAsync(() => SetImageDrawable(imageView, drawable)).ConfigureAwait(false);
+			await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, isLocalOrFromCache, isLoadingPlaceholder)).ConfigureAwait(false);
 
 			return true;
-		}
-
-		/// <summary>
-		/// Tries to load requested image from the cache asynchronously.
-		/// </summary>
-		/// <returns>A boolean indicating if image was loaded from cache.</returns>
-		private async Task<CacheResult> TryLoadingFromCacheAsync(ImageView imageView)
-		{
-			try
-			{
-				if (imageView == null || imageView.Handle == IntPtr.Zero)
-					return CacheResult.NotFound; // weird situation, dunno what to do
-
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
-
-				var key = GetKey();
-
-				if (string.IsNullOrWhiteSpace(key))
-					return CacheResult.NotFound;
-
-				var cacheEntry = ImageCache.Instance.Get(key);
-
-				if (cacheEntry == null)
-					return CacheResult.NotFound; // not available in the cache
-
-				var value = cacheEntry.Item1;
-
-				if (value == null)
-					return CacheResult.NotFound; // not available in the cache
-
-				if (IsCancelled)
-					return CacheResult.NotFound; // not sure what to return in that case
-
-				value.SetIsRetained(true);
-
-				try
-				{
-					Logger.Debug(string.Format("Image from cache: {0}", key));
-					await MainThreadDispatcher.PostAsync(() =>
-						{
-							if (IsCancelled)
-								return;
-
-							var ffDrawable = value as FFBitmapDrawable;
-							if (ffDrawable != null)
-								ffDrawable.StopFadeAnimation();
-
-							SetImageDrawable(imageView, value);
-
-							Completed = true;
-
-							Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
-						}).ConfigureAwait(false);
-
-					if (!Completed)
-						return CacheResult.NotFound; // not sure what to return in that case
-
-					return CacheResult.Found; // found and loaded from cache
-				}
-				finally
-				{
-					value.SetIsRetained(false);
-				}
-			}
-			catch (Exception ex)
-			{
-				Parameters?.OnError(ex);
-				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
-			}
 		}
 
 		private async Task<WithLoadingResult<Stream>> GetStreamAsync(string path, ImageSource source)
@@ -679,7 +649,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled || ImageService.Instance.ExitTasksEarly)
 				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
-			if (GetAttachedImageView() == null)
+			if (!_target.IsTaskValid(this))
 				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.InvalidTarget);
 
 			var resultWithDrawable = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
@@ -754,32 +724,6 @@ namespace FFImageLoading.Work
 					bitmapDrawable.SetIsRetained(false);
 				}
 			}
-		}
-
-		private ImageView GetAttachedImageView()
-		{
-			ImageView imageView;
-			_imageWeakReference.TryGetTarget(out imageView);
-
-			if (imageView == null || imageView.Handle == IntPtr.Zero)
-				return null;
-
-			var task = imageView.GetImageLoaderTask();
-
-			return this == task
-				? imageView
-				: null;
-		}
-
-		private void SetImageDrawable(ImageView imageView, Drawable drawable)
-		{
-			if (IsCancelled)
-				return;
-
-			if (imageView.Handle == IntPtr.Zero)
-				return;
-			
-			imageView.SetImageDrawable(drawable);
 		}
 	}
 }

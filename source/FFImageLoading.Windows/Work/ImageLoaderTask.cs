@@ -20,16 +20,17 @@ namespace FFImageLoading.Work
 {
     public class ImageLoaderTask : ImageLoaderTaskBase
     {
-        private readonly Func<Image> _getNativeControl;
-        private readonly Action<WriteableBitmap, bool, bool> _doWithImage;
+        internal readonly ITarget<WriteableBitmap, ImageLoaderTask> _target;
 
         private static SemaphoreSlim _decodingLock = new SemaphoreSlim(initialCount: 1);
 
-        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, Func<Image> getNativeControl, Action<WriteableBitmap, bool, bool> doWithImage)
+        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
             : base(mainThreadDispatcher, miniLogger, parameters, false)
         {
-            _getNativeControl = getNativeControl;
-            _doWithImage = doWithImage;
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
+            _target = target;
 
             DownloadCache = downloadCache;
         }
@@ -38,23 +39,7 @@ namespace FFImageLoading.Work
 
         public override bool UsesSameNativeControl(IImageLoaderTask task)
         {
-            var loaderTask = task as ImageLoaderTask;
-
-            if (loaderTask == null)
-                return false;
-
-            return UsesSameNativeControl(loaderTask);
-        }
-
-        private bool UsesSameNativeControl(ImageLoaderTask task)
-        {
-            var currentControl = _getNativeControl();
-            var control = task._getNativeControl();
-
-            if (currentControl == null || control == null)
-                return false;
-
-            return currentControl == control;
+            return _target.UsesSameNativeControl((ImageLoaderTask)task);
         }
 
         public override async Task<bool> PrepareAndTryLoadingFromCacheAsync()
@@ -96,7 +81,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
                 return GenerateResult.Canceled;
 
-            if (_getNativeControl() == null)
+            if (!_target.IsTaskValid(this))
                 return GenerateResult.InvalidTarget;
 
             try
@@ -107,7 +92,7 @@ namespace FFImageLoading.Work
 					if (IsCancelled)
                         return;
 
-                    _doWithImage(image, imageWithResult.Result.IsLocalOrCachedResult(), false);
+                    _target.Set(this, image, imageWithResult.Result.IsLocalOrCachedResult(), false);
                     Completed = true;
                     Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
                 }).ConfigureAwait(false);
@@ -128,8 +113,7 @@ namespace FFImageLoading.Work
         {
             try
             {
-                var nativeControl = _getNativeControl();
-                if (nativeControl == null)
+                if (!_target.IsValid)
                     return CacheResult.NotFound; // weird situation, dunno what to do
 
                 var cacheEntry = ImageCache.Instance.Get(GetKey());
@@ -150,8 +134,8 @@ namespace FFImageLoading.Work
                 {
 					if (IsCancelled)
 						return;
-						
-                    _doWithImage(value, true, false);
+                    _target.Set(this, value, true, false);
+ 
                     pixelWidth = value.PixelWidth;
                     pixelHeight = value.PixelHeight;
 
@@ -208,7 +192,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled)
                 return GenerateResult.Canceled;
 
-            if (_getNativeControl() == null)
+            if (!_target.IsTaskValid(this))
                 return GenerateResult.InvalidTarget;
 
             try
@@ -222,7 +206,7 @@ namespace FFImageLoading.Work
 					if (IsCancelled)
                         return;
 
-                    _doWithImage(image, true, false);
+                    _target.Set(this, image, true, false);
                     pixelWidth = image.PixelWidth;
                     pixelHeight = image.PixelHeight;
                     Completed = true;
@@ -447,7 +431,7 @@ namespace FFImageLoading.Work
             var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
             WriteableBitmap image = cacheEntry == null ? null : cacheEntry.Item1;
 
-            bool isLocalOrFromCache = false;
+            bool isLocalOrFromCache = true;
 
             if (image == null)
             {
@@ -467,21 +451,14 @@ namespace FFImageLoading.Work
             if (image == null)
                 return false;
 
-            var view = _getNativeControl();
-            if (view == null)
+            if (!_target.IsValid)
                 return false;
 
             if (IsCancelled)
                 return false;
 
             // Post on main thread but don't wait for it
-            MainThreadDispatcher.Post(() =>
-            {
-                if (IsCancelled)
-                    return;
-
-                _doWithImage(image, isLocalOrFromCache, isLoadingPlaceholder);
-            });
+            MainThreadDispatcher.Post(() => _target.Set(this, image, isLocalOrFromCache, isLoadingPlaceholder));
 
             return true;
         }
@@ -498,7 +475,7 @@ namespace FFImageLoading.Work
             if (IsCancelled || ImageService.Instance.ExitTasksEarly)
                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-            if (_getNativeControl() == null)
+            if (!_target.IsTaskValid(this))
                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.InvalidTarget);
 
             var resultWithImage = await GetImageAsync(sourcePath, source, isPlaceholder).ConfigureAwait(false);

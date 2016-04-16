@@ -81,7 +81,7 @@ namespace FFImageLoading.Cache
 			return memoryStream;
 		}
 
-		public async Task<byte[]> DownloadBytesAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration, CacheType? cacheType)
+		private async Task<byte[]> DownloadBytesAndCacheAsync(string url, string filename, string filepath, CancellationToken token, TimeSpan? duration, CacheType? cacheType)
 		{
 			var responseBytes = await DownloadAsync(url, filename, token).ConfigureAwait(false);
 			if (responseBytes == null)

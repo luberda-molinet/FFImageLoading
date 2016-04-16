@@ -20,44 +20,8 @@ namespace FFImageLoading
         /// <param name="imageScale">Optional scale factor to use when interpreting the image data. If unspecified it will use the device scale (ie: Retina = 2, non retina = 1)</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView, float imageScale = -1f)
         {
-            var weakRef = new WeakReference<UIImageView>(imageView);
-            Func<UIImageView> getNativeControl = () => {
-                UIImageView refView;
-                if (!weakRef.TryGetTarget(out refView))
-                    return null;
-                return refView;
-            };
-
-			Action<UIImage, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
-                UIImageView refView = getNativeControl();
-                if (refView == null)
-                    return;
-
-				bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled.HasValue ?
-					parameters.FadeAnimationEnabled.Value : ImageService.Instance.Config.FadeAnimationEnabled;
-
-				bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages.HasValue ?
-					parameters.FadeAnimationForCachedImages.Value : ImageService.Instance.Config.FadeAnimationForCachedImages);
-
-				if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
-				{
-					// fade animation
-					double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
-						parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
-					
-					UIView.Transition(refView, fadeDuration, 
-						UIViewAnimationOptions.TransitionCrossDissolve 
-						| UIViewAnimationOptions.BeginFromCurrentState,
-						() => { refView.Image = img; },
-						() => {  });
-				}
-				else
-				{
-					refView.Image = img;
-				}
-            };
-
-            return parameters.Into(getNativeControl, doWithImage, imageScale);
+			var target = new UIImageViewTarget(imageView);
+			return parameters.Into(imageScale, target);
         }
 
         /// <summary>
@@ -68,21 +32,8 @@ namespace FFImageLoading
         /// <param name="imageScale">Optional scale factor to use when interpreting the image data. If unspecified it will use the device scale (ie: Retina = 2, non retina = 1)</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIButton button, float imageScale = -1f)
         {
-            var weakRef = new WeakReference<UIButton>(button);
-            Func<UIButton> getNativeControl = () => {
-                UIButton refView;
-                if (!weakRef.TryGetTarget(out refView))
-                    return null;
-                return refView;
-            };
-
-			Action<UIImage, bool, bool> doWithImage = (img, isLocalOrFromCache, isLoadingPlaceholder) => {
-                UIButton refView = getNativeControl();
-                if (refView == null)
-                    return;
-                refView.SetImage(img, UIControlState.Normal);
-            };
-            return parameters.Into(getNativeControl, doWithImage, imageScale);
+			var target = new UIButtonTarget(button);
+            return parameters.Into(imageScale, target);
         }
 
         /// <summary>
@@ -116,18 +67,35 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			using (var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, null, null, 1))
+			var target = new Target<UIImage, ImageLoaderTask>();
+			using (var task = CreateTask(parameters, 1, target))
 			{
 				var key = task.GetKey();
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
 
-        private static IScheduledWork Into(this TaskParameter parameters, Func<UIView> getNativeControl, Action<UIImage, bool, bool> doWithImage, float imageScale = -1f)
+		/// <summary>
+		/// Preload the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		public static void Preload(this TaskParameter parameters)
+		{
+			parameters.Preload = true;
+			var target = new Target<UIImage, ImageLoaderTask>();
+			var task = CreateTask(parameters, 1, target);
+			ImageService.Instance.LoadImage(task);
+		}
+
+		private static ImageLoaderTask CreateTask(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
+		{
+			return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, imageScale, target);
+		}
+
+		private static IScheduledWork Into(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
         {
-            var task = new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters,
-                getNativeControl, doWithImage, imageScale);
-            ImageService.Instance.LoadImage(task);
+			var task = CreateTask(parameters, imageScale, target);
+			ImageService.Instance.LoadImage(task);
             return task;
         }
 
