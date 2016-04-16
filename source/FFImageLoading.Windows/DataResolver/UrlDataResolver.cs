@@ -20,11 +20,17 @@ namespace FFImageLoading.DataResolver
 
         public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
         {
-            var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey).ConfigureAwait(false);
+            var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
 
             var imageInformation = new ImageInformation();
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
+
+            var allowDiskCaching = Parameters.CacheType.HasValue == false || Parameters.CacheType == CacheType.All || Parameters.CacheType == CacheType.Disk;
+            if (allowDiskCaching)
+            {
+                imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
+            }
 
             return WithLoadingResult.Encapsulate(cachedStream.ImageStream,
                 cachedStream.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet, imageInformation);
