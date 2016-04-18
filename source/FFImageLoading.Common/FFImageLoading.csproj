@@ -84,6 +84,7 @@
     <Compile Include="Work\IImageService.cs" />
     <Compile Include="Work\Target.cs" />
     <Compile Include="Work\ITarget.cs" />
+    <Compile Include="Work\IWorkScheduler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

@@ -7,73 +7,29 @@ using System.Threading;
 
 namespace FFImageLoading.Work
 {
-	public interface IWorkScheduler
-	{
-		/// <summary>
-		/// Cancels any pending work for the task.
-		/// </summary>
-		/// <param name="task">Image loading task to cancel</param>
-		void Cancel(IImageLoaderTask task);
-
-		bool ExitTasksEarly { get; }
-
-		void SetExitTasksEarly(bool exitTasksEarly);
-
-		void SetPauseWork(bool pauseWork);
-
-		void RemovePendingTask(IImageLoaderTask task);
-
-		/// <summary>
-		/// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
-		/// </summary>
-		/// <param name="key">Key for cache lookup.</param>
-		/// <param name="task">Image loading task.</param>
-		void LoadImage(IImageLoaderTask task);
-	}
-
 	public class WorkScheduler: IWorkScheduler
 	{
-		protected class PendingTask
-		{
-			public int Position { get; set; }
-
-			public IImageLoaderTask ImageLoadingTask { get; set; }
-
-			public Task FrameworkWrappingTask { get; set; }
-		}
-
 		private readonly IMiniLogger _logger;
-		private readonly int _defaultParallelTasks;
-		private readonly object _pauseWorkLock;
-		private readonly List<PendingTask> _pendingTasks;
+		private readonly object _pauseWorkLock = new object ();
+		private readonly List<PendingTask> _pendingTasks = new List<PendingTask>();
 		private readonly object _pendingTasksLock = new object();
 		private readonly object _runningLock = new object();
-
-		private bool _exitTasksEarly;
 		private bool _pauseWork;
 		private bool _isRunning;
 		private int _currentPosition;
 
 		public WorkScheduler(IMiniLogger logger)
 		{
-			_logger = logger;
-			_pauseWorkLock = new object();
-			_pendingTasks = new List<PendingTask>();
-
 			int _processorCount = Environment.ProcessorCount;
-			if (_processorCount == 1)
-				_defaultParallelTasks = 1;
+			if (_processorCount <= 2)
+				MaxParallelTasks = 1;
 			else
-				_defaultParallelTasks = (int)System.Math.Truncate((double)_processorCount / 2);
+				MaxParallelTasks = (int)Math.Truncate((double)_processorCount / 2d) + 1;
 		}
 
-		public virtual int MaxParallelTasks
-		{
-			get
-			{
-				return _defaultParallelTasks;
-			}
-		}
+		public virtual int MaxParallelTasks { get; private set; }
+
+		public bool ExitTasksEarly { get; private set; }
 
 		/// <summary>
 		/// Cancels any pending work for the task.
@@ -100,17 +56,9 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		public bool ExitTasksEarly
-		{
-			get
-			{
-				return _exitTasksEarly;
-			}
-		}
-
 		public void SetExitTasksEarly(bool exitTasksEarly)
 		{
-			_exitTasksEarly = exitTasksEarly;
+			ExitTasksEarly = exitTasksEarly;
 			SetPauseWork(false);
 		}
 
@@ -141,8 +89,7 @@ namespace FFImageLoading.Work
 						_pendingTasks.Clear();
 					}
 				}
-
-				if (!pauseWork)
+				else
 				{
 					_logger.Debug("SetPauseWork released.");
 				}
@@ -187,6 +134,7 @@ namespace FFImageLoading.Work
 					{
 						pendingTasksCopy = _pendingTasks.ToList();
 					}
+
 					foreach (var pendingTask in pendingTasksCopy)
 					{
 						if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
@@ -274,7 +222,7 @@ namespace FFImageLoading.Work
 
 			// Now our image should be in the cache
 			var cacheResult = await currentPendingTask.ImageLoadingTask.TryLoadingFromCacheAsync().ConfigureAwait(false);
-			if (cacheResult != FFImageLoading.Cache.CacheResult.Found)
+			if (cacheResult != Cache.CacheResult.Found)
 			{
 				_logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", key));
 				forceLoad();
@@ -370,6 +318,15 @@ namespace FFImageLoading.Work
 			}
 
 			await RunAsync().ConfigureAwait(false);
+		}
+
+		protected class PendingTask
+		{
+			public int Position { get; set; }
+
+			public IImageLoaderTask ImageLoadingTask { get; set; }
+
+			public Task FrameworkWrappingTask { get; set; }
 		}
 	}
 }

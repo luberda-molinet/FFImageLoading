@@ -157,7 +157,6 @@ namespace FFImageLoading.Work
 				GenerateResult generatingImageSucceeded = GenerateResult.Failed;
 				Exception ex = null;
 
-
 				if (Parameters.Stream == null)
 				{
 					Func<Task> perform = async () =>
@@ -211,9 +210,10 @@ namespace FFImageLoading.Work
 							generatingImageSucceeded = await LoadFromStreamAsync(stream).ConfigureAwait(false);
 						}
 					}
-					catch (TaskCanceledException)
+					catch (TaskCanceledException tcex)
 					{
 						generatingImageSucceeded = GenerateResult.Canceled;
+						ex = tcex; 
 					}
 					catch (Exception ex2) 
 					{
