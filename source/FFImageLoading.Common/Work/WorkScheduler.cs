@@ -61,10 +61,10 @@ namespace FFImageLoading.Work
 			_pendingTasks = new List<PendingTask>();
 
 			int _processorCount = Environment.ProcessorCount;
-			if (_processorCount == 1)
+			if (_processorCount <= 2)
 				_defaultParallelTasks = 1;
 			else
-				_defaultParallelTasks = (int)System.Math.Truncate((double)_processorCount / 2);
+				_defaultParallelTasks = (int)Math.Truncate ((double)_processorCount / 2d) + 1;
 		}
 
 		public virtual int MaxParallelTasks
