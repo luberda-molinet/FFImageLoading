@@ -82,10 +82,14 @@ namespace FFImageLoading.Views
 
 		private void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
 		{
+			if (drawable == null || drawable.Handle == IntPtr.Zero)
+				return;
+
 			var selfDisposingBitmapDrawable = drawable as SelfDisposingBitmapDrawable;
 			if (selfDisposingBitmapDrawable != null)
 			{
-				selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
+				if (selfDisposingBitmapDrawable.HasValidBitmap)
+					selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
 			}
 			else
 			{

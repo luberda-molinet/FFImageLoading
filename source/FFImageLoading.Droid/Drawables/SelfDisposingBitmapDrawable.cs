@@ -82,25 +82,30 @@ namespace FFImageLoading.Drawables
         public void SetIsDisplayed(bool isDisplayed)
         {
             EventHandler handler = null;
-            lock (monitor) {
-                if (isDisplayed && !HasValidBitmap) {
-                    throw new InvalidOperationException("Cannot redisplay this drawable, its resources have been disposed.");
-                }
+            lock (monitor) 
+			{
+				if (isDisplayed && !HasValidBitmap) 
+				{
+					System.Diagnostics.Debug.WriteLine ("Cannot redisplay this drawable, its resources have been disposed.");
+				}
+				else if (isDisplayed) 
+				{
+					display_ref_count++;
+					if (display_ref_count == 1) {
+						handler = Displayed;
+					}
+				} 
+				else 
+				{
+					display_ref_count--;
+				}
 
-                if (isDisplayed) {
-                    display_ref_count++;
-                    if (display_ref_count == 1) {
-                        handler = Displayed;
-                    }
-                } else {
-                    display_ref_count--;
-                }
-
-                if (display_ref_count <= 0) {
-                    handler = NoLongerDisplayed;
-                }
+				if (display_ref_count <= 0) {
+					handler = NoLongerDisplayed;
+				}
             }
-            if (handler != null) {
+            if (handler != null) 
+			{
                 handler(this, EventArgs.Empty);
             }
             CheckState();
@@ -160,7 +165,9 @@ namespace FFImageLoading.Drawables
         {
             Log.Debug(TAG, "OnFreeResources");
             lock (monitor) {
-                Bitmap.Dispose();
+				if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
+                	Bitmap.Dispose();
+				
                 is_bitmap_disposed = true;
             }
         }
