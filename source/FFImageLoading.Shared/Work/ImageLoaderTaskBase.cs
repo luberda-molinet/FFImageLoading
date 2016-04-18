@@ -38,7 +38,15 @@ namespace FFImageLoading.Work
 			if (!_isDisposed)
 			{
 				Finish();
-				CancellationToken.Dispose();
+
+				try 
+				{
+					CancellationToken?.Dispose();
+				} 
+				catch (ObjectDisposedException) 
+				{
+				}
+
 				_isDisposed = true;
 			}
         }
@@ -50,7 +58,7 @@ namespace FFImageLoading.Work
 			if (Parameters != null)
 			{
 				Parameters?.OnFinish(this); // should call dispose
-				Parameters.Dispose(); // but to be safer let's call it here anyway
+				Parameters?.Dispose(); // but to be safer let's call it here anyway
 			}
 		}
 
@@ -119,7 +127,13 @@ namespace FFImageLoading.Work
 
 			if (!_isDisposed)
 			{
-				CancellationToken.Cancel();
+				try 
+				{
+					CancellationToken?.Cancel();
+				} 
+				catch (ObjectDisposedException) 
+				{
+				}
 			}
 			Finish();
 			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
@@ -129,7 +143,14 @@ namespace FFImageLoading.Work
 		{
 			get
 			{
-				return _isDisposed || CancellationToken.IsCancellationRequested;
+				try 
+				{
+					return _isDisposed || CancellationToken.IsCancellationRequested;
+				} 
+				catch (ObjectDisposedException) 
+				{
+					return true;
+				}
 			}
 		}
 
