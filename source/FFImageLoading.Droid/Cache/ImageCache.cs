@@ -19,14 +19,14 @@ namespace FFImageLoading.Cache
 		private readonly ReuseBitmapDrawableCache _cache;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 
-        private ImageCache(int maxCacheSize)
+        private ImageCache(int maxCacheSize, IMiniLogger logger)
 		{
 			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
 
 			// consider low treshold as a third of maxCacheSize
 			int lowTreshold = safeMaxCacheSize / 3;
 
-			_cache = new ReuseBitmapDrawableCache(safeMaxCacheSize, lowTreshold, safeMaxCacheSize);
+			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, safeMaxCacheSize);
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 		}
 
@@ -34,7 +34,7 @@ namespace FFImageLoading.Cache
         {
             get
             {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxCacheSize));
+                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxCacheSize, ImageService.Instance.Config.Logger));
             }
         }
 

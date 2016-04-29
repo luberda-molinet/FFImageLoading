@@ -4,6 +4,7 @@ using Foundation;
 using FFImageLoading.Extensions;
 using System.Collections.Concurrent;
 using FFImageLoading.Work;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Cache
 {
@@ -13,15 +14,14 @@ namespace FFImageLoading.Cache
         private static IImageCache _instance;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 
-        private ImageCache(int maxCacheSize)
+        private ImageCache(int maxCacheSize, IMiniLogger logger)
         {
             _cache = new NSCache();
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
             _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2); // 20% of physical memory
 
-            // Can't use minilogger here, we would have too many dependencies
             decimal sizeInMB = System.Math.Round((decimal)_cache.TotalCostLimit/(1024*1024), 2);
-            System.Diagnostics.Debug.WriteLine(string.Format("LruCache size: {0}MB", sizeInMB));
+            logger.Debug(string.Format("LruCache size: {0}MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());
@@ -31,7 +31,7 @@ namespace FFImageLoading.Cache
         {
             get
             {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxCacheSize));
+                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxCacheSize, ImageService.Instance.Config.Logger));
             }
         }
 
