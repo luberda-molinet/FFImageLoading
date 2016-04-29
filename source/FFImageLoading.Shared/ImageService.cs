@@ -73,10 +73,6 @@ namespace FFImageLoading
 					configuration.Scheduler = configuration.Scheduler ?? Config.Scheduler;
 					configuration.Logger = configuration.Logger ?? Config.Logger;
 					configuration.DownloadCache = configuration.DownloadCache ?? Config.DownloadCache;
-					configuration.LoadWithTransparencyChannel = configuration.LoadWithTransparencyChannel;
-					configuration.FadeAnimationEnabled = configuration.FadeAnimationEnabled;
-					configuration.TransformPlaceholders = configuration.TransformPlaceholders;
-					configuration.DownsampleInterpolationMode = configuration.DownsampleInterpolationMode;
 
 					// Skip configuration for maxCacheSize and diskCache. They cannot be redefined.
 					if (configuration.Logger != null)
@@ -245,7 +241,13 @@ namespace FFImageLoading
         /// <param name="task">Image loading task.</param>
         public void LoadImage(IImageLoaderTask task)
         {
-            Scheduler.LoadImage(task);
+			if (task == null)
+				return;
+
+			if (task.Parameters.DelayInMs == null && Config.DelayInMs > 0)
+				task.Parameters.Delay(Config.DelayInMs);
+
+			Scheduler.LoadImage(task);
 			AddRequestToHistory(task);
         }
 
