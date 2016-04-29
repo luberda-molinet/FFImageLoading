@@ -66,6 +66,7 @@
     <Reference Include="System.IO" />
     <Reference Include="System.Collections" />
   </ItemGroup>
+  <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>

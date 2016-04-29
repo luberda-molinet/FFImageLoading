@@ -40,6 +40,7 @@ namespace FFImageLoading.Cross
 
 		private TaskParameter _parameters;
 		private string _dataLocation;
+        private string _dataLocationUri;
 
 		private void Initialize()
 		{
@@ -69,7 +70,7 @@ namespace FFImageLoading.Cross
 
 		public int RetryDelayInMs { get; set; }
 
-		public Action<ImageSize, LoadingResult> OnSuccess { get; set; }
+		public Action<ImageInformation, LoadingResult> OnSuccess { get; set; }
 
 		public Action<Exception> OnError { get; set; }
 
@@ -103,6 +104,35 @@ namespace FFImageLoading.Cross
 				_parameters.Into(this);
 			}
 		}
+
+        public string DataLocationUri
+        {
+            get { return _dataLocationUri; }
+            set
+            {
+                _dataLocationUri = value;
+
+                if (string.IsNullOrEmpty(_dataLocationUri))
+                    return;
+
+                if (_dataLocationUri.StartsWith("res:"))
+                {
+                    var resourcePath = _dataLocationUri.Split(new[] { "res:" }, StringSplitOptions.None)[1];
+                    Source = ImageSource.CompiledResource;
+                    DataLocation = resourcePath;
+                }
+                else if (_dataLocationUri.StartsWith("http"))
+                {
+                    Source = ImageSource.Url;
+                    DataLocation = _dataLocationUri;
+                }
+                else
+                {
+                    Source = ImageSource.Filepath;
+                    DataLocation = _dataLocationUri;
+                }
+            }
+        }
 
 		protected override void Dispose(bool disposing)
 		{

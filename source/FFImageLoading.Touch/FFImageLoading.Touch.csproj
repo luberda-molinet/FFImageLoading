@@ -87,6 +87,7 @@
     <Compile Include="Work\UIButtonTarget.cs" />
     <Compile Include="Work\UIImageViewTarget.cs" />
   </ItemGroup>
+  <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
