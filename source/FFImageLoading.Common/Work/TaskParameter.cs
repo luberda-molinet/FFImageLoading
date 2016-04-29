@@ -145,6 +145,12 @@ namespace FFImageLoading.Work
 		public int Priority { get; private set; }
         public CacheType? CacheType { get; private set; }
 
+		/// <summary>
+		/// Gets the delay in milliseconds.
+		/// </summary>
+		/// <value>The delay in milliseconds.</value>
+		public int? DelayInMs { get; private set; }
+
 		public bool Preload { get; set; }
 
         public TaskParameter Transform(ITransformation transformation)
@@ -319,6 +325,16 @@ namespace FFImageLoading.Work
 		public TaskParameter CacheKey(string customCacheKey)
 		{
 			CustomCacheKey = customCacheKey;
+			return this;
+		}
+
+		/// <summary>
+		/// Delay the task by the specified milliseconds.
+		/// </summary>
+		/// <param name="milliseconds">Milliseconds to wait prior to start the task.</param>
+		public TaskParameter Delay(int milliseconds)
+		{
+			DelayInMs = milliseconds;
 			return this;
 		}
 

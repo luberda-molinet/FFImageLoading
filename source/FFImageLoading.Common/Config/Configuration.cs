@@ -109,6 +109,11 @@ namespace FFImageLoading.Config
 		/// </summary>
 		/// <value>The maximum size of the cache in bytes.</value>
 		public int MaxCacheSize { get; set; }
+
+		/// <summary>
+		/// Milliseconds to wait prior to start any task.
+		/// </summary>
+		public int DelayInMs { get; set; }
     }
 }
 

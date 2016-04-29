@@ -174,6 +174,11 @@ namespace FFImageLoading.Work
 			#pragma warning disable 4014
 			Task.Run(async () =>
 			{
+				if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
+				{
+					await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
+				}
+
 				if (task.IsCancelled)
 				{
 					task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
