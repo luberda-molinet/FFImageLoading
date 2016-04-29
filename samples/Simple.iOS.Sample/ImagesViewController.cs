@@ -4,6 +4,7 @@ using UIKit;
 using Foundation;
 using FFImageLoading;
 using FFImageLoading.Work;
+using System.Threading.Tasks;
 
 namespace Simple.iOS.Sample
 {
@@ -78,9 +79,12 @@ namespace Simple.iOS.Sample
 
         partial void TapReloadAll (Foundation.NSObject sender)
         {
-            ImageService.Instance.InvalidateMemoryCache();
-            ImageService.Instance.InvalidateDiskCache();
-            CollectionView.ReloadData();
+			Task.Run(async () =>
+			{
+				ImageService.Instance.InvalidateMemoryCache();
+				await ImageService.Instance.InvalidateDiskCacheAsync();
+				CollectionView.ReloadData();
+			});
         }
     }
 }

@@ -431,56 +431,59 @@ namespace FFImageLoading.Forms
 			InvalidateMeasure();
 		}
 
+		[Obsolete("Use OnMeasure")]
 		protected override SizeRequest OnSizeRequest(double widthConstraint, double heightConstraint)
 		{
-			SizeRequest sizeRequest = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
-			double num = sizeRequest.Request.Width / sizeRequest.Request.Height;
-			double num2 = widthConstraint / heightConstraint;
-			double width = sizeRequest.Request.Width;
-			double height = sizeRequest.Request.Height;
-			if (width == 0 || height == 0)
-			{
-				return new SizeRequest(new Size(0, 0));
-			}
-			double num3 = width;
-			double num4 = height;
-			if (num2 > num)
-			{
-				switch (this.Aspect)
-				{
-					case Aspect.AspectFit:
-					case Aspect.AspectFill:
-						num4 = Math.Min(height, heightConstraint);
-						num3 = width * (num4 / height);
-						break;
-					case Aspect.Fill:
-						num3 = Math.Min(width, widthConstraint);
-						num4 = height * (num3 / width);
-						break;
-				}
-			}
-			else if (num2 < num)
-			{
-				switch (this.Aspect)
-				{
-					case Aspect.AspectFit:
-					case Aspect.AspectFill:
-						num3 = Math.Min(width, widthConstraint);
-						num4 = height * (num3 / width);
-						break;
-					case Aspect.Fill:
-						num4 = Math.Min(height, heightConstraint);
-						num3 = width * (num4 / height);
-						break;
-				}
-			}
-			else
-			{
-				num3 = Math.Min(width, widthConstraint);
-				num4 = height * (num3 / width);
-			} 
-			return new SizeRequest(new Size(num3, num4));
-		}
+            SizeRequest sizeRequest = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
+            Size request = sizeRequest.Request;
+            double width1 = request.Width;
+            request = sizeRequest.Request;
+            double height1 = request.Height;
+            double num1 = width1 / height1;
+            double num2 = widthConstraint / heightConstraint;
+            double width2 = sizeRequest.Request.Width;
+            double height2 = sizeRequest.Request.Height;
+			if (width2 == 0d || height2 == 0d)
+                return new SizeRequest(new Size(0d, 0d));
+            double width3 = width2;
+            double height3 = height2;
+            if (num2 > num1)
+            {
+                switch (this.Aspect)
+                {
+                    case Aspect.AspectFit:
+                    case Aspect.AspectFill:
+                        height3 = Math.Min(height2, heightConstraint);
+                        width3 = width2 * (height3 / height2);
+                        break;
+                    case Aspect.Fill:
+                        width3 = Math.Min(width2, widthConstraint);
+                        height3 = height2 * (width3 / width2);
+                        break;
+                }
+            }
+            else if (num2 < num1)
+            {
+                switch (this.Aspect)
+                {
+                    case Aspect.AspectFit:
+                    case Aspect.AspectFill:
+                        width3 = Math.Min(width2, widthConstraint);
+                        height3 = height2 * (width3 / width2);
+                        break;
+                    case Aspect.Fill:
+                        height3 = Math.Min(height2, heightConstraint);
+                        width3 = width2 * (height3 / height2);
+                        break;
+                }
+            }
+            else
+            {
+                width3 = Math.Min(width2, widthConstraint);
+                height3 = height2 * (width3 / width2);
+            }
+            return new SizeRequest(new Size(width3, height3));
+        }
 
 		internal Action InternalReloadImage;
 			
