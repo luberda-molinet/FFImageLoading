@@ -344,7 +344,7 @@ namespace FFImageLoading.Work
 					currentLotOfPendingTasks = _pendingTasks
 						.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
 						.OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
-						.ThenByDescending(t => t.Position)
+						.ThenBy(t => t.Position)
                     .Take(MaxParallelTasks)
                     .ToList();
 				}
