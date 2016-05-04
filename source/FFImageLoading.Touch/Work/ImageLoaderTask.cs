@@ -346,7 +346,7 @@ namespace FFImageLoading.Work
 			if (imageInformation == null)
 				imageInformation = new ImageInformation();
 			
-			imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(sourcePath));
+			imageInformation.SetKey(path == "Stream" ? GetKey() : GetKey(sourcePath), Parameters.CustomCacheKey);
 
 			// We rely on ImageIO for all datasources except AssetCatalog, this way we don't generate temporary UIImage
 			// furthermore we can do all the work in a thread safe way and in threadpool

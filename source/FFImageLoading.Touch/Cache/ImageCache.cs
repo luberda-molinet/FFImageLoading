@@ -5,6 +5,7 @@ using FFImageLoading.Extensions;
 using System.Collections.Concurrent;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
+using System.Linq;
 
 namespace FFImageLoading.Cache
 {
@@ -13,9 +14,11 @@ namespace FFImageLoading.Cache
         private readonly NSCache _cache;
         private static IImageCache _instance;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+		private readonly IMiniLogger _logger;
 
         private ImageCache(int maxCacheSize, IMiniLogger logger)
         {
+			_logger = logger;
             _cache = new NSCache();
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
             _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2); // 20% of physical memory
@@ -35,13 +38,21 @@ namespace FFImageLoading.Cache
             }
         }
 
+		public ImageInformation GetInfo(string key)
+		{
+			ImageInformation imageInformation;
+			if (_imageInformations.TryGetValue(key, out imageInformation))
+			{
+				return imageInformation;
+			}
+
+			return null;
+		}
+
 		public Tuple<UIImage, ImageInformation> Get(string key)
         {
-			ImageInformation imageInformation = null;
-			_imageInformations.TryGetValue(key, out imageInformation);
-
 			var image = (UIImage)_cache.ObjectForKey(new NSString(key));
-
+			var imageInformation = GetInfo(key);
 			return new Tuple<UIImage, ImageInformation>(image, imageInformation);
         }
 
@@ -56,10 +67,20 @@ namespace FFImageLoading.Cache
 
 		public void Remove(string key)
 		{
+			_logger.Debug(string.Format("Called remove from memory cache for '{0}'", key));
 			_cache.RemoveObjectForKey(new NSString(key));
 			ImageInformation imageInformation;
 			_imageInformations.TryRemove(key, out imageInformation);
-		}	
+		}
+
+		public void RemoveSimilar(string baseKey)
+		{
+			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
+			foreach (var key in keysToRemove)
+			{
+				Remove(key);
+			}
+		}
 
 		public void Clear()
 		{

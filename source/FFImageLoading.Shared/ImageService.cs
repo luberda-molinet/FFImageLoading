@@ -24,7 +24,6 @@ namespace FFImageLoading
         private volatile bool _initialized;
 		private object _initializeLock = new object();
 		private readonly MD5Helper _md5Helper = new MD5Helper();
-		private readonly ConcurrentDictionary<string, string> _fullKeyToKey = new ConcurrentDictionary<string, string>();
 		private Configuration _config;
 
 		private static Lazy<ImageService> LazyInstance = new Lazy<ImageService>(() => new ImageService());
@@ -248,7 +247,6 @@ namespace FFImageLoading
 				task.Parameters.Delay(Config.DelayInMs);
 
 			Scheduler.LoadImage(task);
-			AddRequestToHistory(task);
         }
 
 		/// <summary>
@@ -306,10 +304,7 @@ namespace FFImageLoading
 
 				if (removeSimilar)
 				{
-					foreach (var otherKey in _fullKeyToKey.Where(pair => pair.Value == key).Select(pair => pair.Key))
-					{
-						ImageCache.Instance.Remove(otherKey);
-					}
+					ImageCache.Instance.RemoveSimilar(key);
 				}
 			}
 
@@ -318,22 +313,6 @@ namespace FFImageLoading
 				string hash = _md5Helper.MD5(key);
 				await Config.DiskCache.RemoveAsync(hash).ConfigureAwait(false);
 			}
-		}
-
-		private void AddRequestToHistory(IImageLoaderTask task)
-		{
-			AddRequestToHistory(task.Parameters.Path, task.GetKey());
-			AddRequestToHistory(task.Parameters.CustomCacheKey, task.GetKey());
-			AddRequestToHistory(task.Parameters.LoadingPlaceholderPath, task.GetKey(task.Parameters.LoadingPlaceholderPath));
-			AddRequestToHistory(task.Parameters.ErrorPlaceholderPath, task.GetKey(task.Parameters.ErrorPlaceholderPath));
-		}
-
-		private void AddRequestToHistory(string baseKey, string fullKey)
-		{
-			if (string.IsNullOrWhiteSpace(baseKey) || string.IsNullOrWhiteSpace(fullKey))
-				return;
-
-			_fullKeyToKey.TryAdd(fullKey, baseKey);
 		}
     }
 }

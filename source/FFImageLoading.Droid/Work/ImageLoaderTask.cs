@@ -372,7 +372,7 @@ namespace FFImageLoading.Work
 				var imageInformation = streamWithResult.ImageInformation ?? new ImageInformation();
 				imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
 				imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
-				imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
+				imageInformation.SetKey(path == "Stream" ? GetKey() : GetKey(path), Parameters.CustomCacheKey);
 
 				options.InPurgeable = true;
 				options.InJustDecodeBounds = false;

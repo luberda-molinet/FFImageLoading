@@ -10,6 +10,8 @@ using FFImageLoading.Drawables;
 using System;
 using FFImageLoading.Work;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Cache
 {
@@ -18,9 +20,11 @@ namespace FFImageLoading.Cache
 		private static IImageCache _instance;
 		private readonly ReuseBitmapDrawableCache _cache;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+		private readonly IMiniLogger _logger;
 
         private ImageCache(int maxCacheSize, IMiniLogger logger)
 		{
+			_logger = logger;
 			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
 
 			// consider low treshold as a third of maxCacheSize
@@ -55,15 +59,24 @@ namespace FFImageLoading.Cache
 			_imageInformations.Clear();
 		}
 
+		public ImageInformation GetInfo(string key)
+		{
+			ImageInformation imageInformation;
+			if (_imageInformations.TryGetValue(key, out imageInformation))
+			{
+				return imageInformation;
+			}
+
+			return null;
+		}
+
 		public Tuple<SelfDisposingBitmapDrawable, ImageInformation> Get(string key)
 		{
 			SelfDisposingBitmapDrawable drawable = null;
 
 			if (_cache.TryGetValue(key, out drawable))
 			{
-				ImageInformation imageInformation = null;
-				_imageInformations.TryGetValue(key, out imageInformation);
-
+				var imageInformation = GetInfo(key);
 				return new Tuple<SelfDisposingBitmapDrawable, ImageInformation>(drawable, imageInformation);
 			}
 
@@ -81,9 +94,19 @@ namespace FFImageLoading.Cache
 
 		public void Remove(string key)
 		{
+			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
 			_cache.Remove(key);
 			ImageInformation imageInformation;
 			_imageInformations.TryRemove(key, out imageInformation);
+		}
+
+		public void RemoveSimilar(string baseKey)
+		{
+			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
+			foreach (var key in keysToRemove)
+			{
+				Remove(key);
+			}
 		}
 
 		/// <summary>

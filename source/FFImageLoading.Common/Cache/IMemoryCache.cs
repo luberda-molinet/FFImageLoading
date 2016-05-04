@@ -5,6 +5,8 @@ namespace FFImageLoading.Cache
 {
 	public interface IMemoryCache<TImageContainer>
 	{
+		ImageInformation GetInfo(string key);
+
 		Tuple<TImageContainer, ImageInformation> Get(string key);
 
 		void Add(string key, ImageInformation imageInformation, TImageContainer bitmap);
@@ -12,6 +14,8 @@ namespace FFImageLoading.Cache
 		void Clear();
 
 		void Remove(string key);
+
+		void RemoveSimilar(string baseKey);
 	}
 }
 

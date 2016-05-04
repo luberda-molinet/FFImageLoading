@@ -30,9 +30,10 @@ namespace FFImageLoading.Work
 			FilePath = filePath;
 		}
 
-		internal void SetCacheKey(string cacheKey)
+		internal void SetKey(string cacheKey, string userCustomCacheKey)
 		{
 			CacheKey = cacheKey;
+			UserCustomCacheKey = userCustomCacheKey;
 		}
 
 		public int CurrentWidth { get; private set; }
@@ -48,6 +49,19 @@ namespace FFImageLoading.Work
 		public string FilePath { get; private set; }
 
 		public string CacheKey { get; private set; }
+
+		public string UserCustomCacheKey { get; private set; }
+
+		internal string BaseKey
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(UserCustomCacheKey))
+					return UserCustomCacheKey;
+
+				return Path ?? FilePath ?? CacheKey;
+			}
+		}
 	}
 }
 
