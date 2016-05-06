@@ -177,7 +177,7 @@ namespace FFImageLoading.Cross
 			}
 			if (ErrorPlaceholderPath != null)
 			{
-				parameters.LoadingPlaceholder(ErrorPlaceholderPath, ErrorPlaceholderSource);
+				parameters.ErrorPlaceholder(ErrorPlaceholderPath, ErrorPlaceholderSource);
 			}
 
 			parameters.DownSampleMode(DownSampleInterpolationMode);
