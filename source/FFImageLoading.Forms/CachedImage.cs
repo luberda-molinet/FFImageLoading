@@ -155,6 +155,26 @@ namespace FFImageLoading.Forms
 		}
 
 		/// <summary>
+		/// The loading delay property.
+		/// </summary>
+		public static readonly BindableProperty LoadingDelayProperty = BindableProperty.Create(nameof(LoadingDelay), typeof(int?), typeof(CachedImage), default(int?));
+
+		/// <summary>
+		/// Sets delay in milliseconds before image loading
+		/// </summary>
+		public int? LoadingDelay
+		{
+			get
+			{
+				return (int?)GetValue(LoadingDelayProperty);
+			}
+			set
+			{
+				SetValue(LoadingDelayProperty, value);
+			}
+		}
+
+		/// <summary>
 		/// The downsample width property.
 		/// </summary>
         public static readonly BindableProperty DownsampleWidthProperty = BindableProperty.Create(nameof(DownsampleWidth), typeof(double), typeof(CachedImage), 0d);

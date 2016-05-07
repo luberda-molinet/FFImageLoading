@@ -287,6 +287,11 @@ namespace FFImageLoading.Forms.WinRT
                     imageLoader.WithCache(Element.CacheType.Value);
                 }
 
+				if (Element.LoadingDelay.HasValue)
+				{
+					imageLoader.Delay(Element.LoadingDelay.Value);
+				}
+
                 var element = Element;
 
                 imageLoader.Finish((work) =>

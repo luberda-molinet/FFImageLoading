@@ -238,6 +238,11 @@ namespace FFImageLoading.Forms.Droid
 					        imageLoader.WithCache(Element.CacheType.Value);
 					    }
 
+						if (Element.LoadingDelay.HasValue)
+						{
+							imageLoader.Delay(Element.LoadingDelay.Value);
+						}
+
 						var element = Element;
 
 						imageLoader.Finish((work) => {

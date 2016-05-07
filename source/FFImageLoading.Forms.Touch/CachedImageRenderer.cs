@@ -247,8 +247,11 @@ namespace FFImageLoading.Forms.Touch
 			    {
                     imageLoader.WithCache(Element.CacheType.Value);
                 }
-			    
-			    
+
+				if (Element.LoadingDelay.HasValue)
+				{
+					imageLoader.Delay(Element.LoadingDelay.Value);
+				}
 
 				var element = Element;
 
