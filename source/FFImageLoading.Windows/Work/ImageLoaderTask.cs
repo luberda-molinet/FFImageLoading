@@ -335,7 +335,7 @@ namespace FFImageLoading.Work
 
                 // Setting image informations
                 var imageInformation = streamWithResult.ImageInformation ?? new ImageInformation();
-                imageInformation.SetCacheKey(path == "Stream" ? GetKey() : GetKey(path));
+                imageInformation.SetKey(path == "Stream" ? GetKey() : GetKey(path), Parameters.CustomCacheKey);
 
                 bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ?
                     Parameters.TransformPlaceholdersEnabled.Value : ImageService.Instance.Config.TransformPlaceholders;

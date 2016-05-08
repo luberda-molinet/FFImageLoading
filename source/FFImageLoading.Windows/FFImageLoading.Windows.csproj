@@ -58,7 +58,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Windows Release\FFImageLoading.Platform.XML</DocumentationFile>
+    <DocumentationFile>bin\Windows Release\FFImageLoading.Platform.xml</DocumentationFile>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>

@@ -30,7 +30,7 @@ namespace FFImageLoading.Work
 			FilePath = filePath;
 		}
 
-		internal void SetKey(string cacheKey, string userCustomCacheKey)
+		public void SetKey(string cacheKey, string userCustomCacheKey)
 		{
 			CacheKey = cacheKey;
 			UserCustomCacheKey = userCustomCacheKey;
