@@ -26,3 +26,4 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyKeyFile("")]
 
 [assembly: InternalsVisibleTo("FFImageLoading.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Windows")]
