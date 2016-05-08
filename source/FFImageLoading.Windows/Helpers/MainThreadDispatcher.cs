@@ -33,7 +33,7 @@ namespace FFImageLoading.Helpers
             // not in UI thread, ensuring UI thread:
             else
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
+                await CoreApplication.GetCurrentView().Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
             }
         }
 
