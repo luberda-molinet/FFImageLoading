@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using System;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
+using System.Linq;
 
 namespace FFImageLoading.Cache
 {
@@ -97,7 +98,8 @@ namespace FFImageLoading.Cache
 
 		public void RemoveSimilar(string baseKey)
 		{
-			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
+            var keysToRemove = _reusableBitmaps.Where(v => v.Value?.Item2?.BaseKey == baseKey).Select(v => v.Value?.Item2?.CacheKey).ToList();
+
 			foreach (var key in keysToRemove)
 			{
 				Remove(key);
