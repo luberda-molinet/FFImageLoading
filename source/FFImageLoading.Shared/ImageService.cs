@@ -73,10 +73,10 @@ namespace FFImageLoading
 					configuration.Logger = configuration.Logger ?? Config.Logger;
 					configuration.DownloadCache = configuration.DownloadCache ?? Config.DownloadCache;
 
-					// Skip configuration for maxCacheSize and diskCache. They cannot be redefined.
+					// Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.
 					if (configuration.Logger != null)
-						configuration.Logger.Debug("Skip configuration for maxCacheSize and diskCache. They cannot be redefined.");
-					configuration.MaxCacheSize = Config.MaxCacheSize;
+						configuration.Logger.Debug("Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.");
+					configuration.MaxMemoryCacheSize = Config.MaxMemoryCacheSize;
 					configuration.DiskCache = Config.DiskCache;
 				}
 
