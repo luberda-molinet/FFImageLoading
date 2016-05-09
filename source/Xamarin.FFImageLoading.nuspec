@@ -7,8 +7,8 @@
        <title>FFImageLoading Plugin for Xamarin iOS/Android</title>
        <authors>Fabien Molinet, Daniel Luberda</authors>
        <owners></owners>
-       <licenseUrl>https://raw.githubusercontent.com/molinch/FFImageLoading/master/LICENSE.md</licenseUrl>
-       <projectUrl>https://github.com/molinch/FFImageLoading</projectUrl>
+       <licenseUrl>https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
        <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
