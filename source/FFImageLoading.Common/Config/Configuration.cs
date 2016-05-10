@@ -14,7 +14,7 @@ namespace FFImageLoading.Config
 		public Configuration()
 		{
 			// default values here:
-			MaxCacheSize = 0; 
+			MaxMemoryCacheSize = 0; 
 			LoadWithTransparencyChannel = false;
 			FadeAnimationEnabled = true;
 			FadeAnimationForCachedImages = true;
@@ -105,10 +105,10 @@ namespace FFImageLoading.Config
 		public int HttpReadTimeout { get; set; }
 
 		/// <summary>
-		/// Gets or sets the maximum size of the cache in bytes.
+		/// Gets or sets the maximum size of the memory cache in bytes.
 		/// </summary>
-		/// <value>The maximum size of the cache in bytes.</value>
-		public int MaxCacheSize { get; set; }
+		/// <value>The maximum size of the memory cache in bytes.</value>
+		public int MaxMemoryCacheSize { get; set; }
 
 		/// <summary>
 		/// Milliseconds to wait prior to start any task.
