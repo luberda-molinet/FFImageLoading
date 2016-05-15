@@ -3,12 +3,12 @@
 	<metadata minClientVersion="2.8.1">
    
        <id>Xamarin.FFImageLoading.Transformations</id>
-       <version>2.1.0-rc2</version>
+       <version>2.1.0-rc3</version>
        <title>FFImageLoading Transformations</title>
        <authors>Molinet Fabien, Daniel Luberda</authors>
        <owners></owners>
-       <licenseUrl>https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/LICENSE.md</licenseUrl>
-       <projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
+       <licenseUrl>https://raw.githubusercontent.com/luberda-molinet\FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/luberda-molinet\FFImageLoading</projectUrl>
        <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
@@ -29,25 +29,9 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
        
        <dependencies>
        
-          <group targetFramework="portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10">
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc2" />
+          <group>
+            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc3" />
           </group>
-
-          <group targetFramework="MonoAndroid10">
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc2" />
-          </group>
-
-          <group targetFramework="Xamarin.iOS10">
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc2" />
-          </group>
-
-          <group targetFramework="portable-netcore45+wpa81">
-            <dependency id="FFImageLoading.Windows" version="2.1.0-rc2" />
-          </group>    
-          
-          <group targetFramework="portable-wp8">
-            <dependency id="FFImageLoading.Windows" version="2.1.0-rc2" />
-          </group>    
               
         </dependencies>
         
@@ -56,24 +40,24 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
 	<files>
 
 		<!--Core PCL-->
-        <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.dll" target="lib/portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations/bin/Release/FFImageLoading.Transformations.xml" target="lib/portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10/FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Transformations.xml" />
             
 		<!--Xamarin.Android-->
-		<file src="FFImageLoading.Transformations.Droid/bin/Release/FFImageLoading.Transformations.dll" target="lib/MonoAndroid10/FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations.Droid/bin/Release/FFImageLoading.Transformations.xml" target="lib/MonoAndroid10/FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.dll" target="lib\MonoAndroid10\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.xml" target="lib\MonoAndroid10\FFImageLoading.Transformations.xml" />
             
 		<!--Xamarin.iOS -->
-		<file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.dll" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations.Touch/bin/Release/FFImageLoading.Transformations.xml" target="lib/Xamarin.iOS10/FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.dll" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.xml" />
  
 		<!--Windows-->
-		<file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/portable-netcore45+wpa81/FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows/bin/Windows Release/FFImageLoading.Transformations.xml" target="lib/portable-netcore45+wpa81/FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
 		
 		<!--Windows SL-->
-		<file src="FFImageLoading.Transformations.WinSL/bin/Windows Release/FFImageLoading.Transformations.dll" target="lib/portable-wp8/FFImageLoading.Transformations.dll" />
-		<!-- <file src="FFImageLoading.Transformations.WinSL/bin/Windows Release/FFImageLoading.Transformations.xml" target="lib/portable-wp8/FFImageLoading.Transformations.xml" /> -->
+		<file src="FFImageLoading.Transformations.WinSL\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-wp8\FFImageLoading.Transformations.dll" />
+		<!-- <file src="FFImageLoading.Transformations.WinSL\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-wp8\FFImageLoading.Transformations.xml" /> -->
 		
 		
 	</files>
