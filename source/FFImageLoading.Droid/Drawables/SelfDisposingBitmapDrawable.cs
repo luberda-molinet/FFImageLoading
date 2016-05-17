@@ -163,7 +163,7 @@ namespace FFImageLoading.Drawables
 
         protected virtual void OnFreeResources()
         {
-            Log.Debug(TAG, "OnFreeResources");
+            ImageService.Instance.Config.Logger.Debug("SelfDisposingBitmapDrawable.OnFreeResources");
             lock (monitor) {
 				if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
                 	Bitmap.Dispose();
