@@ -434,19 +434,7 @@ namespace FFImageLoading.Work
 				Bitmap bitmap;
 				try
 				{
-// NOTE: CURRENTLY NOT NEEDED
-//							if (streamWithResult.Result == LoadingResult.Internet)
-//							{
-//								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
-//								bitmap = BitmapFactory.DecodeStream(stream, null, options);
-//							}
-//							else
-//							{
-						lock (_decodingLock)
-						{
-							bitmap = BitmapFactory.DecodeStream(stream, null, options);
-						}
-//							}
+					bitmap = BitmapFactory.DecodeStream(stream, null, options);
 				}
 				catch (Java.Lang.Throwable vme)
 				{
