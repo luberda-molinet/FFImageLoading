@@ -320,19 +320,7 @@ namespace FFImageLoading.Work
 			{
 				try
 				{
-// NOTE: CURRENTLY NOT NEEDED							
-//							if (streamWithResult.Result == LoadingResult.Internet)
-//							{
-//								// When loading from internet stream we shouldn't block otherwise other downloads will be paused
-//								BitmapFactory.DecodeStream(stream, null, options);
-//							}
-//							else
-//							{
-						lock (_decodingLock)
-						{
-							BitmapFactory.DecodeStream(stream, null, options);
-						}
-//							}
+					BitmapFactory.DecodeStream(stream, null, options);
 
 					if (!stream.CanSeek)
 					{
