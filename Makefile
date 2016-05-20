@@ -4,7 +4,6 @@ package:
 	nuget pack source/Xamarin.FFImageLoading.nuspec
 	nuget pack source/Xamarin.FFImageLoading.Transformations.nuspec
 	nuget pack source/Xamarin.FFImageLoading.Forms.nuspec
-	nuget pack source/FFImageLoading.Windows.nuspec
 
 FFImageLoading:
 	xbuild source/FFImageLoading.Common/FFImageLoading.csproj /nologo /p:Configuration=Release /p:BuildingInsideVisualStudio=true /consoleloggerparameters:ErrorsOnly /verbosity:minimal
