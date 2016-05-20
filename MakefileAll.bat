@@ -1,7 +1,7 @@
 set msbuild="C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe"
-set config="Windows Release"
-set platform="AnyCPU"
-set buildargs=/nologo /p:Configuration=%config% /p:Platform=%platform% /consoleloggerparameters:ErrorsOnly /verbosity:detailed
+set config=Windows Release
+set platform=AnyCPU
+set buildargs=/nologo /p:Configuration="%config%" /p:Platform="%platform%" /consoleloggerparameters:ErrorsOnly /verbosity:detailed /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 nuget restore
 
