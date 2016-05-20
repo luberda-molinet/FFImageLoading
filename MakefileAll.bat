@@ -3,7 +3,10 @@
 set msbuild="C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe"
 set config=Windows Release
 set platform=AnyCPU
-set buildargs=/p:Configuration="%config%" /p:Platform="%platform%" /v:detailed /l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+if "%CI%"=="True" (
+    set logger=/l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+)
+set buildargs=/p:Configuration="%config%" /p:Platform="%platform%" /v:detailed %logger%
 
 echo Restoring NuGets...
 
