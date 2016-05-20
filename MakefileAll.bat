@@ -3,6 +3,8 @@ set config="Windows Release"
 set platform="AnyCPU"
 set buildargs=/nologo /p:Configuration=%config% /p:Platform=%platform% /consoleloggerparameters:ErrorsOnly /verbosity:detailed
 
+nuget restore
+
 %msbuild% source/FFImageLoading.Common/FFImageLoading.csproj %buildargs%
 %msbuild% source/FFImageLoading.BaitAndSwitch/FFImageLoading.BaitAndSwitch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Windows/FFImageLoading.Windows.csproj %buildargs%
