@@ -6,11 +6,6 @@ platform: Any CPU
 environment:
   ANDROID_HOME: C:\android-sdk
   AndroidSdkDirectory: C:\android-sdk
-  GitHubToken:
-    secure: ++Q00Aa+yzbi4oEn+fOuO2D2pb4NrFtQ12Hiq69arY1OgOIIUbth7nlImS9/wQRd
-  AppVeyorToken:
-    secure: 5mY0TVM+8MUtvl18rZ+eCuXoLMWgxJCpVRTUvry+mG4=
-  NoWarn: ;1591;
    
 # xamarin:
 #   email: EMAIL@ADDRESS.HE.RE
