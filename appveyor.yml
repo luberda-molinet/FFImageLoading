@@ -17,7 +17,7 @@ environment:
 build_script:
  - cmd: mklink /j %ANDROID_HOME% "C:\Program Files (x86)\Android\android-sdk"
  - cmd: echo y | "%ANDROID_HOME%\tools\android.bat" update sdk --no-ui --all --filter platform-tools,tools,android-23,android-19
- - ps: MakefileAll.bat
+ - cmd: .\MakefileAll.bat
   
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg
