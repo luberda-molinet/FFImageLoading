@@ -73,7 +73,7 @@
     <MtouchUseSGen>true</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|iPhoneSimulator'">
-    <OutputPath>bin\iPhoneSimulator\Windows Debug\</OutputPath>
+    <OutputPath>bin\iPhoneSimulator\Debug\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>full</DebugType>
@@ -84,7 +84,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|iPhone'">
-    <OutputPath>bin\iPhone\Windows Debug\</OutputPath>
+    <OutputPath>bin\iPhone\Debug\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>full</DebugType>
@@ -95,7 +95,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|iPhoneSimulator'">
-    <OutputPath>bin\iPhoneSimulator\Windows Release\</OutputPath>
+    <OutputPath>bin\iPhoneSimulator\Release\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>full</DebugType>
@@ -106,7 +106,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|iPhone'">
-    <OutputPath>bin\iPhone\Windows Release\</OutputPath>
+    <OutputPath>bin\iPhone\Release\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>full</DebugType>
