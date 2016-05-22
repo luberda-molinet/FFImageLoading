@@ -35,8 +35,7 @@
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Windows Debug\</OutputPath>
-    <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
+    <OutputPath>bin\Debug\</OutputPath>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -45,8 +44,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Windows Release\</OutputPath>
-    <DocumentationFile>bin\Release\FFImageLoading.Droid.xml</DocumentationFile>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -86,7 +85,6 @@
     <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
     <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
-    <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Cache\ReuseBitmapDrawableCache.cs" />
     <Compile Include="Drawables\BitmapDrawableExtensions.cs" />

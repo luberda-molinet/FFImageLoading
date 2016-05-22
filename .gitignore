@@ -39,3 +39,5 @@ source/FFImageLoading.Forms.WinRT/project.lock.json
 source/FFImageLoading.Forms.WinRT/project.lock.json
 
 samples/ImageLoading.Forms.Sample/Windows/FFImageLoading.Forms.Sample.WinPhone/project.lock.json
+
+nuget.exe

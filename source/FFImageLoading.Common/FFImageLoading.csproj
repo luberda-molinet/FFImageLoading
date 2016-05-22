@@ -33,8 +33,7 @@
     <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Windows Debug\</OutputPath>
-    <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
+    <OutputPath>bin\Debug\</OutputPath>
     <Optimize>false</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -45,7 +44,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Windows Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -74,7 +73,6 @@
     <Compile Include="Work\WithLoadingResult.cs" />
     <Compile Include="Transformations\FFColorMatrix.cs" />
     <Compile Include="Cache\CacheType.cs" />
-    <Compile Include="Helpers\IImageCacheHelper.cs" />
     <Compile Include="Cache\IMemoryCache.cs" />
     <Compile Include="Work\ImageSource.cs" />
     <Compile Include="Work\InterpolationMode.cs" />

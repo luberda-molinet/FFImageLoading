@@ -29,9 +29,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Windows Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
-    <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -40,7 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Windows Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <Optimize>true</Optimize>

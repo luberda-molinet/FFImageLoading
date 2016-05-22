@@ -3,7 +3,7 @@
 	<metadata minClientVersion="2.8.1">
    
        <id>Xamarin.FFImageLoading.Transformations</id>
-       <version>2.1.0-rc3</version>
+       <version>2.1.0</version>
        <title>FFImageLoading Transformations</title>
        <authors>Molinet Fabien, Daniel Luberda</authors>
        <owners></owners>
@@ -30,7 +30,7 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
        <dependencies>
        
           <group>
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc3" />
+            <dependency id="Xamarin.FFImageLoading" version="2.1.0" />
           </group>
               
         </dependencies>
@@ -52,12 +52,12 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
         <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.xml" />
  
 		<!--Windows-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
 		
 		<!--Windows SL-->
-		<file src="FFImageLoading.Transformations.WinSL\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-wp8\FFImageLoading.Transformations.dll" />
-		<!-- <file src="FFImageLoading.Transformations.WinSL\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-wp8\FFImageLoading.Transformations.xml" /> -->
+		<file src="FFImageLoading.Transformations.WinSL\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-wp8\FFImageLoading.Transformations.dll" />
+		<!-- <file src="FFImageLoading.Transformations.WinSL\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-wp8\FFImageLoading.Transformations.xml" /> -->
 		
 		
 	</files>

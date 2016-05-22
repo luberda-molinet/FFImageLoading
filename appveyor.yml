@@ -1,0 +1,23 @@
+version: '{build}'
+os: Visual Studio 2015
+configuration: Release
+platform: Any CPU
+
+environment:
+  ANDROID_HOME: C:\android-sdk
+  AndroidSdkDirectory: C:\android-sdk
+   
+# xamarin:
+#   email: EMAIL@ADDRESS.HE.RE
+#   password:
+#     secure: SECURE_PASSWORD_HERE
+#   android: true
+#   ios: true
+
+build_script:
+ - cmd: mklink /j %ANDROID_HOME% "C:\Program Files (x86)\Android\android-sdk"
+ - cmd: echo y | "%ANDROID_HOME%\tools\android.bat" update sdk --no-ui --all --filter platform-tools,tools,android-23,android-19
+ - cmd: .\MakefileAll.bat
+  
+artifacts:
+ - path: Xamarin.FFImageLoading.*.nupkg

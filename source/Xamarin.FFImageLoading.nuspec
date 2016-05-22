@@ -3,7 +3,7 @@
 	<metadata minClientVersion="2.8.1">
 
 		<id>Xamarin.FFImageLoading</id>
-		<version>2.1.0-rc3</version>
+		<version>2.1.0</version>
 		<title>FFImageLoading Plugin for Xamarin iOS/Android</title>
 		<authors>Fabien Molinet, Daniel Luberda</authors>
 		<owners/>
@@ -74,16 +74,16 @@ Features:
 		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.xml" target="lib\Xamarin.iOS10\FFImageLoading.xml" />
 
         <!--Windows-->
-		<file src="FFImageLoading.Windows\bin\Windows Release\FFImageLoading.Platform.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.Windows\bin\Windows Release\FFImageLoading.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.xml" />
-        <file src="FFImageLoading.Windows\bin\Windows Release\FFImageLoading.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows\bin\Windows Release\FFImageLoading.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.xml" />
 
 		<!--Windows SL-->
-		<file src="FFImageLoading.WinSL\bin\Windows Release\FFImageLoading.Platform.dll" target="lib\portable-wp8\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.WinSL\bin\Windows Release\FFImageLoading.Platform.xml" target="lib\portable-wp8\FFImageLoading.Platform.xml" />
-        <file src="FFImageLoading.WinSL\bin\Windows Release\FFImageLoading.dll" target="lib\portable-wp8\FFImageLoading.dll" />
-        <file src="FFImageLoading.WinSL\bin\Windows Release\FFImageLoading.xml" target="lib\portable-wp8\FFImageLoading.xml" />		
+		<file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-wp8\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-wp8\FFImageLoading.Platform.xml" />
+        <file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.dll" target="lib\portable-wp8\FFImageLoading.dll" />
+        <file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.xml" target="lib\portable-wp8\FFImageLoading.xml" />		
 	</files>
 
 </package>

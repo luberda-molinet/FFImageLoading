@@ -29,9 +29,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Windows Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
-    <DocumentationFile>bin\Release\FFImageLoading.Touch.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -40,9 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Windows Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
-    <DocumentationFile>bin\Release\FFImageLoading.Touch.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -77,7 +76,6 @@
     <Compile Include="Work\DataResolver\DataResolverFactory.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
-    <Compile Include="Cache\ImageCacheHelper.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Work\DataResolver\AssetCatalogDataResolver.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />

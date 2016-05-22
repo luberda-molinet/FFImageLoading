@@ -2,6 +2,7 @@
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System;
 
 namespace FFImageLoading.Helpers
 {
@@ -12,20 +13,7 @@ namespace FFImageLoading.Helpers
         public string MD5(string input)
         {
             var bytes = ComputeHash(Encoding.UTF8.GetBytes(input));
-            var ret = new char[32];
-            for (int i = 0; i < 16; i++)
-            {
-                ret[i * 2] = (char)hex(bytes[i] >> 4);
-                ret[i * 2 + 1] = (char)hex(bytes[i] & 0xf);
-            }
-            return new string(ret);
-        }
-
-        private int hex(int v)
-        {
-            if (v < 10)
-                return '0' + v;
-            return 'a' + v - 10;
+            return BitConverter.ToString(bytes);
         }
 
         public byte[] ComputeHash(byte[] input)

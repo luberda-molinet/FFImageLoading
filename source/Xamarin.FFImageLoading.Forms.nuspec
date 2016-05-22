@@ -3,7 +3,7 @@
     <metadata>
     
     	<id>Xamarin.FFImageLoading.Forms</id>
-        <version>2.1.0-rc3</version>
+        <version>2.1.0</version>
         <title>FFImageLoading Plugin for Xamarin Forms</title>
         <authors>Daniel Luberda, Fabien Molinet</authors>
         <owners></owners>
@@ -37,8 +37,8 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <dependencies>
         
           <group>
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0-rc3" />
-            <dependency id="Xamarin.Forms" version="2.2.0.31" />
+            <dependency id="Xamarin.FFImageLoading" version="2.1.0" />
+            <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>
 		  
         </dependencies>
@@ -63,22 +63,22 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.xml" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.xml" />
         
         <!--Windows SL-->
-        <file src="FFImageLoading.Forms.WinSL\bin\Windows Release\FFImageLoading.Forms.dll" target="lib\portable-wp8\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinSL\bin\Windows Release\FFImageLoading.Forms.xml" target="lib\portable-wp8\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinSL\bin\Windows Release\FFImageLoading.Forms.WinSL.dll" target="lib\portable-wp8\FFImageLoading.Forms.WinSL.dll" />
-        <file src="FFImageLoading.Forms.WinSL\bin\Windows Release\FFImageLoading.Forms.WinSL.xml" target="lib\portable-wp8\FFImageLoading.Forms.WinSL.xml" />
+        <file src="FFImageLoading.Forms.WinSL\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-wp8\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinSL\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-wp8\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinSL\bin\Release\FFImageLoading.Forms.WinSL.dll" target="lib\portable-wp8\FFImageLoading.Forms.WinSL.dll" />
+        <file src="FFImageLoading.Forms.WinSL\bin\Release\FFImageLoading.Forms.WinSL.xml" target="lib\portable-wp8\FFImageLoading.Forms.WinSL.xml" />
         
         <!--Windows WinRT-->
-        <file src="FFImageLoading.Forms.WinRT\bin\Windows Release\FFImageLoading.Forms.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Windows Release\FFImageLoading.Forms.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Windows Release\FFImageLoading.Forms.WinRT.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Windows Release\FFImageLoading.Forms.WinRT.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.xml" />
 
         <!--Windows WinUWP-->
-        <file src="FFImageLoading.Forms.WinUWP\bin\Windows Release\FFImageLoading.Forms.dll" target="lib\uap10.0\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinUWP\bin\Windows Release\FFImageLoading.Forms.xml" target="lib\uap10.0\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinUWP\bin\Windows Release\FFImageLoading.Forms.WinUWP.dll" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.dll" />
-        <file src="FFImageLoading.Forms.WinUWP\bin\Windows Release\FFImageLoading.Forms.WinUWP.xml" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.xml" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.dll" target="lib\uap10.0\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.xml" target="lib\uap10.0\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.WinUWP.dll" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.dll" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.WinUWP.xml" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.xml" />
 
     </files>
     
