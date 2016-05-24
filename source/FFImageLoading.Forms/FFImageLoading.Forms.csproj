@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading.Forms</RootNamespace>
     <AssemblyName>FFImageLoading.Forms</AssemblyName>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <NuGetPackageImportStamp>

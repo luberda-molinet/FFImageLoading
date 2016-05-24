@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
   </PropertyGroup>
