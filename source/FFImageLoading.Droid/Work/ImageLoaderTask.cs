@@ -554,6 +554,8 @@ namespace FFImageLoading.Work
 			{
 				// We should wrap drawable in an AsyncDrawable, nothing is deferred
 				drawable = new SelfDisposingAsyncDrawable(Context.Resources, drawable.Bitmap, this);
+
+				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, isLocalOrFromCache, isLoadingPlaceholder)).ConfigureAwait(false);
 			}
 			else
 			{
@@ -577,12 +579,8 @@ namespace FFImageLoading.Work
 			if (drawable == null)
 				return false;
 
-			_loadingPlaceholderWeakReference = new WeakReference<BitmapDrawable>(drawable);
-
-			if (IsCancelled)
-				return false;
-
-			await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, isLocalOrFromCache, isLoadingPlaceholder)).ConfigureAwait(false);
+			if (isLoadingPlaceholder)
+				_loadingPlaceholderWeakReference = new WeakReference<BitmapDrawable>(drawable);
 
 			return true;
 		}
