@@ -415,13 +415,6 @@ namespace FFImageLoading.Work
                 var tasks = currentLotOfPendingTasks.Select(p => QueueTaskAsync(p, true));
                 await Task.WhenAny(tasks).ConfigureAwait(false);
             }
-
-            RunAndForget();
-		}
-
-        private async void RunAndForget()
-        {
-            await RunAsync().ConfigureAwait(false);
         }
 
         private async Task QueueTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
@@ -429,8 +422,9 @@ namespace FFImageLoading.Work
             if (_currentlyRunning.Count >= MaxParallelTasks)
                     return;
 
-            if (_currentlyRunning.TryAdd(pendingTask, 1))
-            {
+            if (!_currentlyRunning.TryAdd(pendingTask, 1))
+                return; // If we can't add it it most likely means that it's already in
+
                 try
                 {
                     if (scheduleOnThreadPool)
@@ -450,7 +444,8 @@ namespace FFImageLoading.Work
                         _logger.Error("WorkScheduler: Could not remove task from running tasks.");
                     }
                 }
-            }
+
+            await RunAsync().ConfigureAwait(false);
         }
 	}
 }
