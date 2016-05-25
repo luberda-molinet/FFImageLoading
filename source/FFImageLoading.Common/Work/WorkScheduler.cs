@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using System.Collections.Concurrent;
+using FFImageLoading.Cache;
 
 namespace FFImageLoading.Work
 {
@@ -166,6 +167,14 @@ namespace FFImageLoading.Work
                 return;
             }
 
+            // If we have the image in memory then it's pointless to schedule the job: just display it straight away
+            if (task.CanUseMemoryCache())
+            {
+                var cacheResult = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
+                if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
+                    return; // stop processing if loaded from cache OR if loading from cached raised an exception
+            }
+
             _dispatch = _dispatch.ContinueWith(async t =>
             {
                 try
@@ -262,18 +271,8 @@ namespace FFImageLoading.Work
             var alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
             if (alreadyRunningTaskForSameKey == null)
             {
-                if (!_pendingTasks.TryAdd(task.GetKey(), currentPendingTask))
-                {
-                    _logger.Error("Unable to schedule image task: task cannot be added to pending tasks queue.");
+                if (!AddTaskToPendingTasks(currentPendingTask))
                     return;
-            }
-
-                // Try adding the task by raw key, since many tasks can share the same raw key this may fail
-                string rawKey = task.GetKey(raw: true);
-                if (!_pendingTasksByRawKey.TryAdd(rawKey, currentPendingTask))
-                {
-                    _logger.Debug("There is already a task in pendingTasksByRawKey with this raw key.");
-                }
             }
             else
             {
@@ -290,18 +289,32 @@ namespace FFImageLoading.Work
 			}
 		}
 
+        private bool AddTaskToPendingTasks(PendingTask task)
+        {
+            if (!_pendingTasks.TryAdd(task.ImageLoadingTask.GetKey(), task))
+            {
+                _logger.Error("Unable to schedule image task: task cannot be added to pending tasks queue.");
+                return false;
+            }
+
+            // Try adding the task by raw key, since many tasks can share the same raw key this may fail
+            string rawKey = task.ImageLoadingTask.GetKey(raw: true);
+            if (!_pendingTasksByRawKey.TryAdd(rawKey, task))
+            {
+                _logger.Debug("There is already a task in pendingTasksByRawKey with this raw key.");
+            }
+
+            return true;
+        }
+
 		private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyRunningTaskForSameKey)
 		{
 			string key = alreadyRunningTaskForSameKey.ImageLoadingTask.GetKey();
 
 			Action forceLoad = () =>
 			{
-
-                if (!_pendingTasks.TryAdd(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask))
-                {
-                    _logger.Error("Unable to schedule image task: task cannot be added to pending tasks queue.");
+                if (!AddTaskToPendingTasks(currentPendingTask))
                     return;
-                }
 				Run(currentPendingTask);
 			};
 
