@@ -71,8 +71,10 @@ namespace FFImageLoading.Cache
 			if (_fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
 				#pragma warning disable 4014
-				_currentWrite.ContinueWith(t => Task.Run(async () =>
+				_currentWrite.ContinueWith(async t =>
 				{
+                    await Task.Yield(); // forces it to be scheduled for later
+
 					try
 					{
 						CacheEntry oldEntry;
@@ -103,7 +105,7 @@ namespace FFImageLoading.Cache
 						byte finishedTask;
 						_fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
 					}
-				}));
+				});
 				#pragma warning restore 4014
 			}
 		}
