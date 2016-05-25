@@ -23,7 +23,7 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private static object _decodingLock = new object();
+		private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1);
 
 		private WeakReference<BitmapDrawable> _loadingPlaceholderWeakReference;
 		internal ITarget<BitmapDrawable, ImageLoaderTask> _target;
@@ -454,35 +454,37 @@ namespace FFImageLoading.Work
 				if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
 					&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 				{
-					foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
-					{
-						if (IsCancelled)
-							return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
+                    await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                    try
+                    {
+                        foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                        {
+                            if (IsCancelled)
+                                return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
-						try
-						{
-							var old = bitmap;
+                            try
+                            {
+                                var old = bitmap;
+                                var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+                                bitmap = bitmapHolder.ToNative();
 
-							// Applying a transformation is both CPU and memory intensive
-							lock (_decodingLock)
-							{
-								var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
-								bitmap = bitmapHolder.ToNative();
-							}
-
-							// Transformation succeeded, so garbage the source
-							if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
-							{
-								old.Recycle();
-								old.Dispose();
-							}
-
-						}
-						catch (Exception ex)
-						{
-							Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-						}
-					}
+                                // Transformation succeeded, so garbage the source
+                                if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
+                                {
+                                    old.Recycle();
+                                    old.Dispose();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _decodingLock.Release();
+                    }
 				}
 
 				if (isLoadingPlaceHolder)

@@ -17,8 +17,8 @@ namespace FFImageLoading.Cache
     {
 		const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
 		private string _cachePath;
-		private readonly SemaphoreSlim _fileWriteLock;
 		private ConcurrentDictionary<string, byte> _fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
+		private Task _currentWrite;
 		private ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry> ();
 		private readonly TimeSpan _defaultDuration;
 
@@ -35,9 +35,9 @@ namespace FFImageLoading.Cache
 
             if (!Directory.Exists(cachePath))
                 Directory.CreateDirectory(cachePath);
-			
-            _fileWriteLock = new SemaphoreSlim(initialCount: 1);
+
 			_fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
+			_currentWrite = Task.FromResult<byte>(1);
 			_defaultDuration = new TimeSpan(30, 0, 0, 0);  // the default is 30 days
 				
 			InitializeEntries();
@@ -71,42 +71,39 @@ namespace FFImageLoading.Cache
 			if (_fileWritePendingTasks.TryAdd(sanitizedKey, 1))
 			{
 				#pragma warning disable 4014
-				Task.Run(async () =>
+				_currentWrite.ContinueWith(t => Task.Run(async () =>
+				{
+					try
 					{
-						try
+						CacheEntry oldEntry;
+						if (_entries.TryGetValue(sanitizedKey, out oldEntry))
 						{
-							await _fileWriteLock.WaitAsync().ConfigureAwait(false);
-
-							CacheEntry oldEntry;
-							if (_entries.TryGetValue(sanitizedKey, out oldEntry))
-							{
-								string oldFilepath = Path.Combine(_cachePath, oldEntry.FileName);
-								if (File.Exists(oldFilepath))
-									File.Delete(oldFilepath);
-							}
-
-							string filename = sanitizedKey + "." + duration.TotalSeconds;
-							string filepath = Path.Combine(_cachePath, filename);
-
-							using (var fs = FileStore.GetOutputStream(filepath))
-							{
-								await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-							}
-
-							_entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
+							string oldFilepath = Path.Combine(_cachePath, oldEntry.FileName);
+							if (File.Exists(oldFilepath))
+								File.Delete(oldFilepath);
 						}
-						catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
+
+						string filename = sanitizedKey + "." + duration.TotalSeconds;
+						string filepath = Path.Combine(_cachePath, filename);
+
+						using (var fs = FileStore.GetOutputStream(filepath))
 						{
-							Console.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
-							Console.WriteLine(ex.ToString());
+							await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 						}
-						finally
-						{
-							byte finishedTask;
-							_fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
-							_fileWriteLock.Release();
-						}
-					});
+
+						_entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
+					}
+					catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
+					{
+						Console.WriteLine(string.Format("An error occured while caching to disk image '{0}'.", key));
+						Console.WriteLine(ex.ToString());
+					}
+					finally
+					{
+						byte finishedTask;
+						_fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
+					}
+				}));
 				#pragma warning restore 4014
 			}
 		}
@@ -120,22 +117,13 @@ namespace FFImageLoading.Cache
 			var sanitizedKey = SanitizeKey(key);
 
 			await WaitForPendingWriteIfExists(sanitizedKey).ConfigureAwait(false);
-			try
+			CacheEntry entry;
+			if (_entries.TryRemove(sanitizedKey, out entry))
 			{
-				await _fileWriteLock.WaitAsync().ConfigureAwait(false);
+				string filepath = Path.Combine(_cachePath, entry.FileName);
 
-				CacheEntry entry;
-				if (_entries.TryRemove(sanitizedKey, out entry))
-				{
-					string filepath = Path.Combine(_cachePath, entry.FileName);
-
-					if (File.Exists(filepath))
-						File.Delete(filepath);
-				}
-			}
-			finally
-			{
-				_fileWriteLock.Release();
+				if (File.Exists(filepath))
+					File.Delete(filepath);
 			}
 		}
 
@@ -149,18 +137,9 @@ namespace FFImageLoading.Cache
 				await Task.Delay(20).ConfigureAwait(false);
 			}
 
-			try
-			{
-				await _fileWriteLock.WaitAsync().ConfigureAwait(false);
-
-				Directory.Delete(_cachePath, true);
-				Directory.CreateDirectory (_cachePath);
-				_entries.Clear();
-			}
-			finally
-			{
-				_fileWriteLock.Release();
-			}
+			Directory.Delete(_cachePath, true);
+			Directory.CreateDirectory (_cachePath);
+			_entries.Clear();
 		}
 
 		/// <summary>

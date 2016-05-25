@@ -88,10 +88,10 @@ namespace FFImageLoading.Work
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>
-		public virtual string GetKey(string path = null)
+		public virtual string GetKey(string path = null, bool raw = false)
 		{
 			if (HasCustomCacheKey)
-				return Parameters.CustomCacheKey + TransformationsKey + DownsamplingKey;
+				return Parameters.CustomCacheKey + (!raw ? (TransformationsKey + DownsamplingKey) : "");
 
 			string baseKey = null;
 			if (Parameters.Stream != null)
@@ -108,7 +108,7 @@ namespace FFImageLoading.Work
 					return null; // If path is null then something is wrong, we should not append transformations key
 			}
 
-			return baseKey + TransformationsKey + DownsamplingKey;
+			return baseKey + (!raw ? (TransformationsKey + DownsamplingKey) : "");
 		}
 
 		/// <summary>
