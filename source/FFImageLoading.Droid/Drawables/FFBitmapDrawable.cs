@@ -47,8 +47,7 @@ namespace FFImageLoading.Drawables
 					}
 					else
 					{
-						if (_placeholder != null && _placeholder.Handle != IntPtr.Zero && _placeholder.Bitmap != null 
-							&& _placeholder.Handle != IntPtr.Zero && !_placeholder.Bitmap.IsRecycled)
+                        if (IsBitmapDrawableValid(_placeholder))
 						{
 							_placeholder.Draw(canvas);	
 						}
@@ -62,10 +61,15 @@ namespace FFImageLoading.Drawables
 			} 
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
+                ImageService.Instance.Config.Logger?.Error("FFBitmapDrawable Draw", ex);
 			}
 		}
 
+        bool IsBitmapDrawableValid(BitmapDrawable bitmapDrawable)
+        {
+            return bitmapDrawable != null && bitmapDrawable.Handle != IntPtr.Zero && bitmapDrawable.Bitmap != null
+                                  && bitmapDrawable.Handle != IntPtr.Zero && !bitmapDrawable.Bitmap.IsRecycled;
+        }
 
 		public void StopFadeAnimation()
 		{
@@ -77,28 +81,52 @@ namespace FFImageLoading.Drawables
 		{
 			_alpha = alpha;
 
-			if (_placeholder != null)
-			{
-				_placeholder.SetAlpha(alpha);
-			}
+            try
+            {
+                if (IsBitmapDrawableValid(_placeholder))
+                {
+                    _placeholder.SetAlpha(alpha);
+                }
+            }
+            catch (Exception ex)
+            {
+                ImageService.Instance.Config.Logger?.Error("Placeholder SetAlpha", ex);
+            }
+
 			base.SetAlpha(alpha);
 		}
 
 		public override void SetColorFilter(Color color, PorterDuff.Mode mode)
 		{
-			if (_placeholder != null)
-			{
-				_placeholder.SetColorFilter(color, mode);
-			}
+            try
+            {
+                if (IsBitmapDrawableValid(_placeholder))
+                {
+                    _placeholder.SetColorFilter(color, mode);
+                }
+            }
+            catch (Exception ex)
+            {
+                ImageService.Instance.Config.Logger?.Error("Placeholder SetColorFilter", ex);
+            }
+
 			base.SetColorFilter(color, mode);
 		}
 
 		protected override void OnBoundsChange(Rect bounds)
 		{
-			if (_placeholder != null)
-			{
-				_placeholder.SetBounds(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-			}
+            try
+            {
+                if (IsBitmapDrawableValid(_placeholder))
+                {
+                    _placeholder.SetBounds(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+                }
+            }
+            catch (Exception ex)
+            {
+                ImageService.Instance.Config.Logger?.Error("Placeholder OnBoundsChange", ex);
+            }
+
 			base.OnBoundsChange(bounds);
 		}
 	}
