@@ -6,6 +6,12 @@ using System.Linq;
 using FFImageLoading.Cache;
 using System.IO;
 
+#if SILVERLIGHT
+using FFImageLoading.Concurrency;
+#else
+using System.Collections.Concurrent;
+#endif
+
 namespace FFImageLoading.Work
 {
 	public abstract class ImageLoaderTaskBase: IImageLoaderTask, IDisposable
@@ -20,18 +26,45 @@ namespace FFImageLoading.Work
 		private string _streamKey;
 		private bool _isDisposed;
 
-		protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
-		{
-			_clearCacheOnOutOfMemory = clearCacheOnOutOfMemory;
-			CancellationToken = new CancellationTokenSource();
-			Parameters = parameters;
-			NumberOfRetryNeeded = parameters.RetryCount;
-			MainThreadDispatcher = mainThreadDispatcher;
-			Logger = miniLogger;
-			ConfigureParameters();
-		}
+        private readonly bool _hasCustomCacheKey;
+        private readonly Lazy<string> _transformationsKey;
+        private readonly Lazy<string> _downsamplingKey;
+        private readonly ConcurrentDictionary<string, string> _keys;
+        private readonly Lazy<string> _rawKey;
 
-		#region IDisposable implementation
+        protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
+        {
+            _clearCacheOnOutOfMemory = clearCacheOnOutOfMemory;
+            CancellationToken = new CancellationTokenSource();
+            Parameters = parameters;
+            NumberOfRetryNeeded = parameters.RetryCount;
+            MainThreadDispatcher = mainThreadDispatcher;
+            Logger = miniLogger;
+            ConfigureParameters();
+
+            _hasCustomCacheKey = !string.IsNullOrWhiteSpace(Parameters.CustomCacheKey);
+            _keys = new ConcurrentDictionary<string, string>();
+
+            _transformationsKey = new Lazy<string>(() =>
+            {
+                if (Parameters.Transformations == null || Parameters.Transformations.Count == 0)
+                    return string.Empty;
+
+                return ";" + string.Join(";", Parameters.Transformations.Select(t => t.Key));
+            });
+
+            _downsamplingKey = new Lazy<string>(() =>
+            {
+                if (Parameters.DownSampleSize == null)
+                    return string.Empty;
+
+                return string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
+            });
+
+            _rawKey = new Lazy<string>(() => GetKeyInternal(null, true));
+        }
+
+#region IDisposable implementation
 
 		public void Dispose()
 		{
@@ -51,7 +84,7 @@ namespace FFImageLoading.Work
 			}
         }
 
-		#endregion
+#endregion
 
 		public void Finish()
 		{
@@ -88,27 +121,23 @@ namespace FFImageLoading.Work
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>
-		public virtual string GetKey(string path = null)
+		public virtual string GetKey(string path = null, bool raw = false)
 		{
-			if (HasCustomCacheKey)
-				return Parameters.CustomCacheKey + TransformationsKey + DownsamplingKey;
-
-			string baseKey = null;
-			if (Parameters.Stream != null)
-			{
-				if (_streamKey == null)
-					_streamKey = "Stream" + GetNextStreamIndex();
-
-				baseKey = _streamKey;
-			}
-			else
-			{
-				baseKey = path ?? Parameters.Path;
-				if (string.IsNullOrWhiteSpace(baseKey))
-					return null; // If path is null then something is wrong, we should not append transformations key
-			}
-
-			return baseKey + TransformationsKey + DownsamplingKey;
+            if (raw)
+            {
+                if (path == null || path == Parameters.Path)
+                {
+                    return _rawKey.Value;
+                }
+                else
+                {
+                    return GetKeyInternal(path, true);
+                }
+            }
+            else
+            {
+                return _keys.GetOrAdd(path ?? Parameters.Path, p => GetKeyInternal(p, false));
+            }
 		}
 
 		/// <summary>
@@ -118,7 +147,7 @@ namespace FFImageLoading.Work
 		/// <param name="path">Path.</param>
 		public bool CanUseMemoryCache(string path = null)
 		{
-			return GetKey(path) != null && (Parameters.Stream == null || HasCustomCacheKey);
+			return GetKey(path) != null && (Parameters.Stream == null || _hasCustomCacheKey);
 		}
 
 		public void Cancel()
@@ -273,35 +302,44 @@ namespace FFImageLoading.Work
 
 		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
 
-		protected string TransformationsKey
-		{
-			get
-			{
-				if (Parameters.Transformations == null || Parameters.Transformations.Count == 0)
-					return string.Empty;
+        private string GetKeyInternal(string path, bool raw)
+        {
+            if (_hasCustomCacheKey)
+            {
+                if (!raw)
+                {
+                    return string.Concat(Parameters.CustomCacheKey + _transformationsKey.Value + _downsamplingKey.Value);
+                }
+                else
+                {
+                    return Parameters.CustomCacheKey;
+                }
+            }
 
-				return ";" + Parameters.Transformations.Select(t => t.Key).Aggregate((a, b) => a + ";" + b);
-			}
-		}
+            string baseKey = null;
+            if (Parameters.Stream != null)
+            {
+                if (_streamKey == null)
+                    _streamKey = "Stream" + GetNextStreamIndex();
 
-		protected string DownsamplingKey
-		{
-			get
-			{
-				if (Parameters.DownSampleSize == null)
-					return string.Empty;
+                baseKey = _streamKey;
+            }
+            else
+            {
+                baseKey = path ?? Parameters.Path;
+                if (string.IsNullOrWhiteSpace(baseKey))
+                    return null; // If path is null then something is wrong, we should not append transformations key
+            }
 
-				return string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
-			}
-		}
-
-		protected bool HasCustomCacheKey
-		{
-			get
-			{
-				return !String.IsNullOrWhiteSpace(Parameters.CustomCacheKey);
-			}
-		}
+            if (!raw)
+            {
+                return string.Concat(baseKey + _transformationsKey.Value + _downsamplingKey.Value);
+            }
+            else
+            {
+                return baseKey;
+            }
+        }
 
 		private void ConfigureParameters()
 		{

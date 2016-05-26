@@ -18,7 +18,7 @@ namespace FFImageLoading.Work
 		/// Gets the cache key for this image loading task.
 		/// </summary>
 		/// <value>The cache key.</value>
-        string GetKey(string path = null);
+        string GetKey(string path = null, bool raw = false);
 
 		/// <summary>
 		/// Indicates if memory cache should be used for the request

@@ -25,6 +25,7 @@ namespace FFImageLoading.Cache
 	/// <summary>
 	/// Disk cache iOS/Android implementation.
 	/// </summary>
+    [Obsolete]
 	public class DiskCache: IDiskCache
     {
         enum JournalOp 
