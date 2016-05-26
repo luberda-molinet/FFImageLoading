@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading</RootNamespace>
     <AssemblyName>FFImageLoading</AssemblyName>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;SILVERLIGHT;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -82,6 +82,10 @@
     <Compile Include="Work\IImageService.cs" />
     <Compile Include="Work\Target.cs" />
     <Compile Include="Work\ITarget.cs" />
+    <Compile Include="Concurrency\ConcurrentDictionary.cs" />
+    <Compile Include="Concurrency\SR.cs" />
+    <Compile Include="Concurrency\ArrayHelper.cs" />
+    <Compile Include="Concurrency\PlatformHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>
@@ -96,6 +100,7 @@
   </ProjectExtensions>
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="Concurrency\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -109,9 +114,6 @@
     </Reference>
     <Reference Include="System.Net.Http.Extensions">
       <HintPath>..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Portable.ConcurrentDictionary">
-      <HintPath>..\..\packages\Portable.ConcurrentDictionary.1.0.1\lib\portable-net45+win+wpa81+wp80\Portable.ConcurrentDictionary.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />

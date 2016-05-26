@@ -250,12 +250,6 @@
     <Compile Include="..\FFImageLoading.Windows\Work\ImageTarget.cs">
       <Link>Work\ImageTarget.cs</Link>
     </Compile>
-    <Compile Include="Concurrency\ConcurrentDictionary.cs" />
-    <Compile Include="Concurrency\ConcurrentHashtable.cs" />
-    <Compile Include="Concurrency\Hasher.cs" />
-    <Compile Include="Concurrency\Segment.cs" />
-    <Compile Include="Concurrency\Segmentrange.cs" />
-    <Compile Include="Concurrency\TinyReaderWriterLock.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Helpers\RandomStream.cs" />

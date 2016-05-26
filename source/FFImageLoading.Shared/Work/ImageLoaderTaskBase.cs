@@ -5,7 +5,12 @@ using System.Threading.Tasks;
 using System.Linq;
 using FFImageLoading.Cache;
 using System.IO;
+
+#if SILVERLIGHT
+using FFImageLoading.Concurrency;
+#else
 using System.Collections.Concurrent;
+#endif
 
 namespace FFImageLoading.Work
 {
@@ -59,7 +64,7 @@ namespace FFImageLoading.Work
             _rawKey = new Lazy<string>(() => GetKeyInternal(null, true));
         }
 
-		#region IDisposable implementation
+#region IDisposable implementation
 
 		public void Dispose()
 		{
@@ -79,7 +84,7 @@ namespace FFImageLoading.Work
 			}
         }
 
-		#endregion
+#endregion
 
 		public void Finish()
 		{
