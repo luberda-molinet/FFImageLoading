@@ -3,7 +3,7 @@
     <metadata>
     
     	<id>Xamarin.FFImageLoading.Forms</id>
-        <version>2.1.0</version>
+        <version>2.1.1-pre1</version>
         <title>FFImageLoading Plugin for Xamarin Forms</title>
         <authors>Daniel Luberda, Fabien Molinet</authors>
         <owners></owners>
@@ -37,7 +37,7 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <dependencies>
         
           <group>
-            <dependency id="Xamarin.FFImageLoading" version="2.1.0" />
+            <dependency id="Xamarin.FFImageLoading" version="2.1.1-pre1" />
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>
 		  
@@ -47,8 +47,8 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
 	
     <files>
         <!--Core PCL-->
-        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-net45+netcore45+wpa81+wp8+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.xml" />
 
         <!--Xamarin.Android-->
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\MonoAndroid10\FFImageLoading.Forms.dll" />
