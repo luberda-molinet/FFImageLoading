@@ -30,6 +30,7 @@ namespace FFImageLoading.Cache
     /// <summary>
     /// Disk cache Windows implementation.
     /// </summary>
+    [Obsolete]
     public class DiskCache : IDiskCache
     {
         private static readonly SemaphoreSlim journalLock = new SemaphoreSlim(initialCount: 1);
