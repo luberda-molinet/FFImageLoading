@@ -23,7 +23,6 @@ namespace FFImageLoading.Work
 		}
 
 		private bool _clearCacheOnOutOfMemory;
-		private string _streamKey;
 		private bool _isDisposed;
 
         private readonly bool _hasCustomCacheKey;
@@ -31,6 +30,7 @@ namespace FFImageLoading.Work
         private readonly Lazy<string> _downsamplingKey;
         private readonly ConcurrentDictionary<string, string> _keys;
         private readonly Lazy<string> _rawKey;
+        private readonly Lazy<string> _streamKey;
 
         protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
         {
@@ -62,6 +62,8 @@ namespace FFImageLoading.Work
             });
 
             _rawKey = new Lazy<string>(() => GetKeyInternal(null, true));
+
+            _streamKey = new Lazy<string>(() => "Stream" + GetNextStreamIndex());
         }
 
 #region IDisposable implementation
@@ -136,7 +138,7 @@ namespace FFImageLoading.Work
             }
             else
             {
-                return _keys.GetOrAdd(path ?? Parameters.Path, p => GetKeyInternal(p, false));
+                return _keys.GetOrAdd(path ?? "", p => GetKeyInternal(p, false));
             }
 		}
 
@@ -319,10 +321,7 @@ namespace FFImageLoading.Work
             string baseKey = null;
             if (Parameters.Stream != null)
             {
-                if (_streamKey == null)
-                    _streamKey = "Stream" + GetNextStreamIndex();
-
-                baseKey = _streamKey;
+                baseKey = _streamKey.Value;
             }
             else
             {
