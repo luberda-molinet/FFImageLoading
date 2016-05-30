@@ -42,6 +42,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
   - [iOS Specificities](https://github.com/molinch/FFImageLoading/wiki/iOS-API)
   - [Windows Specificities](https://github.com/molinch/FFImageLoading/wiki/Windows-API)
   - [Advanced usage](https://github.com/molinch/FFImageLoading/wiki/Advanced-Usage)
+  - [Authentication support](https://github.com/molinch/FFImageLoading/wiki/Authentication-Support)
 
 - **Xamarin.Forms**
   - [Xamarin.Forms API](https://github.com/molinch/FFImageLoading/wiki/Xamarin.Forms-API)
@@ -50,6 +51,9 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 - **Transformations**
   - [Transformations Guide](https://github.com/molinch/FFImageLoading/wiki/Transformations-Guide)
   - [Custom Transformations Guide](https://github.com/molinch/FFImageLoading/wiki/Custom-Transformations-Guide)
+
+- **Other**
+  - [MvvmCross usage](https://github.com/molinch/FFImageLoading/wiki/MvvmCross)
 
 [what-is-this]: various_images_and_image_links
 
