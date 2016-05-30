@@ -138,7 +138,7 @@ namespace FFImageLoading.Work
             }
             else
             {
-                return _keys.GetOrAdd(path ?? "", p => GetKeyInternal(p, false));
+                return _keys.GetOrAdd(path ?? "", p => GetKeyInternal(path, false));
             }
 		}
 
