@@ -44,6 +44,7 @@ namespace FFImageLoading.Work
             public Task FrameworkWrappingTask { get; set; }
         }
 
+        private readonly object _addTaskLocker = new object();
         private readonly IMiniLogger _logger;
         private readonly int _defaultParallelTasks;
         private readonly ConcurrentDictionary<string, PendingTask> _pendingTasks;
@@ -268,15 +269,20 @@ namespace FFImageLoading.Work
             int position = Interlocked.Increment(ref _currentPosition);
             var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
 
-            var alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
-            if (alreadyRunningTaskForSameKey == null)
+            PendingTask alreadyRunningTaskForSameKey = null;
+
+            lock (_addTaskLocker)
             {
-                if (!AddTaskToPendingTasks(currentPendingTask))
-                    return;
-            }
-            else
-            {
-                alreadyRunningTaskForSameKey.Position = position;
+                alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
+                if (alreadyRunningTaskForSameKey == null)
+                {
+                    if (!AddTaskToPendingTasks(currentPendingTask))
+                        return;
+                }
+                else
+                {
+                    alreadyRunningTaskForSameKey.Position = position;
+                }
             }
 
 			if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
