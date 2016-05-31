@@ -37,12 +37,19 @@ namespace FFImageLoading.Forms.Droid
 			var uriImageSource = source as UriImageSource;
 			if (uriImageSource != null)
 			{
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uriImageSource.Uri.ToString());
+				var uri = uriImageSource.Uri?.ToString();
+				if (string.IsNullOrWhiteSpace(uri))
+					return null;
+
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uri);
 			}
 
 			var fileImageSource = source as FileImageSource;
 			if (fileImageSource != null)
 			{
+				if (string.IsNullOrWhiteSpace(fileImageSource.File))
+					return null;
+
 				if (File.Exists(fileImageSource.File))
 					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
 
