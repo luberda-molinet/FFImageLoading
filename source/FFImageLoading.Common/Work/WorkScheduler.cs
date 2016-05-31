@@ -320,11 +320,8 @@ namespace FFImageLoading.Work
 
 			Action forceLoad = () =>
 			{
-                lock(_addTaskLocker)
-                {
-                    if (!AddTaskToPendingTasks(currentPendingTask))
-                        return;
-                }
+                if (!AddTaskToPendingTasks(currentPendingTask))
+                    return;
 
 				Run(currentPendingTask);
 			};
