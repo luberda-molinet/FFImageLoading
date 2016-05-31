@@ -283,16 +283,17 @@ namespace FFImageLoading.Work
                 {
                     alreadyRunningTaskForSameKey.Position = position;
                 }
-            }
 
-			if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
-			{
-				Run(currentPendingTask);
-			}
-			else
-			{
-				WaitForSimilarTask(currentPendingTask, alreadyRunningTaskForSameKey);
-			}
+    			if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
+    			{
+    				Run(currentPendingTask);
+    			}
+    			else
+    			{
+    				WaitForSimilarTask(currentPendingTask, alreadyRunningTaskForSameKey);
+    			}
+
+            }
 		}
 
         private bool AddTaskToPendingTasks(PendingTask task)
@@ -319,8 +320,12 @@ namespace FFImageLoading.Work
 
 			Action forceLoad = () =>
 			{
-                if (!AddTaskToPendingTasks(currentPendingTask))
-                    return;
+                lock(_addTaskLocker)
+                {
+                    if (!AddTaskToPendingTasks(currentPendingTask))
+                        return;
+                }
+
 				Run(currentPendingTask);
 			};
 
