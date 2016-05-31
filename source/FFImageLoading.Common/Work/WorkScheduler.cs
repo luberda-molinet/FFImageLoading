@@ -133,6 +133,7 @@ namespace FFImageLoading.Work
                     task.Value.ImageLoadingTask.Cancel();
 
                 _pendingTasks.Clear();
+                _pendingTasksByRawKey.Clear();
             }
 
             if (!pauseWork)
@@ -146,6 +147,9 @@ namespace FFImageLoading.Work
             var key = task.GetKey();
             PendingTask existingTask;
             _pendingTasks.TryRemove(key, out existingTask);
+
+            var rawKey = task.GetKey(raw:true);
+            _pendingTasksByRawKey.TryRemove(key, out existingTask);
         }
 
         /// <summary>
