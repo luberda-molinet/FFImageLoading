@@ -310,7 +310,7 @@ namespace FFImageLoading.Work
             {
                 if (!raw)
                 {
-                    return string.Concat(Parameters.CustomCacheKey + _transformationsKey.Value + _downsamplingKey.Value);
+                    return string.Concat(Parameters.CustomCacheKey, _transformationsKey.Value, _downsamplingKey.Value);
                 }
                 else
                 {
@@ -332,7 +332,7 @@ namespace FFImageLoading.Work
 
             if (!raw)
             {
-                return string.Concat(baseKey + _transformationsKey.Value + _downsamplingKey.Value);
+                return string.Concat(baseKey, _transformationsKey.Value, _downsamplingKey.Value);
             }
             else
             {
