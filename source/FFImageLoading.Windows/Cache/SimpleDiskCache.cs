@@ -29,6 +29,8 @@ namespace FFImageLoading.Cache
         ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
         ConcurrentDictionary<string, CacheEntry> entries;
         readonly TimeSpan defaultDuration;
+        private readonly SemaphoreSlim _currentWriteLock;
+        private Task _currentWrite;
 
         public SimpleDiskCache(string cacheFolderName)
         {
@@ -37,6 +39,7 @@ namespace FFImageLoading.Cache
             this.cacheFolderName = cacheFolderName;
             this.fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
             defaultDuration = new TimeSpan(30, 0, 0, 0);  // the default is 30 days
+            _currentWriteLock = new SemaphoreSlim(1);
 
             initTask = Init();
         }
@@ -166,17 +169,23 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         /// <param name="bytes">Bytes.</param>
         /// <param name="duration">Duration.</param>
-        public async void AddToSavingQueueIfNotExists(string key, byte[] bytes, TimeSpan duration)
+        public async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
         {
             await initTask.ConfigureAwait(false);
 
             var sanitizedKey = SanitizeKey(key);
 
-            if (fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+            if (!fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+                return;
+
+            await _currentWriteLock.WaitAsync().ConfigureAwait(false); // Make sure we don't add multiple continuations to the same task
+
+            try
             {
-#pragma warning disable 4014
-                Task.Run(async () =>
+                _currentWrite = _currentWrite.ContinueWith(async t =>
                 {
+                    await Task.Yield(); // forces it to be scheduled for later
+
                     await initTask.ConfigureAwait(false);
 
                     try
@@ -207,7 +216,10 @@ namespace FFImageLoading.Cache
                         fileWriteLock.Release();
                     }
                 });
-#pragma warning restore 4014
+            }
+            finally
+            {
+                _currentWriteLock.Release();
             }
         }
 
