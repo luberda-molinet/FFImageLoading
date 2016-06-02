@@ -75,7 +75,7 @@ namespace FFImageLoading.Cache
             var allowDiskCaching = AllowDiskCaching(cacheType);
             if (allowDiskCaching)
             {
-                _diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
             }
 			
 			return memoryStream;
@@ -90,7 +90,7 @@ namespace FFImageLoading.Cache
             var allowDiskCaching = AllowDiskCaching(cacheType);
 			if (allowDiskCaching)
             {
-                _diskCache.AddToSavingQueueIfNotExists(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
             }
 			
 			return responseBytes;
