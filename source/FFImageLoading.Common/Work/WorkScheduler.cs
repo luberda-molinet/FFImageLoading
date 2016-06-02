@@ -43,8 +43,7 @@ namespace FFImageLoading.Work
 
         readonly object _runningTasksLock = new object();
         readonly List<PendingTask> _runningTasks = new List<PendingTask>();
-        readonly object _pendingTasksLock = new object();
-        readonly Dictionary<string, PendingTask> _pendingTasks = new Dictionary<string, PendingTask>();
+        readonly ConcurrentDictionary<string, PendingTask> _pendingTasks = new ConcurrentDictionary<string, PendingTask>();
 
         public WorkScheduler(IMiniLogger logger)
         {
@@ -96,15 +95,12 @@ namespace FFImageLoading.Work
             {
                 _logger.Debug("SetPauseWork paused.");
 
-                lock(_pendingTasksLock)
+                foreach (var task in _pendingTasks.Values)
                 {
-                    foreach (var task in _pendingTasks.Values)
-                    {
-                        task?.ImageLoadingTask?.Cancel();
-                    }
-
-                    _pendingTasks.Clear();
+                    task?.ImageLoadingTask?.Cancel();
                 }
+
+                _pendingTasks.Clear();
             }
 
             if (!pauseWork)
@@ -115,15 +111,14 @@ namespace FFImageLoading.Work
 
         public void RemovePendingTask(IImageLoaderTask task)
         {
-            lock(_pendingTasksLock)
-            {
-                PendingTask found = null;
-                var key = task.GetKey();
+            PendingTask found = null;
+            var key = task.GetKey();
 
-                if (_pendingTasks.TryGetValue(task.GetKey(), out found))
+            if (_pendingTasks.TryGetValue(task.GetKey(), out found))
+            {
+                if (found.ImageLoadingTask == task)
                 {
-                    if (found.ImageLoadingTask == task)
-                        _pendingTasks.Remove(key);
+                    _pendingTasks.TryRemove(key, out found);
                 }
             }
         }
@@ -221,16 +216,19 @@ namespace FFImageLoading.Work
             int position = Interlocked.Increment(ref _currentPosition);
             var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
 
-            PendingTask alreadyRunningTaskForSameKey = null;
+            PendingTask alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
 
-            lock(_pendingTasksLock)
+            if (alreadyRunningTaskForSameKey == null)
             {
-                alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
-
-                if (alreadyRunningTaskForSameKey == null)
-                    _pendingTasks.Add(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask);
-                else
-                    alreadyRunningTaskForSameKey.Position = position;
+                if (!_pendingTasks.TryAdd(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask))
+                {
+                    LoadImage(currentPendingTask.ImageLoadingTask);
+                    return;
+                }
+            }
+            else
+            {
+                alreadyRunningTaskForSameKey.Position = position;
             }
 
             if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
@@ -245,29 +243,23 @@ namespace FFImageLoading.Work
 
         PendingTask GetPendingTaskIfValid(IImageLoaderTask task, bool rawKey)
         {
-            lock (_pendingTasksLock)
-            {
-                string key = task.GetKey(raw: rawKey);
-                var found = _pendingTasks.Any(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key);
-                return found ? _pendingTasks.First(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key).Value : null;
-            }
+            string key = task.GetKey(raw: rawKey);
+            var found = _pendingTasks.Any(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key);
+            return found ? _pendingTasks.First(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key).Value : null;
         }
 
         PendingTask FindSimilarPendingTask(IImageLoaderTask task)
         {
-            lock (_pendingTasksLock)
+            // At first check if the exact same items exists in pending tasks (exact same means same transformations, same downsample, ...)
+            // Since it will be exactly the same it can be retrieved from memory cache
+            var alreadyRunningTaskForSameKey = GetPendingTaskIfValid(task, false);
+            if (alreadyRunningTaskForSameKey == null)
             {
-                // At first check if the exact same items exists in pending tasks (exact same means same transformations, same downsample, ...)
-                // Since it will be exactly the same it can be retrieved from memory cache
-                var alreadyRunningTaskForSameKey = GetPendingTaskIfValid(task, false);
-                if (alreadyRunningTaskForSameKey == null)
-                {
-                    // No exact same task found, check if a similar task exists (not necessarily the same transformations, downsample, ...)
-                    alreadyRunningTaskForSameKey = GetPendingTaskIfValid(task, true);
-                }
-
-                return alreadyRunningTaskForSameKey;
+                // No exact same task found, check if a similar task exists (not necessarily the same transformations, downsample, ...)
+                alreadyRunningTaskForSameKey = GetPendingTaskIfValid(task, true);
             }
+
+            return alreadyRunningTaskForSameKey;
         }
 
         async void Run(PendingTask pendingTask)
@@ -320,26 +312,23 @@ namespace FFImageLoading.Work
             {
                 currentLotOfPendingTasks = new Dictionary<string, PendingTask>();
 
-                lock (_pendingTasksLock)
+                foreach (var task in _pendingTasks.Values
+                        .Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+                        .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
+                        .ThenBy(t => t.Position))
                 {
-                    foreach (var task in _pendingTasks.Values
-                            .Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
-                            .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
-                            .ThenBy(t => t.Position))
+                    // We don't want to load, at the same time, images that have same key or same raw key at the same time
+                    // This way we prevent concurrent downloads and benefit from caches
+                    string key = task.ImageLoadingTask.GetKey();
+                    if (!_pendingTasks.ContainsKey(key) && !currentLotOfPendingTasks.ContainsKey(key))
                     {
-                        // We don't want to load, at the same time, images that have same key or same raw key at the same time
-                        // This way we prevent concurrent downloads and benefit from caches
-                        string key = task.ImageLoadingTask.GetKey();
-                        if (!_pendingTasks.ContainsKey(key) && !currentLotOfPendingTasks.ContainsKey(key))
+                        string rawKey = task.ImageLoadingTask.GetKey(raw: true);
+                        if (!_pendingTasks.ContainsKey(rawKey) && !currentLotOfPendingTasks.ContainsKey(rawKey))
                         {
-                            string rawKey = task.ImageLoadingTask.GetKey(raw: true);
-                            if (!_pendingTasks.ContainsKey(rawKey) && !currentLotOfPendingTasks.ContainsKey(rawKey))
-                            {
-                                currentLotOfPendingTasks.Add(key, task);
+                            currentLotOfPendingTasks.Add(key, task);
 
-                                if (currentLotOfPendingTasks.Count == numberOfTasks)
-                                    break;
-                            }
+                            if (currentLotOfPendingTasks.Count == numberOfTasks)
+                                break;
                         }
                     }
                 }
@@ -367,9 +356,10 @@ namespace FFImageLoading.Work
 
             Action forceQueue = () =>
             {
-                lock (_pendingTasksLock)
+                if (!_pendingTasks.TryAdd(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask))
                 {
-                    _pendingTasks.Add(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask);
+                    LoadImage(currentPendingTask.ImageLoadingTask);
+                    return;
                 }
 
                 Run(currentPendingTask);
