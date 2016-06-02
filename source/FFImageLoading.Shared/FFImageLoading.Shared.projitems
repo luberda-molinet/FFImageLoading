@@ -17,7 +17,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MD5Helper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MiniLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\FileStore.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Cache\DiskCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Cache\DownloadCache.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImageService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Work\ImageLoaderTaskBase.cs" />

@@ -79,7 +79,6 @@
     <Compile Include="Args\GetImageAsJpgArgs.cs" />
     <Compile Include="Args\GetImageAsPngArgs.cs" />
     <Compile Include="Args\SuccessEventArgs.cs" />
-    <Compile Include="Cache\DiskCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Cache\SimpleDiskCache.cs" />
