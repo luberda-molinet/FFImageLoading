@@ -9,53 +9,83 @@ using FFImageLoading.Concurrency;
 
 namespace FFImageLoading.Work
 {
-	public interface IWorkScheduler
-	{
-		/// <summary>
-		/// Cancels any pending work for the task.
-		/// </summary>
-		/// <param name="task">Image loading task to cancel</param>
-		void Cancel(IImageLoaderTask task);
+    public interface IWorkScheduler
+    {
+        /// <summary>
+        /// Cancels any pending work for the task.
+        /// </summary>
+        /// <param name="task">Image loading task to cancel</param>
+        void Cancel(IImageLoaderTask task);
 
-		bool ExitTasksEarly { get; }
+        bool ExitTasksEarly { get; }
 
-		void SetExitTasksEarly(bool exitTasksEarly);
+        void SetExitTasksEarly(bool exitTasksEarly);
 
-		void SetPauseWork(bool pauseWork);
+        void SetPauseWork(bool pauseWork);
 
-		void RemovePendingTask(IImageLoaderTask task);
+        void RemovePendingTask(IImageLoaderTask task);
 
-		/// <summary>
-		/// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
-		/// </summary>
-		/// <param name="key">Key for cache lookup.</param>
-		/// <param name="task">Image loading task.</param>
-		void LoadImage(IImageLoaderTask task);
-	}
+        /// <summary>
+        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
+        /// </summary>
+        /// <param name="key">Key for cache lookup.</param>
+        /// <param name="task">Image loading task.</param>
+        void LoadImage(IImageLoaderTask task);
+    }
 
     public class WorkScheduler : IWorkScheduler
     {
-        readonly IMiniLogger _logger;
-        readonly int _maxParallelTasks;
-        volatile bool _pauseWork;
-        int _currentPosition;
-        Task _dispatch = Task.FromResult<byte>(1);
+        protected class PendingTask
+        {
+            public int Position { get; set; }
 
-        readonly object _runningTasksLock = new object();
-        readonly List<PendingTask> _runningTasks = new List<PendingTask>();
-        readonly ConcurrentDictionary<string, PendingTask> _pendingTasks = new ConcurrentDictionary<string, PendingTask>();
+            public IImageLoaderTask ImageLoadingTask { get; set; }
+
+            public Task FrameworkWrappingTask { get; set; }
+        }
+
+        private readonly IMiniLogger _logger;
+        private readonly int _defaultParallelTasks;
+        private readonly object _pendingTasksLock;
+        private readonly List<PendingTask> _pendingTasks;
+
+        private readonly ConcurrentDictionary<string, PendingTask> _currentlyRunning; // Here we use the dictionary as a concurrent set
+        private Task _dispatch;
+
+        private bool _exitTasksEarly; // volatile?
+        private bool _pauseWork; // volatile?
+        private int _currentPosition; // useful?
 
         public WorkScheduler(IMiniLogger logger)
         {
             _logger = logger;
 
+            _pendingTasksLock = new object();
+            _pendingTasks = new List<PendingTask>();
+
+            _currentlyRunning = new ConcurrentDictionary<string, PendingTask>();
+            _dispatch = Task.FromResult<byte>(1);
+
             int _processorCount = Environment.ProcessorCount;
             if (_processorCount <= 2)
-                _maxParallelTasks = 1;
+                _defaultParallelTasks = 1;
             else
-                _maxParallelTasks = (int)Math.Truncate((double)_processorCount / 2d) + 1;
+                _defaultParallelTasks = (int)Math.Truncate((double)_processorCount / 2d) + 1;
         }
 
+        public virtual int MaxParallelTasks
+        {
+            get
+            {
+                return _defaultParallelTasks;
+            }
+        }
+
+        /// <summary>
+        /// Cancels any pending work for the task.
+        /// </summary>
+        /// <param name="task">Image loading task to cancel</param>
+        /// <returns><c>true</c> if this instance cancel task; otherwise, <c>false</c>.</returns>
         public void Cancel(IImageLoaderTask task)
         {
             try
@@ -72,15 +102,21 @@ namespace FFImageLoading.Work
             finally
             {
                 if (task != null && task.IsCancelled)
-                    task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
+                    task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
             }
         }
 
-        public bool ExitTasksEarly { get; private set; }
+        public bool ExitTasksEarly
+        {
+            get
+            {
+                return _exitTasksEarly;
+            }
+        }
 
         public void SetExitTasksEarly(bool exitTasksEarly)
         {
-            ExitTasksEarly = exitTasksEarly;
+            _exitTasksEarly = exitTasksEarly;
             SetPauseWork(false);
         }
 
@@ -95,12 +131,13 @@ namespace FFImageLoading.Work
             {
                 _logger.Debug("SetPauseWork paused.");
 
-                foreach (var task in _pendingTasks.Values)
+                lock (_pendingTasksLock)
                 {
-                    task?.ImageLoadingTask?.Cancel();
-                }
+                    foreach (var task in _pendingTasks)
+                        task.ImageLoadingTask.Cancel();
 
-                _pendingTasks.Clear();
+                    _pendingTasks.Clear();
+                }
             }
 
             if (!pauseWork)
@@ -111,32 +148,30 @@ namespace FFImageLoading.Work
 
         public void RemovePendingTask(IImageLoaderTask task)
         {
-            PendingTask found = null;
-            var key = task.GetKey();
-
-            if (_pendingTasks.TryGetValue(task.GetKey(), out found))
+            lock (_pendingTasksLock)
             {
-                if (found.ImageLoadingTask == task)
-                {
-                    _pendingTasks.TryRemove(key, out found);
-                }
+                _pendingTasks.RemoveAll(p => p.ImageLoadingTask == task);
             }
         }
 
+        /// <summary>
+        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
+        /// </summary>
+        /// <param name="task">Image loading task.</param>
         public async void LoadImage(IImageLoaderTask task)
         {
-            if (task == null || task.Parameters == null)
+            if (task == null)
                 return;
-
-            if (task.IsCancelled)
-            {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
-                return;
-            }
 
             if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
             {
                 await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
+            }
+
+            if (task.IsCancelled)
+            {
+                task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+                return;
             }
 
             // If we have the image in memory then it's pointless to schedule the job: just display it straight away
@@ -146,16 +181,6 @@ namespace FFImageLoading.Work
                 if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
                     return; // stop processing if loaded from cache OR if loading from cached raised an exception
             }
-
-            //foreach (var item in _pendingTasks)
-            //{
-            //    var imageLoadingTask = item.Value;
-            //    if (imageLoadingTask.ImageLoadingTask == null || imageLoadingTask.ImageLoadingTask.IsCancelled
-            //        || imageLoadingTask.ImageLoadingTask.Completed)
-            //    {
-            //        _pendingTasks.TryRemove(item.Key, out imageLoadingTask);
-            //    }
-            //}
 
             _dispatch = _dispatch.ContinueWith(async t =>
             {
@@ -170,23 +195,23 @@ namespace FFImageLoading.Work
             });
         }
 
-        async Task LoadImageAsync(IImageLoaderTask task)
+        private async Task LoadImageAsync(IImageLoaderTask task)
         {
-            if (task == null || task.Parameters == null)
-                return;
-
             if (task.IsCancelled)
             {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
+                task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
                 return;
             }
 
             if (!task.Parameters.Preload)
             {
-                foreach (var pendingTask in _pendingTasks)
+                lock (_pendingTasksLock)
                 {
-                    if (pendingTask.Value.ImageLoadingTask != null && pendingTask.Value.ImageLoadingTask.UsesSameNativeControl(task))
-                        pendingTask.Value.ImageLoadingTask.CancelIfNeeded();
+                    foreach (var pendingTask in _pendingTasks)
+                    {
+                        if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+                            pendingTask.ImageLoadingTask.CancelIfNeeded();
+                    }
                 }
             }
 
@@ -202,53 +227,24 @@ namespace FFImageLoading.Work
 
             if (task.IsCancelled || _pauseWork)
             {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
+                task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
                 return;
             }
 
             QueueAndGenerateImage(task);
+            return;
         }
 
-        void QueueAndGenerateImage(IImageLoaderTask task)
-        {
-            _logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
-
-            int position = Interlocked.Increment(ref _currentPosition);
-            var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
-
-            PendingTask alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
-
-            if (alreadyRunningTaskForSameKey == null)
-            {
-                if (!_pendingTasks.TryAdd(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask))
-                {
-                    LoadImage(currentPendingTask.ImageLoadingTask);
-                    return;
-                }
-            }
-            else
-            {
-                alreadyRunningTaskForSameKey.Position = position;
-            }
-
-            if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
-            {
-                Run(currentPendingTask);
-            }
-            else
-            {
-                WaitForSimilarTask(currentPendingTask, alreadyRunningTaskForSameKey);
-            }
-        }
-
-        PendingTask GetPendingTaskIfValid(IImageLoaderTask task, bool rawKey)
+        private PendingTask GetPendingTaskIfValid(IImageLoaderTask task, bool rawKey)
         {
             string key = task.GetKey(raw: rawKey);
-            var found = _pendingTasks.Any(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key);
-            return found ? _pendingTasks.First(t => t.Value.ImageLoadingTask.GetKey(raw: rawKey) == key).Value : null;
+            lock (_pendingTasksLock)
+            {
+                return _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey(raw: rawKey) == key);
+            }
         }
 
-        PendingTask FindSimilarPendingTask(IImageLoaderTask task)
+        private PendingTask FindSimilarPendingTask(IImageLoaderTask task)
         {
             // At first check if the exact same items exists in pending tasks (exact same means same transformations, same downsample, ...)
             // Since it will be exactly the same it can be retrieved from memory cache
@@ -262,9 +258,81 @@ namespace FFImageLoading.Work
             return alreadyRunningTaskForSameKey;
         }
 
-        async void Run(PendingTask pendingTask)
+        private void QueueAndGenerateImage(IImageLoaderTask task)
         {
-            if (_maxParallelTasks <= 0)
+            _logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
+
+            int position = Interlocked.Increment(ref _currentPosition);
+            var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
+
+            PendingTask alreadyRunningTaskForSameKey = null;
+            lock (_pendingTasksLock)
+            {
+                alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
+                if (alreadyRunningTaskForSameKey == null)
+                {
+                    _pendingTasks.Add(currentPendingTask);
+                }
+                else
+                {
+                    alreadyRunningTaskForSameKey.Position = position;
+                }
+            }
+
+            if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
+            {
+                Run(currentPendingTask);
+            }
+            else
+            {
+                WaitForSimilarTask(currentPendingTask, alreadyRunningTaskForSameKey);
+            }
+        }
+
+        private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyQueuedTaskForSameKey)
+        {
+            string queuedKey = alreadyQueuedTaskForSameKey.ImageLoadingTask.GetKey();
+
+            Action forceQueue = () =>
+            {
+                lock (_pendingTasksLock)
+                {
+                    _pendingTasks.Add(currentPendingTask);
+                }
+                Run(currentPendingTask);
+            };
+
+            if (alreadyQueuedTaskForSameKey.FrameworkWrappingTask == null)
+            {
+                _logger.Debug(string.Format("No C# Task defined for key: {0}", queuedKey));
+                forceQueue();
+                return;
+            }
+
+            _logger.Debug(string.Format("Wait for similar request for key: {0}", queuedKey));
+            // This will wait for the pending task or if it is already finished then it will just pass
+            await alreadyQueuedTaskForSameKey.FrameworkWrappingTask.ConfigureAwait(false);
+
+            // Now our image should be in the cache
+            var cacheResult = await currentPendingTask.ImageLoadingTask.TryLoadingFromCacheAsync().ConfigureAwait(false);
+            if (cacheResult != FFImageLoading.Cache.CacheResult.Found)
+            {
+                _logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", queuedKey));
+                forceQueue();
+            }
+            else
+            {
+                var task = currentPendingTask.ImageLoadingTask;
+                if (task.Parameters.OnFinish != null)
+                    task.Parameters.OnFinish(task);
+
+                task.Dispose();
+            }
+        }
+
+        private async void Run(PendingTask pendingTask)
+        {
+            if (MaxParallelTasks <= 0)
             {
                 pendingTask.FrameworkWrappingTask = pendingTask.ImageLoadingTask.RunAsync(); // FMT: threadpool will limit concurrent work
                 await pendingTask.FrameworkWrappingTask.ConfigureAwait(false);
@@ -297,42 +365,44 @@ namespace FFImageLoading.Work
 
         private async Task RunAsync()
         {
-            Dictionary<string, PendingTask> currentLotOfPendingTasks = null;
-            int numberOfTasks;
-
-            lock (_runningTasksLock)
+            if (_currentlyRunning.Count >= MaxParallelTasks)
             {
-                if (_runningTasks.Count >= _maxParallelTasks)
-                    return;
-
-                numberOfTasks = _maxParallelTasks - _runningTasks.Count;
+                return;
             }
 
+            Dictionary<string, PendingTask> currentLotOfPendingTasks = null;
+
+            int numberOfTasks = MaxParallelTasks - _currentlyRunning.Count;
             if (numberOfTasks > 0)
             {
                 currentLotOfPendingTasks = new Dictionary<string, PendingTask>();
 
-                foreach (var task in _pendingTasks.Values
-                        .Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
-                        .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
-                        .ThenBy(t => t.Position))
+                lock (_pendingTasksLock)
                 {
-                    // We don't want to load, at the same time, images that have same key or same raw key at the same time
-                    // This way we prevent concurrent downloads and benefit from caches
-                    string key = task.ImageLoadingTask.GetKey();
-                    if (!_pendingTasks.ContainsKey(key) && !currentLotOfPendingTasks.ContainsKey(key))
+                    foreach (var task in
+                             _pendingTasks
+                                .Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
+                                .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority)
+                                .ThenBy(t => t.Position))
                     {
-                        string rawKey = task.ImageLoadingTask.GetKey(raw: true);
-                        if (!_pendingTasks.ContainsKey(rawKey) && !currentLotOfPendingTasks.ContainsKey(rawKey))
+                        // We don't want to load, at the same time, images that have same key or same raw key at the same time
+                        // This way we prevent concurrent downloads and benefit from caches
+                        string key = task.ImageLoadingTask.GetKey();
+                        if (!_currentlyRunning.ContainsKey(key) && !currentLotOfPendingTasks.ContainsKey(key))
                         {
-                            currentLotOfPendingTasks.Add(key, task);
+                            string rawKey = task.ImageLoadingTask.GetKey(raw: true);
+                            if (!_currentlyRunning.ContainsKey(rawKey) && !currentLotOfPendingTasks.ContainsKey(rawKey))
+                            {
+                                currentLotOfPendingTasks.Add(key, task);
 
-                            if (currentLotOfPendingTasks.Count == numberOfTasks)
-                                break;
+                                if (currentLotOfPendingTasks.Count == numberOfTasks)
+                                    break;
+                            }
                         }
                     }
                 }
             }
+
 
             if (currentLotOfPendingTasks == null || currentLotOfPendingTasks.Count == 0)
             {
@@ -350,62 +420,17 @@ namespace FFImageLoading.Work
             }
         }
 
-        private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyQueuedTaskForSameKey)
+        private async Task QueueTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
         {
-            string queuedKey = alreadyQueuedTaskForSameKey.ImageLoadingTask.GetKey();
-
-            Action forceQueue = () =>
-            {
-                if (!_pendingTasks.TryAdd(currentPendingTask.ImageLoadingTask.GetKey(), currentPendingTask))
-                {
-                    LoadImage(currentPendingTask.ImageLoadingTask);
-                    return;
-                }
-
-                Run(currentPendingTask);
-            };
-
-            if (alreadyQueuedTaskForSameKey.FrameworkWrappingTask == null)
-            {
-                _logger.Debug(string.Format("No C# Task defined for key: {0}", queuedKey));
-                forceQueue();
+            if (_currentlyRunning.Count >= MaxParallelTasks)
                 return;
-            }
 
-            _logger.Debug(string.Format("Wait for similar request for key: {0}", queuedKey));
-            // This will wait for the pending task or if it is already finished then it will just pass
-            await alreadyQueuedTaskForSameKey.FrameworkWrappingTask.ConfigureAwait(false);
+            string key = pendingTask.ImageLoadingTask.GetKey();
+            if (!_currentlyRunning.TryAdd(key, pendingTask))
+                return; // If we can't add it it most likely means that it's already in
 
-            // Now our image should be in the cache
-            var cacheResult = await currentPendingTask.ImageLoadingTask.TryLoadingFromCacheAsync().ConfigureAwait(false);
-            if (cacheResult != CacheResult.Found)
-            {
-                _logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", queuedKey));
-                forceQueue();
-                return;
-            }
-            else
-            {
-                var task = currentPendingTask.ImageLoadingTask;
-                if (task.Parameters.OnFinish != null)
-                    task.Parameters.OnFinish(task);
-
-                task.Dispose();
-            }
-        }
-
-        async Task QueueTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
-        {
             try
             {
-                lock (_runningTasksLock)
-                {
-                    if (_runningTasks.Count >= _maxParallelTasks)
-                        return;
-                    
-                    _runningTasks.Add(pendingTask);
-                }
-
                 if (scheduleOnThreadPool)
                 {
                     await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
@@ -417,23 +442,14 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                lock (_runningTasksLock)
+                PendingTask doneTask;
+                if (!_currentlyRunning.TryRemove(key, out doneTask))
                 {
-                    _runningTasks.Remove(pendingTask);
+                    _logger.Error("WorkScheduler: Could not remove task from running tasks.");
                 }
-
-                await RunAsync().ConfigureAwait(false);
             }
-        }
 
-        protected class PendingTask
-        {
-            public int Position { get; set; }
-
-            public IImageLoaderTask ImageLoadingTask { get; set; }
-
-            public Task FrameworkWrappingTask { get; set; }
+            await RunAsync().ConfigureAwait(false);
         }
     }
 }
-
