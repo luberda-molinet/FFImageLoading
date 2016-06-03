@@ -101,163 +101,166 @@ namespace FFImageLoading.Forms.Droid
 			
 		private void UpdateBitmap(CachedImage previous = null)
 		{
-			if (previous == null || !object.Equals(previous.Source, Element.Source))
+			if (previous != null && Equals(previous.Source, Element.Source))
+				return;
+
+			var source = Element.Source;
+			var imageView = Control;
+
+			if (imageView != null)
+				imageView.SkipInvalidate();
+
+			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
+
+			Control.SetImageResource(global::Android.Resource.Color.Transparent);
+
+			if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 			{
-				Xamarin.Forms.ImageSource source = Element.Source;
-				var imageView = Control;
+				Cancel();
+				TaskParameter imageLoader = null;
 
-				if (imageView == null)
-					return;
+				var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
 
-				((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
-
-				if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
+				if (ffSource == null)
 				{
-					Cancel();
-					TaskParameter imageLoader = null;
+					if (imageView != null)
+						imageView.SetImageDrawable(null);
 
-					var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
+					ImageLoadingFinished(Element);
+				}
+				else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
+				{
+					imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, Element.CacheDuration);
+				}
+				else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
+				{
+					imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
+				}
+				else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
+				{
+					imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
+				}
+				else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
+				{
+					imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
+				}
+				else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
+				{
+					imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
+				}
 
-					if (ffSource == null)
+				if (imageLoader != null)
+				{
+					// CustomKeyFactory
+					if (Element.CacheKeyFactory != null)
 					{
-						if (imageView != null)
-							imageView.SetImageDrawable(null);	
-
-						ImageLoadingFinished(Element);
+						var bindingContext = Element.BindingContext;
+						imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
 					}
-					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
+
+					// LoadingPlaceholder
+					if (Element.LoadingPlaceholder != null)
 					{
-						imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, Element.CacheDuration);
+						var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+						if (placeholderSource != null)
+							imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 					}
-					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
+
+					// ErrorPlaceholder
+					if (Element.ErrorPlaceholder != null)
 					{
-						imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
+						var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+						if (placeholderSource != null)
+							imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 					}
-					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
+
+					// Downsample
+					if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
 					{
-						imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
+						if (Element.Height > Element.Width)
+						{
+							imageLoader.DownSample(height: Element.Height.DpToPixels());
+						}
+						else
+						{
+							imageLoader.DownSample(width: Element.Width.DpToPixels());
+						}
 					}
-					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
+					else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
 					{
-						imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
+						if (Element.HeightRequest > Element.WidthRequest)
+						{
+							imageLoader.DownSample(height: Element.HeightRequest.DpToPixels());
+						}
+						else
+						{
+							imageLoader.DownSample(width: Element.WidthRequest.DpToPixels());
+						}
 					}
-					else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
+					else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 					{
-						imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
+						if (Element.DownsampleHeight > Element.DownsampleWidth)
+						{
+							imageLoader.DownSample(height: Element.DownsampleUseDipUnits
+								? Element.DownsampleHeight.DpToPixels() : (int)Element.DownsampleHeight);
+						}
+						else
+						{
+							imageLoader.DownSample(width: Element.DownsampleUseDipUnits
+								? Element.DownsampleWidth.DpToPixels() : (int)Element.DownsampleWidth);
+						}
 					}
 
-					if (imageLoader != null)
+					// RetryCount
+					if (Element.RetryCount > 0)
 					{
-						// CustomKeyFactory
-						if (Element.CacheKeyFactory != null)
-						{
-							var bindingContext = Element.BindingContext;
-							imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
-						}
-
-						// LoadingPlaceholder
-						if (Element.LoadingPlaceholder != null)
-						{
-							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
-							if (placeholderSource != null)
-								imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-						}
-
-						// ErrorPlaceholder
-						if (Element.ErrorPlaceholder != null)
-						{
-							var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
-							if (placeholderSource != null)
-								imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-						}
-
-						// Downsample
-						if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
-						{
-							if (Element.Height > Element.Width)
-							{
-								imageLoader.DownSample(height: Element.Height.DpToPixels());
-							}
-							else
-							{
-								imageLoader.DownSample(width: Element.Width.DpToPixels());
-							}
-						}
-						else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
-						{
-							if (Element.HeightRequest > Element.WidthRequest)
-							{
-								imageLoader.DownSample(height: Element.HeightRequest.DpToPixels());
-							}
-							else
-							{
-								imageLoader.DownSample(width: Element.WidthRequest.DpToPixels());
-							}
-						}
-						else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
-						{
-							if (Element.DownsampleHeight > Element.DownsampleWidth)
-							{
-								imageLoader.DownSample(height: Element.DownsampleUseDipUnits 
-									? Element.DownsampleHeight.DpToPixels() : (int)Element.DownsampleHeight);
-							}
-							else
-							{
-								imageLoader.DownSample(width: Element.DownsampleUseDipUnits 
-									? Element.DownsampleWidth.DpToPixels() : (int)Element.DownsampleWidth);
-							}
-						}
-
-						// RetryCount
-						if (Element.RetryCount > 0)
-						{
-							imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
-						}
-
-						// TransparencyChannel
-						if (Element.TransparencyEnabled.HasValue)
-							imageLoader.TransparencyChannel(Element.TransparencyEnabled.Value);
-
-						// FadeAnimation
-						if (Element.FadeAnimationEnabled.HasValue)
-							imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
-
-						// TransformPlaceholders
-						if (Element.TransformPlaceholders.HasValue)
-							imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
-
-						// Transformations
-						if (Element.Transformations != null && Element.Transformations.Count > 0)
-						{
-							imageLoader.Transform(Element.Transformations);
-						}
-
-                        imageLoader.WithPriority(Element.LoadingPriority);
-					    if (Element.CacheType.HasValue)
-					    {
-					        imageLoader.WithCache(Element.CacheType.Value);
-					    }
-
-						if (Element.LoadingDelay.HasValue)
-						{
-							imageLoader.Delay(Element.LoadingDelay.Value);
-						}
-
-						var element = Element;
-
-						imageLoader.Finish((work) => {
-							element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
-							ImageLoadingFinished(element);
-						});
-                            
-						imageLoader.Success((imageInformation, loadingResult) => 
-                            element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
-
-						imageLoader.Error((exception) => 
-							element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
-
-						_currentTask = imageLoader.Into(imageView);	
+						imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
 					}
+
+					// TransparencyChannel
+					if (Element.TransparencyEnabled.HasValue)
+						imageLoader.TransparencyChannel(Element.TransparencyEnabled.Value);
+
+					// FadeAnimation
+					if (Element.FadeAnimationEnabled.HasValue)
+						imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
+
+					// TransformPlaceholders
+					if (Element.TransformPlaceholders.HasValue)
+						imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
+
+					// Transformations
+					if (Element.Transformations != null && Element.Transformations.Count > 0)
+					{
+						imageLoader.Transform(Element.Transformations);
+					}
+
+					imageLoader.WithPriority(Element.LoadingPriority);
+					if (Element.CacheType.HasValue)
+					{
+						imageLoader.WithCache(Element.CacheType.Value);
+					}
+
+					if (Element.LoadingDelay.HasValue)
+					{
+						imageLoader.Delay(Element.LoadingDelay.Value);
+					}
+
+					var element = Element;
+
+					imageLoader.Finish((work) =>
+					{
+						element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
+						ImageLoadingFinished(element);
+					});
+
+					imageLoader.Success((imageInformation, loadingResult) =>
+						element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
+
+					imageLoader.Error((exception) =>
+						element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+
+					_currentTask = imageLoader.Into(imageView);
 				}
 			}
 		}

@@ -5,7 +5,6 @@ using UIKit;
 using Xamarin.Forms.Platform.iOS;
 using Xamarin.Forms;
 using FFImageLoading.Work;
-using FFImageLoading;
 using Foundation;
 using FFImageLoading.Forms;
 using FFImageLoading.Forms.Touch;
@@ -13,7 +12,6 @@ using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
-using System.Threading;
 
 [assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
@@ -47,7 +45,10 @@ namespace FFImageLoading.Forms.Touch
 			{
 				UIImage image = Control.Image;
 				if (image != null)
+				{
 					image.Dispose();
+					image = null;
+				}
 			}
 
 			_isDisposed = true;
@@ -82,7 +83,7 @@ namespace FFImageLoading.Forms.Touch
 		{
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				SetImage(null);
+				SetImage();
 			}
 			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
 			{
@@ -106,19 +107,18 @@ namespace FFImageLoading.Forms.Touch
 
 		private void SetImage(CachedImage oldElement = null)
 		{
-			Xamarin.Forms.ImageSource source = Element.Source; 
+			var source = Element.Source; 
 
 			if (oldElement != null)
 			{
-				Xamarin.Forms.ImageSource source2 = oldElement.Source;
-				if (object.Equals(source2, source))
-				{
+				var oldSource = oldElement.Source;
+				if (Equals(oldSource, source))
 					return;
-				}
-				if (source2 is FileImageSource && source is FileImageSource && ((FileImageSource)source2).File == ((FileImageSource)source).File)
-				{
+
+				if (oldSource is FileImageSource && source is FileImageSource && ((FileImageSource)oldSource).File == ((FileImageSource)source).File)
 					return;
-				}
+
+				Control.Image = null;
 			}
 
 			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);

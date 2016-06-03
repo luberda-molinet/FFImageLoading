@@ -190,9 +190,6 @@
     <Compile Include="..\FFImageLoading.Windows\Args\SuccessEventArgs.cs">
       <Link>Args\SuccessEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\FFImageLoading.Windows\Cache\DiskCache.cs">
-      <Link>Cache\DiskCache.cs</Link>
-    </Compile>
     <Compile Include="..\FFImageLoading.Windows\Cache\ICacheKeyFactory.cs">
       <Link>Cache\ICacheKeyFactory.cs</Link>
     </Compile>
