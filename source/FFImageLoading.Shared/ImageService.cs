@@ -35,18 +35,7 @@ namespace FFImageLoading
         /// Gets FFImageLoading configuration
         /// </summary>
         /// <value>The configuration used by FFImageLoading.</value>
-        public Configuration Config
-		{
-			get
-			{
-				InitializeIfNeeded();
-				return _config;
-			}
-			private set
-			{
-				_config = value;
-			}
-		}
+        public Configuration Config { get; private set; }
 
 		/// <summary>
 		/// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
