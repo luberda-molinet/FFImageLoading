@@ -11,6 +11,10 @@ namespace FFImageLoading.Work
 {
     public interface IWorkScheduler
     {
+        /// <summary>      
+        /// Cancels any pending work for the task.        
+        /// </summary>        
+        /// <param name="task">Image loading task to cancel</param>
         void Cancel(IImageLoaderTask task);
 
         bool ExitTasksEarly { get; }
@@ -21,6 +25,11 @@ namespace FFImageLoading.Work
 
         void RemovePendingTask(IImageLoaderTask task);
 
+        /// <summary>      
+        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.        
+        /// </summary>        
+        /// <param name="key">Key for cache lookup.</param>       
+        /// <param name="task">Image loading task.</param>
         void LoadImage(IImageLoaderTask task);
     }
 
@@ -404,7 +413,6 @@ namespace FFImageLoading.Work
                 lock (_pendingTasksLock)
                 {
                     _currentlyRunning.Remove(key);
-                    _pendingTasks.Remove(pendingTask);
                 }
 
                 await RunAsync().ConfigureAwait(false);
