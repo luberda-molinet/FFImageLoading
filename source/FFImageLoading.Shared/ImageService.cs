@@ -30,43 +30,55 @@ namespace FFImageLoading
 		public static IImageService Instance { get { return LazyInstance.Value; } }
 
 		private ImageService() { }
-
+ 
         /// <summary>
         /// Gets FFImageLoading configuration
         /// </summary>
         /// <value>The configuration used by FFImageLoading.</value>
-        public Configuration Config { get; private set; }
+        public Configuration Config
+        {
+            get
+            {
+                InitializeIfNeeded();
+                return _config;
+            }
 
-		/// <summary>
-		/// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
-		/// </summary>
-		/// <param name="configuration">Configuration.</param>
-		public void Initialize(Configuration configuration)
+            set
+            {
+                _config = value;
+            }
+        }
+
+        /// <summary>
+        /// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
+        /// </summary>
+        /// <param name="configuration">Configuration.</param>
+        public void Initialize(Configuration configuration)
 		{
 			lock (_initializeLock)
 			{
 				_initialized = false;
 
-				if (Config != null)
+				if (_config != null)
 				{
 					// If DownloadCache is not updated but HttpClient is then we inform DownloadCache
 					if (configuration.HttpClient != null && configuration.DownloadCache == null)
 					{
-						configuration.DownloadCache = Config.DownloadCache;
+						configuration.DownloadCache = _config.DownloadCache;
 						configuration.DownloadCache.DownloadHttpClient = configuration.HttpClient;
 					}
 
 					// Redefine these if they were provided only
-					configuration.HttpClient = configuration.HttpClient ?? Config.HttpClient;
-					configuration.Scheduler = configuration.Scheduler ?? Config.Scheduler;
-					configuration.Logger = configuration.Logger ?? Config.Logger;
-					configuration.DownloadCache = configuration.DownloadCache ?? Config.DownloadCache;
+					configuration.HttpClient = configuration.HttpClient ?? _config.HttpClient;
+					configuration.Scheduler = configuration.Scheduler ?? _config.Scheduler;
+					configuration.Logger = configuration.Logger ?? _config.Logger;
+					configuration.DownloadCache = configuration.DownloadCache ?? _config.DownloadCache;
 
 					// Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.
 					if (configuration.Logger != null)
 						configuration.Logger.Debug("Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.");
-					configuration.MaxMemoryCacheSize = Config.MaxMemoryCacheSize;
-					configuration.DiskCache = Config.DiskCache;
+					configuration.MaxMemoryCacheSize = _config.MaxMemoryCacheSize;
+					configuration.DiskCache = _config.DiskCache;
 				}
 
 
