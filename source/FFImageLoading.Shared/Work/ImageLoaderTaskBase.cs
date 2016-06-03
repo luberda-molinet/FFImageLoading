@@ -306,19 +306,22 @@ namespace FFImageLoading.Work
 
         private string GetKeyInternal(string path, bool raw)
         {
+            string baseKey = null;
+
             if (_hasCustomCacheKey)
             {
+                baseKey = path ?? Parameters.CustomCacheKey;
+
                 if (!raw)
                 {
-                    return string.Concat(Parameters.CustomCacheKey, _transformationsKey.Value, _downsamplingKey.Value);
+                    return string.Concat(baseKey, _transformationsKey.Value, _downsamplingKey.Value);
                 }
                 else
                 {
-                    return Parameters.CustomCacheKey;
+                    return baseKey;
                 }
             }
 
-            string baseKey = null;
             if (Parameters.Stream != null)
             {
                 baseKey = _streamKey.Value;

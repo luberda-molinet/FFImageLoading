@@ -211,15 +211,6 @@ namespace FFImageLoading.Work
         private PendingTask FindSimilarPendingTask(IImageLoaderTask task)         {             // At first check if the exact same items exists in pending tasks (exact same means same transformations, same downsample, ...)             // Since it will be exactly the same it can be retrieved from memory cache
              string key = task.GetKey(raw: false);             var alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey(raw: false) == key);
 
-            //TODO BUG / DISABLED as it always resultt with "Similar request finished but the image is not in the cache"
-            //if (alreadyRunningTaskForSameKey == null)
-            //{
-            //    // No exact same task found, check if a similar task exists (not necessarily the same transformations, downsample, ...)
-            //    var rawKey = task.GetKey(raw: true);
-
-            //    alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey(raw: true) == rawKey);
-            //}
-
             return alreadyRunningTaskForSameKey;         }
 
         private void QueueAndGenerateImage(IImageLoaderTask task)
