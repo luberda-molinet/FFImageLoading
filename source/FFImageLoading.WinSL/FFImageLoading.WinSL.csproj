@@ -249,14 +249,12 @@
     </Compile>
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
+    <Compile Include="Helpers\PlatformPerformance.cs" />
     <Compile Include="Helpers\RandomStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="..\FFImageLoading.Windows\Helpers\PlatformPerformance.cs">
-      <Link>Helpers\PlatformPerformance.cs</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net.Http, Version=1.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
