@@ -86,7 +86,7 @@ namespace FFImageLoading.Drawables
 			{
 				if (isDisplayed && !HasValidBitmap) 
 				{
-					System.Diagnostics.Debug.WriteLine ("Cannot redisplay this drawable, its resources have been disposed.");
+					System.Diagnostics.Debug.WriteLine("Cannot redisplay this drawable, its resources have been disposed.");
 				}
 				else if (isDisplayed) 
 				{
@@ -163,7 +163,6 @@ namespace FFImageLoading.Drawables
 
         protected virtual void OnFreeResources()
         {
-            ImageService.Instance.Config.Logger.Debug("SelfDisposingBitmapDrawable.OnFreeResources");
             lock (monitor) {
 				if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
                 	Bitmap.Dispose();
