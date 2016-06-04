@@ -84,6 +84,7 @@
     <Compile Include="Work\UIViewTarget.cs" />
     <Compile Include="Work\UIButtonTarget.cs" />
     <Compile Include="Work\UIImageViewTarget.cs" />
+    <Compile Include="Helpers\PlatformPerformance.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />

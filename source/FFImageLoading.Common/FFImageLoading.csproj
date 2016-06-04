@@ -86,6 +86,7 @@
     <Compile Include="Concurrency\SR.cs" />
     <Compile Include="Concurrency\ArrayHelper.cs" />
     <Compile Include="Concurrency\PlatformHelper.cs" />
+    <Compile Include="Helpers\IPlatformPerformance.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

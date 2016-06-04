@@ -107,7 +107,7 @@ namespace FFImageLoading
 				}
 
 				var logger = userDefinedConfig.Logger ?? new MiniLogger();
-                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger, userDefinedConfig.VerbosePerformanceLogging, new Func<int>(() => Thread.CurrentThread.ManagedThreadId));
+                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger, userDefinedConfig.VerbosePerformanceLogging, new PlatformPerformance());
 				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache");
 				var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(httpClient, diskCache);
 

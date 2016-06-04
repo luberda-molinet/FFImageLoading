@@ -102,6 +102,7 @@
     <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Cache\ICacheKeyFactory.cs" />
     <Compile Include="Work\ImageTarget.cs" />
+    <Compile Include="Helpers\PlatformPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -19,7 +19,7 @@ namespace FFImageLoading.Forms.Sample.iOS
 
 			var config = new FFImageLoading.Config.Configuration()
 			{
-				VerbosePerformanceLogging = true,
+				VerbosePerformanceLogging = false,
 				Logger = new CustomLogger(),
 			};
 			ImageService.Instance.Initialize(config);

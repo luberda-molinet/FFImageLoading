@@ -52,7 +52,7 @@ namespace FFImageLoading.Work
         readonly Dictionary<string, PendingTask> _currentlyRunning = new Dictionary<string, PendingTask>();
         Task _dispatch = Task.FromResult<byte>(1);
 
-        Func<int> _threadIdFunc;
+        IPlatformPerformance _performance;
         bool _verbosePerformanceLogging;
         bool _pauseWork; // volatile?
         int _currentPosition; // useful?
@@ -62,11 +62,11 @@ namespace FFImageLoading.Work
         int _statsTotalWaiting;
         long _loadCount;
 
-        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, Func<int> threadIdFunc)
+        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, IPlatformPerformance performance)
         {
             _verbosePerformanceLogging = verbosePerformanceLogging;
             _logger = logger;
-            _threadIdFunc = threadIdFunc;
+            _performance = performance;
 
             int _processorCount = Environment.ProcessorCount;
             if (_processorCount <= 2)
@@ -432,11 +432,12 @@ namespace FFImageLoading.Work
                     stopwatch.Stop();
 
                     LogSchedulerStats();
-                    _logger.Debug(string.Format("[PERFORMANCE] RunAsync - ThreadId: {1}, Execution: {2} ms, ThreadPool: {3}, Key: {0}",
-                                                key,
-                                                _threadIdFunc(),
+                    _logger.Debug(string.Format("[PERFORMANCE] RunAsync - NetManagedThreadId: {0}, NativeThreadId: {1}, Execution: {2} ms, ThreadPool: {3}, Key: {4}",
+                                                _performance.GetCurrentManagedThreadId(),
+                                                _performance.GetCurrentSystemThreadId(),
                                                 stopwatch.Elapsed.Milliseconds,
-                                                scheduleOnThreadPool));
+                                                scheduleOnThreadPool,
+                                                key));
                 }
                 else
                 {
@@ -471,6 +472,8 @@ namespace FFImageLoading.Work
                                          _statsTotalRunning,
                                          _statsTotalMemoryCacheHits,
                                          _statsTotalWaiting));
+            
+            _logger.Debug(_performance.GetMemoryInfo());
         }
     }
 }
