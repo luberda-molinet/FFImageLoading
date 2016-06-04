@@ -23,6 +23,7 @@ namespace FFImageLoading.Config
 			DownsampleInterpolationMode = InterpolationMode.Default;
 			HttpHeadersTimeout = 15;
 			HttpReadTimeout = 30;
+            VerbosePerformanceLogging = false;
 		}
 
 		/// <summary>
@@ -114,6 +115,12 @@ namespace FFImageLoading.Config
 		/// Milliseconds to wait prior to start any task.
 		/// </summary>
 		public int DelayInMs { get; set; }
+
+        /// <summary>
+        /// Enables / disables verbose performance logging.
+        /// </summary>
+        /// <value>The verbose performance logging.</value>
+        public bool VerbosePerformanceLogging { get; set; }
     }
 }
 

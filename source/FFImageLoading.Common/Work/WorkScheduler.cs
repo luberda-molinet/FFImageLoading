@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using FFImageLoading.Cache;
 using FFImageLoading.Concurrency;
+using System.Diagnostics;
 
 namespace FFImageLoading.Work
 {
@@ -51,12 +52,21 @@ namespace FFImageLoading.Work
         readonly Dictionary<string, PendingTask> _currentlyRunning = new Dictionary<string, PendingTask>();
         Task _dispatch = Task.FromResult<byte>(1);
 
+        Func<int> _threadIdFunc;
+        bool _verbosePerformanceLogging;
         bool _pauseWork; // volatile?
         int _currentPosition; // useful?
+        int _statsTotalPending;
+        int _statsTotalRunning;
+        int _statsTotalMemoryCacheHits;
+        int _statsTotalWaiting;
+        long _loadCount;
 
-        public WorkScheduler(IMiniLogger logger)
+        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, Func<int> threadIdFunc)
         {
+            _verbosePerformanceLogging = verbosePerformanceLogging;
             _logger = logger;
+            _threadIdFunc = threadIdFunc;
 
             int _processorCount = Environment.ProcessorCount;
             if (_processorCount <= 2)
@@ -64,7 +74,6 @@ namespace FFImageLoading.Work
             else
                 _maxParallelTasks = (int)Math.Truncate((double)_processorCount / 2d) + 1;
         }
-
 
         public void Cancel(IImageLoaderTask task)
         {
@@ -134,6 +143,13 @@ namespace FFImageLoading.Work
         /// <param name="task">Image loading task.</param>
         public async void LoadImage(IImageLoaderTask task)
         {
+            Interlocked.Increment(ref _loadCount);
+
+            if (_verbosePerformanceLogging && (_loadCount % 10) == 0)
+            {
+                LogSchedulerStats();
+            }
+
             if (task == null)
                 return;
 
@@ -152,8 +168,14 @@ namespace FFImageLoading.Work
             if (task.CanUseMemoryCache())
             {
                 var cacheResult = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
-                if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // If image is loaded from cache there is nothing to do here anymore, if something weird happened with the cache... error callback has already been called, let's just leave
-                    return; // stop processing if loaded from cache OR if loading from cached raised an exception
+                if (cacheResult == CacheResult.Found) // If image is loaded from cache there is nothing to do here anymore
+                {
+                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+                    return;
+                }
+
+                if (cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
+                    return;
             }
 
             _dispatch = _dispatch.ContinueWith(async t =>
@@ -226,6 +248,7 @@ namespace FFImageLoading.Work
                 alreadyRunningTaskForSameKey = FindSimilarPendingTask(task);
                 if (alreadyRunningTaskForSameKey == null)
                 {
+                    Interlocked.Increment(ref _statsTotalPending);
                     _pendingTasks.Add(currentPendingTask);
                 }
                 else
@@ -247,11 +270,13 @@ namespace FFImageLoading.Work
         private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyQueuedTaskForSameKey)
         {
             string queuedKey = alreadyQueuedTaskForSameKey.ImageLoadingTask.GetKey();
+            Interlocked.Increment(ref _statsTotalWaiting);
 
             Action forceQueue = () =>
             {
                 lock (_pendingTasksLock)
                 {
+                    Interlocked.Increment(ref _statsTotalPending);
                     _pendingTasks.Add(currentPendingTask);
                 }
                 Run(currentPendingTask);
@@ -387,16 +412,42 @@ namespace FFImageLoading.Work
             {
                 lock (_pendingTasks)
                 {
+                    Interlocked.Increment(ref _statsTotalRunning);
                     _currentlyRunning.Add(key, pendingTask);
                 }
 
-                if (scheduleOnThreadPool)
+                if (_verbosePerformanceLogging)
                 {
-                    await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+
+                    if (scheduleOnThreadPool)
+                    {
+                        await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await pendingTask.ImageLoadingTask.RunAsync().ConfigureAwait(false);
+                    }
+
+                    stopwatch.Stop();
+
+                    LogSchedulerStats();
+                    _logger.Debug(string.Format("[PERFORMANCE] RunAsync - ThreadId: {1}, Execution: {2} ms, ThreadPool: {3}, Key: {0}",
+                                                key,
+                                                _threadIdFunc(),
+                                                stopwatch.Elapsed.Milliseconds,
+                                                scheduleOnThreadPool));
                 }
                 else
                 {
-                    await pendingTask.ImageLoadingTask.RunAsync().ConfigureAwait(false);
+                    if (scheduleOnThreadPool)
+                    {
+                        await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await pendingTask.ImageLoadingTask.RunAsync().ConfigureAwait(false);
+                    }
                 }
             }
             finally
@@ -408,6 +459,18 @@ namespace FFImageLoading.Work
 
                 await RunAsync().ConfigureAwait(false);
             }
+        }
+
+        void LogSchedulerStats()
+        {
+            _logger.Debug(string.Format("[PERFORMANCE] Scheduler - Max: {0}, Pending: {1}, Running: {2}, TotalPending: {3}, TotalRunning: {4}, TotalMemoryCacheHit: {5}, TotalWaiting: {6}",
+                                         _maxParallelTasks,
+                                         _pendingTasks.Count,
+                                         _currentlyRunning.Count,
+                                         _statsTotalPending,
+                                         _statsTotalRunning,
+                                         _statsTotalMemoryCacheHits,
+                                         _statsTotalWaiting));
         }
     }
 }
