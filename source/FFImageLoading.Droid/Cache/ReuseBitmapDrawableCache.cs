@@ -60,6 +60,7 @@ namespace FFImageLoading.Cache
 		private readonly TimeSpan debug_dump_interval = TimeSpan.FromSeconds(10);
 		private readonly Handler main_thread_handler;
 		private readonly IMiniLogger log;
+        private readonly bool _verboseLogging;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AndroidBitmapDrawableCache"/> class.
@@ -70,8 +71,9 @@ namespace FFImageLoading.Cache
 		/// On Honeycomb and higher this value is used for the reuse pool size.</param>
 		/// <param name="gcThreshold">Threshold in bytes that triggers a System.GC.Collect (Honeycomb+ only).</param>
 		/// <param name="debugDump">If set to <c>true</c> dump stats to log every 10 seconds.</param>
-		public ReuseBitmapDrawableCache(IMiniLogger logger, long highWatermark, long lowWatermark, long gcThreshold = 2 * 1024 * 1024, bool debugDump = false)
+		public ReuseBitmapDrawableCache(IMiniLogger logger, long highWatermark, long lowWatermark, long gcThreshold = 2 * 1024 * 1024, bool verboseLogging = false)
 		{
+            _verboseLogging = verboseLogging;
 			log = logger;
 			low_watermark = lowWatermark;
 			high_watermark = highWatermark;
@@ -81,10 +83,10 @@ namespace FFImageLoading.Cache
 			reuse_pool = new ByteBoundStrongLruCache<string, SelfDisposingBitmapDrawable>(highWatermark, lowWatermark);
 			reuse_pool.EntryRemoved += OnEntryRemovedFromReusePool;
 
-			if (debugDump) {
-				main_thread_handler = new Handler();
-				DebugDumpStats();
-			}
+   //         if (_verboseLogging) {
+			//	main_thread_handler = new Handler();
+			//	DebugDumpStats();
+			//}
 		}
 
 		/// <summary>
@@ -109,7 +111,8 @@ namespace FFImageLoading.Cache
 			// likelihood of being accessed again so we don't want to steal those bytes too soon.
 			lock (monitor) {
 				if (reuse_pool.CacheSizeInBytes < low_watermark && reuse_pool_refill_needed) {
-					log.Debug("Reuse pool is not full, refusing reuse request");
+                    if (_verboseLogging)
+					    log.Debug("Reuse pool is not full, refusing reuse request");
 					total_reuse_misses++;
 					return null;
 				}
@@ -227,7 +230,8 @@ namespace FFImageLoading.Cache
 					// TODO: Implement high/low watermarks to prevent thrashing
 					if (current_evicted_byte_count > gc_threshold) {
 						total_forced_gc_collections++;
-						log.Debug("Memory usage exceeds threshold, invoking GC.Collect");
+                        if (_verboseLogging)
+						    log.Debug("Memory usage exceeds threshold, invoking GC.Collect");
 						// Force immediate Garbage collection. Please note that is resource intensive.
 						System.GC.Collect();
 						System.GC.WaitForPendingFinalizers ();
@@ -249,7 +253,8 @@ namespace FFImageLoading.Cache
 			lock(monitor) {
 				total_removed++;
 				if (evicted) {
-					log.Debug(string.Format("Evicted key: {0}", value.InCacheKey));
+                    if (_verboseLogging)
+					    log.Debug(string.Format("Evicted key: {0}", value.InCacheKey));
 					total_evictions++;
 				}
 			}
@@ -299,7 +304,8 @@ namespace FFImageLoading.Cache
 		private void OnEntryAdded(string key, BitmapDrawable value)
 		{
 			total_added++;
-			log.Debug(string.Format("OnEntryAdded(key = {0})", key));
+            if (_verboseLogging)
+			    log.Debug(string.Format("OnEntryAdded(key = {0})", key));
 			var selfDisposingBitmapDrawable = value as SelfDisposingBitmapDrawable;
 			if (selfDisposingBitmapDrawable != null) {
 				selfDisposingBitmapDrawable.SetIsCached(true);
@@ -330,12 +336,14 @@ namespace FFImageLoading.Cache
 		public void Add(string key, SelfDisposingBitmapDrawable value)
 		{
 			if (value == null) {
-				log.Error("Attempt to add null value, refusing to cache");
+                if (_verboseLogging)
+				    log.Error("Attempt to add null value, refusing to cache");
 				return;
 			}
 
 			if (!value.HasValidBitmap) {
-				log.Error("Attempt to add Drawable with null or recycled bitmap, refusing to cache");
+                if (_verboseLogging)
+				    log.Error("Attempt to add Drawable with null or recycled bitmap, refusing to cache");
 				return;
 			}
 
@@ -383,13 +391,15 @@ namespace FFImageLoading.Cache
 				var result = displayed_cache.TryGetValue(key, out value);
 				if (result) {
 					total_cache_hits++;
-					log.Debug("Cache hit");
+                    if (_verboseLogging)
+					    log.Debug("Cache hit");
 				} else {
 
 					SelfDisposingBitmapDrawable tmp = null;
 					result = reuse_pool.TryGetValue(key, out tmp); // If key is found, its place in the LRU is refreshed
 					if (result) {
-						log.Debug("Cache hit from reuse pool");
+                        if (_verboseLogging)
+						    log.Debug("Cache hit from reuse pool");
 						total_cache_hits++;
 					}
 					value = tmp;

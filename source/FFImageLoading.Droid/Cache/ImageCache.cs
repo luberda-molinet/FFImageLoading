@@ -22,7 +22,7 @@ namespace FFImageLoading.Cache
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 		private readonly IMiniLogger _logger;
 
-        private ImageCache(int maxCacheSize, IMiniLogger logger)
+        private ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
 		{
 			_logger = logger;
 			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
@@ -30,7 +30,7 @@ namespace FFImageLoading.Cache
 			// consider low treshold as a third of maxCacheSize
 			int lowTreshold = safeMaxCacheSize / 3;
 
-			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, safeMaxCacheSize);
+			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, safeMaxCacheSize, verboseLogging);
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 		}
 
@@ -38,7 +38,7 @@ namespace FFImageLoading.Cache
         {
             get
             {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger));
+                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger, ImageService.Instance.Config.VerboseMemoryCacheLogging));
             }
         }
 
@@ -94,7 +94,8 @@ namespace FFImageLoading.Cache
 
 		public void Remove(string key)
 		{
-			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
+            if (ImageService.Instance.Config.VerboseMemoryCacheLogging)
+			    _logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
 			_cache.Remove(key);
 			ImageInformation imageInformation;
 			_imageInformations.TryRemove(key, out imageInformation);

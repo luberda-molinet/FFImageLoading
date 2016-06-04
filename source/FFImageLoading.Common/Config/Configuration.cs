@@ -24,6 +24,7 @@ namespace FFImageLoading.Config
 			HttpHeadersTimeout = 15;
 			HttpReadTimeout = 30;
             VerbosePerformanceLogging = false;
+            VerboseMemoryCacheLogging = false;
 		}
 
 		/// <summary>
@@ -121,6 +122,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The verbose performance logging.</value>
         public bool VerbosePerformanceLogging { get; set; }
+
+        /// <summary>
+        /// Enables / disables verbose memory cache logging.
+        /// </summary>
+        /// <value>The verbose performance logging.</value>
+        public bool VerboseMemoryCacheLogging { get; set; }
     }
 }
 

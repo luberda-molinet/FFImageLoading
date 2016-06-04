@@ -21,6 +21,7 @@ namespace FFImageLoading.Forms.Sample.Droid
 			var config = new FFImageLoading.Config.Configuration()
 			{
 				VerbosePerformanceLogging = false,
+				VerboseMemoryCacheLogging = false,
 				Logger = new CustomLogger(),
 			};
 			ImageService.Instance.Initialize(config);
