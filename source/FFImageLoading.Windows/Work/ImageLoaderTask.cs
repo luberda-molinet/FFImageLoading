@@ -24,8 +24,8 @@ namespace FFImageLoading.Work
 
         private static SemaphoreSlim _decodingLock = new SemaphoreSlim(initialCount: 1);
 
-        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
-            : base(mainThreadDispatcher, miniLogger, parameters, false)
+        public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
+            : base(mainThreadDispatcher, miniLogger, parameters, false, clearCacheOnOutOfMemory)
         {
             if (target == null)
                 throw new ArgumentNullException(nameof(target));

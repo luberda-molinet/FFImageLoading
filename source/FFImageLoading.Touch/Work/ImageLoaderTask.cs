@@ -26,8 +26,8 @@ namespace FFImageLoading.Work
 			#pragma warning restore 0219
 		}
 
-		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, nfloat imageScale, ITarget<UIImage, ImageLoaderTask> target)
-			: base(mainThreadDispatcher, miniLogger, parameters, true)
+		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, nfloat imageScale, ITarget<UIImage, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
+			: base(mainThreadDispatcher, miniLogger, parameters, true, clearCacheOnOutOfMemory)
 		{
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));

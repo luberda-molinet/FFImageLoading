@@ -31,9 +31,11 @@ namespace FFImageLoading.Work
         private readonly ConcurrentDictionary<string, string> _keys;
         private readonly Lazy<string> _rawKey;
         private readonly Lazy<string> _streamKey;
+        private readonly bool _verboseLoadingCancelledLogging;
 
-        protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory)
+        protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory, bool verboseLoadingCancelledLogging)
         {
+            _verboseLoadingCancelledLogging = verboseLoadingCancelledLogging;
             _clearCacheOnOutOfMemory = clearCacheOnOutOfMemory;
             CancellationToken = new CancellationTokenSource();
             Parameters = parameters;
@@ -167,7 +169,9 @@ namespace FFImageLoading.Work
 				}
 			}
 			Finish();
-			Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
+
+            if (_verboseLoadingCancelledLogging)
+			    Logger.Debug(string.Format("Canceled image generation for {0}", GetKey()));
 		}
 
 		public bool IsCancelled

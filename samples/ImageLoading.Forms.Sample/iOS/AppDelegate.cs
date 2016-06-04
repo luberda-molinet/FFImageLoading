@@ -21,6 +21,7 @@ namespace FFImageLoading.Forms.Sample.iOS
 			{
 				VerbosePerformanceLogging = false,
 				VerboseMemoryCacheLogging = false,
+				VerboseLoadingCancelledLogging = false,
 				Logger = new CustomLogger(),
 			};
 			ImageService.Instance.Initialize(config);

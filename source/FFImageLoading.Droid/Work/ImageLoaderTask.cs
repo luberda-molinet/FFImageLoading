@@ -29,7 +29,7 @@ namespace FFImageLoading.Work
 		internal ITarget<BitmapDrawable, ImageLoaderTask> _target;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<BitmapDrawable, ImageLoaderTask> target)
-			: base(mainThreadDispatcher, miniLogger, parameters, true)
+			: base(mainThreadDispatcher, miniLogger, parameters, true, ImageService.Instance.Config.VerboseLoadingCancelledLogging)
 		{
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));

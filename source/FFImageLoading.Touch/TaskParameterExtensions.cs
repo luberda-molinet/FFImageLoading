@@ -89,7 +89,7 @@ namespace FFImageLoading
 
 		private static ImageLoaderTask CreateTask(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
 		{
-			return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, imageScale, target);
+			return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, imageScale, target, ImageService.Instance.Config.VerboseLoadingCancelledLogging);
 		}
 
 		private static IScheduledWork Into(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
