@@ -412,8 +412,21 @@ namespace FFImageLoading.Work
             {
                 lock (_pendingTasks)
                 {
-                    Interlocked.Increment(ref _statsTotalRunning);
-                    _currentlyRunning.Add(key, pendingTask);
+                    if (!_currentlyRunning.ContainsKey(key))
+                    {
+                        _currentlyRunning.Add(key, pendingTask);
+                        Interlocked.Increment(ref _statsTotalRunning);
+                    }
+                    else
+                    {
+                        var existing = _currentlyRunning[key];
+                        if (pendingTask != existing)
+                        {
+                            WaitForSimilarTask(pendingTask, existing);
+                        }
+
+                        return;
+                    }
                 }
 
                 if (_verbosePerformanceLogging)
