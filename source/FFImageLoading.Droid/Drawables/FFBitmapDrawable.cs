@@ -30,6 +30,9 @@ namespace FFImageLoading.Drawables
 		{
 			try 
 			{
+                if (!IsBitmapDrawableValid(this))
+                    return;
+
 				if (!_animating)
 				{
 					base.SetAlpha(_alpha);
