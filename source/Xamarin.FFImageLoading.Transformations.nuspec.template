@@ -3,7 +3,7 @@
 	<metadata minClientVersion="2.8.1">
    
        <id>Xamarin.FFImageLoading.Transformations</id>
-       <version>2.1.1</version>
+       <version>@version</version>
        <title>FFImageLoading Transformations</title>
        <authors>Molinet Fabien, Daniel Luberda</authors>
        <owners></owners>
@@ -30,7 +30,7 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
        <dependencies>
        
           <group>
-            <dependency id="Xamarin.FFImageLoading" version="2.1.1" />
+            <dependency id="Xamarin.FFImageLoading" version="@version" />
           </group>
               
         </dependencies>

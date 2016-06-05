@@ -3,7 +3,7 @@
     <metadata>
     
     	<id>Xamarin.FFImageLoading.Forms</id>
-        <version>2.1.1</version>
+        <version>@version</version>
         <title>FFImageLoading Plugin for Xamarin Forms</title>
         <authors>Daniel Luberda, Fabien Molinet</authors>
         <owners></owners>
@@ -37,7 +37,7 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <dependencies>
         
           <group>
-            <dependency id="Xamarin.FFImageLoading" version="2.1.1" />
+            <dependency id="Xamarin.FFImageLoading" version="@version" />
             <dependency id="Xamarin.Forms" version="1.4.4.6392" />
           </group>
 		  
