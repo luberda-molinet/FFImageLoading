@@ -21,11 +21,15 @@ build_script:
 before_build:
 - ps: >-
     $nuspec1 = "source\Xamarin.FFImageLoading.nuspec"
+    
     $nuspec2 = "source\Xamarin.FFImageLoading.Forms.nuspec"
-    $nuspec3 = "source\Xamarin.FFImageLoading.Transformations.nuspec"  
+    
+    $nuspec3 = "source\Xamarin.FFImageLoading.Transformations.nuspec"
     
     $nuspec1template = "source\Xamarin.FFImageLoading.nuspec.template"
+    
     $nuspec2template = "source\Xamarin.FFImageLoading.Forms.nuspec.template"
+    
     $nuspec3template = "source\Xamarin.FFImageLoading.Transformations.nuspec.template" 
 
     $version = env:appveyor_build_version
@@ -40,7 +44,9 @@ before_build:
     }
           
     (Get-Content $nuspec1template).replace('@version', $version) | Set-Content $nuspec1
+    
     (Get-Content $nuspec2template).replace('@version', $version) | Set-Content $nuspec2    
+    
     (Get-Content $nuspec3template).replace('@version', $version) | Set-Content $nuspec3
   
 artifacts:
