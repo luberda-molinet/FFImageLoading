@@ -36,8 +36,14 @@ before_build:
     
     $branch = $env:appveyor_repo_branch 
     
+    $baseversion = $version.SubString(0, $version.LastIndexOf(".") - 1)
+
     If ($env:appveyor_repo_tag -ine "true") {
-        $version = ("{0}-pre" -f $version)
+        
+        $version = ("{0}-pre-{1}" -f $baseversion, $env:appveyor_build_number)
+    }
+    Else {
+        $version = $baseversion    
     }
     
     If ($branch -ine "master") {
