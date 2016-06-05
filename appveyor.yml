@@ -36,7 +36,7 @@ before_build:
     
     $branch = $env:appveyor_repo_branch 
     
-    If (-Not $env:appveyor_repo_tag) {
+    If ($env:appveyor_repo_tag -ine "true") {
         $version = ("{0}-pre" -f $version)
     }
     
