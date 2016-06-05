@@ -26,6 +26,7 @@ namespace FFImageLoading.Config
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
+            VerboseLogging = false;
 		}
 
 		/// <summary>
@@ -135,6 +136,13 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The verbose image loading cancelled logging.</value>
         public bool VerboseLoadingCancelledLogging { get; set; }
+
+        /// <summary>
+        /// Enables / disables  verbose logging. 
+        /// IMPORTANT! If it's disabled are other verbose logging options are disabled too
+        /// </summary>
+        /// <value>The verbose logging.</value>
+        public bool VerboseLogging { get; set; }
     }
 }
 

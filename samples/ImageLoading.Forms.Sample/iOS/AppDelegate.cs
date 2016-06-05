@@ -19,6 +19,7 @@ namespace FFImageLoading.Forms.Sample.iOS
 
 			var config = new FFImageLoading.Config.Configuration()
 			{
+				VerboseLogging = false,
 				VerbosePerformanceLogging = false,
 				VerboseMemoryCacheLogging = false,
 				VerboseLoadingCancelledLogging = false,
