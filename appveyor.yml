@@ -32,7 +32,7 @@ before_build:
     
     $nuspec3template = "source\Xamarin.FFImageLoading.Transformations.nuspec.template" 
 
-    $version = env:appveyor_build_version
+    $version = $env:appveyor_build_version
     $branch = $env:appveyor_repo_branch 
     
     If (-Not $env:appveyor_repo_tag) {
