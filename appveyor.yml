@@ -23,6 +23,10 @@ before_build:
     $nuspec1 = "source\Xamarin.FFImageLoading.nuspec"
     $nuspec2 = "source\Xamarin.FFImageLoading.Forms.nuspec"
     $nuspec3 = "source\Xamarin.FFImageLoading.Transformations.nuspec"  
+    
+    $nuspec1template = "source\Xamarin.FFImageLoading.nuspec.template"
+    $nuspec2template = "source\Xamarin.FFImageLoading.Forms.nuspec.template"
+    $nuspec3template = "source\Xamarin.FFImageLoading.Transformations.nuspec.template" 
 
     $version = env:appveyor_build_version
     $branch = $env:appveyor_repo_branch 
@@ -35,9 +39,9 @@ before_build:
         $version = ("{0}-{1}" -f $version, $branch)
     }
           
-    cat ($nuspec1 + ".template") | % { $_ -replace "@version", $version } > $nuspec1
-    cat ($nuspec2 + ".template") | % { $_ -replace "@version", $version } > $nuspec2
-    cat ($nuspec3 + ".template") | % { $_ -replace "@version", $version } > $nuspec3        
+    (Get-Content $nuspec1template).replace('@version', $version) | Set-Content $nuspec1
+    (Get-Content $nuspec2template).replace('@version', $version) | Set-Content $nuspec2    
+    (Get-Content $nuspec3template).replace('@version', $version) | Set-Content $nuspec3
   
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg
