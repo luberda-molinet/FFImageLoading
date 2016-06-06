@@ -400,7 +400,7 @@ namespace FFImageLoading.Work
 
         private async Task QueueTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
         {
-            lock (_pendingTasks)
+            lock (_pendingTasksLock)
             {
                 if (_currentlyRunning.Count >= _maxParallelTasks)
                     return;
@@ -411,7 +411,7 @@ namespace FFImageLoading.Work
             try
             {
                 bool alreadyRunning = false;
-                lock (_pendingTasks)
+                lock (_pendingTasksLock)
                 {
                     if (!_currentlyRunning.ContainsKey(key))
                     {
