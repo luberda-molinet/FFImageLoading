@@ -610,7 +610,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The SuccessCommandProperty.
 		/// </summary>
-		public static readonly BindableProperty SuccessCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.SuccessCommand, null);
+		public static readonly BindableProperty SuccessCommandProperty = BindableProperty.Create(nameof(SuccessCommand), typeof(ICommand), typeof(CachedImage));
 
 		/// <summary>
 		/// Gets or sets the SuccessCommand.
@@ -648,7 +648,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The ErrorCommandProperty.
 		/// </summary>
-		public static readonly BindableProperty ErrorCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.ErrorCommand, null);
+		public static readonly BindableProperty ErrorCommandProperty = BindableProperty.Create(nameof(ErrorCommand), typeof(ICommand), typeof(CachedImage));
 
 		/// <summary>
 		/// Gets or sets the ErrorCommand.
@@ -686,7 +686,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The FinishCommandProperty.
 		/// </summary>
-		public static readonly BindableProperty FinishCommandProperty = BindableProperty.Create<CachedImage, ICommand> (w => w.FinishCommand, null);
+		public static readonly BindableProperty FinishCommandProperty = BindableProperty.Create(nameof(FinishCommand), typeof(ICommand), typeof(CachedImage));
 
 		/// <summary>
 		/// Gets or sets the FinishCommand.
