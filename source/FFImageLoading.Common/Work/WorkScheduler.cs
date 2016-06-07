@@ -410,7 +410,8 @@ namespace FFImageLoading.Work
 
             try
             {
-                bool alreadyRunning = false;
+                PendingTask alreadyRunningTask = null;
+
                 lock (_pendingTasksLock)
                 {
                     if (!_currentlyRunning.ContainsKey(key))
@@ -420,18 +421,17 @@ namespace FFImageLoading.Work
                     }
                     else
                     {
-                        alreadyRunning = true;
+                        alreadyRunningTask = _currentlyRunning[key];
+
+                        // duplicate - return
+                        if (pendingTask == alreadyRunningTask)
+                            return;
                     }
                 }
 
-                if (alreadyRunning)
+                if (alreadyRunningTask != null)
                 {
-                    var existing = _currentlyRunning[key];
-                    if (pendingTask != existing)
-                    {
-                        WaitForSimilarTask(pendingTask, existing);
-                    }
-
+                    WaitForSimilarTask(pendingTask, alreadyRunningTask);
                     return;
                 }
 
