@@ -454,56 +454,60 @@ namespace FFImageLoading.Forms
 		[Obsolete("Use OnMeasure")]
 		protected override SizeRequest OnSizeRequest(double widthConstraint, double heightConstraint)
 		{
-            SizeRequest sizeRequest = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
-            Size request = sizeRequest.Request;
-            double width1 = request.Width;
-            request = sizeRequest.Request;
-            double height1 = request.Height;
-            double num1 = width1 / height1;
-            double num2 = widthConstraint / heightConstraint;
-            double width2 = sizeRequest.Request.Width;
-            double height2 = sizeRequest.Request.Height;
-			if (width2 == 0d || height2 == 0d)
-                return new SizeRequest(new Size(0d, 0d));
-            double width3 = width2;
-            double height3 = height2;
-            if (num2 > num1)
-            {
-                switch (this.Aspect)
-                {
-                    case Aspect.AspectFit:
-                    case Aspect.AspectFill:
-                        height3 = Math.Min(height2, heightConstraint);
-                        width3 = width2 * (height3 / height2);
-                        break;
-                    case Aspect.Fill:
-                        width3 = Math.Min(width2, widthConstraint);
-                        height3 = height2 * (width3 / width2);
-                        break;
-                }
-            }
-            else if (num2 < num1)
-            {
-                switch (this.Aspect)
-                {
-                    case Aspect.AspectFit:
-                    case Aspect.AspectFill:
-                        width3 = Math.Min(width2, widthConstraint);
-                        height3 = height2 * (width3 / width2);
-                        break;
-                    case Aspect.Fill:
-                        height3 = Math.Min(height2, heightConstraint);
-                        width3 = width2 * (height3 / height2);
-                        break;
-                }
-            }
-            else
-            {
-                width3 = Math.Min(width2, widthConstraint);
-                height3 = height2 * (width3 / width2);
-            }
-            return new SizeRequest(new Size(width3, height3));
-        }
+			SizeRequest desiredSize = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
+
+			double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
+			double constraintAspect = widthConstraint / heightConstraint;
+
+			double desiredWidth = desiredSize.Request.Width;
+			double desiredHeight = desiredSize.Request.Height;
+
+			if (desiredWidth == 0 || desiredHeight == 0)
+				return new SizeRequest(new Size(0, 0));
+
+			double width = desiredWidth;
+			double height = desiredHeight;
+			if (constraintAspect > desiredAspect)
+			{
+				// constraint area is proportionally wider than image
+				switch (Aspect)
+				{
+					case Aspect.AspectFit:
+					case Aspect.AspectFill:
+						height = Math.Min(desiredHeight, heightConstraint);
+						width = desiredWidth * (height / desiredHeight);
+						break;
+					case Aspect.Fill:
+						width = Math.Min(desiredWidth, widthConstraint);
+						height = desiredHeight * (width / desiredWidth);
+						break;
+				}
+			}
+			else if (constraintAspect < desiredAspect)
+			{
+				// constraint area is proportionally taller than image
+				switch (Aspect)
+				{
+					case Aspect.AspectFit:
+					case Aspect.AspectFill:
+						width = Math.Min(desiredWidth, widthConstraint);
+						height = desiredHeight * (width / desiredWidth);
+						break;
+					case Aspect.Fill:
+						height = Math.Min(desiredHeight, heightConstraint);
+						width = desiredWidth * (height / desiredHeight);
+						break;
+				}
+			}
+			else
+			{
+				// constraint area is same aspect as image
+				width = Math.Min(desiredWidth, widthConstraint);
+				height = desiredHeight * (width / desiredWidth);
+			}
+
+			return new SizeRequest(new Size(width, height));
+		}
 
 		internal Action InternalReloadImage;
 			
