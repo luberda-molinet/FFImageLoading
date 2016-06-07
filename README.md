@@ -57,16 +57,16 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 
 [what-is-this]: various_images_and_image_links
 
-[ci-img]: https://img.shields.io/appveyor/ci/molinch/ffimageloading.svg?maxAge=2592000
+[ci-img]: https://img.shields.io/appveyor/ci/molinch/ffimageloading.svg
 [ci-link]: https://ci.appveyor.com/project/molinch/ffimageloading
 
-[ffil-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.svg?maxAge=2592000
+[ffil-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.svg
 [ffil-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading
-[forms-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.Forms.svg?maxAge=2592000
+[forms-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.Forms.svg
 [forms-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading.Forms
-[trans-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.Transformations.svg?maxAge=2592000
+[trans-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.Transformations.svg
 [trans-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading.Transformations
-[ffil-pre-img]: https://img.shields.io/nuget/vpre/Xamarin.FFImageLoading.svg?maxAge=2592000
+[ffil-pre-img]: https://img.shields.io/nuget/vpre/Xamarin.FFImageLoading.svg
 [ffil-pre-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading
 
 [ffimageloading_large]: https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/ffimageloading_large.png
