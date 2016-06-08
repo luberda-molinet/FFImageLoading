@@ -240,7 +240,7 @@ namespace FFImageLoading.Work
             _logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
 
             int position = Interlocked.Increment(ref _currentPosition);
-            var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task };
+            var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task, FrameworkWrappingTask = CreateFrameworkTask(task) };
 
             PendingTask alreadyRunningTaskForSameKey = null;
             lock (_pendingTasksLock)
@@ -313,17 +313,17 @@ namespace FFImageLoading.Work
 
         private async void Run(PendingTask pendingTask)
         {
-            if (_maxParallelTasks <= 0)
-            {
-                pendingTask.FrameworkWrappingTask = pendingTask.ImageLoadingTask.RunAsync(); // FMT: threadpool will limit concurrent work
-                await pendingTask.FrameworkWrappingTask.ConfigureAwait(false);
-                return;
-            }
+            await RunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+        }
+
+        private Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
+        {
+            var parameters = imageLoadingTask.Parameters;
 
             var tcs = new TaskCompletionSource<bool>();
 
-            var successCallback = pendingTask.ImageLoadingTask.Parameters.OnSuccess;
-            pendingTask.ImageLoadingTask.Parameters.Success((size, result) =>
+            var successCallback = parameters.OnSuccess;
+            parameters.Success((size, result) =>
             {
                 tcs.TrySetResult(true);
 
@@ -331,8 +331,8 @@ namespace FFImageLoading.Work
                     successCallback(size, result);
             });
 
-            var finishCallback = pendingTask.ImageLoadingTask.Parameters.OnFinish;
-            pendingTask.ImageLoadingTask.Parameters.Finish(sw =>
+            var finishCallback = parameters.OnFinish;
+            parameters.Finish(sw =>
             {
                 tcs.TrySetResult(false);
 
@@ -340,8 +340,7 @@ namespace FFImageLoading.Work
                     finishCallback(sw);
             });
 
-            pendingTask.FrameworkWrappingTask = tcs.Task;
-            await RunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+            return tcs.Task;
         }
 
         private async Task RunAsync()
