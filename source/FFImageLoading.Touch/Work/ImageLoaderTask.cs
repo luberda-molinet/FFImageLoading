@@ -361,7 +361,7 @@ namespace FFImageLoading.Work
 					downsampleHeight = downsampleHeight.PointsToPixels();
 				}
 
-				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), _imageScale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation);
+				imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation);
 			}
 			else if (Parameters.DownSampleSize != null && imageIn != null)
 			{
