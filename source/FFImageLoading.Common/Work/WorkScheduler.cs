@@ -116,7 +116,7 @@ namespace FFImageLoading.Work
 
                 lock (_pendingTasksLock)
                 {
-                    foreach (var task in _pendingTasks)
+                    foreach (var task in _pendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
                         task.ImageLoadingTask.Cancel();
 
                     _pendingTasks.Clear();
@@ -203,7 +203,7 @@ namespace FFImageLoading.Work
             {
                 lock (_pendingTasksLock)
                 {
-                    foreach (var pendingTask in _pendingTasks)
+                    foreach (var pendingTask in _pendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
                     {
                         if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
                             pendingTask.ImageLoadingTask.CancelIfNeeded();
