@@ -17,7 +17,7 @@ namespace FFImageLoading.Config
 			MaxMemoryCacheSize = 0; 
 			LoadWithTransparencyChannel = false;
 			FadeAnimationEnabled = true;
-			FadeAnimationForCachedImages = true;
+			FadeAnimationForCachedImages = false; // by default cached images will not fade when displayed on screen, otherwise it gives the impression that UI is laggy
 			FadeAnimationDuration = 500;
 			TransformPlaceholders = true;
 			DownsampleInterpolationMode = InterpolationMode.Default;
