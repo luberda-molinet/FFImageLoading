@@ -81,6 +81,11 @@ namespace FFImageLoading
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
 		{
+            if (parameters.Priority == null)
+            {
+                parameters.WithPriority(LoadingPriority.Low);
+            }
+
 			parameters.Preload = true;
 			var target = new Target<UIImage, ImageLoaderTask>();
 			var task = CreateTask(parameters, 1, target);

@@ -142,7 +142,7 @@ namespace FFImageLoading.Work
 
 		public string CustomCacheKey { get; private set; }
 
-		public int Priority { get; private set; }
+		public int? Priority { get; private set; }
         public CacheType? CacheType { get; private set; }
 
 		/// <summary>

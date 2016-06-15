@@ -72,9 +72,14 @@ namespace FFImageLoading
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
 		{
+            if (parameters.Priority == null)
+            {
+                parameters.WithPriority(LoadingPriority.Low);
+            }
+
 			parameters.Preload = true;
 			var target = new Target<BitmapDrawable, ImageLoaderTask>();
-			var task = CreateTask(parameters, target);
+            var task = CreateTask(parameters, target);
 			ImageService.Instance.LoadImage(task);
 		}
 
