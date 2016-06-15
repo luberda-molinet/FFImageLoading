@@ -171,11 +171,15 @@ namespace FFImageLoading.Work
                 if (cacheResult == CacheResult.Found) // If image is loaded from cache there is nothing to do here anymore
                 {
                     Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                    return;
                 }
 
-                if (cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
+                if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
+                {
+                    if (task.Parameters.OnFinish != null)
+                        task.Parameters.OnFinish(task);
+                    task.Dispose();
                     return;
+                }
             }
 
             _dispatch = _dispatch.ContinueWith(async t =>
