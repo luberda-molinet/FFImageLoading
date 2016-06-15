@@ -1,3 +1,5 @@
+*We are actively looking for persons that could help maintaining the project. If you are interested just let us know!*
+
 # FFImageLoading - Fast & Furious Image Loading [![AppVeyor][ci-img]][ci-link]
 
 Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms and Windows (WinRT, UWP, Silverlight).
