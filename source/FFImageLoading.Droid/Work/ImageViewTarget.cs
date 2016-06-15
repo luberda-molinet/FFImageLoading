@@ -59,7 +59,7 @@ namespace FFImageLoading.Work
 			return control.Handle == otherControl.Handle;
 		}
 
-		private ImageView Control
+		protected ImageView Control
 		{
 			get
 			{
