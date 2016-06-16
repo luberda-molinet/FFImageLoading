@@ -73,10 +73,14 @@ namespace FFImageLoading.Transformations
 
 		public static Bitmap ToColorSpace(Bitmap source, ColorMatrix colorMatrix)
 		{
+			var config = source.GetConfig();
+            		if (config == null)
+                		config = Bitmap.Config.Argb8888;    // This will support transparency
+			
 			int width = source.Width;
 			int height = source.Height;
 
-			Bitmap bitmap = Bitmap.CreateBitmap(width, height, source.GetConfig());
+			Bitmap bitmap = Bitmap.CreateBitmap(width, height, config);
 
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())
