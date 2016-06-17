@@ -7,14 +7,16 @@ namespace FFImageLoading.IO
 {
     internal static class FileStore
     {
-		public static Stream GetInputStream(string path)
+        private const int DefaultBufferSize = 4096;
+
+		public static Stream GetInputStream(string path, bool asynchronous)
 		{
-			return new FileStream(path, FileMode.Open, FileAccess.Read);
+			return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, asynchronous);
 		}
 
-		public static Stream GetOutputStream(string path)
+		public static Stream GetOutputStream(string path, bool asynchronous)
 		{
-			return new FileStream(path, FileMode.Create, FileAccess.Write);
+			return new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, DefaultBufferSize, asynchronous);
 		}
 
 		public static bool Exists(string path)
@@ -24,7 +26,7 @@ namespace FFImageLoading.IO
 
         public static async Task<byte[]> ReadBytesAsync(string path, CancellationToken token)
         {
-			using (var fs = GetInputStream(path))
+			using (var fs = GetInputStream(path, true))
 			{
 				var buff = new byte[fs.Length];
 				await fs.ReadAsync(buff, 0, (int)fs.Length, token).ConfigureAwait(false);
@@ -34,7 +36,7 @@ namespace FFImageLoading.IO
 
 		public static async Task WriteBytesAsync(string path, byte[] data, CancellationToken token)
         {
-            using (var fs = GetOutputStream(path)) {
+            using (var fs = GetOutputStream(path, true)) {
 				await fs.WriteAsync(data, 0, data.Length, token).ConfigureAwait(false);
             }
         }

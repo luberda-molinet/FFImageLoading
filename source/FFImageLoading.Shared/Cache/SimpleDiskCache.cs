@@ -93,10 +93,7 @@ namespace FFImageLoading.Cache
                         string filename = sanitizedKey + "." + duration.TotalSeconds;
                         string filepath = Path.Combine(_cachePath, filename);
 
-                        using (var fs = FileStore.GetOutputStream(filepath))
-                        {
-                            await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-                        }
+                        await FileStore.WriteBytesAsync(filepath, bytes, CancellationToken.None).ConfigureAwait(false);
 
                         _entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
                     }
@@ -209,7 +206,7 @@ namespace FFImageLoading.Cache
 					return null;
 
 				string filepath = Path.Combine(_cachePath, entry.FileName);
-				return FileStore.GetInputStream(filepath);
+				return FileStore.GetInputStream(filepath, false);
 			}
 			catch
 			{
