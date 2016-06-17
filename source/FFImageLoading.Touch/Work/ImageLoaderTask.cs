@@ -14,9 +14,7 @@ namespace FFImageLoading.Work
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
 		internal readonly ITarget<UIImage, ImageLoaderTask> _target;
-		private readonly nfloat _imageScale;
-		// private static readonly object _imageInLock = new object();
-
+		
 		static ImageLoaderTask()
 		{
 			// do not remove!
@@ -33,7 +31,6 @@ namespace FFImageLoading.Work
 				throw new ArgumentNullException(nameof(target));
 			
 			_target = target;
-			_imageScale = imageScale;
 			DownloadCache = downloadCache;
 		}
 
