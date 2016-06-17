@@ -18,6 +18,12 @@ namespace FFImageLoading.Work
         /// <param name="task">Image loading task to cancel</param>
         void Cancel(IImageLoaderTask task);
 
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        void Cancel(Func<IImageLoaderTask, bool> predicate);
+
         bool ExitTasksEarly { get; }
 
         void SetExitTasksEarly(bool exitTasksEarly);
@@ -92,6 +98,21 @@ namespace FFImageLoading.Work
             {
                 if (task != null && task.IsCancelled)
                     task.Parameters.Dispose(); // this will ensure we don't keep a reference due to callbacks
+            }
+        }
+
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        public void Cancel(Func<IImageLoaderTask, bool> predicate)
+        {
+            lock (_pendingTasksLock)
+            {
+                foreach (var task in _pendingTasks.Where(p => predicate(p.ImageLoadingTask)).ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
+                {
+                    task.ImageLoadingTask.Cancel();
+                }
             }
         }
 

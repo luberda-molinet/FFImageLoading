@@ -123,5 +123,17 @@ namespace FFImageLoading
 		/// <param name="cacheType">Memory cache, Disk cache or both</param>
 		/// <param name="removeSimilar">If similar keys should be removed, ie: typically keys with extra transformations</param>
 		Task InvalidateCacheEntryAsync(string key, CacheType cacheType, bool removeSimilar=false);
+
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        void Cancel(Func<IImageLoaderTask, bool> predicate);
+
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        void Cancel(Func<TaskParameter, bool> predicate);
 	}
 }

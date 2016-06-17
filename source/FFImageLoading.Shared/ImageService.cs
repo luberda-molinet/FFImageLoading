@@ -315,5 +315,22 @@ namespace FFImageLoading
 				await Config.DiskCache.RemoveAsync(hash).ConfigureAwait(false);
 			}
 		}
+
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>        public void Cancel(Func<IImageLoaderTask, bool> predicate)
+        {
+            Scheduler.Cancel(predicate);
+        }
+
+        /// <summary>
+        /// Cancels tasks that match predicate.
+        /// </summary>
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        public void Cancel(Func<TaskParameter, bool> predicate)
+        {
+            Scheduler.Cancel(task => task.Parameters != null && predicate(task.Parameters));
+        }
     }
 }
