@@ -5,7 +5,7 @@ using UIKit;
 
 namespace FFImageLoading.Work
 {
-	public class UIImageViewTarget: UIViewTarget<UIImageView>
+	public class UIImageViewTarget: UIControlTarget<UIImageView>
 	{
 		public UIImageViewTarget(UIImageView control) : base(control)
 		{

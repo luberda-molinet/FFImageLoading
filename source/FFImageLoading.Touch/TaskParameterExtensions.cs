@@ -25,6 +25,18 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// Loads the image into given imageView using defined parameters.
+        /// </summary>
+        /// <param name="parameters">Parameters for loading the image.</param>
+        /// <param name="imageView">Image view that should receive the image.</param>
+        /// <param name="imageScale">Optional scale factor to use when interpreting the image data. If unspecified it will use the device scale (ie: Retina = 2, non retina = 1)</param>
+        public static IScheduledWork Into(this TaskParameter parameters, UITabBarItem item, float imageScale = -1f)
+        {
+            var target = new UIBarItemTarget(item);
+            return parameters.Into(imageScale, target);
+        }
+
+        /// <summary>
         /// Loads the image into given UIButton using defined parameters.
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
