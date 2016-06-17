@@ -22,7 +22,7 @@ namespace FFImageLoading.Work.StreamResolver
 			imageInformation.SetPath(identifier);
 			imageInformation.SetFilePath(identifier);
 
-			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier), LoadingResult.Disk, imageInformation);
+			var result = WithLoadingResult.Encapsulate(FileStore.GetInputStream(identifier, false), LoadingResult.Disk, imageInformation);
 			return Task.FromResult(result);
 		}
 
