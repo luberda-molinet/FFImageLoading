@@ -390,7 +390,7 @@ namespace FFImageLoading.Work
 
                     foreach (var task in _pendingTasks
                                 .Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.Completed)
-                                .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority ?? 0)
+                                .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority ?? (int)LoadingPriority.Normal)
                                 .ThenBy(t => t.Position))
                     {
                         // We don't want to load, at the same time, images that have same key or same raw key at the same time
