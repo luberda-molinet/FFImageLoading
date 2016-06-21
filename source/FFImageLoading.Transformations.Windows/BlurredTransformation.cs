@@ -15,6 +15,8 @@ namespace FFImageLoading.Transformations
             Radius = radius;
         }
 
+		public double Radius { get; set; }
+
         public override string Key
         {
             get { return string.Format("BlurredTransformation,radius={0}", Radius); }
