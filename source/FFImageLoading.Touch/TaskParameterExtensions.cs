@@ -111,6 +111,13 @@ namespace FFImageLoading
 
 		private static IScheduledWork Into(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
         {
+            if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
+            {
+                target.SetAsEmpty();
+                parameters.Dispose();
+                return null;
+            }
+
 			var task = CreateTask(parameters, imageScale, target);
 			ImageService.Instance.LoadImage(task);
             return task;

@@ -18,6 +18,15 @@ namespace FFImageLoading.Work
 				return;
 			control.SetImage(image, UIControlState.Normal);
 		}
+
+        public override void SetAsEmpty()
+        {
+            var control = Control;
+            if (control == null)
+                return;
+
+            control.SetImage(null, UIControlState.Normal);
+        }
 	}
 }
 

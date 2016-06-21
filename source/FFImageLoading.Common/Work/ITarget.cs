@@ -13,6 +13,8 @@ namespace FFImageLoading.Work
 		bool UsesSameNativeControl(TImageLoaderTask task);
 
 		void Set(TImageLoaderTask task, TBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder);
+
+        void SetAsEmpty();
 	}
 }
 

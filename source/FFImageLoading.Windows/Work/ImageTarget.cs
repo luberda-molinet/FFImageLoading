@@ -40,6 +40,15 @@ namespace FFImageLoading.Work
             return IsValid;
         }
 
+        public override void SetAsEmpty()
+        {
+            var control = Control;
+            if (control == null)
+                return;
+
+            control.Source = null;
+        }
+
         public override void Set(ImageLoaderTask task, WriteableBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
         {
             if (task.IsCancelled)

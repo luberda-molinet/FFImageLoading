@@ -39,6 +39,15 @@ namespace FFImageLoading.Work
 				control.Image = image;
 			}
 		}
+
+        public override void SetAsEmpty()
+        {
+            var control = Control;
+            if (control == null)
+                return;
+
+            control.Image = null;
+        }
 	}
 }
 

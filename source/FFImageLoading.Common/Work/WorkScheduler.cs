@@ -158,50 +158,55 @@ namespace FFImageLoading.Work
             }
         }
 
-        /// <summary>
-        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
-        /// </summary>
-        /// <param name="task">Image loading task.</param>
-        public async void LoadImage(IImageLoaderTask task)
-        {
-            Interlocked.Increment(ref _loadCount);
+		/// <summary>
+		/// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
+		/// </summary>
+		/// <param name="task">Image loading task.</param>
+		public async void LoadImage(IImageLoaderTask task)
+		{
+			Interlocked.Increment(ref _loadCount);
 
-            if (_verbosePerformanceLogging && (_loadCount % 10) == 0)
-            {
-                LogSchedulerStats();
-            }
+			if (_verbosePerformanceLogging && (_loadCount % 10) == 0)
+			{
+				LogSchedulerStats();
+			}
 
-            if (task == null)
-                return;
+			if (task == null)
+				return;
 
-            if (task.IsCancelled)
-            {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
-                return;
-            }
+			if (task.IsCancelled)
+			{
+				task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
+				return;
+			}
 
-            if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
-            {
-                await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
-            }
+			if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
+			{
+				await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
+			}
 
-            // If we have the image in memory then it's pointless to schedule the job: just display it straight away
-            if (task.CanUseMemoryCache())
-            {
-                var cacheResult = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
-                if (cacheResult == CacheResult.Found) // If image is loaded from cache there is nothing to do here anymore
-                {
-                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                }
+			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
+			if (task.CanUseMemoryCache())
+			{
+				var cacheResult = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
+				if (cacheResult == CacheResult.Found) // If image is loaded from cache there is nothing to do here anymore
+				{
+					Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+				}
 
-                if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
-                {
-                    if (task.Parameters.OnFinish != null)
-                        task.Parameters.OnFinish(task);
-                    task.Dispose();
-                    return;
-                }
-            }
+				if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
+				{
+					if (task.Parameters.OnFinish != null)
+						task.Parameters.OnFinish(task);
+					task.Dispose();
+					return;
+				}
+			}
+            else if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
+			{
+				_logger.Debug("ImageService: null path ignored");
+				return;
+			}
 
             _dispatch = _dispatch.ContinueWith(async t =>
             {

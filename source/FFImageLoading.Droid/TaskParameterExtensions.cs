@@ -20,7 +20,15 @@ namespace FFImageLoading
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
 			var target = new ImageViewTarget(imageView);
-			var task = CreateTask(parameters, target);
+
+            if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
+            {
+                target.SetAsEmpty();
+                parameters.Dispose();
+                return null;
+            }
+
+            var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
             return task;
         }
