@@ -18,7 +18,7 @@ namespace FFImageLoading.Work
 		/// <param name="filepath">Path to the file.</param>
 		public static TaskParameter FromFile(string filepath)
 		{
-			return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath};
+            return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath }; 
 		}
 
 		/// <summary>
@@ -39,7 +39,12 @@ namespace FFImageLoading.Work
 		/// <returns>The new TaskParameter.</returns>
 		public static TaskParameter FromApplicationBundle(string filepath)
 		{
-			return new TaskParameter() { Source = ImageSource.ApplicationBundle, Path = filepath };
+			var taskParameter = new TaskParameter() { Source = ImageSource.ApplicationBundle, Path = filepath };
+
+            if (!taskParameter.Priority.HasValue)
+                taskParameter.Priority = (int)LoadingPriority.Normal + 1;
+
+            return taskParameter;
 		}
 
 		/// <summary>
@@ -49,7 +54,12 @@ namespace FFImageLoading.Work
 		/// <param name="resourceName">Name of the resource in drawable folder without extension</param>
 		public static TaskParameter FromCompiledResource(string resourceName)
 		{
-			return new TaskParameter() { Source = ImageSource.CompiledResource, Path = resourceName };
+			var taskParameter = new TaskParameter() { Source = ImageSource.CompiledResource, Path = resourceName };
+
+            if (!taskParameter.Priority.HasValue)
+                taskParameter.Priority = (int)LoadingPriority.Normal + 1;
+
+            return taskParameter;
 		}
 
 		/// <summary>
