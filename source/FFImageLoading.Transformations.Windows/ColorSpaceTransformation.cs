@@ -8,6 +8,10 @@ namespace FFImageLoading.Transformations
     {
         float[][] _rgbawMatrix;
 
+		public ColorSpaceTransformation() : this(FFColorMatrix.InvertColorMatrix)
+		{
+		}
+
         public ColorSpaceTransformation(float[][] rgbawMatrix)
         {
             if (rgbawMatrix.Length != 5 || rgbawMatrix.Any(v => v.Length != 5))
@@ -15,6 +19,22 @@ namespace FFImageLoading.Transformations
 
             _rgbawMatrix = rgbawMatrix;
         }
+
+		public float[][] RGBAWMatrix
+		{
+			get
+			{
+				return _rgbawMatrix;
+			}
+
+			set
+			{
+				if (value.Length != 5 || value.Any(v => v.Length != 5))
+					throw new ArgumentException("Wrong size of RGBAW color matrix");
+
+				_rgbawMatrix = value;
+			}
+		}
 
         public override string Key
         {

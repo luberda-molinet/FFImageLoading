@@ -5,22 +5,28 @@ namespace FFImageLoading.Transformations
 {
 	public class FlipTransformation : ITransformation
 	{
-		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
+		public FlipTransformation()
+		{
+			throw new Exception(Common.DoNotReferenceMessage);
+		}
 
 		public FlipTransformation(FlipType flipType)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public IBitmap Transform(IBitmap source)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
+
+		public FlipType FlipType { get; set; }
+
 		public string Key
 		{
 			get
 			{
-				throw new Exception(DoNotReference);
+				throw new Exception(Common.DoNotReferenceMessage);
 			}
 		}
 	}

@@ -5,40 +5,51 @@ namespace FFImageLoading.Transformations
 {
 	public class CornersTransformation : ITransformation
 	{
-		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
+		public CornersTransformation()
+		{
+			throw new Exception(Common.DoNotReferenceMessage);
+		}
 
 		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
 			CornerTransformType cornersTransformType)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
+
+		public double TopLeftCornerSize { get; set; }
+		public double TopRightCornerSize { get; set; }
+		public double BottomLeftCornerSize { get; set; }
+		public double BottomRightCornerSize { get; set; }
+		public double CropWidthRatio { get; set; }
+		public double CropHeightRatio { get; set; }
+		public CornerTransformType CornersTransformType { get; set; }
 
 		public IBitmap Transform(IBitmap source)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public string Key
 		{
 			get
 			{
-				throw new Exception(DoNotReference);
+				throw new Exception(Common.DoNotReferenceMessage);
 			}
 		}
 	}

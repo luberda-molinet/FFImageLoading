@@ -5,21 +5,24 @@ namespace FFImageLoading.Transformations
 {
     public class BlurredTransformation : TransformationBase
     {
-        private double _radius;
+		public BlurredTransformation()
+		{
+			Radius = 20d;
+		}
 
         public BlurredTransformation(double radius)
         {
-            _radius = radius;
+            Radius = radius;
         }
 
         public override string Key
         {
-            get { return string.Format("BlurredTransformation,radius={0}", _radius); }
+            get { return string.Format("BlurredTransformation,radius={0}", Radius); }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            ToLegacyBlurred(source, (int)_radius);
+            ToLegacyBlurred(source, (int)Radius);
 
             return source;
         }

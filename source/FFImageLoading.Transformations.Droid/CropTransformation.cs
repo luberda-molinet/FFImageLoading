@@ -6,11 +6,9 @@ namespace FFImageLoading.Transformations
 	[Preserve(AllMembers = true)]
 	public class CropTransformation : TransformationBase
 	{
-		private double _zoomFactor;
-		private double _xOffset;
-		private double _yOffset;
-		private double _cropWidthRatio;
-		private double _cropHeightRatio;
+		public CropTransformation() : this(1d, 0d, 0d)
+		{
+		}
 
 		public CropTransformation(double zoomFactor, double xOffset, double yOffset) : this(zoomFactor, xOffset, yOffset, 1f, 1f)
 		{
@@ -18,25 +16,34 @@ namespace FFImageLoading.Transformations
 
 		public CropTransformation(double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
 		{
-			_zoomFactor = zoomFactor;
-			_xOffset = xOffset;
-			_yOffset = yOffset;
-			_cropWidthRatio = cropWidthRatio;
-			_cropHeightRatio = cropHeightRatio;
+			ZoomFactor = zoomFactor;
+			XOffset = xOffset;
+			YOffset = yOffset;
+			CropWidthRatio = cropWidthRatio;
+			CropHeightRatio = cropHeightRatio;
 
-			if (zoomFactor < 1f)
-				_zoomFactor = 1f;
+			if (ZoomFactor < 1f)
+				ZoomFactor = 1f;
 		}
+
+		public double ZoomFactor { get; set; }
+		public double XOffset { get; set; }
+		public double YOffset { get; set; }
+		public double CropWidthRatio { get; set; }
+		public double CropHeightRatio { get; set; }
 
 		public override string Key
 		{
-			get { return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}", 
-				_zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio); }
+			get 
+			{ 
+				return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}", 
+				ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio); 
+			}
 		}
 
 		protected override Bitmap Transform(Bitmap source)
 		{
-			return ToCropped(source, _zoomFactor, _xOffset, _yOffset, _cropWidthRatio, _cropHeightRatio);
+			return ToCropped(source, ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
 		}
 
 		public static Bitmap ToCropped(Bitmap source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)

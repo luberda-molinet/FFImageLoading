@@ -5,27 +5,37 @@ namespace FFImageLoading.Transformations
 {
 	public class CropTransformation : ITransformation
 	{
-		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
+		public CropTransformation()
+		{
+			throw new Exception(Common.DoNotReferenceMessage);
+		}
 
 		public CropTransformation(double zoomFactor, double xOffset, double yOffset)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public CropTransformation(double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public IBitmap Transform(IBitmap source)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
+
+		public double ZoomFactor { get; set; }
+		public double XOffset { get; set; }
+		public double YOffset { get; set; }
+		public double CropWidthRatio { get; set; }
+		public double CropHeightRatio { get; set; }
+
 		public string Key
 		{
 			get
 			{
-				throw new Exception(DoNotReference);
+				throw new Exception(Common.DoNotReferenceMessage);
 			}
 		}
 	}

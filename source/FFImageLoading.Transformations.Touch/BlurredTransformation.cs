@@ -8,21 +8,26 @@ namespace FFImageLoading.Transformations
 	[Preserve(AllMembers = true)]
 	public class BlurredTransformation: TransformationBase
 	{
-		private double _radius;
+		public BlurredTransformation()
+		{
+			Radius = 20d;
+		}
 
 		public BlurredTransformation(double radius)
 		{
-			_radius = radius;
+			Radius = radius;
 		}
+
+		public double Radius { get; set; }
 
 		public override string Key
 		{
-			get { return string.Format("BlurredTransformation,radius={0}", _radius); }
+			get { return string.Format("BlurredTransformation,radius={0}", Radius); }
 		}
 
 		protected override UIImage Transform(UIImage source)
 		{
-			return ToBlurred(source, (float)_radius);
+			return ToBlurred(source, (float)Radius);
 		}
 
 		public static UIImage ToBlurred(UIImage source, float rad)

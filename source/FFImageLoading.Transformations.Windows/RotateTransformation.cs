@@ -5,9 +5,9 @@ namespace FFImageLoading.Transformations
 {
     public class RotateTransformation : TransformationBase
     {
-        double _degrees;
-        bool _ccw;
-        bool _resize;
+		public RotateTransformation() : this(30d)
+		{
+		}
 
         public RotateTransformation(double degrees) : this(degrees, false, false)
         {
@@ -19,19 +19,23 @@ namespace FFImageLoading.Transformations
 
         public RotateTransformation(double degrees, bool ccw, bool resize)
         {
-            _degrees = degrees;
-            _ccw = ccw;
-            _resize = resize;
+			Degrees = degrees;
+			CCW = ccw;
+			Resize = resize;
         }
 
-        public override string Key
-        {
-            get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", _degrees, _ccw, _resize); }
-        }
+		public double Degrees { get; set; }
+		public bool CCW { get; set; }
+		public bool Resize { get; set; }
+
+		public override string Key
+		{
+			get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", Degrees, CCW, Resize); }
+		}
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            return ToRotated(source, _degrees, _ccw, _resize);
+            return ToRotated(source, Degrees, CCW, Resize);
         }
 
         public static BitmapHolder ToRotated(BitmapHolder source, double degrees, bool ccw, bool resize)

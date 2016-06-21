@@ -5,32 +5,41 @@ namespace FFImageLoading.Transformations
 {
 	public class RotateTransformation : ITransformation
 	{
-		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
+		public RotateTransformation()
+		{
+			throw new Exception(Common.DoNotReferenceMessage);
+		}
 
 		public RotateTransformation(double degrees) : this(degrees, false, false)
 		{
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public RotateTransformation(double degrees, bool ccw) : this(degrees, ccw, false)
 		{
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public RotateTransformation(double degrees, bool ccw, bool resize)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
+
+		public double Degrees { get; set; }
+		public bool CCW { get; set; }
+		public bool Resize { get; set; }
 
 		public string Key
 		{
 			get
 			{
-				throw new Exception(DoNotReference);
+				throw new Exception(Common.DoNotReferenceMessage);
 			}
 		}
 
 		public IBitmap Transform(IBitmap source)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 	}
 }

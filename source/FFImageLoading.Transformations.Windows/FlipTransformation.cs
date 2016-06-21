@@ -4,21 +4,25 @@ namespace FFImageLoading.Transformations
 {
     public class FlipTransformation : TransformationBase
     {
-        private FlipType _flipType;
+		public FlipTransformation() : this(FlipType.Horizontal)
+		{
+		}
 
         public FlipTransformation(FlipType flipType)
         {
-            _flipType = flipType;
+			FlipType = flipType;
         }
 
         public override string Key
         {
-            get { return string.Format("FlipTransformation,Type={0}", _flipType); }
+            get { return string.Format("FlipTransformation,Type={0}", FlipType); }
         }
+
+		public FlipType FlipType { get; set; }
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            return ToFlipped(source, _flipType);
+            return ToFlipped(source, FlipType);
         }
 
         public static BitmapHolder ToFlipped(BitmapHolder bmp, FlipType flipMode)

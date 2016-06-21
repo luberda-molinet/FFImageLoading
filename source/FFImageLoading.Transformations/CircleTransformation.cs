@@ -5,27 +5,29 @@ namespace FFImageLoading.Transformations
 {
 	public class CircleTransformation : ITransformation
 	{
-		private const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform (iOS/Android) version";
-
-		public CircleTransformation() : this(0d, null)
+		public CircleTransformation()
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public CircleTransformation(double borderSize, string borderHexColor)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
 		public IBitmap Transform(IBitmap source)
 		{
-			throw new Exception(DoNotReference);
+			throw new Exception(Common.DoNotReferenceMessage);
 		}
+
+		public double BorderSize { get; set; }
+		public string BorderHexColor { get; set; }
+
 		public string Key
 		{
 			get
 			{
-				throw new Exception(DoNotReference);
+				throw new Exception(Common.DoNotReferenceMessage);
 			}
 		}
 	}
