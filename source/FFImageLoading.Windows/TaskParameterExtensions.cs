@@ -111,7 +111,7 @@ namespace FFImageLoading
 
         private static ImageLoaderTask CreateTask(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
         {
-            return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, new MainThreadDispatcher(), ImageService.Instance.Config.Logger, parameters, target, ImageService.Instance.Config.VerboseLoadingCancelledLogging);
+            return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, MainThreadDispatcher.Instance, ImageService.Instance.Config.Logger, parameters, target, ImageService.Instance.Config.VerboseLoadingCancelledLogging);
         }
     }
 }
