@@ -3,9 +3,11 @@ using UIKit;
 using CoreGraphics;
 using CoreImage;
 using System.Linq;
+using Foundation;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class ColorSpaceTransformation: TransformationBase
 	{
 		CGColorSpace _colorSpace;

@@ -1,9 +1,11 @@
 ﻿using System;
 using FFImageLoading.Work;
 using Android.Graphics;
+using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class CircleTransformation : TransformationBase
 	{
 		private double _borderSize;

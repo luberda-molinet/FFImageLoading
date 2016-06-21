@@ -1,9 +1,11 @@
 ﻿using System;
 using Android.Graphics;
 using System.Linq;
+using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class ColorSpaceTransformation : TransformationBase
 	{
 		ColorMatrix _colorMatrix;

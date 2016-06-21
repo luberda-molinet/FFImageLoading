@@ -1,9 +1,11 @@
 ﻿using System;
 using Android.Graphics;
 using Android.Content;
+using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class BlurredTransformation: TransformationBase
 	{
 		private double _radius;

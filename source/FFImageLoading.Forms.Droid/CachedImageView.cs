@@ -6,6 +6,7 @@ using Android.Util;
 
 namespace FFImageLoading.Forms.Droid
 {
+	[Preserve(AllMembers = true)]
 	public class CachedImageView : ImageViewAsync
 	{
 		bool _skipInvalidate;

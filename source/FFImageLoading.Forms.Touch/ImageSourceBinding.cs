@@ -3,9 +3,11 @@ using Xamarin.Forms;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Foundation;
 
 namespace FFImageLoading.Forms.Touch
 {
+	[Preserve(AllMembers= true)]
 	internal class ImageSourceBinding
 	{
 		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)

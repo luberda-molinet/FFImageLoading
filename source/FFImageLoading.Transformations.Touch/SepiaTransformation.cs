@@ -1,8 +1,10 @@
 ﻿using UIKit;
 using CoreImage;
+using Foundation;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class SepiaTransformation : TransformationBase
 	{
 		public SepiaTransformation()

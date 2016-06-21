@@ -1,8 +1,10 @@
 ﻿using System;
 using Android.Graphics;
+using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class RoundedTransformation : TransformationBase
 	{
 		private double _radius;

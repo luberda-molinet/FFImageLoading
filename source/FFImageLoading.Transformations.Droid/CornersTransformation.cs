@@ -1,8 +1,10 @@
 ﻿using System;
 using Android.Graphics;
+using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class CornersTransformation : TransformationBase
 	{
 		private double _topLeftCornerSize;

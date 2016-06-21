@@ -1,9 +1,11 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
+using Foundation;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class RotateTransformation : TransformationBase
 	{
 		double _degrees;

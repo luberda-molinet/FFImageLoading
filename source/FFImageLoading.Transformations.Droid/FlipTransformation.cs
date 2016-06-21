@@ -1,9 +1,11 @@
 ﻿using System;
 using Android.Graphics;
+using Android.Runtime;
 using Android.Util;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class FlipTransformation: TransformationBase
 	{
 		private FlipType _flipType;

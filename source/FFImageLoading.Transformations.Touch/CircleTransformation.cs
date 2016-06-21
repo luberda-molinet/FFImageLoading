@@ -1,7 +1,9 @@
-﻿using UIKit;
+﻿using Foundation;
+using UIKit;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class CircleTransformation : TransformationBase
 	{
 		private double _borderSize;

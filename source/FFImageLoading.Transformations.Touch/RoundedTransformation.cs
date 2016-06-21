@@ -2,9 +2,11 @@
 using UIKit;
 using CoreGraphics;
 using FFImageLoading.Transformations.Extensions;
+using Foundation;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class RoundedTransformation : TransformationBase
 	{
 		private double _radius;

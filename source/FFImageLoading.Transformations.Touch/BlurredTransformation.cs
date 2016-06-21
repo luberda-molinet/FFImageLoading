@@ -1,9 +1,11 @@
 ﻿using UIKit;
 using CoreGraphics;
 using CoreImage;
+using Foundation;
 
 namespace FFImageLoading.Transformations
 {
+	[Preserve(AllMembers = true)]
 	public class BlurredTransformation: TransformationBase
 	{
 		private double _radius;
@@ -22,7 +24,6 @@ namespace FFImageLoading.Transformations
 		{
 			return ToBlurred(source, (float)_radius);
 		}
-
 
 		public static UIImage ToBlurred(UIImage source, float rad)
 		{
