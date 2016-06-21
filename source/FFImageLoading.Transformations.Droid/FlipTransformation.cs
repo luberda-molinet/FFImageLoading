@@ -10,7 +10,7 @@ namespace FFImageLoading.Transformations
 	{
 		public FlipTransformation(FlipType flipType)
 		{
-			_flipType = flipType;
+			FlipType = flipType;
 		}
 
 		public override string Key
