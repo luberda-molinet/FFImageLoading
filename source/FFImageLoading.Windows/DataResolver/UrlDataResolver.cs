@@ -24,8 +24,6 @@ namespace FFImageLoading.DataResolver
 
             var imageInformation = new ImageInformation();
             imageInformation.SetPath(identifier);
-            imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
-
             var allowDiskCaching = Parameters.CacheType.HasValue == false || Parameters.CacheType == CacheType.All || Parameters.CacheType == CacheType.Disk;
             if (allowDiskCaching)
             {
