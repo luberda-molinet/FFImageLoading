@@ -9,7 +9,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 |         Xamarin iOS / Android         |             Xamarin.Forms             |         Windows RT / UWP          |          Transformations          |
 |:-------------------------------------:|:-------------------------------------:|:---------------------------------:|:---------------------------------:|
 |    [![NuGet][ffil-img]][ffil-link]    |   [![NuGet][forms-img]][forms-link]   |  [![NuGet][ffil-img]][ffil-link]  | [![NuGet][trans-img]][trans-link] |
-| [![][demo-droid-img]][demo-droid-src] | [![][demo-forms-img]][demo-forms-src] | [![][demo-win-img]][demo-win-src] |                 -                 |
+| [![][demo-droid-img]][demo-droid-src] | [![][demo-forms-img]][demo-forms-src] | [![][demo-win-img]][demo-win-src] | [![][dev-nugets-img]][dev-nugets]                 |
 
 [![NuGet][ffimageloading]][ffimageloading_large]
 
@@ -35,27 +35,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 
 ## Documentation
 
-- **General**
-  - [Fluent Syntax](https://github.com/molinch/FFImageLoading/wiki/Fluent-Syntax)
-
-- **Android, iOS, Windows Phone**
-  - [Common API](https://github.com/molinch/FFImageLoading/wiki/API)
-  - [Android Specificities](https://github.com/molinch/FFImageLoading/wiki/Android-API)
-  - [iOS Specificities](https://github.com/molinch/FFImageLoading/wiki/iOS-API)
-  - [Windows Specificities](https://github.com/molinch/FFImageLoading/wiki/Windows-API)
-  - [Advanced usage](https://github.com/molinch/FFImageLoading/wiki/Advanced-Usage)
-  - [Authentication support](https://github.com/molinch/FFImageLoading/wiki/Authentication-Support)
-
-- **Xamarin.Forms**
-  - [Xamarin.Forms API](https://github.com/molinch/FFImageLoading/wiki/Xamarin.Forms-API)
-  - [Xamarin.Forms Advanced](https://github.com/molinch/FFImageLoading/wiki/Xamarin.Forms-Advanced)
-
-- **Transformations**
-  - [Transformations Guide](https://github.com/molinch/FFImageLoading/wiki/Transformations-Guide)
-  - [Custom Transformations Guide](https://github.com/molinch/FFImageLoading/wiki/Custom-Transformations-Guide)
-
-- **Other**
-  - [MvvmCross usage](https://github.com/molinch/FFImageLoading/wiki/MvvmCross)
+https://github.com/luberda-molinet/FFImageLoading/wiki
 
 [what-is-this]: various_images_and_image_links
 
@@ -80,4 +60,6 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 [demo-droid-src]: https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample
 [demo-win-img]: https://img.shields.io/badge/demo-source-orange.svg
 [demo-win-src]: https://github.com/molinch/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample
+[dev-nugets-img]: https://img.shields.io/badge/nugets-dev-yellow.svg
+[dev-nugets]: https://github.com/luberda-molinet/FFImageLoading/wiki/Dev-NuGet-packages
 
