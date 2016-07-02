@@ -77,6 +77,8 @@ namespace FFImageLoading.Forms.Droid
 			
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
+			base.OnElementPropertyChanged(sender, e);
+
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
 				UpdateBitmap(null);	
