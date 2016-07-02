@@ -334,7 +334,6 @@ namespace FFImageLoading.Forms.WinRT
             {
                 ((Xamarin.Forms.IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
                 ((Xamarin.Forms.IVisualElementController)element).NativeSizeChanged();
-                element.InvalidateViewMeasure();
             }
         }
 

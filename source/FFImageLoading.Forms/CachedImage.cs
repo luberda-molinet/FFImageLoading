@@ -94,7 +94,7 @@ namespace FFImageLoading.Forms
             {
                 BindableObject.SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
             }
-            ((CachedImage)bindable).InvalidateMeasure();
+			((IVisualElementController)bindable).NativeSizeChanged();
         }
 			
 		/// <summary>
@@ -443,12 +443,6 @@ namespace FFImageLoading.Forms
 			}
 
 			base.OnBindingContextChanged();
-		}
-
-		internal void InvalidateViewMeasure()
-		{
-			// this.OnPropertyChanged(Image.SourceProperty.PropertyName);
-			InvalidateMeasure();
 		}
 
 		[Obsolete("Use OnMeasure")]

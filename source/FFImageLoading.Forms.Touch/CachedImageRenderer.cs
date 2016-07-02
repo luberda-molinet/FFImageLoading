@@ -276,7 +276,6 @@ namespace FFImageLoading.Forms.Touch
 			{
 				((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
 				((IVisualElementController)element).NativeSizeChanged();
-				element.InvalidateViewMeasure();
 			}
 		}
 
