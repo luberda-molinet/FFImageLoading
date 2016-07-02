@@ -22,8 +22,6 @@ namespace FFImageLoading.Work
     {
         internal readonly ITarget<WriteableBitmap, ImageLoaderTask> _target;
 
-        private static SemaphoreSlim _decodingLock = new SemaphoreSlim(initialCount: 1);
-
         public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
             : base(mainThreadDispatcher, miniLogger, parameters, false, clearCacheOnOutOfMemory)
         {
@@ -347,17 +345,12 @@ namespace FFImageLoading.Work
 
                     try
                     {
-                        await _decodingLock.WaitAsync();
                         imageIn = await stream.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
                         Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
                         return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
-                    }
-                    finally
-                    {
-                        _decodingLock.Release();
                     }
 
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
@@ -369,16 +362,8 @@ namespace FFImageLoading.Work
                         {
                             var old = imageIn;
 
-                            try
-                            {
-                                await _decodingLock.WaitAsync();
-                                IBitmap bitmapHolder = transformation.Transform(imageIn);
-                                imageIn = bitmapHolder.ToNative();
-                            }
-                            finally
-                            {
-                                _decodingLock.Release();
-                            }
+                            IBitmap bitmapHolder = transformation.Transform(imageIn);
+                            imageIn = bitmapHolder.ToNative();
 
                             if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
                             {
@@ -400,7 +385,6 @@ namespace FFImageLoading.Work
                 {
                     try
                     {
-                        await _decodingLock.WaitAsync();
                         writableBitmap = await stream.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation);
                     }
                     catch (Exception ex)
@@ -408,10 +392,7 @@ namespace FFImageLoading.Work
                         Logger.Error("Something wrong happened while asynchronously loading/decoding image: " + path, ex);
                         return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                     }
-                    finally
-                    {
-                        _decodingLock.Release();
-                    }
+
                 }
             
                 return WithLoadingResult.Encapsulate(writableBitmap, streamWithResult.Result, imageInformation);
