@@ -154,8 +154,6 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (measured)
             {
-                var elCtrl = (Xamarin.Forms.IVisualElementController)Element;
-                elCtrl.NativeSizeChanged();
                 HackInvalidateMeasure(Element);
             }
         }
@@ -167,7 +165,8 @@ namespace FFImageLoading.Forms.WinRT
 
             var obj = elCtrl;
             var ti = obj.GetType().GetTypeInfo();
-            var found = obj.GetType().GetRuntimeMethods().FirstOrDefault(v => v.Name.EndsWith("InvalidateMeasure") && v.GetParameters().Count() == 1);
+            var found = obj.GetType().GetRuntimeMethods()
+                .FirstOrDefault(v => v.Name.EndsWith("InvalidateMeasure") && v.GetParameters().Count() == 1);
             
             if (found != null)
             {
@@ -175,8 +174,13 @@ namespace FFImageLoading.Forms.WinRT
                 var enumValues = Enum.GetValues(paramType);
                 found.Invoke(obj, new[] { enumValues.GetValue(5) });
             }
-
+            else
+            {
+                ((Xamarin.Forms.IVisualElementController)obj).NativeSizeChanged();
+            }
             // END OF HACK
+#else
+            ((Xamarin.Forms.IVisualElementController)obj).NativeSizeChanged();
 #endif
         }
 
@@ -358,7 +362,7 @@ namespace FFImageLoading.Forms.WinRT
             {
                 var elCtrl = (Xamarin.Forms.IVisualElementController)Element;
                 elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
-                elCtrl.NativeSizeChanged();
+                //elCtrl.NativeSizeChanged();
                 HackInvalidateMeasure(Element);
             }
         }
