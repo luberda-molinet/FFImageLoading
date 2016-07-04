@@ -160,10 +160,10 @@ namespace FFImageLoading.Forms.WinRT
 
         void HackInvalidateMeasure(object elCtrl)
         {
+            var obj = elCtrl;
 #if !SILVERLIGHT
             // HACK FOR https://bugzilla.xamarin.com/show_bug.cgi?id=41087
 
-            var obj = elCtrl;
             var ti = obj.GetType().GetTypeInfo();
             var found = obj.GetType().GetRuntimeMethods()
                 .FirstOrDefault(v => v.Name.EndsWith("InvalidateMeasure") && v.GetParameters().Count() == 1);
