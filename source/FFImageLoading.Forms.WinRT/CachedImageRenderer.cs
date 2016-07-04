@@ -10,6 +10,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
 using System.IO;
 using System.Threading;
+using System.Reflection;
+using System.Linq;
 
 #if WINDOWS_UWP
 using FFImageLoading.Forms.WinUWP;
@@ -152,8 +154,30 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (measured)
             {
-                ((Xamarin.Forms.IVisualElementController)Element).NativeSizeChanged();
+                var elCtrl = (Xamarin.Forms.IVisualElementController)Element;
+                elCtrl.NativeSizeChanged();
+                HackInvalidateMeasure(Element);
             }
+        }
+
+        void HackInvalidateMeasure(object elCtrl)
+        {
+#if !SILVERLIGHT
+            // HACK FOR https://bugzilla.xamarin.com/show_bug.cgi?id=41087
+
+            var obj = elCtrl;
+            var ti = obj.GetType().GetTypeInfo();
+            var found = obj.GetType().GetRuntimeMethods().FirstOrDefault(v => v.Name.EndsWith("InvalidateMeasure") && v.GetParameters().Count() == 1);
+            
+            if (found != null)
+            {
+                var paramType = found.GetParameters().First().ParameterType;
+                var enumValues = Enum.GetValues(paramType);
+                found.Invoke(obj, new[] { enumValues.GetValue(5) });
+            }
+
+            // END OF HACK
+#endif
         }
 
         private async void UpdateSource()
@@ -332,8 +356,10 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (element != null)
             {
-                ((Xamarin.Forms.IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
-                ((Xamarin.Forms.IVisualElementController)element).NativeSizeChanged();
+                var elCtrl = (Xamarin.Forms.IVisualElementController)Element;
+                elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
+                elCtrl.NativeSizeChanged();
+                HackInvalidateMeasure(Element);
             }
         }
 
