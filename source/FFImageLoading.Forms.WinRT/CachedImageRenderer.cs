@@ -340,6 +340,18 @@ namespace FFImageLoading.Forms.WinRT
 
         private void UpdateAspect()
         {
+            if (Element.Aspect == Xamarin.Forms.Aspect.AspectFill
+                && Control.HorizontalAlignment != HorizontalAlignment.Center) // Then Center Crop
+            {
+                Control.HorizontalAlignment = HorizontalAlignment.Center;
+                Control.VerticalAlignment = VerticalAlignment.Center;
+            }
+            else if (Control.HorizontalAlignment != HorizontalAlignment.Left) // Default
+            {
+                Control.HorizontalAlignment = HorizontalAlignment.Left;
+                Control.VerticalAlignment = VerticalAlignment.Top;
+            }
+
             Control.Stretch = GetStretch(Element.Aspect);
         }
 
