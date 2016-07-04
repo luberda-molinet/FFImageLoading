@@ -25,9 +25,13 @@ namespace FFImageLoading.Work.DataResolver
 			var path = downloadedData.CachedPath;
 			var result = downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet;
 
-			var imageInformation = new ImageInformation();
-			imageInformation.SetPath(identifier);
-			imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
+            var imageInformation = new ImageInformation();
+            imageInformation.SetPath(identifier);
+            var allowDiskCaching = Parameters.CacheType.HasValue == false || Parameters.CacheType == CacheType.All || Parameters.CacheType == CacheType.Disk;
+            if (allowDiskCaching)
+            {
+                imageInformation.SetFilePath(await DownloadCache.GetDiskCacheFilePathAsync(identifier, Parameters.CustomCacheKey));
+            }
 
 			return new UIImageData() { 
 				Data = bytes, 
