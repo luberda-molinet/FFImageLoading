@@ -29,7 +29,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 - Transformations support
   - BlurredTransformation
   - CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
-  - ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
+  - ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
   - FlipTransformation, RotateTransformation
   - Supports custom transformations (native platform `ITransformation` implementations)
 
