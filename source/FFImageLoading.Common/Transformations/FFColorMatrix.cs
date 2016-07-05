@@ -52,6 +52,23 @@ namespace FFImageLoading.Transformations
 			new [] { 0f, 0f, 0f, 1f, 0f },
 			new [] { 0f, 0f, 0f, 0f, 1f },
 		};
+
+        public static float[][] ColorToTintMatrix(int r, int g, int b, int a)
+        {
+            float progressR = (float)r / 128f;
+            float progressG = (float)g / 128f;
+            float progressB = (float)b / 128f;
+            float progressA = (float)a / 128f;
+
+            return new float[][]
+            {
+                new [] { progressR, 0f, 0f, 0f, 0f },
+                new [] { 0f, progressG, 0f, 0f, 0f },
+                new [] { 0f, 0f, progressB, 0f, 0f },
+                new [] { 0f, 0f, 0f, progressA, 0f },
+                new [] { 0f, 0f, 0f, 0f, 1f },
+            };
+        }
 	}
 }
 

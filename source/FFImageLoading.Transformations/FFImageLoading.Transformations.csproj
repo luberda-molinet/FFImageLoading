@@ -61,6 +61,7 @@
     <Compile Include="CropTransformation.cs" />
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="TintTransformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using FFImageLoading.Work;
+﻿using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
@@ -89,9 +90,9 @@ namespace FFImageLoading.Transformations
 
             for (var line = 0; line < height; line++)
             {
-                var srcOff = (((int)cropY + line) * source.Width + (int)cropX) * Helpers.SizeOfArgb;
-                var dstOff = line * width * Helpers.SizeOfArgb;
-                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * Helpers.SizeOfArgb);
+                var srcOff = (((int)cropY + line) * source.Width + (int)cropX) * ColorExtensions.SizeOfArgb;
+                var dstOff = line * width * ColorExtensions.SizeOfArgb;
+                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
             }
 
             return new BitmapHolder(result, width, height);
@@ -113,9 +114,9 @@ namespace FFImageLoading.Transformations
 
             for (var line = 0; line < height; line++)
             {
-                var srcOff = ((y + line) * srcWidth + x) * Helpers.SizeOfArgb;
-                var dstOff = line * width * Helpers.SizeOfArgb;
-                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * Helpers.SizeOfArgb);
+                var srcOff = ((y + line) * srcWidth + x) * ColorExtensions.SizeOfArgb;
+                var dstOff = line * width * ColorExtensions.SizeOfArgb;
+                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
             }
 
             return new BitmapHolder(result, width, height);

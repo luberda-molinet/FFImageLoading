@@ -1,7 +1,6 @@
 ﻿using System;
 using UIKit;
 using CoreGraphics;
-using FFImageLoading.Transformations.Extensions;
 using Foundation;
 
 namespace FFImageLoading.Transformations
@@ -96,16 +95,6 @@ namespace FFImageLoading.Transformations
 					if (borderSize > 0d) 
 					{
 						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 1000d);
-						UIColor borderColor = UIColor.Clear;
-
-						try
-						{
-							borderColor = borderHexColor.FromHexString();
-						}
-						catch(Exception)
-						{
-						}
-
 						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d), 
 							(desiredWidth - borderSize), (desiredHeight - borderSize));
 
@@ -113,7 +102,7 @@ namespace FFImageLoading.Transformations
 
 						using (var path = UIBezierPath.FromRoundedRect(borderRect, rad))
 						{
-							context.SetStrokeColor(borderColor.CGColor);
+							context.SetStrokeColor(borderHexColor.ToUIColor().CGColor);
 							context.SetLineWidth((nfloat)borderSize);
 							context.AddPath(path.CGPath);
 							context.StrokePath();

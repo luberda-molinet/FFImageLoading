@@ -89,6 +89,7 @@
     <Compile Include="DataResolver\ResolverImageData.cs" />
     <Compile Include="DataResolver\ResourceDataResolver.cs" />
     <Compile Include="DataResolver\UrlDataResolver.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="FFImageSourceBinding.cs" />

@@ -94,19 +94,7 @@ namespace FFImageLoading.Transformations
 				if (borderSize > 0d) 
 				{
 					borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
-					Color borderColor = Color.Transparent;
-
-					try
-					{
-						if(!borderHexColor.StartsWith("#", StringComparison.Ordinal))
-							borderHexColor.Insert(0, "#");
-						borderColor = Color.ParseColor(borderHexColor);
-					}
-					catch(Exception)
-					{
-					}
-
-					paint.Color = borderColor;
+					paint.Color = borderHexColor.ToColor(); ;
 					paint.SetStyle(Paint.Style.Stroke);
 					paint.StrokeWidth = (float)borderSize;
 					paint.SetShader(null);

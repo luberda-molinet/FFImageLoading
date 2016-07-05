@@ -79,6 +79,7 @@
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="RoundedTransformation.cs" />
     <Compile Include="SepiaTransformation.cs" />
+    <Compile Include="TintTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

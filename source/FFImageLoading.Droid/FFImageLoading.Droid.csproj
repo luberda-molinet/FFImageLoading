@@ -99,6 +99,7 @@
     <Compile Include="Extensions\ExifExtensions.cs" />
     <Compile Include="Work\ImageViewTarget.cs" />
     <Compile Include="Helpers\PlatformPerformance.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

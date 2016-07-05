@@ -57,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,7 +76,7 @@
     </Compile>
     <Compile Include="CropTransformation.cs" />
     <Compile Include="RotateTransformation.cs" />
-    <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="TintTransformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>

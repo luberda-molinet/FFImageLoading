@@ -25,8 +25,7 @@ namespace FFImageLoading.Transformations
 
 			_colorSpace = null;
 			_colorMatrix = new CIColorMatrix();
-			_rgbawMatrix = rgbawMatrix;
-			UpdateColorMatrix(rgbawMatrix);
+			RGBAWMatrix = rgbawMatrix;
 		}
 
 		public ColorSpaceTransformation(CGColorSpace colorSpace)
@@ -47,7 +46,9 @@ namespace FFImageLoading.Transformations
 				if (value.Length != 5 || value.Any(v => v.Length != 5))
 					throw new ArgumentException("Wrong size of RGBAW color matrix");
 
+				_colorSpace = null;
 				_rgbawMatrix = value;
+				UpdateColorMatrix(_rgbawMatrix);
 			}
 		}
 

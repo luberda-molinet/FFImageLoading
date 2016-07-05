@@ -17,7 +17,7 @@ namespace FFImageLoading.Transformations
             if (rgbawMatrix.Length != 5 || rgbawMatrix.Any(v => v.Length != 5))
                 throw new ArgumentException("Wrong size of RGBAW color matrix");
 
-            _rgbawMatrix = rgbawMatrix;
+            RGBAWMatrix = rgbawMatrix;
         }
 
 		public float[][] RGBAWMatrix

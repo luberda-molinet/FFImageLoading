@@ -220,6 +220,9 @@
     <Compile Include="..\FFImageLoading.Windows\DataResolver\UrlDataResolver.cs">
       <Link>DataResolver\UrlDataResolver.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Windows\Extensions\ColorExtensions.cs">
+      <Link>Extensions\ColorExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Windows\FFImage.cs">
       <Link>FFImage.cs</Link>
     </Compile>

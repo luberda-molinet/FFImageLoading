@@ -180,6 +180,9 @@
     <Compile Include="..\FFImageLoading.Transformations.Windows\SepiaTransformation.cs">
       <Link>SepiaTransformation.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Transformations.Windows\TintTransformation.cs">
+      <Link>TintTransformation.cs</Link>
+    </Compile>
     <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
       <Link>CornerTransformType.cs</Link>
     </Compile>

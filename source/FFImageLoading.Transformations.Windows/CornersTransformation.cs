@@ -1,4 +1,5 @@
-﻿using FFImageLoading.Work;
+﻿using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 using Windows.UI;
 
 namespace FFImageLoading.Transformations

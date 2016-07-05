@@ -21,8 +21,7 @@ namespace FFImageLoading.Transformations
 				throw new ArgumentException("Wrong size of RGBAW color matrix");
 
 			_colorMatrix = new ColorMatrix();
-			_rgbawMatrix = rgbawMatrix;
-			UpdateColorMatrix(rgbawMatrix);
+			RGBAWMatrix = rgbawMatrix;
 		}
 
 		public ColorSpaceTransformation(ColorMatrix colorMatrix)
@@ -43,6 +42,7 @@ namespace FFImageLoading.Transformations
 					throw new ArgumentException("Wrong size of RGBAW color matrix");
 
 				_rgbawMatrix = value;
+				UpdateColorMatrix(_rgbawMatrix);
 			}
 		}
 
