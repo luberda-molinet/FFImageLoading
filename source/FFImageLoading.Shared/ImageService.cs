@@ -50,7 +50,22 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
+        /// Initializes FFImageLoading with a default Configuration. 
+        /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
+        /// </summary>
+        /// <param name="configuration">Configuration.</param>
+        public void Initialize()
+        {
+            lock (_initializeLock)
+            {
+                _initialized = false;
+                InitializeIfNeeded();
+            }
+        }
+
+        /// <summary>
+        /// Initializes FFImageLoading with a given Configuration. It allows to configure and override most of it.
+        /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
         /// </summary>
         /// <param name="configuration">Configuration.</param>
         public void Initialize(Configuration configuration)
@@ -80,7 +95,6 @@ namespace FFImageLoading
 					configuration.MaxMemoryCacheSize = _config.MaxMemoryCacheSize;
 					configuration.DiskCache = _config.DiskCache;
 				}
-
 
 				InitializeIfNeeded(configuration);
 			}
