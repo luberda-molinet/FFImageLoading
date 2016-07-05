@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using System.Net.Http;
 using FFImageLoading.Helpers;
-using FFImageLoading.Cache;
 using System.Threading;
 
 namespace FFImageLoading.Cache
@@ -98,13 +95,9 @@ namespace FFImageLoading.Cache
 
 		private async Task<byte[]> DownloadAsync(string url, string filename, CancellationToken token)
 		{
-			int headersTimeout = ImageService.Instance.Config.HttpHeadersTimeout;
-			// Not used for the moment
-			// int readTimeout = ImageService.Instance.Config.HttpReadTimeout - headersTimeout;
-
 			using (var cancelHeadersToken = new CancellationTokenSource())
 			{
-				cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(headersTimeout));
+				cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
 				using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
 				{
 					using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
@@ -112,7 +105,13 @@ namespace FFImageLoading.Cache
 						if (!response.IsSuccessStatusCode || response.Content == null)
 							return null;
 
-						return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                        using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                        {
+                            cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+
+                            return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false), 
+                                                  cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                        }
 					}
 				}
 			}
