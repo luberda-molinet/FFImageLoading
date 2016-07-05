@@ -83,7 +83,11 @@ namespace FFImageLoading.Transformations
 			if (cropY + desiredHeight > sourceHeight)
 				cropY = (float)(sourceHeight - desiredHeight);
 
-			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, source.GetConfig());
+			var config = source.GetConfig();
+			if (config == null)
+				config = Bitmap.Config.Argb8888;    // This will support transparency
+
+			Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, config);
 
 			using (Canvas canvas = new Canvas(bitmap))
 			using (Paint paint = new Paint())

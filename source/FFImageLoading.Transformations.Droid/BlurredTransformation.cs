@@ -67,7 +67,11 @@ namespace FFImageLoading.Transformations
 		// Source: http://incubator.quasimondo.com/processing/superfast_blur.php
 		public static Bitmap ToLegacyBlurred(Bitmap source, Context context, int radius)
 		{
-			Bitmap img = source.Copy(source.GetConfig(), true);
+			var config = source.GetConfig();
+			if (config == null)
+				config = Bitmap.Config.Argb8888;    // This will support transparency
+
+			Bitmap img = source.Copy(config, true);
 
 			int w = img.Width;
 			int h = img.Height;
