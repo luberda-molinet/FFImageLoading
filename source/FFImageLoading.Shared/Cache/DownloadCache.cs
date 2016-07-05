@@ -107,7 +107,7 @@ namespace FFImageLoading.Cache
 
                         using (var cancelReadTimeoutToken = new CancellationTokenSource())
                         {
-                            cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+                            cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
 
                             return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false), 
                                                   cancelReadTimeoutToken.Token).ConfigureAwait(false);
