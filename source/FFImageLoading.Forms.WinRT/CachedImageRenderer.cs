@@ -370,9 +370,13 @@ namespace FFImageLoading.Forms.WinRT
 
         private void ImageLoadingFinished(CachedImage element)
         {
-            if (element != null)
+            if (element != null && Element != null)
             {
                 var elCtrl = (Xamarin.Forms.IVisualElementController)Element;
+				if(elCtrl == null) 
+				{
+					return;
+				}
                 elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
                 //elCtrl.NativeSizeChanged();
                 HackInvalidateMeasure(Element);
