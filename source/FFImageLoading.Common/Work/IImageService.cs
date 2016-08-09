@@ -20,10 +20,16 @@ namespace FFImageLoading
 		/// <value>The configuration used by FFImageLoading.</value>
 		Configuration Config { get; }
 
-		/// <summary>
-		/// Initializes FFImageLoading with given Configuration. It allows to configure and override most of it.
-		/// </summary>
-		/// <param name="configuration">Configuration.</param>
+		/// Initializes FFImageLoading with a default Configuration. 
+        /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
+        /// </summary>
+        /// <param name="configuration">Configuration.</param>
+        void Initialize();
+        
+        /// Initializes FFImageLoading with a given Configuration. It allows to configure and override most of it.
+        /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
+        /// </summary>
+        /// <param name="configuration">Configuration.</param>
 		void Initialize(Configuration configuration);
 
         /// <summary>
