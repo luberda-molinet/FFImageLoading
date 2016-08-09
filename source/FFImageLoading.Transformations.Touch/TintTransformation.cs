@@ -34,10 +34,10 @@ namespace FFImageLoading.Transformations
 				var color = value.ToUIColor();
 				nfloat r, g, b, a;
 				color.GetRGBA(out r, out g, out b, out a);
-				R = (int)r;
-				G = (int)g;
-				B = (int)b;
-				A = (int)a;
+				R = (int)(255 * r);
+				G = (int)(255 * g);
+				B = (int)(255 * b);
+				A = (int)(255 * a);
 			}
 		}
 
