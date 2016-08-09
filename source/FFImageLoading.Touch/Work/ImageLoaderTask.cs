@@ -408,25 +408,28 @@ namespace FFImageLoading.Work
 			if (string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
-			bool isLocalOrFromCache = true;
-
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
 			UIImage image = cacheEntry == null ? null: cacheEntry.Item1;
 
-			if (image == null)
-			{
-				try
-				{
-					var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
-					image = imageWithResult.Item;
-					isLocalOrFromCache = imageWithResult.Result.IsLocalOrCachedResult();
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("An error occured while retrieving placeholder's drawable.", ex);
+            if (image == null)
+            {
+                try
+                {
+                    var imageWithResult = await RetrieveImageAsync(placeholderPath, source, true).ConfigureAwait(false);
+                    image = imageWithResult.Item;
+                    //isLocalOrFromCache = imageWithResult.Result.IsLocalOrCachedResult();
+                    MainThreadDispatcher.Post(() => _target.Set(this, image, true, isLoadingPlaceholder));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("An error occured while retrieving placeholder's drawable.", ex);
 					return false;
 				}
 			}
+            else
+            {
+                MainThreadDispatcher.Post(() => _target.Set(this, image, true, isLoadingPlaceholder));
+            }
 
 			if (image == null)
 				return false;
@@ -436,9 +439,6 @@ namespace FFImageLoading.Work
 
 			if (IsCancelled)
 				return false;
-
-			// Post on main thread but don't wait for it
-			MainThreadDispatcher.Post(() => _target.Set(this, image, isLocalOrFromCache, isLoadingPlaceholder));
 
 			return true;
 		}

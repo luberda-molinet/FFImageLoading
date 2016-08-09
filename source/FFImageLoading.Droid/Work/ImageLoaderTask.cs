@@ -546,7 +546,6 @@ namespace FFImageLoading.Work
 			if (!_target.IsValid)
 				return false;
 
-			bool isLocalOrFromCache = true;
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
 
 			BitmapDrawable drawable = cacheEntry == null ? null: cacheEntry.Item1;
@@ -556,21 +555,20 @@ namespace FFImageLoading.Work
 			{
 				// We should wrap drawable in an AsyncDrawable, nothing is deferred
 				drawable = new SelfDisposingAsyncDrawable(Context.Resources, drawable.Bitmap, this);
-
-				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, isLocalOrFromCache, isLoadingPlaceholder)).ConfigureAwait(false);
+				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, isLoadingPlaceholder)).ConfigureAwait(false);
 			}
 			else
 			{
 				// Here we asynchronously load our placeholder: it is deferred so we need a temporary AsyncDrawable
-				drawable = new AsyncDrawable(Context.Resources, null, this);
-				await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, isLoadingPlaceholder)).ConfigureAwait(false); // temporary assign this AsyncDrawable
+				// drawable = new AsyncDrawable(Context.Resources, null, this);
+				// await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, isLoadingPlaceholder)).ConfigureAwait(false);
 
 				try
 				{
 					var drawableWithResult = await RetrieveDrawableAsync(placeholderPath, source, true, true).ConfigureAwait(false);
 					drawable = drawableWithResult.Item;
-					isLocalOrFromCache = drawableWithResult.Result.IsLocalOrCachedResult();
-				}
+                    await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, isLoadingPlaceholder)).ConfigureAwait(false); // temporary assign this AsyncDrawable
+                }
 				catch (Exception ex)
 				{
 					Logger.Error("An error occured while retrieving drawable.", ex);
@@ -625,7 +623,7 @@ namespace FFImageLoading.Work
 			if (IsCancelled || ImageService.Instance.ExitTasksEarly)
 				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
 
-			if (!_target.IsTaskValid(this))
+            if (!isLoadingPlaceHolder && !_target.IsTaskValid(this))
 				return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.InvalidTarget);
 
 			var resultWithDrawable = await GetDrawableAsync(sourcePath, source, isLoadingPlaceHolder, isPlaceholder).ConfigureAwait(false);
