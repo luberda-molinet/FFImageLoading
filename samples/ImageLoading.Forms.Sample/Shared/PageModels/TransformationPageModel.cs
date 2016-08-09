@@ -89,6 +89,14 @@ namespace FFImageLoading.Forms.Sample.PageModels
 				};
 			}
 
+			// TintTransformation
+			if (transformationType == typeof(TintTransformation))
+			{
+				Transformations = new List<ITransformation>() {
+					new TintTransformation("#ff0000")
+				};
+			}
+
 			// FlipTransformation
 			if (transformationType == typeof(FlipTransformation))
 			{

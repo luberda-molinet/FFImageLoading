@@ -163,6 +163,13 @@ namespace FFImageLoading.Forms.Sample.PageModels
 
 				new MenuItem() {
 					Section = "Transformations",
+					Title = "TintTransformation",
+					Command = OpenTransformationExampleCommand,
+					CommandParameter = typeof(TintTransformation),
+				},
+
+				new MenuItem() {
+					Section = "Transformations",
 					Title = "FlipTransformation",
 					Command = OpenTransformationExampleCommand,
 					CommandParameter = typeof(FlipTransformation),
