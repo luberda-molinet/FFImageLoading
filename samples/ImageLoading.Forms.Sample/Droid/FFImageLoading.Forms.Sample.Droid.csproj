@@ -109,6 +109,7 @@
     <Reference Include="Xamarin.Forms.Platform">
       <HintPath>..\..\..\packages\Xamarin.Forms.2.3.0.107\lib\MonoAndroid10\Xamarin.Forms.Platform.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
