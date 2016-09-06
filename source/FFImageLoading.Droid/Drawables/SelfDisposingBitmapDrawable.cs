@@ -14,6 +14,7 @@ using Android.Graphics.Drawables;
 using Android.Util;
 using FFImageLoading.Collections;
 using Android.Runtime;
+using System.IO;
 
 namespace FFImageLoading.Drawables
 {
@@ -61,13 +62,41 @@ namespace FFImageLoading.Drawables
             }
         }
 
-        public SelfDisposingBitmapDrawable(Resources resources, Bitmap bitmap) : base(resources, bitmap)
+        public SelfDisposingBitmapDrawable() : base()
         {
-			if (bitmap == null)
-				throw new ArgumentNullException("Parameter 'bitmap' cannot be null");
         }
 
-        public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+        public SelfDisposingBitmapDrawable(Resources resources) : base(resources)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(Resources resources, Stream stream) : base(resources, stream)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(Resources resources, string filePath) : base(resources, filePath)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(Bitmap bitmap) : base(bitmap)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(Stream stream) : base(stream)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(string filePath) : base(filePath)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(Resources resources, Bitmap bitmap) : base(resources, bitmap)
+        {
+        }
+
+        public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) 
+        { 
+        }
 
         public void SetNoLongerDisplayed()
         {

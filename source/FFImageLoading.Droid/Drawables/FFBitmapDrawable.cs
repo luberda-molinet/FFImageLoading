@@ -4,6 +4,7 @@ using Android.Runtime;
 using Android.OS;
 using Android.Content.Res;
 using Android.Graphics;
+using System.IO;
 
 namespace FFImageLoading.Drawables
 {
@@ -15,8 +16,7 @@ namespace FFImageLoading.Drawables
 		private BitmapDrawable _placeholder;
 		private volatile bool _animating;
 
-		public FFBitmapDrawable(Resources res, Bitmap bitmap, BitmapDrawable placeholder, float fadingTime, bool fadeEnabled)
-			: base(res, bitmap)
+		public FFBitmapDrawable(Resources res, Bitmap bitmap, BitmapDrawable placeholder, float fadingTime, bool fadeEnabled) : base(res, bitmap)
 		{
 			_placeholder = placeholder;
 			_fadingTime = fadingTime;
@@ -24,7 +24,41 @@ namespace FFImageLoading.Drawables
 			_startTimeMillis = SystemClock.UptimeMillis();
 		}
 
-		public FFBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+        public FFBitmapDrawable() : base()
+        {
+        }
+
+        public FFBitmapDrawable(Resources resources) : base(resources)
+        {
+        }
+
+        public FFBitmapDrawable(Resources resources, Stream stream) : base(resources, stream)
+        {
+        }
+
+        public FFBitmapDrawable(Resources resources, string filePath) : base(resources, filePath)
+        {
+        }
+
+        public FFBitmapDrawable(Bitmap bitmap) : base(bitmap)
+        {
+        }
+
+        public FFBitmapDrawable(Stream stream) : base(stream)
+        {
+        }
+
+        public FFBitmapDrawable(string filePath) : base(filePath)
+        {
+        }
+
+        public FFBitmapDrawable(Resources resources, Bitmap bitmap) : base(resources, bitmap)
+        {
+        }
+
+        public FFBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+        }
 
 		public override void Draw(Canvas canvas)
 		{
