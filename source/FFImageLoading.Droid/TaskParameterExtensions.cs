@@ -59,7 +59,12 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
-
+        /// <summary>
+        /// Loads and gets BitmapDrawable using defined parameters.
+        /// IMPORTANT: you should call SetNoLongerDisplayed method if drawable is no longer displayed
+        /// </summary>
+        /// <returns>The bitmap drawable async.</returns>
+        /// <param name="parameters">Parameters.</param>
         public static Task<BitmapDrawable> AsBitmapDrawableAsync(this TaskParameter parameters)
         {
             var target = new BitmapTarget();

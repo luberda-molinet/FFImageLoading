@@ -86,7 +86,6 @@
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Cache\ReuseBitmapDrawableCache.cs" />
-    <Compile Include="Drawables\BitmapDrawableExtensions.cs" />
     <Compile Include="Drawables\SelfDisposingBitmapDrawable.cs" />
     <Compile Include="Collections\StrongLruCache.cs" />
     <Compile Include="Collections\ByteBoundStrongLruCache.cs" />

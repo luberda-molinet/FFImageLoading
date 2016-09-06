@@ -60,7 +60,12 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(imageView, imageScale));
         }
 
-
+        /// <summary>
+        /// Loads and gets UIImage using defined parameters.
+        /// </summary>
+        /// <returns>The UIImage async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="imageScale">Image scale.</param>
         public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters, float imageScale = -1f)
         {
             var target = new UIImageTarget();

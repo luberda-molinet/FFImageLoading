@@ -21,6 +21,10 @@ namespace FFImageLoading.Views
 		{
 		}
 
+        public ImageViewAsync(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle)
+        {
+        }
+
 		private bool _scaleToFit;
 		/// <summary>
 		/// Gets or sets a value if the image should be scale to fit in the available space keeping aspect ratio.

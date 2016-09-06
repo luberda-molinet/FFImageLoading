@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.Graphics.Drawables;
 using FFImageLoading.Work;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading
 {
@@ -22,7 +23,7 @@ namespace FFImageLoading
             }
         }
 
-        public BitmapDrawable BitmapDrawable
+        public SelfDisposingBitmapDrawable BitmapDrawable
         {
             get
             {
@@ -31,7 +32,14 @@ namespace FFImageLoading
 
                 BitmapDrawable drawable = null;
                 _drawableWeakReference.TryGetTarget(out drawable);
-                return drawable;
+                var sdDrawable = drawable as SelfDisposingBitmapDrawable;
+
+                if (sdDrawable != null)
+                {
+                    sdDrawable?.SetIsDisplayed(true);
+                }
+
+                return sdDrawable;
             }
         }
     }

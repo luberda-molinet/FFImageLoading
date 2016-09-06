@@ -67,7 +67,16 @@ namespace FFImageLoading.Drawables
 				throw new ArgumentNullException("Parameter 'bitmap' cannot be null");
         }
 
-		public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+        public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+
+        public void SetNoLongerDisplayed()
+        {
+            lock (monitor)
+            {
+                display_ref_count = 0;
+                SetIsDisplayed(false);
+            }
+        }
 
         /// <summary>
         /// This should only be called by Views that are actually going to draw the drawable.
@@ -100,7 +109,9 @@ namespace FFImageLoading.Drawables
 					display_ref_count--;
 				}
 
-				if (display_ref_count <= 0) {
+				if (display_ref_count <= 0) 
+                {
+                    display_ref_count = 0;
 					handler = NoLongerDisplayed;
 				}
             }
