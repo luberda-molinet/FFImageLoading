@@ -74,6 +74,43 @@ namespace FFImageLoading
             ImageService.Instance.LoadImage(task);
         }
 
+        /// <summary>
+        /// Preload the image request into memory cache/disk cache for future use.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        public static Task PreloadAsync(this TaskParameter parameters)
+        {
+            var tcs = new TaskCompletionSource<IScheduledWork>();
+
+            if (parameters.Priority == null)
+            {
+                parameters.WithPriority(LoadingPriority.Low);
+            }
+
+            var userErrorCallback = parameters.OnError;
+            var finishCallback = parameters.OnFinish;
+
+            parameters.Preload = true;
+
+            parameters
+            .Error(ex =>
+            {
+                userErrorCallback(ex);
+                tcs.SetException(ex);
+            })
+            .Finish(scheduledWork =>
+            {
+                finishCallback(scheduledWork);
+                tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+            });
+
+            var target = new Target<WriteableBitmap, ImageLoaderTask>();
+            var task = CreateTask(parameters, target);
+            ImageService.Instance.LoadImage(task);
+
+            return tcs.Task;
+        }
+
         private static IScheduledWork Into(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))

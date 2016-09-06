@@ -97,14 +97,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />
     <Compile Include="Extensions\ExifExtensions.cs" />
-    <Compile Include="Work\ImageViewTarget.cs" />
     <Compile Include="Helpers\PlatformPerformance.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Targets\ImageViewTarget.cs" />
+    <Compile Include="Targets\BitmapTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Drawables\" />
     <Folder Include="Properties\" />
+    <Folder Include="Targets\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

@@ -60,6 +60,39 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(imageView, imageScale));
         }
 
+
+        public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters, float imageScale = -1f)
+        {
+            var target = new UIImageTarget();
+            var userErrorCallback = parameters.OnError;
+            var finishCallback = parameters.OnFinish;
+            var tcs = new TaskCompletionSource<UIImage>();
+
+            parameters
+                .Error(ex =>
+                {
+                    userErrorCallback(ex);
+                    tcs.SetException(ex);
+                })
+                .Finish(scheduledWork =>
+                {
+                    finishCallback(scheduledWork);
+                    tcs.TrySetResult(target.UIImage);
+                });
+
+            if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
+            {
+                target.SetAsEmpty();
+                parameters.Dispose();
+                return null;
+            }
+
+            var task = CreateTask(parameters, imageScale, target);
+            ImageService.Instance.LoadImage(task);
+
+            return tcs.Task;
+        }
+
         /// <summary>
         /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
         /// </summary>
@@ -100,9 +133,46 @@ namespace FFImageLoading
 
 			parameters.Preload = true;
 			var target = new Target<UIImage, ImageLoaderTask>();
-			var task = CreateTask(parameters, 1, target);
+			var task = CreateTask(parameters, 1f, target);
 			ImageService.Instance.LoadImage(task);
 		}
+
+        /// <summary>
+        /// Preload the image request into memory cache/disk cache for future use.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        public static Task PreloadAsync(this TaskParameter parameters)
+        {
+            var tcs = new TaskCompletionSource<IScheduledWork>();
+
+            if (parameters.Priority == null)
+            {
+                parameters.WithPriority(LoadingPriority.Low);
+            }
+
+            var userErrorCallback = parameters.OnError;
+            var finishCallback = parameters.OnFinish;
+
+            parameters.Preload = true;
+
+            parameters
+            .Error(ex =>
+            {
+                userErrorCallback(ex);
+                tcs.SetException(ex);
+            })
+            .Finish(scheduledWork =>
+            {
+                finishCallback(scheduledWork);
+                tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+            });
+
+            var target = new Target<UIImage, ImageLoaderTask>();
+            var task = CreateTask(parameters, 1f, target);
+            ImageService.Instance.LoadImage(task);
+
+            return tcs.Task;
+        }
 
 		private static ImageLoaderTask CreateTask(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
 		{

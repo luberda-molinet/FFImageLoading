@@ -27,6 +27,15 @@ namespace FFImageLoading
 		{
 			throw new Exception(DoNotReference);
 		}
+
+		/// <summary>
+		/// Preload the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+		public static Task PreloadAsync(this TaskParameter parameters)
+		{
+			throw new Exception(DoNotReference);
+		}
 	}
 }
 
