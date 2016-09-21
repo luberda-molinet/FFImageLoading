@@ -23,7 +23,7 @@ namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
-		private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1);
+		private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
 		private WeakReference<BitmapDrawable> _loadingPlaceholderWeakReference;
 		internal ITarget<BitmapDrawable, ImageLoaderTask> _target;

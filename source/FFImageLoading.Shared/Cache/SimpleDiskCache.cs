@@ -39,7 +39,7 @@ namespace FFImageLoading.Cache
 
 			_fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
 			_currentWrite = Task.FromResult<byte>(1);
-            _currentWriteLock = new SemaphoreSlim(1);
+            _currentWriteLock = new SemaphoreSlim(1, 1);
 			_defaultDuration = new TimeSpan(30, 0, 0, 0);  // the default is 30 days
 				
 			InitializeEntries();
