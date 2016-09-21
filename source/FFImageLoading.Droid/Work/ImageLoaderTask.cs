@@ -457,6 +457,9 @@ namespace FFImageLoading.Work
                     await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
                     try
                     {
+                        if (IsCancelled)
+                            return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
+                        
                         foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                         {
                             if (IsCancelled)

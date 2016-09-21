@@ -372,6 +372,9 @@ namespace FFImageLoading.Work
 			if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
 				&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 			{
+                if (IsCancelled)
+                    return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
+
 				foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
 				{
 					if (IsCancelled)

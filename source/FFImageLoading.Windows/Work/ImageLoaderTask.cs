@@ -353,6 +353,9 @@ namespace FFImageLoading.Work
                         return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                     }
 
+                    if (IsCancelled)
+                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+
                     foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
                         if (IsCancelled)
