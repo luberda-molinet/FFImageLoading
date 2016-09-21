@@ -20,7 +20,7 @@ namespace FFImageLoading.Forms.Sample.Droid
 
 			var config = new FFImageLoading.Config.Configuration()
 			{
-				VerboseLogging = true,
+				VerboseLogging = false,
 				VerbosePerformanceLogging = false,
 				VerboseMemoryCacheLogging = false,
 				VerboseLoadingCancelledLogging = false,
