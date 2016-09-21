@@ -27,6 +27,7 @@ namespace FFImageLoading.Config
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
+            SchedulerMaxParallelTasks = Math.Max(2, (int)(Environment.ProcessorCount / 2d));
 		}
 
 		/// <summary>
@@ -143,6 +144,13 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The verbose logging.</value>
         public bool VerboseLogging { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scheduler max parallel tasks.
+        /// Default is: Math.Max(1, (int)(Environment.ProcessorCount / 2d))
+        /// </summary>
+        /// <value>The scheduler max parallel tasks.</value>
+        public int SchedulerMaxParallelTasks { get; set; }
     }
 }
 

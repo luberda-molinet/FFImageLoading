@@ -7,6 +7,7 @@ using System.Threading;
 using FFImageLoading.Cache;
 using FFImageLoading.Concurrency;
 using System.Diagnostics;
+using FFImageLoading.Config;
 
 namespace FFImageLoading.Work
 {
@@ -68,17 +69,12 @@ namespace FFImageLoading.Work
         int _statsTotalWaiting;
         long _loadCount;
 
-        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, IPlatformPerformance performance)
+        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, IPlatformPerformance performance, int maxParallelTasks)
         {
             _verbosePerformanceLogging = verbosePerformanceLogging;
             _logger = logger;
             _performance = performance;
-
-            int _processorCount = Environment.ProcessorCount;
-            if (_processorCount <= 2)
-                _maxParallelTasks = 1;
-            else
-                _maxParallelTasks = (int)Math.Truncate((double)_processorCount / 2d) + 1;
+            _maxParallelTasks = maxParallelTasks;
         }
 
         public void Cancel(IImageLoaderTask task)
