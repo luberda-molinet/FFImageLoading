@@ -55,7 +55,7 @@ namespace FFImageLoading.Work
                 return;
 
             var control = Control;
-            if (control == null)
+            if (control == null || control.Source == image)
                 return;
 
             var parameters = task.Parameters;

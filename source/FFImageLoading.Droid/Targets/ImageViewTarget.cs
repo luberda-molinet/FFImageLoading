@@ -49,9 +49,9 @@ namespace FFImageLoading.Work
 				return;
 			
 			var control = Control;
-			if (control == null)
+			if (control == null || control.Drawable == image)
 				return;
-
+            
 			control.SetImageDrawable(image);
 		}
 

@@ -14,7 +14,7 @@ namespace FFImageLoading.Work
 		public override void Set(ImageLoaderTask task, UIImage image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
 		{
 			var control = Control;
-			if (control == null)
+			if (control == null || control.Image == image)
 				return;
 
 			var parameters = task.Parameters;
@@ -36,7 +36,7 @@ namespace FFImageLoading.Work
 			}
 			else
 			{
-				control.Image = image;
+                control.Image = image;
 			}
 		}
 
