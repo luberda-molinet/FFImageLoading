@@ -21,10 +21,14 @@ namespace FFImageLoading.Cache
 			_logger = logger;
             _cache = new NSCache();
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
-            _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2); // 20% of physical memory
 
-            decimal sizeInMB = System.Math.Round((decimal)_cache.TotalCostLimit/(1024*1024), 2);
-            logger.Debug(string.Format("LruCache size: {0}MB", sizeInMB));
+            if (maxCacheSize <= 0)
+                _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory    
+            else
+                _cache.TotalCostLimit = (nuint)Math.Max((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
+            
+            double sizeInMB = Math.Round(_cache.TotalCostLimit /1024d / 1024d, 2);
+            logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());

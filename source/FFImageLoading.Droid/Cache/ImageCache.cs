@@ -27,6 +27,9 @@ namespace FFImageLoading.Cache
 			_logger = logger;
 			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
 
+            double sizeInMB = Math.Round(safeMaxCacheSize / 1024d / 1024d, 2);
+            logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
+
 			// consider low treshold as a third of maxCacheSize
 			int lowTreshold = safeMaxCacheSize / 3;
 
@@ -117,8 +120,7 @@ namespace FFImageLoading.Cache
 		/// cache management. This means you must call SetIsRetained(false) when you no
 		/// longer need the instance.
 		/// </summary>
-		/// <returns>A SelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
-		/// when finished using it.</returns>
+		/// <returns>A SelfDisposingBitmapDrawable.</returns>
 		/// <param name="options">Bitmap creation options.</param>
 		public SelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
 		{
@@ -131,9 +133,9 @@ namespace FFImageLoading.Cache
 		private static int GetMaxCacheSize(int maxCacheSize)
         {
 			if (maxCacheSize <= 0)
-                return GetCacheSizeInPercent(0.2f); // 20%
+                return GetCacheSizeInPercent(0.2f); // DEFAULT 20%
 
-			return Math.Min(GetCacheSizeInPercent(0.2f), maxCacheSize);
+            return Math.Max(GetCacheSizeInPercent(0.05f), maxCacheSize); // MIN SAFE LIMIT 5%
         }
 
 		/// <summary>
