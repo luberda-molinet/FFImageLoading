@@ -126,7 +126,7 @@ namespace FFImageLoading
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
-                target.SetAsEmpty();
+                target.SetAsEmpty(null);
                 parameters.Dispose();
                 return null;
             }

@@ -114,7 +114,7 @@ namespace FFImageLoading.Forms.Droid
 
 			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
-			Control.SetImageResource(global::Android.Resource.Color.Transparent);
+			// Control.SetImageResource(global::Android.Resource.Color.Transparent);
 
 			if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 			{

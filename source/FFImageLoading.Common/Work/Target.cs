@@ -14,7 +14,7 @@ namespace FFImageLoading.Work
 
 		public virtual bool UsesSameNativeControl(TImageLoaderTask task) => false;
 
-        public virtual void SetAsEmpty() { }
+        public virtual void SetAsEmpty(TImageLoaderTask task) { }
 	}
 }
 

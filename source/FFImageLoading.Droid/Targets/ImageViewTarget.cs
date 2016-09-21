@@ -4,6 +4,7 @@ using Android.Widget;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
 using Android.Graphics;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Work
 {
@@ -34,13 +35,15 @@ namespace FFImageLoading.Work
 			return controlTask == task;
 		}
 
-        public override void SetAsEmpty()
+        public override void SetAsEmpty(ImageLoaderTask task)
         {
             var control = Control;
             if (control == null)
                 return;
 
-            control.SetImageResource(global::Android.Resource.Color.Transparent);
+            var drawable = new AsyncDrawable(control.Context.Resources, null, task);
+            control.SetImageDrawable(drawable);
+            //control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
 		public override void Set(ImageLoaderTask task, BitmapDrawable image, bool isLocalOrFromCache, bool isLoadingPlaceholder)

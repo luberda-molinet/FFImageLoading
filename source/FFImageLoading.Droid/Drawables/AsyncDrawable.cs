@@ -15,9 +15,6 @@ namespace FFImageLoading.Drawables
 		public AsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
 			: base(res, bitmap)
 		{
-			if (imageLoaderTask == null)
-				throw new ArgumentNullException("Parameter 'imageLoaderTask' cannot be null");
-			
 			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
 		}
 

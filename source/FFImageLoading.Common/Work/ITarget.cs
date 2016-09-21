@@ -14,7 +14,7 @@ namespace FFImageLoading.Work
 
 		void Set(TImageLoaderTask task, TBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder);
 
-        void SetAsEmpty();
+        void SetAsEmpty(TImageLoaderTask task);
 	}
 }
 

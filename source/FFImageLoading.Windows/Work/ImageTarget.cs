@@ -40,7 +40,7 @@ namespace FFImageLoading.Work
             return IsValid;
         }
 
-        public override void SetAsEmpty()
+        public override void SetAsEmpty(ImageLoaderTask task)
         {
             var control = Control;
             if (control == null)

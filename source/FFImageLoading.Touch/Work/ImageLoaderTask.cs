@@ -58,7 +58,8 @@ namespace FFImageLoading.Work
 					return true; // stop processing if loaded from cache OR if loading from cached raised an exception
 			}
 
-			await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
+            await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
+            
 			return false;
 		}
 
@@ -408,8 +409,12 @@ namespace FFImageLoading.Work
 		/// <param name="source">Source for the path: local, web, assets</param>
 		private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
 		{
-			if (string.IsNullOrWhiteSpace(placeholderPath))
-				return false;
+            if (string.IsNullOrWhiteSpace(placeholderPath))
+            {
+                if (isLoadingPlaceholder)
+                    MainThreadDispatcher.Post(() => _target.SetAsEmpty(this));
+                return false;
+            }
 
 			var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
 			UIImage image = cacheEntry == null ? null: cacheEntry.Item1;

@@ -410,7 +410,11 @@ namespace FFImageLoading.Work
         private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
         {
             if (string.IsNullOrWhiteSpace(placeholderPath))
+            {
+                if (isLoadingPlaceholder)
+                    MainThreadDispatcher.Post(() => _target.SetAsEmpty(this));
                 return false;
+            }
 
             var cacheEntry = ImageCache.Instance.Get(GetKey(placeholderPath));
             WriteableBitmap image = cacheEntry == null ? null : cacheEntry.Item1;
