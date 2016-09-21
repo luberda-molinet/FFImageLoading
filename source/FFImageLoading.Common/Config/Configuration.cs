@@ -147,7 +147,7 @@ namespace FFImageLoading.Config
 
         /// <summary>
         /// Gets or sets the scheduler max parallel tasks.
-        /// Default is: Math.Max(1, (int)(Environment.ProcessorCount / 2d))
+        /// Default is: Math.Max(2, (int)(Environment.ProcessorCount / 2d))
         /// </summary>
         /// <value>The scheduler max parallel tasks.</value>
         public int SchedulerMaxParallelTasks { get; set; }
