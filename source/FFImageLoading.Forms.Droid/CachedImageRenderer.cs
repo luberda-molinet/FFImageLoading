@@ -344,6 +344,11 @@ namespace FFImageLoading.Forms.Droid
 				return compressed;
 			}
 		}
+
+		protected override CachedImageView CreateNativeControl()
+		{
+			return new CachedImageView(Context);
+		}
 	}
 }
 
