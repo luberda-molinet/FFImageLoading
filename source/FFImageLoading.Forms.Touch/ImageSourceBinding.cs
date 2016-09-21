@@ -38,7 +38,7 @@ namespace FFImageLoading.Forms.Touch
 			var uriImageSource = source as UriImageSource;
 			if (uriImageSource != null)
 			{
-				var uri = uriImageSource.Uri?.ToString();
+				var uri = uriImageSource.Uri?.OriginalString;
 				if (string.IsNullOrWhiteSpace(uri))
 					return null;
 
