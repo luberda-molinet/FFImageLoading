@@ -3,6 +3,7 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 #if SILVERLIGHT
 using System.Windows.Controls;
@@ -89,19 +90,27 @@ namespace FFImageLoading
 
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
+            List<Exception> exceptions = null;
 
             parameters.Preload = true;
 
             parameters
             .Error(ex =>
             {
+                if (exceptions == null)
+                    exceptions = new List<Exception>();
+
+                exceptions.Add(ex);
                 userErrorCallback(ex);
-                tcs.SetException(ex);
             })
             .Finish(scheduledWork =>
             {
                 finishCallback(scheduledWork);
-                tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+
+                if (exceptions != null)
+                    tcs.TrySetException(exceptions);
+                else
+                    tcs.TrySetResult(scheduledWork);
             });
 
             var target = new Target<WriteableBitmap, ImageLoaderTask>();
@@ -130,15 +139,23 @@ namespace FFImageLoading
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<IScheduledWork>();
+            List<Exception> exceptions = null;
 
             parameters
                 .Error(ex => {
+                    if (exceptions == null)
+                        exceptions = new List<Exception>();
+
+                    exceptions.Add(ex);
                     userErrorCallback(ex);
-                    tcs.SetException(ex);
                 })
                 .Finish(scheduledWork => {
                     finishCallback(scheduledWork);
-                    tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+
+                    if (exceptions != null)
+                        tcs.TrySetException(exceptions);
+                    else
+                        tcs.TrySetResult(scheduledWork);
                 });
 
             into(parameters);

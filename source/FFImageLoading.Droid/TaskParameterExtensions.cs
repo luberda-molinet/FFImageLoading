@@ -6,6 +6,7 @@ using FFImageLoading.Views;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
 using Android.Graphics.Drawables;
+using System.Collections.Generic;
 
 
 namespace FFImageLoading
@@ -44,15 +45,25 @@ namespace FFImageLoading
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<IScheduledWork>();
+            List<Exception> exceptions = null;
 
             parameters
-                .Error(ex => {
+                .Error(ex =>
+                {
+                    if (exceptions == null)
+                        exceptions = new List<Exception>();
+                    
+                    exceptions.Add(ex);
                     userErrorCallback(ex);
-                    tcs.SetException(ex);
                 })
-                .Finish(scheduledWork => {
+                .Finish(scheduledWork =>
+                {
                     finishCallback(scheduledWork);
-                    tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+
+                    if (exceptions != null)
+                        tcs.TrySetException(exceptions);
+                    else
+                        tcs.TrySetResult(scheduledWork);
                 })
                 .Into(imageView);
 
@@ -71,17 +82,25 @@ namespace FFImageLoading
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<BitmapDrawable>();
+            List<Exception> exceptions = null;
 
             parameters
                 .Error(ex =>
                 {
+                    if (exceptions == null)
+                        exceptions = new List<Exception>();
+
+                    exceptions.Add(ex);
                     userErrorCallback(ex);
-                    tcs.SetException(ex);
                 })
                 .Finish(scheduledWork =>
                 {
                     finishCallback(scheduledWork);
-                    tcs.TrySetResult(target.BitmapDrawable);
+
+                    if (exceptions != null)
+                        tcs.TrySetException(exceptions);
+                    else
+                        tcs.TrySetResult(target.BitmapDrawable);
                 });
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
@@ -113,7 +132,7 @@ namespace FFImageLoading
 		}
 
 		/// <summary>
-		/// Preload the image request into memory cache/disk cache for future use.
+		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
@@ -130,7 +149,8 @@ namespace FFImageLoading
 		}
 
         /// <summary>
-        /// Preload the image request into memory cache/disk cache for future use.
+        /// Preloads the image request into memory cache/disk cache for future use.
+        /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
         public static Task PreloadAsync(this TaskParameter parameters)
@@ -144,19 +164,27 @@ namespace FFImageLoading
 
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
+            List<Exception> exceptions = null;
 
             parameters.Preload = true;
 
             parameters
             .Error(ex =>
             {
+                if (exceptions == null)
+                    exceptions = new List<Exception>();
+
+                exceptions.Add(ex);
                 userErrorCallback(ex);
-                tcs.SetException(ex);
             })
             .Finish(scheduledWork =>
             {
                 finishCallback(scheduledWork);
-                tcs.TrySetResult(scheduledWork); // we should use TrySetResult since SetException could have been called earlier. It is not allowed to set result after SetException
+
+                if (exceptions != null)
+                    tcs.TrySetException(exceptions);
+                else
+                    tcs.TrySetResult(scheduledWork);
             });
 
             var target = new Target<BitmapDrawable, ImageLoaderTask>();

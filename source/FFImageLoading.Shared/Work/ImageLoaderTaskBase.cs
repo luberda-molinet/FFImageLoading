@@ -283,7 +283,7 @@ namespace FFImageLoading.Work
 					if (ex == null)
 						ex = new Exception("FFImageLoading is unable to generate image.");
 
-					Parameters?.OnError(ex);
+                    Parameters?.OnError(ex);
 				}
 			}
 			finally

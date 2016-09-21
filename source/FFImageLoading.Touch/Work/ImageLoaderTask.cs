@@ -158,7 +158,7 @@ namespace FFImageLoading.Work
 			}
 			catch (Exception ex)
 			{
-				Parameters?.OnError(ex);
+                Parameters?.OnError(ex);
 				return CacheResult.ErrorOccured; // weird, what can we do if loading from cache fails
 			}
 		}
@@ -303,7 +303,7 @@ namespace FFImageLoading.Work
 			{
 				var message = String.Format("Unable to retrieve image data from source: {0}", sourcePath);
 				Logger.Error(message, ex);
-				Parameters.OnError(ex);
+                Parameters?.OnError(ex);
 				return new WithLoadingResult<UIImage>(LoadingResult.Failed);
 			}
 
