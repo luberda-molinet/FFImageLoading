@@ -347,20 +347,31 @@ namespace FFImageLoading.Work
             }
         }
 
-		private void ConfigureParameters()
-		{
-			var successCallback = Parameters.OnSuccess;
-			var errorCallback = Parameters.OnError;
-			var finishCallback = Parameters.OnFinish;
+        private void ConfigureParameters()
+        {
+            var successCallback = Parameters.OnSuccess;
+            var errorCallback = Parameters.OnError;
+            var finishCallback = Parameters.OnFinish;
 
-			// make sure callbacks are invoked on Main thread
-			Parameters.Success((s, r) => MainThreadDispatcher.Post(() => successCallback(s, r)));
-			Parameters.Error(ex => MainThreadDispatcher.Post(() => errorCallback(ex)));
+            // make sure callbacks are invoked on Main thread
+            Parameters.Success((s, r) =>
+            {
+                if (successCallback != null)
+                    MainThreadDispatcher.Post(() => successCallback(s, r));
+            });
+            Parameters.Error(ex =>
+            {
+                if (errorCallback != null)
+                    MainThreadDispatcher.Post(() => errorCallback(ex));
+            });
 			Parameters.Finish(scheduledWork =>
-				{
-					MainThreadDispatcher.Post(() => finishCallback(scheduledWork));
-					Parameters.Dispose(); // if Finish is called then Parameters are useless now, we can dispose them so we don't keep a reference to callbacks
-				});
+			{
+                if (finishCallback != null)
+                {
+                    MainThreadDispatcher.Post(() => finishCallback(scheduledWork));
+                }
+				Parameters?.Dispose(); // if Finish is called then Parameters are useless now, we can dispose them so we don't keep a reference to callbacks
+			});
 		}
 	}
 }

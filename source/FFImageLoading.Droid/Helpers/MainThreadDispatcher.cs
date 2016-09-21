@@ -40,7 +40,8 @@ namespace FFImageLoading.Helpers
             var tcs = new TaskCompletionSource<object>();
             Post(() => {
                 try {
-                    action();
+                    if (action != null)
+                        action();
                     tcs.SetResult(string.Empty);
                 } catch (Exception ex) {
                     tcs.SetException(ex);

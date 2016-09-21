@@ -44,7 +44,8 @@ namespace FFImageLoading.Helpers
             Post(() => {
                 try
                 {
-                    action();
+                    if (action != null)
+                        action();
                     tcs.SetResult(string.Empty);
                 }
                 catch (Exception ex)
