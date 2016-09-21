@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
-using System.Threading;
 using FFImageLoading.Cache;
 
 namespace FFImageLoading.Forms
@@ -408,7 +407,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transformations property.
 		/// </summary>
-        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>());
+		public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>(), propertyChanged: new BindableProperty.BindingPropertyChangedDelegate(HandleTransformationsPropertyChangedDelegate));
 
 		/// <summary>
 		/// Gets or sets the transformations.
@@ -423,6 +422,18 @@ namespace FFImageLoading.Forms
 			set
 			{
 				SetValue(TransformationsProperty, value); 
+			}
+		}
+
+		static void HandleTransformationsPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
+		{
+			if (oldValue != newValue)
+			{
+				var cachedImage = bindable as CachedImage;
+				if (cachedImage != null && cachedImage.Source != null)
+				{
+					cachedImage.ReloadImage();
+				}
 			}
 		}
 
