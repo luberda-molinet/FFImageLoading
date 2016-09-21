@@ -49,7 +49,8 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
+        /// Loads the image into given imageView using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
@@ -62,6 +63,7 @@ namespace FFImageLoading
 
         /// <summary>
         /// Loads and gets UIImage using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>The UIImage async.</returns>
         /// <param name="parameters">Parameters.</param>
@@ -107,7 +109,8 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
+        /// Loads the image into given UIButton using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
@@ -134,7 +137,7 @@ namespace FFImageLoading
 		}
 
 		/// <summary>
-		/// Preload the image request into memory cache/disk cache for future use.
+		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
@@ -151,7 +154,8 @@ namespace FFImageLoading
 		}
 
         /// <summary>
-        /// Preload the image request into memory cache/disk cache for future use.
+        /// Preloads the image request into memory cache/disk cache for future use.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
         public static Task PreloadAsync(this TaskParameter parameters)

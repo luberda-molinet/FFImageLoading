@@ -35,7 +35,8 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
+        /// Loads the image into given imageView using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
@@ -73,6 +74,7 @@ namespace FFImageLoading
         /// <summary>
         /// Loads and gets BitmapDrawable using defined parameters.
         /// IMPORTANT: you should call SetNoLongerDisplayed method if drawable is no longer displayed
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>The bitmap drawable async.</returns>
         /// <param name="parameters">Parameters.</param>
@@ -150,7 +152,7 @@ namespace FFImageLoading
 
         /// <summary>
         /// Preloads the image request into memory cache/disk cache for future use.
-        /// Only use this method if you plan to handle exceptions in your code. Awaiting this method will give you this flexibility.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
         public static Task PreloadAsync(this TaskParameter parameters)
