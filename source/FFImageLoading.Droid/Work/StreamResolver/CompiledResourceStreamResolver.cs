@@ -15,7 +15,7 @@ namespace FFImageLoading.Work.StreamResolver
 
 		private Context Context {
 			get {
-				return Android.App.Application.Context.ApplicationContext;
+				return new Android.Content.ContextWrapper(Android.App.Application.Context);
 			}
 		}
 
