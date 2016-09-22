@@ -24,6 +24,7 @@ namespace FFImageLoading.Forms.Touch
 	{
 		private bool _isDisposed;
 		private IScheduledWork _currentTask;
+		private ImageSourceBinding _lastImageSource;
 
 		/// <summary>
 		///   Used for registration with dependency service
@@ -110,16 +111,13 @@ namespace FFImageLoading.Forms.Touch
 		private void SetImage(CachedImage oldElement = null)
 		{
 			var source = Element.Source; 
+			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
+			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
 
-			if (oldElement != null)
+			if (oldElement != null && _lastImageSource != null && ffSource != null && !ffSource.Equals(_lastImageSource)
+				&& (string.IsNullOrWhiteSpace(placeholderSource?.Path) || placeholderSource?.Stream != null))
 			{
-				var oldSource = oldElement.Source;
-				if (Equals(oldSource, source))
-					return;
-
-				if (oldSource is FileImageSource && source is FileImageSource && ((FileImageSource)oldSource).File == ((FileImageSource)source).File)
-					return;
-
+				_lastImageSource = null;
 				Control.Image = null;
 			}
 
@@ -127,8 +125,6 @@ namespace FFImageLoading.Forms.Touch
 
 			Cancel();
 			TaskParameter imageLoader = null;
-
-			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
 
 			if (ffSource == null)
 			{
@@ -170,7 +166,6 @@ namespace FFImageLoading.Forms.Touch
 				// LoadingPlaceholder
 				if (Element.LoadingPlaceholder != null)
 				{
-					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
 					if (placeholderSource != null)
 						imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 				}
@@ -178,9 +173,9 @@ namespace FFImageLoading.Forms.Touch
 				// ErrorPlaceholder
 				if (Element.ErrorPlaceholder != null)
 				{
-					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
-					if (placeholderSource != null)
-						imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+					var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+					if (errorPlaceholderSource != null)
+						imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
 				}
 
 				// Downsample
@@ -262,8 +257,11 @@ namespace FFImageLoading.Forms.Touch
 					ImageLoadingFinished(element);
 				});
 
-				imageLoader.Success((imageInformation, loadingResult) => 
-					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
+				imageLoader.Success((imageInformation, loadingResult) =>
+				{
+					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult));
+					_lastImageSource = ffSource;
+				});
 
 				imageLoader.Error((exception) => 
 					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));

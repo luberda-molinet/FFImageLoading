@@ -27,12 +27,8 @@ namespace FFImageLoading.Work
 
 		public override bool IsTaskValid(ImageLoaderTask task)
 		{
-			var control = Control;
-			if (control == null)
-				return false;
-
-			var controlTask = control.GetImageLoaderTask();
-			return controlTask == task;
+            var controlTask = Control?.GetImageLoaderTask();
+            return IsValid && (controlTask == null || controlTask == task);
 		}
 
         public override void SetAsEmpty(ImageLoaderTask task)
@@ -41,9 +37,9 @@ namespace FFImageLoading.Work
             if (control == null)
                 return;
 
-            var drawable = new AsyncDrawable(control.Context.Resources, null, task);
-            control.SetImageDrawable(drawable);
-            //control.SetImageResource(global::Android.Resource.Color.Transparent);
+            //var drawable = new AsyncDrawable(control.Context.Resources, null, task);
+            //control.SetImageDrawable(drawable);
+            control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
 		public override void Set(ImageLoaderTask task, BitmapDrawable image, bool isLocalOrFromCache, bool isLoadingPlaceholder)

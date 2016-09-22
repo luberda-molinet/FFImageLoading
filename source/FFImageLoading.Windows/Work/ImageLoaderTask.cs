@@ -411,8 +411,6 @@ namespace FFImageLoading.Work
         {
             if (string.IsNullOrWhiteSpace(placeholderPath))
             {
-                if (isLoadingPlaceholder)
-                    MainThreadDispatcher.Post(() => _target.SetAsEmpty(this));
                 return false;
             }
 

@@ -34,6 +34,7 @@ namespace FFImageLoading.Forms.Droid
 
         private bool _isDisposed;
 		private IScheduledWork _currentTask;
+		private ImageSourceBinding _lastImageSource;
 
 		public CachedImageRenderer()
 		{
@@ -103,30 +104,34 @@ namespace FFImageLoading.Forms.Droid
 			
 		private void UpdateBitmap(CachedImage previous = null)
 		{
-			if (previous != null && Equals(previous.Source, Element.Source))
-				return;
-
 			var source = Element.Source;
 			var imageView = Control;
 
-			if (imageView != null)
-				imageView.SkipInvalidate();
+			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
+			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+
+			if (previous != null && _lastImageSource != null && ffSource != null && !ffSource.Equals(_lastImageSource)
+				&& (string.IsNullOrWhiteSpace(placeholderSource?.Path) || placeholderSource?.Stream != null))
+			{
+				_lastImageSource = null;
+
+				if (imageView != null)
+					imageView.SkipInvalidate();
+
+				Control.SetImageResource(global::Android.Resource.Color.Transparent);
+			}
 
 			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
-
-			// Control.SetImageResource(global::Android.Resource.Color.Transparent);
 
 			if (Element != null && object.Equals(Element.Source, source) && !_isDisposed)
 			{
 				Cancel();
 				TaskParameter imageLoader = null;
 
-				var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
-
 				if (ffSource == null)
 				{
 					if (imageView != null)
-						imageView.SetImageDrawable(null);
+						imageView.SetImageResource(global::Android.Resource.Color.Transparent);
 
 					ImageLoadingFinished(Element);
 				}
@@ -163,7 +168,6 @@ namespace FFImageLoading.Forms.Droid
 					// LoadingPlaceholder
 					if (Element.LoadingPlaceholder != null)
 					{
-						var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
 						if (placeholderSource != null)
 							imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
 					}
@@ -171,9 +175,9 @@ namespace FFImageLoading.Forms.Droid
 					// ErrorPlaceholder
 					if (Element.ErrorPlaceholder != null)
 					{
-						var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
-						if (placeholderSource != null)
-							imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+						var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+						if (errorPlaceholderSource != null)
+							imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
 					}
 
 					// Downsample
@@ -257,7 +261,10 @@ namespace FFImageLoading.Forms.Droid
 					});
 
 					imageLoader.Success((imageInformation, loadingResult) =>
-						element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
+					{
+						element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult));
+						_lastImageSource = ffSource;
+					});
 
 					imageLoader.Error((exception) =>
 						element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
