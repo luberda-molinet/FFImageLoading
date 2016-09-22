@@ -20,7 +20,7 @@ namespace FFImageLoading
 		}
 
 		/// <summary>
-		/// Preload the image request into memory cache/disk cache for future use.
+		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
 		public static void Preload(this TaskParameter parameters)
@@ -29,7 +29,8 @@ namespace FFImageLoading
 		}
 
 		/// <summary>
-		/// Preload the image request into memory cache/disk cache for future use.
+		/// Preloads the image request into memory cache/disk cache for future use.
+		/// IMPORTANT: It throws image loading exceptions - you should handle them
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
 		public static Task PreloadAsync(this TaskParameter parameters)
