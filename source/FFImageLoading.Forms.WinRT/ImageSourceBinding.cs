@@ -97,7 +97,7 @@ namespace FFImageLoading.Forms.WinRT
                 return false;
             }
 
-            return this.ImageSource.Equals(item.ImageSource) && this.Path.Equals(item.Path) && this.Stream.Equals(item.Stream);
+            return this.ImageSource == item.ImageSource && this.Path == item.Path && this.Stream == item.Stream;
         }
 
         public override int GetHashCode()
