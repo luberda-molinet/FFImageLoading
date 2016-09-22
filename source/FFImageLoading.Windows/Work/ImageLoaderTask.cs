@@ -409,7 +409,7 @@ namespace FFImageLoading.Work
         
         private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
         {
-            if (string.IsNullOrWhiteSpace(placeholderPath))
+            if (Parameters.Preload || string.IsNullOrWhiteSpace(placeholderPath))
             {
                 return false;
             }

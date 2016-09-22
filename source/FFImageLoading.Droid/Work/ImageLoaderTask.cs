@@ -77,14 +77,7 @@ namespace FFImageLoading.Work
 					return true; // stop processing if cancelled
 			}
 
-			bool hasDrawable = await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
-			if (!hasDrawable)
-			{
-				// Assign the Drawable to the image
-				//var drawable = new AsyncDrawable(Context.Resources, null, this);
-				//await MainThreadDispatcher.PostAsync(() => _target.Set(this, drawable, true, true)).ConfigureAwait(false);
-                //await MainThreadDispatcher.PostAsync(() => _target.SetAsEmpty(this));
-			}
+            await LoadPlaceHolderAsync(Parameters.LoadingPlaceholderPath, Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
 
 			return false;
 		}
@@ -544,7 +537,7 @@ namespace FFImageLoading.Work
 		/// <param name="source">Source for the path: local, web, assets</param>
 		protected async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
 		{
-			if (string.IsNullOrWhiteSpace(placeholderPath))
+			if (Parameters.Preload || string.IsNullOrWhiteSpace(placeholderPath))
 				return false;
 
 			if (!_target.IsValid)

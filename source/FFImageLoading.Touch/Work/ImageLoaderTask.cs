@@ -409,7 +409,7 @@ namespace FFImageLoading.Work
 		/// <param name="source">Source for the path: local, web, assets</param>
 		private async Task<bool> LoadPlaceHolderAsync(string placeholderPath, ImageSource source, bool isLoadingPlaceholder)
 		{
-            if (string.IsNullOrWhiteSpace(placeholderPath))
+            if (Parameters.Preload || string.IsNullOrWhiteSpace(placeholderPath))
             {
                 return false;
             }
