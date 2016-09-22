@@ -149,7 +149,7 @@ namespace FFImageLoading.Cache
 			if (percent < 0.01f || percent > 0.8f)
 				throw new Exception("GetCacheSizeInPercent - percent must be between 0.01 and 0.8 (inclusive)");
 
-			var context = Android.App.Application.Context.ApplicationContext;
+			var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
 			var am = (ActivityManager) context.GetSystemService(Context.ActivityService);
 			bool largeHeap = (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
 			int memoryClass = am.MemoryClass;

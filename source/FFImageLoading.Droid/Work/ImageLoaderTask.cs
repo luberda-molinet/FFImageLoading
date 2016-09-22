@@ -95,7 +95,7 @@ namespace FFImageLoading.Work
 		{
 			get
 			{
-				return Android.App.Application.Context.ApplicationContext;
+				return new Android.Content.ContextWrapper(Android.App.Application.Context);
 			}
 		}
 
