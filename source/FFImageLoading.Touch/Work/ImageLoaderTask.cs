@@ -8,11 +8,13 @@ using FFImageLoading.Work.DataResolver;
 using System.Linq;
 using System.IO;
 using FFImageLoading.Extensions;
+using System.Threading;
 
 namespace FFImageLoading.Work
 {
 	public class ImageLoaderTask : ImageLoaderTaskBase
 	{
+        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 		internal readonly ITarget<UIImage, ImageLoaderTask> _target;
 		
 		static ImageLoaderTask()
@@ -370,28 +372,37 @@ namespace FFImageLoading.Work
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
             	&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
             {
-                if (IsCancelled)
-                    return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
+                await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
 
-                foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                try
                 {
                     if (IsCancelled)
                         return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-                    try
+                    foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                     {
-                        var old = imageIn;
-                        var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
-                        imageIn = bitmapHolder.ToNative();
+                        if (IsCancelled)
+                            return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-                        // Transformation succeeded, so garbage the source
-                        if (old != null && old != imageIn && old.Handle != imageIn.Handle)
-                            old.Dispose();
+                        try
+                        {
+                            var old = imageIn;
+                            var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
+                            imageIn = bitmapHolder.ToNative();
+
+                            // Transformation succeeded, so garbage the source
+                            if (old != null && old != imageIn && old.Handle != imageIn.Handle)
+                                old.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-                    }
+                }
+                finally
+                {
+                    _decodingLock.Release();
                 }
             }
 				
