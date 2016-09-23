@@ -313,8 +313,8 @@ namespace FFImageLoading.Work
 			try
 			{
 				try
-				{
-					BitmapFactory.DecodeStream(stream, null, options);
+                {
+                    await BitmapFactory.DecodeStreamAsync(stream, null, options).ConfigureAwait(false);
 
 					if (!stream.CanSeek)
 					{
@@ -416,7 +416,7 @@ namespace FFImageLoading.Work
 				Bitmap bitmap;
 				try
 				{
-					bitmap = BitmapFactory.DecodeStream(stream, null, options);
+                    bitmap = await BitmapFactory.DecodeStreamAsync(stream, null, options).ConfigureAwait(false);
 				}
 				catch (Java.Lang.Throwable vme)
 				{
