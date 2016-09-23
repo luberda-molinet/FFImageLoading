@@ -15,17 +15,18 @@ namespace FFImageLoading.Forms.Sample.iOS
 			FFImageLoading.Forms.Touch.CachedImageRenderer.Init();
 
 			global::Xamarin.Forms.Forms.Init();
-			LoadApplication(new App());
 
 			var config = new FFImageLoading.Config.Configuration()
 			{
 				VerboseLogging = false,
 				VerbosePerformanceLogging = false,
-				VerboseMemoryCacheLogging = true,
+				VerboseMemoryCacheLogging = false,
 				VerboseLoadingCancelledLogging = false,
 				Logger = new CustomLogger(),
 			};
 			ImageService.Instance.Initialize(config);
+
+			LoadApplication(new App());
 
 			return base.FinishedLaunching(app, options);
 		}
