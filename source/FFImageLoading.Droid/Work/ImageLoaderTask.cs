@@ -358,6 +358,7 @@ namespace FFImageLoading.Work
 
 				options.InPurgeable = true;
 				options.InJustDecodeBounds = false;
+                options.InDither = true;
 
 				if (!ImageService.Instance.Config.LoadWithTransparencyChannel || Parameters.LoadTransparencyChannel == null || !Parameters.LoadTransparencyChannel.Value)
 				{
