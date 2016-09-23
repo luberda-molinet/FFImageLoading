@@ -25,16 +25,13 @@ namespace FFImageLoading.Work
 		}
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, nfloat imageScale, ITarget<UIImage, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
-			: base(mainThreadDispatcher, miniLogger, parameters, true, clearCacheOnOutOfMemory)
+			: base(mainThreadDispatcher, miniLogger, parameters, downloadCache, true, clearCacheOnOutOfMemory)
 		{
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));
 			
 			_target = target;
-			DownloadCache = downloadCache;
 		}
-
-		protected IDownloadCache DownloadCache { get; private set; }
 
 		/// <summary>
 		/// Indicates if the task uses the same native control
@@ -370,33 +367,33 @@ namespace FFImageLoading.Work
 			bool transformPlaceholdersEnabled = Parameters.TransformPlaceholdersEnabled.HasValue ? 
 				Parameters.TransformPlaceholdersEnabled.Value : ImageService.Instance.Config.TransformPlaceholders;
 
-			if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
-				&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
-			{
+            if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
+            	&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
+            {
                 if (IsCancelled)
                     return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-				foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
-				{
-					if (IsCancelled)
-						return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
+                foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                {
+                    if (IsCancelled)
+                        return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-					try
-					{
-						var old = imageIn;
-						var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
-						imageIn = bitmapHolder.ToNative();
+                    try
+                    {
+                        var old = imageIn;
+                        var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn));
+                        imageIn = bitmapHolder.ToNative();
 
-						// Transformation succeeded, so garbage the source
-						if (old != null && old != imageIn && old.Handle != imageIn.Handle)
-							old.Dispose();
-					}
-					catch (Exception ex)
-					{
-						Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-					}
-				}
-			}
+                        // Transformation succeeded, so garbage the source
+                        if (old != null && old != imageIn && old.Handle != imageIn.Handle)
+                            old.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
+                    }
+                }
+            }
 				
 			return WithLoadingResult.Encapsulate(imageIn, result.Value, imageInformation);
 		}

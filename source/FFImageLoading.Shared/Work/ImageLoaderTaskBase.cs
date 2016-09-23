@@ -33,11 +33,12 @@ namespace FFImageLoading.Work
         private readonly Lazy<string> _streamKey;
         private readonly bool _verboseLoadingCancelledLogging;
 
-        protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, bool clearCacheOnOutOfMemory, bool verboseLoadingCancelledLogging)
+        protected ImageLoaderTaskBase(IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, IDownloadCache downloadCache, bool clearCacheOnOutOfMemory, bool verboseLoadingCancelledLogging)
         {
             _verboseLoadingCancelledLogging = verboseLoadingCancelledLogging;
             _clearCacheOnOutOfMemory = clearCacheOnOutOfMemory;
             CancellationToken = new CancellationTokenSource();
+            DownloadCache = downloadCache;
             Parameters = parameters;
             NumberOfRetryNeeded = parameters.RetryCount;
             MainThreadDispatcher = mainThreadDispatcher;
@@ -110,6 +111,8 @@ namespace FFImageLoading.Work
 		protected IMiniLogger Logger { get; private set; }
 
 		protected CancellationTokenSource CancellationToken { get; private set; }
+
+        protected IDownloadCache DownloadCache { get; private set; }
 
 		public int NumberOfRetryNeeded { get; private set; }
 
@@ -220,7 +223,10 @@ namespace FFImageLoading.Work
 						{
 							try
 							{
-								generatingImageSucceeded = await TryGeneratingImageAsync().ConfigureAwait(false);
+                                if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
+                                    generatingImageSucceeded = await TryDownloadImageAsync().ConfigureAwait(false);
+                                else
+                                    generatingImageSucceeded = await TryGeneratingImageAsync().ConfigureAwait(false);
 							}
 							catch (OutOfMemoryException oom)
 							{
@@ -307,6 +313,34 @@ namespace FFImageLoading.Work
 		public abstract Task<GenerateResult> LoadFromStreamAsync(Stream stream);
 
 		protected abstract Task<GenerateResult> TryGeneratingImageAsync();
+
+        protected async virtual Task<GenerateResult> TryDownloadImageAsync()
+        {
+            try
+            {
+                if (Parameters.Source != ImageSource.Url)
+                    throw new InvalidOperationException("DownloadOnly: Only Url ImageSource is supported.");
+
+                var data = await DownloadCache.GetStreamAsync(Parameters.Path, CancellationToken.Token, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
+                using (var imageStream = data.ImageStream)
+                {
+                    if (!data.RetrievedFromDiskCache)
+                        Logger?.Debug(string.Format("DownloadOnly: {0} successfully downloaded.", Parameters.Path));
+                }
+
+                return GenerateResult.Success;
+            }
+            catch (Exception ex)
+            {
+                if (ex is OperationCanceledException)
+                {
+                    return GenerateResult.Canceled;
+                }
+
+                Logger?.Error(string.Format("DownloadOnly: {0} downloaded failed.", Parameters.Path), ex);
+                return GenerateResult.Failed;
+            }
+        }
 
         private string GetKeyInternal(string path, bool raw)
         {

@@ -29,13 +29,12 @@ namespace FFImageLoading.Work
 		internal ITarget<BitmapDrawable, ImageLoaderTask> _target;
 
 		public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<BitmapDrawable, ImageLoaderTask> target)
-			: base(mainThreadDispatcher, miniLogger, parameters, true, ImageService.Instance.Config.VerboseLoadingCancelledLogging)
+			: base(mainThreadDispatcher, miniLogger, parameters, downloadCache, true, ImageService.Instance.Config.VerboseLoadingCancelledLogging)
 		{
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));
 
 			_target = target;
-			DownloadCache = downloadCache;
 		}
 
 		/// <summary>
@@ -81,8 +80,6 @@ namespace FFImageLoading.Work
 
 			return false;
 		}
-
-		protected IDownloadCache DownloadCache { get; private set; }
 
 		protected Context Context
 		{

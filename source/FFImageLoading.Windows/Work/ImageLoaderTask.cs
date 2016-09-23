@@ -23,7 +23,7 @@ namespace FFImageLoading.Work
         internal readonly ITarget<WriteableBitmap, ImageLoaderTask> _target;
 
         public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
-            : base(mainThreadDispatcher, miniLogger, parameters, false, clearCacheOnOutOfMemory)
+            : base(mainThreadDispatcher, miniLogger, parameters, downloadCache, false, clearCacheOnOutOfMemory)
         {
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
@@ -32,8 +32,6 @@ namespace FFImageLoading.Work
 
             DownloadCache = downloadCache;
         }
-
-        protected IDownloadCache DownloadCache { get; private set; }
 
         public override bool UsesSameNativeControl(IImageLoaderTask task)
         {
