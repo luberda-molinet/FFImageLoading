@@ -196,6 +196,33 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Downloads the image request into disk cache for future use if not already exists.
+        /// Only Url Source supported.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        public static void DownloadOnly(this TaskParameter parameters)
+        {
+            if (parameters.Source == ImageSource.Url)
+            {
+                Preload(parameters.WithCache(CacheType.Disk));
+            }
+        }
+
+        /// <summary>
+        /// Downloads the image request into disk cache for future use if not already exists.
+        /// Only Url Source supported.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        public static async Task DownloadOnlyAsync(this TaskParameter parameters)
+        {
+            if (parameters.Source == ImageSource.Url)
+            {
+                await PreloadAsync(parameters.WithCache(CacheType.Disk));
+            }
+        }
+
 		private static ImageLoaderTask CreateTask(this TaskParameter parameters, Target<BitmapDrawable, ImageLoaderTask> target)
 		{
 			return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, MainThreadDispatcher.Instance, ImageService.Instance.Config.Logger, parameters, target);
