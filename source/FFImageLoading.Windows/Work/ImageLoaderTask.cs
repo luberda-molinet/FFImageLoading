@@ -20,6 +20,7 @@ namespace FFImageLoading.Work
 {
     public class ImageLoaderTask : ImageLoaderTaskBase
     {
+        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
         internal readonly ITarget<WriteableBitmap, ImageLoaderTask> _target;
 
         public ImageLoaderTask(IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher, IMiniLogger miniLogger, TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target, bool clearCacheOnOutOfMemory)
@@ -351,31 +352,40 @@ namespace FFImageLoading.Work
                         return new WithLoadingResult<WriteableBitmap>(LoadingResult.Failed);
                     }
 
-                    if (IsCancelled)
-                        return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
+                    await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
 
-                    foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                    try
                     {
                         if (IsCancelled)
                             return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-                        try
+                        foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
                         {
-                            var old = imageIn;
+                            if (IsCancelled)
+                                return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-                            IBitmap bitmapHolder = transformation.Transform(imageIn);
-                            imageIn = bitmapHolder.ToNative();
-
-                            if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
+                            try
                             {
-                                old.FreePixels();
-                                old = null;
+                                var old = imageIn;
+
+                                IBitmap bitmapHolder = transformation.Transform(imageIn);
+                                imageIn = bitmapHolder.ToNative();
+
+                                if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
+                                {
+                                    old.FreePixels();
+                                    old = null;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            Logger.Error("Can't apply transformation " + transformation.Key + " to image " + path, ex);
-                        }
+                    }
+                    finally
+                    {
+                        _decodingLock.Release();
                     }
 
                     writableBitmap = await imageIn.ToBitmapImageAsync();
