@@ -30,8 +30,6 @@ namespace FFImageLoading.Work
                 throw new ArgumentNullException(nameof(target));
 
             _target = target;
-
-            DownloadCache = downloadCache;
         }
 
         public override bool UsesSameNativeControl(IImageLoaderTask task)
