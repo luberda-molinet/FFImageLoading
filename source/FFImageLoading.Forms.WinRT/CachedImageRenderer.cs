@@ -98,11 +98,12 @@ namespace FFImageLoading.Forms.WinRT
                 Image control = new Image()
                 {
                     Stretch = GetStretch(Xamarin.Forms.Aspect.AspectFill),
-					HorizontalAlignment = HorizontalAlignment.Center,
-					VerticalAlignment = VerticalAlignment.Center,
                 };
                 control.ImageOpened += OnImageOpened;
                 SetNativeControl(control);
+
+				Control.HorizontalAlignment = HorizontalAlignment.Center;
+				Control.VerticalAlignment = VerticalAlignment.Center;
             }
 
             if (e.NewElement != null)
