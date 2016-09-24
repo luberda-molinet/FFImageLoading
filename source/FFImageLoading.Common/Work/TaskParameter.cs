@@ -77,17 +77,10 @@ namespace FFImageLoading.Work
             Transformations = new List<ITransformation>();
 
             // default values so we don't have a null value
-            OnSuccess = (s,r) =>
-			{
-			};
-
-			OnError = ex =>
-			{
-			};
-
-			OnFinish = scheduledWork =>
-			{
-			};
+            OnSuccess = (s,r) => {};
+			OnError = ex => { };
+			OnFinish = scheduledWork => { };
+            OnDownloadStarted = downloadInformation => { };
 		}
 
 		public void Dispose()
@@ -95,9 +88,10 @@ namespace FFImageLoading.Work
 			if (!_disposed)
 			{
 				// remove reference to callbacks
-				OnSuccess = (s, r) => {};
-				OnError = (e) => {};
-				OnFinish = (sw) => {};
+                OnSuccess = (s, r) => { };
+                OnError = ex => { };
+                OnFinish = scheduledWork => { };
+                OnDownloadStarted = downloadInformation => { };
 
 				Transformations = null;
 				Stream = null;
@@ -137,6 +131,8 @@ namespace FFImageLoading.Work
 		public Action<Exception> OnError { get; private set; }
 
 		public Action<IScheduledWork> OnFinish { get; private set; }
+
+        public Action<DownloadInformation> OnDownloadStarted { get; private set; }
 
 		public List<ITransformation> Transformations { get; private set; }
 
@@ -403,6 +399,20 @@ namespace FFImageLoading.Work
 			OnFinish = action;
 			return this;
 		}
+
+        /// <summary>
+        /// If image starts downloading from Internet this callback is called
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="action">Action.</param>
+        public TaskParameter DownloadStarted(Action<DownloadInformation> action)
+        {
+            if (action == null)
+                throw new Exception("Given lambda should not be null.");
+
+            OnDownloadStarted = action;
+            return this;
+        }
 	}
 }
 

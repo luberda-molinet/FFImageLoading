@@ -37,6 +37,16 @@ namespace FFImageLoading.Forms
 
 			public IScheduledWork ScheduledWork { get; private set; }
 		}
+
+		public class DownloadStartedEventArgs : EventArgs
+		{
+			public DownloadStartedEventArgs(DownloadInformation downloadInformation)
+			{
+				DownloadInformation = downloadInformation;
+			}
+
+			public DownloadInformation DownloadInformation { get; private set; }
+		}
 	}
 }
 

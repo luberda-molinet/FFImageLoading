@@ -321,7 +321,7 @@ namespace FFImageLoading.Work
                 if (Parameters.Source != ImageSource.Url)
                     throw new InvalidOperationException("DownloadOnly: Only Url ImageSource is supported.");
 
-                var data = await DownloadCache.GetStreamAsync(Parameters.Path, CancellationToken.Token, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
+                var data = await DownloadCache.GetStreamAsync(Parameters.Path, CancellationToken.Token, Parameters.OnDownloadStarted, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
                 using (var imageStream = data.ImageStream)
                 {
                     if (!data.RetrievedFromDiskCache)

@@ -12,9 +12,9 @@ namespace FFImageLoading.Cache
 
 		HttpClient DownloadHttpClient { get; set; }
 
-		Task<DownloadedData> GetAsync (string url, CancellationToken token, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
+        Task<DownloadedData> GetAsync (string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
 
-		Task<CacheStream> GetStreamAsync (string url, CancellationToken token, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
+		Task<CacheStream> GetStreamAsync (string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null);
 	}
 }
 

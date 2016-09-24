@@ -367,9 +367,7 @@ namespace FFImageLoading.Cache
 
         string SanitizeKey(string key)
         {
-            return new string(key
-                .Where(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
-                .ToArray());
+            return key.ToSanitizedKey();
         }
     }
 }

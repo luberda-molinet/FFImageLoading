@@ -269,6 +269,9 @@ namespace FFImageLoading.Forms.Droid
 					imageLoader.Error((exception) =>
 						element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
 
+					imageLoader.DownloadStarted((downloadInformation) =>
+						element.OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
+
 					_currentTask = imageLoader.Into(imageView);
 				}
 			}

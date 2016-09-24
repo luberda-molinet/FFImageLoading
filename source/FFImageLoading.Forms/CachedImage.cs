@@ -721,6 +721,45 @@ namespace FFImageLoading.Forms
 				finishCommand.Execute(e);
 		}
 
+
+		/// <summary>
+		/// Occurs when an image starts downloading from web.
+		/// </summary>
+		public event EventHandler<EventArgs> DownloadStarted;
+
+		/// <summary>
+		/// The DownloadStartedCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty DownloadStartedCommandProperty = BindableProperty.Create(nameof(DownloadStartedCommand), typeof(ICommand), typeof(CachedImage));
+
+		/// <summary>
+		/// Gets or sets the DownloadStartedCommand.
+		///  Occurs when an image starts downloading from web.
+		/// Command parameter: EventArgs
+		/// </summary>
+		/// <value>The download started command.</value>
+		public ICommand DownloadStartedCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(DownloadStartedCommandProperty);
+			}
+			set
+			{
+				SetValue(DownloadStartedCommandProperty, value);
+			}
+		}
+
+		internal void OnDownloadStarted(EventArgs e)
+		{
+			var handler = DownloadStarted;
+			if (handler != null) handler(this, e);
+
+			var downloadStartedCommand = DownloadStartedCommand;
+			if (downloadStartedCommand != null && downloadStartedCommand.CanExecute(e))
+				downloadStartedCommand.Execute(e);
+		}
+
         /// <summary>
         /// The cache type property.
         /// </summary>

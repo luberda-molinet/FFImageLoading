@@ -20,7 +20,7 @@ namespace FFImageLoading.DataResolver
 
         public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
         {
-            var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
+            var cachedStream = await DownloadCache.GetStreamAsync(identifier, token, Parameters.OnDownloadStarted, Parameters.CacheDuration, Parameters.CustomCacheKey, Parameters.CacheType).ConfigureAwait(false);
 
             var imageInformation = new ImageInformation();
             imageInformation.SetPath(identifier);
