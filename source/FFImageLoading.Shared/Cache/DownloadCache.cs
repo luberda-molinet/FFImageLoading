@@ -11,28 +11,30 @@ namespace FFImageLoading.Cache
     {
         private readonly MD5Helper _md5Helper;
         private readonly IDiskCache _diskCache;
+        private readonly TimeSpan _diskCacheDuration;
 		private const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
 
-        public DownloadCache(HttpClient httpClient, IDiskCache diskCache)
+        public DownloadCache(HttpClient httpClient, IDiskCache diskCache, TimeSpan diskCacheDuration)
         {
 			DownloadHttpClient = httpClient;
             _md5Helper = new MD5Helper();
             _diskCache = diskCache;
+            _diskCacheDuration = diskCacheDuration;
         }
 
 		public HttpClient DownloadHttpClient { get; set; }
 
 		public async Task<string> GetDiskCacheFilePathAsync(string url, string key = null)
 		{
-			string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
-			return await _diskCache.GetFilePathAsync(filename);
+            string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
+            return await _diskCache.GetFilePathAsync(filename).ConfigureAwait(false);
 		}
 
 		public async Task<DownloadedData> GetAsync(string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null)
         {
-            string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
+            string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
 		    var allowDiskCaching = AllowDiskCaching(cacheType);
-            string filepath = allowDiskCaching == false ? null : await _diskCache.GetFilePathAsync(filename);
+            string filepath = allowDiskCaching == false ? null : await _diskCache.GetFilePathAsync(filename).ConfigureAwait(false);
 
             if (allowDiskCaching)
             {
@@ -50,9 +52,8 @@ namespace FFImageLoading.Cache
 
 		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null)
 		{
-			string filename = string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key);
+			string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
             var allowDiskCaching = AllowDiskCaching(cacheType);
-            // string filepath = allowDiskCaching == false ? null : await _diskCache.GetFilePathAsync(filename);
 
             if (allowDiskCaching)
             {
@@ -80,7 +81,7 @@ namespace FFImageLoading.Cache
             var allowDiskCaching = AllowDiskCaching(cacheType);
             if (allowDiskCaching)
             {
-                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? _diskCacheDuration).ConfigureAwait(false);
             }
 			
 			return memoryStream;
@@ -95,7 +96,7 @@ namespace FFImageLoading.Cache
             var allowDiskCaching = AllowDiskCaching(cacheType);
 			if (allowDiskCaching)
             {
-                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? new TimeSpan(30, 0, 0, 0)); // by default we cache data 30 days)
+                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? _diskCacheDuration).ConfigureAwait(false);
             }
 			
 			return responseBytes;
@@ -106,6 +107,7 @@ namespace FFImageLoading.Cache
 			using (var cancelHeadersToken = new CancellationTokenSource())
 			{
 				cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
+
 				using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
 				{
 					using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))

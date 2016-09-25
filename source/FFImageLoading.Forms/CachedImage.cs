@@ -264,7 +264,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The cache duration property.
 		/// </summary>
-        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), TimeSpan.FromDays(90));
+		public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), default(TimeSpan));
 
 		/// <summary>
 		/// How long the file will be cached on disk.

@@ -7,7 +7,7 @@ namespace FFImageLoading
         {
             Url = url;
             CustomCacheKey = customCacheKey;
-            FileName = fileName?.ToSanitizedKey();
+            FileName = fileName;
             AllowDiskCaching = allowDiskCaching;
             CacheValidity = cacheValidity;
         }

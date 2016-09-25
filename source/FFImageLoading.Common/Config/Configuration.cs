@@ -28,6 +28,7 @@ namespace FFImageLoading.Config
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
             SchedulerMaxParallelTasks = Math.Max(2, (int)(Environment.ProcessorCount / 2d));
+            DiskCacheDuration = TimeSpan.FromDays(30d);
 		}
 
 		/// <summary>
@@ -151,6 +152,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The scheduler max parallel tasks.</value>
         public int SchedulerMaxParallelTasks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default duration of the disk cache entries.
+        /// </summary>
+        /// <value>The duration of the cache.</value>
+        public TimeSpan DiskCacheDuration { get; set; }
     }
 }
 
