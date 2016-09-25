@@ -1,19 +1,12 @@
 ﻿using System.Threading;
 using Android.Content;
-using Android.Content.Res;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.OS;
-using Android.Widget;
-using Object = Java.Lang.Object;
 using System.Threading.Tasks;
 using System.IO;
-using FFImageLoading.Work;
 using FFImageLoading.Helpers;
-using FFImageLoading.IO;
 using FFImageLoading.Cache;
 using FFImageLoading.Extensions;
-using Android.Runtime;
 using System;
 using FFImageLoading.Work.StreamResolver;
 using System.Linq;
@@ -85,7 +78,7 @@ namespace FFImageLoading.Work
 		{
 			get
 			{
-				return new Android.Content.ContextWrapper(Android.App.Application.Context);
+				return new ContextWrapper(Android.App.Application.Context);
 			}
 		}
 
@@ -129,11 +122,11 @@ namespace FFImageLoading.Work
 
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
-					{
-						_target.Set(this, drawableWithResult.Item, drawableWithResult.Result.IsLocalOrCachedResult(), false);
-						Completed = true;
-						Parameters?.OnSuccess(drawableWithResult.ImageInformation, drawableWithResult.Result);
-					}).ConfigureAwait(false);
+				{
+					_target.Set(this, drawableWithResult.Item, drawableWithResult.Result.IsLocalOrCachedResult(), false);
+					Completed = true;
+					Parameters?.OnSuccess(drawableWithResult.ImageInformation, drawableWithResult.Result);
+				}).ConfigureAwait(false);
 
 				if (!Completed)
 					return GenerateResult.Failed;
@@ -185,20 +178,20 @@ namespace FFImageLoading.Work
 				{
 					Logger.Debug(string.Format("Image from cache: {0}", key));
 					await MainThreadDispatcher.PostAsync(() =>
-						{
-							if (IsCancelled)
-								return;
+					{
+						if (IsCancelled)
+							return;
 
-							var ffDrawable = value as FFBitmapDrawable;
-							if (ffDrawable != null)
-								ffDrawable.StopFadeAnimation();
+						var ffDrawable = value as FFBitmapDrawable;
+						if (ffDrawable != null)
+							ffDrawable.StopFadeAnimation();
 
-							_target.Set(this, value, true, false);
+						_target.Set(this, value, true, false);
 
-							Completed = true;
+						Completed = true;
 
-							Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
-						}).ConfigureAwait(false);
+						Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
+					}).ConfigureAwait(false);
 
 					if (!Completed)
 						return CacheResult.NotFound; // not sure what to return in that case
@@ -254,12 +247,12 @@ namespace FFImageLoading.Work
 
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
-					{
-						_target.Set(this, resultWithDrawable.Item, true, false);
-						
-						Completed = true;
-						Parameters?.OnSuccess(resultWithDrawable.ImageInformation, resultWithDrawable.Result);
-					}).ConfigureAwait(false);
+				{
+					_target.Set(this, resultWithDrawable.Item, true, false);
+					
+					Completed = true;
+					Parameters?.OnSuccess(resultWithDrawable.ImageInformation, resultWithDrawable.Result);
+				}).ConfigureAwait(false);
 
 				if (!Completed)
 					return GenerateResult.Failed;
@@ -335,7 +328,7 @@ namespace FFImageLoading.Work
 					}
 					else
 					{
-						stream.Seek(0, SeekOrigin.Begin);
+                        stream.Seek(0, SeekOrigin.Begin);
 					}
 				}
 				catch (Exception ex)
@@ -446,13 +439,15 @@ namespace FFImageLoading.Work
 				if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
 					&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
 				{
+                    var transformations = Parameters.Transformations.ToList();
+
                     await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
                     try
                     {
                         if (IsCancelled)
                             return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
                         
-                        foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                        foreach (var transformation in transformations)
                         {
                             if (IsCancelled)
                                 return new WithLoadingResult<SelfDisposingBitmapDrawable>(LoadingResult.Canceled);
@@ -522,8 +517,7 @@ namespace FFImageLoading.Work
 			}
 			finally
 			{
-				if (stream != null)
-					stream.Dispose();
+				stream?.Dispose();
 			}
 		}
 

@@ -338,6 +338,7 @@ namespace FFImageLoading.Work
                 if (Parameters.Transformations != null && Parameters.Transformations.Count > 0
                 && (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
                 {
+                    var transformations = Parameters.Transformations.ToList();
                     BitmapHolder imageIn = null;
 
                     try
@@ -357,7 +358,7 @@ namespace FFImageLoading.Work
                         if (IsCancelled)
                             return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);
 
-                        foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                        foreach (var transformation in transformations)
                         {
                             if (IsCancelled)
                                 return new WithLoadingResult<WriteableBitmap>(LoadingResult.Canceled);

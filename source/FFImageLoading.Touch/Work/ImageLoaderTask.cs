@@ -97,14 +97,14 @@ namespace FFImageLoading.Work
 			{
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (IsCancelled)
-							return;
+				{
+					if (IsCancelled)
+						return;
 
-						_target.Set(this, image, imageWithResult.Result.IsLocalOrCachedResult(), false);
-						Completed = true;
-						Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
-					}).ConfigureAwait(false);
+					_target.Set(this, image, imageWithResult.Result.IsLocalOrCachedResult(), false);
+					Completed = true;
+					Parameters?.OnSuccess(imageWithResult.ImageInformation, imageWithResult.Result);
+				}).ConfigureAwait(false);
 
 				if (!Completed)
 					return GenerateResult.Failed;
@@ -142,14 +142,14 @@ namespace FFImageLoading.Work
 					return CacheResult.NotFound; // not sure what to return in that case
 
 				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (IsCancelled)
-							return;
-						
-						_target.Set(this, value, true, false);
-						Completed = true;
-						Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
-					}).ConfigureAwait(false);
+				{
+					if (IsCancelled)
+						return;
+					
+					_target.Set(this, value, true, false);
+					Completed = true;
+					Parameters?.OnSuccess(cacheEntry.Item2, LoadingResult.MemoryCache);
+				}).ConfigureAwait(false);
 
 				if (!Completed)
 					return CacheResult.NotFound; // not sure what to return in that case
@@ -211,14 +211,14 @@ namespace FFImageLoading.Work
 			{
 				// Post on main thread
 				await MainThreadDispatcher.PostAsync(() =>
-					{
-						if (IsCancelled)
-							return;
+				{
+					if (IsCancelled)
+						return;
 
-						_target.Set(this, image, true, false);
-						Completed = true;
-						Parameters?.OnSuccess(resultWithImage.ImageInformation, resultWithImage.Result);
-					}).ConfigureAwait(false);
+					_target.Set(this, image, true, false);
+					Completed = true;
+					Parameters?.OnSuccess(resultWithImage.ImageInformation, resultWithImage.Result);
+				}).ConfigureAwait(false);
 
 				if (!Completed)
 					return GenerateResult.Failed;
@@ -372,6 +372,8 @@ namespace FFImageLoading.Work
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0 
             	&& (!isPlaceholder || (isPlaceholder && transformPlaceholdersEnabled)))
             {
+                var transformations = Parameters.Transformations.ToList();
+
                 await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
 
                 try
@@ -379,7 +381,7 @@ namespace FFImageLoading.Work
                     if (IsCancelled)
                         return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
 
-                    foreach (var transformation in Parameters.Transformations.ToList() /* to prevent concurrency issues */)
+                    foreach (var transformation in transformations)
                     {
                         if (IsCancelled)
                             return new WithLoadingResult<UIImage>(LoadingResult.Canceled);
