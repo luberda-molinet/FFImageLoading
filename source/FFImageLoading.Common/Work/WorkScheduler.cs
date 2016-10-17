@@ -182,21 +182,14 @@ namespace FFImageLoading.Work
 			}
 
 			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
-			if (task.CanUseMemoryCache())
+			if (task.CanUseMemoryCache)
 			{
-				var cacheResult = await task.TryLoadingFromCacheAsync().ConfigureAwait(false);
-				if (cacheResult == CacheResult.Found) // If image is loaded from cache there is nothing to do here anymore
-				{
-					Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-				}
-
-				if (cacheResult == CacheResult.Found || cacheResult == CacheResult.ErrorOccured) // if something weird happened with the cache... error callback has already been called, let's just leave
-				{
-					if (task.Parameters.OnFinish != null)
-						task.Parameters.OnFinish(task);
-					task.Dispose();
-					return;
-				}
+                if (await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
+                {
+                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+                    task.Dispose();
+                    return;
+                }
 			}
             else if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
 			{
@@ -204,67 +197,48 @@ namespace FFImageLoading.Work
 				return;
 			}
 
-            _dispatch = _dispatch.ContinueWith(async t =>
+            _dispatch = _dispatch.ContinueWith(t =>
             {
                 try
                 {
-                    await LoadImageAsync(task).ConfigureAwait(false);
+                    if (task.IsCancelled)
+                    {
+                        task?.Dispose();
+                        return;
+                    }
+
+                    if (!task.Parameters.Preload)
+                    {
+                        lock (_pendingTasksLock)
+                        {
+                            foreach (var pendingTask in _pendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
+                            {
+                                if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+                                    pendingTask.ImageLoadingTask.CancelIfNeeded();
+                            }
+                        }
+                    }
+
+                    if (task.IsCancelled || _pauseWork)
+                    {
+                        task?.Dispose();
+                        return;
+                    }
+
+                    QueueAndGenerateImage(task);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error("An error occured while loading image", ex);
+                    _logger.Error(string.Format("Image loaded from cache: {0}", task?.Key), ex);
                 }
             });
         }
 
-        private async Task LoadImageAsync(IImageLoaderTask task)
-        {
-            if (task.IsCancelled)
-            {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
-                return;
-            }
-
-            if (!task.Parameters.Preload)
-            {
-                lock (_pendingTasksLock)
-                {
-                    foreach (var pendingTask in _pendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
-                    {
-                        if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
-                            pendingTask.ImageLoadingTask.CancelIfNeeded();
-                    }
-                }
-            }
-
-            bool loadedFromCache = await task.PrepareAndTryLoadingFromCacheAsync().ConfigureAwait(false);
-            if (loadedFromCache)
-            {
-                if (task.Parameters.OnFinish != null)
-                    task.Parameters.OnFinish(task);
-
-                task.Dispose();
-                return; // image successfully loaded from cache
-            }
-
-            if (task.IsCancelled || _pauseWork)
-            {
-                task.Parameters?.Dispose(); // this will ensure we don't keep a reference due to callbacks
-                return;
-            }
-
-            QueueAndGenerateImage(task);
-        }
-
         private PendingTask FindSimilarPendingTask(IImageLoaderTask task)         {             // At first check if the exact same items exists in pending tasks (exact same means same transformations, same downsample, ...)             // Since it will be exactly the same it can be retrieved from memory cache
-             string key = task.GetKey(raw: false);             var alreadyRunningTaskForSameKey = _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.GetKey(raw: false) == key);
-
-            return alreadyRunningTaskForSameKey;         }
+             return _pendingTasks.FirstOrDefault(t => t.ImageLoadingTask.Key == task.Key);         }
 
         private void QueueAndGenerateImage(IImageLoaderTask task)
         {
-            _logger.Debug(string.Format("Generating/retrieving image: {0}", task.GetKey()));
-
             int position = Interlocked.Increment(ref _currentPosition);
             var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task, FrameworkWrappingTask = CreateFrameworkTask(task) };
 
@@ -283,7 +257,7 @@ namespace FFImageLoading.Work
                 }
             }
 
-            if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache())
+            if (alreadyRunningTaskForSameKey == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache)
             {
                 Run(currentPendingTask);
             }
@@ -293,9 +267,9 @@ namespace FFImageLoading.Work
             }
         }
 
-        private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask alreadyQueuedTaskForSameKey)
+        private async void WaitForSimilarTask(PendingTask currentPendingTask, PendingTask taskForSimilarKey)
         {
-            string queuedKey = alreadyQueuedTaskForSameKey.ImageLoadingTask.GetKey();
+            string queuedKey = taskForSimilarKey.ImageLoadingTask.Key;
             Interlocked.Increment(ref _statsTotalWaiting);
 
             Action forceQueue = () =>
@@ -308,7 +282,7 @@ namespace FFImageLoading.Work
                 Run(currentPendingTask);
             };
 
-            if (alreadyQueuedTaskForSameKey.FrameworkWrappingTask == null)
+            if (taskForSimilarKey.FrameworkWrappingTask == null)
             {
                 _logger.Debug(string.Format("No C# Task defined for key: {0}", queuedKey));
                 forceQueue();
@@ -317,23 +291,20 @@ namespace FFImageLoading.Work
 
             _logger.Debug(string.Format("Wait for similar request for key: {0}", queuedKey));
             // This will wait for the pending task or if it is already finished then it will just pass
-            await alreadyQueuedTaskForSameKey.FrameworkWrappingTask.ConfigureAwait(false);
+            await taskForSimilarKey.FrameworkWrappingTask.ConfigureAwait(false);
 
             // Now our image should be in the cache
-            var cacheResult = await currentPendingTask.ImageLoadingTask.TryLoadingFromCacheAsync().ConfigureAwait(false);
-            if (cacheResult != CacheResult.Found)
+            var cacheFound = await currentPendingTask.ImageLoadingTask.TryLoadFromMemoryCacheAsync().ConfigureAwait(false);
+            if (!cacheFound)
             {
-                _logger.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", queuedKey));
+                _logger?.Debug(string.Format("Similar request finished but the image is not in the cache: {0}", 
+                                             currentPendingTask.ImageLoadingTask.Key)); 
                 forceQueue();
                 return;
             }
             else
             {
-                var task = currentPendingTask.ImageLoadingTask;
-                if (task.Parameters.OnFinish != null)
-                    task.Parameters.OnFinish(task);
-
-                task.Dispose();
+                currentPendingTask?.ImageLoadingTask?.Dispose();
             }
         }
 
@@ -352,18 +323,14 @@ namespace FFImageLoading.Work
             parameters.Success((size, result) =>
             {
                 tcs.TrySetResult(true);
-
-                if (successCallback != null)
-                    successCallback(size, result);
+                successCallback?.Invoke(size, result);
             });
 
             var finishCallback = parameters.OnFinish;
             parameters.Finish(sw =>
             {
                 tcs.TrySetResult(false);
-
-                if (finishCallback != null)
-                    finishCallback(sw);
+                finishCallback?.Invoke(sw);
             });
 
             return tcs.Task;
@@ -402,10 +369,10 @@ namespace FFImageLoading.Work
                     {
                         // We don't want to load, at the same time, images that have same key or same raw key at the same time
                         // This way we prevent concurrent downloads and benefit from caches
-                        string key = task.ImageLoadingTask.GetKey();
+                        string key = task.ImageLoadingTask.Key;
                         if (!_currentlyRunning.ContainsKey(key) && !currentLotOfPendingTasks.ContainsKey(key))
                         {
-                            string rawKey = task.ImageLoadingTask.GetKey(raw: true);
+                            string rawKey = task.ImageLoadingTask.KeyRaw;
                             if (!_currentlyRunning.ContainsKey(rawKey) && !currentLotOfPendingTasks.ContainsKey(rawKey))
                             {
                                 currentLotOfPendingTasks.Add(key, task);
@@ -442,7 +409,7 @@ namespace FFImageLoading.Work
                     return;
             }
 
-            string key = pendingTask.ImageLoadingTask.GetKey();
+            string key = pendingTask.ImageLoadingTask.Key;
 
             try
             {

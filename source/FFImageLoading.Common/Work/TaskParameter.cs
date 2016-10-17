@@ -83,23 +83,6 @@ namespace FFImageLoading.Work
             OnDownloadStarted = downloadInformation => { };
 		}
 
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				// remove reference to callbacks
-                OnSuccess = (s, r) => { };
-                OnError = ex => { };
-                OnFinish = scheduledWork => { };
-                OnDownloadStarted = downloadInformation => { };
-
-				Transformations = null;
-				Stream = null;
-
-				_disposed = true;
-			}
-		}
-
 		public ImageSource Source { get; private set; }
 
 		public string Path { get; private set; }
@@ -126,7 +109,7 @@ namespace FFImageLoading.Work
 
 		public int RetryDelayInMs { get; private set; }
 
-		public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
+        public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
 
 		public Action<Exception> OnError { get; private set; }
 
@@ -413,6 +396,21 @@ namespace FFImageLoading.Work
             OnDownloadStarted = action;
             return this;
         }
-	}
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                OnSuccess = null;
+                OnError = null;
+                OnFinish = null;
+                OnDownloadStarted = null;
+                Transformations = null;
+                Stream = null;
+
+                _disposed = true;
+            }
+        }
+    }
 }
 

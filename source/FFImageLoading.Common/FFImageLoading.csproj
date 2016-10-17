@@ -90,6 +90,9 @@
     <Compile Include="Helpers\MiniLoggerWrapper.cs" />
     <Compile Include="Work\DownloadInformation.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Work\ImageLoaderTask.cs" />
+    <Compile Include="Work\IDataResolverFactory.cs" />
+    <Compile Include="Work\IDataResolver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

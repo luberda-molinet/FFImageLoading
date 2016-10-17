@@ -12,12 +12,12 @@ using System.Threading;
 
 namespace FFImageLoading.Work
 {
-	public class ImageLoaderTask : ImageLoaderTaskBase
+	public class ImageLoaderTaskOLD : ImageLoaderTaskBase
 	{
         private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 		internal readonly ITarget<UIImage, ImageLoaderTask> _target;
 		
-		static ImageLoaderTask()
+		static ImageLoaderTaskOLD()
 		{
 			// do not remove!
 			// kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread

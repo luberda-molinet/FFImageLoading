@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 
 namespace FFImageLoading.Work
 {
-	public abstract class ImageLoaderTaskBase: IImageLoaderTask, IDisposable
+	public abstract class ImageLoaderTaskBase : IImageLoaderTask, IDisposable
 	{
 		private static int _streamIndex;
 		private static int GetNextStreamIndex()

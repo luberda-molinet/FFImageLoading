@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-	public class Target<TBitmap, TImageLoaderTask>: ITarget<TBitmap, TImageLoaderTask>
-		where TImageLoaderTask: IImageLoaderTask
+    public class Target<TBitmap, TImageLoaderTask>: ITarget<TBitmap, TImageLoaderTask> where TImageLoaderTask: IImageLoaderTask
 	{
 		public virtual bool IsValid { get; } = true;
 

@@ -9,7 +9,7 @@ namespace FFImageLoading.Work.DataResolver
 	{
 
 		public static IDataResolver GetResolver(ImageSource source, TaskParameter parameter, IDownloadCache downloadCache, IMainThreadDispatcher mainThreadDispatcher)
-		{
+        {
 			switch (source)
 			{
 				case ImageSource.ApplicationBundle:

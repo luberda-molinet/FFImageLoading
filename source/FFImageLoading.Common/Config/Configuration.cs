@@ -61,6 +61,12 @@ namespace FFImageLoading.Config
 		/// <value>The download cache.</value>
 		public IDownloadCache DownloadCache { get; set; }
 
+        /// <summary>
+        /// Gets or sets the image data resolver factory.
+        /// </summary>
+        /// <value>The data resolver factory.</value>
+        public IDataResolverFactory DataResolverFactory { get; set; }
+
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
 		/// </summary>
