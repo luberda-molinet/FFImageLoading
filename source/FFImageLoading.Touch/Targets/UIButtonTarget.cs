@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 using UIKit;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
 	public class UIButtonTarget: UIControlTarget<UIButton>
 	{
@@ -11,16 +12,20 @@ namespace FFImageLoading.Work
 		{
 		}
 
-		public override void Set(ImageLoaderTask task, UIImage image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
-		{
-			var control = Control;
-			if (control == null)
-				return;
-			control.SetImage(image, UIControlState.Normal);
-		}
-
-        public override void SetAsEmpty(ImageLoaderTask task)
+        public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
+            task.CancellationToken.ThrowIfCancellationRequested();
+
+            var control = Control;
+            if (control == null)
+                return;
+            control.SetImage(image, UIControlState.Normal);
+        }
+
+        public override void SetAsEmpty(IImageLoaderTask task)
+        {
+            task.CancellationToken.ThrowIfCancellationRequested();
+
             var control = Control;
             if (control == null)
                 return;

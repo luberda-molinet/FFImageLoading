@@ -1,11 +1,10 @@
 ﻿using System;
-using FFImageLoading.Work;
 using FFImageLoading.Config;
 
-namespace FFImageLoading
+namespace FFImageLoading.Work
 {
     public interface IDataResolverFactory
     {
-        IDataResolver GetResolver(string identifier, ImageSource source, TaskParameter parameters);
+        IDataResolver GetResolver(string identifier, ImageSource source, TaskParameter parameters, Configuration configuration);
     }
 }

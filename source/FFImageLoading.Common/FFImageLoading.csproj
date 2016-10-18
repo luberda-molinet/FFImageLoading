@@ -58,9 +58,7 @@
     <Compile Include="Helpers\IMiniLogger.cs" />
     <Compile Include="Work\IImageLoaderTask.cs" />
     <Compile Include="Config\Configuration.cs" />
-    <Compile Include="Cache\IDownloadCache.cs" />
     <Compile Include="Cache\DownloadedData.cs" />
-    <Compile Include="Cache\IDiskCache.cs" />
     <Compile Include="Work\WorkScheduler.cs" />
     <Compile Include="Work\IScheduledWork.cs" />
     <Compile Include="Work\TaskParameter.cs" />
@@ -73,7 +71,6 @@
     <Compile Include="Work\WithLoadingResult.cs" />
     <Compile Include="Transformations\FFColorMatrix.cs" />
     <Compile Include="Cache\CacheType.cs" />
-    <Compile Include="Cache\IMemoryCache.cs" />
     <Compile Include="Work\ImageSource.cs" />
     <Compile Include="Work\InterpolationMode.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
@@ -81,7 +78,6 @@
     <Compile Include="Work\LoadingPriority.cs" />
     <Compile Include="Work\IImageService.cs" />
     <Compile Include="Work\Target.cs" />
-    <Compile Include="Work\ITarget.cs" />
     <Compile Include="Concurrency\ConcurrentDictionary.cs" />
     <Compile Include="Concurrency\SR.cs" />
     <Compile Include="Concurrency\ArrayHelper.cs" />
@@ -91,8 +87,14 @@
     <Compile Include="Work\DownloadInformation.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Work\ImageLoaderTask.cs" />
-    <Compile Include="Work\IDataResolverFactory.cs" />
     <Compile Include="Work\IDataResolver.cs" />
+    <Compile Include="Work\IDataResolverFactory.cs" />
+    <Compile Include="Cache\IDiskCache.cs" />
+    <Compile Include="Cache\IDownloadCache.cs" />
+    <Compile Include="Cache\IMemoryCache.cs" />
+    <Compile Include="Work\ITarget.cs" />
+    <Compile Include="Work\IWorkScheduler.cs" />
+    <Compile Include="Helpers\Retry.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

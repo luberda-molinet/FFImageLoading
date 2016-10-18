@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.IO;
-using FFImageLoading.Work;
-using FFImageLoading.Config;
 using System.Threading;
 
-namespace FFImageLoading
+namespace FFImageLoading.Work
 {
     public interface IDataResolver
     {
-        Task<Tuple<Stream, LoadingResult>> Resolve(string identifier, TaskParameter parameters, Configuration configuration, CancellationToken token);
+        Task<Tuple<Stream, LoadingResult, ImageInformation, DownloadInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token);
     }
 }

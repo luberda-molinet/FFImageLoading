@@ -9,10 +9,10 @@ using System.Linq;
 
 namespace FFImageLoading.Cache
 {
-    internal class ImageCache: IImageCache
+    internal class ImageCache: IMemoryCache<UIImage>
     {
         private readonly NSCache _cache;
-        private static IImageCache _instance;
+        private static IMemoryCache<UIImage> _instance;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 		private readonly IMiniLogger _logger;
 
@@ -34,7 +34,7 @@ namespace FFImageLoading.Cache
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());
         }
 
-        public static IImageCache Instance
+        public static IMemoryCache<UIImage> Instance
         {
             get
             {
