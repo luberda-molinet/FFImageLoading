@@ -19,11 +19,11 @@ namespace FFImageLoading.Cache
 
         public virtual async Task<CacheStream> DownloadAndCacheIfNeededAsync(string url, TaskParameter parameters, Configuration configuration, CancellationToken token)
         {
-            var allowCustomKey = string.IsNullOrWhiteSpace(parameters.CustomCacheKey) 
+            var allowCustomKey = !string.IsNullOrWhiteSpace(parameters.CustomCacheKey) 
                                        && (string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) || parameters.LoadingPlaceholderPath != url)
                                        && (string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) || parameters.ErrorPlaceholderPath != url);
 
-            string filename = (allowCustomKey ? MD5Helper.MD5(url) : MD5Helper.MD5(parameters.CustomCacheKey))?.ToSanitizedKey();
+            string filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url))?.ToSanitizedKey();
             var allowDiskCaching = AllowDiskCaching(parameters.CacheType);
             var duration = parameters.CacheDuration.HasValue ? parameters.CacheDuration.Value : configuration.DiskCacheDuration;
             string filePath = null;
@@ -64,26 +64,33 @@ namespace FFImageLoading.Cache
 
         async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client)
         {
-            using (var cancelHeadersToken = new CancellationTokenSource())
+            try
             {
-                cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
-
-                using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
+                using (var cancelHeadersToken = new CancellationTokenSource())
                 {
-                    using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
+                    cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
+
+                    using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
                     {
-                        if (!response.IsSuccessStatusCode || response.Content == null)
-                            return null;
-
-                        using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                        using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
                         {
-                            cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+                            if (!response.IsSuccessStatusCode || response.Content == null)
+                                return null;
 
-                            return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false),
-                                                  cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                            using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                            {
+                                cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+
+                                return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false),
+                                                      cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                            }
                         }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                throw new Exception("HttpHeadersTimeout");
             }
         }
 
