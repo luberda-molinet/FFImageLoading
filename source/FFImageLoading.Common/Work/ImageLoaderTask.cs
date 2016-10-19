@@ -126,7 +126,7 @@ namespace FFImageLoading.Work
 
         public bool CanUseMemoryCache { get; private set; }
 
-        public bool Completed { get; private set; }
+        public bool IsCompleted { get; private set; }
 
         public string Key { get; private set; }
 
@@ -179,7 +179,7 @@ namespace FFImageLoading.Work
 
         public void CancelIfNeeded()
         {
-            if (!IsCancelled && !Completed)
+            if (!IsCancelled && !IsCompleted)
                 Cancel();
         }
 
@@ -202,7 +202,7 @@ namespace FFImageLoading.Work
                     Logger.Debug(string.Format("Image loaded from cache: {0}", Key));
                     Parameters?.OnSuccess?.Invoke(ImageInformation, LoadingResult.MemoryCache);
                     Parameters?.OnFinish?.Invoke(this);
-                    Completed = true;
+                    IsCompleted = true;
                 }
                 else
                 {
@@ -280,38 +280,11 @@ namespace FFImageLoading.Work
             }
         }
 
-        //async Task<Tuple<bool, LoadingResult>> TryDownloadOnlyAsync()
-        //{
-        //    try
-        //    {
-        //        if (Parameters.Source != ImageSource.Url)
-        //            throw new InvalidOperationException("DownloadOnly: Only Url ImageSource is supported.");
-
-        //        var data = await DownloadCache.DownloadAndCacheIfNeededAsync(Parameters.Path, Parameters, Configuration, CancellationToken).ConfigureAwait(false);
-        //        using (var imageStream = data.ImageStream)
-        //        {
-        //            if (!data.RetrievedFromDiskCache)
-        //                Logger?.Debug(string.Format("DownloadOnly success: {0}", Key));
-        //        }
-
-        //        return new Tuple<bool, LoadingResult>(true, data.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (!(ex is OperationCanceledException))
-        //        {
-        //            Logger?.Error(string.Format("DownloadOnly failed: {0}", Key), ex);
-        //        }
-        //    }
-
-        //    return new Tuple<bool, LoadingResult>(false, LoadingResult.Failed);
-        //}
-
         public async Task RunAsync()
         {
             try
             {
-                if (Completed || IsCancelled || ImageService.ExitTasksEarly)
+                if (IsCompleted || IsCancelled || ImageService.ExitTasksEarly)
                     throw new OperationCanceledException();
 
                 CancellationToken.ThrowIfCancellationRequested();
@@ -404,7 +377,7 @@ namespace FFImageLoading.Work
                     ImageService.RemovePendingTask(this);
                 }
 
-                Completed = true;
+                IsCompleted = true;
             }
         }
 
