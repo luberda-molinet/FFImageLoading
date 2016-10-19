@@ -725,7 +725,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Occurs when an image starts downloading from web.
 		/// </summary>
-		public event EventHandler<EventArgs> DownloadStarted;
+		public event EventHandler<CachedImageEvents.DownloadStartedEventArgs> DownloadStarted;
 
 		/// <summary>
 		/// The DownloadStartedCommandProperty.
@@ -750,10 +750,9 @@ namespace FFImageLoading.Forms
 			}
 		}
 
-		internal void OnDownloadStarted(EventArgs e)
+		internal void OnDownloadStarted(CachedImageEvents.DownloadStartedEventArgs e)
 		{
-			var handler = DownloadStarted;
-			if (handler != null) handler(this, e);
+			DownloadStarted?.Invoke(this, e);
 
 			var downloadStartedCommand = DownloadStartedCommand;
 			if (downloadStartedCommand != null && downloadStartedCommand.CanExecute(e))
