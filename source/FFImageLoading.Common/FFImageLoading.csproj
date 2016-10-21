@@ -65,10 +65,8 @@
     <Compile Include="Work\ITransformation.cs" />
     <Compile Include="Work\IBitmap.cs" />
     <Compile Include="Cache\CacheResult.cs" />
-    <Compile Include="Work\GenerateResult.cs" />
     <Compile Include="Work\LoadingResult.cs" />
     <Compile Include="Cache\CacheStream.cs" />
-    <Compile Include="Work\WithLoadingResult.cs" />
     <Compile Include="Transformations\FFColorMatrix.cs" />
     <Compile Include="Cache\CacheType.cs" />
     <Compile Include="Work\ImageSource.cs" />

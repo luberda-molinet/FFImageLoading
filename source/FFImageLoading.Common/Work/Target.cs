@@ -4,13 +4,7 @@ namespace FFImageLoading.Work
 {
     public class Target<TImageContainer, TImageView>: ITarget<TImageContainer, TImageView>
 	{
-        public virtual TImageView Control
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual TImageView Control { get { throw new NotImplementedException(); }}
 
 		public virtual bool IsValid { get; } = true;
 
@@ -18,9 +12,9 @@ namespace FFImageLoading.Work
 
 		public virtual bool UsesSameNativeControl(IImageLoaderTask task) => false;
 
-        public virtual void SetAsEmpty(IImageLoaderTask task) { task.CancellationToken.ThrowIfCancellationRequested(); }
+        public virtual void SetAsEmpty(IImageLoaderTask task) {  }
 
-        public virtual void Set(IImageLoaderTask task, TImageContainer image, bool animated) { task.CancellationToken.ThrowIfCancellationRequested(); }
+        public virtual void Set(IImageLoaderTask task, TImageContainer image, bool animated) { }
     }
 }
 

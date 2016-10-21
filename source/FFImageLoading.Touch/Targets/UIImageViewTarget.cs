@@ -14,7 +14,8 @@ namespace FFImageLoading.Targets
 
         public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
-            task.CancellationToken.ThrowIfCancellationRequested();
+            if (task == null || task.IsCancelled)
+                return;
 
             var control = Control;
             if (control == null || control.Image == image)
@@ -41,7 +42,8 @@ namespace FFImageLoading.Targets
 
         public override void SetAsEmpty(IImageLoaderTask task)
         {
-            task.CancellationToken.ThrowIfCancellationRequested();
+            if (task == null || task.IsCancelled)
+                return;
 
             var control = Control;
             if (control == null)

@@ -5,7 +5,7 @@ namespace FFImageLoading.Drawables
 {
 	public interface IAsyncDrawable
 	{
-		ImageLoaderTask GetImageLoaderTask();
+		IImageLoaderTask GetImageLoaderTask();
 	}
 }
 

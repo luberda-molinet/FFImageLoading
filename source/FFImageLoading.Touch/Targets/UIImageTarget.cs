@@ -10,7 +10,8 @@ namespace FFImageLoading.Targets
 
         public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
-            task.CancellationToken.ThrowIfCancellationRequested();
+            if (task == null || task.IsCancelled)
+                return;
 
             if (_imageWeakReference == null)
                 _imageWeakReference = new WeakReference<UIImage>(image);

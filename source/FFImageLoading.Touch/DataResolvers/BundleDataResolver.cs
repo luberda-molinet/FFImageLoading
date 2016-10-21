@@ -11,7 +11,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
 	{
-        public Task<Tuple<Stream, LoadingResult, ImageInformation, DownloadInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var fileName = Path.GetFileNameWithoutExtension(identifier);
             var extension = Path.GetExtension(identifier).TrimStart('.');
@@ -27,8 +27,8 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetPath(identifier);
                 imageInformation.SetFilePath(url.Path);
 
-                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation, DownloadInformation>(
-                    stream, LoadingResult.CompiledResource, imageInformation, null));
+                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+                    stream, LoadingResult.CompiledResource, imageInformation));
             }
 
             throw new FileNotFoundException(identifier);

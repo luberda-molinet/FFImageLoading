@@ -17,7 +17,7 @@ namespace FFImageLoading.DataResolvers
 
         protected ImageSource Source { get; private set; }
 
-        public Task<Tuple<Stream, LoadingResult, ImageInformation, DownloadInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             string file = null;
 
@@ -58,8 +58,8 @@ namespace FFImageLoading.DataResolvers
                 else if (parameters.ErrorPlaceholderPath == identifier)
                     result = (LoadingResult)(int)parameters.LoadingPlaceholderSource;
 
-                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation, DownloadInformation>(
-                    stream, result, imageInformation, null));
+                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+                    stream, result, imageInformation));
             }
 
             throw new FileNotFoundException(identifier);

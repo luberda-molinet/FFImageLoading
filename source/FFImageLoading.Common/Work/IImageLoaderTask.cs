@@ -30,8 +30,6 @@ namespace FFImageLoading.Work
         ImageInformation ImageInformation { get; }
 
         DownloadInformation DownloadInformation { get; }
-
-        CancellationToken CancellationToken { get; }
     }
 }
 

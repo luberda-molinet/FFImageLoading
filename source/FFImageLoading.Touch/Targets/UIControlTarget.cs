@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
-using FFImageLoading.Extensions;
 using FFImageLoading.Work;
 using ObjCRuntime;
 using UIKit;

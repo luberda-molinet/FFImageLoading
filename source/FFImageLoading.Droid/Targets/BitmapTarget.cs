@@ -5,22 +5,19 @@ using FFImageLoading.Drawables;
 
 namespace FFImageLoading
 {
-    public class BitmapTarget : Target<BitmapDrawable, ImageLoaderTask>
+    public class BitmapTarget : Target<SelfDisposingBitmapDrawable, SelfDisposingBitmapDrawable>
     {
-        private WeakReference<BitmapDrawable> _drawableWeakReference = null;
+        WeakReference<BitmapDrawable> _drawableWeakReference = null;
 
-        public override void Set(ImageLoaderTask task, BitmapDrawable image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
+        public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
         {
-            if (task.IsCancelled)
+            if (task == null || task.IsCancelled)
                 return;
 
-            if (!isLoadingPlaceholder)
-            {
-                if (_drawableWeakReference == null)
-                    _drawableWeakReference = new WeakReference<BitmapDrawable>(image);
-                else
-                    _drawableWeakReference.SetTarget(image);
-            }
+            if (_drawableWeakReference == null)
+                _drawableWeakReference = new WeakReference<BitmapDrawable>(image);
+            else
+                _drawableWeakReference.SetTarget(image);
         }
 
         public SelfDisposingBitmapDrawable BitmapDrawable

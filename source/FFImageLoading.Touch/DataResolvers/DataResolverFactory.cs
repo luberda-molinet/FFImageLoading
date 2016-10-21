@@ -6,7 +6,18 @@ namespace FFImageLoading.DataResolvers
 {
     public class DataResolverFactory : IDataResolverFactory
     {
-        public IDataResolver GetResolver(string identifier, ImageSource source, TaskParameter parameters, Configuration configuration)
+        static DataResolverFactory instance;
+        internal static DataResolverFactory Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new DataResolverFactory();
+                return instance;
+            }
+        }
+
+        public virtual IDataResolver GetResolver(string identifier, ImageSource source, TaskParameter parameters, Configuration configuration)
         {
             switch (source)
             {

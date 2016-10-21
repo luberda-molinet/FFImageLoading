@@ -12,7 +12,7 @@ namespace FFImageLoading.Extensions
 		/// </summary>
 		/// <param name="imageView"></param>
 		/// <returns></returns>
-		public static ImageLoaderTask GetImageLoaderTask(this ImageView imageView)
+		public static IImageLoaderTask GetImageLoaderTask(this ImageView imageView)
 		{
 			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return null;

@@ -51,7 +51,6 @@ namespace FFImageLoading.Cache
                 return null;
 
             var memoryStream = new MemoryStream(responseBytes, false);
-            memoryStream.Position = 0;
 
             if (allowDiskCaching)
             {
