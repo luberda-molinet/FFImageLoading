@@ -70,19 +70,12 @@
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Extensions\ImageViewExtensions.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Work\StreamResolver\ApplicationBundleStreamResolver.cs" />
-    <Compile Include="Work\StreamResolver\FilePathStreamResolver.cs" />
-    <Compile Include="Work\StreamResolver\IStreamResolver.cs" />
-    <Compile Include="Work\StreamResolver\StreamResolverFactory.cs" />
-    <Compile Include="Work\StreamResolver\UrlStreamResolver.cs" />
-    <Compile Include="Work\StreamResolver\CompiledResourceStreamResolver.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Cache\ReuseBitmapDrawableCache.cs" />
@@ -100,19 +93,21 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Targets\ImageViewTarget.cs" />
     <Compile Include="Targets\BitmapTarget.cs" />
+    <Compile Include="DataResolvers\BundleDataResolver.cs" />
+    <Compile Include="DataResolvers\ResourceDataResolver.cs" />
+    <Compile Include="DataResolvers\FileDataResolver.cs" />
+    <Compile Include="DataResolvers\UrlDataResolver.cs" />
+    <Compile Include="Work\PlatformImageLoadingTask.cs" />
+    <Compile Include="DataResolvers\DataResolverFactory.cs" />
+    <Compile Include="DataResolvers\StreamDataResolver.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Config\" />
-    <Folder Include="Drawables\" />
-    <Folder Include="Properties\" />
-    <Folder Include="Targets\" />
-  </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="80" TabWidth="4" TabsToSpaces="True" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>

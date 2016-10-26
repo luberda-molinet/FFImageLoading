@@ -8,7 +8,7 @@ namespace FFImageLoading.Work
 
         bool IsCancelled { get; }
 
-        bool Completed { get; }
+        bool IsCompleted { get; }
     }
 }
 

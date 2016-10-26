@@ -4,130 +4,96 @@ using System.IO;
 using System.Net.Http;
 using FFImageLoading.Helpers;
 using System.Threading;
+using FFImageLoading.Work;
+using FFImageLoading.Config;
 
 namespace FFImageLoading.Cache
 {
-    public class DownloadCache: IDownloadCache
+    public class DownloadCache : IDownloadCache
     {
-        private readonly MD5Helper _md5Helper;
-        private readonly IDiskCache _diskCache;
-        private readonly TimeSpan _diskCacheDuration;
-		private const int BufferSize = 4096; // Xamarin large object heap threshold is 8K
+        const int BufferSize = 4096;
 
-        public DownloadCache(HttpClient httpClient, IDiskCache diskCache, TimeSpan diskCacheDuration)
+        public virtual MD5Helper MD5Helper { get; private set; } = new MD5Helper();
+
+        public virtual TimeSpan DelayBetweenRetry { get; set; } = TimeSpan.FromSeconds(1);
+
+        public virtual async Task<CacheStream> DownloadAndCacheIfNeededAsync(string url, TaskParameter parameters, Configuration configuration, CancellationToken token)
         {
-			DownloadHttpClient = httpClient;
-            _md5Helper = new MD5Helper();
-            _diskCache = diskCache;
-            _diskCacheDuration = diskCacheDuration;
-        }
+            var allowCustomKey = !string.IsNullOrWhiteSpace(parameters.CustomCacheKey) 
+                                       && (string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) || parameters.LoadingPlaceholderPath != url)
+                                       && (string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) || parameters.ErrorPlaceholderPath != url);
 
-		public HttpClient DownloadHttpClient { get; set; }
-
-		public async Task<string> GetDiskCacheFilePathAsync(string url, string key = null)
-		{
-            string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
-            return await _diskCache.GetFilePathAsync(filename).ConfigureAwait(false);
-		}
-
-		public async Task<DownloadedData> GetAsync(string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null)
-        {
-            string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
-		    var allowDiskCaching = AllowDiskCaching(cacheType);
-            string filepath = allowDiskCaching == false ? null : await _diskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+            string filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url))?.ToSanitizedKey();
+            var allowDiskCaching = AllowDiskCaching(parameters.CacheType);
+            var duration = parameters.CacheDuration.HasValue ? parameters.CacheDuration.Value : configuration.DiskCacheDuration;
+            string filePath = null;
 
             if (allowDiskCaching)
             {
-                byte[] data = await _diskCache.TryGetAsync(filename, token).ConfigureAwait(false);
-                if (data != null)
-                    return new DownloadedData(filepath, data) { RetrievedFromDiskCache = true };
-            }
-
-            var downloadInformation = new DownloadInformation(url, key, filename, allowDiskCaching, duration);
-            onDownloadStarted?.Invoke(downloadInformation);
-
-			var bytes = await DownloadBytesAndCacheAsync(url, filename, token, duration, cacheType).ConfigureAwait(false);
-			return new DownloadedData(filepath, bytes);
-        }
-
-		public async Task<CacheStream> GetStreamAsync(string url, CancellationToken token, Action<DownloadInformation> onDownloadStarted, TimeSpan? duration = null, string key = null, CacheType? cacheType = null)
-		{
-			string filename = (string.IsNullOrWhiteSpace(key) ? _md5Helper.MD5(url) : _md5Helper.MD5(key))?.ToSanitizedKey();
-            var allowDiskCaching = AllowDiskCaching(cacheType);
-
-            if (allowDiskCaching)
-            {
-                var diskStream = await _diskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
+                var diskStream = await configuration.DiskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
                 if (diskStream != null)
-                    return new CacheStream(diskStream, true);
+                {
+                    filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+                    return new CacheStream(diskStream, true, filePath);
+                }
             }
 
-            var downloadInformation = new DownloadInformation(url, key, filename, allowDiskCaching, duration);
-            onDownloadStarted?.Invoke(downloadInformation);
+            var downloadInfo = new DownloadInformation(url, parameters.CustomCacheKey, filename, allowDiskCaching, duration);
+            parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
-			var memoryStream = await DownloadStreamAndCacheAsync(url, filename, token, duration, cacheType).ConfigureAwait(false);
-			return new CacheStream(memoryStream, false);
-		}
+            var responseBytes = await Retry.DoAsync(
+                async () => await DownloadAsync(url, token, configuration.HttpClient).ConfigureAwait(false),
+                DelayBetweenRetry,
+                parameters.RetryCount,
+                () => configuration.Logger.Debug(string.Format("Retry download: {0}", url)));
 
-		private async Task<MemoryStream> DownloadStreamAndCacheAsync(string url, string filename, CancellationToken token, TimeSpan? duration, CacheType? cacheType)
-		{
-			var responseBytes = await DownloadAsync(url, filename, token).ConfigureAwait(false);
-			if (responseBytes == null)
-				return null;
+            if (responseBytes == null)
+                return null;
 
-			var memoryStream = new MemoryStream(responseBytes, false);
-			memoryStream.Position = 0;
+            var memoryStream = new MemoryStream(responseBytes, false);
 
-            var allowDiskCaching = AllowDiskCaching(cacheType);
             if (allowDiskCaching)
             {
-                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? _diskCacheDuration).ConfigureAwait(false);
+                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration).ConfigureAwait(false);
             }
-			
-			return memoryStream;
-		}
 
-		private async Task<byte[]> DownloadBytesAndCacheAsync(string url, string filename, CancellationToken token, TimeSpan? duration, CacheType? cacheType)
-		{
-			var responseBytes = await DownloadAsync(url, filename, token).ConfigureAwait(false);
-			if (responseBytes == null)
-				return null;
+            filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+            return new CacheStream(memoryStream, false, filePath);
+        }
 
-            var allowDiskCaching = AllowDiskCaching(cacheType);
-			if (allowDiskCaching)
+        async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client)
+        {
+            try
             {
-                await _diskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration ?? _diskCacheDuration).ConfigureAwait(false);
-            }
-			
-			return responseBytes;
-		}
+                using (var cancelHeadersToken = new CancellationTokenSource())
+                {
+                    cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
 
-		private async Task<byte[]> DownloadAsync(string url, string filename, CancellationToken token)
-		{
-			using (var cancelHeadersToken = new CancellationTokenSource())
-			{
-				cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpHeadersTimeout));
-
-				using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
-				{
-					using (var response = await DownloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
-					{
-						if (!response.IsSuccessStatusCode || response.Content == null)
-							return null;
-
-                        using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                    using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
+                    {
+                        using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
                         {
-                            cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+                            if (!response.IsSuccessStatusCode || response.Content == null)
+                                return null;
 
-                            return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false), 
-                                                  cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                            using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                            {
+                                cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(ImageService.Instance.Config.HttpReadTimeout));
+
+                                return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false),
+                                                      cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                            }
                         }
-					}
-				}
-			}
-		}
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw new Exception("HttpHeadersTimeout");
+            }
+        }
 
-        private static bool AllowDiskCaching(CacheType? cacheType)
+        static bool AllowDiskCaching(CacheType? cacheType)
         {
             return cacheType.HasValue == false || cacheType == CacheType.All || cacheType == CacheType.Disk;
         }

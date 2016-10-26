@@ -9,15 +9,15 @@ namespace FFImageLoading.Drawables
 {
 	public class SelfDisposingAsyncDrawable : SelfDisposingBitmapDrawable, IAsyncDrawable
 	{
-		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
+		private readonly WeakReference<IImageLoaderTask> _imageLoaderTaskReference;
 
-		public SelfDisposingAsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
+		public SelfDisposingAsyncDrawable(Resources res, Bitmap bitmap, IImageLoaderTask imageLoaderTask)
 			: base(res, bitmap)
 		{
 			if (imageLoaderTask == null)
                 throw new ArgumentNullException(nameof(imageLoaderTask));
 			
-			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
+			_imageLoaderTaskReference = new WeakReference<IImageLoaderTask>(imageLoaderTask);
 		}
 
         public SelfDisposingAsyncDrawable() : base()
@@ -57,12 +57,12 @@ namespace FFImageLoading.Drawables
 
         }
 
-		public ImageLoaderTask GetImageLoaderTask()
+		public IImageLoaderTask GetImageLoaderTask()
 		{
 			if (_imageLoaderTaskReference == null)
 				return null;
 
-			ImageLoaderTask task;
+			IImageLoaderTask task;
 			_imageLoaderTaskReference.TryGetTarget(out task);
 			return task;
 		}

@@ -3,18 +3,22 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-	public interface ITarget<TBitmap, TImageLoaderTask>
-		where TImageLoaderTask: IImageLoaderTask
-	{
-		bool IsValid { get; }
+    public interface ITarget
+    {
+        bool IsValid { get; }
 
-		bool IsTaskValid(TImageLoaderTask task);
+        bool IsTaskValid(IImageLoaderTask task);
 
-		bool UsesSameNativeControl(TImageLoaderTask task);
+        bool UsesSameNativeControl(IImageLoaderTask task);
+    }
 
-		void Set(TImageLoaderTask task, TBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder);
+    public interface ITarget<TImageContainer, TImageView> : ITarget
+    {
+        TImageView Control { get; }
 
-        void SetAsEmpty(TImageLoaderTask task);
-	}
+        void Set(IImageLoaderTask task, TImageContainer image, bool animated);
+
+        void SetAsEmpty(IImageLoaderTask task);
+    }
 }
 

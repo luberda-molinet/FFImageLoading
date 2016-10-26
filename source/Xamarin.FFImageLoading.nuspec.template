@@ -78,12 +78,7 @@ Features:
 		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.xml" />
         <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.dll" />
         <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.xml" />
-
-		<!--Windows SL-->
-		<file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-wp8\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-wp8\FFImageLoading.Platform.xml" />
-        <file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.dll" target="lib\portable-wp8\FFImageLoading.dll" />
-        <file src="FFImageLoading.WinSL\bin\Release\FFImageLoading.xml" target="lib\portable-wp8\FFImageLoading.xml" />		
+	
 	</files>
 
 </package>

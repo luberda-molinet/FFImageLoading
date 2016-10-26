@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace FFImageLoading.Work
 {
-	public class Target<TBitmap, TImageLoaderTask>: ITarget<TBitmap, TImageLoaderTask>
-		where TImageLoaderTask: IImageLoaderTask
+    public class Target<TImageContainer, TImageView>: ITarget<TImageContainer, TImageView>
 	{
+        public virtual TImageView Control { get { throw new NotImplementedException(); }}
+
 		public virtual bool IsValid { get; } = true;
 
-		public virtual bool IsTaskValid(TImageLoaderTask task) => IsValid;
+        public virtual bool IsTaskValid(IImageLoaderTask task) => IsValid;
 
-		public virtual void Set(TImageLoaderTask task, TBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder) { }
+		public virtual bool UsesSameNativeControl(IImageLoaderTask task) => false;
 
-		public virtual bool UsesSameNativeControl(TImageLoaderTask task) => false;
+        public virtual void SetAsEmpty(IImageLoaderTask task) {  }
 
-        public virtual void SetAsEmpty(TImageLoaderTask task) { }
-	}
+        public virtual void Set(IImageLoaderTask task, TImageContainer image, bool animated) { }
+    }
 }
 

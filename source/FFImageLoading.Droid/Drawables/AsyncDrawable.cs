@@ -10,12 +10,12 @@ namespace FFImageLoading.Drawables
 {
 	public class AsyncDrawable : BitmapDrawable, IAsyncDrawable
 	{
-		private readonly WeakReference<ImageLoaderTask> _imageLoaderTaskReference;
+		private readonly WeakReference<IImageLoaderTask> _imageLoaderTaskReference;
 
-		public AsyncDrawable(Resources res, Bitmap bitmap, ImageLoaderTask imageLoaderTask)
+		public AsyncDrawable(Resources res, Bitmap bitmap, IImageLoaderTask imageLoaderTask)
 			: base(res, bitmap)
 		{
-			_imageLoaderTaskReference = new WeakReference<ImageLoaderTask>(imageLoaderTask);
+			_imageLoaderTaskReference = new WeakReference<IImageLoaderTask>(imageLoaderTask);
 		}
 
         public AsyncDrawable() : base()
@@ -54,12 +54,12 @@ namespace FFImageLoading.Drawables
         {
         }
 
-		public ImageLoaderTask GetImageLoaderTask()
+		public IImageLoaderTask GetImageLoaderTask()
 		{
 			if (_imageLoaderTaskReference == null)
 				return null;
 
-			ImageLoaderTask task;
+			IImageLoaderTask task;
 			_imageLoaderTaskReference.TryGetTarget(out task);
 			return task;
 		}

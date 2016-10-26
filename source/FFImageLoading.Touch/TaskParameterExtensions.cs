@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using UIKit;
-using CoreAnimation;
 using FFImageLoading.Cache;
 using System.Collections.Generic;
+using FFImageLoading.Targets;
 
 namespace FFImageLoading
 {
@@ -20,7 +19,7 @@ namespace FFImageLoading
         /// <param name="imageScale">Optional scale factor to use when interpreting the image data. If unspecified it will use the device scale (ie: Retina = 2, non retina = 1)</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView, float imageScale = -1f)
         {
-			var target = new UIImageViewTarget(imageView);
+            var target = new UIImageViewTarget(imageView);
 			return parameters.Into(imageScale, target);
         }
 
@@ -128,10 +127,10 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			var target = new Target<UIImage, ImageLoaderTask>();
+            var target = new Target<UIImage, object>();
 			using (var task = CreateTask(parameters, 1, target))
 			{
-				var key = task.GetKey();
+                var key = task.Key;
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
@@ -148,7 +147,7 @@ namespace FFImageLoading
             }
 
 			parameters.Preload = true;
-			var target = new Target<UIImage, ImageLoaderTask>();
+            var target = new Target<UIImage, object>();
 			var task = CreateTask(parameters, 1f, target);
 			ImageService.Instance.LoadImage(task);
 		}
@@ -192,7 +191,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
             });
 
-            var target = new Target<UIImage, ImageLoaderTask>();
+            var target = new Target<UIImage, object>();
             var task = CreateTask(parameters, 1f, target);
             ImageService.Instance.LoadImage(task);
 
@@ -226,12 +225,12 @@ namespace FFImageLoading
             }
         }
 
-		private static ImageLoaderTask CreateTask(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
+        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, float imageScale, ITarget<UIImage, TImageView> target) where TImageView: class
 		{
-            return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, MainThreadDispatcher.Instance, ImageService.Instance.Config.Logger, parameters, imageScale, target, ImageService.Instance.Config.VerboseLoadingCancelledLogging);
+            return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
 		}
 
-		private static IScheduledWork Into(this TaskParameter parameters, float imageScale, ITarget<UIImage, ImageLoaderTask> target)
+        private static IScheduledWork Into<TImageView>(this TaskParameter parameters, float imageScale, ITarget<UIImage, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {

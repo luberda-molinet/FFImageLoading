@@ -63,6 +63,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					RetryCount = 3,
 					RetryDelay = 500,
 					LoadingPlaceholder = "loading.png",
+					ErrorPlaceholder = "error.png",
 				};
 				image.SetBinding<ListExampleItem>(CachedImage.SourceProperty, v => v.ImageUrl);
 

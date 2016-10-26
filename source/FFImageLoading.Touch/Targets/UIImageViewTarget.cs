@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 using UIKit;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
 	public class UIImageViewTarget: UIControlTarget<UIImageView>
 	{
@@ -11,37 +12,39 @@ namespace FFImageLoading.Work
 		{
 		}
 
-		public override void Set(ImageLoaderTask task, UIImage image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
-		{
-			var control = Control;
-			if (control == null || control.Image == image)
-				return;
-
-			var parameters = task.Parameters;
-
-			bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled ?? ImageService.Instance.Config.FadeAnimationEnabled;
-			bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages ?? ImageService.Instance.Config.FadeAnimationForCachedImages);
-
-			if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
-			{
-				// fade animation
-				double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
-					parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
-
-				UIView.Transition(control, fadeDuration, 
-					UIViewAnimationOptions.TransitionCrossDissolve 
-					| UIViewAnimationOptions.BeginFromCurrentState,
-					() => { control.Image = image; },
-					() => {  });
-			}
-			else
-			{
-                control.Image = image;
-			}
-		}
-
-        public override void SetAsEmpty(ImageLoaderTask task)
+        public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
+            if (task == null || task.IsCancelled)
+                return;
+
+            var control = Control;
+            if (control == null || control.Image == image)
+                return;
+
+            var parameters = task.Parameters;
+            if (animated)
+            {
+                // fade animation
+                double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
+                    parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
+
+                UIView.Transition(control, fadeDuration,
+                    UIViewAnimationOptions.TransitionCrossDissolve
+                    | UIViewAnimationOptions.BeginFromCurrentState,
+                    () => { control.Image = image; },
+                    () => { });
+            }
+            else
+            {
+                control.Image = image;
+            }
+        }
+
+        public override void SetAsEmpty(IImageLoaderTask task)
+        {
+            if (task == null || task.IsCancelled)
+                return;
+
             var control = Control;
             if (control == null)
                 return;

@@ -10,7 +10,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 
-
 #if SILVERLIGHT
 using FFImageLoading.Concurrency;
 #else
@@ -76,13 +75,6 @@ namespace FFImageLoading
 
 				if (_config != null)
 				{
-					// If DownloadCache is not updated but HttpClient is then we inform DownloadCache
-					if (configuration.HttpClient != null && configuration.DownloadCache == null)
-					{
-						configuration.DownloadCache = _config.DownloadCache;
-						configuration.DownloadCache.DownloadHttpClient = configuration.HttpClient;
-					}
-
 					// Redefine these if they were provided only
 					configuration.HttpClient = configuration.HttpClient ?? _config.HttpClient;
 					configuration.Scheduler = configuration.Scheduler ?? _config.Scheduler;
@@ -123,7 +115,7 @@ namespace FFImageLoading
                 var logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? new MiniLogger(), userDefinedConfig.VerboseLogging);
                 var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger, userDefinedConfig.VerbosePerformanceLogging, new PlatformPerformance(), userDefinedConfig.SchedulerMaxParallelTasks);
 				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache");
-                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(httpClient, diskCache, userDefinedConfig.DiskCacheDuration);
+                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache();
 
 				userDefinedConfig.HttpClient = httpClient;
 				userDefinedConfig.Scheduler = scheduler;

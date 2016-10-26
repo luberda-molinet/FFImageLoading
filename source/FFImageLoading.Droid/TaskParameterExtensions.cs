@@ -7,7 +7,8 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
 using Android.Graphics.Drawables;
 using System.Collections.Generic;
-
+using FFImageLoading.Drawables;
+using FFImageLoading.Targets;
 
 namespace FFImageLoading
 {
@@ -20,7 +21,7 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
-			var target = new ImageViewTarget(imageView);
+            var target = new ImageViewTarget(imageView);
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -125,30 +126,30 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			var target = new Target<BitmapDrawable, ImageLoaderTask>();
-			using (var task = CreateTask(parameters, target))
-			{
-				var key = task.GetKey();
-				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
-			}
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
+            using (var task = CreateTask(parameters, target))
+            {
+                var key = task.Key;
+                await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+            }
 		}
 
 		/// <summary>
 		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
-		public static void Preload(this TaskParameter parameters)
-		{
+        public static void Preload(this TaskParameter parameters)
+        {
             if (parameters.Priority == null)
             {
                 parameters.WithPriority(LoadingPriority.Low);
             }
 
-			parameters.Preload = true;
-			var target = new Target<BitmapDrawable, ImageLoaderTask>();
+            parameters.Preload = true;
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
-			ImageService.Instance.LoadImage(task);
-		}
+            ImageService.Instance.LoadImage(task);
+        }
 
         /// <summary>
         /// Preloads the image request into memory cache/disk cache for future use.
@@ -189,7 +190,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
             });
 
-            var target = new Target<BitmapDrawable, ImageLoaderTask>();
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
 
@@ -223,9 +224,9 @@ namespace FFImageLoading
             }
         }
 
-		private static ImageLoaderTask CreateTask(this TaskParameter parameters, Target<BitmapDrawable, ImageLoaderTask> target)
+        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
 		{
-			return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, MainThreadDispatcher.Instance, ImageService.Instance.Config.Logger, parameters, target);
+            return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
 		}
     }
 }

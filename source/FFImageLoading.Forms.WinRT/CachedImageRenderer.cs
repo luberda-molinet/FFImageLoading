@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Reflection;
 using System.Linq;
+using FFImageLoading.Helpers;
 
 #if WINDOWS_UWP
 using FFImageLoading.Forms.WinUWP;
@@ -379,16 +380,19 @@ namespace FFImageLoading.Forms.WinRT
 
         private void ImageLoadingFinished(CachedImage element)
         {
-            if (element != null && !_isDisposed)
-            {
-                var elCtrl = element as Xamarin.Forms.IVisualElementController;
-				if(elCtrl != null) 
+			MainThreadDispatcher.Instance.Post(() =>
+			{
+            	if (element != null && !_isDisposed)
 				{
-					elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
-					//elCtrl.NativeSizeChanged();
-					HackInvalidateMeasure(element);
+					var elCtrl = element as Xamarin.Forms.IVisualElementController;
+					if (elCtrl != null)
+					{
+						elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
+						//elCtrl.NativeSizeChanged();
+						HackInvalidateMeasure(element);
+					}
 				}
-            }
+			});
         }
 
 		private void ReloadImage()

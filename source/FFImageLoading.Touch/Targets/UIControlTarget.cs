@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Threading.Tasks;
-using FFImageLoading.Extensions;
+using FFImageLoading.Work;
 using ObjCRuntime;
 using UIKit;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
-    public interface IUIViewTarget<TControl>
-        where TControl : class, INativeObject
-	{
-		TControl Control { get; }
-	}
-
-	public abstract class UIControlTarget<TControl>: Target<UIImage, ImageLoaderTask>, IUIViewTarget<TControl>
-		where TControl: class, INativeObject
+	public abstract class UIControlTarget<TControl> : Target<UIImage, TControl> where TControl: class, INativeObject
 	{
 		protected readonly WeakReference<TControl> _controlWeakReference;
 
@@ -30,14 +22,14 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		public override bool IsTaskValid(ImageLoaderTask task)
+		public override bool IsTaskValid(IImageLoaderTask task)
 		{
 			return IsValid;
 		}
 
-		public override bool UsesSameNativeControl(ImageLoaderTask task)
+		public override bool UsesSameNativeControl(IImageLoaderTask task)
 		{
-			var otherTarget = task._target as IUIViewTarget<TControl>;
+            var otherTarget = task.Target as UIControlTarget<TControl>;
 			if (otherTarget == null)
 				return false;
 
@@ -49,7 +41,7 @@ namespace FFImageLoading.Work
 			return control.Handle == otherControl.Handle;
 		}
 
-		public TControl Control
+		public override TControl Control
 		{
 			get
 			{

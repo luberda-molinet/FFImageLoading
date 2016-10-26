@@ -6,7 +6,7 @@ using CoreFoundation;
 
 namespace FFImageLoading.Helpers
 {
-    public class MainThreadDispatcher: IMainThreadDispatcher
+    public class MainThreadDispatcher : IMainThreadDispatcher
     {
 		static MainThreadDispatcher instance;
 

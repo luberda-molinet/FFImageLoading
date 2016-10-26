@@ -11,6 +11,11 @@ namespace FFImageLoading.Work
 	{
 		private bool _disposed;
 
+        private TaskParameter()
+        {
+            Transformations = new List<ITransformation>();
+        }
+
 		/// <summary>
 		/// Constructs a new TaskParameter to load an image from a file.
 		/// </summary>
@@ -72,34 +77,6 @@ namespace FFImageLoading.Work
 			return new TaskParameter() { Source = ImageSource.Stream, Stream = stream };
 		}
 
-		private TaskParameter()
-		{
-            Transformations = new List<ITransformation>();
-
-            // default values so we don't have a null value
-            OnSuccess = (s,r) => {};
-			OnError = ex => { };
-			OnFinish = scheduledWork => { };
-            OnDownloadStarted = downloadInformation => { };
-		}
-
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				// remove reference to callbacks
-                OnSuccess = (s, r) => { };
-                OnError = ex => { };
-                OnFinish = scheduledWork => { };
-                OnDownloadStarted = downloadInformation => { };
-
-				Transformations = null;
-				Stream = null;
-
-				_disposed = true;
-			}
-		}
-
 		public ImageSource Source { get; private set; }
 
 		public string Path { get; private set; }
@@ -126,7 +103,7 @@ namespace FFImageLoading.Work
 
 		public int RetryDelayInMs { get; private set; }
 
-		public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
+        public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
 
 		public Action<Exception> OnError { get; private set; }
 
@@ -157,7 +134,7 @@ namespace FFImageLoading.Work
 		/// <value>The delay in milliseconds.</value>
 		public int? DelayInMs { get; private set; }
 
-		public bool Preload { get; set; }
+        public bool Preload { get; internal set; }
 
         public TaskParameter Transform(ITransformation transformation)
 		{
@@ -413,6 +390,21 @@ namespace FFImageLoading.Work
             OnDownloadStarted = action;
             return this;
         }
-	}
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                OnSuccess = null;
+                OnError = null;
+                OnFinish = null;
+                OnDownloadStarted = null;
+                Transformations = null;
+                Stream = null;
+
+                _disposed = true;
+            }
+        }
+    }
 }
 

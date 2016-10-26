@@ -5,18 +5,11 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.IO;
 
-namespace FFImageLoading.DataResolver
+namespace FFImageLoading.DataResolvers
 {
-    class ResourceDataResolver : IStreamResolver
+    public class ResourceDataResolver : IDataResolver
     {
-        private readonly ImageSource _source;
-
-        public ResourceDataResolver(ImageSource source)
-        {
-            _source = source;
-        }
-
-        public async Task<WithLoadingResult<Stream>> GetStream(string identifier, CancellationToken token)
+        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             StorageFile file = null;
 
@@ -51,14 +44,12 @@ namespace FFImageLoading.DataResolver
                 imageInformation.SetPath(identifier);
                 imageInformation.SetFilePath(file.Path);
 
-                return WithLoadingResult.Encapsulate(await file.OpenStreamForReadAsync(), LoadingResult.CompiledResource, imageInformation);
+                var stream = await file.OpenStreamForReadAsync();
+
+                return new Tuple<Stream, LoadingResult, ImageInformation>(stream, LoadingResult.CompiledResource, imageInformation);
             }
 
-            return WithLoadingResult.Encapsulate<Stream>(null, LoadingResult.CompiledResource);
-        }
-
-        public void Dispose()
-        {
+            throw new FileNotFoundException(identifier);
         }
     }
 }

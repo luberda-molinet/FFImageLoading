@@ -2,24 +2,21 @@
 using FFImageLoading.Work;
 using UIKit;
 
-namespace FFImageLoading
+namespace FFImageLoading.Targets
 {
-    public class UIImageTarget: Target<UIImage, ImageLoaderTask>
+    public class UIImageTarget: Target<UIImage, UIImage>
     {
         private WeakReference<UIImage> _imageWeakReference = null;
 
-        public override void Set(ImageLoaderTask task, UIImage image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
+        public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
-            if (task.IsCancelled)
+            if (task == null || task.IsCancelled)
                 return;
 
-            if (!isLoadingPlaceholder)
-            {
-                if (_imageWeakReference == null)
-                    _imageWeakReference = new WeakReference<UIImage>(image);
-                else
-                    _imageWeakReference.SetTarget(image);
-            }
+            if (_imageWeakReference == null)
+                _imageWeakReference = new WeakReference<UIImage>(image);
+            else
+                _imageWeakReference.SetTarget(image);
         }
 
         public UIImage UIImage

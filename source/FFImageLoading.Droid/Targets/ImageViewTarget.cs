@@ -1,20 +1,18 @@
 ﻿using System;
-using Android.Graphics.Drawables;
-using Android.Widget;
-using System.Threading.Tasks;
 using FFImageLoading.Extensions;
-using Android.Graphics;
 using FFImageLoading.Drawables;
+using FFImageLoading.Views;
+using FFImageLoading.Work;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
-	public class ImageViewTarget: Target<BitmapDrawable, ImageLoaderTask>
+    public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageViewAsync>
 	{
-		private readonly WeakReference<ImageView> _controlWeakReference;
+		readonly WeakReference<ImageViewAsync> _controlWeakReference;
 
-		public ImageViewTarget(ImageView control)
+		public ImageViewTarget(ImageViewAsync control)
 		{
-			_controlWeakReference = new WeakReference<ImageView>(control);
+			_controlWeakReference = new WeakReference<ImageViewAsync>(control);
 		}
 
 		public override bool IsValid
@@ -25,38 +23,40 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		public override bool IsTaskValid(ImageLoaderTask task)
+		public override bool IsTaskValid(IImageLoaderTask task)
 		{
             var controlTask = Control?.GetImageLoaderTask();
             return IsValid && (controlTask == null || controlTask == task);
 		}
 
-        public override void SetAsEmpty(ImageLoaderTask task)
+        public override void SetAsEmpty(IImageLoaderTask task)
         {
+            if (task == null || task.IsCancelled)
+                return;
+            
             var control = Control;
             if (control == null)
                 return;
 
-            //var drawable = new AsyncDrawable(control.Context.Resources, null, task);
-            //control.SetImageDrawable(drawable);
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
-		public override void Set(ImageLoaderTask task, BitmapDrawable image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
-		{
-			if (task.IsCancelled)
-				return;
-			
-			var control = Control;
-			if (control == null || control.Drawable == image)
-				return;
-            
-			control.SetImageDrawable(image);
-		}
+        public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
+        {
+            if (task == null || task.IsCancelled)
+                return;
 
-		public override bool UsesSameNativeControl(ImageLoaderTask task)
+            var control = Control;
+            if (control == null || control.Drawable == image)
+                return;
+
+            control.SetImageDrawable(image);
+            control.PostInvalidate();
+        }
+
+		public override bool UsesSameNativeControl(IImageLoaderTask task)
 		{
-			var otherTarget = task._target as ImageViewTarget;
+            var otherTarget = task.Target as ImageViewTarget;
 			if (otherTarget == null)
 				return false;
 
@@ -68,18 +68,18 @@ namespace FFImageLoading.Work
 			return control.Handle == otherControl.Handle;
 		}
 
-		protected ImageView Control
+        public override ImageViewAsync Control
 		{
 			get
 			{
-				ImageView control;
+				ImageViewAsync control;
 				if (!_controlWeakReference.TryGetTarget(out control))
 					return null;
 
 				if (control == null || control.Handle == IntPtr.Zero)
 					return null;
 
-				return control;
+                return control;
 			}
 		}
 	}
