@@ -34,9 +34,9 @@ before_build:
 
     $version = $env:appveyor_build_version
     
-    $branch = $env:appveyor_repo_branch 
+    $branch = $env:appveyor_repo_branch
     
-    $baseversion = $version.SubString(0, $version.LastIndexOf(".")).Replace("_", "-")
+    $baseversion = $version.SubString(0, $version.LastIndexOf("."))
 
     If ($env:appveyor_repo_tag -ine "true") {
         
@@ -47,7 +47,7 @@ before_build:
     }
     
     If ($branch -ine "master") {
-        $version = ("{0}-{1}" -f $version, $branch)
+        $version = ("{0}-{1}" -f $version, $branch.Replace("_", "-"))
     }
           
     (Get-Content $nuspec1template).replace('@version', $version) | Set-Content $nuspec1
