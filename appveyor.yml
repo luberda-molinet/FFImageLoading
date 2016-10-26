@@ -36,7 +36,7 @@ before_build:
     
     $branch = $env:appveyor_repo_branch 
     
-    $baseversion = $version.SubString(0, $version.LastIndexOf("."))
+    $baseversion = $version.SubString(0, $version.LastIndexOf(".")).Replace("_", "-")
 
     If ($env:appveyor_repo_tag -ine "true") {
         
