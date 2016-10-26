@@ -50,6 +50,7 @@ namespace FFImageLoading.Work
                 return;
 
             control.SetImageDrawable(image);
+            control.PostInvalidate();
         }
 
 		public override bool UsesSameNativeControl(IImageLoaderTask task)

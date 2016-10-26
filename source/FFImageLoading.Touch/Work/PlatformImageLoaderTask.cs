@@ -34,7 +34,7 @@ namespace FFImageLoading.Work
             });
         }
 
-        protected async override Task<UIImage> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations)
+        protected async override Task<UIImage> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             UIImage imageIn = null;
 
@@ -63,7 +63,7 @@ namespace FFImageLoading.Work
                 //CancellationToken.ThrowIfCancellationRequested();
 
                 // Special case to handle WebP decoding on iOS
-                if (path.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+                if (source != ImageSource.Stream && path.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
                 {
                     imageIn = new WebP.Touch.WebPCodec().Decode(imageData);
                 }

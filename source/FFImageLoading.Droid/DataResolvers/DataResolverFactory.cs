@@ -29,6 +29,8 @@ namespace FFImageLoading.DataResolvers
                     return new FileDataResolver();
                 case ImageSource.Url:
                     return new UrlDataResolver(parameters, configuration);
+                case ImageSource.Stream:
+                    return new StreamDataResolver();
                 default:
                     throw new ArgumentException("Unknown type of ImageSource");
             }

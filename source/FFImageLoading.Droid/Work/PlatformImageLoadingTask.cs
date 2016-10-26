@@ -37,79 +37,66 @@ namespace FFImageLoading
         {
             await base.ShowPlaceholder(path, key, source, isLoadingPlaceholder);
 
-            //if (isLoadingPlaceholder)
-            //{
-            //    var placeholder = MemoryCache.Get(key);
-            //    if (placeholder?.Item1 != null)
-            //    {
-            //        if (_loadingPlaceholderWeakReference == null)
-            //            _loadingPlaceholderWeakReference = new WeakReference<SelfDisposingBitmapDrawable>(placeholder?.Item1);
-            //        else
-            //            _loadingPlaceholderWeakReference.SetTarget(placeholder?.Item1);
-            //    }
-            //    else
-            //    {
-            //        _loadingPlaceholderWeakReference = null;
-            //    }
-            //}
+            if (isLoadingPlaceholder)
+            {
+                var placeholder = MemoryCache.Get(key)?.Item1;
+
+                if (placeholder != null)
+                {
+                    if (_loadingPlaceholderWeakReference == null)
+                        _loadingPlaceholderWeakReference = new WeakReference<SelfDisposingBitmapDrawable>(placeholder);
+                    else
+                        _loadingPlaceholderWeakReference.SetTarget(placeholder);
+                }
+            }
         }
 
         protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
-            image?.SetIsRetained(true);
-            try
+            ThrowIfCancellationRequested();
+
+            var ffDrawable = image as FFBitmapDrawable;
+            if (ffDrawable != null)
+            {
+                if (ffDrawable.IsAnimationRunning)
+                {
+                    await Task.Delay(ffDrawable.FadeDuration + 25);
+                }
+
+                if (animated)
+                {
+                    SelfDisposingBitmapDrawable placeholderDrawable = null;
+                    if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+                    {
+                        int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
+                            Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
+                        
+                        placeholderDrawable?.SetIsRetained(true);
+                        ffDrawable?.SetPlaceholder(placeholderDrawable, fadeDuration);
+                        placeholderDrawable?.SetIsRetained(false);
+                    }
+                }
+            }
+
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
 
-
-
-                //if (animated)
-                //{
-                //    var ffDrawable = image as FFBitmapDrawable;
-                //    if (ffDrawable != null)
-                //    {
-                //        if (animated)
-                //        {
-                //            SelfDisposingBitmapDrawable placeholderDrawable = null;
-                //            if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
-                //            {
-                //                placeholderDrawable?.SetIsRetained(true);
-                //                int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
-                //                    Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
-
-                //                //ffDrawable?.StartTransition(fadeDuration, placeholderDrawable);
-                //                //ffDrawable?.EnableFadeAnimation(placeholderDrawable, fadeDuration);
-                //                placeholderDrawable?.SetIsRetained(false);
-                //            }
-                //        }
-                //        //else
-                //        //{
-                //        //    ffDrawable?.DisableFadeAnimation();
-                //        //}
-                //    }
-                //}
-
-                await MainThreadDispatcher.PostAsync(() =>
-                {
-                    if (!animated)
-                    {
-                        var ffDrawable = image as FFBitmapDrawable;
-                        if (ffDrawable != null)
-                            ffDrawable.StopFadeAnimation();
-                    }
-
-                    ThrowIfCancellationRequested();
-                    image.InvalidateSelf();
-                    PlatformTarget.Set(this, image, animated);
-                }).ConfigureAwait(false);
-            }
-            finally
-            {
-                image?.SetIsRetained(false);
-            }
+                PlatformTarget.Set(this, image, animated);
+            }).ConfigureAwait(false);
         }
 
-        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations)
+        protected override void BeforeLoading(SelfDisposingBitmapDrawable image, bool fromMemoryCache)
+        {
+            image?.SetIsRetained(true);
+        }
+
+        protected override void AfterLoading(SelfDisposingBitmapDrawable image, bool fromMemoryCache)
+        {
+            image?.SetIsRetained(false);
+        }
+
+        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             Bitmap bitmap = null;
 
@@ -250,30 +237,19 @@ namespace FFImageLoading
                 }
             }
 
-            SelfDisposingBitmapDrawable placeholderDrawable = null;
-            if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+            if (isPlaceholder)
             {
-                placeholderDrawable?.SetIsRetained(true);
-                int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
-                    Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
-
-                var drawable = new FFBitmapDrawable(Context.Resources, bitmap, placeholderDrawable, fadeDuration, true);
-
-                //ffDrawable?.StartTransition(fadeDuration, placeholderDrawable);
-                //ffDrawable?.EnableFadeAnimation(placeholderDrawable, fadeDuration);
-                placeholderDrawable?.SetIsRetained(false);
-
-                return drawable;
+                return new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this);
             }
 
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
-        protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations)
+        protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {
-                return await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations);
+                return await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
             }
             catch (Exception ex)
             {

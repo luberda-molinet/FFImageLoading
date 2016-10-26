@@ -11,6 +11,7 @@ namespace FFImageLoading.Work
 {
     public abstract class ImageLoaderTask<TImageContainer, TImageView> : IImageLoaderTask where TImageContainer: class where TImageView: class
     {
+        bool isLoadingPlaceholderLoaded;
         static int _streamIndex;
         static int GetNextStreamIndex()
         {
@@ -192,11 +193,15 @@ namespace FFImageLoading.Work
                 Cancel();
         }
 
-        protected abstract Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations);
+        protected abstract Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder);
 
         protected abstract Task SetTargetAsync(TImageContainer image, bool animated);
 
-        public async Task<bool> TryLoadFromMemoryCacheAsync()
+        protected virtual void BeforeLoading(TImageContainer image, bool fromMemoryCache) { }
+
+        protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
+
+        public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
         {
             try
             {
@@ -216,10 +221,12 @@ namespace FFImageLoading.Work
                 else
                 {
                     // Loading placeholder if enabled
-                    if (!string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
+                    if (!isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
                     {
                         await ShowPlaceholder(Parameters.LoadingPlaceholderPath, KeyForLoadingPlaceholder,
                                               Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
+
+                        isLoadingPlaceholderLoaded = true;
                     }
                 }
 
@@ -252,14 +259,21 @@ namespace FFImageLoading.Work
         async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated)
         {
             var found = MemoryCache.Get(key);
-
             if (found?.Item1 != null)
             {
-                await SetTargetAsync(found.Item1, false).ConfigureAwait(false);
+                try
+                {
+                    BeforeLoading(found.Item1, true);
+                    await SetTargetAsync(found.Item1, animated).ConfigureAwait(false);
 
-                if (updateImageInformation)
-                    ImageInformation = found.Item2;
-                
+                    if (updateImageInformation)
+                        ImageInformation = found.Item2;
+                }
+                finally
+                {
+                    AfterLoading(found.Item1, true);
+                }
+
                 return true;
             }
 
@@ -277,14 +291,14 @@ namespace FFImageLoading.Work
                 {
                     ThrowIfCancellationRequested();
 
-                    var loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders).ConfigureAwait(false);
+                    var loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
 
                     if (loadImage != default(TImageContainer))
                         MemoryCache.Add(key, loadImageData.Item3, loadImage);
 
                     ThrowIfCancellationRequested();
 
-                    //await SetTargetAsync(loadImage, false).ConfigureAwait(false);
+                    await SetTargetAsync(loadImage, false).ConfigureAwait(false);
                 }
             }
         }
@@ -327,15 +341,24 @@ namespace FFImageLoading.Work
 
                         ThrowIfCancellationRequested();
 
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, TransformPlaceholders).ConfigureAwait(false);
+                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, TransformPlaceholders, false).ConfigureAwait(false);
 
-                        if (image != default(TImageContainer) && CanUseMemoryCache)
-                            MemoryCache.Add(Key, imageData.Item3, image);
+                        try
+                        {
+                            BeforeLoading(image, false);
 
-                        ThrowIfCancellationRequested();
+                            if (image != default(TImageContainer) && CanUseMemoryCache)
+                                MemoryCache.Add(Key, imageData.Item3, image);
 
-                        bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
-                        await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
+                            ThrowIfCancellationRequested();
+
+                            bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
+                            await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
+                        }
+                        finally
+                        {
+                            AfterLoading(image, false);
+                        }
                     }
                 }
 

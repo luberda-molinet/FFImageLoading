@@ -5,24 +5,21 @@ using Android.OS;
 using Android.Content.Res;
 using Android.Graphics;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace FFImageLoading.Drawables
 {
     public class FFBitmapDrawable : SelfDisposingBitmapDrawable
     {
-        private readonly float _fadingTime;
-        private readonly long _startTimeMillis;
-        private int _alpha = 0xFF;
-        private BitmapDrawable _placeholder;
-        private volatile bool _animating;
+        BitmapDrawable placeholder;
+        long startTimeMillis;
+        bool animating;
+        int alpha = 255;
+        float fadeDuration = 200;
 
-        public FFBitmapDrawable(Resources res, Bitmap bitmap, BitmapDrawable placeholder, float fadingTime, bool fadeEnabled) : base(res, bitmap)
+        public FFBitmapDrawable(Resources res, Bitmap bitmap) : base(res, bitmap)
         {
-            base.SetAlpha(0x00);
-            _placeholder = placeholder;
-            _fadingTime = fadingTime;
-            _animating = fadeEnabled;
-            _startTimeMillis = SystemClock.UptimeMillis();
         }
 
         public FFBitmapDrawable() : base()
@@ -53,55 +50,60 @@ namespace FFImageLoading.Drawables
         {
         }
 
-        public FFBitmapDrawable(Resources resources, Bitmap bitmap) : base(resources, bitmap)
-        {
-        }
-
         public FFBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
         {
         }
 
+        public void SetPlaceholder(BitmapDrawable drawable, int animationDuration)
+        {
+            if (!animating)
+            {
+                alpha = 255;
+                fadeDuration = animationDuration;
+                startTimeMillis = SystemClock.UptimeMillis();
+                placeholder = drawable;
+                animating = true;
+            }
+        }
+
+        public bool IsAnimationRunning
+        {
+            get { return animating; }
+        }
+
+        public int FadeDuration
+        {
+            get { return (int)fadeDuration; }
+        }
+
         public override void Draw(Canvas canvas)
         {
-            try
+            if (!animating)
             {
-                if (!IsBitmapDrawableValid(this))
-                    return;
-
-                if (!_animating)
+                base.Draw(canvas);
+            }
+            else
+            {
+                float normalized = (SystemClock.UptimeMillis() - startTimeMillis) / fadeDuration;
+                if (normalized >= 1f)
                 {
-                    base.SetAlpha(0xFF);
+                    animating = false;
+                    placeholder = null;
+                    normalized = 0f;
                     base.Draw(canvas);
                 }
                 else
                 {
-                    var uptime = SystemClock.UptimeMillis();
-                    float normalized = (uptime - _startTimeMillis) / _fadingTime;
-                    if (normalized >= 1f)
+                    if (IsBitmapDrawableValid(placeholder))
                     {
-                        _animating = false;
-                        _placeholder = null;
-                        base.SetAlpha(0xFF);
-                        base.Draw(canvas);
+                        placeholder.Draw(canvas);
                     }
-                    else
-                    {
-                        if (IsBitmapDrawableValid(_placeholder))
-                        {
-                            _placeholder.Draw(canvas);
-                        }
 
-                        int partialAlpha = (int)(_alpha * normalized);
-                        base.SetAlpha(partialAlpha);
-                        base.Draw(canvas);
-                        base.SetAlpha(_alpha);
-                    }
-                    InvalidateSelf();
+                    int partialAlpha = (int)(alpha * normalized);
+                    base.SetAlpha(partialAlpha);
+                    base.Draw(canvas);
+                    base.SetAlpha(alpha);
                 }
-            }
-            catch (Exception ex)
-            {
-                ImageService.Instance.Config.Logger?.Error("FFBitmapDrawable Draw", ex);
             }
         }
 
@@ -111,26 +113,38 @@ namespace FFImageLoading.Drawables
                                   && bitmapDrawable.Handle != IntPtr.Zero && !bitmapDrawable.Bitmap.IsRecycled;
         }
 
-        public void StopFadeAnimation()
+        public override int IntrinsicHeight
         {
-            _animating = false;
-            _placeholder = null;
+            get
+            {
+                if (animating && IsBitmapDrawableValid(placeholder))
+                {
+                    return placeholder.IntrinsicHeight;
+                }
+
+                return base.IntrinsicHeight;
+            }
         }
+
+        public override int IntrinsicWidth
+        {
+            get
+            {
+                if (animating && IsBitmapDrawableValid(placeholder))
+                {
+                    return placeholder.IntrinsicWidth;
+                }
+
+                return base.IntrinsicWidth;
+            }
+        }
+
 
         public override void SetAlpha(int alpha)
         {
-            _alpha = alpha;
-
-            try
+            if (IsBitmapDrawableValid(placeholder))
             {
-                if (IsBitmapDrawableValid(_placeholder))
-                {
-                    _placeholder.SetAlpha(alpha);
-                }
-            }
-            catch (Exception ex)
-            {
-                ImageService.Instance.Config.Logger?.Error("Placeholder SetAlpha", ex);
+                placeholder.SetAlpha(alpha);
             }
 
             base.SetAlpha(alpha);
@@ -138,36 +152,12 @@ namespace FFImageLoading.Drawables
 
         public override void SetColorFilter(Color color, PorterDuff.Mode mode)
         {
-            try
+            if (IsBitmapDrawableValid(placeholder))
             {
-                if (IsBitmapDrawableValid(_placeholder))
-                {
-                    _placeholder.SetColorFilter(color, mode);
-                }
-            }
-            catch (Exception ex)
-            {
-                ImageService.Instance.Config.Logger?.Error("Placeholder SetColorFilter", ex);
+                placeholder.SetColorFilter(color, mode);
             }
 
             base.SetColorFilter(color, mode);
-        }
-
-        protected override void OnBoundsChange(Rect bounds)
-        {
-            try
-            {
-                if (IsBitmapDrawableValid(_placeholder))
-                {
-                    _placeholder.SetBounds(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-                }
-            }
-            catch (Exception ex)
-            {
-                ImageService.Instance.Config.Logger?.Error("Placeholder OnBoundsChange", ex);
-            }
-
-            base.OnBoundsChange(bounds);
         }
     }
 }
