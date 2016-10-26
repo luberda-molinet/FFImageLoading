@@ -3,7 +3,7 @@ using Android.Graphics.Drawables;
 using FFImageLoading.Work;
 using FFImageLoading.Drawables;
 
-namespace FFImageLoading
+namespace FFImageLoading.Targets
 {
     public class BitmapTarget : Target<SelfDisposingBitmapDrawable, SelfDisposingBitmapDrawable>
     {

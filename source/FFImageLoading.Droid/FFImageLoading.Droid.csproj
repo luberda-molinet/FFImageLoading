@@ -70,7 +70,6 @@
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Extensions\ImageViewExtensions.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
@@ -102,12 +101,7 @@
     <Compile Include="DataResolvers\DataResolverFactory.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Drawables\" />
-    <Folder Include="Properties\" />
-    <Folder Include="Targets\" />
-    <Folder Include="DataResolvers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

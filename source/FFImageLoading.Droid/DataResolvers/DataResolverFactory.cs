@@ -28,7 +28,7 @@ namespace FFImageLoading.DataResolvers
                 case ImageSource.Filepath:
                     return new FileDataResolver();
                 case ImageSource.Url:
-                    return new UrlDataResolver(parameters, configuration);
+                    return new UrlDataResolver(configuration);
                 case ImageSource.Stream:
                     return new StreamDataResolver();
                 default:

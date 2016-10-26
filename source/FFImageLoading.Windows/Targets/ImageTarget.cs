@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if SILVERLIGHT
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows;
-#else
+using FFImageLoading.Work;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml;
-#endif
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
-    public class ImageTarget : Target<WriteableBitmap, ImageLoaderTask>
+    public class ImageTarget : Target<WriteableBitmap, Image>
     {
         private readonly WeakReference<Image> _controlWeakReference;
 
@@ -35,12 +23,12 @@ namespace FFImageLoading.Work
             }
         }
 
-        public override bool IsTaskValid(ImageLoaderTask task)
+        public override bool IsTaskValid(IImageLoaderTask task)
         {
             return IsValid;
         }
 
-        public override void SetAsEmpty(ImageLoaderTask task)
+        public override void SetAsEmpty(IImageLoaderTask task)
         {
             var control = Control;
             if (control == null)
@@ -49,7 +37,7 @@ namespace FFImageLoading.Work
             control.Source = null;
         }
 
-        public override void Set(ImageLoaderTask task, WriteableBitmap image, bool isLocalOrFromCache, bool isLoadingPlaceholder)
+        public override void Set(IImageLoaderTask task, WriteableBitmap image, bool animated)
         {
             if (task.IsCancelled)
                 return;
@@ -63,7 +51,7 @@ namespace FFImageLoading.Work
             bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled ?? ImageService.Instance.Config.FadeAnimationEnabled;
             bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages ?? ImageService.Instance.Config.FadeAnimationForCachedImages);
 
-            if (!isLoadingPlaceholder && isFadeAnimationEnabled && (!isLocalOrFromCache || (isLocalOrFromCache && isFadeAnimationEnabledForCached)))
+            if (animated)
             {
                 // fade animation
                 int fadeDuration = parameters.FadeAnimationDuration.HasValue ?
@@ -75,12 +63,7 @@ namespace FFImageLoading.Work
                 fade.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut };
 
                 Storyboard fadeInStoryboard = new Storyboard();
-
-#if SILVERLIGHT
-                Storyboard.SetTargetProperty(fade, new PropertyPath("Image.Opacity"));
-#else
                 Storyboard.SetTargetProperty(fade, "Image.Opacity");
-#endif
                 Storyboard.SetTarget(fade, control);
                 fadeInStoryboard.Children.Add(fade);
                 fadeInStoryboard.Begin();
@@ -92,9 +75,9 @@ namespace FFImageLoading.Work
             }
         }
 
-        public override bool UsesSameNativeControl(ImageLoaderTask task)
+        public override bool UsesSameNativeControl(IImageLoaderTask task)
         {
-            var otherTarget = task._target as ImageTarget;
+            var otherTarget = task.Target as ImageTarget;
             if (otherTarget == null)
                 return false;
 
@@ -106,7 +89,7 @@ namespace FFImageLoading.Work
             return control == otherControl;
         }
 
-        private Image Control
+        public override Image Control
         {
             get
             {

@@ -1,6 +1,7 @@
-﻿using System;
-using FFImageLoading.Work;
+﻿using FFImageLoading.Cache;
 using FFImageLoading.Config;
+using FFImageLoading.Work;
+using System;
 
 namespace FFImageLoading.DataResolvers
 {
@@ -22,10 +23,10 @@ namespace FFImageLoading.DataResolvers
             switch (source)
             {
                 case ImageSource.ApplicationBundle:
+                case ImageSource.CompiledResource:
+                    return new ResourceDataResolver();
                 case ImageSource.Filepath:
                     return new FileDataResolver();
-                case ImageSource.CompiledResource:
-                    return new BundleDataResolver();
                 case ImageSource.Url:
                     return new UrlDataResolver(configuration);
                 case ImageSource.Stream:
@@ -36,4 +37,3 @@ namespace FFImageLoading.DataResolvers
         }
     }
 }
-

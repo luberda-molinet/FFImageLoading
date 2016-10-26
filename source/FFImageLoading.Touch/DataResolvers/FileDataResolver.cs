@@ -10,13 +10,6 @@ namespace FFImageLoading.DataResolvers
 {
 	public class FileDataResolver : IDataResolver
 	{
-        public FileDataResolver(ImageSource source)
-        {
-            Source = source;
-        }
-
-        protected ImageSource Source { get; private set; }
-
         public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             string file = null;

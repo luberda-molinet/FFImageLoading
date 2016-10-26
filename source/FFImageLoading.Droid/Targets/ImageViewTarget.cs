@@ -2,8 +2,9 @@
 using FFImageLoading.Extensions;
 using FFImageLoading.Drawables;
 using FFImageLoading.Views;
+using FFImageLoading.Work;
 
-namespace FFImageLoading.Work
+namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageViewAsync>
 	{

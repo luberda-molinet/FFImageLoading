@@ -8,7 +8,7 @@ using FFImageLoading.Cache;
 using Android.Graphics.Drawables;
 using System.Collections.Generic;
 using FFImageLoading.Drawables;
-
+using FFImageLoading.Targets;
 
 namespace FFImageLoading
 {

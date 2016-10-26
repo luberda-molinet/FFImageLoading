@@ -10,13 +10,11 @@ namespace FFImageLoading.DataResolvers
 {
     public class UrlDataResolver : IDataResolver
     {
-        public UrlDataResolver(TaskParameter parameters, Configuration configuration)
+        public UrlDataResolver(Configuration configuration)
         {
-            Parameters = parameters;
             Configuration = configuration;
         }
 
-        protected TaskParameter Parameters { get; private set; }
         protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
         protected Configuration Configuration { get; private set; }
 

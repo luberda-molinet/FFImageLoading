@@ -4,18 +4,9 @@ using FFImageLoading.Work;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
-#if SILVERLIGHT
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows;
-#else
+using FFImageLoading.Targets;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml;
-#endif
 
 namespace FFImageLoading
 {
@@ -51,10 +42,10 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-			var target = new Target<WriteableBitmap, ImageLoaderTask>();
+			var target = new Target<WriteableBitmap, object>();
 			using (var task = CreateTask(parameters, target))
 			{
-				var key = task.GetKey();
+				var key = task.Key;
 				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
 			}
 		}
@@ -71,7 +62,7 @@ namespace FFImageLoading
             }
 
             parameters.Preload = true;
-            var target = new Target<WriteableBitmap, ImageLoaderTask>();
+            var target = new Target<WriteableBitmap, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
         }
@@ -115,7 +106,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
             });
 
-            var target = new Target<WriteableBitmap, ImageLoaderTask>();
+            var target = new Target<WriteableBitmap, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
 
@@ -149,7 +140,7 @@ namespace FFImageLoading
             }
         }
 
-        private static IScheduledWork Into(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
+        private static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -192,9 +183,9 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
-        private static ImageLoaderTask CreateTask(this TaskParameter parameters, ITarget<WriteableBitmap, ImageLoaderTask> target)
+        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
         {
-            return new ImageLoaderTask(ImageService.Instance.Config.DownloadCache, MainThreadDispatcher.Instance, ImageService.Instance.Config.Logger, parameters, target, ImageService.Instance.Config.VerboseLoadingCancelledLogging);
+            return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
         }
     }
 }

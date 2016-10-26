@@ -72,9 +72,6 @@
     <Compile Include="..\FFImageLoading.Shared\ImageService.cs">
       <Link>ImageService.cs</Link>
     </Compile>
-    <Compile Include="..\FFImageLoading.Shared\Work\ImageLoaderTaskBase.cs">
-      <Link>Work\ImageLoaderTaskBase.cs</Link>
-    </Compile>
     <Compile Include="Args\ErrorEventArgs.cs" />
     <Compile Include="Args\FinishEventArgs.cs" />
     <Compile Include="Args\GetImageAsJpgArgs.cs" />
@@ -83,12 +80,11 @@
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Cache\SimpleDiskCache.cs" />
-    <Compile Include="DataResolver\DataResolverFactory.cs" />
-    <Compile Include="DataResolver\FilePathDataResolver.cs" />
-    <Compile Include="DataResolver\IStreamResolver.cs" />
-    <Compile Include="DataResolver\ResolverImageData.cs" />
-    <Compile Include="DataResolver\ResourceDataResolver.cs" />
-    <Compile Include="DataResolver\UrlDataResolver.cs" />
+    <Compile Include="DataResolvers\DataResolverFactory.cs" />
+    <Compile Include="DataResolvers\FileDataResolver.cs" />
+    <Compile Include="DataResolvers\ResourceDataResolver.cs" />
+    <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
@@ -101,10 +97,10 @@
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="FFImage.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs" />
     <Compile Include="Cache\ICacheKeyFactory.cs" />
-    <Compile Include="Work\ImageTarget.cs" />
+    <Compile Include="Targets\ImageTarget.cs" />
     <Compile Include="Helpers\PlatformPerformance.cs" />
+    <Compile Include="Work\PlatformImageLoaderTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

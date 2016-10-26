@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Reflection;
 using System.Linq;
+using FFImageLoading.Helpers;
 
 #if WINDOWS_UWP
 using FFImageLoading.Forms.WinUWP;
