@@ -53,8 +53,15 @@ namespace FFImageLoading.Cache
 		/// <param name="cacheName">Cache name.</param>
 		public static SimpleDiskCache CreateCache(string cacheName)
         {
-            string tmpPath = Path.GetTempPath();
+#if __ANDROID__
+            var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
+            string tmpPath = context.CacheDir.AbsolutePath;
             string cachePath = Path.Combine(tmpPath, cacheName);
+#else
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string tmpPath = Path.Combine(documents, "..", "Library");
+            string cachePath = Path.Combine(tmpPath, cacheName);
+#endif
 
 			return new SimpleDiskCache(cachePath);
         }
