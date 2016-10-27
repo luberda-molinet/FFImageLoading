@@ -32,8 +32,7 @@ namespace FFImageLoading.Cache
             _cachePath = cachePath;
             Configuration = configuration;
 
-            Logger.Debug("SimpleDiskCache path: " + cachePath);
-		
+            Logger?.Debug("SimpleDiskCache path: " + cachePath);
 
             if (!Directory.Exists(cachePath))
                 Directory.CreateDirectory(cachePath);

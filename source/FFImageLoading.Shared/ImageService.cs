@@ -108,25 +108,28 @@ namespace FFImageLoading
 				if (userDefinedConfig == null)
 					userDefinedConfig = new Configuration();
 
+                var logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? new MiniLogger(), userDefinedConfig.VerboseLogging);
+                userDefinedConfig.Logger = logger;
+
+                var md5Helper = userDefinedConfig.MD5Helper ?? new MD5Helper();
+                userDefinedConfig.MD5Helper = md5Helper;
+
 				var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
 
 				if (userDefinedConfig.HttpReadTimeout > 0)
 				{
 					httpClient.Timeout = TimeSpan.FromSeconds(userDefinedConfig.HttpReadTimeout);
 				}
+                userDefinedConfig.HttpClient = httpClient;
 
-                var logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? new MiniLogger(), userDefinedConfig.VerboseLogging);
                 var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, new PlatformPerformance());
-				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache", userDefinedConfig);
-                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
-                var md5Helper = userDefinedConfig.MD5Helper ?? new MD5Helper();
+                userDefinedConfig.Scheduler = scheduler;
 
-				userDefinedConfig.HttpClient = httpClient;
-				userDefinedConfig.Scheduler = scheduler;
-				userDefinedConfig.Logger = logger;
-				userDefinedConfig.DiskCache = diskCache;
+				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache", userDefinedConfig);
+                userDefinedConfig.DiskCache = diskCache;
+
+                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
 				userDefinedConfig.DownloadCache = downloadCache;
-                userDefinedConfig.MD5Helper = md5Helper;
 
 				Config = userDefinedConfig;
 
