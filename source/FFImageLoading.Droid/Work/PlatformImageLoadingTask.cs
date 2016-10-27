@@ -124,10 +124,11 @@ namespace FFImageLoading
                 imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
                 imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
 
-                if (!Configuration.LoadWithTransparencyChannel || (Parameters.LoadTransparencyChannel.HasValue && !Parameters.LoadTransparencyChannel.Value))
+                if (!Configuration.BitmapOptimizations || (Parameters.BitmapOptimizationsEnabled.HasValue && !Parameters.BitmapOptimizationsEnabled.Value))
                 {
                     // Same quality but no transparency channel. This allows to save 50% of memory: 1 pixel=2bytes instead of 4.
                     options.InPreferredConfig = Bitmap.Config.Rgb565;
+                    options.InPreferQualityOverSpeed = false;
                 }
 
                 // CHECK IF BITMAP IS EXIF ROTATED
@@ -211,23 +212,26 @@ namespace FFImageLoading
                     {
                         ThrowIfCancellationRequested();
 
+                        var old = bitmap;
+
                         try
                         {
-                            var old = bitmap;
                             var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
                             bitmap = bitmapHolder.ToNative();
-
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                            throw;
+                        }
+                        finally
+                        {
                             // Transformation succeeded, so garbage the source
                             if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
                             {
                                 old?.Recycle();
                                 old?.Dispose();
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
-                            throw;
                         }
                     }
                 }

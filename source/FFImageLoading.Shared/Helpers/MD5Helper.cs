@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace FFImageLoading.Helpers
 {
-    public class MD5Helper
+    public class MD5Helper : IMD5Helper
     {
         public string MD5(string input)
         {
@@ -13,4 +13,3 @@ namespace FFImageLoading.Helpers
         }
     }
 }
-

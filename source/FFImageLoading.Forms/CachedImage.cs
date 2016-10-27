@@ -304,11 +304,13 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// The transparency enabled property.
 		/// </summary>
+		[Obsolete("Use BitmapOptimizationsProperty")]
         public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create(nameof(TransparencyEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
 
 		/// <summary>
 		/// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.
 		/// </summary>
+		[Obsolete("Use BitmapOptimizations")]
 		public bool? TransparencyEnabled
 		{
 			get
@@ -318,6 +320,27 @@ namespace FFImageLoading.Forms
 			set
 			{
 				SetValue(TransparencyEnabledProperty, value); 
+			}
+		}
+
+		/// <summary>
+		/// The bitmap optimizations property.
+		/// </summary>
+		public static readonly BindableProperty BitmapOptimizationsProperty = BindableProperty.Create(nameof(BitmapOptimizations), typeof(bool?), typeof(CachedImage), default(bool?));
+
+		/// <summary>
+		/// Enables or disables the bitmap optimizations.
+		/// </summary>
+		/// <value>The bitmap optimizations.</value>
+		public bool? BitmapOptimizations
+		{
+			get
+			{
+				return (bool?)GetValue(BitmapOptimizationsProperty);
+			}
+			set
+			{
+				SetValue(BitmapOptimizationsProperty, value);
 			}
 		}
 

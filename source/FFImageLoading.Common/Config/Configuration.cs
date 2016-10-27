@@ -15,10 +15,10 @@ namespace FFImageLoading.Config
 		{
 			// default values here:
 			MaxMemoryCacheSize = 0; 
-			LoadWithTransparencyChannel = false;
+			BitmapOptimizations = true;
 			FadeAnimationEnabled = true;
 			FadeAnimationForCachedImages = false; // by default cached images will not fade when displayed on screen, otherwise it gives the impression that UI is laggy
-			FadeAnimationDuration = 500;
+			FadeAnimationDuration = 300;
 			TransformPlaceholders = true;
 			DownsampleInterpolationMode = InterpolationMode.Default;
 			HttpHeadersTimeout = 6;
@@ -67,11 +67,29 @@ namespace FFImageLoading.Config
         /// <value>The data resolver factory.</value>
         public IDataResolverFactory DataResolverFactory { get; set; }
 
+        /// <summary>
+        /// Gets or sets the MD5 helper.
+        /// </summary>
+        /// <value>The MD5 helper.</value>
+        public IMD5Helper MD5Helper { get; set; }
+
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
 		/// </summary>
 		/// <value><c>true</c> if FFIMageLoading loads images with transparency; otherwise, <c>false</c>.</value>
-		public bool LoadWithTransparencyChannel { get; set; }
+        [Obsolete]
+        public bool LoadWithTransparencyChannel
+        {
+            get { return BitmapOptimizations; }
+            set { BitmapOptimizations = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="T:FFImageLoading.Config.Configuration"/> bitmap
+        /// memory optimizations.
+        /// </summary>
+        /// <value><c>true</c> if bitmap memory optimizations; otherwise, <c>false</c>.</value>
+        public bool BitmapOptimizations { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> fade animation enabled.
@@ -158,6 +176,13 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The scheduler max parallel tasks.</value>
         public int SchedulerMaxParallelTasks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scheduler max parallel tasks factory.
+        /// If null SchedulerMaxParallelTasks property is used
+        /// </summary>
+        /// <value>The scheduler max parallel tasks factory.</value>
+        public Func<Configuration, int> SchedulerMaxParallelTasksFactory { get; set; }
 
         /// <summary>
         /// Gets or sets the default duration of the disk cache entries.

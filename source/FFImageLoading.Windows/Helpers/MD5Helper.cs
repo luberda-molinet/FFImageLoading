@@ -6,7 +6,7 @@ using System;
 
 namespace FFImageLoading.Helpers
 {
-    public class MD5Helper
+    public class MD5Helper : IMD5Helper
     {
         private static HashAlgorithmProvider hashProvider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
 

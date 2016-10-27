@@ -58,7 +58,6 @@
     <Compile Include="Helpers\IMiniLogger.cs" />
     <Compile Include="Work\IImageLoaderTask.cs" />
     <Compile Include="Config\Configuration.cs" />
-    <Compile Include="Cache\DownloadedData.cs" />
     <Compile Include="Work\WorkScheduler.cs" />
     <Compile Include="Work\IScheduledWork.cs" />
     <Compile Include="Work\TaskParameter.cs" />
@@ -71,7 +70,6 @@
     <Compile Include="Cache\CacheType.cs" />
     <Compile Include="Work\ImageSource.cs" />
     <Compile Include="Work\InterpolationMode.cs" />
-    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Work\ImageInformation.cs" />
     <Compile Include="Work\LoadingPriority.cs" />
     <Compile Include="Work\IImageService.cs" />
@@ -93,6 +91,8 @@
     <Compile Include="Work\ITarget.cs" />
     <Compile Include="Work\IWorkScheduler.cs" />
     <Compile Include="Helpers\Retry.cs" />
+    <Compile Include="Cache\DownloadCache.cs" />
+    <Compile Include="Helpers\IMD5Helper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

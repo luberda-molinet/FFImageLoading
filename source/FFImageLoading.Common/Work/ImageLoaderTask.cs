@@ -208,7 +208,7 @@ namespace FFImageLoading.Work
                 if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     return false;
 
-                bool isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImages ?? Configuration.FadeAnimationForCachedImages;
+                bool isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImagesEnabled.HasValue ? Parameters.FadeAnimationForCachedImagesEnabled.Value : Configuration.FadeAnimationForCachedImages;
                 var result = await TryLoadFromMemoryCacheAsync(Key, true, isFadeAnimationEnabledForCached).ConfigureAwait(false);
 
                 if (result)

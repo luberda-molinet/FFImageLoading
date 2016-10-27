@@ -113,11 +113,14 @@ namespace FFImageLoading.Work
 
 		public List<ITransformation> Transformations { get; private set; }
 
+        [Obsolete("Use BitmapOptimizations")]
 		public bool? LoadTransparencyChannel { get; private set; }
+
+        public bool? BitmapOptimizationsEnabled { get; private set; }
 
 		public bool? FadeAnimationEnabled { get; private set; }
 
-		public bool? FadeAnimationForCachedImages { get; private set; }
+		public bool? FadeAnimationForCachedImagesEnabled { get; private set; }
 
 		public int? FadeAnimationDuration { get; private set; }
 
@@ -254,11 +257,18 @@ namespace FFImageLoading.Work
 		/// </summary>
 		/// <returns>The TaskParameter instance for chaining the call.</returns>
 		/// <param name="loadTransparencyChannel">If set to <c>true</c> force loading alpha channel otherwise force not loading it.</param>
-		public TaskParameter TransparencyChannel(bool loadTransparencyChannel)
+        [Obsolete]
+        public TaskParameter TransparencyChannel(bool loadTransparencyChannel)
 		{
 			LoadTransparencyChannel = loadTransparencyChannel;
 			return this;
 		}
+
+        public TaskParameter BitmapOptimizations(bool enabled)
+        {
+            BitmapOptimizationsEnabled = enabled;
+            return this;
+        }
 
 		/// <summary>
 		/// Indicates if the fade animation should be enabled.
@@ -270,7 +280,7 @@ namespace FFImageLoading.Work
 		public TaskParameter FadeAnimation(bool enabled, bool? enabledForCachedImages = null, int? duration = null)
 		{
 			FadeAnimationEnabled = enabled;
-			FadeAnimationForCachedImages = enabledForCachedImages;
+			FadeAnimationForCachedImagesEnabled = enabledForCachedImages;
 			FadeAnimationDuration = duration;
 
 			return this;

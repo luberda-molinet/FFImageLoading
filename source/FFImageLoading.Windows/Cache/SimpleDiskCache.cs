@@ -8,6 +8,8 @@ using System.IO;
 using FFImageLoading.Cache;
 using Windows.Storage;
 using System.Runtime.InteropServices.WindowsRuntime;
+using FFImageLoading.Config;
+using FFImageLoading.Helpers;
 
 #if SILVERLIGHT
 using FFImageLoading.Concurrency;
@@ -20,28 +22,20 @@ namespace FFImageLoading.Cache
 {
     public class SimpleDiskCache : IDiskCache
     {
-        private static readonly SemaphoreSlim fileWriteLock = new SemaphoreSlim(1, 1);
-
+        readonly SemaphoreSlim fileWriteLock = new SemaphoreSlim(1, 1);
+        readonly SemaphoreSlim _currentWriteLock = new SemaphoreSlim(1, 1);
         Task initTask = null;
-        string version;
         string cacheFolderName;
         StorageFolder cacheFolder;
-        ConcurrentDictionary<string, byte> fileWritePendingTasks; // we use it as an Hashset, since there's no ConcurrentHashset
-        ConcurrentDictionary<string, CacheEntry> entries;
-        readonly TimeSpan defaultDuration;
-        private readonly SemaphoreSlim _currentWriteLock;
-        private Task _currentWrite;
+        ConcurrentDictionary<string, byte> fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
+        ConcurrentDictionary<string, CacheEntry> entries = new ConcurrentDictionary<string, CacheEntry>();
+        Task _currentWrite = Task.FromResult<byte>(1);
 
-        public SimpleDiskCache(string cacheFolderName)
+        public SimpleDiskCache(string cachePath, Configuration configuration)
         {
-            this.entries = new ConcurrentDictionary<string, CacheEntry>();
-            this.cacheFolder = null;
-            this.cacheFolderName = cacheFolderName;
-            this.fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
-            defaultDuration = new TimeSpan(30, 0, 0, 0);  // the default is 30 days
-            _currentWriteLock = new SemaphoreSlim(1, 1);
-            _currentWrite = Task.FromResult<byte>(1);
-
+            Configuration = configuration;
+            cacheFolder = null;
+            cacheFolderName = cachePath;
             initTask = Init();
         }
 
@@ -50,13 +44,15 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <returns>The cache.</returns>
         /// <param name="cacheName">Cache name.</param>
-        /// <param name="version">Version.</param>
-        public static SimpleDiskCache CreateCache(string cacheName)
+        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
         {
-            return new SimpleDiskCache(cacheName);
+            return new SimpleDiskCache(cacheName, configuration);
         }
 
-        async Task Init()
+        protected Configuration Configuration { get; private set; }
+        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+
+        protected virtual async Task Init()
         {
             try
             {
@@ -87,7 +83,7 @@ namespace FFImageLoading.Cache
             }
         }
 
-        async Task InitializeEntries()
+        protected virtual async Task InitializeEntries()
         {
             foreach (var file in await cacheFolder.GetFilesAsync())
             {
@@ -97,23 +93,21 @@ namespace FFImageLoading.Cache
             }
         }
 
-        private TimeSpan GetDuration(string text)
+        protected virtual TimeSpan GetDuration(string text)
         {
             string textToParse = text.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-            if (textToParse == null)
-                return defaultDuration;
+            if (string.IsNullOrWhiteSpace(textToParse))
+                return Configuration.DiskCacheDuration;
 
             int duration;
-            return Int32.TryParse(textToParse, out duration) ? TimeSpan.FromSeconds(duration) : defaultDuration;
+            return int.TryParse(textToParse, out duration) ? TimeSpan.FromSeconds(duration) : Configuration.DiskCacheDuration;
         }
 
-        async Task CleanCallback()
+        protected virtual async Task CleanCallback()
         {
             KeyValuePair<string, CacheEntry>[] kvps;
             var now = DateTime.UtcNow;
             kvps = entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).ToArray();
-
-            System.Diagnostics.Debug.WriteLine(string.Format("DiskCacher: Removing {0} elements from the cache", kvps.Length));
 
             foreach (var kvp in kvps)
             {
@@ -122,6 +116,7 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
+                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
                         var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
                         await file.DeleteAsync();
                     }
@@ -137,11 +132,11 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<string> GetFilePathAsync(string key)
+        public virtual async Task<string> GetFilePathAsync(string key)
         {
             await initTask.ConfigureAwait(false);
 
-            var sanitizedKey = SanitizeKey(key);
+            var sanitizedKey = key.ToSanitizedKey();
 
             CacheEntry entry;
             if (!entries.TryGetValue(sanitizedKey, out entry))
@@ -155,13 +150,11 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <returns>The async.</returns>
         /// <param name="key">Key.</param>
-        public async Task<bool> ExistsAsync(string key)
+        public virtual async Task<bool> ExistsAsync(string key)
         {
-            key = SanitizeKey(key);
-
             await initTask.ConfigureAwait(false);
 
-            return entries.ContainsKey(key);
+            return entries.ContainsKey(key.ToSanitizedKey());
         }
 
         /// <summary>
@@ -170,11 +163,11 @@ namespace FFImageLoading.Cache
         /// <param name="key">Key.</param>
         /// <param name="bytes">Bytes.</param>
         /// <param name="duration">Duration.</param>
-        public async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
+        public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration)
         {
             await initTask.ConfigureAwait(false);
 
-            var sanitizedKey = SanitizeKey(key);
+            var sanitizedKey = key.ToSanitizedKey();
 
             if (!fileWritePendingTasks.TryAdd(sanitizedKey, 1))
                 return;
@@ -225,57 +218,15 @@ namespace FFImageLoading.Cache
         }
 
         /// <summary>
-        /// Tries to get cached file as byte array.
-        /// </summary>
-        /// <returns>The get async.</returns>
-        /// <param name="key">Key.</param>
-        /// <param name="token">Token.</param>
-        public async Task<byte[]> TryGetAsync(string key, CancellationToken token)
-        {
-            await initTask.ConfigureAwait(false);
-
-            key = SanitizeKey(key);
-            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
-
-            try
-            {
-                CacheEntry entry;
-                if (!entries.TryGetValue(key, out entry))
-                    return null;
-
-                StorageFile file = null;
-
-                try
-                {
-                    file = await cacheFolder.GetFileAsync(entry.FileName);
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-
-                if (file == null)
-                    return null;
-
-                var buffer = await FileIO.ReadBufferAsync(file);
-                return buffer.ToArray();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Tries to get cached file as stream.
         /// </summary>
         /// <returns>The get async.</returns>
         /// <param name="key">Key.</param>
-        public async Task<Stream> TryGetStreamAsync(string key)
+        public virtual async Task<Stream> TryGetStreamAsync(string key)
         {
             await initTask.ConfigureAwait(false);
 
-            key = SanitizeKey(key);
+            key = key.ToSanitizedKey();
             await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
             try
@@ -301,17 +252,13 @@ namespace FFImageLoading.Cache
         /// Removes the specified cache entry.
         /// </summary>
         /// <param name="key">Key.</param>
-        public async Task RemoveAsync(string key)
+        public virtual async Task RemoveAsync(string key)
         {
             await initTask.ConfigureAwait(false);
 
-            key = SanitizeKey(key);
+            key = key.ToSanitizedKey();
 
-            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
-
-            key = SanitizeKey(key);
-            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
-            
+            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);            
 
             CacheEntry oldCacheEntry;
             if (entries.TryRemove(key, out oldCacheEntry))
@@ -330,7 +277,7 @@ namespace FFImageLoading.Cache
         /// <summary>
         /// Clears all cache entries.
         /// </summary>
-        public async Task ClearAsync()
+        public virtual async Task ClearAsync()
         {
             await initTask.ConfigureAwait(false);
 
@@ -357,17 +304,12 @@ namespace FFImageLoading.Cache
             }
         }
 
-        async Task WaitForPendingWriteIfExists(string key)
+        protected virtual async Task WaitForPendingWriteIfExists(string key)
         {
             while (fileWritePendingTasks.ContainsKey(key))
             {
                 await Task.Delay(20).ConfigureAwait(false);
             }
-        }
-
-        string SanitizeKey(string key)
-        {
-            return key.ToSanitizedKey();
         }
     }
 }

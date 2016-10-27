@@ -48,9 +48,6 @@ namespace FFImageLoading.Targets
 
             var parameters = task.Parameters;
 
-            bool isFadeAnimationEnabled = parameters.FadeAnimationEnabled ?? ImageService.Instance.Config.FadeAnimationEnabled;
-            bool isFadeAnimationEnabledForCached = isFadeAnimationEnabled && (parameters.FadeAnimationForCachedImages ?? ImageService.Instance.Config.FadeAnimationForCachedImages);
-
             if (animated)
             {
                 // fade animation

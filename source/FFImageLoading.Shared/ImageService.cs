@@ -80,6 +80,9 @@ namespace FFImageLoading
 					configuration.Scheduler = configuration.Scheduler ?? _config.Scheduler;
 					configuration.Logger = configuration.Logger ?? _config.Logger;
 					configuration.DownloadCache = configuration.DownloadCache ?? _config.DownloadCache;
+                    configuration.DataResolverFactory = configuration.DataResolverFactory ?? _config.DataResolverFactory;
+                    configuration.SchedulerMaxParallelTasksFactory = configuration.SchedulerMaxParallelTasksFactory ?? _config.SchedulerMaxParallelTasksFactory;
+                    configuration.MD5Helper = configuration.MD5Helper ?? _config.MD5Helper;
 
 					// Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.
 					if (configuration.Logger != null)
@@ -113,15 +116,17 @@ namespace FFImageLoading
 				}
 
                 var logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? new MiniLogger(), userDefinedConfig.VerboseLogging);
-                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(logger, userDefinedConfig.VerbosePerformanceLogging, new PlatformPerformance(), userDefinedConfig.SchedulerMaxParallelTasks);
-				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache");
-                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache();
+                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, new PlatformPerformance());
+				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache", userDefinedConfig);
+                var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
+                var md5Helper = userDefinedConfig.MD5Helper ?? new MD5Helper();
 
 				userDefinedConfig.HttpClient = httpClient;
 				userDefinedConfig.Scheduler = scheduler;
 				userDefinedConfig.Logger = logger;
 				userDefinedConfig.DiskCache = diskCache;
 				userDefinedConfig.DownloadCache = downloadCache;
+                userDefinedConfig.MD5Helper = md5Helper;
 
 				Config = userDefinedConfig;
 
@@ -131,7 +136,8 @@ namespace FFImageLoading
 
         private IWorkScheduler Scheduler
         {
-            get {
+            get 
+            {
                 InitializeIfNeeded();
                 return Config.Scheduler;
             }

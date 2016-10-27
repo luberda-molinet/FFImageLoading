@@ -15,8 +15,6 @@ namespace FFImageLoading.Cache
 		/// <param name="duration">Specifies how long an item should remain in the cache.</param>
 		Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration);
 
-		Task<byte[]> TryGetAsync(string key, CancellationToken token);
-
 		Task<Stream> TryGetStreamAsync(string key);
 
 		Task RemoveAsync(string key);

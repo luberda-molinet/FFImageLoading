@@ -45,23 +45,6 @@ namespace FFImageLoading.Work
 
             try
             {
-                //TODO It's not neccessary - remove?
-                //if (imageData.Position != 0)
-                //{
-                //    if (imageData.CanSeek)
-                //    {
-                //        imageData.Position = 0;
-                //    }
-                //    else
-                //    {
-                //        var resolver = DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
-                //        var resolved = await resolver.Resolve(path, Parameters, CancellationToken).ConfigureAwait(false);
-                //        imageData?.Dispose();
-                //        imageData = resolved.Item1;
-                //    }
-                //}
-                //CancellationToken.ThrowIfCancellationRequested();
-
                 // Special case to handle WebP decoding on iOS
                 if (source != ImageSource.Stream && path.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
                 {

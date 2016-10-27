@@ -2,7 +2,7 @@
 using FFImageLoading.Helpers;
 namespace FFImageLoading
 {
-    public class MiniLoggerWrapper : IMiniLogger
+    internal class MiniLoggerWrapper : IMiniLogger
     {
         IMiniLogger _logger;
         bool _verboseLogging;

@@ -54,7 +54,7 @@ namespace FFImageLoading
 		/// IMPORTANT: It throws image loading exceptions - you should handle them
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
-		public static async Task DownloadOnlyAsync(this TaskParameter parameters)
+		public static Task DownloadOnlyAsync(this TaskParameter parameters)
 		{
 			throw new Exception(DoNotReference);
 		}

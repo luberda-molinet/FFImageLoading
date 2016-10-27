@@ -310,9 +310,8 @@ namespace FFImageLoading.Forms.WinRT
                     imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
                 }
 
-                // TransparencyChannel
-                if (Element.TransparencyEnabled.HasValue)
-                    imageLoader.TransparencyChannel(Element.TransparencyEnabled.Value);
+				if (Element.BitmapOptimizations.HasValue)
+					imageLoader.BitmapOptimizations(Element.BitmapOptimizations.Value);
 
                 // FadeAnimation
                 if (Element.FadeAnimationEnabled.HasValue)

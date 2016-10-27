@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using System.Diagnostics;
+using FFImageLoading.Config;
 
 namespace FFImageLoading.Work
 {
@@ -20,24 +21,33 @@ namespace FFImageLoading.Work
         int _statsTotalWaiting;
         long _loadCount;
 
-        public WorkScheduler(IMiniLogger logger, bool verbosePerformanceLogging, IPlatformPerformance performance, int maxParallelTasks)
+        public WorkScheduler(Configuration configuration, IPlatformPerformance performance)
         {
-            VerbosePerformanceLogging = verbosePerformanceLogging;
-            Logger = logger;
+            Configuration = configuration;
             Performance = performance;
-            MaxParallelTasks = maxParallelTasks;
             PendingTasks = new List<PendingTask>();
             RunningTasks = new Dictionary<string, PendingTask>();
         }
 
-        protected IMiniLogger Logger { get; private set; }
-        protected int MaxParallelTasks { get; private set; }
+        protected int MaxParallelTasks 
+        { 
+            get
+            {
+                if (Configuration.SchedulerMaxParallelTasksFactory != null)
+                    return Configuration.SchedulerMaxParallelTasksFactory(Configuration);
+
+                return Configuration.SchedulerMaxParallelTasks;
+            }
+        }
+
         protected IPlatformPerformance Performance { get; private set; }
         protected List<PendingTask> PendingTasks { get; private set; }
         protected Dictionary<string, PendingTask> RunningTasks { get; private set; }
-        protected bool VerbosePerformanceLogging { get; private set; }
 
-        void EvictStaleTasks()
+        protected Configuration Configuration { get; private set; }
+        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+
+        protected virtual void EvictStaleTasks()
         {
             lock (_pendingTasksLock)
             {
@@ -53,7 +63,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        public void Cancel(IImageLoaderTask task)
+        public virtual void Cancel(IImageLoaderTask task)
         {
             try
             {
@@ -86,13 +96,13 @@ namespace FFImageLoading.Work
 
         public bool ExitTasksEarly { get; private set; }
 
-        public virtual void SetExitTasksEarly(bool exitTasksEarly)
+        public void SetExitTasksEarly(bool exitTasksEarly)
         {
             ExitTasksEarly = exitTasksEarly;
             SetPauseWork(false);
         }
 
-        public virtual void SetPauseWork(bool pauseWork)
+        public void SetPauseWork(bool pauseWork)
         {
             if (_pauseWork == pauseWork)
                 return;
@@ -132,7 +142,7 @@ namespace FFImageLoading.Work
 
             EvictStaleTasks();
 
-			if (VerbosePerformanceLogging && (_loadCount % 10) == 0)
+            if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
 			{
 				LogSchedulerStats();
 			}
@@ -208,7 +218,7 @@ namespace FFImageLoading.Work
             });
         }
 
-        void QueueImageLoadingTask(IImageLoaderTask task)
+        protected void QueueImageLoadingTask(IImageLoaderTask task)
         {
             int position = Interlocked.Increment(ref _currentPosition);
             var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task, FrameworkWrappingTask = CreateFrameworkTask(task) };
@@ -238,7 +248,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        async void WaitForSimilarTaskFinished(PendingTask currentPendingTask, PendingTask taskForSimilarKey)
+        protected async void WaitForSimilarTaskFinished(PendingTask currentPendingTask, PendingTask taskForSimilarKey)
         {
             Interlocked.Increment(ref _statsTotalWaiting);
 
@@ -276,12 +286,12 @@ namespace FFImageLoading.Work
             }
         }
 
-        async void TakeFromPendingTasksAndRun()
+        protected async void TakeFromPendingTasksAndRun()
         {
             await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
         }
 
-        Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
+        protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
         {
             var parameters = imageLoadingTask.Parameters;
 
@@ -304,7 +314,7 @@ namespace FFImageLoading.Work
             return tcs.Task;
         }
 
-        int GetDefaultPriority(ImageSource source)
+        protected int GetDefaultPriority(ImageSource source)
         {
             if (source == ImageSource.ApplicationBundle || source == ImageSource.CompiledResource)
                 return (int)LoadingPriority.Normal + 2;
@@ -315,7 +325,7 @@ namespace FFImageLoading.Work
             return (int)LoadingPriority.Normal;
         }
 
-        async Task TakeFromPendingTasksAndRunAsync()
+        protected async Task TakeFromPendingTasksAndRunAsync()
         {
             Dictionary<string, PendingTask> tasksToRun = null;
 
@@ -359,7 +369,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        async Task RunImageLoadingTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
+        protected async Task RunImageLoadingTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
         {
             var key = pendingTask.ImageLoadingTask.Key;
 
@@ -377,7 +387,7 @@ namespace FFImageLoading.Work
                     Interlocked.Increment(ref _statsTotalRunning);
                 }
 
-                if (VerbosePerformanceLogging)
+                if (Configuration.VerbosePerformanceLogging)
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -424,7 +434,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        void LogSchedulerStats()
+        protected void LogSchedulerStats()
         {
             Logger.Debug(string.Format("[PERFORMANCE] Scheduler - Max: {0}, Pending: {1}, Running: {2}, TotalPending: {3}, TotalRunning: {4}, TotalMemoryCacheHit: {5}, TotalWaiting: {6}",
                         MaxParallelTasks,

@@ -5,7 +5,7 @@ namespace FFImageLoading.Helpers
 {
     public interface IMainThreadDispatcher
     {
-        void Post(Action action);
+        // void Post(Action action);
 
         Task PostAsync(Action action);
     }
