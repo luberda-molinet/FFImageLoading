@@ -16,16 +16,16 @@ namespace FFImageLoading.Forms.Sample.iOS
 
 			global::Xamarin.Forms.Forms.Init();
 
-			//var config = new FFImageLoading.Config.Configuration()
-			//{
-			//	VerboseLogging = false,
-			//	VerbosePerformanceLogging = false,
-			//	VerboseMemoryCacheLogging = false,
-			//	VerboseLoadingCancelledLogging = false,
-			//	Logger = new CustomLogger(),
-			//};
-			//ImageService.Instance.Initialize(config);
-			//ImageService.Instance.Initialize();
+			var config = new FFImageLoading.Config.Configuration()
+			{
+				VerboseLogging = false,
+				VerbosePerformanceLogging = false,
+				VerboseMemoryCacheLogging = false,
+				VerboseLoadingCancelledLogging = false,
+				Logger = new CustomLogger(),
+			};
+			ImageService.Instance.Initialize(config);
+
 			LoadApplication(new App());
 
 			return base.FinishedLaunching(app, options);
