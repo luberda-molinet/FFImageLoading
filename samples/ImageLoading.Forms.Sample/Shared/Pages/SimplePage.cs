@@ -21,8 +21,15 @@ namespace FFImageLoading.Forms.Sample.Pages
 				RetryCount = 0,
 				RetryDelay = 250,
 				TransparencyEnabled = false,
-				Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg",
 			};
+
+			cachedImage.Success += (sender, e) =>
+			{
+				var h = e.ImageInformation.OriginalHeight;
+				var w = e.ImageInformation.OriginalHeight;
+			};
+
+			cachedImage.Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg";
 
 			Content = cachedImage;
 		}

@@ -18,15 +18,15 @@ namespace FFImageLoading.Forms.Sample.Droid
 			base.OnCreate(bundle);
 			FFImageLoading.Forms.Droid.CachedImageRenderer.Init();
 
-			var config = new FFImageLoading.Config.Configuration()
-			{
-				VerboseLogging = false,
-				VerbosePerformanceLogging = false,
-				VerboseMemoryCacheLogging = false,
-				VerboseLoadingCancelledLogging = false,
-				Logger = new CustomLogger(),
-			};
-			ImageService.Instance.Initialize(config);
+			//var config = new FFImageLoading.Config.Configuration()
+			//{
+			//	VerboseLogging = true,
+			//	VerbosePerformanceLogging = false,
+			//	VerboseMemoryCacheLogging = false,
+			//	VerboseLoadingCancelledLogging = false,
+			//	Logger = new CustomLogger(),
+			//};
+			//ImageService.Instance.Initialize(config);
 
 			global::Xamarin.Forms.Forms.Init(this, bundle);
 			LoadApplication(new App());

@@ -10,6 +10,9 @@ namespace FFImageLoading.Forms.Sample
 		public App()
 		{
             MainPage = new XamarinFormsPageFactory().Init<HomePageModel, PFNavigationPage>();
+
+			ImageService.Instance.LoadCompiledResource("loading.png").Preload();
+			ImageService.Instance.LoadUrl("http://loremflickr.com/600/600/nature?filename=simple.jpg").DownloadOnly();
         }
 
 		protected override void OnStart()

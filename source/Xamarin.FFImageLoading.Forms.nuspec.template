@@ -49,30 +49,39 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <!--Core PCL-->
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.pdb" />
 
         <!--Xamarin.Android-->
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\MonoAndroid10\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\MonoAndroid10\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\MonoAndroid10\FFImageLoading.Forms.pdb" />
         <file src="FFImageLoading.Forms.Droid\bin\Release\FFImageLoading.Forms.Droid.dll" target="lib\MonoAndroid10\FFImageLoading.Forms.Droid.dll" />
         <file src="FFImageLoading.Forms.Droid\bin\Release\FFImageLoading.Forms.Droid.xml" target="lib\MonoAndroid10\FFImageLoading.Forms.Droid.xml" />
+        <file src="FFImageLoading.Forms.Droid\bin\Release\FFImageLoading.Forms.Droid.pdb" target="lib\MonoAndroid10\FFImageLoading.Forms.Droid.pdb" />
 
         <!--Xamarin.iOS-->
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\Xamarin.iOS10\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\Xamarin.iOS10\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Forms.pdb" />
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.dll" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.dll" />
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.xml" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.xml" />
+        <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.pdb" />
         
         <!--Windows WinRT-->
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.pdb" />
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.dll" />
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.WinRT.pdb" />
 
         <!--Windows WinUWP-->
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.dll" target="lib\uap10.0\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.xml" target="lib\uap10.0\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.pdb" target="lib\uap10.0\FFImageLoading.Forms.pdb" />
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.WinUWP.dll" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.dll" />
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.WinUWP.xml" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.xml" />
+        <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.WinUWP.pdb" target="lib\uap10.0\FFImageLoading.Forms.WinUWP.pdb" />
 
     </files>
     

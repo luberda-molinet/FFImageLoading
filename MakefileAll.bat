@@ -35,6 +35,10 @@ echo Building FFImageLoading.Forms...
 %msbuild% source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj %buildargs%
 
+echo Generating symbols with Gitlink...
+
+GitLink.exe %~dp0 -u https://github.com/luberda-molinet/FFImageLoading
+
 echo Packaging NuGets...
 
 nuget pack source/Xamarin.FFImageLoading.nuspec
