@@ -78,33 +78,37 @@ namespace FFImageLoading.Drawables
 
         public override void Draw(Canvas canvas)
         {
-            if (!animating)
+            try
             {
-                base.Draw(canvas);
-            }
-            else
-            {
-                float normalized = (SystemClock.UptimeMillis() - startTimeMillis) / fadeDuration;
-                if (normalized >= 1f)
+                if (!animating)
                 {
-                    animating = false;
-                    placeholder = null;
-                    normalized = 0f;
                     base.Draw(canvas);
                 }
                 else
                 {
-                    if (IsBitmapDrawableValid(placeholder))
+                    float normalized = (SystemClock.UptimeMillis() - startTimeMillis) / fadeDuration;
+                    if (normalized >= 1f)
                     {
-                        placeholder.Draw(canvas);
+                        animating = false;
+                        placeholder = null;
+                        normalized = 0f;
+                        base.Draw(canvas);
                     }
+                    else
+                    {
+                        if (IsBitmapDrawableValid(placeholder))
+                        {
+                            placeholder.Draw(canvas);
+                        }
 
-                    int partialAlpha = (int)(alpha * normalized);
-                    base.SetAlpha(partialAlpha);
-                    base.Draw(canvas);
-                    base.SetAlpha(alpha);
+                        int partialAlpha = (int)(alpha * normalized);
+                        base.SetAlpha(partialAlpha);
+                        base.Draw(canvas);
+                        base.SetAlpha(alpha);
+                    }
                 }
             }
+            catch (Exception) { }
         }
 
         bool IsBitmapDrawableValid(BitmapDrawable bitmapDrawable)
@@ -117,10 +121,14 @@ namespace FFImageLoading.Drawables
         {
             get
             {
-                if (animating && IsBitmapDrawableValid(placeholder))
+                try
                 {
-                    return placeholder.IntrinsicHeight;
+                    if (animating && IsBitmapDrawableValid(placeholder))
+                    {
+                        return placeholder.IntrinsicHeight;
+                    }
                 }
+                catch (Exception) { }
 
                 return base.IntrinsicHeight;
             }
@@ -130,10 +138,14 @@ namespace FFImageLoading.Drawables
         {
             get
             {
-                if (animating && IsBitmapDrawableValid(placeholder))
+                try
                 {
-                    return placeholder.IntrinsicWidth;
+                    if (animating && IsBitmapDrawableValid(placeholder))
+                    {
+                        return placeholder.IntrinsicWidth;
+                    }
                 }
+                catch (Exception) {}
 
                 return base.IntrinsicWidth;
             }
@@ -142,22 +154,30 @@ namespace FFImageLoading.Drawables
 
         public override void SetAlpha(int alpha)
         {
-            if (IsBitmapDrawableValid(placeholder))
+            try
             {
-                placeholder.SetAlpha(alpha);
-            }
+                if (IsBitmapDrawableValid(placeholder))
+                {
+                    placeholder.SetAlpha(alpha);
+                }
 
-            base.SetAlpha(alpha);
+                base.SetAlpha(alpha);
+            }
+            catch (Exception) { }
         }
 
         public override void SetColorFilter(Color color, PorterDuff.Mode mode)
         {
-            if (IsBitmapDrawableValid(placeholder))
+            try
             {
-                placeholder.SetColorFilter(color, mode);
-            }
+                if (IsBitmapDrawableValid(placeholder))
+                {
+                    placeholder.SetColorFilter(color, mode);
+                }
 
-            base.SetColorFilter(color, mode);
+                base.SetColorFilter(color, mode);
+            }
+            catch (Exception) { }
         }
     }
 }
