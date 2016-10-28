@@ -13,7 +13,6 @@ namespace FFImageLoading.Work
     {
         Task _dispatch = Task.FromResult<byte>(1);
         protected readonly object _pendingTasksLock = new object();
-        bool _pauseWork; // volatile?
         int _currentPosition; // useful?
         int _statsTotalPending;
         int _statsTotalRunning;
@@ -98,20 +97,14 @@ namespace FFImageLoading.Work
 
         public void SetExitTasksEarly(bool exitTasksEarly)
         {
-            ExitTasksEarly = exitTasksEarly;
-            SetPauseWork(false);
-        }
-
-        public void SetPauseWork(bool pauseWork)
-        {
-            if (_pauseWork == pauseWork)
+            if (ExitTasksEarly == exitTasksEarly)
                 return;
 
-            _pauseWork = pauseWork;
+            ExitTasksEarly = exitTasksEarly;
 
-            if (pauseWork)
+            if (exitTasksEarly)
             {
-                Logger.Debug("SetPauseWork paused.");
+                Logger.Debug("ExitTasksEarly enabled.");
 
                 lock (_pendingTasksLock)
                 {
@@ -121,10 +114,29 @@ namespace FFImageLoading.Work
                     PendingTasks.Clear();
                 }
             }
-
-            if (!pauseWork)
+            else
             {
-                Logger.Debug("SetPauseWork released.");
+                Logger.Debug("ExitTasksEarly disabled.");
+            }
+        }
+
+        public bool PauseWork { get; private set; }
+
+        public void SetPauseWork(bool pauseWork)
+        {
+            if (PauseWork == pauseWork)
+                return;
+
+            PauseWork = pauseWork;
+
+            if (pauseWork)
+            {
+                Logger.Debug("SetPauseWork enabled.");
+            }
+            else
+            {
+                Logger.Debug("SetPauseWork disabled.");
+                TakeFromPendingTasksAndRun();
             }
         }
 
@@ -203,7 +215,7 @@ namespace FFImageLoading.Work
                         }
                     }
 
-                    if (task.IsCancelled || _pauseWork)
+                    if (task.IsCancelled || ExitTasksEarly)
                     {
                         task?.Dispose();
                         return;
@@ -237,6 +249,9 @@ namespace FFImageLoading.Work
                     similarRunningTask.Position = position;
                 }
             }
+
+            if (PauseWork)
+                return;
 
             if (similarRunningTask == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache)
             {

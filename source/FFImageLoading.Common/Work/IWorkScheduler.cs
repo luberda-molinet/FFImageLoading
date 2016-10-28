@@ -20,6 +20,8 @@ namespace FFImageLoading.Work
 
         void SetExitTasksEarly(bool exitTasksEarly);
 
+        bool PauseWork { get; }
+
         void SetPauseWork(bool pauseWork);
 
         void RemovePendingTask(IImageLoaderTask task);

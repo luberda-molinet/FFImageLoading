@@ -81,6 +81,12 @@ namespace FFImageLoading
 		void SetExitTasksEarly(bool exitTasksEarly);
 
         /// <summary>
+        /// Gets a value indicating whether ImageService will pause tasks execution
+        /// </summary>
+        /// <value><c>true</c> if pause work; otherwise, <c>false</c>.</value>
+        bool PauseWork { get; }
+
+        /// <summary>
         /// Sets a value indicating if all loading work should be paused (silently canceled).
         /// </summary>
         /// <param name="pauseWork">If set to <c>true</c> pause/cancel work.</param>

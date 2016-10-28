@@ -233,6 +233,18 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// Gets a value indicating whether this ImageService will pause tasks execution.
+        /// </summary>
+        /// <value><c>true</c> if pause work; otherwise, <c>false</c>.</value>
+        public bool PauseWork
+        {
+            get
+            {
+                return Scheduler.PauseWork;
+            }
+        }
+
+        /// <summary>
         /// Cancel any loading work for the given ImageView
         /// </summary>
         /// <param name="task">Image loading task to cancel.</param>
