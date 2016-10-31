@@ -43,3 +43,6 @@ samples/ImageLoading.Forms.Sample/Windows/FFImageLoading.Forms.Sample.WinPhone/p
 nuget.exe
 
 .vs/config/applicationhost.config
+
+*.DS_Store
+*.bak

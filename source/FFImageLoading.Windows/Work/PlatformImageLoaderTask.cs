@@ -88,7 +88,7 @@ namespace FFImageLoading.Work
                         }
                         finally
                         {
-                            if (old != null && old != imageIn && old.Pixels != imageIn.Pixels)
+                            if (old != null && old != imageIn && old.PixelData != imageIn.PixelData)
                             {
                                 old.FreePixels();
                                 old = null;

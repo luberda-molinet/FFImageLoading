@@ -14,43 +14,27 @@ namespace FFImageLoading.Extensions
     {
         public static async Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder)
         {
-            if (holder == null || holder.Pixels == null)
+            if (holder == null || holder.PixelData == null)
                 return null;
 
             WriteableBitmap writeableBitmap = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(() =>
+            await MainThreadDispatcher.Instance.PostAsync(async () =>
             {
-                writeableBitmap = holder.ToWriteableBitmap();
+                writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
             });
 
             return writeableBitmap;
         }
 
-        private static unsafe WriteableBitmap ToWriteableBitmap(this BitmapHolder holder)
+        private static async Task<WriteableBitmap> ToWriteableBitmap(this BitmapHolder holder)
         {
             var writeableBitmap = new WriteableBitmap(holder.Width, holder.Height);
 
             using (var stream = writeableBitmap.PixelBuffer.AsStream())
             {
-                int length = holder.Pixels.Length;
-
-                var buffer = new byte[length * 4];
-                fixed (int* srcPtr = holder.Pixels)
-                {
-                    var b = 0;
-                    for (var i = 0; i < length; i++, b += 4)
-                    {
-                        var p = srcPtr[i];
-                        buffer[b + 3] = (byte)((p >> 24) & 0xff);
-                        buffer[b + 2] = (byte)((p >> 16) & 0xff);
-                        buffer[b + 1] = (byte)((p >> 8) & 0xff);
-                        buffer[b + 0] = (byte)(p & 0xff);
-                    }
-                    stream.Write(buffer, 0, length * 4);
-                }
-
+                await stream.WriteAsync(holder.PixelData, 0, holder.PixelData.Length);
             }
 
             return writeableBitmap;
@@ -118,10 +102,8 @@ namespace FFImageLoading.Extensions
                         PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
 
                         var bytes = pixelDataProvider.DetachPixelData();
-                        int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
-                        CopyPixels(bytes, array);
 
-                        return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                        return new BitmapHolder(bytes, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     }
                 }
                 else
@@ -136,10 +118,8 @@ namespace FFImageLoading.Extensions
                     }
 
                     var bytes = pixelDataProvider.DetachPixelData();
-                    int[] array = new int[decoder.PixelWidth * decoder.PixelHeight];
-                    CopyPixels(bytes, array);
 
-                    return new BitmapHolder(array, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    return new BitmapHolder(bytes, (int)decoder.PixelWidth, (int)decoder.PixelHeight);
                 }
             }
         }

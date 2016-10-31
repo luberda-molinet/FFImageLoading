@@ -89,7 +89,7 @@ namespace FFImageLoading.Transformations
             }
             else
             {
-                bitmap = new BitmapHolder(source.Pixels, source.Width, source.Height);
+                bitmap = new BitmapHolder(source.PixelData, source.Width, source.Height);
             }
 
             topLeftCornerSize = topLeftCornerSize * (desiredWidth + desiredHeight) / 2 / 100;
@@ -114,22 +114,22 @@ namespace FFImageLoading.Transformations
                     if (x <= topLeftSize && y <= topLeftSize)
                     { //top left corner
                         if (!CheckCorner(topLeftSize, topLeftSize, topLeftSize, cornersTransformType, Corner.TopLeftCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x >= w - topRightSize && y <= topRightSize && topRightSize > 0)
                     { // top right corner
                         if (!CheckCorner(w - topRightSize, topRightSize, topRightSize, cornersTransformType, Corner.TopRightCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x >= w - bottomRightSize && y >= h - bottomRightSize && bottomRightSize > 0)
                     { // bottom right corner
                         if (!CheckCorner(w - bottomRightSize, h - bottomRightSize, bottomRightSize, cornersTransformType, Corner.BottomRightCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x <= bottomLeftSize && y >= h - bottomLeftSize && bottomLeftSize > 0)
                     { // bottom left corner
                         if (!CheckCorner(bottomLeftSize, h - bottomLeftSize, bottomLeftSize, cornersTransformType, Corner.BottomLeftCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                 }
             }

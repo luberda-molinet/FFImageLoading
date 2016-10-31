@@ -25,12 +25,11 @@ namespace FFImageLoading.Transformations
         {
             var nWidth = bmp.Width;
             var nHeight = bmp.Height;
-            var px = bmp.Pixels;
-            var len = bmp.Pixels.Length;
+            var len = bmp.PixelCount;
 
             for (var i = 0; i < len; i++)
             {
-                var c = px[i];
+                var c = bmp.GetPixelAsInt(i);
                 var a = (c >> 24) & 0x000000FF;
                 var r = (c >> 16) & 0x000000FF;
                 var g = (c >> 8) & 0x000000FF;
@@ -49,7 +48,7 @@ namespace FFImageLoading.Transformations
                 if (bNew > 255)
                     bNew = 255;
 
-                px[i] = (a << 24) | (rNew << 16) | (gNew << 8) | bNew;
+                bmp.SetPixel(i, (a << 24) | (rNew << 16) | (gNew << 8) | bNew);
             }
         }
     }

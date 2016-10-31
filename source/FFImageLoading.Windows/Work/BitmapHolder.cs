@@ -1,66 +1,79 @@
-﻿using Windows.UI;
+﻿using FFImageLoading.Extensions;
+using System;
+using Windows.UI;
 
 namespace FFImageLoading.Work
 {
     public class BitmapHolder : IBitmap
     {
-        public BitmapHolder(int[] pixels, int width, int height)
+        public BitmapHolder(byte[] pixels, int width, int height)
         {
-            Pixels = pixels;
+            PixelData = pixels;
             Width = width;
             Height = height;
         }
 
-        public int Height
-        {
-            get; private set; 
-        }
+        public int Height { get; private set; }
 
-        public int Width
-        {
-            get; private set; 
-        }
+        public int Width { get; private set; }
 
-        public int[] Pixels { get; private set; }
+        public byte[] PixelData { get; private set; }
 
-        internal void SetPixels(int[] pixels, int width, int height)
-        {
-            Pixels = null;
-            Pixels = pixels;
-            Width = width;
-            Height = height;
-        }
+        public int PixelCount { get { return (int)(PixelData.Length / 4); } }
 
         public void SetPixel(int x, int y, int color)
         {
-            if (x < Width && y < Height)
-                Pixels[y * Width + x] = color;
+            int pixelPos = (y * Width + x);
+            SetPixel(pixelPos, color);
+        }
+
+        public unsafe void SetPixel(int pos, int color)
+        {
+            fixed (byte* numPtr = &PixelData[pos * 4])
+            *(int*)numPtr = color;
         }
 
         public void SetPixel(int x, int y, Color color)
         {
-            SetPixel(x, y, ToInt(color));
+            int pixelPos = (y * Width + x);
+            SetPixel(pixelPos, color);
         }
 
-		public void FreePixels()
-		{
-			Pixels = null;
-		}
-
-        static int ToInt(Color color)
+        public void SetPixel(int pos, Color color)
         {
-            var col = 0;
+            int bytePos = pos * 4;
+            PixelData[bytePos] = color.A;
+            PixelData[bytePos + 1] = color.R;
+            PixelData[bytePos + 2] = color.G;
+            PixelData[bytePos + 3] = color.B;
+        }
 
-            if (color.A != 0)
-            {
-                var a = color.A + 1;
-                col = (color.A << 24)
-                  | ((byte)((color.R * a) >> 8) << 16)
-                  | ((byte)((color.G * a) >> 8) << 8)
-                  | ((byte)((color.B * a) >> 8));
-            }
+        public int GetPixelAsInt(int x, int y)
+        {
+            int pixelPos = (y * Width + x);
+            return GetPixelAsInt(pixelPos);
+        }
 
-            return col;
+        public int GetPixelAsInt(int pos)
+        {
+            return BitConverter.ToInt32(PixelData, pos * 4);
+        }
+
+        public Color GetPixelAsColor(int x, int y)
+        {
+            int pixelPos = (y * Width + x) ;
+            return GetPixelAsColor(pixelPos);
+        }
+
+        public Color GetPixelAsColor(int pos)
+        {
+            int bytePos = pos * 4;
+            return Color.FromArgb(PixelData[bytePos], PixelData[bytePos + 1], PixelData[bytePos + 2], PixelData[bytePos + 3]);
+        }
+
+        public void FreePixels()
+        {
+            PixelData = null;
         }
     }
 

@@ -75,7 +75,7 @@ namespace FFImageLoading.Transformations
             }
             else
             {
-                bitmap = new BitmapHolder(source.Pixels, source.Width, source.Height);
+                bitmap = new BitmapHolder(source.PixelData, source.Width, source.Height);
             }
 
             if (rad == 0)
@@ -94,22 +94,22 @@ namespace FFImageLoading.Transformations
                     if (x <= rad && y <= rad)
                     { //top left corner
                         if (!CheckRoundedCorner(rad, rad, rad, Corner.TopLeftCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x >= w - rad && y <= rad)
                     { // top right corner
                         if (!CheckRoundedCorner(w - rad, rad, rad, Corner.TopRightCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x >= w - rad && y >= h - rad)
                     { // bottom right corner
                         if (!CheckRoundedCorner(w - rad, h - rad, rad, Corner.BottomRightCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                     else if (x <= rad && y >= h - rad)
                     { // bottom left corner
                         if (!CheckRoundedCorner(rad, h - rad, rad, Corner.BottomLeftCorner, x, y))
-                            bitmap.Pixels[y * w + x] = transparentColor;
+                            bitmap.SetPixel(y * w + x, transparentColor);
                     }
                 }
             }

@@ -58,7 +58,7 @@ namespace FFImageLoading.Transformations
                 rsum = gsum = bsum = 0;
                 for (i = -radius; i <= radius; i++)
                 {
-                    p = source.Pixels[yi + Math.Min(wm, Math.Max(i, 0))];
+                    p = source.GetPixelAsInt(yi + Math.Min(wm, Math.Max(i, 0)));
                     rsum += (p & 0xff0000) >> 16;
                     gsum += (p & 0x00ff00) >> 8;
                     bsum += p & 0x0000ff;
@@ -75,8 +75,8 @@ namespace FFImageLoading.Transformations
                         vmin[x] = Math.Min(x + radius + 1, wm);
                         vmax[x] = Math.Max(x - radius, 0);
                     }
-                    p1 = source.Pixels[yw + vmin[x]];
-                    p2 = source.Pixels[yw + vmax[x]];
+                    p1 = source.GetPixelAsInt(yw + vmin[x]);
+                    p2 = source.GetPixelAsInt(yw + vmax[x]);
 
                     rsum += ((p1 & 0xff0000) - (p2 & 0xff0000)) >> 16;
                     gsum += ((p1 & 0x00ff00) - (p2 & 0x00ff00)) >> 8;
@@ -102,7 +102,7 @@ namespace FFImageLoading.Transformations
                 for (y = 0; y < h; y++)
                 {
                     // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                    source.Pixels[yi] = (int)((0xff000000 & (uint)source.Pixels[yi]) | (uint)(dv[rsum] << 16) | (uint)(dv[gsum] << 8) | (uint)dv[bsum]);
+                    source.SetPixel(yi, (int)((0xff000000 & (uint)source.GetPixelAsInt(yi)) | (uint)(dv[rsum] << 16) | (uint)(dv[gsum] << 8) | (uint)dv[bsum]));
                     if (x == 0)
                     {
                         vmin[y] = Math.Min(y + radius + 1, hm) * w;

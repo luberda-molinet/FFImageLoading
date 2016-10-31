@@ -20,6 +20,8 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
+		public bool EnableColorReplace { get; set; }
+
 		public string HexColor { get; set; }
 
 		public int R { get; set; }

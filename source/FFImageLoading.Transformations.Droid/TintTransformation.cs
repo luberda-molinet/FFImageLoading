@@ -41,6 +41,8 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
+		public bool EnableColorReplace { get; set; }
+
 		public int R { get; set; }
 
 		public int G { get; set; }

@@ -86,13 +86,13 @@ namespace FFImageLoading.Transformations
             int height = (int)desiredHeight;
 
             // Copy the pixels line by line using fast BlockCopy
-            var result = new int[width * height];
+            var result = new byte[width * height * 4];
 
             for (var line = 0; line < height; line++)
             {
                 var srcOff = (((int)cropY + line) * source.Width + (int)cropX) * ColorExtensions.SizeOfArgb;
                 var dstOff = line * width * ColorExtensions.SizeOfArgb;
-                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
+                Helpers.BlockCopy(source.PixelData, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
             }
 
             return new BitmapHolder(result, width, height);
@@ -110,13 +110,13 @@ namespace FFImageLoading.Transformations
             if (y + height > srcHeight) height = srcHeight - y;
 
             // Copy the pixels line by line using fast BlockCopy
-            var result = new int[width * height];
+            var result = new byte[width * height * 4];
 
             for (var line = 0; line < height; line++)
             {
                 var srcOff = ((y + line) * srcWidth + x) * ColorExtensions.SizeOfArgb;
                 var dstOff = line * width * ColorExtensions.SizeOfArgb;
-                Helpers.BlockCopy(source.Pixels, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
+                Helpers.BlockCopy(source.PixelData, srcOff, result, dstOff, width * ColorExtensions.SizeOfArgb);
             }
 
             return new BitmapHolder(result, width, height);

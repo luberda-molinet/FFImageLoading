@@ -96,8 +96,7 @@ namespace FFImageLoading.Transformations
             iDestCentreX = newWidth / 2;
             iDestCentreY = newHeight / 2;
 
-            var newp = new int[newWidth * newHeight];
-            var oldp = source.Pixels;
+            var newSource = new BitmapHolder(new byte[newWidth * newHeight * 4], newWidth, newHeight);
             var oldw = source.Width;
 
             // assigning pixels of destination image from source image
@@ -117,7 +116,7 @@ namespace FFImageLoading.Transformations
                         if (y == 0)
                         {
                             // center of image, no rotation needed
-                            newp[i * newWidth + j] = oldp[iCentreY * oldw + iCentreX];
+                            newSource.SetPixel(i * newWidth + j, source.GetPixelAsInt(iCentreY * oldw + iCentreX));
                             continue;
                         }
                         if (y < 0)
@@ -159,10 +158,10 @@ namespace FFImageLoading.Transformations
                     fDeltaX = fTrueX - iFloorX;
                     fDeltaY = fTrueY - iFloorY;
 
-                    var clrTopLeft = oldp[iFloorY * oldw + iFloorX];
-                    var clrTopRight = oldp[iFloorY * oldw + iCeilingX];
-                    var clrBottomLeft = oldp[iCeilingY * oldw + iFloorX];
-                    var clrBottomRight = oldp[iCeilingY * oldw + iCeilingX];
+                    var clrTopLeft = source.GetPixelAsInt(iFloorY * oldw + iFloorX);
+                    var clrTopRight = source.GetPixelAsInt(iFloorY * oldw + iCeilingX);
+                    var clrBottomLeft = source.GetPixelAsInt(iCeilingY * oldw + iFloorX);
+                    var clrBottomRight = source.GetPixelAsInt(iCeilingY * oldw + iCeilingX);
 
                     fTopAlpha = (1 - fDeltaX) * ((clrTopLeft >> 24) & 0xFF) + fDeltaX * ((clrTopRight >> 24) & 0xFF);
                     fTopRed = (1 - fDeltaX) * ((clrTopLeft >> 16) & 0xFF) + fDeltaX * ((clrTopRight >> 16) & 0xFF);
@@ -192,14 +191,16 @@ namespace FFImageLoading.Transformations
                     if (iAlpha > 255) iAlpha = 255;
 
                     var a = iAlpha + 1;
-                    newp[i * newWidth + j] = (iAlpha << 24)
+                    
+                    var val = (iAlpha << 24)
                                            | ((byte)((iRed * a) >> 8) << 16)
                                            | ((byte)((iGreen * a) >> 8) << 8)
                                            | ((byte)((iBlue * a) >> 8));
+                    newSource.SetPixel(i * newWidth + j, val);
                 }
             }
 
-            return new BitmapHolder(newp, newWidth, newHeight);
+            return newSource;
         }
     }
 }

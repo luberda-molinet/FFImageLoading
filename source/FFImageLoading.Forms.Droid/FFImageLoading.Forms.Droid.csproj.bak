@@ -45,8 +45,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <DocumentationFile>bin\Release\FFImageLoading.Forms.Droid.xml</DocumentationFile>
