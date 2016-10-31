@@ -20,7 +20,7 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public bool EnableColorReplace { get; set; }
+		public bool EnableSolidColor { get; set; }
 
 		public string HexColor { get; set; }
 

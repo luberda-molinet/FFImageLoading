@@ -41,7 +41,7 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		public bool EnableColorReplace { get; set; }
+		public bool EnableSolidColor { get; set; }
 
 		public int R { get; set; }
 
@@ -55,16 +55,44 @@ namespace FFImageLoading.Transformations
 		{
 			get 
 			{ 
-				return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4}", 
-				                     R, G, B, A, HexColor); 
+				return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4},EnableSolidColor={5}",
+									 R, G, B, A, HexColor, EnableSolidColor);
 			}
 		}
 
 		protected override Bitmap Transform(Bitmap source)
 		{
+			if (EnableSolidColor)
+				return ToSolidColor(source, R, G, B, A);
+
 			RGBAWMatrix = FFColorMatrix.ColorToTintMatrix(R, G, B, A);
 
 			return base.Transform(source);
+		}
+
+		public static Bitmap ToSolidColor(Bitmap sourceBitmap, int r, int g, int b, int a)
+		{
+			var config = sourceBitmap?.GetConfig();
+			if (config == null)
+			{
+				config = Bitmap.Config.Argb8888;
+			}
+
+			int width = sourceBitmap.Width;
+			int height = sourceBitmap.Height;
+
+			Bitmap bitmap = Bitmap.CreateBitmap(width, height, config);
+
+			using (Canvas canvas = new Canvas(bitmap))
+			{
+				using (Paint paint = new Paint())
+				{
+					PorterDuffColorFilter cf = new PorterDuffColorFilter(Color.Argb(a, r, g, b), PorterDuff.Mode.SrcAtop);
+					paint.SetColorFilter(cf);
+					canvas.DrawBitmap(sourceBitmap, 0, 0, paint);
+					return bitmap;
+				}
+			}
 		}
 	}
 }

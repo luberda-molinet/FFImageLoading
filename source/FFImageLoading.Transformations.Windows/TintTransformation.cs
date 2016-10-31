@@ -41,7 +41,7 @@ namespace FFImageLoading.Transformations
             }
         }
 
-        public bool EnableColorReplace { get; set; } = true;
+        public bool EnableSolidColor { get; set; };
 
         public int R { get; set; }
 
@@ -55,14 +55,14 @@ namespace FFImageLoading.Transformations
         {
             get
             {
-                return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4},EnableColorReplace={5}",
-                                     R, G, B, A, HexColor, EnableColorReplace);
+                return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4},EnableSolidColor={5}",
+                                     R, G, B, A, HexColor, EnableSolidColor);
             }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
-            if (EnableColorReplace)
+            if (EnableSolidColor)
             {
                 ToReplacedColor(source, R, G, B, A);
                 return source;
