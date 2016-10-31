@@ -23,9 +23,10 @@ namespace FFImageLoading.DataResolvers
 
                 while (scale > 1)
                 {
-                    file = string.Format(pattern, filename, scale, extension);
-                    if (FileStore.Exists(file))
+                    var tmpFile = string.Format(pattern, filename, scale, extension);
+                    if (FileStore.Exists(tmpFile))
                     {
+                        file = tmpFile;
                         break;
                     }
                     scale--;
