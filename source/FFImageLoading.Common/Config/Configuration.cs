@@ -29,6 +29,7 @@ namespace FFImageLoading.Config
             VerboseLogging = false;
             SchedulerMaxParallelTasks = Math.Max(2, (int)(Environment.ProcessorCount / 2d));
             DiskCacheDuration = TimeSpan.FromDays(30d);
+            ExecuteCallbacksOnUIThread = false;
 		}
 
 		/// <summary>
@@ -189,6 +190,13 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The duration of the cache.</value>
         public TimeSpan DiskCacheDuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether callbacs (OnFinish, OnSuccess, etc) 
+        /// should execute on UI thread
+        /// </summary>
+        /// <value><c>true</c> if execute callbacks on UIT hread; otherwise, <c>false</c>.</value>
+        public bool ExecuteCallbacksOnUIThread { get; set; }
     }
 }
 
