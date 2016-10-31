@@ -41,7 +41,7 @@ namespace FFImageLoading.Transformations
             }
         }
 
-		public bool EnableColorReplace { get; set; }
+        public bool EnableColorReplace { get; set; } = true;
 
         public int R { get; set; }
 
@@ -55,16 +55,51 @@ namespace FFImageLoading.Transformations
         {
             get
             {
-                return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4}",
-                                     R, G, B, A, HexColor);
+                return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4},EnableColorReplace={5}",
+                                     R, G, B, A, HexColor, EnableColorReplace);
             }
         }
 
         protected override BitmapHolder Transform(BitmapHolder source)
         {
+            if (EnableColorReplace)
+            {
+                ToReplacedColor(source, R, G, B, A);
+                return source;
+            }
+
             RGBAWMatrix = FFColorMatrix.ColorToTintMatrix(R, G, B, A);
 
             return base.Transform(source);
+        }
+
+        public static void ToReplacedColor(BitmapHolder bmp, int r, int g, int b, int a)
+        {
+            var nWidth = bmp.Width;
+            var nHeight = bmp.Height;
+            var len = bmp.PixelCount;
+
+            for (var i = 0; i < len; i++)
+            {
+                var c = bmp.GetPixelAsInt(i);
+                var currentAlpha = (c >> 24) & 0x000000FF;
+                var aNew = (int)(currentAlpha * (a / currentAlpha));
+
+                var rNew = r;
+                var gNew = g;
+                var bNew = b;
+
+                if (rNew > 255)
+                    rNew = 255;
+
+                if (gNew > 255)
+                    gNew = 255;
+
+                if (bNew > 255)
+                    bNew = 255;
+
+                bmp.SetPixel(i, (aNew << 24) | (rNew << 16) | (gNew << 8) | bNew);
+            }
         }
     }
 }
