@@ -10,7 +10,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class FileDataResolver : IDataResolver
     {
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             if (!FileStore.Exists(identifier))
             {

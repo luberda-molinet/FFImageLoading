@@ -18,7 +18,7 @@ namespace FFImageLoading.DataResolvers
         protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
         protected Configuration Configuration { get; private set; }
 
-        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var downloadedData = await DownloadCache.DownloadAndCacheIfNeededAsync(identifier, parameters, Configuration, token).ConfigureAwait(false);
 

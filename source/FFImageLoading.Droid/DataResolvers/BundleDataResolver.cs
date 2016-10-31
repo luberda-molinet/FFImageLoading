@@ -10,7 +10,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
     {
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var stream = Context.Assets.Open(identifier, Access.Streaming);
 

@@ -13,7 +13,7 @@ namespace FFImageLoading.DataResolvers
 	{
         readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "webp", "PNG", "JPG", "JPEG", "WEBP"};
 
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             foreach (var fileType in fileTypes)
             {

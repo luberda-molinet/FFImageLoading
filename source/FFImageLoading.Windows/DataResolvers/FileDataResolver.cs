@@ -9,7 +9,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class FileDataResolver : IDataResolver
     {
-        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             StorageFile file = null;
 

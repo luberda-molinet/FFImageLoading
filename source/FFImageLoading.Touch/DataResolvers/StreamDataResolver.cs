@@ -8,7 +8,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class StreamDataResolver : IDataResolver
     {
-        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var imageInformation = new ImageInformation();
             var stream = await parameters.Stream?.Invoke(token);
