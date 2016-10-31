@@ -26,7 +26,7 @@ namespace FFImageLoading.DataResolvers
                     file = string.Format(pattern, filename, scale, extension);
                     if (FileStore.Exists(file))
                     {
-                        
+                        break;
                     }
                     scale--;
                 }
