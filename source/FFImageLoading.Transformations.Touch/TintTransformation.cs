@@ -44,7 +44,7 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		public bool EnableSolidColor { get; set; } = true;
+		public bool EnableSolidColor { get; set; }
 
 		public int R { get; set; }
 
