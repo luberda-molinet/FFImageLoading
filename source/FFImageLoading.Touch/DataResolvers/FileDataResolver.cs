@@ -33,7 +33,7 @@ namespace FFImageLoading.DataResolvers
                 }
             }
 
-            if (FileStore.Exists(identifier))
+            if (string.IsNullOrEmpty(file) && FileStore.Exists(identifier))
             {
                 file = identifier;
             }
