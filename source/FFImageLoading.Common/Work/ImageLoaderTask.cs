@@ -80,6 +80,8 @@ namespace FFImageLoading.Work
 
             ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
             ImageInformation.SetPath(Parameters.Path);
+
+            Target?.SetImageLoadingTask(this);
         }
 
         public Configuration Configuration { get; private set; }
@@ -155,8 +157,10 @@ namespace FFImageLoading.Work
         protected void ThrowIfCancellationRequested()
         {
             try
-            {
+            {                
                 CancellationTokenSource?.Token.ThrowIfCancellationRequested();
+                if (!Target.IsTaskValid(this))
+                    throw new TaskCanceledException();
             }
             catch (ObjectDisposedException)
             {
@@ -199,7 +203,10 @@ namespace FFImageLoading.Work
 
         protected virtual void BeforeLoading(TImageContainer image, bool fromMemoryCache) { }
 
-        protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
+        protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) 
+        { 
+            Target?.SetImageLoadingTask(null); 
+        }
 
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
         {
@@ -487,6 +494,7 @@ namespace FFImageLoading.Work
             {
                 try
                 {
+                    Target?.SetImageLoadingTask(null);
                     Parameters?.Dispose();
                     CancellationTokenSource?.Dispose();
                 }

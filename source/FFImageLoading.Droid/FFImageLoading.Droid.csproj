@@ -84,9 +84,6 @@
     <Compile Include="Collections\StrongLruCache.cs" />
     <Compile Include="Collections\ByteBoundStrongLruCache.cs" />
     <Compile Include="Drawables\FFBitmapDrawable.cs" />
-    <Compile Include="Drawables\AsyncDrawable.cs" />
-    <Compile Include="Drawables\IAsyncDrawable.cs" />
-    <Compile Include="Drawables\SelfDisposingAsyncDrawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />
     <Compile Include="Extensions\ExifExtensions.cs" />

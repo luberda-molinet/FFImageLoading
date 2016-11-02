@@ -5,8 +5,7 @@ using Android.OS;
 using Android.Content.Res;
 using Android.Graphics;
 using System.IO;
-using System.Threading.Tasks;
-using System.Threading;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Drawables
 {

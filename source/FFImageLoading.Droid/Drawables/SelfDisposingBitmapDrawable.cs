@@ -15,6 +15,7 @@ using Android.Util;
 using FFImageLoading.Collections;
 using Android.Runtime;
 using System.IO;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Drawables
 {

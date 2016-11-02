@@ -93,6 +93,7 @@ namespace FFImageLoading
 
         protected override void AfterLoading(SelfDisposingBitmapDrawable image, bool fromMemoryCache)
         {
+            base.AfterLoading(image, fromMemoryCache);
             image?.SetIsRetained(false);
         }
 
@@ -243,7 +244,7 @@ namespace FFImageLoading
 
             if (isPlaceholder)
             {
-                return new SelfDisposingAsyncDrawable(Context.Resources, bitmap, this);
+                return new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
             }
 
             return new FFBitmapDrawable(Context.Resources, bitmap);

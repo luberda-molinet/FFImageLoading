@@ -25,7 +25,8 @@ namespace FFImageLoading.Targets
 
 		public override bool IsTaskValid(IImageLoaderTask task)
 		{
-            var controlTask = Control?.GetImageLoaderTask();
+            var controlTask = Control?.ImageLoaderTask;
+
             return IsValid && (controlTask == null || controlTask == task);
 		}
 
@@ -52,6 +53,12 @@ namespace FFImageLoading.Targets
 
             control.SetImageDrawable(image);
             control.PostInvalidate();
+        }
+
+        public override void SetImageLoadingTask(IImageLoaderTask task)
+        {
+            if (IsValid)
+                Control.ImageLoaderTask = task;
         }
 
 		public override bool UsesSameNativeControl(IImageLoaderTask task)

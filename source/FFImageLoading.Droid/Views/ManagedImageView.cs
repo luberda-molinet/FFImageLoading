@@ -5,6 +5,7 @@ using Android.Widget;
 using System;
 using Android.Runtime;
 using FFImageLoading.Drawables;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Views
 {
@@ -57,33 +58,56 @@ namespace FFImageLoading.Views
 		}
 		*/
 
+        public IImageLoaderTask ImageLoaderTask { get; set; }
+
 		public override void SetImageDrawable(Drawable drawable)
 		{
-			var previous = Drawable;
+            try
+            {
+                var previous = Drawable;
 
-			_drawableRef = new WeakReference<Drawable>(drawable);
-			base.SetImageDrawable(drawable);
+                _drawableRef = new WeakReference<Drawable>(drawable);
+                base.SetImageDrawable(drawable);
 
-			UpdateDrawableDisplayedState(drawable, true);
-			UpdateDrawableDisplayedState(previous, false);
+                UpdateDrawableDisplayedState(drawable, true);
+                UpdateDrawableDisplayedState(previous, false);
+            }
+            finally
+            {
+                ImageLoaderTask = null;
+            }
 		}
 
 		public override void SetImageResource(int resId)
 		{
-			var previous = Drawable;
-			// Ultimately calls SetImageDrawable, where the state will be updated.
-			_drawableRef = null;
-			base.SetImageResource(resId);
-			UpdateDrawableDisplayedState(previous, false);
+            try
+            {
+                var previous = Drawable;
+                // Ultimately calls SetImageDrawable, where the state will be updated.
+                _drawableRef = null;
+                base.SetImageResource(resId);
+                UpdateDrawableDisplayedState(previous, false);
+            }
+            finally
+            {
+                ImageLoaderTask = null;
+            }
 		}
 
 		public override void SetImageURI(global::Android.Net.Uri uri)
 		{
-			var previous = Drawable;
-			// Ultimately calls SetImageDrawable, where the state will be updated.
-			_drawableRef = null;
-			base.SetImageURI(uri);
-			UpdateDrawableDisplayedState(previous, false);
+            try
+            {
+                var previous = Drawable;
+                // Ultimately calls SetImageDrawable, where the state will be updated.
+                _drawableRef = null;
+                base.SetImageURI(uri);
+                UpdateDrawableDisplayedState(previous, false);
+            }
+            finally
+            {
+                ImageLoaderTask = null;
+            }
 		}
 
 		private void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)

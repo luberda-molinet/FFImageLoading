@@ -1,7 +1,6 @@
 using System;
 using Android.Content;
 using Android.Util;
-using FFImageLoading.Extensions;
 using Android.Runtime;
 
 namespace FFImageLoading.Views
@@ -72,7 +71,7 @@ namespace FFImageLoading.Views
 
 		public void CancelLoading()
 		{
-			ImageService.Instance.CancelWorkFor(this.GetImageLoaderTask());
+            ImageService.Instance.CancelWorkFor(ImageLoaderTask);
 		}
 
 		protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)

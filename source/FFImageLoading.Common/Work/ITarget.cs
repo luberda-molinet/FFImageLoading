@@ -10,6 +10,8 @@ namespace FFImageLoading.Work
         bool IsTaskValid(IImageLoaderTask task);
 
         bool UsesSameNativeControl(IImageLoaderTask task);
+
+        void SetImageLoadingTask(IImageLoaderTask task);
     }
 
     public interface ITarget<TImageContainer, TImageView> : ITarget

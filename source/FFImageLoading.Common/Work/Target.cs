@@ -15,6 +15,8 @@ namespace FFImageLoading.Work
         public virtual void SetAsEmpty(IImageLoaderTask task) {  }
 
         public virtual void Set(IImageLoaderTask task, TImageContainer image, bool animated) { }
+
+        public virtual void SetImageLoadingTask(IImageLoaderTask task) { }
     }
 }
 
