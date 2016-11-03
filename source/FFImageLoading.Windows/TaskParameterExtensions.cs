@@ -94,11 +94,11 @@ namespace FFImageLoading
                     exceptions = new List<Exception>();
 
                 exceptions.Add(ex);
-                userErrorCallback(ex);
+                userErrorCallback?.Invoke(ex);
             })
             .Finish(scheduledWork =>
             {
-                finishCallback(scheduledWork);
+                finishCallback?.Invoke(scheduledWork);
 
                 if (exceptions != null)
                     tcs.TrySetException(exceptions);
@@ -145,7 +145,7 @@ namespace FFImageLoading
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
-                parameters.Dispose();
+                parameters?.Dispose();
                 return null;
             }
 
@@ -167,10 +167,10 @@ namespace FFImageLoading
                         exceptions = new List<Exception>();
 
                     exceptions.Add(ex);
-                    userErrorCallback(ex);
+                    userErrorCallback?.Invoke(ex);
                 })
                 .Finish(scheduledWork => {
-                    finishCallback(scheduledWork);
+                    finishCallback?.Invoke(scheduledWork);
 
                     if (exceptions != null)
                         tcs.TrySetException(exceptions);
