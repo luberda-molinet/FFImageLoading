@@ -52,7 +52,7 @@ namespace FFImageLoading.Targets
                 return;
 
             control.SetImageDrawable(image);
-            control.PostInvalidate();
+            control.Invalidate();
         }
 
         public override void SetImageLoadingTask(IImageLoaderTask task)
