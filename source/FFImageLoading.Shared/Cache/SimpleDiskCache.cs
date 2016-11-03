@@ -58,7 +58,7 @@ namespace FFImageLoading.Cache
             string cachePath = Path.Combine(tmpPath, cacheName);
 #else
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string tmpPath = Path.Combine(documents, "..", "Library");
+            string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
             string cachePath = Path.Combine(tmpPath, cacheName);
 #endif
 
