@@ -392,16 +392,13 @@ namespace FFImageLoading.Work
             {
                 if (RunningTasks.ContainsKey(key))
                     return;
+                
+                RunningTasks.Add(key, pendingTask);
+                Interlocked.Increment(ref _statsTotalRunning);
             }
 
             try
             {
-                lock (_pendingTasksLock)
-                {
-                    RunningTasks.Add(key, pendingTask);
-                    Interlocked.Increment(ref _statsTotalRunning);
-                }
-
                 if (Configuration.VerbosePerformanceLogging)
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
