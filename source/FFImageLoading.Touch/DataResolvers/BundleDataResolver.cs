@@ -7,6 +7,7 @@ using System.Linq;
 using FFImageLoading.IO;
 using System.Threading;
 using FFImageLoading.Helpers;
+using UIKit;
 
 namespace FFImageLoading.DataResolvers
 {
@@ -14,7 +15,7 @@ namespace FFImageLoading.DataResolvers
 	{
         readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG","webp", "WEBP"};
 
-        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             NSBundle bundle = null;
             string file = null;
@@ -52,13 +53,44 @@ namespace FFImageLoading.DataResolvers
                 {
                     var path = bundle.PathForResource(file, fileType);
                     var stream = FileStore.GetInputStream(path, true);
-                    System.Diagnostics.Debug.WriteLine(path);
                     var imageInformation = new ImageInformation();
                     imageInformation.SetPath(identifier);
                     imageInformation.SetFilePath(path);
 
-                    return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
-                        stream, LoadingResult.CompiledResource, imageInformation));
+                    return new Tuple<Stream, LoadingResult, ImageInformation>(
+                        stream, LoadingResult.CompiledResource, imageInformation);
+                }
+            }
+
+            //Asset catalog
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
+            {
+                var asset = new NSDataAsset(identifier);
+                if (!string.IsNullOrWhiteSpace(asset.Name))
+                {
+                    var stream = asset.Data?.AsStream();
+                    var imageInformation = new ImageInformation();
+                    imageInformation.SetPath(identifier);
+                    imageInformation.SetFilePath(null);
+
+                    return new Tuple<Stream, LoadingResult, ImageInformation>(
+                        stream, LoadingResult.CompiledResource, imageInformation);
+                }
+            }
+            else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
+            {
+                UIImage image = null;
+                await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(identifier)).ConfigureAwait(false);
+                if (image != null)
+                {
+                    var stream = image.AsPNG()?.AsStream();
+                    var imageInformation = new ImageInformation();
+                    imageInformation.SetPath(identifier);
+                    imageInformation.SetFilePath(null);
+
+                    return new Tuple<Stream, LoadingResult, ImageInformation>(
+                        stream, LoadingResult.CompiledResource, imageInformation);
                 }
             }
 
