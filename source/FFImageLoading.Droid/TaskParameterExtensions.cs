@@ -21,6 +21,8 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
+            imageView.CancelLoading();
+
             var target = new ImageViewTarget(imageView);
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))

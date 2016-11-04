@@ -174,10 +174,11 @@ namespace FFImageLoading.Work
 
         public void Cancel()
         {
-            ImageService.RemovePendingTask(this);
-
             if (!_isDisposed)
             {
+                Target?.SetImageLoadingTask(null);
+                ImageService.RemovePendingTask(this);
+
                 try
                 {
                     CancellationTokenSource?.Cancel();
@@ -185,10 +186,10 @@ namespace FFImageLoading.Work
                 catch (ObjectDisposedException)
                 {
                 }
-            }
 
-            if (Configuration.VerboseLoadingCancelledLogging)
-                Logger.Debug(string.Format("Image loading cancelled: {0}", Key));
+                if (Configuration.VerboseLoadingCancelledLogging)
+                    Logger.Debug(string.Format("Image loading cancelled: {0}", Key));
+            }
         }
 
         public void CancelIfNeeded()
@@ -203,10 +204,7 @@ namespace FFImageLoading.Work
 
         protected virtual void BeforeLoading(TImageContainer image, bool fromMemoryCache) { }
 
-        protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) 
-        { 
-            Target?.SetImageLoadingTask(null); 
-        }
+        protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
 
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
         {
@@ -423,7 +421,7 @@ namespace FFImageLoading.Work
                     MemoryCache.Clear();
                 }
 
-                if (ex is OperationCanceledException)
+                if (ex is OperationCanceledException || ex is ObjectDisposedException)
                 {
                     if (Configuration.VerboseLoadingCancelledLogging)
                     {

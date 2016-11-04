@@ -169,7 +169,7 @@ namespace FFImageLoading.Work
 			if (task == null)
 				return;
 
-            if (task.IsCancelled || task.IsCompleted)
+            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
 			{
 				task?.Dispose();
 				return;
@@ -195,32 +195,6 @@ namespace FFImageLoading.Work
             {
                 try
                 {
-                    EvictStaleTasks();
-
-                    if (task.IsCancelled || task.IsCompleted)
-                    {
-                        task?.Dispose();
-                        return;
-                    }
-
-                    if (!task.Parameters.Preload)
-                    {
-                        lock (_pendingTasksLock)
-                        {
-                            foreach (var pendingTask in PendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
-                            {
-                                if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
-                                    pendingTask.ImageLoadingTask.CancelIfNeeded();
-                            }
-                        }
-                    }
-
-                    if (task.IsCancelled || ExitTasksEarly)
-                    {
-                        task?.Dispose();
-                        return;
-                    }
-
                     QueueImageLoadingTask(task);
                 }
                 catch (Exception ex)
@@ -235,9 +209,26 @@ namespace FFImageLoading.Work
             int position = Interlocked.Increment(ref _currentPosition);
             var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task, FrameworkWrappingTask = CreateFrameworkTask(task) };
 
+            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
+            {
+                task?.Dispose();
+                return;
+            }
+
             PendingTask similarRunningTask = null;
             lock (_pendingTasksLock)
             {
+                if (!task.Parameters.Preload)
+                {
+                    foreach (var pendingTask in PendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
+                    {
+                        if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
+                            pendingTask.ImageLoadingTask.CancelIfNeeded();
+                    }
+
+                    EvictStaleTasks();
+                }
+
                 similarRunningTask = PendingTasks.FirstOrDefault(t => t.ImageLoadingTask.Key == task.Key);
                 if (similarRunningTask == null)
                 {

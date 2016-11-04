@@ -69,11 +69,6 @@ namespace FFImageLoading.Views
 			base.OnDetachedFromWindow();
 		}*/
 
-		public void CancelLoading()
-		{
-            ImageService.Instance.CancelWorkFor(ImageLoaderTask);
-		}
-
 		protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
 		{
 			if (Drawable == null)

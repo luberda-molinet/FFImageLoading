@@ -26,7 +26,6 @@ namespace FFImageLoading.Targets
 		public override bool IsTaskValid(IImageLoaderTask task)
 		{
             var controlTask = Control?.ImageLoaderTask;
-
             return IsValid && (controlTask == null || controlTask == task);
 		}
 
@@ -38,7 +37,8 @@ namespace FFImageLoading.Targets
             var control = Control;
             if (control == null)
                 return;
-
+            
+            control.ImageLoaderTask = null;
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
@@ -72,7 +72,7 @@ namespace FFImageLoading.Targets
 			if (control == null || otherControl == null)
 				return false;
 
-			return control.Handle == otherControl.Handle;
+            return control.Handle == otherControl.Handle;
 		}
 
         public override ImageViewAsync Control
