@@ -78,7 +78,10 @@ namespace FFImageLoading.Cross
 
 		public List<ITransformation> Transformations { get; set; }
 
+        [Obsolete]
 		public bool? LoadTransparencyChannel { get; set; }
+
+        public bool? BitmapOptimizations { get; set; }
 
 		public bool? FadeAnimationEnabled { get; set; }
 
@@ -205,6 +208,11 @@ namespace FFImageLoading.Cross
 			{
 				parameters.TransparencyChannel(LoadTransparencyChannel.Value);
 			}
+
+            if (BitmapOptimizations.HasValue)
+            {
+                parameters.BitmapOptimizations(BitmapOptimizations.Value);
+            }
 
 			if (FadeAnimationEnabled.HasValue)
 			{
