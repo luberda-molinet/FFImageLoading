@@ -98,6 +98,7 @@
     <Compile Include="Work\PlatformImageLoadingTask.cs" />
     <Compile Include="DataResolvers\DataResolverFactory.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="Drawables\ISelfDisposingBitmapDrawable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

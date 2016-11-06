@@ -26,7 +26,7 @@ namespace FFImageLoading.Drawables
     /// On Android versions Honeycomb and higher the internal Bitmap is Dispose()d but not recycled.
     /// On all other Android versions the Bitmap is recycled then disposed.
     /// </summary>
-    public class SelfDisposingBitmapDrawable : BitmapDrawable, IByteSizeAware
+    public class SelfDisposingBitmapDrawable : BitmapDrawable, ISelfDisposingBitmapDrawable
     {
         private const string TAG = "SelfDisposingBitmapDrawable";
 
@@ -38,7 +38,7 @@ namespace FFImageLoading.Drawables
 
         private bool is_bitmap_disposed;
 
-        public string InCacheKey;
+        public string InCacheKey { get; set; }
 
         /// <summary>
         /// Occurs when internal displayed reference count has reached 0.

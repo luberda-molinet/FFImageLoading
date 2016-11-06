@@ -73,20 +73,20 @@ namespace FFImageLoading.Cache
 			return null;
 		}
 
-		public Tuple<SelfDisposingBitmapDrawable, ImageInformation> Get(string key)
+		public Tuple<ISelfDisposingBitmapDrawable, ImageInformation> Get(string key)
 		{
-			SelfDisposingBitmapDrawable drawable = null;
+			ISelfDisposingBitmapDrawable drawable = null;
 
 			if (_cache.TryGetValue(key, out drawable))
 			{
 				var imageInformation = GetInfo(key);
-				return new Tuple<SelfDisposingBitmapDrawable, ImageInformation>(drawable, imageInformation);
+				return new Tuple<ISelfDisposingBitmapDrawable, ImageInformation>(drawable, imageInformation);
 			}
 
 			return null;
 		}
 
-		public void Add(string key, ImageInformation imageInformation, SelfDisposingBitmapDrawable bitmap)
+		public void Add(string key, ImageInformation imageInformation, ISelfDisposingBitmapDrawable bitmap)
 		{
 			if (string.IsNullOrWhiteSpace(key) || bitmap == null || bitmap.Handle == IntPtr.Zero || !bitmap.HasValidBitmap || _cache.ContainsKey(key))
 				return;
@@ -120,9 +120,9 @@ namespace FFImageLoading.Cache
 		/// cache management. This means you must call SetIsRetained(false) when you no
 		/// longer need the instance.
 		/// </summary>
-		/// <returns>A SelfDisposingBitmapDrawable.</returns>
+		/// <returns>A ISelfDisposingBitmapDrawable.</returns>
 		/// <param name="options">Bitmap creation options.</param>
-		public SelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
+		public ISelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
 		{
 			if (_cache.Count == 0)
 				return null;

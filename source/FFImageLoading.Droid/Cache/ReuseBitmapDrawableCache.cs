@@ -22,7 +22,7 @@ using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-	public class ReuseBitmapDrawableCache : IDictionary<string, SelfDisposingBitmapDrawable>
+	public class ReuseBitmapDrawableCache : IDictionary<string, ISelfDisposingBitmapDrawable>
 	{
 		private const string TAG = "ReuseBitmapDrawableCache";
 
@@ -47,7 +47,7 @@ namespace FFImageLoading.Cache
 		/// Contains all entries that are currently being displayed. These entries are not eligible for
 		/// reuse or eviction. Entries will be added to the reuse pool when they are no longer displayed.
 		/// </summary>
-		private IDictionary<string, SelfDisposingBitmapDrawable> displayed_cache;
+		private IDictionary<string, ISelfDisposingBitmapDrawable> displayed_cache;
 		/// <summary>
 		/// Contains entries that potentially available for reuse and candidates for eviction.
 		/// This is the default location for newly added entries. This cache
@@ -55,7 +55,7 @@ namespace FFImageLoading.Cache
 		/// place in the LRU list will be refreshed. Items only move out of reuse and into displayed
 		/// when the entry has SetIsDisplayed(true) called on it.
 		/// </summary>
-		private readonly ByteBoundStrongLruCache<string, SelfDisposingBitmapDrawable> reuse_pool;
+		private readonly ByteBoundStrongLruCache<string, ISelfDisposingBitmapDrawable> reuse_pool;
 
 		private readonly TimeSpan debug_dump_interval = TimeSpan.FromSeconds(10);
 		private readonly Handler main_thread_handler;
@@ -79,8 +79,8 @@ namespace FFImageLoading.Cache
 			high_watermark = highWatermark;
 
 			gc_threshold = gcThreshold;
-			displayed_cache = new Dictionary<string, SelfDisposingBitmapDrawable>();
-			reuse_pool = new ByteBoundStrongLruCache<string, SelfDisposingBitmapDrawable>(highWatermark, lowWatermark);
+			displayed_cache = new Dictionary<string, ISelfDisposingBitmapDrawable>();
+			reuse_pool = new ByteBoundStrongLruCache<string, ISelfDisposingBitmapDrawable>(highWatermark, lowWatermark);
 			reuse_pool.EntryRemoved += OnEntryRemovedFromReusePool;
 
    //         if (_verboseLogging) {
@@ -96,12 +96,12 @@ namespace FFImageLoading.Cache
 		/// cache management. This means you must call SetIsRetained(false) when you no
 		/// longer need the instance.
 		/// </summary>
-		/// <returns>A SelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
+		/// <returns>A ISelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
 		/// when finished using it.</returns>
 		/// <param name="width">Width of the image to be written to the bitmap allocation.</param>
 		/// <param name="height">Height of the image to be written to the bitmap allocation.</param>
 		/// <param name="inSampleSize">DownSample factor.</param>
-		public SelfDisposingBitmapDrawable GetReusableBitmapDrawable(int width, int height, Bitmap.Config bitmapConfig, int inSampleSize)
+		public ISelfDisposingBitmapDrawable GetReusableBitmapDrawable(int width, int height, Bitmap.Config bitmapConfig, int inSampleSize)
 		{
 			if (reuse_pool == null) return null;
 
@@ -118,7 +118,7 @@ namespace FFImageLoading.Cache
 				}
 				reuse_pool_refill_needed = false;
 
-				SelfDisposingBitmapDrawable reuseDrawable = null;
+				ISelfDisposingBitmapDrawable reuseDrawable = null;
 
 				if (reuse_pool.Count > 0) {
 					var reuse_keys = reuse_pool.Keys;
@@ -243,12 +243,12 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		private void OnEntryRemovedFromReusePool (object sender, EntryRemovedEventArgs<string, SelfDisposingBitmapDrawable> e)
+		private void OnEntryRemovedFromReusePool (object sender, EntryRemovedEventArgs<string, ISelfDisposingBitmapDrawable> e)
 		{
 			ProcessRemoval(e.OldValue, e.Evicted);
 		}
 
-		private void ProcessRemoval(SelfDisposingBitmapDrawable value, bool evicted)
+		private void ProcessRemoval(ISelfDisposingBitmapDrawable value, bool evicted)
 		{
 			lock(monitor) {
 				total_removed++;
@@ -273,7 +273,7 @@ namespace FFImageLoading.Cache
 
 		private void OnEntryNoLongerDisplayed(object sender, EventArgs args)
 		{
-			var sdbd = sender as SelfDisposingBitmapDrawable;
+			var sdbd = sender as ISelfDisposingBitmapDrawable;
 
 			if (sdbd != null) 
 			{
@@ -287,7 +287,7 @@ namespace FFImageLoading.Cache
 
 		private void OnEntryDisplayed(object sender, EventArgs args)
 		{
-			var sdbd = sender as SelfDisposingBitmapDrawable;
+			var sdbd = sender as ISelfDisposingBitmapDrawable;
 
 			if (sdbd != null) 
 			{
@@ -301,12 +301,12 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		private void OnEntryAdded(string key, BitmapDrawable value)
+		private void OnEntryAdded(string key, ISelfDisposingBitmapDrawable value)
 		{
 			total_added++;
             if (_verboseLogging)
 			    log.Debug(string.Format("OnEntryAdded(key = {0})", key));
-			var selfDisposingBitmapDrawable = value as SelfDisposingBitmapDrawable;
+			var selfDisposingBitmapDrawable = value as ISelfDisposingBitmapDrawable;
 			if (selfDisposingBitmapDrawable != null) {
 				selfDisposingBitmapDrawable.SetIsCached(true);
 				selfDisposingBitmapDrawable.InCacheKey = key;
@@ -315,7 +315,7 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		private void PromoteReuseEntryToDisplayedCache(SelfDisposingBitmapDrawable value)
+		private void PromoteReuseEntryToDisplayedCache(ISelfDisposingBitmapDrawable value)
 		{
 			value.Displayed -= OnEntryDisplayed;
 			value.NoLongerDisplayed += OnEntryNoLongerDisplayed;
@@ -323,7 +323,7 @@ namespace FFImageLoading.Cache
 			displayed_cache.Add(value.InCacheKey, value);
 		}
 
-		private void DemoteDisplayedEntryToReusePool(SelfDisposingBitmapDrawable value)
+		private void DemoteDisplayedEntryToReusePool(ISelfDisposingBitmapDrawable value)
 		{
 			value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
 			value.Displayed += OnEntryDisplayed;
@@ -333,7 +333,7 @@ namespace FFImageLoading.Cache
 
 		#region IDictionary implementation
 
-		public void Add(string key, SelfDisposingBitmapDrawable value)
+		public void Add(string key, ISelfDisposingBitmapDrawable value)
 		{
 			if (value == null) {
                 if (_verboseLogging)
@@ -364,8 +364,8 @@ namespace FFImageLoading.Cache
 
 		public bool Remove(string key)
 		{
-			SelfDisposingBitmapDrawable tmp = null;
-			SelfDisposingBitmapDrawable reuseTmp = null;
+			ISelfDisposingBitmapDrawable tmp = null;
+			ISelfDisposingBitmapDrawable reuseTmp = null;
 			var result = false;
 			lock (monitor) {
 				if (displayed_cache.TryGetValue(key, out tmp)) {
@@ -375,7 +375,7 @@ namespace FFImageLoading.Cache
 				}
 				if (tmp != null)
 				{
-					ProcessRemoval((SelfDisposingBitmapDrawable)tmp, evicted: true);
+					ProcessRemoval((ISelfDisposingBitmapDrawable)tmp, evicted: true);
 				}
 				if (reuseTmp != null)
 				{
@@ -385,7 +385,7 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		public bool TryGetValue(string key, out SelfDisposingBitmapDrawable value)
+		public bool TryGetValue(string key, out ISelfDisposingBitmapDrawable value)
 		{
 			lock (monitor) {
 				var result = displayed_cache.TryGetValue(key, out value);
@@ -395,7 +395,7 @@ namespace FFImageLoading.Cache
 					    log.Debug("Cache hit");
 				} else {
 
-					SelfDisposingBitmapDrawable tmp = null;
+					ISelfDisposingBitmapDrawable tmp = null;
 					result = reuse_pool.TryGetValue(key, out tmp); // If key is found, its place in the LRU is refreshed
 					if (result) {
                         if (_verboseLogging)
@@ -408,10 +408,10 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		public SelfDisposingBitmapDrawable this[string index] {
+		public ISelfDisposingBitmapDrawable this[string index] {
 			get {
 				lock (monitor) {
-					SelfDisposingBitmapDrawable tmp = null;
+					ISelfDisposingBitmapDrawable tmp = null;
 					TryGetValue(index, out tmp);
 					return tmp;
 				}
@@ -432,11 +432,11 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		public ICollection<SelfDisposingBitmapDrawable> Values {
+		public ICollection<ISelfDisposingBitmapDrawable> Values {
 			get {
 				lock (monitor) {
 					var cacheValues = displayed_cache.Values;
-					var allValues = new List<SelfDisposingBitmapDrawable>(cacheValues);
+					var allValues = new List<ISelfDisposingBitmapDrawable>(cacheValues);
 					allValues.AddRange(reuse_pool.Values);
 					return allValues;
 				}
@@ -447,7 +447,7 @@ namespace FFImageLoading.Cache
 
 		#region ICollection implementation
 
-		public void Add(KeyValuePair<string, SelfDisposingBitmapDrawable> item)
+		public void Add(KeyValuePair<string, ISelfDisposingBitmapDrawable> item)
 		{
 			Add(item.Key, item.Value);
 		}
@@ -459,7 +459,7 @@ namespace FFImageLoading.Cache
 					var tmp = displayed_cache[k];
 					if (tmp != null)
 					{
-						ProcessRemoval((SelfDisposingBitmapDrawable)tmp, evicted: true);
+						ProcessRemoval((ISelfDisposingBitmapDrawable)tmp, evicted: true);
 					}
 				}
 				displayed_cache.Clear();
@@ -471,17 +471,17 @@ namespace FFImageLoading.Cache
 			}
 		}
 
-		public bool Contains(KeyValuePair<string, SelfDisposingBitmapDrawable> item)
+		public bool Contains(KeyValuePair<string, ISelfDisposingBitmapDrawable> item)
 		{
 			return ContainsKey(item.Key);
 		}
 
-		public void CopyTo(KeyValuePair<string, SelfDisposingBitmapDrawable>[] array, int arrayIndex)
+		public void CopyTo(KeyValuePair<string, ISelfDisposingBitmapDrawable>[] array, int arrayIndex)
 		{
 			throw new NotImplementedException("CopyTo is not supported");
 		}
 
-		public bool Remove(KeyValuePair<string, SelfDisposingBitmapDrawable> item)
+		public bool Remove(KeyValuePair<string, ISelfDisposingBitmapDrawable> item)
 		{
 			return Remove(item.Key);
 		}
@@ -506,13 +506,13 @@ namespace FFImageLoading.Cache
 
 		#region IEnumerable implementation
 
-		public IEnumerator<KeyValuePair<string, SelfDisposingBitmapDrawable>> GetEnumerator()
+		public IEnumerator<KeyValuePair<string, ISelfDisposingBitmapDrawable>> GetEnumerator()
 		{
-			List<KeyValuePair<string, SelfDisposingBitmapDrawable>> values;
+			List<KeyValuePair<string, ISelfDisposingBitmapDrawable>> values;
 			lock (monitor) {
-				values = new List<KeyValuePair<string, SelfDisposingBitmapDrawable>>(Count);
+				values = new List<KeyValuePair<string, ISelfDisposingBitmapDrawable>>(Count);
 				foreach (var k in Keys) {
-					values.Add(new KeyValuePair<string, SelfDisposingBitmapDrawable>(k, this[k]));
+					values.Add(new KeyValuePair<string, ISelfDisposingBitmapDrawable>(k, this[k]));
 				}
 			}
 			foreach (var kvp in values) {

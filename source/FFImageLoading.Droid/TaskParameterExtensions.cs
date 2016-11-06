@@ -81,12 +81,12 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The bitmap drawable async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<BitmapDrawable> AsBitmapDrawableAsync(this TaskParameter parameters)
+        public static Task<Drawable> AsBitmapDrawableAsync(this TaskParameter parameters)
         {
             var target = new BitmapTarget();
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
-            var tcs = new TaskCompletionSource<BitmapDrawable>();
+            var tcs = new TaskCompletionSource<Drawable>();
             List<Exception> exceptions = null;
 
             parameters
@@ -105,7 +105,7 @@ namespace FFImageLoading
                     if (exceptions != null)
                         tcs.TrySetException(exceptions);
                     else
-                        tcs.TrySetResult(target.BitmapDrawable);
+                    tcs.TrySetResult(target.BitmapDrawable as Drawable);
                 });
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
@@ -128,7 +128,7 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-            var target = new Target<SelfDisposingBitmapDrawable, object>();
+            var target = new Target<ISelfDisposingBitmapDrawable, object>();
             using (var task = CreateTask(parameters, target))
             {
                 var key = task.Key;
@@ -148,7 +148,7 @@ namespace FFImageLoading
             }
 
             parameters.Preload = true;
-            var target = new Target<SelfDisposingBitmapDrawable, object>();
+            var target = new Target<ISelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
         }
@@ -192,7 +192,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
             });
 
-            var target = new Target<SelfDisposingBitmapDrawable, object>();
+            var target = new Target<ISelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
 
@@ -226,7 +226,7 @@ namespace FFImageLoading
             }
         }
 
-        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
+        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<ISelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
 		{
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
 		}

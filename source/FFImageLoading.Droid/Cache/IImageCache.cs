@@ -5,7 +5,7 @@ using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-	public interface IImageCache : IMemoryCache<SelfDisposingBitmapDrawable>
+    public interface IImageCache : IMemoryCache<ISelfDisposingBitmapDrawable>
     {
 		/// <summary>
 		/// Attempts to find a bitmap suitable for reuse based on the given dimensions.
@@ -17,7 +17,7 @@ namespace FFImageLoading.Cache
 		/// <returns>A SelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
 		/// when finished using it.</returns>
 		/// <param name="options">Bitmap creation options.</param>
-		SelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options);
+		ISelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options);
     }
 }
 

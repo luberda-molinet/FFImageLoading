@@ -3,10 +3,11 @@ using FFImageLoading.Extensions;
 using FFImageLoading.Drawables;
 using FFImageLoading.Views;
 using FFImageLoading.Work;
+using Android.Graphics.Drawables;
 
 namespace FFImageLoading.Targets
 {
-    public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageViewAsync>
+    public class ImageViewTarget : Target<ISelfDisposingBitmapDrawable, ImageViewAsync>
 	{
 		readonly WeakReference<ImageViewAsync> _controlWeakReference;
 
@@ -42,7 +43,7 @@ namespace FFImageLoading.Targets
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
-        public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
+        public override void Set(IImageLoaderTask task, ISelfDisposingBitmapDrawable image, bool animated)
         {
             if (task == null || task.IsCancelled)
                 return;
@@ -51,7 +52,7 @@ namespace FFImageLoading.Targets
             if (control == null || control.Drawable == image)
                 return;
 
-            control.SetImageDrawable(image);
+            control.SetImageDrawable(image as Drawable);
             control.Invalidate();
         }
 
