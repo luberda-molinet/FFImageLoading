@@ -16,7 +16,8 @@ namespace FFImageLoading.Drawables
         bool animating;
         int alpha = 255;
         float fadeDuration = 200;
-        float normalized = 1f;
+        bool placeholderInitialized;
+        Rect orgRect;
 
         public FFBitmapDrawable(Resources res, Bitmap bitmap) : base(res, bitmap)
         {
@@ -58,11 +59,10 @@ namespace FFImageLoading.Drawables
         {
             if (!animating)
             {
-                normalized = 0f;
                 alpha = 255;
                 fadeDuration = animationDuration;
                 startTimeMillis = SystemClock.UptimeMillis();
-                placeholder = drawable;
+                placeholder = drawable.GetConstantState().NewDrawable().Mutate() as BitmapDrawable;
                 animating = true;
             }
         }
@@ -77,18 +77,24 @@ namespace FFImageLoading.Drawables
             get { return (int)fadeDuration; }
         }
 
+        protected override void OnBoundsChange(Rect bounds)
+        {
+            orgRect = bounds;
+            placeholderInitialized = false;
+            base.OnBoundsChange(bounds);
+        }
+
         public override void Draw(Canvas canvas)
         {
             try
             {
                 if (!animating)
                 {
-                    normalized = 1f;
                     base.Draw(canvas);
                 }
                 else
                 {
-                    normalized = (SystemClock.UptimeMillis() - startTimeMillis) / fadeDuration;
+                    var normalized = (SystemClock.UptimeMillis() - startTimeMillis) / fadeDuration;
                     if (normalized >= 1f)
                     {
                         animating = false;
@@ -100,6 +106,20 @@ namespace FFImageLoading.Drawables
                     {
                         if (IsBitmapDrawableValid(placeholder))
                         {
+                            if (!placeholderInitialized)
+                            {
+                                var placeholderSizeRatio = canvas.Width > canvas.Height ?
+                                                                 (double)orgRect.Right / placeholder.IntrinsicWidth
+                                                                 : (double)orgRect.Bottom / placeholder.IntrinsicHeight;
+
+                                var scaledWidth = placeholderSizeRatio * placeholder.IntrinsicWidth;
+                                var newOffset = (double)orgRect.CenterX() - scaledWidth / 2;
+                                placeholder.Gravity = Android.Views.GravityFlags.Fill;
+                                placeholder.SetBounds((int)newOffset, orgRect.Top, orgRect.Right, orgRect.Bottom);
+
+                                placeholderInitialized = true;
+                            }
+
                             placeholder.Draw(canvas);
                         }
 
@@ -118,41 +138,6 @@ namespace FFImageLoading.Drawables
             return bitmapDrawable != null && bitmapDrawable.Handle != IntPtr.Zero && bitmapDrawable.Bitmap != null
                                   && bitmapDrawable.Handle != IntPtr.Zero && !bitmapDrawable.Bitmap.IsRecycled;
         }
-
-        public override int IntrinsicHeight
-        {
-            get
-            {
-                try
-                {
-                    if (animating && normalized < 0.8f && IsBitmapDrawableValid(placeholder))
-                    {
-                        return placeholder.IntrinsicHeight;
-                    }
-                }
-                catch (Exception) { }
-
-                return base.IntrinsicHeight;
-            }
-        }
-
-        public override int IntrinsicWidth
-        {
-            get
-            {
-                try
-                {
-                    if (animating && normalized < 0.8f && IsBitmapDrawableValid(placeholder))
-                    {
-                        return placeholder.IntrinsicWidth;
-                    }
-                }
-                catch (Exception) {}
-
-                return base.IntrinsicWidth;
-            }
-        }
-
 
         public override void SetAlpha(int alpha)
         {

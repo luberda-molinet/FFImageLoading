@@ -72,7 +72,7 @@ namespace FFImageLoading
                     {
                         int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
                             Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
-                        
+
                         placeholderDrawable?.SetIsRetained(true);
                         ffDrawable?.SetPlaceholder(placeholderDrawable as BitmapDrawable, fadeDuration);
                         placeholderDrawable?.SetIsRetained(false);
@@ -83,7 +83,9 @@ namespace FFImageLoading
             await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
+
                 PlatformTarget.Set(this, image, animated);
+
             }).ConfigureAwait(false);
         }
 
@@ -248,8 +250,14 @@ namespace FFImageLoading
                 return new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
             }
 
-            //return new TransitionDrawable(new[] { new ISelfDisposingBitmapDrawable(Context.Resources, bitmap)});
+            //var imageDrawable = new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
+            //ISelfDisposingBitmapDrawable placeholderDrawable = null;
+            //if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+            //{
+            //    return new SelfDisposingTransitionDrawable(imageDrawable, placeholderDrawable as SelfDisposingBitmapDrawable);
+            //}
 
+            //return imageDrawable;
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 

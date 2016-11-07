@@ -28,40 +28,13 @@ namespace FFImageLoading.Drawables
     /// </summary>
     public class SelfDisposingBitmapDrawable : BitmapDrawable, ISelfDisposingBitmapDrawable
     {
-        private const string TAG = "SelfDisposingBitmapDrawable";
-
+        const string TAG = "SelfDisposingBitmapDrawable";
         protected readonly object monitor = new object();
 
-        private int cache_ref_count;
-        private int display_ref_count;
-        private int retain_ref_count;
-
-        private bool is_bitmap_disposed;
-
-        public string InCacheKey { get; set; }
-
-        /// <summary>
-        /// Occurs when internal displayed reference count has reached 0.
-        /// It is raised before the counts are rechecked, and thus before
-        /// any resources have potentially been freed.
-        /// </summary>
-        public event EventHandler NoLongerDisplayed;
-
-        /// <summary>
-        /// Occurs when internal displayed reference count goes from 0 to 1.
-        /// Once the internal reference count is > 1 this event will not be raised
-        /// on subsequent calls to SetIsDisplayed(bool).
-        /// </summary>
-        public event EventHandler Displayed;
-
-        public long SizeInBytes {
-            get {
-                if (HasValidBitmap) {
-                    return Bitmap.Height * Bitmap.RowBytes;
-                }
-                return 0;
-            }
-        }
+        int cache_ref_count;
+        int display_ref_count;
+        int retain_ref_count;
+        bool is_bitmap_disposed;
 
         public SelfDisposingBitmapDrawable() : base()
         {
@@ -95,8 +68,36 @@ namespace FFImageLoading.Drawables
         {
         }
 
-        public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) 
-        { 
+        public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+        }
+
+        public string InCacheKey { get; set; }
+
+        /// <summary>
+        /// Occurs when internal displayed reference count has reached 0.
+        /// It is raised before the counts are rechecked, and thus before
+        /// any resources have potentially been freed.
+        /// </summary>
+        public event EventHandler NoLongerDisplayed;
+
+        /// <summary>
+        /// Occurs when internal displayed reference count goes from 0 to 1.
+        /// Once the internal reference count is > 1 this event will not be raised
+        /// on subsequent calls to SetIsDisplayed(bool).
+        /// </summary>
+        public event EventHandler Displayed;
+
+        public long SizeInBytes
+        {
+            get
+            {
+                if (HasValidBitmap)
+                {
+                    return Bitmap.Height * Bitmap.RowBytes;
+                }
+                return 0;
+            }
         }
 
         public void SetNoLongerDisplayed()
@@ -110,7 +111,6 @@ namespace FFImageLoading.Drawables
 
         /// <summary>
         /// This should only be called by Views that are actually going to draw the drawable.
-        ///
         /// Increments or decrements the internal displayed reference count.
         /// If the internal reference count becomes 0, NoLongerDisplayed will be raised.
         /// If the internal reference count becomes 1, Displayed will be raised.
@@ -121,32 +121,33 @@ namespace FFImageLoading.Drawables
         public void SetIsDisplayed(bool isDisplayed)
         {
             EventHandler handler = null;
-            lock (monitor) 
-			{
-				if (isDisplayed && !HasValidBitmap) 
-				{
-					System.Diagnostics.Debug.WriteLine("Cannot redisplay this drawable, its resources have been disposed.");
-				}
-				else if (isDisplayed) 
-				{
-					display_ref_count++;
-					if (display_ref_count == 1) {
-						handler = Displayed;
-					}
-				} 
-				else 
-				{
-					display_ref_count--;
-				}
+            lock (monitor)
+            {
+                if (isDisplayed && !HasValidBitmap)
+                {
+                    System.Diagnostics.Debug.WriteLine("Cannot redisplay this drawable, its resources have been disposed.");
+                }
+                else if (isDisplayed)
+                {
+                    display_ref_count++;
+                    if (display_ref_count == 1)
+                    {
+                        handler = Displayed;
+                    }
+                }
+                else
+                {
+                    display_ref_count--;
+                }
 
-				if (display_ref_count <= 0) 
+                if (display_ref_count <= 0)
                 {
                     display_ref_count = 0;
-					handler = NoLongerDisplayed;
-				}
+                    handler = NoLongerDisplayed;
+                }
             }
-            if (handler != null) 
-			{
+            if (handler != null)
+            {
                 handler(this, EventArgs.Empty);
             }
             CheckState();
@@ -162,10 +163,13 @@ namespace FFImageLoading.Drawables
         /// <param name="isCached">If set to <c>true</c> is cached.</param>
         public void SetIsCached(bool isCached)
         {
-            lock (monitor) {
-                if (isCached) {
+            lock (monitor)
+            {
+                if (isCached)
+                {
                     cache_ref_count++;
-                } else {
+                }
+                else {
                     cache_ref_count--;
                 }
             }
@@ -184,19 +188,25 @@ namespace FFImageLoading.Drawables
         /// <param name="isRetained">If set to <c>true</c> is retained.</param>
         public void SetIsRetained(bool isRetained)
         {
-            lock (monitor) {
-                if (isRetained) {
+            lock (monitor)
+            {
+                if (isRetained)
+                {
                     retain_ref_count++;
-                } else {
+                }
+                else {
                     retain_ref_count--;
                 }
             }
             CheckState();
         }
 
-        public bool IsRetained {
-            get {
-                lock (monitor) {
+        public bool IsRetained
+        {
+            get
+            {
+                lock (monitor)
+                {
                     return retain_ref_count > 0;
                 }
             }
@@ -204,26 +214,32 @@ namespace FFImageLoading.Drawables
 
         protected virtual void OnFreeResources()
         {
-            lock (monitor) {
-				if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
-                	Bitmap.Dispose();
-				
+            lock (monitor)
+            {
+                if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
+                    Bitmap.Dispose();
+
                 is_bitmap_disposed = true;
             }
         }
 
-        private void CheckState()
+        void CheckState()
         {
-            lock (monitor) {
-                if (ShouldFreeResources) {
+            lock (monitor)
+            {
+                if (ShouldFreeResources)
+                {
                     OnFreeResources();
                 }
             }
         }
 
-        private bool ShouldFreeResources {
-            get {
-                lock (monitor) {
+        bool ShouldFreeResources
+        {
+            get
+            {
+                lock (monitor)
+                {
                     return cache_ref_count <= 0 &&
                     display_ref_count <= 0 &&
                     retain_ref_count <= 0 &&
@@ -232,10 +248,13 @@ namespace FFImageLoading.Drawables
             }
         }
 
-        public virtual bool HasValidBitmap {
-            get {
-                lock (monitor) {
-					return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !is_bitmap_disposed && !Bitmap.IsRecycled;
+        public virtual bool HasValidBitmap
+        {
+            get
+            {
+                lock (monitor)
+                {
+                    return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !is_bitmap_disposed && !Bitmap.IsRecycled;
                 }
             }
         }

@@ -43,7 +43,7 @@ namespace FFImageLoading.Targets
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
-        public override void Set(IImageLoaderTask task, ISelfDisposingBitmapDrawable image, bool animated)
+        public override void Set(IImageLoaderTask task, ISelfDisposingBitmapDrawable image, bool animated) 
         {
             if (task == null || task.IsCancelled)
                 return;

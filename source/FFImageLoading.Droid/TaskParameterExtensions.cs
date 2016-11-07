@@ -81,12 +81,12 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The bitmap drawable async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<Drawable> AsBitmapDrawableAsync(this TaskParameter parameters)
+        public static Task<BitmapDrawable> AsBitmapDrawableAsync(this TaskParameter parameters)
         {
             var target = new BitmapTarget();
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
-            var tcs = new TaskCompletionSource<Drawable>();
+            var tcs = new TaskCompletionSource<BitmapDrawable>();
             List<Exception> exceptions = null;
 
             parameters
@@ -105,7 +105,7 @@ namespace FFImageLoading
                     if (exceptions != null)
                         tcs.TrySetException(exceptions);
                     else
-                    tcs.TrySetResult(target.BitmapDrawable as Drawable);
+                    tcs.TrySetResult(target.BitmapDrawable as BitmapDrawable);
                 });
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))

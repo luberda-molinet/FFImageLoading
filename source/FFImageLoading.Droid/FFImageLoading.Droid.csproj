@@ -99,6 +99,7 @@
     <Compile Include="DataResolvers\DataResolverFactory.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
     <Compile Include="Drawables\ISelfDisposingBitmapDrawable.cs" />
+    <Compile Include="Drawables\SelfDisposingTransitionDrawable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
