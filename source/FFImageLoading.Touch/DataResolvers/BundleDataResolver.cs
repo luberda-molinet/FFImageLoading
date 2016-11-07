@@ -66,8 +66,15 @@ namespace FFImageLoading.DataResolvers
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
             {
-                var asset = new NSDataAsset(identifier);
-                if (!string.IsNullOrWhiteSpace(asset.Name))
+                NSDataAsset asset = null;
+
+                try
+                {
+                    await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(identifier)).ConfigureAwait(false);
+                }
+                catch (Exception) { }
+
+                if (asset != null)
                 {
                     var stream = asset.Data?.AsStream();
                     var imageInformation = new ImageInformation();
@@ -81,7 +88,13 @@ namespace FFImageLoading.DataResolvers
             else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
             {
                 UIImage image = null;
-                await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(identifier)).ConfigureAwait(false);
+
+                try
+                {
+                    await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(identifier)).ConfigureAwait(false);
+                }
+                catch (Exception) { }
+
                 if (image != null)
                 {
                     var stream = image.AsPNG()?.AsStream();

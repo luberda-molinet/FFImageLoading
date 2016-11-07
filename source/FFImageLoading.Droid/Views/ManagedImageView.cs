@@ -104,7 +104,7 @@ namespace FFImageLoading.Views
 			if (drawable == null || drawable.Handle == IntPtr.Zero)
 				return;
 
-			var selfDisposingBitmapDrawable = drawable as SelfDisposingBitmapDrawable;
+			var selfDisposingBitmapDrawable = drawable as ISelfDisposingBitmapDrawable;
 			if (selfDisposingBitmapDrawable != null)
 			{
 				if (selfDisposingBitmapDrawable.HasValidBitmap)
