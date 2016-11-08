@@ -32,7 +32,7 @@ namespace FFImageLoading.DataResolvers
                     while (scale > 1)
                     {
                         var tmpFile = string.Format(pattern, filename, scale, extension);
-                        bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrEmpty(bu.PathForResource(tmpFile, fileType)));
+                        bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrWhiteSpace(bu.PathForResource(tmpFile, fileType)));
 
                         if (bundle != null)
                         {
@@ -46,19 +46,23 @@ namespace FFImageLoading.DataResolvers
                 if (bundle == null)
                 {
                     file = identifier;
-                    bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrEmpty(bu.PathForResource(identifier, fileType)));
+                    bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrWhiteSpace(bu.PathForResource(identifier, fileType)));
                 }
 
                 if (bundle != null)
                 {
                     var path = bundle.PathForResource(file, fileType);
-                    var stream = FileStore.GetInputStream(path, true);
-                    var imageInformation = new ImageInformation();
-                    imageInformation.SetPath(identifier);
-                    imageInformation.SetFilePath(path);
 
-                    return new Tuple<Stream, LoadingResult, ImageInformation>(
-                        stream, LoadingResult.CompiledResource, imageInformation);
+                    if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                    {
+                        var stream = FileStore.GetInputStream(path, true);
+                        var imageInformation = new ImageInformation();
+                        imageInformation.SetPath(identifier);
+                        imageInformation.SetFilePath(path);
+
+                        return new Tuple<Stream, LoadingResult, ImageInformation>(
+                            stream, LoadingResult.CompiledResource, imageInformation);
+                    }
                 }
             }
 
