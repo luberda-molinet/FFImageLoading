@@ -19,20 +19,23 @@ namespace FFImageLoading.DataResolvers
         {
             NSBundle bundle = null;
             string file = null;
+            var filename = Path.GetFileNameWithoutExtension(identifier);
+            var extension = Path.GetExtension(identifier);
+            const string pattern = "{0}@{1}x{2}";
 
             foreach (var fileType in fileTypes)
             {
                 int scale = (int)ScaleHelper.Scale;
                 if (scale > 1)
                 {
-                    var filename = Path.GetFileNameWithoutExtension(identifier);
-                    var extension = Path.GetExtension(identifier);
-                    const string pattern = "{0}@{1}x{2}";
-
                     while (scale > 1)
                     {
                         var tmpFile = string.Format(pattern, filename, scale, extension);
-                        bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrWhiteSpace(bu.PathForResource(tmpFile, fileType)));
+                        bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
+                        {
+                            var path = bu.PathForResource(tmpFile, fileType);
+                            return !string.IsNullOrWhiteSpace(path);
+                        });
 
                         if (bundle != null)
                         {
@@ -46,23 +49,24 @@ namespace FFImageLoading.DataResolvers
                 if (bundle == null)
                 {
                     file = identifier;
-                    bundle = NSBundle._AllBundles.FirstOrDefault(bu => !string.IsNullOrWhiteSpace(bu.PathForResource(identifier, fileType)));
+                    bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
+                    {
+                        var path = bu.PathForResource(file, fileType);
+                        return !string.IsNullOrWhiteSpace(path);
+                    });
                 }
 
                 if (bundle != null)
                 {
                     var path = bundle.PathForResource(file, fileType);
 
-                    if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
-                    {
-                        var stream = FileStore.GetInputStream(path, true);
-                        var imageInformation = new ImageInformation();
-                        imageInformation.SetPath(identifier);
-                        imageInformation.SetFilePath(path);
+                    var stream = FileStore.GetInputStream(path, true);
+                    var imageInformation = new ImageInformation();
+                    imageInformation.SetPath(identifier);
+                    imageInformation.SetFilePath(path);
 
-                        return new Tuple<Stream, LoadingResult, ImageInformation>(
-                            stream, LoadingResult.CompiledResource, imageInformation);
-                    }
+                    return new Tuple<Stream, LoadingResult, ImageInformation>(
+                        stream, LoadingResult.CompiledResource, imageInformation);
                 }
             }
 
@@ -74,7 +78,7 @@ namespace FFImageLoading.DataResolvers
 
                 try
                 {
-                    await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(identifier)).ConfigureAwait(false);
+                    await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
                 }
                 catch (Exception) { }
 
@@ -95,7 +99,7 @@ namespace FFImageLoading.DataResolvers
 
                 try
                 {
-                    await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(identifier)).ConfigureAwait(false);
+                    await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(filename)).ConfigureAwait(false);
                 }
                 catch (Exception) { }
 
