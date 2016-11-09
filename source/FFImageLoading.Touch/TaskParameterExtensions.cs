@@ -139,7 +139,7 @@ namespace FFImageLoading
 		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
-		public static void Preload(this TaskParameter parameters)
+		public static IImageLoaderTask Preload(this TaskParameter parameters)
 		{
             if (parameters.Priority == null)
             {
@@ -150,6 +150,7 @@ namespace FFImageLoading
             var target = new Target<UIImage, object>();
 			var task = CreateTask(parameters, 1f, target);
 			ImageService.Instance.LoadImage(task);
+            return task;
 		}
 
         /// <summary>
@@ -203,12 +204,14 @@ namespace FFImageLoading
         /// Only Url Source supported.
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
-        public static void DownloadOnly(this TaskParameter parameters)
+        public static IImageLoaderTask DownloadOnly(this TaskParameter parameters)
         {
             if (parameters.Source == ImageSource.Url)
             {
-                Preload(parameters.WithCache(CacheType.Disk));
+                return Preload(parameters.WithCache(CacheType.Disk));
             }
+
+            return null;
         }
 
         /// <summary>

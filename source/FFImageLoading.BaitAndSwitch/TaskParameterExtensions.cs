@@ -23,7 +23,7 @@ namespace FFImageLoading
 		/// Preloads the image request into memory cache/disk cache for future use.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
-		public static void Preload(this TaskParameter parameters)
+		public static IImageLoaderTask Preload(this TaskParameter parameters)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -43,7 +43,7 @@ namespace FFImageLoading
 		/// Only Url Source supported.
 		/// </summary>
 		/// <param name="parameters">Image parameters.</param>
-		public static void DownloadOnly(this TaskParameter parameters)
+		public static IImageLoaderTask DownloadOnly(this TaskParameter parameters)
 		{
 			throw new Exception(DoNotReference);
 		}
