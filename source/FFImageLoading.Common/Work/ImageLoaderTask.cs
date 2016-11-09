@@ -416,11 +416,6 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex)
             {
-                if (_clearCacheOnOutOfMemory && ex is OutOfMemoryException)
-                {
-                    MemoryCache.Clear();
-                }
-
                 if (ex is OperationCanceledException || ex is ObjectDisposedException)
                 {
                     if (Configuration.VerboseLoadingCancelledLogging)
@@ -430,6 +425,11 @@ namespace FFImageLoading.Work
                 }
                 else
                 {
+                    if (_clearCacheOnOutOfMemory && ex is OutOfMemoryException)
+                    {
+                        MemoryCache.Clear();
+                    }
+
                     Logger.Error(string.Format("Image loading failed: {0}", Key), ex);
 
                     if (Configuration.ExecuteCallbacksOnUIThread && Parameters?.OnError != null)
