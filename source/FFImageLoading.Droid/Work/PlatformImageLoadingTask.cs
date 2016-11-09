@@ -62,10 +62,9 @@ namespace FFImageLoading
             {
                 if (ffDrawable.IsAnimationRunning)
                 {
-                    await Task.Delay(ffDrawable.FadeDuration + 25);
+                    await Task.Delay(ffDrawable.FadeDuration + 50).ConfigureAwait(false);
                 }
-
-                if (animated)
+                else if (animated)
                 {
                     ISelfDisposingBitmapDrawable placeholderDrawable = null;
                     if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
