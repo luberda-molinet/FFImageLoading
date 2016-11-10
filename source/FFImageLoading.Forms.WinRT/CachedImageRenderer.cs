@@ -207,7 +207,12 @@ namespace FFImageLoading.Forms.WinRT
         {
             ((Xamarin.Forms.IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
-            Xamarin.Forms.ImageSource source = Element.Source;
+            Xamarin.Forms.ImageSource source = null;
+			var vectorSource = Element.Source as IVectorImageSource;
+			if (vectorSource != null)
+				source = vectorSource.ImageSource;
+			else
+				source = Element.Source;
 
             Cancel();
             TaskParameter imageLoader = null;
@@ -249,6 +254,35 @@ namespace FFImageLoading.Forms.WinRT
 				{
 					var bindingContext = Element.BindingContext;
 					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
+				}
+
+				// CustomDataResolver
+				if (Element.CustomDataResolver != null)
+				{
+					imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
+				}
+				else if (vectorSource != null)
+				{
+					if (vectorSource.VectorHeight == 0 && vectorSource.VectorWidth == 0)
+					{
+						if (Element.Height > 0d)
+						{
+							vectorSource.UseDipUnits = true;
+							vectorSource.VectorHeight = (int)Element.Height;
+						}
+						else if (Element.Width > 0d)
+						{
+							vectorSource.UseDipUnits = true;
+							vectorSource.VectorWidth = (int)Element.Width;
+						}
+						else
+						{
+							vectorSource.UseDipUnits = false;
+							vectorSource.VectorHeight = 200;
+						}
+					}
+
+					imageLoader.WithCustomDataResolver(vectorSource.GetVectorDataResolver());
 				}
 
                 // LoadingPlaceholder

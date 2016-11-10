@@ -466,6 +466,12 @@ namespace FFImageLoading.Forms
 		/// <value>The cache key factory.</value>
 		public ICacheKeyFactory CacheKeyFactory { get; set; }
 
+		/// <summary>
+		/// Gets or sets the custom data resolver for eg. SVG support (another nuget)
+		/// </summary>
+		/// <value>The custom data resolver.</value>
+		public Work.IDataResolver CustomDataResolver { get; set; }
+
 		//
 		// Methods
 		//

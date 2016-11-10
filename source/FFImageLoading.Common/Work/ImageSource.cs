@@ -10,7 +10,7 @@ namespace FFImageLoading.Work
 		ApplicationBundle = 11,
 		CompiledResource = 12,
 
-		Stream = 20
+		Stream = 20,
 	}
 }
 

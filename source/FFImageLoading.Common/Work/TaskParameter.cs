@@ -120,6 +120,8 @@ namespace FFImageLoading.Work
 
 		public bool? FadeAnimationEnabled { get; private set; }
 
+        public IDataResolver CustomDataResolver { get; private set; }
+
 		public bool? FadeAnimationForCachedImagesEnabled { get; private set; }
 
 		public int? FadeAnimationDuration { get; private set; }
@@ -234,6 +236,29 @@ namespace FFImageLoading.Work
 			Priority = (int)priority;
 			return this;
 		}
+
+        /// <summary>
+        /// Forces task to use custom resolver.
+        /// </summary>
+        /// <returns>The custom resolver.</returns>
+        /// <param name="resolver">Resolver.</param>
+        public TaskParameter WithCustomDataResolver(IDataResolver resolver)
+        {
+            CustomDataResolver = resolver;
+
+            var vectorResolver = resolver as IVectorDataResolver;
+            if (vectorResolver != null && string.IsNullOrWhiteSpace(CustomCacheKey))
+            {
+                CacheKey(string.Format("{0};{4}(size={1}x{2},dip={3})", 
+                                       Path, 
+                                       vectorResolver.VectorWidth, 
+                                       vectorResolver.VectorHeight, 
+                                       vectorResolver.UseDipUnits,
+                                       resolver.GetType()?.Name ?? "Vector"));
+            }
+
+            return this;
+        }
 
 		/// <summary>
 		/// Defines the loading priority, the default is 0 (LoadingPriority.Normal)

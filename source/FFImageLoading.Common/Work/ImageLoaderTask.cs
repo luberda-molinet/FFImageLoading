@@ -347,7 +347,7 @@ namespace FFImageLoading.Work
                 if (!(await TryLoadFromMemoryCacheAsync().ConfigureAwait(false)))
                 {
                     Logger.Debug(string.Format("Generating/retrieving image: {0}", Key));
-                    var resolver = DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
+                    var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
                     var imageData = await resolver.Resolve(Parameters.Path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                     loadingResult = imageData.Item2;
 

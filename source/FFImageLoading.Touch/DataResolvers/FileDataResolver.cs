@@ -50,7 +50,7 @@ namespace FFImageLoading.DataResolvers
                 if (parameters.LoadingPlaceholderPath == identifier)
                     result = (LoadingResult)(int)parameters.LoadingPlaceholderSource;
                 else if (parameters.ErrorPlaceholderPath == identifier)
-                    result = (LoadingResult)(int)parameters.LoadingPlaceholderSource;
+                    result = (LoadingResult)(int)parameters.ErrorPlaceholderSource;
 
                 return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
                     stream, result, imageInformation));

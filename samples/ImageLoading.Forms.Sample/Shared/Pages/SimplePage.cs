@@ -30,6 +30,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 			};
 
 			cachedImage.Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg";
+			//cachedImage.Source = FFImageLoading.Svg.FormsSvgImageSource.FromFile("Sample.svg");
 
 			Content = cachedImage;
 		}
