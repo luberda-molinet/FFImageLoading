@@ -161,7 +161,7 @@ namespace FFImageLoading.Work
 
             if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
             {
-                Logger.Debug("ImageService: null path ignored");
+                Logger.Error("ImageService: null path ignored");
                 task?.Dispose();
                 return;
             }
@@ -337,10 +337,28 @@ namespace FFImageLoading.Work
 
             lock (_pendingTasksLock)
             {
-                if (RunningTasks.Count >= MaxParallelTasks)
-                    return;
+                int preloadOrUrlTasksCount = 0;
+                int urlTasksCount = 0;
+                int preloadTasksCount = 0;
 
-                int numberOfTasks = MaxParallelTasks - RunningTasks.Count;
+                if (RunningTasks.Count >= MaxParallelTasks)
+                {
+                    urlTasksCount = RunningTasks.Count(v => v.Value?.ImageLoadingTask != null
+                                        && (!v.Value.ImageLoadingTask.Parameters.Preload && v.Value.ImageLoadingTask.Parameters.Source == ImageSource.Url));
+                    
+                    preloadTasksCount = RunningTasks.Count(v => v.Value?.ImageLoadingTask != null
+                        && v.Value.ImageLoadingTask.Parameters.Preload);
+                    preloadOrUrlTasksCount = preloadTasksCount + urlTasksCount;
+
+                    if (preloadOrUrlTasksCount == 0 || preloadOrUrlTasksCount != MaxParallelTasks)
+                        return;
+
+                    // Allow only half of MaxParallelTasks as additional allowed tasks when preloading occurs to prevent starvation
+                    if (RunningTasks.Count - Math.Max(1, Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2)) >= MaxParallelTasks)
+                        return;
+                }
+
+                int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, PendingTask>();
 
                 foreach (var task in PendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.IsCompleted)
@@ -354,7 +372,15 @@ namespace FFImageLoading.Work
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
                         continue;
 
-                    tasksToRun.Add(rawKey, task);
+                    if (preloadOrUrlTasksCount != 0)
+                    {
+                        if (!task.ImageLoadingTask.Parameters.Preload && (urlTasksCount == 0 || task.ImageLoadingTask.Parameters.Source != ImageSource.Url))
+                            tasksToRun.Add(rawKey, task);
+                    }
+                    else
+                    {
+                        tasksToRun.Add(rawKey, task);
+                    }
 
                     if (tasksToRun.Count == numberOfTasks)
                         break;
@@ -370,8 +396,8 @@ namespace FFImageLoading.Work
                 else
                 {
                     var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value, true));
-                    await Task.WhenAny(tasks).ConfigureAwait(false);
-                }   
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                } 
             }
         }
 
@@ -392,6 +418,7 @@ namespace FFImageLoading.Work
             {
                 if (Configuration.VerbosePerformanceLogging)
                 {
+                    LogSchedulerStats();
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
                     if (scheduleOnThreadPool)
@@ -405,7 +432,6 @@ namespace FFImageLoading.Work
 
                     stopwatch.Stop();
 
-                    LogSchedulerStats();
                     Logger.Debug(string.Format("[PERFORMANCE] RunAsync - NetManagedThreadId: {0}, NativeThreadId: {1}, Execution: {2} ms, ThreadPool: {3}, Key: {4}",
                                                 Performance.GetCurrentManagedThreadId(),
                                                 Performance.GetCurrentSystemThreadId(),
