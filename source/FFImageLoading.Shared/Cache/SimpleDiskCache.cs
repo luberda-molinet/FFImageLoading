@@ -95,7 +95,7 @@ namespace FFImageLoading.Cache
                                 File.Delete(oldFilepath);
                         }
 
-                        string filename = sanitizedKey + "." + duration.TotalSeconds;
+                        string filename = sanitizedKey + "." + (long)duration.TotalSeconds;
                         string filepath = Path.Combine(_cachePath, filename);
 
                         await FileStore.WriteBytesAsync(filepath, bytes, CancellationToken.None).ConfigureAwait(false);

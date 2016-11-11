@@ -186,7 +186,7 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                        string filename = sanitizedKey + "." + duration.TotalSeconds;
+                        string filename = sanitizedKey + "." + (long)duration.TotalSeconds;
 
                         var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
 
