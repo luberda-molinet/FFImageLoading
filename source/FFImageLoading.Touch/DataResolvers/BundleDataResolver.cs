@@ -46,7 +46,7 @@ namespace FFImageLoading.DataResolvers
                     }
                 }
 
-                if (bundle == null)
+                if (file == null)
                 {
                     file = identifier;
                     bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
