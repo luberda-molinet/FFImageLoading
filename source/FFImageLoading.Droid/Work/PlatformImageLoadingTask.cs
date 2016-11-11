@@ -11,16 +11,12 @@ using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
-using FFImageLoading.Views;
-using Android.Graphics.Drawables;
 
 namespace FFImageLoading
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<ISelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
-
-        WeakReference<ISelfDisposingBitmapDrawable> _loadingPlaceholderWeakReference;
 
         public PlatformImageLoaderTask(ITarget<ISelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
             : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
@@ -35,24 +31,6 @@ namespace FFImageLoading
             }
         }
 
-        protected async override Task ShowPlaceholder(string path, string key, ImageSource source, bool isLoadingPlaceholder)
-        {
-            await base.ShowPlaceholder(path, key, source, isLoadingPlaceholder);
-
-            if (isLoadingPlaceholder)
-            {
-                var placeholder = MemoryCache.Get(key)?.Item1;
-
-                if (placeholder != null)
-                {
-                    if (_loadingPlaceholderWeakReference == null)
-                        _loadingPlaceholderWeakReference = new WeakReference<ISelfDisposingBitmapDrawable>(placeholder);
-                    else
-                        _loadingPlaceholderWeakReference.SetTarget(placeholder);
-                }
-            }
-        }
-
         protected async override Task SetTargetAsync(ISelfDisposingBitmapDrawable image, bool animated)
         {
             ThrowIfCancellationRequested();
@@ -62,18 +40,24 @@ namespace FFImageLoading
             {
                 if (ffDrawable.IsAnimationRunning)
                 {
-                    await Task.Delay(ffDrawable.FadeDuration + 50).ConfigureAwait(false);
+                    var mut = new FFBitmapDrawable(Context.Resources, ffDrawable.Bitmap, ffDrawable);
+                    ffDrawable = mut as FFBitmapDrawable;
+                    image = ffDrawable;
+
+                    // old hacky workaround
+                    //await Task.Delay(ffDrawable.FadeDuration + 50).ConfigureAwait(false);
                 }
-                else if (animated)
+
+                if (animated)
                 {
                     ISelfDisposingBitmapDrawable placeholderDrawable = null;
-                    if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+                    if (PlaceholderWeakReference != null && PlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
                     {
                         int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
                             Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
 
                         placeholderDrawable?.SetIsRetained(true);
-                        ffDrawable?.SetPlaceholder(placeholderDrawable as BitmapDrawable, fadeDuration);
+                        ffDrawable?.SetPlaceholder(placeholderDrawable as SelfDisposingBitmapDrawable, fadeDuration);
                         placeholderDrawable?.SetIsRetained(false);
                     }
                 }
@@ -249,14 +233,6 @@ namespace FFImageLoading
                 return new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
             }
 
-            //var imageDrawable = new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
-            //ISelfDisposingBitmapDrawable placeholderDrawable = null;
-            //if (_loadingPlaceholderWeakReference != null && _loadingPlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
-            //{
-            //    return new SelfDisposingTransitionDrawable(imageDrawable, placeholderDrawable as SelfDisposingBitmapDrawable);
-            //}
-
-            //return imageDrawable;
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 

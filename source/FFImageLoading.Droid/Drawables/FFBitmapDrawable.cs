@@ -11,6 +11,7 @@ namespace FFImageLoading.Drawables
 {
     public class FFBitmapDrawable : SelfDisposingBitmapDrawable
     {
+        WeakReference<ISelfDisposingBitmapDrawable> baseDrawable;
         BitmapDrawable placeholder;
         long startTimeMillis;
         bool animating;
@@ -18,6 +19,11 @@ namespace FFImageLoading.Drawables
         float fadeDuration = 200;
         bool placeholderInitialized;
         Rect orgRect;
+
+        public FFBitmapDrawable(Resources res, Bitmap bitmap, SelfDisposingBitmapDrawable baseDrawable) : base(res, bitmap)
+        {
+            this.baseDrawable = new WeakReference<ISelfDisposingBitmapDrawable>(baseDrawable);
+        }
 
         public FFBitmapDrawable(Resources res, Bitmap bitmap) : base(res, bitmap)
         {
@@ -55,15 +61,29 @@ namespace FFImageLoading.Drawables
         {
         }
 
-        public void SetPlaceholder(BitmapDrawable drawable, int animationDuration)
+        public void SetPlaceholder(SelfDisposingBitmapDrawable drawable, int animationDuration)
         {
             if (!animating)
             {
                 alpha = 255;
                 fadeDuration = animationDuration;
                 startTimeMillis = SystemClock.UptimeMillis();
-                placeholder = drawable.GetConstantState().NewDrawable().Mutate() as BitmapDrawable;
+                placeholder = drawable.GetConstantState().NewDrawable() as BitmapDrawable;
                 animating = true;
+            }
+        }
+
+        public override void SetIsDisplayed(bool isDisplayed)
+        {
+            base.SetIsDisplayed(isDisplayed);
+
+            if (baseDrawable != null)
+            {
+                ISelfDisposingBitmapDrawable sdbDraw = null;
+                if (baseDrawable.TryGetTarget(out sdbDraw) && sdbDraw.IsValidAndHasValidBitmap())
+                {
+                    sdbDraw.SetIsDisplayed(isDisplayed);
+                }
             }
         }
 
@@ -104,7 +124,7 @@ namespace FFImageLoading.Drawables
                     }
                     else
                     {
-                        if (IsBitmapDrawableValid(placeholder))
+                        if (placeholder.IsValidAndHasValidBitmap())
                         {
                             if (!placeholderInitialized)
                             {
@@ -133,17 +153,11 @@ namespace FFImageLoading.Drawables
             catch (Exception) { }
         }
 
-        bool IsBitmapDrawableValid(BitmapDrawable bitmapDrawable)
-        {
-            return bitmapDrawable != null && bitmapDrawable.Handle != IntPtr.Zero && bitmapDrawable.Bitmap != null
-                                  && bitmapDrawable.Handle != IntPtr.Zero && !bitmapDrawable.Bitmap.IsRecycled;
-        }
-
         public override void SetAlpha(int alpha)
         {
             try
             {
-                if (IsBitmapDrawableValid(placeholder))
+                if (placeholder.IsValidAndHasValidBitmap())
                 {
                     placeholder.SetAlpha(alpha);
                 }
@@ -157,7 +171,7 @@ namespace FFImageLoading.Drawables
         {
             try
             {
-                if (IsBitmapDrawableValid(placeholder))
+                if (placeholder.IsValidAndHasValidBitmap())
                 {
                     placeholder.SetColorFilter(color, mode);
                 }

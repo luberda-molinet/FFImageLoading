@@ -118,7 +118,7 @@ namespace FFImageLoading.Drawables
         /// </summary>
         /// <param name="isDisplayed">If set to <c>true</c> reference count is
         /// incremented, otherwise it is decremented.</param>
-        public void SetIsDisplayed(bool isDisplayed)
+        public virtual void SetIsDisplayed(bool isDisplayed)
         {
             EventHandler handler = null;
             lock (monitor)
