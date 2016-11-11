@@ -47,8 +47,11 @@ namespace FFImageLoading.Work
                 KeyRaw = Parameters.CustomCacheKey;
             }
 
+            if (string.IsNullOrWhiteSpace(KeyRaw))
+                KeyRaw = Guid.NewGuid().ToString("N");
+
             KeyDownsamplingOnly = string.Empty;
-            if (Parameters.DownSampleSize != null)
+            if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
             {
                 KeyDownsamplingOnly = string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
             }

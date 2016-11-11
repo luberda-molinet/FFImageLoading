@@ -75,6 +75,9 @@ namespace FFImageLoading.Cache
 
 		public Tuple<ISelfDisposingBitmapDrawable, ImageInformation> Get(string key)
 		{
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
+
 			ISelfDisposingBitmapDrawable drawable = null;
 
 			if (_cache.TryGetValue(key, out drawable))
@@ -97,6 +100,9 @@ namespace FFImageLoading.Cache
 
 		public void Remove(string key)
 		{
+            if (string.IsNullOrWhiteSpace(key))
+                return;
+
             if (ImageService.Instance.Config.VerboseMemoryCacheLogging)
 			    _logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
 			_cache.Remove(key);
@@ -106,6 +112,9 @@ namespace FFImageLoading.Cache
 
 		public void RemoveSimilar(string baseKey)
 		{
+            if (string.IsNullOrWhiteSpace(baseKey))
+                return;
+
 			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
 			foreach (var key in keysToRemove)
 			{

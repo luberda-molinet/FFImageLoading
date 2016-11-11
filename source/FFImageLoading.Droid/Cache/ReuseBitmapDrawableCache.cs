@@ -335,7 +335,7 @@ namespace FFImageLoading.Cache
 
 		public void Add(string key, ISelfDisposingBitmapDrawable value)
 		{
-			if (value == null) {
+            if (string.IsNullOrEmpty(key) || value == null) {
                 if (_verboseLogging)
 				    log.Error("Attempt to add null value, refusing to cache");
 				return;
@@ -357,6 +357,9 @@ namespace FFImageLoading.Cache
 
 		public bool ContainsKey(string key)
 		{
+            if (string.IsNullOrEmpty(key))
+                return false;
+
 			lock (monitor) {
 				return displayed_cache.ContainsKey(key) || reuse_pool.ContainsKey(key);
 			}
@@ -364,6 +367,9 @@ namespace FFImageLoading.Cache
 
 		public bool Remove(string key)
 		{
+            if (string.IsNullOrEmpty(key))
+                return false;
+
 			ISelfDisposingBitmapDrawable tmp = null;
 			ISelfDisposingBitmapDrawable reuseTmp = null;
 			var result = false;

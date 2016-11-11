@@ -35,6 +35,9 @@ namespace FFImageLoading.Cache
 
         public void Add(string key, ImageInformation imageInformation, WriteableBitmap bitmap)
         {
+            if (string.IsNullOrWhiteSpace(key) || bitmap == null)
+                return;
+
             var weakRef = new WeakReference<WriteableBitmap>(bitmap);
             _reusableBitmaps.TryAdd(key, new Tuple<WeakReference<WriteableBitmap>, ImageInformation>(weakRef, imageInformation));
         }
@@ -53,6 +56,9 @@ namespace FFImageLoading.Cache
         public Tuple<WriteableBitmap, ImageInformation> Get(string key)
         {
             CleanAbandonedItems();
+
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
 
             Tuple<WeakReference<WriteableBitmap>, ImageInformation> cacheEntry;
             WriteableBitmap bitmap = null;
@@ -91,6 +97,9 @@ namespace FFImageLoading.Cache
 
         public void Remove(string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+                return;
+            
 			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
 			Tuple<WeakReference<WriteableBitmap>, ImageInformation> removed;
             _reusableBitmaps.TryRemove(key, out removed);
@@ -98,6 +107,9 @@ namespace FFImageLoading.Cache
 
 		public void RemoveSimilar(string baseKey)
 		{
+            if (string.IsNullOrWhiteSpace(baseKey))
+                return;
+            
             var keysToRemove = _reusableBitmaps.Where(v => v.Value?.Item2?.BaseKey == baseKey).Select(v => v.Value?.Item2?.CacheKey).ToList();
 
 			foreach (var key in keysToRemove)

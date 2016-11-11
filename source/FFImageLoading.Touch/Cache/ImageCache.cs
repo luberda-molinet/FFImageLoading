@@ -55,7 +55,13 @@ namespace FFImageLoading.Cache
 
 		public Tuple<UIImage, ImageInformation> Get(string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
+            
 			var image = (UIImage)_cache.ObjectForKey(new NSString(key));
+            if (image == null)
+                return null;
+
 			var imageInformation = GetInfo(key);
 			return new Tuple<UIImage, ImageInformation>(image, imageInformation);
         }
@@ -71,6 +77,9 @@ namespace FFImageLoading.Cache
 
 		public void Remove(string key)
 		{
+            if (string.IsNullOrWhiteSpace(key))
+                return;
+
 			_logger.Debug(string.Format("Called remove from memory cache for '{0}'", key));
 			_cache.RemoveObjectForKey(new NSString(key));
 			ImageInformation imageInformation;
@@ -79,6 +88,9 @@ namespace FFImageLoading.Cache
 
 		public void RemoveSimilar(string baseKey)
 		{
+            if (string.IsNullOrWhiteSpace(baseKey))
+                return;
+            
 			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
 			foreach (var key in keysToRemove)
 			{
