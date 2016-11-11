@@ -58,7 +58,7 @@ namespace FFImageLoading.Cache
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url)));
 
             if (responseBytes == null)
-                return null;
+                throw new HttpRequestException("No Content");
 
             if (allowDiskCaching)
             {
@@ -88,7 +88,7 @@ namespace FFImageLoading.Cache
                                 throw new HttpRequestException(response.StatusCode.ToString());
 
                             if (response.Content == null)
-                                throw new HttpRequestException("No HttpContent");
+                                throw new HttpRequestException("No Content");
 
                             using (var cancelReadTimeoutToken = new CancellationTokenSource())
                             {
