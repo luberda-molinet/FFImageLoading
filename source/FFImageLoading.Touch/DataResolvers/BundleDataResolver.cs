@@ -25,11 +25,15 @@ namespace FFImageLoading.DataResolvers
 
             foreach (var fileType in fileTypes)
             {
+                token.ThrowIfCancellationRequested();
+
                 int scale = (int)ScaleHelper.Scale;
                 if (scale > 1)
                 {
                     while (scale > 1)
                     {
+                        token.ThrowIfCancellationRequested();
+
                         var tmpFile = string.Format(pattern, filename, scale, extension);
                         bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                         {
@@ -46,6 +50,8 @@ namespace FFImageLoading.DataResolvers
                     }
                 }
 
+                token.ThrowIfCancellationRequested();
+
                 if (file == null)
                 {
                     file = identifier;
@@ -55,6 +61,8 @@ namespace FFImageLoading.DataResolvers
                         return !string.IsNullOrWhiteSpace(path);
                     });
                 }
+
+                token.ThrowIfCancellationRequested();
 
                 if (bundle != null)
                 {
@@ -71,6 +79,7 @@ namespace FFImageLoading.DataResolvers
             }
 
             //Asset catalog
+            token.ThrowIfCancellationRequested();
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
             {
@@ -84,6 +93,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (asset != null)
                 {
+                    token.ThrowIfCancellationRequested();
                     var stream = asset.Data?.AsStream();
                     var imageInformation = new ImageInformation();
                     imageInformation.SetPath(identifier);
@@ -105,6 +115,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (image != null)
                 {
+                    token.ThrowIfCancellationRequested();
                     var stream = image.AsPNG()?.AsStream();
                     var imageInformation = new ImageInformation();
                     imageInformation.SetPath(identifier);

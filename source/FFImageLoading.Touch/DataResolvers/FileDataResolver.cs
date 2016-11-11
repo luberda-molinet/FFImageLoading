@@ -23,6 +23,8 @@ namespace FFImageLoading.DataResolvers
 
                 while (scale > 1)
                 {
+                    token.ThrowIfCancellationRequested();
+
                     var tmpFile = string.Format(pattern, filename, scale, extension);
                     if (FileStore.Exists(tmpFile))
                     {
@@ -37,6 +39,8 @@ namespace FFImageLoading.DataResolvers
             {
                 file = identifier;
             }
+
+            token.ThrowIfCancellationRequested();
 
             if (!string.IsNullOrEmpty(file))
             {

@@ -44,6 +44,7 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetPath(identifier);
                 imageInformation.SetFilePath(file.Path);
 
+                token.ThrowIfCancellationRequested();
                 var stream = await file.OpenStreamForReadAsync();
 
                 return new Tuple<Stream, LoadingResult, ImageInformation>(stream, LoadingResult.CompiledResource, imageInformation);

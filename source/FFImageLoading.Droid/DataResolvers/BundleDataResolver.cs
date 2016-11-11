@@ -12,6 +12,7 @@ namespace FFImageLoading.DataResolvers
     {
         public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             var stream = Context.Assets.Open(identifier, Access.Streaming);
 
             if (stream == null)

@@ -40,10 +40,13 @@ namespace FFImageLoading.Cache
                 var diskStream = await configuration.DiskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
                 if (diskStream != null)
                 {
+                    token.ThrowIfCancellationRequested();
                     filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
                     return new CacheStream(diskStream, true, filePath);
                 }
             }
+
+            token.ThrowIfCancellationRequested();
 
             var downloadInfo = new DownloadInformation(url, parameters.CustomCacheKey, filename, allowDiskCaching, duration);
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
@@ -62,7 +65,9 @@ namespace FFImageLoading.Cache
                 await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration).ConfigureAwait(false);
             }
 
+            token.ThrowIfCancellationRequested();
             filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
             var memoryStream = new MemoryStream(responseBytes, false);
             return new CacheStream(memoryStream, false, filePath);
         }

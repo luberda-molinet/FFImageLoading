@@ -242,6 +242,7 @@ namespace FFImageLoading.Work
                 }
                 else
                 {
+                    ThrowIfCancellationRequested();
                     // Loading placeholder if enabled
                     if (!isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
                     {

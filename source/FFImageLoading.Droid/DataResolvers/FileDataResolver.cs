@@ -17,6 +17,8 @@ namespace FFImageLoading.DataResolvers
                 throw new FileNotFoundException(identifier);
             }
 
+            token.ThrowIfCancellationRequested();
+
             var stream = FileStore.GetInputStream(identifier, true);
 
             var imageInformation = new ImageInformation();

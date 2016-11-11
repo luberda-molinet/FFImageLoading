@@ -20,6 +20,7 @@ namespace FFImageLoading.DataResolvers
             int resourceId = 0;
             if (!_resourceIdentifiersCache.TryGetValue(resourceName, out resourceId))
             {
+                token.ThrowIfCancellationRequested();
                 resourceId = Context.Resources.GetIdentifier(resourceName.ToLower(), "drawable", Context.PackageName);
                 _resourceIdentifiersCache.TryAdd(resourceName.ToLower(), resourceId);
             }
@@ -27,6 +28,7 @@ namespace FFImageLoading.DataResolvers
             if (resourceId == 0)
                 throw new FileNotFoundException(identifier);
 
+            token.ThrowIfCancellationRequested();
             Stream stream  = Context.Resources.OpenRawResource(resourceId);
 
             if (stream == null)
