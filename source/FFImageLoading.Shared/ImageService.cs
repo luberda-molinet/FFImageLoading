@@ -125,8 +125,16 @@ namespace FFImageLoading
                 var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, new PlatformPerformance());
                 userDefinedConfig.Scheduler = scheduler;
 
-				var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache", userDefinedConfig);
-                userDefinedConfig.DiskCache = diskCache;
+                if (string.IsNullOrWhiteSpace(userDefinedConfig.DiskCachePath))
+                {
+                    var diskCache = userDefinedConfig.DiskCache ?? SimpleDiskCache.CreateCache("FFSimpleDiskCache", userDefinedConfig);
+                    userDefinedConfig.DiskCache = diskCache;
+                }
+                else
+                {
+                    var diskCache = userDefinedConfig.DiskCache ?? new SimpleDiskCache(userDefinedConfig.DiskCachePath, userDefinedConfig);
+                    userDefinedConfig.DiskCache = diskCache;
+                }
 
                 var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
 				userDefinedConfig.DownloadCache = downloadCache;

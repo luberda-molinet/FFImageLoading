@@ -56,6 +56,12 @@ namespace FFImageLoading.Config
 		/// <value>The disk cache.</value>
 		public IDiskCache DiskCache { get; set; }
 
+        /// <summary>
+        /// Gets or sets the disk cache path.
+        /// </summary>
+        /// <value>The disk cache path.</value>
+        public string DiskCachePath { get; set; }
+
 		/// <summary>
 		/// Gets or sets the download cache. Download cache is responsible for retrieving data from the web, or taking from the disk cache.
 		/// </summary>
