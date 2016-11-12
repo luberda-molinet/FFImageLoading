@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
 using SkiaSharp;
+using FFImageLoading.DataResolvers;
 
 namespace FFImageLoading.Svg.Platform
 {
@@ -30,12 +31,12 @@ namespace FFImageLoading.Svg.Platform
 		{
 			ImageSource source = parameters.Source;
 
-			if (parameters.LoadingPlaceholderPath == identifier)
+			if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
 				source = parameters.LoadingPlaceholderSource;
-			else if (parameters.ErrorPlaceholderPath == identifier)
+			else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
 				source = parameters.ErrorPlaceholderSource;
 
-			var resolvedData = await Configuration.DataResolverFactory
+			var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
 			                                .GetResolver(identifier, source, parameters, Configuration)
 			                                .Resolve(identifier, parameters, token);
 
@@ -53,18 +54,20 @@ namespace FFImageLoading.Svg.Platform
 				picture = svg.Load(resolvedData?.Item1);
 			}
 
-			using (var bitmap = new SKBitmap(200, 200, true))
+			using (var bitmap = new SKBitmap(100, 100, true))
 			using (var canvas = new SKCanvas(bitmap))
 			{
-				float canvasMin = Math.Min(200, 200);
-				float svgMax = Math.Max(svg.Picture.Bounds.Width, svg.Picture.Bounds.Height);
-				float scale = canvasMin / svgMax;
-				var matrix = SKMatrix.MakeScale(scale, scale);
-				canvas.DrawPicture(picture, ref matrix);
-
+				//float canvasMin = Math.Min(200, 200);
+				//float svgMax = Math.Max(svg.Picture.Bounds.Width, svg.Picture.Bounds.Height);
+				//float scale = canvasMin / svgMax;
+				//var matrix = SKMatrix.MakeScale(scale, scale);
+				//canvas.DrawPicture(picture, ref matrix);
+				canvas.DrawPicture(picture);
+				canvas.Flush();
 				using (var image = SKImage.FromBitmap(bitmap))
+				using (var data = image.Encode(SKImageEncodeFormat.Png, 80))
 				{
-					var stream = image.Encode()?.AsStream();
+					var stream = data?.AsStream();
 					return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
 				}
 			}
