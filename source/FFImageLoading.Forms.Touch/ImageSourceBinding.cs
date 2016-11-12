@@ -51,7 +51,7 @@ namespace FFImageLoading.Forms.Touch
 				if (string.IsNullOrWhiteSpace(fileImageSource.File))
 					return null;
 				
-				if (File.Exists(fileImageSource.File) && Directory.Exists(fileImageSource.File))
+				if (File.Exists(fileImageSource.File))
 					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
 				
 				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
