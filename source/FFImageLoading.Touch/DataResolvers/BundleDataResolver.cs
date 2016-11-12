@@ -20,11 +20,12 @@ namespace FFImageLoading.DataResolvers
             NSBundle bundle = null;
             string file = null;
             var filename = Path.GetFileNameWithoutExtension(identifier);
-            var extension = Path.GetExtension(identifier);
             const string pattern = "{0}@{1}x{2}";
 
             foreach (var fileType in fileTypes)
             {
+                var extension = Path.HasExtension(identifier) ? Path.GetExtension(identifier) : string.IsNullOrWhiteSpace(fileType) ? string.Empty : "." + fileType;
+
                 token.ThrowIfCancellationRequested();
 
                 int scale = (int)ScaleHelper.Scale;
@@ -76,53 +77,56 @@ namespace FFImageLoading.DataResolvers
                     return new Tuple<Stream, LoadingResult, ImageInformation>(
                         stream, LoadingResult.CompiledResource, imageInformation);
                 }
-            }
 
-            //Asset catalog
-            token.ThrowIfCancellationRequested();
+                token.ThrowIfCancellationRequested();
 
-            if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
-            {
-                NSDataAsset asset = null;
-
-                try
+                if (string.IsNullOrEmpty(fileType))
                 {
-                    await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
-                }
-                catch (Exception) { }
+                    //Asset catalog
+                    if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
+                    {
+                        NSDataAsset asset = null;
 
-                if (asset != null)
-                {
-                    token.ThrowIfCancellationRequested();
-                    var stream = asset.Data?.AsStream();
-                    var imageInformation = new ImageInformation();
-                    imageInformation.SetPath(identifier);
-                    imageInformation.SetFilePath(null);
+                        try
+                        {
+                            await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
+                        }
+                        catch (Exception) { }
 
-                    return new Tuple<Stream, LoadingResult, ImageInformation>(
-                        stream, LoadingResult.CompiledResource, imageInformation);
-                }
-            }
-            else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
-            {
-                UIImage image = null;
+                        if (asset != null)
+                        {
+                            token.ThrowIfCancellationRequested();
+                            var stream = asset.Data?.AsStream();
+                            var imageInformation = new ImageInformation();
+                            imageInformation.SetPath(identifier);
+                            imageInformation.SetFilePath(null);
 
-                try
-                {
-                    await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(filename)).ConfigureAwait(false);
-                }
-                catch (Exception) { }
+                            return new Tuple<Stream, LoadingResult, ImageInformation>(
+                                stream, LoadingResult.CompiledResource, imageInformation);
+                        }
+                    }
+                    else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
+                    {
+                        UIImage image = null;
 
-                if (image != null)
-                {
-                    token.ThrowIfCancellationRequested();
-                    var stream = image.AsPNG()?.AsStream();
-                    var imageInformation = new ImageInformation();
-                    imageInformation.SetPath(identifier);
-                    imageInformation.SetFilePath(null);
+                        try
+                        {
+                            await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(filename)).ConfigureAwait(false);
+                        }
+                        catch (Exception) { }
 
-                    return new Tuple<Stream, LoadingResult, ImageInformation>(
-                        stream, LoadingResult.CompiledResource, imageInformation);
+                        if (image != null)
+                        {
+                            token.ThrowIfCancellationRequested();
+                            var stream = image.AsPNG()?.AsStream();
+                            var imageInformation = new ImageInformation();
+                            imageInformation.SetPath(identifier);
+                            imageInformation.SetFilePath(null);
+
+                            return new Tuple<Stream, LoadingResult, ImageInformation>(
+                                stream, LoadingResult.CompiledResource, imageInformation);
+                        }
+                    }
                 }
             }
 
