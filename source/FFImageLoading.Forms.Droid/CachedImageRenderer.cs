@@ -221,35 +221,39 @@ namespace FFImageLoading.Forms.Droid
 					{
 						if (Element.Height > Element.Width)
 						{
-							imageLoader.DownSample(height: Element.Height.DpToPixels());
+							imageLoader.DownSampleInDip(height: (int)Element.Height);
 						}
 						else
 						{
-							imageLoader.DownSample(width: Element.Width.DpToPixels());
+							imageLoader.DownSampleInDip(width: (int)Element.Width);
 						}
 					}
 					else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
 					{
 						if (Element.HeightRequest > Element.WidthRequest)
 						{
-							imageLoader.DownSample(height: Element.HeightRequest.DpToPixels());
+							imageLoader.DownSampleInDip(height: (int)Element.HeightRequest);
 						}
 						else
 						{
-							imageLoader.DownSample(width: Element.WidthRequest.DpToPixels());
+							imageLoader.DownSampleInDip(width: (int)Element.WidthRequest);
 						}
 					}
 					else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 					{
 						if (Element.DownsampleHeight > Element.DownsampleWidth)
 						{
-							imageLoader.DownSample(height: Element.DownsampleUseDipUnits
-								? Element.DownsampleHeight.DpToPixels() : (int)Element.DownsampleHeight);
+							if (Element.DownsampleUseDipUnits)
+								imageLoader.DownSampleInDip(height: (int)Element.DownsampleHeight);
+							else
+								imageLoader.DownSample(height: (int)Element.DownsampleHeight);
 						}
 						else
 						{
-							imageLoader.DownSample(width: Element.DownsampleUseDipUnits
-								? Element.DownsampleWidth.DpToPixels() : (int)Element.DownsampleWidth);
+							if (Element.DownsampleUseDipUnits)
+								imageLoader.DownSampleInDip(width: (int)Element.DownsampleWidth);
+							else
+								imageLoader.DownSample(width: (int)Element.DownsampleWidth);
 						}
 					}
 

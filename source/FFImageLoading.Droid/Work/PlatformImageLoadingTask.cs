@@ -314,5 +314,10 @@ namespace FFImageLoading
                 bitmapDrawable?.SetIsRetained(false);
             }
         }
+
+        protected override int DpiToPixels(int size)
+        {
+            return size.DpToPixels();
+        }
     }
 }

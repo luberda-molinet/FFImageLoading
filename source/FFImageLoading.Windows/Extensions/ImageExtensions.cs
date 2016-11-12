@@ -153,7 +153,7 @@ namespace FFImageLoading.Extensions
 
             IRandomAccessStream resizedStream = imageStream;
 			var decoder = await BitmapDecoder.CreateAsync(imageStream);
-            if (decoder.PixelHeight > height || decoder.PixelWidth > width)
+            if ((height > 0 && decoder.PixelHeight > height) || (width > 0 && decoder.PixelWidth > width))
             {
                 using (imageStream)
                 {

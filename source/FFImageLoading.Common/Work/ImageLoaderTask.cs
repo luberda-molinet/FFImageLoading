@@ -53,7 +53,10 @@ namespace FFImageLoading.Work
             KeyDownsamplingOnly = string.Empty;
             if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
             {
-                KeyDownsamplingOnly = string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
+                if (Parameters.DownSampleUseDipUnits)
+                    KeyDownsamplingOnly = string.Concat(";", DpiToPixels(Parameters.DownSampleSize.Item1), "x", DpiToPixels(Parameters.DownSampleSize.Item2));
+                else
+                    KeyDownsamplingOnly = string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
             }
 
             KeyTransformationsOnly = string.Empty;
@@ -112,6 +115,8 @@ namespace FFImageLoading.Work
         protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
         protected IMainThreadDispatcher MainThreadDispatcher { get; private set; }
+
+        protected abstract int DpiToPixels(int size);
 
         public bool IsCancelled
         {

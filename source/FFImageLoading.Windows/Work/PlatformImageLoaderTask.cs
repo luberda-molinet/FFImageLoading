@@ -112,5 +112,10 @@ namespace FFImageLoading.Work
                 imageIn = null;
             }
         }
+
+        protected override int DpiToPixels(int size)
+        {
+            return size.PointsToPixels();
+        }
     }
 }
