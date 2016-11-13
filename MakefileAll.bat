@@ -35,6 +35,14 @@ echo Building FFImageLoading.Forms...
 %msbuild% source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj %buildargs%
 
+echo Building FFImageLoading.Svg...
+
+%msbuild% source/FFImageLoading.Svg.Touch/FFImageLoading.Svg.Touch.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Droid/FFImageLoading.Svg.Droid.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Forms/FFImageLoading.Svg.Forms.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Forms.Touch/FFImageLoading.Svg.Forms.Touch.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj %buildargs%
+
 echo Generating symbols with Gitlink...
 
 GitLink.exe %~dp0 -u https://github.com/luberda-molinet/FFImageLoading
@@ -44,5 +52,7 @@ echo Packaging NuGets...
 nuget pack source/Xamarin.FFImageLoading.nuspec
 nuget pack source/Xamarin.FFImageLoading.Transformations.nuspec
 nuget pack source/Xamarin.FFImageLoading.Forms.nuspec
+nuget pack source/Xamarin.FFImageLoading.Svg.nuspec
+nuget pack source/Xamarin.FFImageLoading.Svg.Forms.nuspec
 
 echo All done.

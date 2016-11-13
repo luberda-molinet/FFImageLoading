@@ -26,11 +26,19 @@ before_build:
     
     $nuspec3 = "source\Xamarin.FFImageLoading.Transformations.nuspec"
     
+    $nuspec4 = "source\Xamarin.FFImageLoading.Svg.nuspec"
+    
+    $nuspec5 = "source\Xamarin.FFImageLoading.Svg.Forms.nuspec"
+    
     $nuspec1template = "source\Xamarin.FFImageLoading.nuspec.template"
     
     $nuspec2template = "source\Xamarin.FFImageLoading.Forms.nuspec.template"
     
     $nuspec3template = "source\Xamarin.FFImageLoading.Transformations.nuspec.template" 
+    
+    $nuspec4template = "source\Xamarin.FFImageLoading.Svg.nuspec.template" 
+    
+    $nuspec5template = "source\Xamarin.FFImageLoading.Svg.Forms.nuspec.template" 
 
     $version = $env:appveyor_build_version
     
@@ -55,6 +63,10 @@ before_build:
     (Get-Content $nuspec2template).replace('@version', $version) | Set-Content $nuspec2    
     
     (Get-Content $nuspec3template).replace('@version', $version) | Set-Content $nuspec3
+    
+    (Get-Content $nuspec4template).replace('@version', $version) | Set-Content $nuspec4
+        
+    (Get-Content $nuspec5template).replace('@version', $version) | Set-Content $nuspec5
   
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg

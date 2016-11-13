@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="2.8.1">
+   
+       <id>Xamarin.FFImageLoading.Svg</id>
+       <version>@version</version>
+       <title>FFImageLoading SVG support</title>
+       <authors>Daniel Luberda</authors>
+       <owners></owners>
+       <licenseUrl>https://raw.githubusercontent.com/luberda-molinet\FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
+       <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
+       <requireLicenseAcceptance>false</requireLicenseAcceptance>
+       
+       <description>
+SVG support for FFImageLoading library.
+
+IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
+       </description>
+       
+       <summary>Xamarin SVG support for FFImageLoading.</summary>
+       <tags>xamarin, android, ios, bitmap, image, svg</tags>
+       
+       <dependencies>
+       
+          <group>
+            <dependency id="Xamarin.FFImageLoading" version="@version" />
+            <dependency id="SkiaSharp" version="1.55.0" />
+          </group>
+              
+        </dependencies>
+        
+	</metadata>
+	
+	<files>
+
+		<!--Core PCL-->
+<!-- 
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.pdb" />
+ -->
+            
+		<!--Xamarin.Android-->
+		<file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.pdb" />
+            
+		<!--Xamarin.iOS -->
+		<file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.pdb" />
+ 
+		<!--Windows-->
+<!-- 
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.dll" />
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.xml" />
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.pdb" />	
+ -->
+	</files>
+	
+</package>
