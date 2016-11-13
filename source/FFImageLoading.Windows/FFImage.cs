@@ -151,7 +151,7 @@ namespace FFImageLoading
                     }
                     else
                     {
-                        imageLoader.DownSampleInDip(width: (int)Width));
+                        imageLoader.DownSampleInDip(width: (int)Width);
                     }
                 }
                 else if (DownsampleToViewSize && (MinWidth > 0 || MinHeight > 0))
