@@ -26,6 +26,7 @@
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\FFImageLoading.Svg.Forms.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="SvgImageSource.cs" />
