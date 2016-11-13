@@ -254,7 +254,7 @@ namespace FFImageLoading.Forms.WinRT
                 // LoadingPlaceholder
                 if (Element.LoadingPlaceholder != null)
                 {
-					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
+					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -262,7 +262,7 @@ namespace FFImageLoading.Forms.WinRT
                 // ErrorPlaceholder
                 if (Element.ErrorPlaceholder != null)
                 {
-					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
+					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
