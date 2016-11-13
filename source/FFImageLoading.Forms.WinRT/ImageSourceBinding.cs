@@ -119,7 +119,7 @@ namespace FFImageLoading.Forms.WinRT
 					vectorSource.VectorWidth = (int)element.MinimumWidthRequest;
 				}
 
-				return GetImageSourceBinding(vectorSource.ImageSource, element);
+				return await GetImageSourceBinding(vectorSource.ImageSource, element).ConfigureAwait(false);
 			}
 
             throw new NotImplementedException("ImageSource type not supported");
