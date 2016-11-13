@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgImageSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -88,7 +87,7 @@
       <Name>FFImageLoading.Touch</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems')" />
+  <Import Project="..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.3.2.127\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.3.2.127\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
 </Project>

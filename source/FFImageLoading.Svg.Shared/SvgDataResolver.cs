@@ -16,10 +16,9 @@ namespace FFImageLoading.Svg.Platform
 			VectorWidth = vectorWidth;
 			VectorHeight = vectorHeight;
 			UseDipUnits = useDipUnits;
-			Configuration = ImageService.Instance.Config;
 		}
 
-		public Configuration Configuration { get; private set; }
+		public Configuration Configuration { get { return ImageService.Instance.Config; } }
 
 		public bool UseDipUnits { get; private set; }
 
@@ -37,8 +36,8 @@ namespace FFImageLoading.Svg.Platform
 				source = parameters.ErrorPlaceholderSource;
 
 			var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
-			                                .GetResolver(identifier, source, parameters, Configuration)
-			                                .Resolve(identifier, parameters, token);
+											.GetResolver(identifier, source, parameters, Configuration)
+											.Resolve(identifier, parameters, token);
 
 			if (resolvedData?.Item1 == null)
 				throw new FileNotFoundException(identifier);
@@ -54,20 +53,46 @@ namespace FFImageLoading.Svg.Platform
 				picture = svg.Load(resolvedData?.Item1);
 			}
 
-			using (var bitmap = new SKBitmap(100, 100, true))
+			float sizeX = 0;
+			float sizeY = 0;
+
+			if (VectorWidth == 0 && VectorHeight == 0)
+			{
+				sizeX = 200;
+				sizeY = (VectorWidth / picture.Bounds.Width) * picture.Bounds.Height;
+			}
+			else if (VectorWidth > 0 && VectorHeight > 0)
+			{
+				sizeX = VectorWidth;
+				sizeY = VectorHeight;
+			}
+			else if (VectorWidth > 0)
+			{
+				sizeX = VectorWidth;
+				sizeY = (VectorWidth / picture.Bounds.Width) * picture.Bounds.Height;
+			}
+			else
+			{
+				sizeX = (VectorHeight / picture.Bounds.Height) * picture.Bounds.Width;
+				sizeY = VectorHeight;
+			}
+
+			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY, true))
 			using (var canvas = new SKCanvas(bitmap))
 			{
-				//float canvasMin = Math.Min(200, 200);
-				//float svgMax = Math.Max(svg.Picture.Bounds.Width, svg.Picture.Bounds.Height);
-				//float scale = canvasMin / svgMax;
-				//var matrix = SKMatrix.MakeScale(scale, scale);
-				//canvas.DrawPicture(picture, ref matrix);
-				canvas.DrawPicture(picture);
+				float scaleX = sizeX / picture.Bounds.Width;
+				float scaleY = sizeY / picture.Bounds.Height;
+				var matrix = SKMatrix.MakeScale(scaleX, scaleY);
+				canvas.DrawPicture(picture, ref matrix);
 				canvas.Flush();
+
 				using (var image = SKImage.FromBitmap(bitmap))
 				using (var data = image.Encode(SKImageEncodeFormat.Png, 80))
 				{
-					var stream = data?.AsStream();
+					var stream = new MemoryStream();
+					data.SaveTo(stream);
+					stream.Position = 0;
+					//var stream = data?.AsStream();
 					return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
 				}
 			}

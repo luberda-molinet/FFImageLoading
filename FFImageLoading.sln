@@ -85,6 +85,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Svg.Forms.To
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Svg.Forms.Droid", "source\FFImageLoading.Svg.Forms.Droid\FFImageLoading.Svg.Forms.Droid.csproj", "{CCA629E9-55E3-414A-91AF-79A0CB845CD5}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Svg.Forms.Shared", "source\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.shproj", "{3F817BAD-EDFB-44E3-A9EF-1FDED55ED787}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		source\FFImageLoading.Shared\FFImageLoading.Shared.projitems*{e72ac4ed-03a8-465c-95a2-38b0544b37db}*SharedItemsImports = 13
@@ -1604,5 +1606,6 @@ Global
 		{488664FA-5BC5-4868-9FC4-44DB7294EC5A} = {EDE40129-FB1D-40C5-A0C2-B344A1ED3D2D}
 		{A73A1EA8-E709-474D-9102-DCB2482950AB} = {EDE40129-FB1D-40C5-A0C2-B344A1ED3D2D}
 		{CCA629E9-55E3-414A-91AF-79A0CB845CD5} = {EDE40129-FB1D-40C5-A0C2-B344A1ED3D2D}
+		{3F817BAD-EDFB-44E3-A9EF-1FDED55ED787} = {EDE40129-FB1D-40C5-A0C2-B344A1ED3D2D}
 	EndGlobalSection
 EndGlobal

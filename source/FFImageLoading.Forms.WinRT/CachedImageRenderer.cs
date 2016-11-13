@@ -207,17 +207,12 @@ namespace FFImageLoading.Forms.WinRT
         {
             ((Xamarin.Forms.IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
 
-            Xamarin.Forms.ImageSource source = null;
-			var vectorSource = Element.Source as IVectorImageSource;
-			if (vectorSource != null)
-				source = vectorSource.ImageSource;
-			else
-				source = Element.Source;
+            Xamarin.Forms.ImageSource source = Element.Source;
 
             Cancel();
             TaskParameter imageLoader = null;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source).ConfigureAwait(false);
+            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source, Element).ConfigureAwait(false);
 
             if (ffSource == null)
             {
@@ -256,39 +251,10 @@ namespace FFImageLoading.Forms.WinRT
 					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
 				}
 
-				// CustomDataResolver
-				if (Element.CustomDataResolver != null)
-				{
-					imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
-				}
-				else if (vectorSource != null)
-				{
-					if (vectorSource.VectorHeight == 0 && vectorSource.VectorWidth == 0)
-					{
-						if (Element.Height > 0d)
-						{
-							vectorSource.UseDipUnits = true;
-							vectorSource.VectorHeight = (int)Element.Height;
-						}
-						else if (Element.Width > 0d)
-						{
-							vectorSource.UseDipUnits = true;
-							vectorSource.VectorWidth = (int)Element.Width;
-						}
-						else
-						{
-							vectorSource.UseDipUnits = false;
-							vectorSource.VectorHeight = 200;
-						}
-					}
-
-					imageLoader.WithCustomDataResolver(vectorSource.GetVectorDataResolver());
-				}
-
                 // LoadingPlaceholder
                 if (Element.LoadingPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder).ConfigureAwait(false);
+					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
@@ -296,10 +262,33 @@ namespace FFImageLoading.Forms.WinRT
                 // ErrorPlaceholder
                 if (Element.ErrorPlaceholder != null)
                 {
-                    var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder).ConfigureAwait(false);
+					var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
                     if (placeholderSource != null)
                         imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
                 }
+
+				// Enable vector image source
+				var vect1 = Element.Source as IVectorImageSource;
+				var vect2 = Element.LoadingPlaceholder as IVectorImageSource;
+				var vect3 = Element.ErrorPlaceholder as IVectorImageSource;
+				if (vect1 != null)
+				{
+					imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
+				}
+				if (vect2 != null)
+				{
+					imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
+				}
+				if (vect3 != null)
+				{
+					imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+				}
+				if (Element.CustomDataResolver != null)
+				{
+					imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
+					imageLoader.WithCustomLoadingPlaceholderDataResolver(Element.CustomDataResolver);
+					imageLoader.WithCustomErrorPlaceholderDataResolver(Element.CustomDataResolver);
+				}
 
 				// Downsample
 				if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))

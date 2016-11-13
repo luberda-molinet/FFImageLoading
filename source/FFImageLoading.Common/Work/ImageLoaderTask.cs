@@ -50,6 +50,12 @@ namespace FFImageLoading.Work
             if (string.IsNullOrWhiteSpace(KeyRaw))
                 KeyRaw = Guid.NewGuid().ToString("N");
 
+            var vect = Parameters.CustomDataResolver as IVectorDataResolver;
+            if (vect != null)
+            {
+                KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+            }
+
             KeyDownsamplingOnly = string.Empty;
             if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
             {
@@ -74,6 +80,12 @@ namespace FFImageLoading.Work
                     KeyForLoadingPlaceholder = string.Concat(Parameters.LoadingPlaceholderPath, KeyDownsamplingOnly, KeyTransformationsOnly);
                 else
                     KeyForLoadingPlaceholder = string.Concat(Parameters.LoadingPlaceholderPath, KeyDownsamplingOnly);
+
+                var vectLo = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
+                if (vectLo != null)
+                {
+                    KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Parameters.ErrorPlaceholderPath))
@@ -82,6 +94,12 @@ namespace FFImageLoading.Work
                     KeyForErrorPlaceholder = string.Concat(Parameters.ErrorPlaceholderPath, KeyDownsamplingOnly, KeyTransformationsOnly);
                 else
                     KeyForErrorPlaceholder = string.Concat(Parameters.ErrorPlaceholderPath, KeyDownsamplingOnly);
+
+                var vectEr = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
+                if (vectEr != null)
+                {
+                    KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits);
+                }
             }
 
             ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
@@ -325,9 +343,13 @@ namespace FFImageLoading.Work
 
         protected virtual async Task ShowPlaceholder(string path, string key, ImageSource source, bool isLoadingPlaceholder)
         {
+            if (Parameters.Preload)
+                return;
+
             if (!await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
             {
-                var loadResolver = DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
+                var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
+                var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                 var loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
 
                 using (loadImageData.Item1)

@@ -122,6 +122,10 @@ namespace FFImageLoading.Work
 
         public IDataResolver CustomDataResolver { get; private set; }
 
+        public IDataResolver CustomErrorPlaceholderDataResolver { get; private set; }
+
+        public IDataResolver CustomLoadingPlaceholderDataResolver { get; private set; }
+
 		public bool? FadeAnimationForCachedImagesEnabled { get; private set; }
 
 		public int? FadeAnimationDuration { get; private set; }
@@ -242,21 +246,21 @@ namespace FFImageLoading.Work
         /// </summary>
         /// <returns>The custom resolver.</returns>
         /// <param name="resolver">Resolver.</param>
-        public TaskParameter WithCustomDataResolver(IDataResolver resolver)
+        public TaskParameter WithCustomDataResolver(IDataResolver resolver = null)
         {
             CustomDataResolver = resolver;
+            return this;
+        }
 
-            var vectorResolver = resolver as IVectorDataResolver;
-            if (vectorResolver != null && string.IsNullOrWhiteSpace(CustomCacheKey))
-            {
-                CacheKey(string.Format("{0};{4}(size={1}x{2},dip={3})", 
-                                       Path, 
-                                       vectorResolver.VectorWidth, 
-                                       vectorResolver.VectorHeight, 
-                                       vectorResolver.UseDipUnits,
-                                       resolver.GetType()?.Name ?? "Vector"));
-            }
+        public TaskParameter WithCustomLoadingPlaceholderDataResolver(IDataResolver resolver = null)
+        {
+            CustomLoadingPlaceholderDataResolver = resolver;
+            return this;
+        }
 
+        public TaskParameter WithCustomErrorPlaceholderDataResolver(IDataResolver resolver = null)
+        {
+            CustomErrorPlaceholderDataResolver = resolver;
             return this;
         }
 

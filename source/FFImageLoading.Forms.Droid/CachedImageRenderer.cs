@@ -105,17 +105,12 @@ namespace FFImageLoading.Forms.Droid
 			
 		private void UpdateBitmap(CachedImage previous = null)
 		{
-			Xamarin.Forms.ImageSource source = null;
-			var vectorSource = Element.Source as IVectorImageSource;
-			if (vectorSource != null)
-				source = vectorSource.ImageSource;
-			else
-				source = Element.Source;
+			Xamarin.Forms.ImageSource source = Element.Source;
 
 			var imageView = Control;
 
-			var ffSource = ImageSourceBinding.GetImageSourceBinding(source);
-			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder);
+			var ffSource = ImageSourceBinding.GetImageSourceBinding(source, Element);
+			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element);
 
 			if (previous != null && _lastImageSource != null && ffSource != null && !ffSource.Equals(_lastImageSource)
 				&& (string.IsNullOrWhiteSpace(placeholderSource?.Path) || placeholderSource?.Stream != null))
@@ -172,35 +167,6 @@ namespace FFImageLoading.Forms.Droid
 						imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
 					}
 
-					// CustomDataResolver
-					if (Element.CustomDataResolver != null)
-					{
-						imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
-					}
-					else if (vectorSource != null)
-					{
-						if (vectorSource.VectorHeight == 0 && vectorSource.VectorWidth == 0)
-						{
-							if (Element.Height > 0d)
-							{
-								vectorSource.UseDipUnits = true;
-								vectorSource.VectorHeight = (int)Element.Height;
-							}
-							else if (Element.Width > 0d)
-							{
-								vectorSource.UseDipUnits = true;
-								vectorSource.VectorWidth = (int)Element.Width;
-							}
-							else
-							{
-								vectorSource.UseDipUnits = false;
-								vectorSource.VectorHeight = 200;
-							}
-						}
-
-						imageLoader.WithCustomDataResolver(vectorSource.GetVectorDataResolver());
-					}
-
 					// LoadingPlaceholder
 					if (Element.LoadingPlaceholder != null)
 					{
@@ -211,9 +177,32 @@ namespace FFImageLoading.Forms.Droid
 					// ErrorPlaceholder
 					if (Element.ErrorPlaceholder != null)
 					{
-						var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder);
+						var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element);
 						if (errorPlaceholderSource != null)
 							imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
+					}
+
+					// Enable vector image source
+					var vect1 = Element.Source as IVectorImageSource;
+					var vect2 = Element.LoadingPlaceholder as IVectorImageSource;
+					var vect3 = Element.ErrorPlaceholder as IVectorImageSource;
+					if (vect1 != null)
+					{
+						imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
+					}
+					if (vect2 != null)
+					{
+						imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
+					}
+					if (vect3 != null)
+					{
+						imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+					}
+					if (Element.CustomDataResolver != null)
+					{
+						imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
+						imageLoader.WithCustomLoadingPlaceholderDataResolver(Element.CustomDataResolver);
+						imageLoader.WithCustomErrorPlaceholderDataResolver(Element.CustomDataResolver);
 					}
 
 					// Downsample

@@ -14,15 +14,18 @@ namespace FFImageLoading.Svg.Forms
 		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits)
 		{
 			ImageSource = imageSource;
+			VectorWidth = vectorWidth;
+			VectorHeight = vectorHeight;
+			UseDipUnits = useDipUnits;
 		}
 
 		public Xamarin.Forms.ImageSource ImageSource { get; private set; }
 
-		public int VectorWidth { get; set; } = 0;
+		public int VectorWidth { get; set; }
 
-		public int VectorHeight { get; set; } = 0;
+		public int VectorHeight { get; set; }
 
-		public bool UseDipUnits { get; set; } = true;
+		public bool UseDipUnits { get; set; }
 
 		public IVectorDataResolver GetVectorDataResolver()
 		{
