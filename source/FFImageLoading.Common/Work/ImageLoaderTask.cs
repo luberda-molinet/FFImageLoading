@@ -47,6 +47,11 @@ namespace FFImageLoading.Work
                 KeyRaw = Parameters.CustomCacheKey;
             }
 
+            if (Parameters.CacheType == CacheType.Disk)
+            {
+                CanUseMemoryCache = false;
+            }
+
             if (string.IsNullOrWhiteSpace(KeyRaw))
                 KeyRaw = Guid.NewGuid().ToString("N");
 
