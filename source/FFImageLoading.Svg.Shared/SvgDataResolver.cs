@@ -77,13 +77,16 @@ namespace FFImageLoading.Svg.Platform
 				sizeY = VectorHeight;
 			}
 
-			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY, true))
+			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
 			using (var canvas = new SKCanvas(bitmap))
+			using (var paint = new SKPaint())
 			{
+				canvas.Clear(SKColors.Transparent);
 				float scaleX = sizeX / picture.Bounds.Width;
 				float scaleY = sizeY / picture.Bounds.Height;
 				var matrix = SKMatrix.MakeScale(scaleX, scaleY);
-				canvas.DrawPicture(picture, ref matrix);
+
+				canvas.DrawPicture(picture, ref matrix, paint);
 				canvas.Flush();
 
 				using (var image = SKImage.FromBitmap(bitmap))
