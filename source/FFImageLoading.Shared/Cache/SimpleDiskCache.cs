@@ -29,13 +29,13 @@ namespace FFImageLoading.Cache
 		/// <param name="cachePath">Cache path.</param>
         public SimpleDiskCache(string cachePath, Configuration configuration)
         {
-            _cachePath = cachePath;
+            _cachePath = Path.GetFullPath(cachePath);
             Configuration = configuration;
 
-            Logger?.Debug("SimpleDiskCache path: " + cachePath);
+            Logger?.Debug("SimpleDiskCache path: " + _cachePath);
 
-            if (!Directory.Exists(cachePath))
-                Directory.CreateDirectory(cachePath);
+            if (!Directory.Exists(_cachePath))
+                Directory.CreateDirectory(_cachePath);
             
 			InitializeEntries();
 
