@@ -76,7 +76,10 @@ namespace FFImageLoading.Cache
             var sanitizedKey = key.ToSanitizedKey();
 
             if (!_fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+            {
+                Logger?.Error("Can't save to disk as another write with the same key is pending: " + key);
                 return;
+            }
 
             await _currentWriteLock.WaitAsync().ConfigureAwait(false); // Make sure we don't add multiple continuations to the same task
             try
@@ -101,10 +104,13 @@ namespace FFImageLoading.Cache
                         await FileStore.WriteBytesAsync(filepath, bytes, CancellationToken.None).ConfigureAwait(false);
 
                         _entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
+
+                        if (Configuration.VerboseLogging)
+                            Logger?.Debug(string.Format("File {0} saved to disk cache for key {1}", filepath, key));
                     }
                     catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
                     {
-                        Logger.Error(string.Format("An error occured while caching to disk image '{0}'.", key), ex);
+                        Logger?.Error(string.Format("An error occured while writing to disk cache for {0}", key), ex);
                     }
                     finally
                     {
