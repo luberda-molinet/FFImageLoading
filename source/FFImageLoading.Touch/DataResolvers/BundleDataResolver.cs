@@ -55,10 +55,11 @@ namespace FFImageLoading.DataResolvers
 
                 if (file == null)
                 {
-                    file = identifier;
+                    var tmpFile = string.Format(filename + extension);
+                    file = tmpFile;
                     bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                     {
-                        var path = bu.PathForResource(file, fileType);
+                        var path = bu.PathForResource(tmpFile, fileType);
                         return !string.IsNullOrWhiteSpace(path);
                     });
                 }
