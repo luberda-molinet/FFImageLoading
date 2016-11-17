@@ -33,7 +33,7 @@ namespace FFImageLoading.Cache
 			// consider low treshold as a third of maxCacheSize
 			int lowTreshold = safeMaxCacheSize / 3;
 
-			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, safeMaxCacheSize, verboseLogging);
+			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, verboseLogging);
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 		}
 
@@ -136,7 +136,7 @@ namespace FFImageLoading.Cache
 			if (_cache.Count == 0)
 				return null;
 
-			return _cache.GetReusableBitmapDrawable(options.OutWidth, options.OutHeight, options.InPreferredConfig, options.InSampleSize);
+			return _cache.GetReusableBitmapDrawable(options);
 		}
 
 		private static int GetMaxCacheSize(int maxCacheSize)

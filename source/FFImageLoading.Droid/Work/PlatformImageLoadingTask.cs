@@ -74,6 +74,7 @@ namespace FFImageLoading
 
         protected override void BeforeLoading(ISelfDisposingBitmapDrawable image, bool fromMemoryCache)
         {
+            base.BeforeLoading(image, fromMemoryCache);
             image?.SetIsRetained(true);
         }
 
@@ -236,11 +237,11 @@ namespace FFImageLoading
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
-        protected async override Task<ISelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected override Task<ISelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {
-                return await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                return PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
             }
             catch (Exception ex)
             {
