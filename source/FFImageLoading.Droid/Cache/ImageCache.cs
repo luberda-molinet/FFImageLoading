@@ -11,18 +11,32 @@ using System;
 using FFImageLoading.Work;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace FFImageLoading.Cache
 {
-	public class ImageCache : IImageCache
+    public class ImageCache : ImageCache<SelfDisposingBitmapDrawable>
+    {
+        private ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging) : base(maxCacheSize, logger, verboseLogging)
+        {
+        }
+
+        static IImageCache<SelfDisposingBitmapDrawable> _instance;
+        public static IImageCache<SelfDisposingBitmapDrawable> Instance
+        {
+            get
+            {
+                return _instance ?? (_instance = new ImageCache<SelfDisposingBitmapDrawable>(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger, ImageService.Instance.Config.VerboseMemoryCacheLogging));
+            }
+        }
+    }
+
+    public class ImageCache<TValue> : IImageCache<TValue> where TValue: Java.Lang.Object, ISelfDisposingBitmapDrawable
 	{
-		private static IImageCache _instance;
-		private readonly ReuseBitmapDrawableCache _cache;
+        private readonly ReuseBitmapDrawableCache<TValue> _cache;
 		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
 		private readonly IMiniLogger _logger;
 
-        private ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
+        public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
 		{
 			_logger = logger;
 			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
@@ -31,19 +45,11 @@ namespace FFImageLoading.Cache
             logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
 			// consider low treshold as a third of maxCacheSize
-			int lowTreshold = safeMaxCacheSize / 3;
+			int lowTreshold = safeMaxCacheSize / 2;
 
-			_cache = new ReuseBitmapDrawableCache(logger, safeMaxCacheSize, lowTreshold, verboseLogging);
+            _cache = new ReuseBitmapDrawableCache<TValue>(logger, safeMaxCacheSize, lowTreshold, verboseLogging);
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 		}
-
-        public static IImageCache Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger, ImageService.Instance.Config.VerboseMemoryCacheLogging));
-            }
-        }
 
 		public static int GetBitmapSize(BitmapDrawable bmp)
 		{
@@ -73,25 +79,25 @@ namespace FFImageLoading.Cache
 			return null;
 		}
 
-		public Tuple<ISelfDisposingBitmapDrawable, ImageInformation> Get(string key)
+        public Tuple<TValue, ImageInformation> Get(string key)
 		{
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-			ISelfDisposingBitmapDrawable drawable = null;
+			TValue drawable = null;
 
-			if (_cache.TryGetValue(key, out drawable))
+            if (_cache.TryGetValue(key, out drawable))
 			{
 				var imageInformation = GetInfo(key);
-				return new Tuple<ISelfDisposingBitmapDrawable, ImageInformation>(drawable, imageInformation);
+				return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
 			}
 
 			return null;
 		}
 
-		public void Add(string key, ImageInformation imageInformation, ISelfDisposingBitmapDrawable bitmap)
+		public void Add(string key, ImageInformation imageInformation, TValue bitmap)
 		{
-			if (string.IsNullOrWhiteSpace(key) || bitmap == null || bitmap.Handle == IntPtr.Zero || !bitmap.HasValidBitmap || _cache.ContainsKey(key))
+            if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap() || _cache.ContainsKey(key))
 				return;
 
 			_imageInformations.TryAdd(key, imageInformation);
@@ -131,11 +137,8 @@ namespace FFImageLoading.Cache
 		/// </summary>
 		/// <returns>A ISelfDisposingBitmapDrawable.</returns>
 		/// <param name="options">Bitmap creation options.</param>
-		public ISelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
+		public TValue GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
 		{
-			if (_cache.Count == 0)
-				return null;
-
 			return _cache.GetReusableBitmapDrawable(options);
 		}
 

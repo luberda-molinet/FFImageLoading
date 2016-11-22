@@ -12,7 +12,6 @@ using Android.Graphics;
 using System;
 using Android.Graphics.Drawables;
 using Android.Util;
-using FFImageLoading.Collections;
 using Android.Runtime;
 using System.IO;
 using FFImageLoading.Work;
@@ -88,7 +87,7 @@ namespace FFImageLoading.Drawables
         /// </summary>
         public event EventHandler Displayed;
 
-        public long SizeInBytes
+        public int SizeInBytes
         {
             get
             {
@@ -96,6 +95,7 @@ namespace FFImageLoading.Drawables
                 {
                     return Bitmap.Height * Bitmap.RowBytes;
                 }
+
                 return 0;
             }
         }

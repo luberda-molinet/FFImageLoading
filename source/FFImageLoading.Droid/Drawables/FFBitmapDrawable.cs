@@ -68,7 +68,7 @@ namespace FFImageLoading.Drawables
                 alpha = 255;
                 fadeDuration = animationDuration;
                 startTimeMillis = SystemClock.UptimeMillis();
-                placeholder = drawable.GetConstantState().NewDrawable() as BitmapDrawable;
+                placeholder = drawable?.GetConstantState().NewDrawable() as BitmapDrawable;
                 animating = true;
             }
         }

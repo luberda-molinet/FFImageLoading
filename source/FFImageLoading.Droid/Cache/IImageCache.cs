@@ -1,11 +1,9 @@
 ﻿using System;
-using Android.Graphics.Drawables;
 using Android.Graphics;
-using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Cache
 {
-    public interface IImageCache : IMemoryCache<ISelfDisposingBitmapDrawable>
+    public interface IImageCache<TValue> : IMemoryCache<TValue>
     {
 		/// <summary>
 		/// Attempts to find a bitmap suitable for reuse based on the given dimensions.
@@ -17,7 +15,7 @@ namespace FFImageLoading.Cache
 		/// <returns>A SelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
 		/// when finished using it.</returns>
 		/// <param name="options">Bitmap creation options.</param>
-		ISelfDisposingBitmapDrawable GetBitmapDrawableFromReusableSet(BitmapFactory.Options options);
+		TValue GetBitmapDrawableFromReusableSet(BitmapFactory.Options options);
     }
 }
 

@@ -82,7 +82,6 @@
     <Compile Include="Extensions\UnitsExtensions.cs" />
     <Compile Include="Cache\ReuseBitmapDrawableCache.cs" />
     <Compile Include="Drawables\SelfDisposingBitmapDrawable.cs" />
-    <Compile Include="Collections\ByteBoundStrongLruCache.cs" />
     <Compile Include="Drawables\FFBitmapDrawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />
@@ -101,7 +100,10 @@
     <Compile Include="Drawables\ISelfDisposingBitmapDrawable.cs" />
     <Compile Include="Drawables\SelfDisposingTransitionDrawable.cs" />
     <Compile Include="Extensions\DrawableExtensions.cs" />
-    <Compile Include="Collections\LRUCache.cs" />
+    <Compile Include="Cache\ByteBoundStrongLruCache.cs" />
+    <Compile Include="Cache\LRUCache.cs" />
+    <Compile Include="Cache\IByteSizeAware.cs" />
+    <Compile Include="Cache\StrongCache.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

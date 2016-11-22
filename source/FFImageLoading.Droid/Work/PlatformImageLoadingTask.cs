@@ -14,11 +14,11 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading
 {
-    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<ISelfDisposingBitmapDrawable, TImageView> where TImageView : class
+    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
-        public PlatformImageLoaderTask(ITarget<ISelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
+        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
             : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
         {
         }
@@ -31,7 +31,7 @@ namespace FFImageLoading
             }
         }
 
-        protected async override Task SetTargetAsync(ISelfDisposingBitmapDrawable image, bool animated)
+        protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
             ThrowIfCancellationRequested();
 
@@ -50,16 +50,20 @@ namespace FFImageLoading
 
                 if (animated)
                 {
-                    ISelfDisposingBitmapDrawable placeholderDrawable = null;
+                    SelfDisposingBitmapDrawable placeholderDrawable = null;
                     if (PlaceholderWeakReference != null && PlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
                     {
                         int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
                             Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
 
                         placeholderDrawable?.SetIsRetained(true);
-                        ffDrawable?.SetPlaceholder(placeholderDrawable as SelfDisposingBitmapDrawable, fadeDuration);
+                        ffDrawable?.SetPlaceholder(placeholderDrawable, fadeDuration);
                         placeholderDrawable?.SetIsRetained(false);
                     }
+                }
+                else
+                {
+                    ffDrawable?.SetPlaceholder(null, 0);
                 }
             }
 
@@ -72,19 +76,19 @@ namespace FFImageLoading
             }).ConfigureAwait(false);
         }
 
-        protected override void BeforeLoading(ISelfDisposingBitmapDrawable image, bool fromMemoryCache)
+        protected override void BeforeLoading(SelfDisposingBitmapDrawable image, bool fromMemoryCache)
         {
             base.BeforeLoading(image, fromMemoryCache);
             image?.SetIsRetained(true);
         }
 
-        protected override void AfterLoading(ISelfDisposingBitmapDrawable image, bool fromMemoryCache)
+        protected override void AfterLoading(SelfDisposingBitmapDrawable image, bool fromMemoryCache)
         {
             base.AfterLoading(image, fromMemoryCache);
             image?.SetIsRetained(false);
         }
 
-        async Task<ISelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             Bitmap bitmap = null;
 
@@ -237,7 +241,7 @@ namespace FFImageLoading
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
-        protected override Task<ISelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {

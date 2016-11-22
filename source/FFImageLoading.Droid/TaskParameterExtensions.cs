@@ -128,7 +128,7 @@ namespace FFImageLoading
 		/// <param name="cacheType">Cache type.</param>
 		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
 		{
-            var target = new Target<ISelfDisposingBitmapDrawable, object>();
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
             using (var task = CreateTask(parameters, target))
             {
                 var key = task.Key;
@@ -148,7 +148,7 @@ namespace FFImageLoading
             }
 
             parameters.Preload = true;
-            var target = new Target<ISelfDisposingBitmapDrawable, object>();
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
             return task;
@@ -193,7 +193,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
             });
 
-            var target = new Target<ISelfDisposingBitmapDrawable, object>();
+            var target = new Target<SelfDisposingBitmapDrawable, object>();
             var task = CreateTask(parameters, target);
             ImageService.Instance.LoadImage(task);
 
@@ -229,7 +229,7 @@ namespace FFImageLoading
             }
         }
 
-        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<ISelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
+        private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
 		{
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
 		}

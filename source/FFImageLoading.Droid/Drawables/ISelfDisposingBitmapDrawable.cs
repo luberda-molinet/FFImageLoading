@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Collections;
 using Android.Graphics.Drawables;
 using Android.Graphics;
 
