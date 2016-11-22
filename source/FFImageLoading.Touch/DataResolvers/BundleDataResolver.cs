@@ -20,7 +20,8 @@ namespace FFImageLoading.DataResolvers
             NSBundle bundle = null;
             string file = null;
             var filename = Path.GetFileNameWithoutExtension(identifier);
-            const string pattern = "{0}@{1}x{2}";
+            var tmpPath = Path.GetDirectoryName(identifier).Trim('/');
+            var filenamePath = string.IsNullOrWhiteSpace(tmpPath) ? null : tmpPath + "/";
 
             foreach (var fileType in fileTypes)
             {
@@ -35,10 +36,12 @@ namespace FFImageLoading.DataResolvers
                     {
                         token.ThrowIfCancellationRequested();
 
-                        var tmpFile = string.Format(pattern, filename, scale, extension);
+                        var tmpFile = string.Format("{0}@{1}x{2}", filename, scale, extension);
                         bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                         {
-                            var path = bu.PathForResource(tmpFile, fileType);
+                            var path = string.IsNullOrWhiteSpace(filenamePath) ? 
+                                             bu.PathForResource(tmpFile, fileType) : 
+                                             bu.PathForResource(tmpFile, fileType, filenamePath);
                             return !string.IsNullOrWhiteSpace(path);
                         });
 
@@ -59,7 +62,10 @@ namespace FFImageLoading.DataResolvers
                     file = tmpFile;
                     bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                     {
-                        var path = bu.PathForResource(tmpFile, fileType);
+                        var path = string.IsNullOrWhiteSpace(filenamePath) ?
+                                         bu.PathForResource(tmpFile, fileType) :
+                                         bu.PathForResource(tmpFile, fileType, filenamePath);
+                        
                         return !string.IsNullOrWhiteSpace(path);
                     });
                 }
