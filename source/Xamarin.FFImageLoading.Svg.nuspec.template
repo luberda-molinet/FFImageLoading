@@ -35,11 +35,10 @@ IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
 	<files>
 
 		<!--Core PCL-->
-<!-- 
+ 
         <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.dll" />
         <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.xml" />
-        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.pdb" />
- -->
+ 
             
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.dll" />

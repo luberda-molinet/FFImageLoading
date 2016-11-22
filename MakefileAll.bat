@@ -37,6 +37,7 @@ echo Building FFImageLoading.Forms...
 
 echo Building FFImageLoading.Svg...
 
+%msbuild% source/FFImageLoading.Svg/FFImageLoading.Svg.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Touch/FFImageLoading.Svg.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Droid/FFImageLoading.Svg.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms/FFImageLoading.Svg.Forms.csproj %buildargs%
