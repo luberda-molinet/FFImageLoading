@@ -14,8 +14,6 @@
        
        <description>
 Xamarin.Forms SVG support for FFImageLoading library.
-
-IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
        </description>
        
        <summary>Xamarin.Forms SVG support for FFImageLoading.</summary>

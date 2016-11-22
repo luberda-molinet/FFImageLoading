@@ -14,8 +14,6 @@
        
        <description>
 SVG support for FFImageLoading library.
-
-IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
        </description>
        
        <summary>Xamarin SVG support for FFImageLoading.</summary>
@@ -25,7 +23,7 @@ IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
        
           <group>
             <dependency id="Xamarin.FFImageLoading" version="@version" />
-            <dependency id="SkiaSharp" version="1.55.0" />
+            <dependency id="SkiaSharp" version="1.55.1" />
           </group>
               
         </dependencies>
