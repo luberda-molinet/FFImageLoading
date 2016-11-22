@@ -31,9 +31,7 @@ IMPORTANT: Your must reference System.Xml.Linq in your projects !!!
         </dependencies>
 
         <frameworkAssemblies>
-            <group targetFramework="monoandroid+monotouch+uap+winrt">
-                <frameworkAssembly assemblyName="System.Xml.Linq"/>
-            </group>
+            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="monoandroid+monotouch+uap+winrt"/>
         </frameworkAssemblies>           
         
 	</metadata>
