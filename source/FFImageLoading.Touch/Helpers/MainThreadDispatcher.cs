@@ -25,26 +25,45 @@ namespace FFImageLoading.Helpers
         {
 			if (NSThread.Current.IsMainThread)
 			{
-				action();
+				action?.Invoke();
 			}
 			else	
 			{
-				DispatchQueue.MainQueue.DispatchAsync(action);
+                DispatchQueue.MainQueue.DispatchSync(action);
 			}
         }
 
         public Task PostAsync(Action action)
         {
             var tcs = new TaskCompletionSource<object>();
-            Post(() => {
-                try {
-                    if (action != null)
-                        action();
-                    tcs.SetResult(string.Empty);
-                } catch (Exception ex) {
+
+            if (NSThread.Current.IsMainThread)
+            {
+                try
+                {
+                    action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
                     tcs.SetException(ex);
                 }
-            });
+            }
+            else
+            {
+                DispatchQueue.MainQueue.DispatchAsync(() =>
+                {
+                    try
+                    {
+                        action?.Invoke();
+                        tcs.SetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.SetException(ex);
+                    }
+                });
+            }
 
             return tcs.Task;
         }
