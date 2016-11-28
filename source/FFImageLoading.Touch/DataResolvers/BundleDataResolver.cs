@@ -12,19 +12,19 @@ using UIKit;
 namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
-	{
-        readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG","webp", "WEBP"};
+    {
+        readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG", "webp", "WEBP" };
 
         public virtual async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             NSBundle bundle = null;
-            string file = null;
             var filename = Path.GetFileNameWithoutExtension(identifier);
             var tmpPath = Path.GetDirectoryName(identifier).Trim('/');
             var filenamePath = string.IsNullOrWhiteSpace(tmpPath) ? null : tmpPath + "/";
 
             foreach (var fileType in fileTypes)
             {
+                string file = null;
                 var extension = Path.HasExtension(identifier) ? Path.GetExtension(identifier) : string.IsNullOrWhiteSpace(fileType) ? string.Empty : "." + fileType;
 
                 token.ThrowIfCancellationRequested();
@@ -39,9 +39,9 @@ namespace FFImageLoading.DataResolvers
                         var tmpFile = string.Format("{0}@{1}x{2}", filename, scale, extension);
                         bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                         {
-                            var path = string.IsNullOrWhiteSpace(filenamePath) ? 
-                                             bu.PathForResource(tmpFile, fileType) : 
-                                             bu.PathForResource(tmpFile, fileType, filenamePath);
+                            var path = string.IsNullOrWhiteSpace(filenamePath) ?
+                                             bu.PathForResource(tmpFile, null) :
+                                             bu.PathForResource(tmpFile, null, filenamePath);
                             return !string.IsNullOrWhiteSpace(path);
                         });
 
@@ -63,9 +63,9 @@ namespace FFImageLoading.DataResolvers
                     bundle = NSBundle._AllBundles.FirstOrDefault(bu =>
                     {
                         var path = string.IsNullOrWhiteSpace(filenamePath) ?
-                                         bu.PathForResource(tmpFile, fileType) :
-                                         bu.PathForResource(tmpFile, fileType, filenamePath);
-                        
+                                         bu.PathForResource(tmpFile, null) :
+                                         bu.PathForResource(tmpFile, null, filenamePath);
+
                         return !string.IsNullOrWhiteSpace(path);
                     });
                 }
@@ -74,7 +74,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (bundle != null)
                 {
-                    var path = bundle.PathForResource(file, fileType);
+                    var path = bundle.PathForResource(file, null);
 
                     var stream = FileStore.GetInputStream(path, true);
                     var imageInformation = new ImageInformation();
