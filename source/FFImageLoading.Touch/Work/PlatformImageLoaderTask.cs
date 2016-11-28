@@ -21,7 +21,7 @@ namespace FFImageLoading.Work
         {
             // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
             #pragma warning disable 0219
-            var ignore = ScaleHelper.Scale;
+            ScaleHelper.Init();
             #pragma warning restore 0219
         }
 
