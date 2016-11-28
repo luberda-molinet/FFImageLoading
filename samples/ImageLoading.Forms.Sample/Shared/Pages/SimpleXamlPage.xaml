@@ -7,7 +7,7 @@
 		<ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
 			WidthRequest="300" HeightRequest="300"
 			DownsampleToViewSize="true"
-			Source = "loading.png">
+			Source = "http://loremflickr.com/600/600/nature?filename=simple.jpg">
 			<ffimageloading:CachedImage.Transformations>
 				<fftransformations:GrayscaleTransformation />
 			</ffimageloading:CachedImage.Transformations>
