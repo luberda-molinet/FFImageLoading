@@ -421,7 +421,7 @@ namespace FFImageLoading.Cache
         {
             lock (monitor)
             {
-                var keys = displayed_cache.Keys;
+                var keys = displayed_cache.Keys.ToList();
                 foreach (var k in keys)
                 {
                     Remove(k);
