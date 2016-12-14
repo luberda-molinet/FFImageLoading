@@ -426,13 +426,14 @@ namespace FFImageLoading.Forms.WinRT
 			UpdateSource();
 		}
 
-        private void Cancel()
-        {
-            if (_currentTask != null && !_currentTask.IsCancelled)
-            {
-                _currentTask.Cancel();
-            }
-        }
+		private async void Cancel()
+		{
+			var taskToCancel = _currentTask;
+			if (taskToCancel != null && !taskToCancel.IsCancelled))
+			{
+				await Task.Run(() => taskToCancel?.Cancel());
+			}
+		}
 
 		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {

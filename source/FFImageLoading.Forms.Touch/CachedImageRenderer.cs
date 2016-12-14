@@ -317,11 +317,12 @@ namespace FFImageLoading.Forms.Touch
 			SetImage(null);
 		}
 
-		private void Cancel()
+		private async void Cancel()
 		{
-			if (_currentTask != null && !_currentTask.IsCancelled) 
+			var taskToCancel = _currentTask;
+			if (taskToCancel != null && !taskToCancel.IsCancelled)
 			{
-				_currentTask.Cancel ();
+				await Task.Run(() => taskToCancel?.Cancel());
 			}
 		}
 			
