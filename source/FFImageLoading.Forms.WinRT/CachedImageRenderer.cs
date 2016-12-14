@@ -429,7 +429,7 @@ namespace FFImageLoading.Forms.WinRT
 		private async void Cancel()
 		{
 			var taskToCancel = _currentTask;
-			if (taskToCancel != null && !taskToCancel.IsCancelled))
+			if (taskToCancel != null && !taskToCancel.IsCancelled)
 			{
 				await Task.Run(() => taskToCancel?.Cancel());
 			}
