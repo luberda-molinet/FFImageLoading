@@ -25,7 +25,7 @@ namespace FFImageLoading.Cache
             if (maxCacheSize <= 0)
                 _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory    
             else
-                _cache.TotalCostLimit = (nuint)Math.Max((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
+                _cache.TotalCostLimit = (nuint)Math.Min((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
             
             double sizeInMB = Math.Round(_cache.TotalCostLimit /1024d / 1024d, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
