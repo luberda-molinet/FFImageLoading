@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using FFImageLoading.Forms;
 using FFImageLoading.Work;
 
@@ -68,6 +69,16 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
 		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		{
+			throw new Exception(DoNotReference);
+		}
+
+		public static ImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		{
+			throw new Exception(DoNotReference);
+		}
+
+		public static ImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
 		{
 			throw new Exception(DoNotReference);
 		}

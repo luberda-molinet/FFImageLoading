@@ -3,6 +3,7 @@ using System.IO;
 using FFImageLoading.Forms;
 using FFImageLoading.Work;
 using FFImageLoading.Svg.Platform;
+using System.Reflection;
 
 namespace FFImageLoading.Svg.Forms
 {
@@ -72,6 +73,50 @@ namespace FFImageLoading.Svg.Forms
 		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
 		{
 			return new SvgImageSource(Xamarin.Forms.ImageSource.FromUri(uri), vectorWidth, vectorHeight, useDipUnits);
+		}
+
+		/// <summary>
+		/// SvgImageSource FromResource.
+		/// By default it uses view size as vectorWidth / vectorHeight
+		/// </summary>
+		/// <returns>The resource.</returns>
+		/// <param name="resource">Resource.</param>
+		/// <param name="resolvingType">Resolving type.</param>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		public static SvgImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		{
+			
+			return FromResource(resource, resolvingType.GetTypeInfo().Assembly, vectorWidth, vectorHeight, useDipUnits);
+		}
+
+		/// <summary>
+		/// SvgImageSource FromResource.
+		/// By default it uses view size as vectorWidth / vectorHeight
+		/// </summary>
+		/// <returns>The resource.</returns>
+		/// <param name="resource">Resource.</param>
+		/// <param name="sourceAssembly">Source assembly.</param>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		public static SvgImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		{
+			if (sourceAssembly == null)
+			{
+				MethodInfo callingAssemblyMethod = typeof(Assembly).GetTypeInfo().GetDeclaredMethod("GetCallingAssembly");
+				if (callingAssemblyMethod != null)
+				{
+					sourceAssembly = (Assembly)callingAssemblyMethod.Invoke(null, new object[0]);
+				}
+				else
+				{
+					return null;
+				}
+			}
+
+			return FromStream(() => sourceAssembly.GetManifestResourceStream(resource), vectorWidth, vectorHeight, useDipUnits);
 		}
 	}
 }
