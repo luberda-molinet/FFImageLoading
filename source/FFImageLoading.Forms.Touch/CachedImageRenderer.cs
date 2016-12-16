@@ -322,7 +322,7 @@ namespace FFImageLoading.Forms.Touch
 			var taskToCancel = _currentTask;
 			if (taskToCancel != null && !taskToCancel.IsCancelled)
 			{
-				await Task.Run(() => taskToCancel?.Cancel());
+				taskToCancel.Cancel();
 			}
 		}
 			
@@ -343,7 +343,7 @@ namespace FFImageLoading.Forms.Touch
 			await MainThreadDispatcher.Instance.PostAsync(() => {
 				if (Control != null)
 					image = Control.Image;
-			});
+			}).ConfigureAwait(false);
 
 			if (image == null)
 				return null;
