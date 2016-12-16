@@ -47,6 +47,26 @@ namespace FFImageLoading.Forms
 
 			public DownloadInformation DownloadInformation { get; private set; }
 		}
+
+		public class DownloadProgressEventArgs : EventArgs
+		{
+			public DownloadProgressEventArgs(DownloadProgress downloadProgress)
+			{
+				DownloadProgress = downloadProgress;
+			}
+
+			public DownloadProgress DownloadProgress { get; private set; }
+		}
+
+		public class FileWriteFinishedEventArgs : EventArgs
+		{
+			public FileWriteFinishedEventArgs(FileWriteInfo fileWriteInfo)
+			{
+				FileWriteInfo = fileWriteInfo;
+			}
+
+			public FileWriteInfo FileWriteInfo { get; private set; }
+		}
 	}
 }
 

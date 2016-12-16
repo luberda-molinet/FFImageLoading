@@ -765,7 +765,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Gets or sets the DownloadStartedCommand.
 		///  Occurs when an image starts downloading from web.
-		/// Command parameter: EventArgs
+		/// Command parameter: DownloadStartedEventArgs
 		/// </summary>
 		/// <value>The download started command.</value>
 		public ICommand DownloadStartedCommand
@@ -787,6 +787,80 @@ namespace FFImageLoading.Forms
 			var downloadStartedCommand = DownloadStartedCommand;
 			if (downloadStartedCommand != null && downloadStartedCommand.CanExecute(e))
 				downloadStartedCommand.Execute(e);
+		}
+
+		/// <summary>
+		/// This callback can be used for reading download progress
+		/// </summary>
+		public event EventHandler<CachedImageEvents.DownloadProgressEventArgs> DownloadProgress;
+
+		/// <summary>
+		/// The DownloadProgressCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty DownloadProgressCommandProperty = BindableProperty.Create(nameof(DownloadProgressCommand), typeof(ICommand), typeof(CachedImage));
+
+		/// <summary>
+		/// Gets or sets the DownloadProgressCommand.
+		///  This callback can be used for reading download progress
+		/// Command parameter: DownloadProgressEventArgs
+		/// </summary>
+		/// <value>The download started command.</value>
+		public ICommand DownloadProgressCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(DownloadProgressCommandProperty);
+			}
+			set
+			{
+				SetValue(DownloadProgressCommandProperty, value);
+			}
+		}
+
+		internal void OnDownloadProgress(CachedImageEvents.DownloadProgressEventArgs e)
+		{
+			DownloadProgress?.Invoke(this, e);
+
+			var downloadProgressCommand = DownloadProgressCommand;
+			if (downloadProgressCommand != null && downloadProgressCommand.CanExecute(e))
+				downloadProgressCommand.Execute(e);
+		}
+
+		/// <summary>
+		/// Called after file is succesfully written to the disk.
+		/// </summary>
+		public event EventHandler<CachedImageEvents.FileWriteFinishedEventArgs> FileWriteFinished;
+
+		/// <summary>
+		/// The FileWriteFinishedCommandProperty.
+		/// </summary>
+		public static readonly BindableProperty FileWriteFinishedCommandProperty = BindableProperty.Create(nameof(FileWriteFinishedCommand), typeof(ICommand), typeof(CachedImage));
+
+		/// <summary>
+		/// Gets or sets the FileWriteFinishedCommand.
+		///  Called after file is succesfully written to the disk.
+		/// Command parameter: FileWriteFinishedEventArgs
+		/// </summary>
+		/// <value>The download started command.</value>
+		public ICommand FileWriteFinishedCommand
+		{
+			get
+			{
+				return (ICommand)GetValue(FileWriteFinishedCommandProperty);
+			}
+			set
+			{
+				SetValue(FileWriteFinishedCommandProperty, value);
+			}
+		}
+
+		internal void OnFileWriteFinished(CachedImageEvents.FileWriteFinishedEventArgs e)
+		{
+			FileWriteFinished?.Invoke(this, e);
+
+			var fileWriteFinishedCommand = FileWriteFinishedCommand;
+			if (fileWriteFinishedCommand != null && fileWriteFinishedCommand.CanExecute(e))
+				fileWriteFinishedCommand.Execute(e);
 		}
 
         /// <summary>

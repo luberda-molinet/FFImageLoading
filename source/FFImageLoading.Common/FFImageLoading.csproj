@@ -96,6 +96,8 @@
     <Compile Include="Cache\DownloadCache.cs" />
     <Compile Include="Helpers\IMD5Helper.cs" />
     <Compile Include="Work\IVectorDataResolver.cs" />
+    <Compile Include="Work\DownloadProgress.cs" />
+    <Compile Include="Work\FileWriteInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

@@ -382,6 +382,12 @@ namespace FFImageLoading.Forms.WinRT
 				imageLoader.DownloadStarted((downloadInformation) =>
 					element.OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
 
+				imageLoader.DownloadProgress((progress) =>
+					element.OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
+
+				imageLoader.FileWriteFinished((fileWriteInfo) =>
+					element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
+
                 _currentTask = imageLoader.Into(Control);
             }
         }

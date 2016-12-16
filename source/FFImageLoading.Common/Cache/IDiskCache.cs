@@ -13,7 +13,7 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key to store/retrieve the file.</param>
 		/// <param name="bytes">File data in bytes.</param>
 		/// <param name="duration">Specifies how long an item should remain in the cache.</param>
-		Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration);
+        Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null);
 
 		Task<Stream> TryGetStreamAsync(string key);
 

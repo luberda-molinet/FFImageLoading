@@ -52,7 +52,7 @@ namespace FFImageLoading.Cache
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
             var responseBytes = await Retry.DoAsync(
-                async () => await DownloadAsync(url, token, configuration.HttpClient).ConfigureAwait(false),
+                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress).ConfigureAwait(false),
                 DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
@@ -62,7 +62,18 @@ namespace FFImageLoading.Cache
 
             if (allowDiskCaching)
             {
-                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration).ConfigureAwait(false);
+                Action finishedAction = null;
+
+                if (parameters.OnFileWriteFinished != null)
+                {
+                    finishedAction = new Action(() =>
+                    {
+                        parameters.OnFileWriteFinished(new FileWriteInfo(filePath, url));
+                    });
+                }
+
+
+                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration, finishedAction).ConfigureAwait(false);
             }
 
             token.ThrowIfCancellationRequested();
@@ -72,7 +83,7 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client)
+        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction)
         {
             using (var cancelHeadersToken = new CancellationTokenSource())
             {
@@ -94,10 +105,38 @@ namespace FFImageLoading.Cache
                             {
                                 cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
 
+                                int total = (int)(response.Content.Headers.ContentLength.HasValue ? response.Content.Headers.ContentLength.Value : -1L);
+                                var canReportProgress = total != -1 && progressAction != null;
+
                                 try
                                 {
-                                    return await Task.Run(async () => await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false), 
-                                                          cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                                    return await Task.Run(async () =>
+                                    {
+                                        using (var outputStream = new MemoryStream())
+                                        using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                                        {
+                                            int totalRead = 0;
+                                            var buffer = new byte[4096];
+
+                                            int read;
+                                            while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                token.ThrowIfCancellationRequested();
+
+                                                outputStream.Write(buffer, 0, read);
+
+                                                totalRead += read;
+
+                                                if (canReportProgress)
+                                                {
+                                                    progressAction(new DownloadProgress() { Total = total, Current = totalRead });
+                                                }
+                                            }
+
+                                            return outputStream.ToArray();
+                                        }
+
+                                    }, cancelReadTimeoutToken.Token).ConfigureAwait(false);
                                 }
                                 catch (OperationCanceledException)
                                 {

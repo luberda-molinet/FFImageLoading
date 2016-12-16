@@ -111,6 +111,10 @@ namespace FFImageLoading.Work
 
         public Action<DownloadInformation> OnDownloadStarted { get; private set; }
 
+        public Action<FileWriteInfo> OnFileWriteFinished { get; private set; }
+
+        public Action<DownloadProgress> OnDownloadProgress { get; private set; }
+
 		public List<ITransformation> Transformations { get; private set; }
 
         [Obsolete("Use BitmapOptimizations")]
@@ -427,6 +431,34 @@ namespace FFImageLoading.Work
                 throw new Exception("Given lambda should not be null.");
 
             OnDownloadStarted = action;
+            return this;
+        }
+
+        /// <summary>
+        /// This callback can be used for reading download progress
+        /// </summary>
+        /// <returns>The progress.</returns>
+        /// <param name="action">Action.</param>
+        public TaskParameter DownloadProgress(Action<DownloadProgress> action)
+        {
+            if (action == null)
+                throw new Exception("Given lambda should not be null.");
+
+            OnDownloadProgress = action;
+            return this;
+        }
+
+        /// <summary>
+        /// Called after file is succesfully written to the disk
+        /// </summary>
+        /// <returns>The write ended.</returns>
+        /// <param name="action">Action.</param>
+        public TaskParameter FileWriteFinished(Action<FileWriteInfo> action)
+        {
+            if (action == null)
+                throw new Exception("Given lambda should not be null.");
+
+            OnFileWriteFinished = action;
             return this;
         }
 
