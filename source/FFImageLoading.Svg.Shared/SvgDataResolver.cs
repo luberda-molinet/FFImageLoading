@@ -37,7 +37,7 @@ namespace FFImageLoading.Svg.Platform
 
 			var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
 											.GetResolver(identifier, source, parameters, Configuration)
-											.Resolve(identifier, parameters, token);
+											.Resolve(identifier, parameters, token).ConfigureAwait(false);
 
 			if (resolvedData?.Item1 == null)
 				throw new FileNotFoundException(identifier);

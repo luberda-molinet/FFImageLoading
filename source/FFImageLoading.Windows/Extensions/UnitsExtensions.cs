@@ -18,7 +18,7 @@ namespace FFImageLoading.Extensions
             await MainThreadDispatcher.Instance.PostAsync(() =>
             {
                 resolutionScale = (double)DisplayInformation.GetForCurrentView().ResolutionScale / 100.0d;
-            });
+            }).ConfigureAwait(false);
         }
 
         static void WaitForResolutionScaleInit()

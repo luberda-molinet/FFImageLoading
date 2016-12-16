@@ -617,12 +617,12 @@ namespace FFImageLoading.Forms
 			var fileImageSource = source as FileImageSource;
 
 			if (fileImageSource != null)
-				await ImageService.Instance.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar);
+				await ImageService.Instance.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar).ConfigureAwait(false);
 
 			var uriImageSource = source as UriImageSource;
 
 			if (uriImageSource != null)
-				await ImageService.Instance.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar);
+				await ImageService.Instance.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
 		}
 
 		/// <summary>

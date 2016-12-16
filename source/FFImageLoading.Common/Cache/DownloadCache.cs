@@ -55,7 +55,7 @@ namespace FFImageLoading.Cache
                 async () => await DownloadAsync(url, token, configuration.HttpClient).ConfigureAwait(false),
                 DelayBetweenRetry,
                 parameters.RetryCount,
-                () => configuration.Logger.Debug(string.Format("Retry download: {0}", url)));
+                () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
 
             if (responseBytes == null)
                 throw new HttpRequestException("No Content");

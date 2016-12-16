@@ -89,7 +89,7 @@ namespace FFImageLoading
 
             TaskParameter imageLoader = null;
 
-            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source);
+            var ffSource = await FFImageSourceBinding.GetImageSourceBinding(Source).ConfigureAwait(false);
 
             if (ffSource == null)
             {

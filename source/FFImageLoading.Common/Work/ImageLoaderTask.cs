@@ -261,7 +261,7 @@ namespace FFImageLoading.Work
                         {
                             Parameters?.OnSuccess?.Invoke(ImageInformation, LoadingResult.MemoryCache);
                             Parameters?.OnFinish?.Invoke(this);
-                        });
+                        }).ConfigureAwait(false);
                     }
                     else
                     {
@@ -307,7 +307,7 @@ namespace FFImageLoading.Work
                         await MainThreadDispatcher.PostAsync(() =>
                         {
                             Parameters?.OnError?.Invoke(ex);
-                        });
+                        }).ConfigureAwait(false);
                     }
                     else
                     {
@@ -460,7 +460,7 @@ namespace FFImageLoading.Work
                         await MainThreadDispatcher.PostAsync(() =>
                         {
                             Parameters?.OnError?.Invoke(ex);
-                        });
+                        }).ConfigureAwait(false);
                     }
                     else
                     {
@@ -498,7 +498,7 @@ namespace FFImageLoading.Work
                             if (success)
                                 Parameters?.OnSuccess?.Invoke(ImageInformation, loadingResult);
                             Parameters?.OnFinish?.Invoke(this);
-                        });
+                        }).ConfigureAwait(false);
                     }
                     else
                     {

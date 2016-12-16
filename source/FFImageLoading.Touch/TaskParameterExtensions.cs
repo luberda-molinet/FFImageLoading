@@ -224,7 +224,7 @@ namespace FFImageLoading
         {
             if (parameters.Source == ImageSource.Url)
             {
-                await PreloadAsync(parameters.WithCache(CacheType.Disk));
+                await PreloadAsync(parameters.WithCache(CacheType.Disk)).ConfigureAwait(false);
             }
         }
 
