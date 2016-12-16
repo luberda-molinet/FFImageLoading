@@ -279,9 +279,6 @@ namespace FFImageLoading
 			if (task == null)
 				return;
 
-			if (task.Parameters.DelayInMs == null && Config.DelayInMs > 0)
-				task.Parameters.Delay(Config.DelayInMs);
-
 			Scheduler.LoadImage(task);
         }
 
