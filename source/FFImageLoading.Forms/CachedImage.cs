@@ -93,7 +93,6 @@ namespace FFImageLoading.Forms
             {
                 BindableObject.SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
             }
-			((IVisualElementController)bindable).NativeSizeChanged();
         }
 			
 		/// <summary>
