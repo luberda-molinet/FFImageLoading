@@ -396,17 +396,17 @@ namespace FFImageLoading.Work
             {
                 if (tasksToRun.Count == 1)
                 {
-                    await RunImageLoadingTaskAsync(tasksToRun.Values.First(), false).ConfigureAwait(false);
+                    await RunImageLoadingTaskAsync(tasksToRun.Values.First()).ConfigureAwait(false);
                 }
                 else
                 {
-                    var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value, true));
+                    var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value));
                     await Task.WhenAll(tasks).ConfigureAwait(false);
                 } 
             }
         }
 
-        protected async Task RunImageLoadingTaskAsync(PendingTask pendingTask, bool scheduleOnThreadPool)
+        protected async Task RunImageLoadingTaskAsync(PendingTask pendingTask)
         {
             var key = pendingTask.ImageLoadingTask.Key;
 
@@ -426,34 +426,19 @@ namespace FFImageLoading.Work
                     LogSchedulerStats();
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
-                    if (scheduleOnThreadPool)
-                    {
-                        await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        await pendingTask.ImageLoadingTask.RunAsync().ConfigureAwait(false);
-                    }
+                    await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
 
                     stopwatch.Stop();
 
-                    Logger.Debug(string.Format("[PERFORMANCE] RunAsync - NetManagedThreadId: {0}, NativeThreadId: {1}, Execution: {2} ms, ThreadPool: {3}, Key: {4}",
+                    Logger.Debug(string.Format("[PERFORMANCE] RunAsync - NetManagedThreadId: {0}, NativeThreadId: {1}, Execution: {2} ms, Key: {3}",
                                                 Performance.GetCurrentManagedThreadId(),
                                                 Performance.GetCurrentSystemThreadId(),
                                                 stopwatch.Elapsed.Milliseconds,
-                                                scheduleOnThreadPool,
                                                 key));
                 }
                 else
                 {
-                    if (scheduleOnThreadPool)
-                    {
-                        await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        await pendingTask.ImageLoadingTask.RunAsync().ConfigureAwait(false);
-                    }
+                    await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
                 }
             }
             finally
