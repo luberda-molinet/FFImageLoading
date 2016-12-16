@@ -235,10 +235,6 @@ namespace FFImageLoading.Work
                     Interlocked.Increment(ref _statsTotalPending);
                     PendingTasks.Add(currentPendingTask);
                 }
-                else
-                {
-                    similarRunningTask.Position = position;
-                }
             }
 
             if (PauseWork)
@@ -258,7 +254,9 @@ namespace FFImageLoading.Work
         {
             Interlocked.Increment(ref _statsTotalWaiting);
 
-            if (taskForSimilarKey.FrameworkWrappingTask == null)
+            if (taskForSimilarKey?.FrameworkWrappingTask == null 
+                || taskForSimilarKey.FrameworkWrappingTask.IsCanceled 
+                || taskForSimilarKey.FrameworkWrappingTask.IsFaulted)
             {
                 lock (_pendingTasksLock)
                 {
@@ -273,10 +271,17 @@ namespace FFImageLoading.Work
             Logger.Debug(string.Format("Wait for similar request for key: {0}", taskForSimilarKey.ImageLoadingTask.Key));
             await taskForSimilarKey.FrameworkWrappingTask.ConfigureAwait(false);
 
+            if (currentPendingTask?.ImageLoadingTask == null || currentPendingTask.ImageLoadingTask.IsCancelled)
+                return;
+
             // Now our image should be in the cache
             var cacheFound = await currentPendingTask.ImageLoadingTask.TryLoadFromMemoryCacheAsync().ConfigureAwait(false);
+
             if (!cacheFound)
             {
+                if (currentPendingTask?.ImageLoadingTask == null || currentPendingTask.ImageLoadingTask.IsCancelled)
+                    return;
+                
                 lock (_pendingTasksLock)
                 {
                     Interlocked.Increment(ref _statsTotalPending);
