@@ -8,6 +8,8 @@ namespace FFImageLoading.Views
 	[Register("ffimageloading.views.ImageViewAsync")]
 	public class ImageViewAsync : ManagedImageView
 	{
+        bool _customFit = false;
+
 		public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
 		{
 		}
@@ -37,6 +39,7 @@ namespace FFImageLoading.Views
 			}
 			set
 			{
+                _customFit = true;
 				_scaleToFit = value;
 				SetAdjustViewBounds(false);
 				SetScaleType(ScaleType.Matrix);
@@ -56,6 +59,7 @@ namespace FFImageLoading.Views
 			}
 			set
 			{
+                _customFit = true;
 				_bottomAlign = value;
 				SetAdjustViewBounds(false);
 				SetScaleType(ScaleType.Matrix);
@@ -71,7 +75,7 @@ namespace FFImageLoading.Views
 
 		protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
 		{
-			if (Drawable == null)
+			if (_customFit && Drawable == null)
 			{
 				SetMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
 			}
@@ -83,7 +87,7 @@ namespace FFImageLoading.Views
 
 		protected override bool SetFrame(int l, int t, int r, int b)
 		{
-			if (Drawable != null && Drawable.IntrinsicWidth != 0)
+			if (_customFit && Drawable != null && Drawable.IntrinsicWidth != 0)
 			{
 				bool bottomAlignmentDefined = AlignMode != AlignMode.None;
 				if (ScaleToFit || bottomAlignmentDefined)
