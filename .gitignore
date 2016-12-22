@@ -47,3 +47,5 @@ nuget.exe
 *.DS_Store
 *.bak
 .droidres/.ffimageloading.droidres.db
+
+.vs/FFImageLoading.sqlite
