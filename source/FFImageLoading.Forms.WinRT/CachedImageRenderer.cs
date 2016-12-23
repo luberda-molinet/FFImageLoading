@@ -205,7 +205,7 @@ namespace FFImageLoading.Forms.WinRT
 
         private async void UpdateSource()
         {
-            ((Xamarin.Forms.IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
+            Element.SetIsLoading(true);
 
             Xamarin.Forms.ImageSource source = Element.Source;
 
@@ -419,7 +419,7 @@ namespace FFImageLoading.Forms.WinRT
 					var elCtrl = element as Xamarin.Forms.IVisualElementController;
 					if (elCtrl != null)
 					{
-						elCtrl.SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
+						elCtrl.SetIsLoading(false);
 						//elCtrl.NativeSizeChanged();
 						HackInvalidateMeasure(element);
 					}
@@ -432,7 +432,7 @@ namespace FFImageLoading.Forms.WinRT
 			UpdateSource();
 		}
 
-		private async void Cancel()
+		private void Cancel()
 		{
 			var taskToCancel = _currentTask;
 			if (taskToCancel != null && !taskToCancel.IsCancelled)

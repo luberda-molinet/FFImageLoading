@@ -15,22 +15,18 @@ namespace FFImageLoading.Views
 
 		public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
 		{
-			SetWillNotDraw(false);
 		}
 
 		public ManagedImageView(Context context) : base(context)
 		{
-			SetWillNotDraw(false);
 		}
 
         public ManagedImageView(Context context, IAttributeSet attrs) : base(context, attrs)
 		{
-            SetWillNotDraw(false);
 		}
 
         public ManagedImageView(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle)
         {
-            SetWillNotDraw(false);
         }
 
 		protected override void Dispose(bool disposing)

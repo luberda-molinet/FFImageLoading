@@ -122,7 +122,7 @@ namespace FFImageLoading.Forms.Touch
 				Control.Image = null;
 			}
 
-			((IElementController)Element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, true);
+			Element.SetIsLoading(true);
 
 			Cancel();
 			TaskParameter imageLoader = null;
@@ -312,7 +312,7 @@ namespace FFImageLoading.Forms.Touch
 			{
 				if (element != null && !_isDisposed)
 				{
-					((IElementController)element).SetValueFromRenderer(CachedImage.IsLoadingPropertyKey, false);
+					element.SetIsLoading(false);
 					((IVisualElementController)element).NativeSizeChanged();
 				}
 			});
@@ -323,7 +323,7 @@ namespace FFImageLoading.Forms.Touch
 			SetImage(null);
 		}
 
-		private async void Cancel()
+		private void Cancel()
 		{
 			var taskToCancel = _currentTask;
 			if (taskToCancel != null && !taskToCancel.IsCancelled)

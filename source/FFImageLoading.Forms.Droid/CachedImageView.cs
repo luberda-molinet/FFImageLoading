@@ -3,6 +3,7 @@ using FFImageLoading.Views;
 using Android.Content;
 using Android.Runtime;
 using Android.Util;
+using Android.Graphics.Drawables;
 
 namespace FFImageLoading.Forms.Droid
 {
@@ -13,18 +14,16 @@ namespace FFImageLoading.Forms.Droid
 
         public CachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
-            SetWillNotDraw(false);
         }
 
         public CachedImageView(Context context) : base(context)
         {
-            SetWillNotDraw(false);
         }
 
         public CachedImageView(Context context, IAttributeSet attrs): base(context, attrs)
         {
-            SetWillNotDraw(false);
         }
+
 
 		public override void Invalidate()
 		{
