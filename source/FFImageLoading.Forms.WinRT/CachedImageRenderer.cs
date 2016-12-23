@@ -417,9 +417,10 @@ namespace FFImageLoading.Forms.WinRT
             	if (element != null && !_isDisposed)
 				{
 					var elCtrl = element as Xamarin.Forms.IVisualElementController;
+					element.SetIsLoading(false);
+
 					if (elCtrl != null)
 					{
-						elCtrl.SetIsLoading(false);
 						//elCtrl.NativeSizeChanged();
 						HackInvalidateMeasure(element);
 					}
