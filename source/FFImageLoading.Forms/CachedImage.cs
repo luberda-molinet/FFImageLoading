@@ -11,6 +11,7 @@ namespace FFImageLoading.Forms
 	/// <summary>
 	/// CachedImage - Xamarin.Forms Image replacement with caching and downsampling capabilities
 	/// </summary>
+
 	public class CachedImage : View
 	{
 		public CachedImage()
@@ -486,13 +487,9 @@ namespace FFImageLoading.Forms
 			base.OnBindingContextChanged();
 		}
 
-		[Obsolete("Use OnMeasure")]
-		protected override SizeRequest OnSizeRequest(double widthConstraint, double heightConstraint)
+		protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
 		{
-			SizeRequest desiredSize = base.OnSizeRequest(double.PositiveInfinity, double.PositiveInfinity);
-
-			double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
-			double constraintAspect = widthConstraint / heightConstraint;
+			SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
 
 			double desiredWidth = desiredSize.Request.Width;
 			double desiredHeight = desiredSize.Request.Height;
@@ -500,48 +497,34 @@ namespace FFImageLoading.Forms
 			if (desiredWidth == 0 || desiredHeight == 0)
 				return new SizeRequest(new Size(0, 0));
 
-			double width = desiredWidth;
-			double height = desiredHeight;
-			if (constraintAspect > desiredAspect)
+
+			if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
 			{
-				// constraint area is proportionally wider than image
-				switch (Aspect)
-				{
-					case Aspect.AspectFit:
-					case Aspect.AspectFill:
-						height = Math.Min(desiredHeight, heightConstraint);
-						width = desiredWidth * (height / desiredHeight);
-						break;
-					case Aspect.Fill:
-						width = Math.Min(desiredWidth, widthConstraint);
-						height = desiredHeight * (width / desiredWidth);
-						break;
-				}
-			}
-			else if (constraintAspect < desiredAspect)
-			{
-				// constraint area is proportionally taller than image
-				switch (Aspect)
-				{
-					case Aspect.AspectFit:
-					case Aspect.AspectFill:
-						width = Math.Min(desiredWidth, widthConstraint);
-						height = desiredHeight * (width / desiredWidth);
-						break;
-					case Aspect.Fill:
-						height = Math.Min(desiredHeight, heightConstraint);
-						width = desiredWidth * (height / desiredHeight);
-						break;
-				}
-			}
-			else
-			{
-				// constraint area is same aspect as image
-				width = Math.Min(desiredWidth, widthConstraint);
-				height = desiredHeight * (width / desiredWidth);
+				return new SizeRequest(new Size(desiredWidth, desiredHeight));
 			}
 
-			return new SizeRequest(new Size(width, height));
+			if (double.IsPositiveInfinity(widthConstraint))
+			{
+				double factor = heightConstraint / desiredHeight;
+				return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+			}
+
+			if (double.IsPositiveInfinity(heightConstraint))
+			{
+				double factor = widthConstraint / desiredWidth;
+				return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+			}
+
+			double fitsWidthRatio = widthConstraint / desiredWidth;
+			double fitsHeightRatio = heightConstraint / desiredHeight;
+			double ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
+
+			return new SizeRequest(new Size(desiredWidth * ratioFactor, desiredHeight * ratioFactor));
+		}
+
+		public void SetIsLoading(bool isLoading)
+		{
+			SetValue(IsLoadingPropertyKey, isLoading);
 		}
 
 		internal Action InternalReloadImage;
@@ -863,10 +846,10 @@ namespace FFImageLoading.Forms
 				fileWriteFinishedCommand.Execute(e);
 		}
 
-        /// <summary>
-        /// The cache type property.
-        /// </summary>
-        public static readonly BindableProperty CacheTypeProperty = BindableProperty.Create(nameof(CacheType), typeof(CacheType?), typeof(CachedImage), default(CacheType?));
+		/// <summary>
+		/// The cache type property.
+		/// </summary>
+		public static readonly BindableProperty CacheTypeProperty = BindableProperty.Create(nameof(CacheType), typeof(CacheType?), typeof(CachedImage), default(CacheType?));
 
         /// <summary>
         /// Set the cache storage type, (Memory, Disk, All). by default cache is set to All.
