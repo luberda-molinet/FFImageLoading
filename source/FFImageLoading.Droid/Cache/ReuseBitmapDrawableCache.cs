@@ -139,21 +139,19 @@ namespace FFImageLoading.Cache
                 // allocation byte count.
                 int width = targetOptions.OutWidth / targetOptions.InSampleSize;
                 int height = targetOptions.OutHeight / targetOptions.InSampleSize;
+
+                if (targetOptions.InSampleSize > 1)
+                {
+                    // Android docs: the decoder uses a final value based on powers of 2, any other value will be rounded down to the nearest power of 2.
+                    if (width % 2 != 0)
+                      width += 1;
+
+                    if (height % 2 != 0)
+                      height += 1; 
+                }
+
                 int byteCount = width * height * GetBytesPerPixel(candidate.GetConfig());
                 return byteCount <= candidate.AllocationByteCount;
-
-                //  int newWidth = (int)Math.Ceiling(width/(float)inSampleSize);
-                //  int newHeight = (int)Math.Ceiling(height/(float)inSampleSize);
-
-                //  if (inSampleSize > 1)
-                //  {
-                //      // Android docs: the decoder uses a final value based on powers of 2, any other value will be rounded down to the nearest power of 2.
-                //      //if (newWidth % 2 != 0)
-                //      //  newWidth += 1;
-
-                //      //if (newHeight % 2 != 0)
-                //      //  newHeight += 1; 
-                //  }
             }
 
             // On earlier versions, the dimensions must match exactly and the inSampleSize must be 1
