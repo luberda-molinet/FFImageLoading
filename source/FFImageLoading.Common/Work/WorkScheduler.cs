@@ -235,12 +235,12 @@ namespace FFImageLoading.Work
                     Interlocked.Increment(ref _statsTotalPending);
                     PendingTasks.Add(currentPendingTask);
                 }
-                else
+                else if (similarRunningTask.ImageLoadingTask != null && task.Parameters.Priority.HasValue)
                 {
-                    if (task.Parameters.Priority > similarRunningTask.ImageLoadingTask.Parameters.Priority)
+                    if (!similarRunningTask.ImageLoadingTask.Parameters.Priority.HasValue 
+                        || task.Parameters.Priority.Value > similarRunningTask.ImageLoadingTask.Parameters.Priority.Value)
                     {
-                        var similarIndex = PendingTasks.IndexOf(similarRunningTask);
-                        PendingTasks[similarIndex].ImageLoadingTask.Parameters.WithPriority((LoadingPriority)task.Parameters.Priority);
+                        similarRunningTask.ImageLoadingTask.Parameters.WithPriority(task.Parameters.Priority.Value);
                     }
                 }
             }
