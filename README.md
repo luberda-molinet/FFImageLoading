@@ -39,8 +39,8 @@ https://github.com/luberda-molinet/FFImageLoading/wiki
 
 [what-is-this]: various_images_and_image_links
 
-[ci-img]: https://img.shields.io/appveyor/ci/molinch/ffimageloading.svg
-[ci-link]: https://ci.appveyor.com/project/molinch/ffimageloading
+[ci-img]: https://img.shields.io/appveyor/ci/daniel-luberda/ffimageloading.svg
+[ci-link]: https://ci.appveyor.com/project/daniel-luberda/ffimageloading
 
 [ffil-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.svg
 [ffil-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading
@@ -51,15 +51,15 @@ https://github.com/luberda-molinet/FFImageLoading/wiki
 [ffil-pre-img]: https://img.shields.io/nuget/vpre/Xamarin.FFImageLoading.svg
 [ffil-pre-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading
 
-[ffimageloading_large]: https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/ffimageloading_large.png
-[ffimageloading]: https://raw.githubusercontent.com/molinch/FFImageLoading/master/samples/Screenshots/ffimageloading.png
+[ffimageloading_large]: https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/samples/Screenshots/ffimageloading_large.png
+[ffimageloading]: https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/samples/Screenshots/ffimageloading.png
 
 [demo-forms-img]: https://img.shields.io/badge/demo-source-orange.svg
-[demo-forms-src]: https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample
+[demo-forms-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample
 [demo-droid-img]: https://img.shields.io/badge/demo-source-orange.svg
-[demo-droid-src]: https://github.com/molinch/FFImageLoading/tree/master/samples/ImageLoading.Sample
+[demo-droid-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.Sample
 [demo-win-img]: https://img.shields.io/badge/demo-source-orange.svg
-[demo-win-src]: https://github.com/molinch/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample
+[demo-win-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample
 [dev-nugets-img]: https://img.shields.io/badge/nugets-dev-yellow.svg
 [dev-nugets]: https://github.com/luberda-molinet/FFImageLoading/wiki/Dev-NuGet-packages
 
