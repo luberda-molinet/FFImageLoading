@@ -470,6 +470,8 @@ namespace FFImageLoading.Work
                 OnError = null;
                 OnFinish = null;
                 OnDownloadStarted = null;
+                OnDownloadProgress = null;
+                OnFileWriteFinished = null;
                 Transformations = null;
                 Stream = null;
 

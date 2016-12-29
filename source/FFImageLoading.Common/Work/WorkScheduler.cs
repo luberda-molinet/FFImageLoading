@@ -235,12 +235,23 @@ namespace FFImageLoading.Work
                     Interlocked.Increment(ref _statsTotalPending);
                     PendingTasks.Add(currentPendingTask);
                 }
-                else if (similarRunningTask.ImageLoadingTask != null && task.Parameters.Priority.HasValue)
+                else if (similarRunningTask.ImageLoadingTask != null)
                 {
-                    if (!similarRunningTask.ImageLoadingTask.Parameters.Priority.HasValue 
-                        || task.Parameters.Priority.Value > similarRunningTask.ImageLoadingTask.Parameters.Priority.Value)
+                    if (task.Parameters.Priority.HasValue && (!similarRunningTask.ImageLoadingTask.Parameters.Priority.HasValue
+                        || task.Parameters.Priority.Value > similarRunningTask.ImageLoadingTask.Parameters.Priority.Value))
                     {
                         similarRunningTask.ImageLoadingTask.Parameters.WithPriority(task.Parameters.Priority.Value);
+                    }
+
+                    if (task.Parameters.OnDownloadProgress != null)
+                    {
+                        var similarTaskOnDownloadProgress = similarRunningTask.ImageLoadingTask.Parameters.OnDownloadProgress;
+
+                        similarRunningTask.ImageLoadingTask.Parameters.DownloadProgress((DownloadProgress obj) =>
+                        {
+                            similarTaskOnDownloadProgress?.Invoke(obj);
+                            task.Parameters.OnDownloadProgress(obj);
+                        });
                     }
                 }
             }
