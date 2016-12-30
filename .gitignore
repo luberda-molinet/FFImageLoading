@@ -49,3 +49,9 @@ nuget.exe
 .droidres/.ffimageloading.droidres.db
 
 .vs/FFImageLoading.sqlite
+
+source/FFImageLoading.Svg.Forms.Windows/project.lock.json
+
+source/FFImageLoading.Svg.Forms.Windows/project.lock.json
+
+source/FFImageLoading.Svg.Windows/project.lock.json
