@@ -37,11 +37,9 @@ SVG support for FFImageLoading library.
 	<files>
 
 		<!--Core PCL-->
- 
         <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.dll" />
         <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Svg.Platform.xml" />
  
-            
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.dll" />
         <file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.xml" />
@@ -53,11 +51,10 @@ SVG support for FFImageLoading library.
         <file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.pdb" />
  
 		<!--Windows-->
-<!-- 
-		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.dll" />
-		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.xml" />
-		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Svg.Platform.pdb" />	
- -->
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.dll" target="lib\uap10.0\FFImageLoading.Svg.Platform.dll" />
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.xml" target="lib\uap10.0\FFImageLoading.Svg.Platform.xml" />
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap10.0\FFImageLoading.Svg.Platform.pdb" />	
+
 	</files>
 	
 </package>
