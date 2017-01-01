@@ -11,7 +11,30 @@ set buildargs=/p:Configuration="%config%" /p:Platform="%platform%" /p:NoWarn="%w
 
 echo Restoring NuGets...
 
-nuget restore
+nuget restore source/FFImageLoading.Common/FFImageLoading.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.BaitAndSwitch/FFImageLoading.BaitAndSwitch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Windows/FFImageLoading.Windows.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Touch/FFImageLoading.Touch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Droid/FFImageLoading.Droid.csproj -solutiondirectory source/
+
+nuget restore source/FFImageLoading.Transformations/FFImageLoading.Transformations.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Transformations.Windows/FFImageLoading.Transformations.Windows.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Transformations.Touch/FFImageLoading.Transformations.Touch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Transformations.Droid/FFImageLoading.Transformations.Droid.csproj -solutiondirectory source/
+
+nuget restore source/FFImageLoading.Forms.WinRT/FFImageLoading.Forms.WinRT.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Forms.WinUWP/FFImageLoading.Forms.WinUWP.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj -solutiondirectory source/
+
+nuget restore source/FFImageLoading.Svg/FFImageLoading.Svg.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Touch/FFImageLoading.Svg.Touch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Droid/FFImageLoading.Svg.Droid.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Windows/FFImageLoading.Svg.Windows.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Forms/FFImageLoading.Svg.Forms.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Forms.Touch/FFImageLoading.Svg.Forms.Touch.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj -solutiondirectory source/
+nuget restore source/FFImageLoading.Svg.Forms.Windows/FFImageLoading.Svg.Forms.Windows.csproj -solutiondirectory source/
 
 echo Building FFImageLoading...
 
