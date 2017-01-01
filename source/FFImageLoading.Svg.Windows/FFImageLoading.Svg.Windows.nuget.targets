@@ -5,5 +5,6 @@
   </PropertyGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)skiasharp\1.55.1\build\uap10.0\SkiaSharp.targets" Condition="Exists('$(NuGetPackageRoot)skiasharp\1.55.1\build\uap10.0\SkiaSharp.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.bcl.build\1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.bcl.build\1.0.21\build\Microsoft.Bcl.Build.targets')" />
   </ImportGroup>
 </Project>

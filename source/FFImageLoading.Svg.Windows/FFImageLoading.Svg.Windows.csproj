@@ -107,12 +107,14 @@
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
     <Optimize>true</Optimize>
     <NoStdLib>true</NoStdLib>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Windows Release\FFImageLoading.Svg.Platform.XML</DocumentationFile>
+    <GenerateLibraryLayout>false</GenerateLibraryLayout>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|x86'">
     <OutputPath>bin\x86\Windows Release\</OutputPath>
@@ -157,6 +159,16 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\FFImageLoading.Svg.Windows.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj">
+      <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
+      <Name>FFImageLoading.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
