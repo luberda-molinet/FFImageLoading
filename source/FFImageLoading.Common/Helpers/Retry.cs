@@ -28,7 +28,7 @@ namespace FFImageLoading
                 await Task.Delay(retryInterval).ConfigureAwait(false);
             }
 
-            throw new AggregateException(exceptions);
+            throw new DownloadAggregateException(exceptions);
         }
     }
 }
