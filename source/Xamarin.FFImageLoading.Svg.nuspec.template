@@ -36,7 +36,8 @@ SVG support for FFImageLoading library.
         </dependencies>
 
         <frameworkAssemblies>
-            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="xamarinios+monoandroid"/>
+            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="MonoTouch"/>
+            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="MonoAndroid"/>
         </frameworkAssemblies>           
         
 	</metadata>
