@@ -1,5 +1,3 @@
-@echo off
-
 set msbuild="C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe"
 set config=Windows Release
 set platform=AnyCPU

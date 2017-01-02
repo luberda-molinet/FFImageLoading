@@ -312,8 +312,8 @@ namespace FFImageLoading.Forms.Touch
 			{
 				if (element != null && !_isDisposed)
 				{
-					element.SetIsLoading(false);
 					((IVisualElementController)element).NativeSizeChanged();
+					element.SetIsLoading(false);
 				}
 			});
 		}
