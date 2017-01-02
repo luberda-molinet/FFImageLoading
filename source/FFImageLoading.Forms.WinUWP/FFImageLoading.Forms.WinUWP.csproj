@@ -11,7 +11,7 @@
     <AssemblyName>FFImageLoading.Forms.WinUWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -110,6 +110,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="packages.config" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -125,7 +126,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
-      <Name>FFImageLoading-contrib</Name>
+      <Name>FFImageLoading</Name>
     </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3d6c1f12-68d7-44c2-a7de-8e7942627a01}</Project>
@@ -133,7 +134,7 @@
     </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj">
       <Project>{610543a5-d06f-4bca-9443-e6addff06c71}</Project>
-      <Name>FFImageLoading-contrib.Windows</Name>
+      <Name>FFImageLoading.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

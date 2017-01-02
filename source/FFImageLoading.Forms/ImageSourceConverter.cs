@@ -11,6 +11,7 @@ namespace FFImageLoading.Forms
 			return sourceType == typeof(string);
 		}
 
+        [Obsolete]
 		public override object ConvertFrom(CultureInfo culture, object value)
 		{
 			var text = value as string;

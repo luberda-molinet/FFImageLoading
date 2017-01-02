@@ -6,7 +6,7 @@
     "Microsoft.Bcl": "1.1.10",
     "Microsoft.Bcl.Build": "1.0.21",
     "Microsoft.Net.Http": "2.2.29",
-    "Xamarin.Forms": "2.3.2.127"
+    "Xamarin.Forms": "2.3.3.175"
   },
   "frameworks": {
     "WindowsPhoneApp,Version=v8.1": {}

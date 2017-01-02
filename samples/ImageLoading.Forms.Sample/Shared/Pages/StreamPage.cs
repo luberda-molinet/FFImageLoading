@@ -30,7 +30,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					cachedImage.Source = null;
 
 					var streamSource = new StreamImageSource() {
-						Stream = new Func<CancellationToken, Task<Stream>>(async (arg) => new MemoryStream(bytes))
+						Stream = new Func<CancellationToken, Task<Stream>>((arg) => Task.FromResult<Stream>(new MemoryStream(bytes)))
 					};
 
 					cachedImage.CacheKeyFactory = new CustomCacheKeyFactory();
