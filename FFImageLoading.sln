@@ -435,8 +435,8 @@ Global
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Debug|x86.ActiveCfg = Windows Debug|x86
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Debug|x86.Build.0 = Windows Debug|x86
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Debug|x86.Deploy.0 = Windows Debug|x86
-		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|Any CPU.ActiveCfg = Windows Release|x86
-		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|Any CPU.Deploy.0 = Windows Release|x86
+		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|Any CPU.ActiveCfg = Windows Release|Any CPU
+		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|Any CPU.Deploy.0 = Windows Release|Any CPU
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|ARM.ActiveCfg = Windows Release|x86
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|ARM.Build.0 = Windows Release|x86
 		{CD43A8FB-4DF0-4C24-8138-99B81656F980}.Windows Release|ARM.Deploy.0 = Windows Release|x86
@@ -1437,7 +1437,7 @@ Global
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Debug|x86.ActiveCfg = Debug|x86
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Debug|x86.Build.0 = Debug|x86
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Debug|x86.Deploy.0 = Debug|x86
-		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Release|Any CPU.ActiveCfg = Windows Release|x64
+		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Release|Any CPU.ActiveCfg = Windows Release|Any CPU
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Release|ARM.ActiveCfg = Release|ARM
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Release|ARM.Build.0 = Release|ARM
 		{C682D8F6-CD69-4A4B-BD03-FD79827CDC40}.Windows Release|ARM.Deploy.0 = Release|ARM
