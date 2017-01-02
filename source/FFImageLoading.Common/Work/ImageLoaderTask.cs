@@ -11,7 +11,7 @@ namespace FFImageLoading.Work
 {
     public abstract class ImageLoaderTask<TImageContainer, TImageView> : IImageLoaderTask where TImageContainer : class where TImageView : class
     {
-        bool isLoadingPlaceholderLoaded;
+        bool _isLoadingPlaceholderLoaded;
         static int _streamIndex;
         static int GetNextStreamIndex()
         {
@@ -273,12 +273,10 @@ namespace FFImageLoading.Work
                 {
                     ThrowIfCancellationRequested();
                     // Loading placeholder if enabled
-                    if (!isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
+                    if (!_isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
                     {
                         await ShowPlaceholder(Parameters.LoadingPlaceholderPath, KeyForLoadingPlaceholder,
                                               Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
-
-                        isLoadingPlaceholderLoaded = true;
                     }
                 }
 
@@ -375,11 +373,18 @@ namespace FFImageLoading.Work
 
                         await SetTargetAsync(loadImage, false).ConfigureAwait(false);
                     }
+
+                    if (isLoadingPlaceholder)
+                        _isLoadingPlaceholderLoaded = true;
                 }
                 catch (Exception ex)
                 {
                     Logger.Error("Setting placeholder failed", ex);
                 }
+            }
+            else if (isLoadingPlaceholder)
+            {
+                _isLoadingPlaceholderLoaded = true;
             }
         }
 
