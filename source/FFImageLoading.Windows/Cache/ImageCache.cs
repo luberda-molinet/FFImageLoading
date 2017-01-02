@@ -2,8 +2,8 @@
 using FFImageLoading.Concurrency;
 using System.Windows.Media.Imaging;
 #else
-using System.Collections.Concurrent;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.Security.ExchangeActiveSyncProvisioning;
 #endif
 
 using System;
@@ -21,13 +21,20 @@ namespace FFImageLoading.Cache
 
         private ImageCache(int maxCacheSize, IMiniLogger logger)
         {
+            _logger = logger;
+
             if (maxCacheSize == 0)
             {
-                maxCacheSize = 1000000 * 32; //32MB
-                //TODO Does anyone know how we could get available app ram from WinRT API? It should be improved
+                //TODO Does anyone know how we could get available app ram from WinRT API?
+                EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
+                if (deviceInfo.OperatingSystem.ToLower().Contains("phone"))
+                    maxCacheSize = 1000000 * 32; //32MB
+                else
+                    maxCacheSize = 1000000 * 128; //128MB
+
+                _logger?.Debug($"Memory cache size: {maxCacheSize} bytes");
             }
 
-			_logger = logger;
             _reusableBitmaps = new WriteableBitmapLRUCache(maxCacheSize);
         }
 
