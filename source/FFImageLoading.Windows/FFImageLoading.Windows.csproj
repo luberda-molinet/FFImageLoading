@@ -55,7 +55,8 @@
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugSymbols>true</DebugSymbols>
-    <DebugType></DebugType>
+    <DebugType>
+    </DebugType>
     <PlatformTarget>anycpu</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -77,7 +78,9 @@
     <Compile Include="Args\SuccessEventArgs.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
+    <Compile Include="Cache\LRUCache.cs" />
     <Compile Include="Cache\SimpleDiskCache.cs" />
+    <Compile Include="Cache\WriteableBitmapLRUCache.cs" />
     <Compile Include="DataResolvers\DataResolverFactory.cs" />
     <Compile Include="DataResolvers\FileDataResolver.cs" />
     <Compile Include="DataResolvers\ResourceDataResolver.cs" />
