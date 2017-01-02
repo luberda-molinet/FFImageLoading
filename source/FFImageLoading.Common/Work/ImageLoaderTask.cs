@@ -353,25 +353,32 @@ namespace FFImageLoading.Work
 
             if (!await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
             {
-                var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
-                var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
-                var loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
-
-                using (loadImageData.Item1)
+                try
                 {
-                    ThrowIfCancellationRequested();
+                    var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
+                    var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
+                    var loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
 
-                    var loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
+                    using (loadImageData.Item1)
+                    {
+                        ThrowIfCancellationRequested();
 
-                    if (loadImage != default(TImageContainer))
-                        MemoryCache.Add(key, loadImageData.Item3, loadImage);
+                        var loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
 
-                    ThrowIfCancellationRequested();
+                        if (loadImage != default(TImageContainer))
+                            MemoryCache.Add(key, loadImageData.Item3, loadImage);
 
-                    if (isLoadingPlaceholder)
-                        PlaceholderWeakReference = new WeakReference<TImageContainer>(loadImage);
-                    
-                    await SetTargetAsync(loadImage, false).ConfigureAwait(false);
+                        ThrowIfCancellationRequested();
+
+                        if (isLoadingPlaceholder)
+                            PlaceholderWeakReference = new WeakReference<TImageContainer>(loadImage);
+
+                        await SetTargetAsync(loadImage, false).ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Setting placeholder failed", ex);
                 }
             }
         }
