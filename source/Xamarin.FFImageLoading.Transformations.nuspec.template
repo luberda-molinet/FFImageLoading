@@ -55,9 +55,9 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
         <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.pdb" />
  
 		<!--Windows-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.pdb" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.pdb" />
 		
 	</files>
 	

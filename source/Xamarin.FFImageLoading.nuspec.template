@@ -61,7 +61,6 @@ Features:
 		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.pdb" />
 		<file src="FFImageLoading.BaitAndSwitch\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Platform.dll" />
 		<file src="FFImageLoading.BaitAndSwitch\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Platform.xml" />
-		<file src="FFImageLoading.BaitAndSwitch\bin\Release\FFImageLoading.Platform.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Platform.pdb" />
 
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Platform.dll" />
