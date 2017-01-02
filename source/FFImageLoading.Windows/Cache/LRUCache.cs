@@ -130,8 +130,6 @@ namespace FFImageLoading.Cache
             var size = GetValueSize(value);
             _currentSize += size;
 
-            System.Diagnostics.Debug.WriteLine($"_capacity={_capacity} _currentSize ={_currentSize} size={size}");
-
             while (_currentSize > _capacity && _lruList.Count > 0)
             {
                 this.RemoveFirst();

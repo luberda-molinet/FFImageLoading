@@ -55,9 +55,9 @@ namespace WinUWP
 
                 var config = new FFImageLoading.Config.Configuration()
                 {
-                    VerboseLogging = true,
+                    VerboseLogging = false,
                     VerbosePerformanceLogging = false,
-                    VerboseMemoryCacheLogging = true,
+                    VerboseMemoryCacheLogging = false,
                     VerboseLoadingCancelledLogging = false,
                     Logger = new CustomLogger(),
                 };
