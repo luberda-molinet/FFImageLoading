@@ -85,6 +85,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformati
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		source\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems*{0bf13419-ba9c-4004-812c-eb22e41927d9}*SharedItemsImports = 4
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4
 		source\FFImageLoading.Shared\FFImageLoading.Shared.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{3c58b37d-edb7-4778-aa48-f3ad9a571059}*SharedItemsImports = 13
@@ -94,6 +95,9 @@ Global
 		source\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems*{6d4f9dfa-012e-4966-a6e8-01c3464b537e}*SharedItemsImports = 4
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{74bf9402-3e13-4003-8923-bc20a1294ce2}*SharedItemsImports = 4
 		source\FFImageLoading.Shared\FFImageLoading.Shared.projitems*{74bf9402-3e13-4003-8923-bc20a1294ce2}*SharedItemsImports = 4
+		source\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems*{a73a1ea8-e709-474d-9102-dcb2482950ab}*SharedItemsImports = 4
+		source\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems*{aa5b8d71-77c6-4341-bfba-ebb7b8faf5ac}*SharedItemsImports = 4
+		source\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems*{cca629e9-55e3-414a-91af-79a0cb845cd5}*SharedItemsImports = 4
 		source\FFImageLoading.Shared\FFImageLoading.Shared.projitems*{e72ac4ed-03a8-465c-95a2-38b0544b37db}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
