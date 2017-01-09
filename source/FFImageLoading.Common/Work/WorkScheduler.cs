@@ -6,14 +6,15 @@ using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using FFImageLoading.Config;
+using FFImageLoading.Concurrency;
 
 namespace FFImageLoading.Work
 {
     public class WorkScheduler : IWorkScheduler
     {
-        Task _dispatch = Task.FromResult<byte>(1);
-        protected readonly object _pendingTasksLock = new object();
-        int _currentPosition; // useful?
+        readonly object _runningTasksLock = new object();
+        readonly object _similarTasksLock = new object();
+
         int _statsTotalPending;
         int _statsTotalRunning;
         int _statsTotalMemoryCacheHits;
@@ -24,8 +25,9 @@ namespace FFImageLoading.Work
         {
             Configuration = configuration;
             Performance = performance;
-            PendingTasks = new List<PendingTask>();
-            RunningTasks = new Dictionary<string, PendingTask>();
+            PendingTasks = new PendingTasksQueue();
+            RunningTasks = new Dictionary<string, IImageLoaderTask>();
+            SimilarTasks = new List<IImageLoaderTask>();
         }
 
         protected int MaxParallelTasks 
@@ -40,55 +42,25 @@ namespace FFImageLoading.Work
         }
 
         protected IPlatformPerformance Performance { get; private set; }
-        protected List<PendingTask> PendingTasks { get; private set; }
-        protected Dictionary<string, PendingTask> RunningTasks { get; private set; }
-
+        protected PendingTasksQueue PendingTasks { get; private set; }
+        protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; }
+        protected List<IImageLoaderTask> SimilarTasks { get; private set; }
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
-        protected virtual void EvictStaleTasks()
-        {
-            lock (_pendingTasksLock)
-            {
-                var toRemove = PendingTasks.Where(v => v.FrameworkWrappingTask == null || v.ImageLoadingTask == null
-                                   || v.ImageLoadingTask.IsCancelled || v.ImageLoadingTask.IsCompleted)
-                            .ToList();
-
-                foreach (var task in toRemove)
-                {
-                    task?.ImageLoadingTask?.Dispose();
-                    PendingTasks.Remove(task);
-                }
-            }
-        }
-
-        public virtual void Cancel(IImageLoaderTask task)
-        {
-            try
-            {
-                if (task != null && !task.IsCancelled && !task.IsCompleted)
-                {
-                    task.Cancel();
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(string.Format("Cancelling task failed: {0}", task?.Key), e);
-            }
-            finally
-            {
-                task?.Dispose();
-                EvictStaleTasks();
-            }
-        }
-
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
-            lock (_pendingTasksLock)
+            lock (_similarTasksLock)
             {
-                foreach (var task in PendingTasks.Where(p => predicate(p.ImageLoadingTask)).ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
+                foreach (var task in PendingTasks.Where(p => predicate(p)))
                 {
-                    task.ImageLoadingTask.Cancel();
+                    task?.Cancel();
+                }
+
+                var items = SimilarTasks.Where(v => predicate(v)).ToList();
+                foreach (var item in items)
+                {
+                    SimilarTasks.Remove(item);
                 }
             }
         }
@@ -106,12 +78,17 @@ namespace FFImageLoading.Work
             {
                 Logger.Debug("ExitTasksEarly enabled.");
 
-                lock (_pendingTasksLock)
+                lock (_similarTasksLock)
                 {
-                    foreach (var task in PendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
-                        task.ImageLoadingTask.Cancel();
+                    foreach (var task in PendingTasks)
+                        task?.Cancel();
 
                     PendingTasks.Clear();
+
+                    foreach (var task in SimilarTasks)
+                        task?.Cancel();
+
+                    SimilarTasks.Clear();
                 }
             }
             else
@@ -142,17 +119,19 @@ namespace FFImageLoading.Work
 
         public virtual void RemovePendingTask(IImageLoaderTask task)
         {
-            lock (_pendingTasksLock)
+            if (task != null)
             {
-                PendingTasks.RemoveAll(p => p.ImageLoadingTask == task);
+                lock (_similarTasksLock)
+                {
+                    PendingTasks.Remove(task);
+                    SimilarTasks.Remove(task);
+                }
             }
         }
 
 		public virtual async void LoadImage(IImageLoaderTask task)
 		{
 			Interlocked.Increment(ref _loadCount);
-
-            EvictStaleTasks();
 
             if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
 			{
@@ -183,7 +162,7 @@ namespace FFImageLoading.Work
 			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
 			if (task.CanUseMemoryCache)
 			{
-                if (await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
+                if (await Task.Run(async() => await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false)).ConfigureAwait(false))
                 {
                     Interlocked.Increment(ref _statsTotalMemoryCacheHits);
                     task?.Dispose();
@@ -191,134 +170,86 @@ namespace FFImageLoading.Work
                 }
 			}
 
-            _dispatch = _dispatch.ContinueWith(t =>
+            try
             {
-                try
-                {
-                    QueueImageLoadingTask(task);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(string.Format("Image loaded failed: {0}", task?.Key), ex);
-                }
-            });
+                QueueImageLoadingTask(task);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format("Image loaded failed: {0}", task?.Key), ex);
+            }
+        }
+
+        void Enqueue(IImageLoaderTask task)
+        {
+            PendingTasks.Enqueue(task, task.Parameters.Priority ?? GetDefaultPriority(task.Parameters.Source));
         }
 
         protected void QueueImageLoadingTask(IImageLoaderTask task)
         {
-            int position = Interlocked.Increment(ref _currentPosition);
-            var currentPendingTask = new PendingTask() { Position = position, ImageLoadingTask = task, FrameworkWrappingTask = CreateFrameworkTask(task) };
-
             if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
             {
                 task?.Dispose();
                 return;
             }
 
-            PendingTask similarRunningTask = null;
-            lock (_pendingTasksLock)
+            IImageLoaderTask similarRunningTask = null;
+            if (!task.Parameters.Preload)
             {
-                if (!task.Parameters.Preload)
-                {
-                    foreach (var pendingTask in PendingTasks.ToList()) // FMT: here we need a copy since cancelling will trigger them to be removed, hence collection is modified during enumeration
-                    {
-                        if (pendingTask.ImageLoadingTask != null && pendingTask.ImageLoadingTask.UsesSameNativeControl(task))
-                            pendingTask.ImageLoadingTask.CancelIfNeeded();
-                    }
+                PendingTasks.CancelWhenUsesSameNativeControl(task);
+            }
 
-                    EvictStaleTasks();
+            similarRunningTask = PendingTasks.FirstOrDefaultByRawKey(task.KeyRaw);
+            if (similarRunningTask == null)
+            {
+                Interlocked.Increment(ref _statsTotalPending);
+                Enqueue(task);
+            }
+            else if (similarRunningTask != null)
+            {
+                if (task.Parameters.Priority.HasValue && (!similarRunningTask.Parameters.Priority.HasValue
+                    || task.Parameters.Priority.Value > similarRunningTask.Parameters.Priority.Value))
+                {
+                    similarRunningTask.Parameters.WithPriority(task.Parameters.Priority.Value);
+                    PendingTasks.UpdatePriority(similarRunningTask, task.Parameters.Priority.Value);
                 }
 
-                similarRunningTask = PendingTasks.FirstOrDefault(t => t.ImageLoadingTask.Key == task.Key);
-                if (similarRunningTask == null)
+                if (task.Parameters.OnDownloadProgress != null)
                 {
-                    Interlocked.Increment(ref _statsTotalPending);
-                    PendingTasks.Add(currentPendingTask);
-                }
-                else if (similarRunningTask.ImageLoadingTask != null)
-                {
-                    if (task.Parameters.Priority.HasValue && (!similarRunningTask.ImageLoadingTask.Parameters.Priority.HasValue
-                        || task.Parameters.Priority.Value > similarRunningTask.ImageLoadingTask.Parameters.Priority.Value))
-                    {
-                        similarRunningTask.ImageLoadingTask.Parameters.WithPriority(task.Parameters.Priority.Value);
-                    }
+                    var similarTaskOnDownloadProgress = similarRunningTask.Parameters.OnDownloadProgress;
 
-                    if (task.Parameters.OnDownloadProgress != null)
+                    similarRunningTask.Parameters.DownloadProgress((DownloadProgress obj) =>
                     {
-                        var similarTaskOnDownloadProgress = similarRunningTask.ImageLoadingTask.Parameters.OnDownloadProgress;
-
-                        similarRunningTask.ImageLoadingTask.Parameters.DownloadProgress((DownloadProgress obj) =>
-                        {
-                            similarTaskOnDownloadProgress?.Invoke(obj);
-                            task.Parameters.OnDownloadProgress(obj);
-                        });
-                    }
+                        similarTaskOnDownloadProgress?.Invoke(obj);
+                        task.Parameters.OnDownloadProgress(obj);
+                    });
                 }
             }
 
             if (PauseWork)
                 return;
 
-            if (similarRunningTask == null || !currentPendingTask.ImageLoadingTask.CanUseMemoryCache)
+            if (similarRunningTask == null || !task.CanUseMemoryCache)
             {
                 TakeFromPendingTasksAndRun();
             }
             else
             {
-                WaitForSimilarTaskFinished(currentPendingTask, similarRunningTask);
+                Interlocked.Increment(ref _statsTotalWaiting);
+                Logger.Debug(string.Format("Wait for similar request for key: {0}", task.Key));
+                lock (_similarTasksLock)
+                {
+                    SimilarTasks.Add(task);
+                }
             }
         }
 
-        protected async void WaitForSimilarTaskFinished(PendingTask currentPendingTask, PendingTask taskForSimilarKey)
+        protected void TakeFromPendingTasksAndRun()
         {
-            Interlocked.Increment(ref _statsTotalWaiting);
-
-            if (taskForSimilarKey?.FrameworkWrappingTask == null 
-                || taskForSimilarKey.FrameworkWrappingTask.IsCanceled 
-                || taskForSimilarKey.FrameworkWrappingTask.IsFaulted)
+            Task.Factory.StartNew(async () =>
             {
-                lock (_pendingTasksLock)
-                {
-                    Interlocked.Increment(ref _statsTotalPending);
-                    PendingTasks.Add(currentPendingTask);
-                }
-
-                TakeFromPendingTasksAndRun();
-                return;
-            }
-
-            Logger.Debug(string.Format("Wait for similar request for key: {0}", taskForSimilarKey.ImageLoadingTask.Key));
-            await taskForSimilarKey.FrameworkWrappingTask.ConfigureAwait(false);
-
-            if (currentPendingTask?.ImageLoadingTask == null || currentPendingTask.ImageLoadingTask.IsCancelled)
-                return;
-
-            // Now our image should be in the cache
-            var cacheFound = await currentPendingTask.ImageLoadingTask.TryLoadFromMemoryCacheAsync().ConfigureAwait(false);
-
-            if (!cacheFound)
-            {
-                if (currentPendingTask?.ImageLoadingTask == null || currentPendingTask.ImageLoadingTask.IsCancelled)
-                    return;
-                
-                lock (_pendingTasksLock)
-                {
-                    Interlocked.Increment(ref _statsTotalPending);
-                    PendingTasks.Add(currentPendingTask);
-                }
-
-                TakeFromPendingTasksAndRun();
-                return;
-            }
-            else
-            {
-                currentPendingTask?.ImageLoadingTask?.Dispose();
-            }
-        }
-
-        protected async void TakeFromPendingTasksAndRun()
-        {
-            await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+                await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+            }, TaskCreationOptions.PreferFairness).ConfigureAwait(false);
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
@@ -344,34 +275,23 @@ namespace FFImageLoading.Work
             return tcs.Task;
         }
 
-        protected int GetDefaultPriority(ImageSource source)
-        {
-            if (source == ImageSource.ApplicationBundle || source == ImageSource.CompiledResource)
-                return (int)LoadingPriority.Normal + 2;
-            
-            if (source == ImageSource.Filepath)
-                return (int)LoadingPriority.Normal + 1;
-
-            return (int)LoadingPriority.Normal;
-        }
-
         protected async Task TakeFromPendingTasksAndRunAsync()
         {
-            Dictionary<string, PendingTask> tasksToRun = null;
+            if (PendingTasks.Count == 0)
+                return;
 
-            lock (_pendingTasksLock)
+            Dictionary<string, IImageLoaderTask> tasksToRun = null;
+
+            int preloadOrUrlTasksCount = 0;
+            int urlTasksCount = 0;
+            int preloadTasksCount = 0;
+
+            lock (_runningTasksLock)
             {
-                int preloadOrUrlTasksCount = 0;
-                int urlTasksCount = 0;
-                int preloadTasksCount = 0;
-
                 if (RunningTasks.Count >= MaxParallelTasks)
                 {
-                    urlTasksCount = RunningTasks.Count(v => v.Value?.ImageLoadingTask != null
-                                        && (!v.Value.ImageLoadingTask.Parameters.Preload && v.Value.ImageLoadingTask.Parameters.Source == ImageSource.Url));
-                    
-                    preloadTasksCount = RunningTasks.Count(v => v.Value?.ImageLoadingTask != null
-                        && v.Value.ImageLoadingTask.Parameters.Preload);
+                    urlTasksCount = RunningTasks.Count(v => v.Value != null && (!v.Value.Parameters.Preload && v.Value.Parameters.Source == ImageSource.Url));
+                    preloadTasksCount = RunningTasks.Count(v => v.Value != null && v.Value.Parameters.Preload);
                     preloadOrUrlTasksCount = preloadTasksCount + urlTasksCount;
 
                     if (preloadOrUrlTasksCount == 0 || preloadOrUrlTasksCount != MaxParallelTasks)
@@ -383,69 +303,79 @@ namespace FFImageLoading.Work
                 }
 
                 int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
-                tasksToRun = new Dictionary<string, PendingTask>();
+                tasksToRun = new Dictionary<string, IImageLoaderTask>();
 
-                foreach (var task in PendingTasks.Where(t => !t.ImageLoadingTask.IsCancelled && !t.ImageLoadingTask.IsCompleted)
-                    .OrderByDescending(t => t.ImageLoadingTask.Parameters.Priority ?? GetDefaultPriority(t.ImageLoadingTask.Parameters.Source))
-                    .ThenBy(t => t.Position))
+                while (tasksToRun.Count < numberOfTasks && PendingTasks.Count > 0)
                 {
+                    var task = PendingTasks.Dequeue();
+
+                    if (task == null || task.IsCancelled || task.IsCompleted)
+                        continue;
+
                     // We don't want to load, at the same time, images that have same key or same raw key at the same time
                     // This way we prevent concurrent downloads and benefit from caches
-
-                    string rawKey = task.ImageLoadingTask.KeyRaw;
+                    string rawKey = task.KeyRaw;
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
-                        continue;
+                    {
+                        lock (_similarTasksLock)
+                        {
+                            SimilarTasks.Add(task);
+                            continue;
+                        }
+                    }
 
                     if (preloadOrUrlTasksCount != 0)
                     {
-                        if (!task.ImageLoadingTask.Parameters.Preload && (urlTasksCount == 0 || task.ImageLoadingTask.Parameters.Source != ImageSource.Url))
+                        if (!task.Parameters.Preload && (urlTasksCount == 0 || task.Parameters.Source != ImageSource.Url))
                             tasksToRun.Add(rawKey, task);
+                        else
+                        {
+                            Enqueue(task);
+                            break;
+                        }
                     }
                     else
                     {
                         tasksToRun.Add(rawKey, task);
                     }
-
-                    if (tasksToRun.Count == numberOfTasks)
-                        break;
                 }
             }
 
             if (tasksToRun != null && tasksToRun.Count > 0)
             {
-                if (tasksToRun.Count == 1)
-                {
-                    await RunImageLoadingTaskAsync(tasksToRun.Values.First()).ConfigureAwait(false);
-                }
-                else
-                {
-                    var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value));
-                    await Task.WhenAll(tasks).ConfigureAwait(false);
-                } 
+                var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value));
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
 
-        protected async Task RunImageLoadingTaskAsync(PendingTask pendingTask)
+        protected async Task RunImageLoadingTaskAsync(IImageLoaderTask pendingTask)
         {
-            var key = pendingTask.ImageLoadingTask.Key;
-
-            lock (_pendingTasksLock)
-            {
-                if (RunningTasks.ContainsKey(key))
-                    return;
-                
-                RunningTasks.Add(key, pendingTask);
-                Interlocked.Increment(ref _statsTotalRunning);
-            }
+            var key = pendingTask.Key;
+            var keyRaw = pendingTask.KeyRaw;
 
             try
             {
+                lock (_runningTasksLock)
+                {
+                    if (RunningTasks.ContainsKey(keyRaw))
+                    {
+                        lock (_similarTasksLock)
+                        {
+                            SimilarTasks.Add(pendingTask);
+                        }
+                        return;
+                    }
+
+                    RunningTasks.Add(keyRaw, pendingTask);
+                    Interlocked.Increment(ref _statsTotalRunning);
+                }
+
                 if (Configuration.VerbosePerformanceLogging)
                 {
                     LogSchedulerStats();
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
-                    await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
+                    await pendingTask.RunAsync().ConfigureAwait(false);
 
                     stopwatch.Stop();
 
@@ -457,17 +387,31 @@ namespace FFImageLoading.Work
                 }
                 else
                 {
-                    await Task.Run(pendingTask.ImageLoadingTask.RunAsync).ConfigureAwait(false);
+                    await pendingTask.RunAsync().ConfigureAwait(false);
                 }
             }
             finally
             {
-                lock (_pendingTasksLock)
+                lock (_runningTasksLock)
                 {
-                    RunningTasks.Remove(key);
-                }
-                pendingTask?.ImageLoadingTask?.Dispose();
+                    RunningTasks.Remove(keyRaw);
 
+                    lock (_similarTasksLock)
+                    {
+                        if (SimilarTasks.Count > 0)
+                        {
+                            SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
+                            var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw).ToList();
+                            foreach (var similar in similarItems)
+                            {
+                                SimilarTasks.Remove(similar);
+                                LoadImage(similar);
+                            }
+                        }
+                    }
+                }
+
+                pendingTask?.Dispose();
                 await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false);
             }
         }
@@ -486,13 +430,15 @@ namespace FFImageLoading.Work
             Logger.Debug(Performance.GetMemoryInfo());
         }
 
-        protected class PendingTask
+        protected virtual int GetDefaultPriority(ImageSource source)
         {
-            public int Position { get; set; }
+            if (source == ImageSource.ApplicationBundle || source == ImageSource.CompiledResource)
+                return (int)LoadingPriority.Normal + 2;
 
-            public IImageLoaderTask ImageLoadingTask { get; set; }
+            if (source == ImageSource.Filepath)
+                return (int)LoadingPriority.Normal + 1;
 
-            public Task FrameworkWrappingTask { get; set; }
+            return (int)LoadingPriority.Normal;
         }
     }
 }
