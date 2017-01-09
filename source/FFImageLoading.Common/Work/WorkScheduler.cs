@@ -401,6 +401,7 @@ namespace FFImageLoading.Work
                     {
                         if (SimilarTasks.Count > 0)
                         {
+                            SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
                             var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw).ToList();
                             foreach (var similar in similarItems)
                             {
