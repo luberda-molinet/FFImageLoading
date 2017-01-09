@@ -27,7 +27,7 @@ namespace FFImageLoading.Config
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
-            SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 3d)));
+            SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 2d)));
             DiskCacheDuration = TimeSpan.FromDays(30d);
             ExecuteCallbacksOnUIThread = false;
 		}
