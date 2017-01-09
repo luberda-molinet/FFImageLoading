@@ -133,10 +133,20 @@ namespace FFImageLoading.Work
 		{
 			Interlocked.Increment(ref _loadCount);
 
-            if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
+			if (task == null)
+				return;
+
+            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
 			{
-				LogSchedulerStats();
+                if (!task.IsCompleted)
+				    task?.Dispose();
+				return;
 			}
+
+            if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
+            {
+                LogSchedulerStats();
+            }
 
             if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
             {
@@ -145,29 +155,18 @@ namespace FFImageLoading.Work
                 return;
             }
 
-			if (task == null)
-				return;
-
-            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
-			{
-				task?.Dispose();
-				return;
-			}
-
 			if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
 			{
 				await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
 			}
 
 			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
-			if (task.CanUseMemoryCache)
+			if (task.CanUseMemoryCache && await Task.Run(async () => 
+                                                         await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false)).ConfigureAwait(false))
 			{
-                if (await Task.Run(async() => await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false)).ConfigureAwait(false))
-                {
-                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                    task?.Dispose();
-                    return;
-                }
+                Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+                task?.Dispose();
+                return;
 			}
 
             try
@@ -189,7 +188,9 @@ namespace FFImageLoading.Work
         {
             if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
             {
-                task?.Dispose();
+                if (!task.IsCompleted)
+                    task?.Dispose();
+                
                 return;
             }
 
@@ -217,7 +218,6 @@ namespace FFImageLoading.Work
                 if (task.Parameters.OnDownloadProgress != null)
                 {
                     var similarTaskOnDownloadProgress = similarRunningTask.Parameters.OnDownloadProgress;
-
                     similarRunningTask.Parameters.DownloadProgress((DownloadProgress obj) =>
                     {
                         similarTaskOnDownloadProgress?.Invoke(obj);
@@ -339,6 +339,12 @@ namespace FFImageLoading.Work
                         tasksToRun.Add(rawKey, task);
                     }
                 }
+
+                foreach (var item in tasksToRun)
+                {
+                    RunningTasks.Add(item.Key, item.Value);
+                    Interlocked.Increment(ref _statsTotalRunning);
+                }
             }
 
             if (tasksToRun != null && tasksToRun.Count > 0)
@@ -350,26 +356,10 @@ namespace FFImageLoading.Work
 
         protected async Task RunImageLoadingTaskAsync(IImageLoaderTask pendingTask)
         {
-            var key = pendingTask.Key;
             var keyRaw = pendingTask.KeyRaw;
 
             try
             {
-                lock (_runningTasksLock)
-                {
-                    if (RunningTasks.ContainsKey(keyRaw))
-                    {
-                        lock (_similarTasksLock)
-                        {
-                            SimilarTasks.Add(pendingTask);
-                        }
-                        return;
-                    }
-
-                    RunningTasks.Add(keyRaw, pendingTask);
-                    Interlocked.Increment(ref _statsTotalRunning);
-                }
-
                 if (Configuration.VerbosePerformanceLogging)
                 {
                     LogSchedulerStats();
@@ -383,7 +373,7 @@ namespace FFImageLoading.Work
                                                 Performance.GetCurrentManagedThreadId(),
                                                 Performance.GetCurrentSystemThreadId(),
                                                 stopwatch.Elapsed.Milliseconds,
-                                                key));
+                                                pendingTask.Key));
                 }
                 else
                 {

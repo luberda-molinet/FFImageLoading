@@ -1,6 +1,7 @@
 ﻿using System;
 using FFImageLoading.Work;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Concurrency
 {
@@ -8,12 +9,15 @@ namespace FFImageLoading.Concurrency
     {
         public override void Remove(IImageLoaderTask item)
         {
-            try
+            lock (_queue)
             {
-                base.Remove(item);
-            }
-            catch (InvalidOperationException)
-            {
+                var comparer = EqualityComparer<IImageLoaderTask>.Default;
+                var found = _queue.FirstOrDefault(v => comparer.Equals(v.Data, item));
+
+                if (found != null)
+                {
+                    _queue.Remove(found);
+                }
             }
         }
 
