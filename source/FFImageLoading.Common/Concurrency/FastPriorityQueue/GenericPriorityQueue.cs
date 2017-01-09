@@ -232,7 +232,7 @@ namespace FFImageLoading.Concurrency
         private bool HasHigherPriority(TItem higher, TItem lower)
         {
             var cmp = higher.Priority.CompareTo(lower.Priority);
-            return (cmp < 0 || (cmp == 0 && higher.InsertionIndex < lower.InsertionIndex));
+            return (cmp > 0 || (cmp == 0 && higher.InsertionIndex < lower.InsertionIndex));
         }
 
         /// <summary>
