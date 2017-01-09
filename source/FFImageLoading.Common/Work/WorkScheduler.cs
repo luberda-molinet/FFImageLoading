@@ -15,7 +15,6 @@ namespace FFImageLoading.Work
         readonly object _runningTasksLock = new object();
         readonly object _similarTasksLock = new object();
 
-        int _currentPosition; // useful?
         int _statsTotalPending;
         int _statsTotalRunning;
         int _statsTotalMemoryCacheHits;
@@ -163,7 +162,7 @@ namespace FFImageLoading.Work
 			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
 			if (task.CanUseMemoryCache)
 			{
-                if (await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
+                if (await Task.Run(async() => await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false)).ConfigureAwait(false))
                 {
                     Interlocked.Increment(ref _statsTotalMemoryCacheHits);
                     task?.Dispose();
