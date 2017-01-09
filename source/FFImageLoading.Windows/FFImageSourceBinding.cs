@@ -1,9 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace FFImageLoading
 {
+    /// <summary>
+    /// This class optimizes the call to "StorageFile.GetFileFromPathAsync" that is time consuming.
+    /// The source of each image is the key of the cache... once a source has been checked the first time, any other control can be skipped 
+    /// </summary>
+    public static class FFImageSourceBindingCheckerCache
+    {
+        private static Dictionary<string, bool> _cache = new Dictionary<string, bool>();
+
+        public static async Task<bool> IsThisFile(string source)
+        {
+
+            if (_cache.ContainsKey(source))
+            {
+                return _cache[source];
+            }
+            else
+            {
+                StorageFile file = null;
+                try
+                {
+                    var filePath = System.IO.Path.GetDirectoryName(source);
+                    if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
+                    {
+                        file = await StorageFile.GetFileFromPathAsync(source);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+                _cache.Add(source, file != null);
+                return file != null;
+            }
+        }
+    }
+
     public class FFImageSourceBinding
     {
         public FFImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
@@ -26,22 +62,8 @@ namespace FFImageLoading
             Uri uri;
             if (!Uri.TryCreate(source, UriKind.Absolute, out uri) || uri.Scheme == "file")
             {
-                StorageFile file = null;
-
-                try
-                {
-                    var filePath = System.IO.Path.GetDirectoryName(source);
-
-                    if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
-                    {
-                        file = await StorageFile.GetFileFromPathAsync(source);
-                    }
-                }
-                catch (Exception)
-                {
-                }
-
-                if (file != null)
+                var isFile = await FFImageSourceBindingCheckerCache.IsThisFile(source);
+                if (isFile)
                 {
                     return new FFImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, source);
                 }
