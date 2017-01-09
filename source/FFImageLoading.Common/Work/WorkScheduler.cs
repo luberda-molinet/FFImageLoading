@@ -316,12 +316,9 @@ namespace FFImageLoading.Work
             }
         }
 
-        protected void TakeFromPendingTasksAndRun()
+        protected async void TakeFromPendingTasksAndRun()
         {
-            Task.Factory.StartNew(async () =>
-            {
-                await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
-            }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
+            await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
