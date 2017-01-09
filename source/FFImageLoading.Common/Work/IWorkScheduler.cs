@@ -4,12 +4,6 @@ namespace FFImageLoading.Work
 {
     public interface IWorkScheduler
     {
-        /// <summary>      
-        /// Cancels any pending work for the task.        
-        /// </summary>        
-        /// <param name="task">Image loading task to cancel</param>
-        void Cancel(IImageLoaderTask task);
-
         /// <summary>
         /// Cancels tasks that match predicate.
         /// </summary>

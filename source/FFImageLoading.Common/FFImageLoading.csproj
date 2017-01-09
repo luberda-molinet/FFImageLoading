@@ -99,6 +99,12 @@
     <Compile Include="Work\DownloadProgress.cs" />
     <Compile Include="Work\FileWriteInfo.cs" />
     <Compile Include="Helpers\DownloadAggregateException.cs" />
+    <Compile Include="Concurrency\FastPriorityQueue\IFixedSizePriorityQueue.cs" />
+    <Compile Include="Concurrency\FastPriorityQueue\IPriorityQueue.cs" />
+    <Compile Include="Concurrency\FastPriorityQueue\SimplePriorityQueue.cs" />
+    <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueueNode.cs" />
+    <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueue.cs" />
+    <Compile Include="Concurrency\PendingTasksQueue.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -115,6 +121,7 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Concurrency\" />
+    <Folder Include="Concurrency\FastPriorityQueue\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
