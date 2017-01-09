@@ -188,8 +188,6 @@ namespace FFImageLoading.Work
 
         protected void QueueImageLoadingTask(IImageLoaderTask task)
         {
-            int position = Interlocked.Increment(ref _currentPosition);
-
             if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
             {
                 task?.Dispose();
@@ -199,15 +197,10 @@ namespace FFImageLoading.Work
             IImageLoaderTask similarRunningTask = null;
             if (!task.Parameters.Preload)
             {
-                //TODO
-                foreach (var pendingTask in PendingTasks.Where(v => v != null && v.UsesSameNativeControl(task)))
-                {
-                    pendingTask.CancelIfNeeded();
-                }
+                PendingTasks.CancelWhenUsesSameNativeControl(task);
             }
 
-            //TODO
-            similarRunningTask = PendingTasks.FirstOrDefault(t => t.KeyRaw == task.KeyRaw);
+            similarRunningTask = PendingTasks.FirstOrDefaultByRawKey(task.KeyRaw);
             if (similarRunningTask == null)
             {
                 Interlocked.Increment(ref _statsTotalPending);
@@ -367,7 +360,10 @@ namespace FFImageLoading.Work
                 {
                     if (RunningTasks.ContainsKey(keyRaw))
                     {
-                        SimilarTasks.Add(pendingTask);
+                        lock (_similarTasksLock)
+                        {
+                            SimilarTasks.Add(pendingTask);
+                        }
                         return;
                     }
 
