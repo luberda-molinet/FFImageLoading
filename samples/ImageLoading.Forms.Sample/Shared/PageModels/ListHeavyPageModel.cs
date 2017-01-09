@@ -68,11 +68,11 @@ namespace FFImageLoading.Forms.Sample.PageModels
             var howMuch = images.Length;
             var howManyTimes = 10;
 
-            if (Device.OS == TargetPlatform.WinPhone || Device.OS == TargetPlatform.Windows)
-            {
-                howMuch = 10;
-                howManyTimes = 3    ;
-            }
+            //if (Device.OS == TargetPlatform.WinPhone || Device.OS == TargetPlatform.Windows)
+            //{
+            //    howMuch = 10;
+            //    howManyTimes = 3    ;
+            //}
                 
 
 			for (int j = 0; j < howManyTimes; j++)

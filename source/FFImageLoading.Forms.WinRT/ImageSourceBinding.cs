@@ -15,7 +15,7 @@ namespace FFImageLoading.Forms.WinRT
 {
     public class ImageSourceBinding
     {
-        public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
+        public ImageSourceBinding(Work.ImageSource imageSource, string path)
         {
             ImageSource = imageSource;
             Path = path;
@@ -23,17 +23,17 @@ namespace FFImageLoading.Forms.WinRT
 
         public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
         {
-            ImageSource = FFImageLoading.Work.ImageSource.Stream;
+            ImageSource = Work.ImageSource.Stream;
             Stream = stream;
         }
 
-        public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
+        public Work.ImageSource ImageSource { get; private set; }
 
         public string Path { get; private set; }
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-		internal static async Task<ImageSourceBinding> GetImageSourceBinding(Xamarin.Forms.ImageSource source, CachedImage element)
+		internal static async Task<ImageSourceBinding> GetImageSourceBinding(ImageSource source, CachedImage element)
         {
             if (source == null)
             {
@@ -47,7 +47,7 @@ namespace FFImageLoading.Forms.WinRT
 				if (string.IsNullOrWhiteSpace(uri))
 					return null;
 
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uri);
+				return new ImageSourceBinding(Work.ImageSource.Url, uri);
             }
 
             var fileImageSource = source as FileImageSource;
@@ -64,7 +64,7 @@ namespace FFImageLoading.Forms.WinRT
 
                     if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
-						file = await StorageFile.GetFileFromPathAsync(fileImageSource.File);
+						file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
                     }
                 }
                 catch (Exception)
@@ -73,10 +73,10 @@ namespace FFImageLoading.Forms.WinRT
 
                 if (file != null)
                 {
-                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
+                    return new ImageSourceBinding(Work.ImageSource.Filepath, fileImageSource.File);
                 }
 
-                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.ApplicationBundle, fileImageSource.File);
+                return new ImageSourceBinding(Work.ImageSource.ApplicationBundle, fileImageSource.File);
             }
 
             var streamImageSource = source as StreamImageSource;

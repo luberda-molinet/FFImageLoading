@@ -16,10 +16,9 @@ namespace FFImageLoading.DataResolvers
             try
             {
                 var filePath = Path.GetDirectoryName(identifier);
-
                 if (!string.IsNullOrWhiteSpace(filePath))
                 {
-                    file = await StorageFile.GetFileFromPathAsync(identifier);
+                    file = await Cache.FFSourceBindingCache.GetFileAsync(identifier);
                 }
             }
             catch (Exception)
