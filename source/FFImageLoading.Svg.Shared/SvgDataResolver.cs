@@ -9,9 +9,20 @@ using FFImageLoading.DataResolvers;
 
 namespace FFImageLoading.Svg.Platform
 {
+	/// <summary>
+	/// Svg data resolver.
+	/// </summary>
 	public class SvgDataResolver : IVectorDataResolver
 	{
-		public SvgDataResolver(int vectorWidth, int vectorHeight, bool useDipUnits)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
+		/// Default SVG size is read from SVG file width / height attributes
+		/// You can override it by specyfing vectorWidth / vectorHeight params
+		/// </summary>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
 		{
 			VectorWidth = vectorWidth;
 			VectorHeight = vectorHeight;
@@ -58,8 +69,15 @@ namespace FFImageLoading.Svg.Platform
 
 			if (VectorWidth == 0 && VectorHeight == 0)
 			{
-				sizeX = 200;
-				sizeY = (VectorWidth / picture.Bounds.Width) * picture.Bounds.Height;
+				if (picture.Bounds.Width > 0)
+					sizeX = picture.Bounds.Width;
+				else
+					sizeX = 300;
+
+				if (picture.Bounds.Height > 0)
+					sizeY = picture.Bounds.Height;
+				else
+					sizeY = 300;
 			}
 			else if (VectorWidth > 0 && VectorHeight > 0)
 			{
