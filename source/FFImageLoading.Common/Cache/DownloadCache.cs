@@ -105,37 +105,35 @@ namespace FFImageLoading.Cache
                             {
                                 cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
 
-                                int total = (int)(response.Content.Headers.ContentLength.HasValue ? response.Content.Headers.ContentLength.Value : -1L);
+                                int total = (int)((progressAction != null && response.Content.Headers.ContentLength.HasValue) ? response.Content.Headers.ContentLength.Value : -1);
                                 var canReportProgress = total != -1 && progressAction != null;
 
                                 try
                                 {
                                     return await Task.Run(async () =>
                                     {
-                                        using (var outputStream = new MemoryStream())
-                                        using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                                        if (canReportProgress)
                                         {
-                                            int totalRead = 0;
-                                            var buffer = new byte[4096];
-
-                                            int read;
-                                            while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+                                            using (var outputStream = new MemoryStream())
+                                            using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                                             {
-                                                token.ThrowIfCancellationRequested();
+                                                int totalRead = 0;
+                                                var buffer = new byte[4096];
 
-                                                outputStream.Write(buffer, 0, read);
-
-                                                totalRead += read;
-
-                                                if (canReportProgress)
+                                                int read = 0;
+                                                while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
                                                 {
+                                                    token.ThrowIfCancellationRequested();
+                                                    outputStream.Write(buffer, 0, read);
+                                                    totalRead += read;
                                                     progressAction(new DownloadProgress() { Total = total, Current = totalRead });
                                                 }
-                                            }
 
-                                            return outputStream.ToArray();
+                                                return outputStream.ToArray();
+                                            }
                                         }
 
+                                        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                                     }, cancelReadTimeoutToken.Token).ConfigureAwait(false);
                                 }
                                 catch (OperationCanceledException)
