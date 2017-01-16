@@ -7,16 +7,23 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Xamarin.Forms.Platform.Android;
+using FFImageLoading.Forms.Droid;
 
 namespace FFImageLoading.Forms.Sample.Droid
 {
 	[Activity(Label = "FFImageLoading.Forms.Sample.Droid", Icon = "@drawable/icon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
+	public class MainActivity : FormsAppCompatActivity
 	{
 		protected override void OnCreate(Bundle bundle)
 		{
+			// set the layout resources first
+			FormsAppCompatActivity.ToolbarResource = Resource.Layout.toolbar;
+			FormsAppCompatActivity.TabLayoutResource = Resource.Layout.tabs;
+
 			base.OnCreate(bundle);
-			FFImageLoading.Forms.Droid.CachedImageRenderer.Init();
+
+			CachedImageRenderer.Init();
 
 			var config = new FFImageLoading.Config.Configuration()
 			{

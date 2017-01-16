@@ -1,18 +1,28 @@
 ﻿using System;
 using Xamarin.Forms;
-using DLToolkit.PageFactory;
-using FFImageLoading.Forms.Sample.PageModels;
+using Xamarin.Forms.Xaml;
+using Xamvvm;
 
+[assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace FFImageLoading.Forms.Sample
 {
 	public class App : Application
 	{
 		public App()
 		{
-            MainPage = new XamarinFormsPageFactory().Init<HomePageModel, PFNavigationPage>();
+			App.Current.Resources = new ResourceDictionary()
+			{
+				{ "CustomCacheKeyFactory", new CustomCacheKeyFactory() }
+			};
 
-			ImageService.Instance.LoadCompiledResource("loading.png").Preload();
-			ImageService.Instance.LoadUrl("http://loremflickr.com/600/600/nature?filename=simple.jpg").DownloadOnly();
+			// Xamvvm init
+			var factory = new XamvvmFormsFactory(this);
+			factory.RegisterNavigationPage<MenuNavigationPageModel>(() => this.GetPageFromCache<MenuPageModel>());
+			XamvvmCore.SetCurrentFactory(factory);
+			MainPage = this.GetPageFromCache<MenuNavigationPageModel>() as Page;
+
+			//ImageService.Instance.LoadCompiledResource("loading.png").Preload();
+			//ImageService.Instance.LoadUrl("http://loremflickr.com/600/600/nature?filename=simple.jpg").DownloadOnly();
         }
 
 		protected override void OnStart()

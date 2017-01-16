@@ -53,36 +53,92 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Pages\HomePage.cs" />
-    <Compile Include="Models\ListExampleItem.cs" />
     <Compile Include="App.cs" />
-    <Compile Include="Models\MenuItem.cs" />
-    <Compile Include="Pages\CropTransformationPage.cs" />
-    <Compile Include="Models\ListHeavyItem.cs" />
-    <Compile Include="Pages\CustomCacheKeyPage.cs" />
-    <Compile Include="PageModels\CropTransformationPageModel.cs" />
-    <Compile Include="PageModels\CustomCacheKeyPageModel.cs" />
-    <Compile Include="PageModels\HomePageModel.cs" />
-    <Compile Include="PageModels\CommonPageModel.cs" />
-    <Compile Include="PageModels\DownsamplingPageModel.cs" />
-    <Compile Include="PageModels\ListPageModel.cs" />
-    <Compile Include="PageModels\ListHeavyPageModel.cs" />
-    <Compile Include="PageModels\ListTransformPageModel.cs" />
-    <Compile Include="PageModels\PlaceholdersPageModel.cs" />
-    <Compile Include="PageModels\SimplePageModel.cs" />
-    <Compile Include="PageModels\StreamPageModel.cs" />
-    <Compile Include="PageModels\TransformationPageModel.cs" />
-    <Compile Include="PageModels\SimpleXamlPageModel.cs" />
-    <Compile Include="Pages\DownsamplingPage.cs" />
-    <Compile Include="Pages\ListPage.cs" />
+    <Compile Include="Pages\MenuPage.xaml.cs">
+      <DependentUpon>MenuPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MenuPageModel.cs" />
+    <Compile Include="Pages\MenuNavigationPageModel.cs" />
+    <Compile Include="Pages\BasicPage.xaml.cs">
+      <DependentUpon>BasicPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\BasicPageModel.cs" />
+    <Compile Include="Pages\PlaceholdersPage.xaml.cs">
+      <DependentUpon>PlaceholdersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\PlaceholdersPageModel.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Pages\ListPageModel.cs" />
+    <Compile Include="Pages\ListTransformationsPageModel.cs" />
+    <Compile Include="Pages\ListHeavyPageModel.cs" />
+    <Compile Include="Pages\ListPage.xaml.cs">
+      <DependentUpon>ListPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ListTransformationsPage.xaml.cs">
+      <DependentUpon>ListTransformationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ListPageCell.xaml.cs">
+      <DependentUpon>ListPageCell.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ListTransformationsPageCell.xaml.cs">
+      <DependentUpon>ListTransformationsPageCell.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ListHeavyPage.cs" />
-    <Compile Include="Pages\ListTransformPage.cs" />
-    <Compile Include="Pages\PlaceholdersPage.cs" />
-    <Compile Include="Pages\SimplePage.cs" />
-    <Compile Include="Pages\StreamPage.cs" />
-    <Compile Include="Pages\TransformationPage.cs" />
-    <Compile Include="Pages\SimpleXamlPage.xaml.cs">
-      <DependentUpon>SimpleXamlPage.xaml</DependentUpon>
+    <Compile Include="Pages\Transformations\RotateTransformationPage.xaml.cs">
+      <DependentUpon>RotateTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\RotateTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\BaseTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\CropTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\CropTransformationPage.xaml.cs">
+      <DependentUpon>CropTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\CircleTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\CircleTransformationPage.xaml.cs">
+      <DependentUpon>CircleTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\RoundedTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\RoundedTransformationPage.xaml.cs">
+      <DependentUpon>RoundedTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\CornersTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\CornersTransformationPage.xaml.cs">
+      <DependentUpon>CornersTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\GrayscaleTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\GrayscaleTransformationPage.xaml.cs">
+      <DependentUpon>GrayscaleTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\BlurredTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\BlurredTransformationPage.xaml.cs">
+      <DependentUpon>BlurredTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\SepiaTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\SepiaTransformationPage.xaml.cs">
+      <DependentUpon>SepiaTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\ColorSpaceTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\ColorSpaceTransformationPage.xaml.cs">
+      <DependentUpon>ColorSpaceTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\TintTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\TintTransformationPage.xaml.cs">
+      <DependentUpon>TintTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\FlipTransformationPageModel.cs" />
+    <Compile Include="Pages\Transformations\FlipTransformationPage.xaml.cs">
+      <DependentUpon>FlipTransformationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Transformations\MultipleTransformationsPageModel.cs" />
+    <Compile Include="Pages\Transformations\MultipleTransformationsPage.xaml.cs">
+      <DependentUpon>MultipleTransformationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CustomKeyPageModel.cs" />
+    <Compile Include="Pages\CustomKeyPage.xaml.cs">
+      <DependentUpon>CustomKeyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CustomKeyPageCell.xaml.cs">
+      <DependentUpon>CustomKeyPageCell.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
@@ -99,14 +155,23 @@
     <Reference Include="SkiaSharp">
       <HintPath>..\..\..\packages\SkiaSharp.1.55.1\lib\portable-net45+win8+wpa81+wp8\SkiaSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Xamvvm.Core">
+      <HintPath>..\..\..\packages\Xamvvm.Forms.1.0.2\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamvvm.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamvvm.Forms">
+      <HintPath>..\..\..\packages\Xamvvm.Forms.1.0.2\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamvvm.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="Xamarin.Forms.Core">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.175\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.180\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Core.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Platform">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.175\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Platform.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.180\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Platform.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.175\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Xaml.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.3.3.180\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyChanged">
+      <HintPath>..\..\..\packages\PropertyChanged.Fody.1.52.1\lib\portable-net4+sl4+wp8+win8+wpa81+MonoAndroid16+MonoTouch40\PropertyChanged.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -134,11 +199,77 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Pages\SimpleXamlPage.xaml">
+    <EmbeddedResource Include="Pages\MenuPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\BasicPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\PlaceholdersPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\ListPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\ListTransformationsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\ListPageCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\ListTransformationsPageCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\RotateTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\CropTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\CircleTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\RoundedTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\CornersTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\GrayscaleTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\BlurredTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\SepiaTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\ColorSpaceTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\TintTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\FlipTransformationPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\Transformations\MultipleTransformationsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\CustomKeyPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\CustomKeyPageCell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="..\..\..\packages\Xamarin.Forms.2.3.3.175\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.3.3.175\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />
+  <ItemGroup>
+    <Folder Include="Pages\" />
+    <Folder Include="Pages\Transformations\" />
+  </ItemGroup>
+  <Import Project="..\..\..\packages\Xamarin.Forms.2.3.3.180\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.3.3.180\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />
+  <Import Project="..\..\..\packages\Fody.1.29.2\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\..\..\packages\Fody.1.29.2\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
 </Project>

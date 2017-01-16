@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using FFImageLoading.Forms.Touch;
 using Foundation;
 using UIKit;
 
@@ -12,9 +12,8 @@ namespace FFImageLoading.Forms.Sample.iOS
 	{
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
-			FFImageLoading.Forms.Touch.CachedImageRenderer.Init();
-
 			global::Xamarin.Forms.Forms.Init();
+			CachedImageRenderer.Init();
 
 			var config = new FFImageLoading.Config.Configuration()
 			{
