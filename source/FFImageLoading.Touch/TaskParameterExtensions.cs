@@ -6,6 +6,7 @@ using UIKit;
 using FFImageLoading.Cache;
 using System.Collections.Generic;
 using FFImageLoading.Targets;
+using System.IO;
 
 namespace FFImageLoading
 {
@@ -226,6 +227,17 @@ namespace FFImageLoading
             {
                 await PreloadAsync(parameters.WithCache(CacheType.Disk)).ConfigureAwait(false);
             }
+        }
+
+        /// <summary>
+        /// Loads the image into PNG Stream
+        /// </summary>
+        /// <returns>The PNGS tream async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
+        {
+            var result = await AsUIImageAsync(parameters);
+            return result.AsPNG().AsStream();
         }
 
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, float imageScale, ITarget<UIImage, TImageView> target) where TImageView: class

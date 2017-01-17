@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using FFImageLoading.Targets;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
+using System.IO;
 
 namespace FFImageLoading
 {
@@ -184,6 +185,16 @@ namespace FFImageLoading
             into(parameters);
 
             return tcs.Task;
+        }
+
+        /// <summary>
+        /// Loads the image into PNG Stream
+        /// </summary>
+        /// <returns>The PNGS tream async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        public static Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
+        {
+            throw new NotImplementedException();
         }
 
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
