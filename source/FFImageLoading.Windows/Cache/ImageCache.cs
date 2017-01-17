@@ -105,12 +105,13 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
             
-            var keysToRemove = _reusableBitmaps.Values.Where(v => v?.Item2?.BaseKey == baseKey).Select(v => v?.Item2?.CacheKey).ToList();
+            var pattern = baseKey + ";";
 
-			foreach (var key in keysToRemove)
-			{
-				Remove(key);
-			}
+            var keysToRemove = _reusableBitmaps.Keys.Where(i => i.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            foreach (var key in keysToRemove)
+            {
+                Remove(key);
+            }
 		}
     }
 }

@@ -410,6 +410,7 @@ namespace FFImageLoading.Work
                     using (imageData.Item1)
                     {
                         ImageInformation = imageData.Item3;
+                        ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
                         ThrowIfCancellationRequested();
 
                         // Preload

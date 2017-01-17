@@ -121,11 +121,13 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
 
-			var keysToRemove = _imageInformations.Where(i => i.Value?.BaseKey == baseKey).Select(i => i.Value.CacheKey).ToList();
-			foreach (var key in keysToRemove)
-			{
-				Remove(key);
-			}
+            var pattern = baseKey + ";";
+
+            var keysToRemove = _imageInformations.Keys.Where(i => i.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            foreach (var key in keysToRemove)
+            {
+                Remove(key);
+            }
 		}
 
 		/// <summary>
