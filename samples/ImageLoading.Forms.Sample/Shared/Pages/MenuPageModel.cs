@@ -77,6 +77,15 @@ namespace FFImageLoading.Forms.Sample
 
 				new MenuItem() {
 					Section = "Advanced",
+					Title = "Stream from base64 data",
+					Command = new BaseCommand(async (param) =>
+					{
+						await this.PushPageFromCacheAsync<StreamListPageModel>(pm => pm.Reload());
+					})
+				},
+
+				new MenuItem() {
+					Section = "Advanced",
 					Title = "Stream with custom cache key example",
 					Command = new BaseCommand((param) =>
 					{

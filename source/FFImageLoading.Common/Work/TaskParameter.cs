@@ -83,6 +83,10 @@ namespace FFImageLoading.Work
 
 		public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
+        internal Stream StreamRead { get; set; }
+
+        internal string StreamChecksum { get; set; }
+
 		public TimeSpan? CacheDuration { get; private set; }
 
 		public Tuple<int, int> DownSampleSize { get; private set; }

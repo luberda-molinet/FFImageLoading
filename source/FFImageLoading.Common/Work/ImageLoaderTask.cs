@@ -12,12 +12,6 @@ namespace FFImageLoading.Work
     public abstract class ImageLoaderTask<TImageContainer, TImageView> : IImageLoaderTask where TImageContainer : class where TImageView : class
     {
         bool _isLoadingPlaceholderLoaded;
-        static int _streamIndex;
-        static int GetNextStreamIndex()
-        {
-            return Interlocked.Increment(ref _streamIndex);
-        }
-
         readonly bool _clearCacheOnOutOfMemory;
 
         public ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, IDataResolverFactory dataResolverFactory, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher, bool clearCacheOnOutOfMemory)
@@ -33,12 +27,43 @@ namespace FFImageLoading.Work
             CancellationTokenSource = new CancellationTokenSource();
             ImageInformation = new ImageInformation();
             CanUseMemoryCache = true;
+            SetKeys();
+            Target?.SetImageLoadingTask(this);
+        }
 
+        public async Task Init()
+        {
+            if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys)
+            {
+                await Task.Run(async () =>
+                {
+                    Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+
+                    if (string.IsNullOrWhiteSpace(Parameters.CustomCacheKey) && Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
+                    {
+                        Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
+                        Parameters.StreamRead.Position = 0;
+                        SetKeys();
+                    }
+                }).ConfigureAwait(false);
+            }
+        }
+
+        void SetKeys()
+        {
             KeyRaw = Parameters.Path;
             if (Parameters.Source == ImageSource.Stream)
             {
-                CanUseMemoryCache = false;
-                KeyRaw = string.Concat("Stream_", GetNextStreamIndex());
+                if (!string.IsNullOrWhiteSpace(Parameters.StreamChecksum))
+                {
+                    CanUseMemoryCache = true;
+                    KeyRaw = Parameters.StreamChecksum;
+                }
+                else
+                {
+                    CanUseMemoryCache = false;
+                    KeyRaw = string.Concat("Stream_", Guid.NewGuid().ToString("N"));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
@@ -109,8 +134,6 @@ namespace FFImageLoading.Work
 
             ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
             ImageInformation.SetPath(Parameters.Path);
-
-            Target?.SetImageLoadingTask(this);
         }
 
         public Configuration Configuration { get; private set; }
@@ -411,6 +434,7 @@ namespace FFImageLoading.Work
                     {
                         ImageInformation = imageData.Item3;
                         ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
+                        ImageInformation.SetPath(Parameters.Path);
                         ThrowIfCancellationRequested();
 
                         // Preload

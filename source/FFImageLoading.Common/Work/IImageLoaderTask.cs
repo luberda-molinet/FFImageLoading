@@ -7,6 +7,8 @@ namespace FFImageLoading.Work
 {
     public interface IImageLoaderTask : IScheduledWork, IDisposable
     {
+        Task Init();
+
         TaskParameter Parameters { get; }
 
         bool CanUseMemoryCache { get; }

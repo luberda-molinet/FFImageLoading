@@ -140,6 +140,13 @@
     <Compile Include="Pages\CustomKeyPageCell.xaml.cs">
       <DependentUpon>CustomKeyPageCell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\StreamListPageModel.cs" />
+    <Compile Include="Pages\StreamListPage.xaml.cs">
+      <DependentUpon>StreamListPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\StreamListPageCell.xaml.cs">
+      <DependentUpon>StreamListPageCell.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
@@ -263,6 +270,12 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Pages\CustomKeyPageCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\StreamListPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\StreamListPageCell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
