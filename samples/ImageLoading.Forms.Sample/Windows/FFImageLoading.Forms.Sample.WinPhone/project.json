@@ -1,12 +1,11 @@
 ﻿{
   "supports": {},
   "dependencies": {
-    "DLToolkit.PageFactory.Forms": "2.0.1",
-    "DLToolkit.PageFactory.Shared": "2.0.1",
     "Microsoft.Bcl": "1.1.10",
     "Microsoft.Bcl.Build": "1.0.21",
     "Microsoft.Net.Http": "2.2.29",
-    "Xamarin.Forms": "2.3.3.175"
+    "Xamarin.Forms": "2.3.3.180",
+    "Xamvvm.Forms": "1.0.2"
   },
   "frameworks": {
     "WindowsPhoneApp,Version=v8.1": {}

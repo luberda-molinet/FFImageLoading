@@ -3,26 +3,6 @@
   "version": 1,
   "targets": {
     "UAP,Version=v10.0": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -2085,7 +2065,7 @@
           }
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -2097,30 +2077,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-arm": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -4263,7 +4236,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -4275,30 +4248,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-arm-aot": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -6480,7 +6446,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -6492,30 +6458,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-x64": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -8667,7 +8626,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -8679,30 +8638,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-x64-aot": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -10893,7 +10845,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -10905,30 +10857,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-x86": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -13080,7 +13025,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -13092,30 +13037,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
+        }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
         }
       }
     },
     "UAP,Version=v10.0/win10-x86-aot": {
-      "DLToolkit.PageFactory.Forms/2.0.1": {
-        "dependencies": {
-          "DLToolkit.PageFactory.Shared": "2.0.1",
-          "Xamarin.Forms": "1.4.4.6392"
-        },
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll": {}
-        }
-      },
-      "DLToolkit.PageFactory.Shared/2.0.1": {
-        "compile": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        },
-        "runtime": {
-          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll": {}
-        }
-      },
       "Microsoft.Bcl/1.1.10": {
         "dependencies": {
           "Microsoft.Bcl.Build": "1.0.14"
@@ -15306,7 +15244,7 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Xamarin.Forms/2.3.3.175": {
+      "Xamarin.Forms/2.3.3.180": {
         "compile": {
           "lib/uap10.0/Xamarin.Forms.Core.dll": {},
           "lib/uap10.0/Xamarin.Forms.Platform.UAP.dll": {},
@@ -15319,31 +15257,23 @@
           "lib/uap10.0/Xamarin.Forms.Platform.dll": {},
           "lib/uap10.0/Xamarin.Forms.Xaml.dll": {}
         }
+      },
+      "Xamvvm.Forms/1.0.2": {
+        "dependencies": {
+          "Xamarin.Forms": "2.0.0.6482"
+        },
+        "compile": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll": {},
+          "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll": {}
+        }
       }
     }
   },
   "libraries": {
-    "DLToolkit.PageFactory.Forms/2.0.1": {
-      "sha512": "JImifVpBT6RrdeuWA3z8/XwGQYE0NRZekuUKDhcFygTU91ICdDBz3u0usefogCISNtf1p3w9NoBit1qChmmgqw==",
-      "type": "package",
-      "path": "dltoolkit.pagefactory.forms/2.0.1",
-      "files": [
-        "dltoolkit.pagefactory.forms.2.0.1.nupkg.sha512",
-        "dltoolkit.pagefactory.forms.nuspec",
-        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Forms.dll"
-      ]
-    },
-    "DLToolkit.PageFactory.Shared/2.0.1": {
-      "sha512": "Y8ESwKdeD/cPNvsxvwGuBZY2mrPOhAr0Ci14I1w6lp8/zt5Gjzd4fPBCkaALTH1fp1Bk6SDR7ouOTT0/XJrc8A==",
-      "type": "package",
-      "path": "dltoolkit.pagefactory.shared/2.0.1",
-      "files": [
-        "dltoolkit.pagefactory.shared.2.0.1.nupkg.sha512",
-        "dltoolkit.pagefactory.shared.nuspec",
-        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.dll",
-        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/DLToolkit.PageFactory.Shared.xml"
-      ]
-    },
     "Microsoft.Bcl/1.1.10": {
       "sha512": "+tTqoh/M1pyL8El3qLy30EcwnAtyvFoDZJtdG9Cbg/WdFbh4N8kyrq198XHuEL7lnJbeD0DRO8jcX5IIOh05cQ==",
       "type": "package",
@@ -21714,11 +21644,13 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
-    "Xamarin.Forms/2.3.3.175": {
-      "sha512": "ykrHIH6of2zy1NyZ4taaz42iyVlyw/rx6wHOm2TU3/yMEe9ptPUtfZ8kkjAyxJn1nsOjzIGsU8QufMogKLWPtg==",
+    "Xamarin.Forms/2.3.3.180": {
+      "sha512": "n4zTnWMDmtWnLqD8duenKd4Ofk8NmklPHHFRIMx+BuUuzX9ZOJFGWun6RCgzok54UBWQgX38Mf80Hvh7v3GYzQ==",
       "type": "package",
-      "path": "xamarin.forms/2.3.3.175",
+      "path": "Xamarin.Forms/2.3.3.180",
       "files": [
+        "Xamarin.Forms.2.3.3.180.nupkg.sha512",
+        "Xamarin.Forms.nuspec",
         "build/portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20/ICSharpCode.Decompiler.dll",
         "build/portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20/ICSharpCode.NRefactory.CSharp.dll",
         "build/portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20/ICSharpCode.NRefactory.Cecil.dll",
@@ -21872,20 +21804,29 @@
         "lib/wpa81/Xamarin.Forms.Platform.WinRT/Xamarin.Forms.Platform.WinRT.xr.xml",
         "lib/wpa81/Xamarin.Forms.Platform.dll",
         "lib/wpa81/Xamarin.Forms.Xaml.dll",
-        "lib/wpa81/Xamarin.Forms.Xaml.xml",
-        "xamarin.forms.2.3.3.175.nupkg.sha512",
-        "xamarin.forms.nuspec"
+        "lib/wpa81/Xamarin.Forms.Xaml.xml"
+      ]
+    },
+    "Xamvvm.Forms/1.0.2": {
+      "sha512": "9G09cxA5QnqnkBD0D7YZnIa81vf2FFHl5k2Ftk8LFDBbaGbRxFdb+SwTwH5ZINeJLbFhbTGnRe/GiKajUU4e1Q==",
+      "type": "package",
+      "path": "Xamvvm.Forms/1.0.2",
+      "files": [
+        "Xamvvm.Forms.1.0.2.nupkg.sha512",
+        "Xamvvm.Forms.nuspec",
+        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.dll",
+        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Core.xml",
+        "lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/Xamvvm.Forms.dll"
       ]
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "DLToolkit.PageFactory.Forms >= 2.0.1",
-      "DLToolkit.PageFactory.Shared >= 2.0.1",
       "Microsoft.Bcl.Build >= 1.0.21",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.2.2",
       "Microsoft.Net.Http >= 2.2.29",
-      "Xamarin.Forms >= 2.3.3.175"
+      "Xamarin.Forms >= 2.3.3.180",
+      "Xamvvm.Forms >= 1.0.2"
     ],
     "UAP,Version=v10.0": []
   }
