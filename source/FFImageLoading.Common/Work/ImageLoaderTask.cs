@@ -33,13 +33,13 @@ namespace FFImageLoading.Work
 
         public async Task Init()
         {
-            if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys)
+            if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
                 await Task.Run(async () =>
                 {
                     Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
 
-                    if (string.IsNullOrWhiteSpace(Parameters.CustomCacheKey) && Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
+                    if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
                     {
                         Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
                         Parameters.StreamRead.Position = 0;
