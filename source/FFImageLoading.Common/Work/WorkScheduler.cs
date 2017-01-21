@@ -208,7 +208,7 @@ namespace FFImageLoading.Work
                 Interlocked.Increment(ref _statsTotalPending);
                 Enqueue(task);
             }
-            else if (similarRunningTask != null)
+            else
             {
                 if (task.Parameters.Priority.HasValue && (!similarRunningTask.Parameters.Priority.HasValue
                     || task.Parameters.Priority.Value > similarRunningTask.Parameters.Priority.Value))

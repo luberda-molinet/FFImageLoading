@@ -30,11 +30,7 @@ namespace FFImageLoading.Targets
                 SelfDisposingBitmapDrawable drawable = null;
                 _drawableWeakReference.TryGetTarget(out drawable);
                 var sdDrawable = drawable as SelfDisposingBitmapDrawable;
-
-                if (sdDrawable != null)
-                {
-                    sdDrawable?.SetIsDisplayed(true);
-                }
+                sdDrawable?.SetIsDisplayed(true);
 
                 return sdDrawable;
             }

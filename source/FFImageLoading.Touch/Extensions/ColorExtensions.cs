@@ -11,7 +11,7 @@ namespace FFImageLoading
                 throw new ArgumentException("Invalid color string.", nameof(hexColor));
 
             if (!hexColor.StartsWith("#", StringComparison.Ordinal))
-                hexColor.Insert(0, "#");
+                hexColor = hexColor.Insert(0, "#");
 
             UIColor color = UIColor.Clear;
 

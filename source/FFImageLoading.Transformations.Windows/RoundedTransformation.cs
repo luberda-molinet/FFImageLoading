@@ -123,7 +123,7 @@ namespace FFImageLoading.Transformations
                 try
                 {
                     if (!borderHexColor.StartsWith("#", StringComparison.Ordinal))
-                        borderHexColor.Insert(0, "#");
+                        borderHexColor = borderHexColor.Insert(0, "#");
                     borderColor = borderHexColor.ToColorFromHex().ToInt();
                 }
                 catch (Exception)
