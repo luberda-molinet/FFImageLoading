@@ -89,6 +89,7 @@
     <Compile Include="DataResolvers\FileDataResolver.cs" />
     <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="Helpers\GifHelper.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />

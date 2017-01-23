@@ -48,6 +48,12 @@ namespace FFImageLoading.Work
                 {
                     imageIn = new WebP.Touch.WebPCodec().Decode(imageData);
                 }
+                // Special case to handle gif animations on iOS
+                else if (path.ToLowerInvariant().EndsWith(".gif", StringComparison.InvariantCulture))
+                {
+                    using (var nsdata = NSData.FromStream(imageData))
+                        imageIn = GifHelper.AnimateGif(nsdata);
+                }
                 else
                 {
                     var nsdata = NSData.FromStream(imageData);

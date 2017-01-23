@@ -30,6 +30,15 @@ namespace FFImageLoading.Forms.Sample
 					})
 				},
 
+                new MenuItem() {
+                    Section = "Basic",
+                    Title = "Simple Gif",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<SimpleGifPageModel>(pm => pm.Reload());
+                    })
+                },
+
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Placeholders examples",
