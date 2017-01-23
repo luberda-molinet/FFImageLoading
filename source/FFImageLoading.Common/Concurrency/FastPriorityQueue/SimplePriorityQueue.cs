@@ -12,39 +12,12 @@ namespace FFImageLoading.Concurrency
     /// <typeparam name="TPriority">The priority-type to use for nodes.  Must extend IComparable&lt;TPriority&gt;</typeparam>
     public class SimplePriorityQueue<TItem, TPriority> : IPriorityQueue<TItem, TPriority>
         where TPriority : IComparable<TPriority>
-    {
-        protected class SimpleNode : GenericPriorityQueueNode<TPriority>
+    {        
+        protected readonly IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> _queue;
+
+        public SimplePriorityQueue(IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> queue)
         {
-            public TItem Data { get; private set; }
-
-            public SimpleNode(TItem data)
-            {
-                Data = data;
-            }
-        }
-
-        private const int INITIAL_QUEUE_SIZE = 10;
-        protected readonly GenericPriorityQueue<SimpleNode, TPriority> _queue;
-
-        public SimplePriorityQueue()
-        {
-            _queue = new GenericPriorityQueue<SimpleNode, TPriority>(INITIAL_QUEUE_SIZE);
-        }
-
-        /// <summary>
-        /// Given an item of type T, returns the exist SimpleNode in the queue
-        /// </summary>
-        private SimpleNode GetExistingNode(TItem item)
-        {
-            var comparer = EqualityComparer<TItem>.Default;
-            foreach (var node in _queue)
-            {
-                if (comparer.Equals(node.Data, item))
-                {
-                    return node;
-                }
-            }
-            throw new InvalidOperationException("Item cannot be found in queue: " + item);
+            _queue = queue;
         }
 
         /// <summary>
@@ -79,7 +52,7 @@ namespace FFImageLoading.Concurrency
                         throw new InvalidOperationException("Cannot call .First on an empty queue");
                     }
 
-                    SimpleNode first = _queue.First;
+                    var first = _queue.First;
                     return (first != null ? first.Data : default(TItem));
                 }
             }
@@ -131,7 +104,7 @@ namespace FFImageLoading.Concurrency
                     throw new InvalidOperationException("Cannot call Dequeue() on an empty queue");
                 }
 
-                SimpleNode node = _queue.Dequeue();
+                var node = _queue.Dequeue();
                 return node.Data;
             }
         }
@@ -146,7 +119,7 @@ namespace FFImageLoading.Concurrency
         {
             lock (_queue)
             {
-                SimpleNode node = new SimpleNode(item);
+                var node = new SimpleNode<TItem, TPriority>(item);
                 if (_queue.Count == _queue.MaxSize)
                 {
                     _queue.Resize(_queue.MaxSize * 2 + 1);
@@ -190,7 +163,7 @@ namespace FFImageLoading.Concurrency
             {
                 try
                 {
-                    SimpleNode updateMe = GetExistingNode(item);
+                    var updateMe = GetExistingNode(item);
                     _queue.UpdatePriority(updateMe, priority);
                 }
                 catch (InvalidOperationException ex)
@@ -220,6 +193,7 @@ namespace FFImageLoading.Concurrency
             return GetEnumerator();
         }
 
+#if DEBUG
         public bool IsValidQueue()
         {
             lock (_queue)
@@ -227,5 +201,23 @@ namespace FFImageLoading.Concurrency
                 return _queue.IsValidQueue();
             }
         }
+#endif
+
+        /// <summary>
+        /// Given an item of type T, returns the exist SimpleNode in the queue
+        /// </summary>
+        private SimpleNode<TItem, TPriority> GetExistingNode(TItem item)
+        {
+            var comparer = EqualityComparer<TItem>.Default;
+            foreach (var node in _queue)
+            {
+                if (comparer.Equals(node.Data, item))
+                {
+                    return node;
+                }
+            }
+            throw new InvalidOperationException("Item cannot be found in queue: " + item);
+        }
+
     }
 }

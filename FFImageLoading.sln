@@ -83,6 +83,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Sample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Transformations.Windows", "source\FFImageLoading.Transformations.Windows\FFImageLoading.Transformations.Windows.csproj", "{564542CF-011E-4E83-B72B-2E1AA2BCD254}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A420B061-9AF1-40EC-A728-60536C59031E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Core.Tests", "source\Tests\FFImageLoading.Core.Tests\FFImageLoading.Core.Tests.csproj", "{C234E3F9-8DE1-4105-A793-E0584A538092}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4

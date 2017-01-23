@@ -398,6 +398,7 @@ namespace FFImageLoading.Concurrency
             return GetEnumerator();
         }
 
+#if DEBUG
         /// <summary>
         /// <b>Should not be called in production code.</b>
         /// Checks to make sure the queue is still in a valid state.  Used for testing/debugging the queue.
@@ -419,5 +420,6 @@ namespace FFImageLoading.Concurrency
             }
             return true;
         }
+#endif
     }
 }
