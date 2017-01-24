@@ -13,6 +13,7 @@ namespace FFImageLoading.Transformations
 		public BlurredTransformation()
 		{
 			Radius = 20d;
+			_context = Android.App.Application.Context;
 		}
 
 		public BlurredTransformation(double radius)
