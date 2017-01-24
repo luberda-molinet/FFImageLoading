@@ -148,7 +148,7 @@
       <DependentUpon>StreamListPageCell.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\SvgSamplePageModel.cs" />
-    <Compile Include="SvgSamplePage.xaml.cs">
+    <Compile Include="Pages\SvgSamplePage.xaml.cs">
       <DependentUpon>SvgSamplePage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -282,7 +282,7 @@
     <EmbeddedResource Include="Pages\StreamListPageCell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="SvgSamplePage.xaml">
+    <EmbeddedResource Include="Pages\SvgSamplePage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
