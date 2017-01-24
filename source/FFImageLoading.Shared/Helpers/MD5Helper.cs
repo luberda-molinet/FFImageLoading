@@ -12,13 +12,13 @@ namespace FFImageLoading.Helpers
         public string MD5(Stream stream)
         {
             var bytes = _provider.ComputeHash(stream);
-            return BitConverter.ToString(bytes);
+            return BitConverter.ToString(bytes)?.ToSanitizedKey();
         }
 
         public string MD5(string input)
         {
 			var bytes = _provider.ComputeHash(Encoding.UTF8.GetBytes(input));
-			return BitConverter.ToString(bytes);
+            return BitConverter.ToString(bytes)?.ToSanitizedKey();
         }
     }
 }
