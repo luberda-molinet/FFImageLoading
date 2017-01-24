@@ -136,7 +136,7 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
     <AndroidResource Include="Resources\drawable\loading.png" />
     <AndroidResource Include="Resources\drawable\error.png" />
-    <AndroidResource Include="Resources\drawable\Sample.svg" />
+    <AndroidResource Include="Resources\drawable\sample.svg" />
     <AndroidResource Include="Resources\values\colors.xml" />
     <AndroidResource Include="Resources\values\style.xml" />
     <AndroidResource Include="Resources\values-v21\style.xml" />

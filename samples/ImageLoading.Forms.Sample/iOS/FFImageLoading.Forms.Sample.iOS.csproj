@@ -164,7 +164,7 @@
   <ItemGroup>
     <BundleResource Include="Resources\error.png" />
     <BundleResource Include="Resources\loading.png" />
-    <BundleResource Include="Resources\Sample.svg" />
+    <BundleResource Include="Resources\sample.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj">

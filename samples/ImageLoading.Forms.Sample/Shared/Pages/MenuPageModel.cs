@@ -200,6 +200,15 @@ namespace FFImageLoading.Forms.Sample
 						await this.PushPageFromCacheAsync<MultipleTransformationsPageModel>(pm => pm.Reload());
 					})
 				},
+
+				new MenuItem() {
+					Section = "SVG",
+					Title = "Simple SVG example",
+					Command = new BaseCommand(async (param) =>
+					{
+						await this.PushPageFromCacheAsync<SvgSamplePageModel>();
+					})
+				},
 			};
 
 			var sorted = menuItems

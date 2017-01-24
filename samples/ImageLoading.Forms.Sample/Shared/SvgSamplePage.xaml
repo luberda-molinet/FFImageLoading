@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.SvgSamplePage"
+		xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
+		xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+		xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+		xmlns:ffimageloadingsvg="clr-namespace:FFImageLoading.Svg.Forms;assembly=FFImageLoading.Svg.Forms"
+		Title="SVG">
+	
+	<ContentPage.Resources>
+		<ResourceDictionary>
+	  		<ffimageloadingsvg:SvgImageSourceConverter x:Key="SvgImageSourceConverter"></ffimageloadingsvg:SvgImageSourceConverter>
+		</ResourceDictionary>
+	</ContentPage.Resources>
+	
+	<ContentPage.Content>
+		<ffimageloading:CachedImage WidthRequest="300" HeightRequest="300"
+			Source="{Binding Source, Converter={StaticResource SvgImageSourceConverter}}">
+		</ffimageloading:CachedImage>
+	</ContentPage.Content>
+</ContentPage>
