@@ -240,6 +240,17 @@ namespace FFImageLoading
             return result.AsPNG().AsStream();
         }
 
+        /// <summary>
+        /// Loads the image into JPG Stream
+        /// </summary>
+        /// <returns>The JPG Stream async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        public async static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        {
+            var result = await AsUIImageAsync(parameters);
+            return result.AsJPEG((nfloat)quality).AsStream();
+        }
+
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, float imageScale, ITarget<UIImage, TImageView> target) where TImageView: class
 		{
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);

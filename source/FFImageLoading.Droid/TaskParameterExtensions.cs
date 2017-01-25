@@ -231,6 +231,20 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// Loads the image into JPG Stream
+        /// </summary>
+        /// <returns>The JPG Stream async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        public async static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        {
+            var result = await AsBitmapDrawableAsync(parameters);
+            var stream = new MemoryStream();
+            await result.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Jpeg, quality, stream);
+            stream.Position = 0;
+            return stream;
+        }
+
+        /// <summary>
         /// Downloads the image request into disk cache for future use if not already exists.
         /// Only Url Source supported.
         /// IMPORTANT: It throws image loading exceptions - you should handle them
