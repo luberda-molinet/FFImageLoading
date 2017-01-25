@@ -25,4 +25,5 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
+[assembly: InternalsVisibleTo("FFImageLoading.Core.Tests")]
 [assembly: InternalsVisibleTo("FFImageLoading.Platform")]

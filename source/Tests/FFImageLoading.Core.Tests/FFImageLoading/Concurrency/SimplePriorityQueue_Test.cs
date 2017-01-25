@@ -1,6 +1,7 @@
 ﻿using FFImageLoading.Concurrency;
 using FFImageLoading.Work;
 using Moq;
+using System;
 using Xunit;
 
 namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
@@ -17,22 +18,50 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         [Fact]
         public void Given_item_added_Then_count_is_1()
         {
-            var request = new Mock<IImageLoaderTask>();
+            var request = new Mock<IImageLoaderTask>().Object;
             var sut = CreatePriorityQueue();
-            sut.Enqueue(request.Object, 0);
+            sut.Enqueue(request, 0);
 
             Assert.Equal(1, sut.Count);
         }
 
-        private IFixedSizePriorityQueue<SimpleNode<IImageLoaderTask, int>, int> CreateQueue()
+        [Fact]
+        public void Given_queue_has_items_Then_dequeue_max_priority()
         {
-            var mock = new Mock<IFixedSizePriorityQueue<SimpleNode<IImageLoaderTask, int>, int>>();
-            return mock.Object;
+            var request = new Mock<IImageLoaderTask>().Object;
+            var sut = CreatePriorityQueue();
+            sut.Enqueue(request, 0);
+            var result = sut.Dequeue();
+
+            Assert.Same(request, result);
+        }
+
+        [Fact]
+        public void Given_queue_is_empty_Then_dequeue_throws()
+        {
+            var request = new Mock<IImageLoaderTask>().Object;
+            var sut = CreatePriorityQueue();
+
+            Assert.Throws<InvalidOperationException>(() => sut.Dequeue());
+        }
+
+        [Fact]
+        public void Given_item_dequeued_Then_count_decreases()
+        {
+            var request = new Mock<IImageLoaderTask>().Object;
+            var sut = CreatePriorityQueue();
+            sut.Enqueue(request, 0);
+            sut.Enqueue(request, 0);
+            sut.Enqueue(request, 0);
+            sut.Dequeue();
+
+            Assert.Equal(2, sut.Count);
         }
 
         private SimplePriorityQueue<IImageLoaderTask, int> CreatePriorityQueue()
         {
-            return new SimplePriorityQueue<IImageLoaderTask, int>(CreateQueue());
+            var queue = new StubFixedSizePriorityQueue();
+            return new SimplePriorityQueue<IImageLoaderTask, int>(queue);
         }
     }
 }
