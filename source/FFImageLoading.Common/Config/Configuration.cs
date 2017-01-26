@@ -162,18 +162,21 @@ namespace FFImageLoading.Config
 
         /// <summary>
         /// Enables / disables verbose performance logging.
+        /// WARNING! It will downgrade image loading performance, disable it for release builds!
         /// </summary>
         /// <value>The verbose performance logging.</value>
         public bool VerbosePerformanceLogging { get; set; }
 
         /// <summary>
         /// Enables / disables verbose memory cache logging.
+        /// WARNING! It will downgrade image loading performance, disable it for release builds!
         /// </summary>
         /// <value>The verbose memory cache logging.</value>
         public bool VerboseMemoryCacheLogging { get; set; }
 
         /// <summary>
         /// Enables / disables verbose image loading cancelled logging.
+        /// WARNING! It will downgrade image loading performance, disable it for release builds!
         /// </summary>
         /// <value>The verbose image loading cancelled logging.</value>
         public bool VerboseLoadingCancelledLogging { get; set; }
