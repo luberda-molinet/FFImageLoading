@@ -29,7 +29,7 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         {
             get
             {
-                return list.First();
+                return list.OrderByDescending(n => n.Priority).FirstOrDefault();
             }
         }
 
@@ -53,7 +53,7 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
 
         public SimpleNode<IImageLoaderTask, int> Dequeue()
         {
-            var node = list.OrderBy(n => n.Priority).FirstOrDefault();
+            var node = First;
             list.Remove(node);
             return node;
         }
@@ -62,11 +62,6 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         {
             node.Priority = priority;
             list.Add(node);
-        }
-
-        public IEnumerator<SimpleNode<IImageLoaderTask, int>> GetEnumerator()
-        {
-            return list.GetEnumerator();
         }
 
         public bool IsValidQueue()
@@ -86,6 +81,11 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         public void UpdatePriority(SimpleNode<IImageLoaderTask, int> node, int priority)
         {
             node.Priority = priority;
+        }
+
+        public IEnumerator<SimpleNode<IImageLoaderTask, int>> GetEnumerator()
+        {
+            return list.OrderByDescending(n => n.Priority).ToList().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
