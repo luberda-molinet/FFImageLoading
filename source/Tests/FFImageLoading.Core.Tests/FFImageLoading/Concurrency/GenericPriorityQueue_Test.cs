@@ -11,8 +11,15 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         [Fact]
         public void Given_instance_created_Then_empty()
         {
-            var sut = CreatePriorityQueue();
+            var sut = CreatePriorityQueue(5);
             Assert.Equal(0, sut.Count);
+            Assert.Equal(5, sut.MaxSize);
+        }
+
+        [Fact]
+        public void Given_instance_created_with_invalid_max_nodes_Then_throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => CreatePriorityQueue(0));
         }
 
         [Fact]
@@ -40,6 +47,23 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
             var result = sut.Dequeue();
 
             Assert.Same(request3, result);
+        }
+
+        [Fact]
+        public void Given_queue_has_items_with_same_priority_Then_dequeue_first_enqueued()
+        {
+            var request0 = CreateRequest();
+            var request1 = CreateRequest();
+            var request2_tie1 = CreateRequest();
+            var request2_tie2 = CreateRequest();
+            var sut = CreatePriorityQueue();
+            sut.Enqueue(request0, 0);
+            sut.Enqueue(request2_tie1, 2);
+            sut.Enqueue(request2_tie2, 2);
+            sut.Enqueue(request1, 1);
+            var result = sut.Dequeue();
+
+            Assert.Same(request2_tie1, result);
         }
 
         [Fact]
@@ -219,6 +243,31 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
                 Assert.Same(current, requestEnumerated);
                 i++;
             }
+        }
+
+        [Fact]
+        public void Given_queue_resized_with_invalid_value_Then_throws()
+        {
+            var sut = CreatePriorityQueue(5);
+            Assert.Throws<InvalidOperationException>(() => sut.Resize(0));
+        }
+
+        [Fact]
+        public void Given_queue_having_items_resized_with_invalid_value_Then_throws()
+        {
+            var sut = CreatePriorityQueue(5);
+            sut.Enqueue(CreateRequest(), 0);
+            sut.Enqueue(CreateRequest(), 0);
+            Assert.Throws<InvalidOperationException>(() => sut.Resize(1));
+        }
+
+        [Fact]
+        public void Given_queue_resized_Then_max_size_increased()
+        {
+            var sut = CreatePriorityQueue(5);
+            sut.Resize(10);
+
+            Assert.Equal(10, sut.MaxSize);
         }
 
         private GenericPriorityQueue<SimpleNode<IImageLoaderTask, int>, int> CreatePriorityQueue(int maxItems = 10)
