@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FFImageLoading\Concurrency\GenericPriorityQueue_Test.cs" />
     <Compile Include="FFImageLoading\Concurrency\PendingTasksQueue_Test.cs" />
     <Compile Include="FFImageLoading\Concurrency\SimplePriorityQueue_Test.cs" />
     <Compile Include="FFImageLoading\Concurrency\StubFixedSizePriorityQueue.cs" />
