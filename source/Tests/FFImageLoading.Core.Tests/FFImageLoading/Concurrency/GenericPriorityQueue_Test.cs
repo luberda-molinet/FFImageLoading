@@ -224,26 +224,26 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
             Assert.Same(requestLow, sut.First);
         }
 
-        [Fact]
-        public void Given_items_Then_enumerate_by_priority()
-        {
-            var request4 = CreateRequest();
-            var request7 = CreateRequest();
-            var request5 = CreateRequest();
-            var requests = new[] { request7, request5, request4 };
-            var sut = CreatePriorityQueue();
-            sut.Enqueue(request4, 4);
-            sut.Enqueue(request7, 7);
-            sut.Enqueue(request5, 5);
+        //[Fact]
+        //public void Given_items_Then_enumerate_by_priority()
+        //{
+        //    var request4 = CreateRequest();
+        //    var request7 = CreateRequest();
+        //    var request5 = CreateRequest();
+        //    var requests = new[] { request7, request5, request4 };
+        //    var sut = CreatePriorityQueue();
+        //    sut.Enqueue(request4, 4);
+        //    sut.Enqueue(request7, 7);
+        //    sut.Enqueue(request5, 5);
 
-            int i = 0;
-            foreach (var requestEnumerated in sut)
-            {
-                var current = requests[i];
-                Assert.Same(current, requestEnumerated);
-                i++;
-            }
-        }
+        //    int i = 0;
+        //    foreach (var requestEnumerated in sut)
+        //    {
+        //        var current = requests[i];
+        //        Assert.Same(current, requestEnumerated);
+        //        i++;
+        //    }
+        //}
 
         [Fact]
         public void Given_queue_resized_with_invalid_value_Then_throws()
