@@ -37,7 +37,7 @@ Features:
 			</group>
 
 			<group targetFramework="Xamarin.iOS10">
-				<dependency id="WebP.Touch" version="1.0.2" />
+				<dependency id="WebP.Touch" version="1.0.3" />
 			</group>	
 
 			<group targetFramework="portable-netcore45+wpa81">
