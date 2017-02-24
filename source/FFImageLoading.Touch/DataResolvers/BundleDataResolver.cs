@@ -74,7 +74,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (bundle != null)
                 {
-                    var path = bundle.PathForResource(file, null);
+                    string path = !string.IsNullOrEmpty(filenamePath) ? bundle.PathForResource(file, null, filenamePath) : bundle.PathForResource(file, null);
 
                     var stream = FileStore.GetInputStream(path, true);
                     var imageInformation = new ImageInformation();
