@@ -69,13 +69,13 @@ namespace FFImageLoading.Svg.Platform
 
 			if (VectorWidth == 0 && VectorHeight == 0)
 			{
-				if (picture.Bounds.Width > 0)
-					sizeX = picture.Bounds.Width;
+				if (picture.CullRect.Width > 0)
+					sizeX = picture.CullRect.Width;
 				else
 					sizeX = 300;
 
-				if (picture.Bounds.Height > 0)
-					sizeY = picture.Bounds.Height;
+				if (picture.CullRect.Height > 0)
+					sizeY = picture.CullRect.Height;
 				else
 					sizeY = 300;
 			}
@@ -87,11 +87,11 @@ namespace FFImageLoading.Svg.Platform
 			else if (VectorWidth > 0)
 			{
 				sizeX = VectorWidth;
-				sizeY = (VectorWidth / picture.Bounds.Width) * picture.Bounds.Height;
+				sizeY = (VectorWidth / picture.CullRect.Width) * picture.CullRect.Height;
 			}
 			else
 			{
-				sizeX = (VectorHeight / picture.Bounds.Height) * picture.Bounds.Width;
+				sizeX = (VectorHeight / picture.CullRect.Height) * picture.CullRect.Width;
 				sizeY = VectorHeight;
 			}
 
@@ -100,8 +100,8 @@ namespace FFImageLoading.Svg.Platform
 			using (var paint = new SKPaint())
 			{
 				canvas.Clear(SKColors.Transparent);
-				float scaleX = sizeX / picture.Bounds.Width;
-				float scaleY = sizeY / picture.Bounds.Height;
+				float scaleX = sizeX / picture.CullRect.Width;
+				float scaleY = sizeY / picture.CullRect.Height;
 				var matrix = SKMatrix.MakeScale(scaleX, scaleY);
 
 				canvas.DrawPicture(picture, ref matrix, paint);
