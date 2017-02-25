@@ -2,8 +2,8 @@
   "dependencies": {
     "Microsoft.Bcl.Build": "1.0.21",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
-    "SkiaSharp": "1.55.1",
-    "Xamarin.Forms": "2.3.3.175"
+    "SkiaSharp": "1.56.1",
+    "Xamarin.Forms": "2.3.3.193"
   },
   "frameworks": {
     "uap10.0": {}
