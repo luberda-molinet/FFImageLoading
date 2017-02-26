@@ -239,6 +239,48 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// The horizontal alignment property of the underlying image.
+        /// </summary>
+        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(FFImage), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
+
+        public HorizontalAlignment HorizontalImageAlignment
+        {
+            get { return (HorizontalAlignment)GetValue(HorizontalImageAlignmentProperty); }
+            set { SetValue(HorizontalImageAlignmentProperty, value); }
+        }
+
+        private static void HorizontalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FFImage)d).HorizontalImageAlignmentPropertyChanged((HorizontalAlignment)e.NewValue);
+        }
+
+        private void HorizontalImageAlignmentPropertyChanged(HorizontalAlignment horizontalAlignment)
+        {
+            internalImage.HorizontalAlignment = horizontalAlignment;
+        }
+
+        /// <summary>
+        /// The vertical alignment property of the underlying image.
+        /// </summary>
+        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(FFImage), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
+
+        public VerticalAlignment VerticalImageAlignment
+        {
+            get { return (VerticalAlignment)GetValue(VerticalImageAlignmentProperty); }
+            set { SetValue(VerticalImageAlignmentProperty, value); }
+        }
+
+        private static void VerticalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FFImage)d).VerticalImageAlignmentPropertyChanged((VerticalAlignment)e.NewValue);
+        }
+
+        private void VerticalImageAlignmentPropertyChanged(VerticalAlignment verticalAlignment)
+        {
+            internalImage.VerticalAlignment = verticalAlignment;
+        }
+
+        /// <summary>
         /// The retry count property.
         /// </summary>
         public static readonly DependencyProperty RetryCountProperty = DependencyProperty.Register(nameof(RetryCount), typeof(int), typeof(FFImage), new PropertyMetadata(default(int)));
