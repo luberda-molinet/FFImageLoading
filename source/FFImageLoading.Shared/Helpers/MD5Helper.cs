@@ -9,16 +9,20 @@ namespace FFImageLoading.Helpers
     {
         public string MD5(Stream stream)
         {
-            var hashProvider = new MD5CryptoServiceProvider();
-            var bytes = hashProvider.ComputeHash(stream);
-            return BitConverter.ToString(bytes)?.ToSanitizedKey();
+            using (var hashProvider = new MD5CryptoServiceProvider())
+            {
+                var bytes = hashProvider.ComputeHash(stream);
+                return BitConverter.ToString(bytes)?.ToSanitizedKey();
+            }
         }
 
         public string MD5(string input)
         {
-            var hashProvider = new MD5CryptoServiceProvider();
-            var bytes = hashProvider.ComputeHash(Encoding.UTF8.GetBytes(input));
-            return BitConverter.ToString(bytes)?.ToSanitizedKey();
+            using (var hashProvider = new MD5CryptoServiceProvider())
+            {
+                var bytes = hashProvider.ComputeHash(Encoding.UTF8.GetBytes(input));
+                return BitConverter.ToString(bytes)?.ToSanitizedKey();
+            }
         }
     }
 }
