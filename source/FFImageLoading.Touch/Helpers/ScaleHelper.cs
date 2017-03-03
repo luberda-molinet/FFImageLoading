@@ -13,6 +13,9 @@ namespace FFImageLoading.Helpers
 
         public static void Init()
         {
+            if (Scale > 0)
+                return;
+
             MainThreadDispatcher.Instance.Post(() =>
             {
                Scale = UIScreen.MainScreen.Scale;
