@@ -37,7 +37,15 @@ namespace FFImageLoading.Work
             {
                 await Task.Run(async () =>
                 {
-                    Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                    try
+                    {
+                        Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                    }
+                    catch(TaskCanceledException ex)
+                    {
+                        Parameters.StreamRead = null;
+                        Logger.Error(ex.Message, ex);
+                    }
 
                     if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
                     {
