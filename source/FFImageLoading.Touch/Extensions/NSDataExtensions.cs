@@ -22,18 +22,12 @@ namespace FFImageLoading.Extensions
         {
 			using (var sourceRef = CGImageSource.FromData(data))
 			{
-				if (sourceRef == null)
-				{
-					return null;
-				}
+                var imageProperties = GetImageProperties(sourceRef);
 
-				// Get original image size
-				var imageProperties = sourceRef.GetProperties(0);
-
-				if (imageProperties == null)
-				{
-					return null;
-				}
+                if (imageProperties == null)
+                {
+                    return null;
+                }
 
 				if (imageinformation != null)
 				{
@@ -244,6 +238,26 @@ namespace FFImageLoading.Extensions
 					}
 			}
 		}
+
+        private static CoreGraphics.CGImageProperties GetImageProperties(CGImageSource imageSource)
+        {
+            if (imageSource == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                // Get original image size
+                 return imageSource.GetProperties(0);
+            }
+            catch (ArgumentNullException ex)
+            {
+                ImageService.Instance.Config.Logger.Debug(ex.ToString());
+                return null;
+            }
+        }
+                            
 	}
 }
 
