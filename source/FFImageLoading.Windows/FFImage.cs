@@ -760,11 +760,14 @@ namespace FFImageLoading
         internal void OnSuccess(Args.SuccessEventArgs e)
         {
             var handler = Success;
-            if (handler != null) handler(this, e);
+            handler?.Invoke(this, e);
 
-            var successCommand = SuccessCommand;
-            if (successCommand != null && successCommand.CanExecute(e))
-                successCommand.Execute(e);
+            MainThreadDispatcher.Instance.Post(() =>
+            {
+                var successCommand = SuccessCommand;
+                if (successCommand != null && successCommand.CanExecute(e))
+                    successCommand.Execute(e);
+            });
         }
 
         /// <summary>
@@ -799,11 +802,14 @@ namespace FFImageLoading
         internal void OnError(Args.ErrorEventArgs e)
         {
             var handler = Error;
-            if (handler != null) handler(this, e);
+            handler?.Invoke(this, e);
 
-            var errorCommand = ErrorCommand;
-            if (errorCommand != null && errorCommand.CanExecute(e))
-                errorCommand.Execute(e);
+            MainThreadDispatcher.Instance.Post(() =>
+            {
+                var errorCommand = ErrorCommand;
+                if (errorCommand != null && errorCommand.CanExecute(e))
+                    errorCommand.Execute(e);
+            });
         }
 
         /// <summary>
@@ -838,11 +844,14 @@ namespace FFImageLoading
         internal void OnFinish(Args.FinishEventArgs e)
         {
             var handler = Finish;
-            if (handler != null) handler(this, e);
+            handler?.Invoke(this, e);
 
-            var finishCommand = FinishCommand;
-            if (finishCommand != null && finishCommand.CanExecute(e))
-                finishCommand.Execute(e);
+            MainThreadDispatcher.Instance.Post(() =>
+            {
+                var finishCommand = FinishCommand;
+                if (finishCommand != null && finishCommand.CanExecute(e))
+                    finishCommand.Execute(e);
+            });
         }
 
         public void Dispose()
