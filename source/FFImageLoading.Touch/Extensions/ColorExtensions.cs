@@ -72,8 +72,9 @@ namespace FFImageLoading
                         throw new FormatException(string.Format("The {0} string passed in the c argument is not a recognized Color format.", hexColor));
                 }
             }
-            catch (Exception)
+            catch (Exception ex) when (!(ex is FormatException))
             {
+                ImageService.Instance.Config.Logger.Debug(ex.ToString());
             }
 
             return color;
