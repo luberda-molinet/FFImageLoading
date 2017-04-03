@@ -6,6 +6,7 @@ using FFImageLoading.Helpers;
 using System.Threading;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
+using System.Net;
 
 namespace FFImageLoading.Cache
 {
@@ -52,7 +53,7 @@ namespace FFImageLoading.Cache
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
             var responseBytes = await Retry.DoAsync(
-                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress).ConfigureAwait(false),
+                async () => await DownloadAsync(url, token, parameters.OnDownloadProgress).ConfigureAwait(false),
                 DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
@@ -83,7 +84,7 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction)
+        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, Action<DownloadProgress> progressAction)
         {
             using (var cancelHeadersToken = new CancellationTokenSource())
             {
@@ -93,47 +94,44 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
-                        {
-                            if (!response.IsSuccessStatusCode)
-                                throw new HttpRequestException(response.StatusCode.ToString());
 
-                            if (response.Content == null)
-                                throw new HttpRequestException("No Content");
+                        using (var response = GetImageResponse(url, linkedHeadersToken.Token))
+                        {
+                            if (!IsSuccessStatusCode(response.StatusCode))
+                                throw new HttpRequestException(response.StatusCode.ToString());
 
                             using (var cancelReadTimeoutToken = new CancellationTokenSource())
                             {
                                 cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
-
-                                int total = (int)((progressAction != null && response.Content.Headers.ContentLength.HasValue) ? response.Content.Headers.ContentLength.Value : -1);
-                                var canReportProgress = total != -1 && progressAction != null;
+                                var total = (int)response.ContentLength;
 
                                 try
                                 {
-                                    return await Task.Run(async () =>
+                                    return await Task.Run(() =>
                                     {
-                                        if (canReportProgress)
+                                        using (var outputStream = new MemoryStream())
+                                        using (var sourceStream = response.GetResponseStream())
                                         {
-                                            using (var outputStream = new MemoryStream())
-                                            using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                                            if (sourceStream == null || sourceStream == Stream.Null)
                                             {
-                                                int totalRead = 0;
-                                                var buffer = new byte[4096];
-
-                                                int read = 0;
-                                                while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
-                                                {
-                                                    token.ThrowIfCancellationRequested();
-                                                    outputStream.Write(buffer, 0, read);
-                                                    totalRead += read;
-                                                    progressAction(new DownloadProgress() { Total = total, Current = totalRead });
-                                                }
-
-                                                return outputStream.ToArray();
+                                                throw new HttpRequestException("No Content");
                                             }
+
+                                            int totalRead = 0;
+                                            var buffer = new byte[4096];
+
+                                            int read = 0;
+                                            while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                token.ThrowIfCancellationRequested();
+                                                outputStream.Write(buffer, 0, read);
+                                                totalRead += read;
+                                                progressAction?.Invoke(new DownloadProgress() { Total = total, Current = totalRead });
+                                            }
+
+                                            return outputStream.ToArray();
                                         }
 
-                                        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                                     }, cancelReadTimeoutToken.Token).ConfigureAwait(false);
                                 }
                                 catch (OperationCanceledException)
@@ -161,6 +159,47 @@ namespace FFImageLoading.Cache
         {
             return cacheType.HasValue == false || cacheType == CacheType.All || cacheType == CacheType.Disk;
         }
+
+        private bool IsSuccessStatusCode(HttpStatusCode statusCode)
+        {
+            return ((int)statusCode >= 200) && ((int)statusCode <= 299);
+        }
+
+        private HttpWebResponse GetImageResponse (string url, CancellationToken ct)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = HttpMethod.Get.Method;
+            using (ct.Register(() => request.Abort(), false))
+            {
+                var response = GetWebResponse(request);
+                ct.ThrowIfCancellationRequested();
+                return response;
+            }
+        }
+
+        private HttpWebResponse GetWebResponse(HttpWebRequest request)
+        {
+            using (var resetEvent = new ManualResetEvent(false))
+            {
+                var result = request.BeginGetResponse(CallStreamCallback, resetEvent);
+                resetEvent.WaitOne();
+                try
+                {
+                    return (HttpWebResponse)request.EndGetResponse(result);
+                }
+                catch (WebException ex)
+                {
+                    var description = (ex.Response as HttpWebResponse)?.StatusDescription ?? "Connection Failure";
+                    throw new HttpRequestException(description);
+                }
+            }
+        }
+
+        private void CallStreamCallback(IAsyncResult asynchronousResult)
+        {
+            (asynchronousResult.AsyncState as ManualResetEvent)?.Set();
+        }
+
     }
 }
 
