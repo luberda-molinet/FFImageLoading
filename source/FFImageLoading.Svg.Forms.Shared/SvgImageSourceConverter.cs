@@ -7,7 +7,7 @@ namespace FFImageLoading.Svg.Forms
     /// <summary>
     /// SvgImageSourceConverter
     /// </summary>
-	public class SvgImageSourceConverter : IValueConverter
+	public class SvgImageSourceConverter : TypeConverter, IValueConverter
 	{
 		ImageSourceConverter imageSourceConverter = new ImageSourceConverter();
 
@@ -43,5 +43,30 @@ namespace FFImageLoading.Svg.Forms
 		{
 			throw new NotImplementedException();
 		}
+
+        public override bool CanConvertFrom(Type sourceType)
+        {
+        	return sourceType == typeof(string);
+        }
+
+        [Obsolete]
+        public override object ConvertFrom(CultureInfo culture, object value)
+        {
+        	var text = value as string;
+
+        	if (text != null)
+        	{
+                if (text.ToLower().Contains("svg"))
+                {
+                    var xfSource = imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
+                    return new SvgImageSource(xfSource, 0, 0, true);
+                }
+
+        		Uri uri;
+        		return Uri.TryCreate(text, UriKind.Absolute, out uri) && uri.Scheme != "file" ? ImageSource.FromUri(uri) : ImageSource.FromFile(text);
+        	}
+
+        	throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
+        }
 	}
 }
