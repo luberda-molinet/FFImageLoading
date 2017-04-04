@@ -52,7 +52,7 @@ namespace FFImageLoading.Cache
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
             var responseBytes = await Retry.DoAsync(
-                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress).ConfigureAwait(false),
+                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress, parameters).ConfigureAwait(false),
                 DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
@@ -83,7 +83,7 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction)
+        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
         {
             using (var cancelHeadersToken = new CancellationTokenSource())
             {
@@ -100,6 +100,8 @@ namespace FFImageLoading.Cache
 
                             if (response.Content == null)
                                 throw new HttpRequestException("No Content");
+
+                            ModifyParametersAfterResponse(response, parameters);
 
                             using (var cancelReadTimeoutToken = new CancellationTokenSource())
                             {
@@ -155,6 +157,12 @@ namespace FFImageLoading.Cache
                     }
                 }
             }
+        }
+
+        protected virtual void ModifyParametersAfterResponse(HttpResponseMessage response, TaskParameter parameters)
+        {
+            // YOUR CUSTOM LOGIC HERE
+            // eg: parameters.CacheDuration = response.Headers.CacheControl.MaxAge;
         }
 
         protected virtual bool AllowDiskCaching(CacheType? cacheType)
