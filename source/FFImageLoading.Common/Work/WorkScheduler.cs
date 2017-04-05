@@ -121,11 +121,8 @@ namespace FFImageLoading.Work
         {
             if (task != null)
             {
-                lock (_similarTasksLock)
-                {
-                    PendingTasks.Remove(task);
-                    SimilarTasks.Remove(task);
-                }
+                PendingTasks.Remove(task);
+                SimilarTasks.Remove(task);
             }
         }
 
