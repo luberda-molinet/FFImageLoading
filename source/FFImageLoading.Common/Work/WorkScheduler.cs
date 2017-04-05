@@ -131,47 +131,48 @@ namespace FFImageLoading.Work
 
 		public virtual async void LoadImage(IImageLoaderTask task)
 		{
-			Interlocked.Increment(ref _loadCount);
-
-			if (task == null)
-				return;
-
-            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
-			{
-                if (!task.IsCompleted)
-				    task?.Dispose();
-				return;
-			}
-
-            if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
-            {
-                LogSchedulerStats();
-            }
-
-            if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
-            {
-                Logger.Error("ImageService: null path ignored");
-                task?.Dispose();
-                return;
-            }
-
-			if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
-			{
-				await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
-			}
-
-            await task.Init();
-
-			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
-			if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
-			{
-                Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                task?.Dispose();
-                return;
-			}
-
             try
             {
+                Interlocked.Increment(ref _loadCount);
+
+                if (task == null)
+                    return;
+
+                if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
+                {
+                    if (!task.IsCompleted)
+                        task?.Dispose();
+                    return;
+                }
+
+                if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
+                {
+
+    				LogSchedulerStats();
+                }
+
+                if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
+                {
+                    Logger.Error("ImageService: null path ignored");
+                    task?.Dispose();
+                    return;
+                }
+
+                if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
+                {
+                    await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
+                }
+
+                await task.Init();
+
+                // If we have the image in memory then it's pointless to schedule the job: just display it straight away
+                if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
+                {
+                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+                    task?.Dispose();
+                    return;
+                }
+
                 QueueImageLoadingTask(task);
             }
             catch (Exception ex)

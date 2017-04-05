@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SvgImageSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SvgImageSourceConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SvgCachedImage.cs" />
   </ItemGroup>
 </Project>

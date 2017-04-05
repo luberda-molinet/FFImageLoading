@@ -67,7 +67,7 @@ namespace FFImageLoading.Forms.Droid
 			if (e.NewElement != null)
 			{
 				e.NewElement.InternalReloadImage = new Action(ReloadImage);
-				e.NewElement.InternalCancel = new Action(Cancel);
+				e.NewElement.InternalCancel = new Action(Cancel);//TODO
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
@@ -333,11 +333,18 @@ namespace FFImageLoading.Forms.Droid
 
 		private async void Cancel()
 		{
-			var taskToCancel = _currentTask;
-			if (taskToCancel != null && !taskToCancel.IsCancelled)
-			{
-				await Task.Run(() => taskToCancel?.Cancel());
-			}
+            try
+            {
+                var taskToCancel = _currentTask;
+                if (taskToCancel != null && !taskToCancel.IsCancelled)
+                {
+                    await Task.Run(() => taskToCancel?.Cancel());
+                }
+            }
+            catch (Exception ex)
+            {
+                ImageService.Instance.Config.Logger.Error(ex.Message, ex);
+            }
 		}
 
 		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)

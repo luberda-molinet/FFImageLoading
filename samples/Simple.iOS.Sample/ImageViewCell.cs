@@ -32,9 +32,11 @@ namespace Simple.iOS.Sample
 
         protected void UpdateContent()
         {
+            imageView.Image = null;
+
             ImageService.Instance.LoadUrl(imageURL)
-                        .ErrorPlaceholder("error@2x.png", ImageSource.ApplicationBundle)
-                        .LoadingPlaceholder("placeholder.png", ImageSource.CompiledResource)
+                        .ErrorPlaceholder("error.png", ImageSource.ApplicationBundle)
+                        .LoadingPlaceholder("placeholder", ImageSource.CompiledResource)
                         .Into(imageView);            
         }
     }

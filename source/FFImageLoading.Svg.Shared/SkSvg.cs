@@ -786,9 +786,9 @@ namespace FFImageLoading.Svg.Platform
 						{
 							nt.Values = new float[]
 							{
-								ReadNumber(args[1]), ReadNumber(args[3]), ReadNumber(args[5]),
-								ReadNumber(args[2]), ReadNumber(args[4]), ReadNumber(args[6]),
-								0, 0, 1
+									ReadNumber(args[1]), ReadNumber(args[3]), ReadNumber(args[5]),
+									ReadNumber(args[2]), ReadNumber(args[4]), ReadNumber(args[6]),
+									0, 0, 1
 							};
 						}
 						else
@@ -918,7 +918,7 @@ namespace FFImageLoading.Svg.Platform
 			//var focusX = ReadOptionalNumber(e.Attribute("fx")) ?? centerX;
 			//var focusY = ReadOptionalNumber(e.Attribute("fy")) ?? centerY;
 			var radius = ReadNumber(e.Attribute("r"));
-			var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
+			//var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
 			var tileMode = ReadSpreadMethod(e);
 			var stops = ReadStops(e);
 
@@ -939,7 +939,7 @@ namespace FFImageLoading.Svg.Platform
 			var startY = ReadNumber(e.Attribute("y1"));
 			var endX = ReadNumber(e.Attribute("x2"));
 			var endY = ReadNumber(e.Attribute("y2"));
-			var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
+			//var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
 			var tileMode = ReadSpreadMethod(e);
 			var stops = ReadStops(e);
 

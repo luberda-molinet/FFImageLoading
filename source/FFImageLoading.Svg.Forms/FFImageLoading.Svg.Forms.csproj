@@ -39,7 +39,12 @@
   <ItemGroup>
     <Compile Include="SvgImageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgImageSourceConverter.cs" />
+    <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgCachedImage.cs">
+      <Link>SvgCachedImage.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgImageSourceConverter.cs">
+      <Link>SvgImageSourceConverter.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.BaitAndSwitch\FFImageLoading.BaitAndSwitch.csproj">
