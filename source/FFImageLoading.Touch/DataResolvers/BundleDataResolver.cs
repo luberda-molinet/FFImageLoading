@@ -89,30 +89,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (string.IsNullOrEmpty(fileType))
                 {
-                    //Asset catalog
-                    if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
-                    {
-                        NSDataAsset asset = null;
-
-                        try
-                        {
-                            await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
-                        }
-                        catch (Exception) { }
-
-                        if (asset != null)
-                        {
-                            token.ThrowIfCancellationRequested();
-                            var stream = asset.Data?.AsStream();
-                            var imageInformation = new ImageInformation();
-                            imageInformation.SetPath(identifier);
-                            imageInformation.SetFilePath(null);
-
-                            return new Tuple<Stream, LoadingResult, ImageInformation>(
-                                stream, LoadingResult.CompiledResource, imageInformation);
-                        }
-                    }
-                    else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
+                    if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
                     {
                         UIImage image = null;
 
