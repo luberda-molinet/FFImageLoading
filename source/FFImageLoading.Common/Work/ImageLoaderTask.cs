@@ -35,25 +35,23 @@ namespace FFImageLoading.Work
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
-                await Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
-                    }
-                    catch(TaskCanceledException ex)
-                    {
-                        Parameters.StreamRead = null;
-                        Logger.Error(ex.Message, ex);
-                    }
+                    Parameters.StreamRead = await(Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                }
+                catch(TaskCanceledException ex)
+                {
+                    Parameters.StreamRead = null;
+                    Logger.Error(ex.Message, ex);
+                }
 
-                    if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
-                    {
-                        Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
-                        Parameters.StreamRead.Position = 0;
-                        SetKeys();
-                    }
-                }).ConfigureAwait(false);
+                if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
+                {
+                    Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
+                    Parameters.StreamRead.Position = 0;
+
+					SetKeys();
+                }
             }
         }
 

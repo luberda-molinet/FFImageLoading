@@ -12,8 +12,7 @@ namespace FFImageLoading.Work
 {
     public class WorkScheduler : IWorkScheduler
     {
-        readonly object _runningTasksLock = new object();
-        readonly object _similarTasksLock = new object();
+        readonly object _lock = new object();
 
         int _statsTotalPending;
         int _statsTotalRunning;
@@ -27,7 +26,7 @@ namespace FFImageLoading.Work
             Performance = performance;
             PendingTasks = new PendingTasksQueue();
             RunningTasks = new Dictionary<string, IImageLoaderTask>();
-            SimilarTasks = new List<IImageLoaderTask>();
+            SimilarTasks = new ThreadSafeCollection<IImageLoaderTask>();
         }
 
         protected int MaxParallelTasks 
@@ -44,24 +43,20 @@ namespace FFImageLoading.Work
         protected IPlatformPerformance Performance { get; private set; }
         protected PendingTasksQueue PendingTasks { get; private set; }
         protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; }
-        protected List<IImageLoaderTask> SimilarTasks { get; private set; }
+        protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; }
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
-            lock (_similarTasksLock)
+            lock (_lock)
             {
                 foreach (var task in PendingTasks.Where(p => predicate(p)))
                 {
                     task?.Cancel();
                 }
 
-                var items = SimilarTasks.Where(v => predicate(v)).ToList();
-                foreach (var item in items)
-                {
-                    SimilarTasks.Remove(item);
-                }
+                SimilarTasks.RemoveAll(predicate);
             }
         }
 
@@ -78,7 +73,7 @@ namespace FFImageLoading.Work
             {
                 Logger.Debug("ExitTasksEarly enabled.");
 
-                lock (_similarTasksLock)
+                lock (_lock)
                 {
                     foreach (var task in PendingTasks)
                         task?.Cancel();
@@ -121,7 +116,7 @@ namespace FFImageLoading.Work
         {
             if (task != null)
             {
-                lock (_similarTasksLock)
+                lock (_lock)
                 {
                     PendingTasks.Remove(task);
                     SimilarTasks.Remove(task);
@@ -239,10 +234,7 @@ namespace FFImageLoading.Work
             {
                 Interlocked.Increment(ref _statsTotalWaiting);
                 Logger.Debug(string.Format("Wait for similar request for key: {0}", task.Key));
-                lock (_similarTasksLock)
-                {
-                    SimilarTasks.Add(task);
-                }
+                SimilarTasks.Add(task);
             }
         }
 
@@ -288,7 +280,7 @@ namespace FFImageLoading.Work
             int urlTasksCount = 0;
             int preloadTasksCount = 0;
 
-            lock (_runningTasksLock)
+            lock (_lock)
             {
                 if (RunningTasks.Count >= MaxParallelTasks)
                 {
@@ -319,11 +311,8 @@ namespace FFImageLoading.Work
                     string rawKey = task.KeyRaw;
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
                     {
-                        lock (_similarTasksLock)
-                        {
-                            SimilarTasks.Add(task);
-                            continue;
-                        }
+                        SimilarTasks.Add(task);
+                        continue;
                     }
 
                     if (preloadOrUrlTasksCount != 0)
@@ -384,21 +373,19 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                lock (_runningTasksLock)
+                lock (_lock)
                 {
                     RunningTasks.Remove(keyRaw);
 
-                    lock (_similarTasksLock)
+                    if (SimilarTasks.Count > 0)
                     {
-                        if (SimilarTasks.Count > 0)
+                        SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
+                        var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw);
+                        foreach (var similar in similarItems)
                         {
-                            SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
-                            var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw).ToList();
-                            foreach (var similar in similarItems)
-                            {
-                                SimilarTasks.Remove(similar);
-                                LoadImage(similar);
-                            }
+                            SimilarTasks.Remove(similar);
+
+							LoadImage(similar);
                         }
                     }
                 }
