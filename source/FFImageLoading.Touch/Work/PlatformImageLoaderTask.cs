@@ -44,7 +44,14 @@ namespace FFImageLoading.Work
             try
             {
                 // Special case to handle WebP decoding on iOS
-                if (source != ImageSource.Stream && path.ToLowerInvariant().EndsWith(".webp", StringComparison.InvariantCulture))
+
+                string ext = null;
+                if (source == ImageSource.Url)
+                    ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
+                else
+                    ext = Path.GetExtension(path).ToLowerInvariant();
+                
+                if (source != ImageSource.Stream && ext == ".webp")
                 {
                     imageIn = new WebP.Touch.WebPCodec().Decode(imageData);
                 }
