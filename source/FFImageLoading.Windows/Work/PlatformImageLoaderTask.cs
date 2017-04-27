@@ -44,9 +44,10 @@ namespace FFImageLoading.Work
                 // Special case to handle WebP decoding on Windows
                 string ext = null;
                 if (source == ImageSource.Url)
-                    ext = new FileInfo(new Uri(path).LocalPath).Extension.ToLowerInvariant();
+                    ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
                 else
-                    ext = new FileInfo(path).Extension.ToLowerInvariant();
+                    ext = Path.GetExtension(path).ToLowerInvariant();
+                
                 if (source != ImageSource.Stream && ext == ".webp")
                 {
                     throw new NotImplementedException("Webp is not implemented on Windows");
