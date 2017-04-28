@@ -21,6 +21,7 @@ namespace FFImageLoading.Cross
 	#elif __ANDROID__
 	[Register("ffimageloading.cross.MvxImageLoadingView")]
 	#endif
+    [Obsolete("Please use a new/better MvxCachedImageView")]
 	public class MvxImageLoadingView
 	#if __IOS__
 		: UIImageView
