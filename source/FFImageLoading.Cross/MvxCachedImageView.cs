@@ -415,7 +415,8 @@ namespace FFImageLoading.Cross
                 imageLoader.DownloadProgress((progress) =>
                                              OnDownloadProgress?.Invoke(progress));
 
-                imageLoader.FileWriteFinished(OnFileWriteFinished);
+                if (OnFileWriteFinished != null)
+                    imageLoader.FileWriteFinished(OnFileWriteFinished);
 
                 _scheduledWork = imageLoader.Into(this);
             }
