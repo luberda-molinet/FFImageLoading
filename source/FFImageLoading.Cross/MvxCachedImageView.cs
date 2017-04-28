@@ -406,9 +406,11 @@ namespace FFImageLoading.Cross
                     _lastImageSource = ffSource;
                 });
 
-                imageLoader.Error(OnError);
+                if (OnError != null)
+                    imageLoader.Error(OnError);
 
-                imageLoader.DownloadStarted(OnDownloadStarted);
+                if (OnDownloadStarted != null)
+                    imageLoader.DownloadStarted(OnDownloadStarted);
 
                 imageLoader.DownloadProgress((progress) =>
                                              OnDownloadProgress?.Invoke(progress));
