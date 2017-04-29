@@ -154,7 +154,10 @@ namespace FFImageLoading.Cross
 			if (disposing)
 			{
 				CleanParameters();
-			}
+        OnSuccess = null;
+        OnError = null;
+        OnFinish = null;
+      }
 			base.Dispose(disposing);
 		}
 
@@ -165,9 +168,6 @@ namespace FFImageLoading.Cross
 				_parameters.Dispose();
 				_parameters = null;
 			}
-			OnSuccess = null;
-			OnError = null;
-			OnFinish = null;
 		}
 
 		private TaskParameter MakeParams()
