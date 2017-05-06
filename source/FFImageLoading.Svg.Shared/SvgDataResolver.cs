@@ -65,7 +65,7 @@ namespace FFImageLoading.Svg.Platform
             };
             SKPicture picture;
 
-            if (ReplaceStringMap == null && ReplaceStringMap.Count == 0)
+            if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
             {
                 using (var svgStream = resolvedData.Item1)
                 {
@@ -132,7 +132,8 @@ namespace FFImageLoading.Svg.Platform
 #endif
             }
 
-			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
+            using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
+			//using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
 			using (var canvas = new SKCanvas(bitmap))
 			using (var paint = new SKPaint())
 			{
@@ -145,7 +146,8 @@ namespace FFImageLoading.Svg.Platform
 				canvas.Flush();
 
 				using (var image = SKImage.FromBitmap(bitmap))
-				using (var data = image.Encode(SKImageEncodeFormat.Png, 80))
+				//using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
+				using (var data = image.Encode())
 				{
 					var stream = new MemoryStream();
 					data.SaveTo(stream);
