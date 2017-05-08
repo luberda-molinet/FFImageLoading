@@ -104,7 +104,7 @@ namespace FFImageLoading.Work
             KeyTransformationsOnly = string.Empty;
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
-                KeyTransformationsOnly = string.Concat(string.Join(";", Parameters.Transformations.Select(t => t.Key)));
+                KeyTransformationsOnly = string.Concat(";", string.Join(";", Parameters.Transformations.Select(t => t.Key)));
             }
 
             Key = string.Concat(KeyRaw, KeyDownsamplingOnly, KeyTransformationsOnly);
