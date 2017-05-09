@@ -7,7 +7,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 | iOS / Android / Windows (UWP / WinRT) | Xamarin.Forms |
 |:--------------------------------:|:-------------:|
 | [![NuGet][ffil-img]][ffil-link] [![NuGet][preffil-img]][preffil-link] | [![NuGet][forms-img]][forms-link] [![NuGet][preforms-img]][preforms-link] |
-| [![][demo-droid-img]][demo-droid-src] [![][demo-win-img]][demo-win-src] | [![][demo-forms-img]][demo-forms-src] |
+| [![][demo-droid-img]][demo-droid-src] [![][demo-win-img]][demo-win-src] [![][demo-mvvmcross-img]][demo-mvvmcross-src] | [![][demo-forms-img]][demo-forms-src] |
 
 | Addon | iOS / Android / Windows | Xamarin.Forms |
 |:-----:|:-----------------------:|:-------------:|
@@ -70,11 +70,13 @@ https://github.com/luberda-molinet/FFImageLoading/wiki
 [ffimageloading_large]: https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/samples/Screenshots/ffimageloading_large.png
 [ffimageloading]: https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/samples/Screenshots/ffimageloading.png
 
-[demo-forms-img]: https://img.shields.io/badge/examples-xamarin.forms-orange.svg
+[demo-forms-img]: https://img.shields.io/badge/demo-xamarin.forms-orange.svg
 [demo-forms-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.Forms.Sample
-[demo-droid-img]: https://img.shields.io/badge/examples-android-orange.svg
-[demo-droid-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.Sample
-[demo-win-img]: https://img.shields.io/badge/examples-win-orange.svg
+[demo-droid-img]: https://img.shields.io/badge/demo-android-orange.svg
+[demo-droid-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.MvvmCross.Sample
+[demo-mvvmcross-img]: https://img.shields.io/badge/demo-mvvmcross-orange.svg
+[demo-mvvmcross-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/ImageLoading.Sample
+[demo-win-img]: https://img.shields.io/badge/demo-win-orange.svg
 [demo-win-src]: https://github.com/luberda-molinet/FFImageLoading/tree/master/samples/Simple.WinPhone.Sample
 [dev-nugets-img]: https://img.shields.io/badge/nugets-dev-yellow.svg
 [dev-nugets]: https://github.com/luberda-molinet/FFImageLoading/wiki/Dev-NuGet-packages
