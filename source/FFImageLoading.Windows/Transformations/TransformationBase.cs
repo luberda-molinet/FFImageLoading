@@ -9,8 +9,8 @@ namespace FFImageLoading.Transformations
 
         public IBitmap Transform(IBitmap bitmapHolder, string path, ImageSource source, bool isPlaceholder, string key)
         {
-        	var sourceBitmap = bitmapHolder.ToNative();
-            return new BitmapHolder(Transform(sourceBitmap) ?? Transform(sourceBitmap, path, source, isPlaceholder, key));
+            var transformed = Transform(sourceBitmap) ?? Transform(sourceBitmap, path, source, isPlaceholder, key);
+            return transformed.ToNative();
         }
 
         [Obsolete("Use the new override")]
