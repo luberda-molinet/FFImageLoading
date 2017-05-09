@@ -456,7 +456,7 @@ namespace FFImageLoading.Work
 
                         ThrowIfCancellationRequested();
 
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, TransformPlaceholders, false).ConfigureAwait(false);
+                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
 
                         try
                         {
