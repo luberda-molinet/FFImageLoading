@@ -84,7 +84,7 @@ namespace FFImageLoading.Work
 
                         try
                         {
-                            IBitmap bitmapHolder = transformation.Transform(imageIn);
+                            IBitmap bitmapHolder = transformation.Transform(imageIn, path, source, isPlaceholder, Key);
                             imageIn = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)

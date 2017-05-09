@@ -44,9 +44,9 @@ namespace FFImageLoading.Transformations
 		public double BorderSize { get; set; }
 		public string BorderHexColor { get; set; }
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToRounded(source, (nfloat)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+			return ToRounded(sourceBitmap, (nfloat)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
 		}
 
 		public static UIImage ToRounded(UIImage source, nfloat rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)

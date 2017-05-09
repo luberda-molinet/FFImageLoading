@@ -6,7 +6,7 @@ using Foundation;
 namespace FFImageLoading.Transformations
 {
 	[Preserve(AllMembers = true)]
-	public class BlurredTransformation: TransformationBase
+	public class BlurredTransformation : TransformationBase
 	{
 		public BlurredTransformation()
 		{
@@ -25,9 +25,9 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("BlurredTransformation,radius={0}", Radius); }
 		}
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToBlurred(source, (float)Radius);
+			return ToBlurred(sourceBitmap, (float)Radius);
 		}
 
 		public static UIImage ToBlurred(UIImage source, float rad)

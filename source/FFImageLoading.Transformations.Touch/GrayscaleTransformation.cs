@@ -16,11 +16,11 @@ namespace FFImageLoading.Transformations
 			get { return "GrayscaleTransformation"; }
 		}
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			using (var colorSpace = CGColorSpace.CreateDeviceGray())
 			{
-				return ColorSpaceTransformation.ToColorSpace(source, colorSpace);
+				return ColorSpaceTransformation.ToColorSpace(sourceBitmap, colorSpace);
 			}
 		}
 	}

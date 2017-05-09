@@ -36,9 +36,9 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", Degrees, CCW, Resize); }
 		}
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToRotated(source, Degrees, CCW, Resize);
+			return ToRotated(sourceBitmap, Degrees, CCW, Resize);
 		}
 
 		public static UIImage ToRotated(UIImage source, double degrees, bool ccw, bool resize)

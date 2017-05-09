@@ -15,9 +15,9 @@ namespace FFImageLoading.Transformations
 			get { return "GrayscaleTransformation"; }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToGrayscale(source);
+			return ToGrayscale(sourceBitmap);
 		}
 
 		public static Bitmap ToGrayscale(Bitmap source)

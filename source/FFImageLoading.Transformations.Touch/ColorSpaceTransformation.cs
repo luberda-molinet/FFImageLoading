@@ -73,15 +73,15 @@ namespace FFImageLoading.Transformations
 			_colorMatrix.BiasVector = new CIVector(ma[0][4], ma[1][4], ma[2][4], ma[3][4]);
 		}
 			
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			if (_colorMatrix != null)
 			{
-				return ToFilter(source, _colorMatrix);
+				return ToFilter(sourceBitmap, _colorMatrix);
 			}
 			else
 			{
-				return ToColorSpace(source, _colorSpace);
+				return ToColorSpace(sourceBitmap, _colorSpace);
 			}
 		}
 

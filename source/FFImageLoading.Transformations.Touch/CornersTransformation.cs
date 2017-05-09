@@ -57,9 +57,9 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToTransformedCorners(source, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
+			return ToTransformedCorners(sourceBitmap, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
 				CornersTransformType, CropWidthRatio, CropHeightRatio);
 		}
 

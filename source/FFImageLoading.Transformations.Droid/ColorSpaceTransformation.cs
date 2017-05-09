@@ -88,9 +88,9 @@ namespace FFImageLoading.Transformations
 			return transposed;
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToColorSpace(source, _colorMatrix);
+			return ToColorSpace(sourceBitmap, _colorMatrix);
 		}
 
 		public static Bitmap ToColorSpace(Bitmap source, ColorMatrix colorMatrix)

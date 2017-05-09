@@ -53,9 +53,9 @@ namespace FFImageLoading.Transformations
 				TopLeftCornerSize, TopRightCornerSize, BottomRightCornerSize, BottomLeftCornerSize, CornersTransformType, CropWidthRatio, CropHeightRatio); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToTransformedCorners(source, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize, 
+			return ToTransformedCorners(sourceBitmap, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize, 
 				CornersTransformType, CropWidthRatio, CropHeightRatio);
 		}
 

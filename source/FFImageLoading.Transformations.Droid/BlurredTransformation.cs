@@ -43,10 +43,10 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("BlurredTransformation,radius={0}", Radius); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
-		{
-			return ToBlurred(source, _context, (float)Radius);
-		}
+        protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
+        {
+            return ToBlurred(sourceBitmap, _context, (float)Radius);
+        }
 
 		public static Bitmap ToBlurred(Bitmap source, Context context, float radius)
 		{

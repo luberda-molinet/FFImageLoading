@@ -55,9 +55,9 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            return ToTransformedCorners(source, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
+            return ToTransformedCorners(bitmapSource, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
 				CornersTransformType, CropWidthRatio, CropHeightRatio);
         }
 

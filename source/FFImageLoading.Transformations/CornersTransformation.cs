@@ -40,7 +40,7 @@ namespace FFImageLoading.Transformations
 		public double CropHeightRatio { get; set; }
 		public CornerTransformType CornersTransformType { get; set; }
 
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}

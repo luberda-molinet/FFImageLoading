@@ -33,9 +33,9 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("RotateTransformation,degrees={0},ccw={1},resize={2}", Degrees, CCW, Resize); }
 		}
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            return ToRotated(source, Degrees, CCW, Resize);
+            return ToRotated(bitmapSource, Degrees, CCW, Resize);
         }
 
         public static BitmapHolder ToRotated(BitmapHolder source, double degrees, bool ccw, bool resize)
