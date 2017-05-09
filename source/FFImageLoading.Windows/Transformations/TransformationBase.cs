@@ -9,7 +9,7 @@ namespace FFImageLoading.Transformations
 
         public IBitmap Transform(IBitmap bitmapHolder, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            var transformed = Transform(sourceBitmap) ?? Transform(sourceBitmap, path, source, isPlaceholder, key);
+            var transformed = Transform(bitmapHolder) ?? Transform(bitmapHolder, path, source, isPlaceholder, key);
             return transformed.ToNative();
         }
 
