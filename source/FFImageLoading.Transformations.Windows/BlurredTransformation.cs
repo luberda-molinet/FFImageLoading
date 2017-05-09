@@ -22,7 +22,7 @@ namespace FFImageLoading.Transformations
             get { return string.Format("BlurredTransformation,radius={0}", Radius); }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, ImageSource source, bool isPlaceholder)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, ImageSource source, bool isPlaceholder, string key)
         {
 
             ToLegacyBlurred(bitmapSource, (int)Radius);
