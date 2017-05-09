@@ -35,25 +35,23 @@ namespace FFImageLoading.Work
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
-                await Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
-                    }
-                    catch(TaskCanceledException ex)
-                    {
-                        Parameters.StreamRead = null;
-                        Logger.Error(ex.Message, ex);
-                    }
+                    Parameters.StreamRead = await(Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                }
+                catch(TaskCanceledException ex)
+                {
+                    Parameters.StreamRead = null;
+                    Logger.Error(ex.Message, ex);
+                }
 
-                    if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
-                    {
-                        Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
-                        Parameters.StreamRead.Position = 0;
-                        SetKeys();
-                    }
-                }).ConfigureAwait(false);
+                if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
+                {
+                    Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
+                    Parameters.StreamRead.Position = 0;
+
+					SetKeys();
+                }
             }
         }
 
@@ -106,7 +104,7 @@ namespace FFImageLoading.Work
             KeyTransformationsOnly = string.Empty;
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
-                KeyTransformationsOnly = string.Concat(string.Join(";", Parameters.Transformations.Select(t => t.Key)));
+                KeyTransformationsOnly = string.Concat(";", string.Join(";", Parameters.Transformations.Select(t => t.Key)));
             }
 
             Key = string.Concat(KeyRaw, KeyDownsamplingOnly, KeyTransformationsOnly);
@@ -458,7 +456,7 @@ namespace FFImageLoading.Work
 
                         ThrowIfCancellationRequested();
 
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, TransformPlaceholders, false).ConfigureAwait(false);
+                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
 
                         try
                         {

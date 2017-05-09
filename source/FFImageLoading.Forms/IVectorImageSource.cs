@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms
@@ -14,5 +15,7 @@ namespace FFImageLoading.Forms
 		int VectorHeight { get; set; }
 
 		bool UseDipUnits { get; set; }
+
+        Dictionary<string, string> ReplaceStringMap { get; set; }
 	}
 }

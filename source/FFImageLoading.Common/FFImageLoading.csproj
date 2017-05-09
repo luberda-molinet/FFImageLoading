@@ -106,6 +106,8 @@
     <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueueNode.cs" />
     <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueue.cs" />
     <Compile Include="Concurrency\PendingTasksQueue.cs" />
+    <Compile Include="Concurrency\ThreadSafeCollection.cs" />
+    <Compile Include="Views\ICachedImageView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -141,5 +143,8 @@
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.Extensions" />
     <Reference Include="System.Threading" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
   </ItemGroup>
 </Project>

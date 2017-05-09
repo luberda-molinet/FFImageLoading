@@ -20,15 +20,15 @@ namespace FFImageLoading.Transformations
 
 		public FlipType FlipType { get; set; }
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			switch (FlipType)
 			{
 				case FlipType.Vertical:
-					return Flip(source, 1, -1);
+					return Flip(sourceBitmap, 1, -1);
 
 				case FlipType.Horizontal:
-					return Flip(source, -1, 1);
+					return Flip(sourceBitmap, -1, 1);
 
 				default:
 					throw new Exception("Invalid FlipType");

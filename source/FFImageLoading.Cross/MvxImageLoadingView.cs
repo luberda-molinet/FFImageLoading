@@ -21,6 +21,13 @@ namespace FFImageLoading.Cross
 	#elif __ANDROID__
 	[Register("ffimageloading.cross.MvxImageLoadingView")]
 	#endif
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    [Obsolete("Please use a new/better MvxCachedImageView")]
 	public class MvxImageLoadingView
 	#if __IOS__
 		: UIImageView
@@ -153,7 +160,10 @@ namespace FFImageLoading.Cross
 			if (disposing)
 			{
 				CleanParameters();
-			}
+        OnSuccess = null;
+        OnError = null;
+        OnFinish = null;
+      }
 			base.Dispose(disposing);
 		}
 
@@ -164,9 +174,6 @@ namespace FFImageLoading.Cross
 				_parameters.Dispose();
 				_parameters = null;
 			}
-			OnSuccess = null;
-			OnError = null;
-			OnFinish = null;
 		}
 
 		private TaskParameter MakeParams()

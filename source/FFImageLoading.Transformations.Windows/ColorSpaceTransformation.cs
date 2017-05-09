@@ -45,11 +45,11 @@ namespace FFImageLoading.Transformations
             }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            ToColorSpace(source, _rgbawMatrix);
+            ToColorSpace(bitmapSource, _rgbawMatrix);
 
-            return source;
+            return bitmapSource;
         }
 
         public static void ToColorSpace(BitmapHolder bmp, float[][] rgbawMatrix)

@@ -41,9 +41,9 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToCropped(source, ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
+			return ToCropped(sourceBitmap, ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
 		}
 
 		public static Bitmap ToCropped(Bitmap source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)

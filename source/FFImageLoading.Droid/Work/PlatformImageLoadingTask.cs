@@ -208,7 +208,7 @@ namespace FFImageLoading
 
                         try
                         {
-                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
                             bitmap = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)

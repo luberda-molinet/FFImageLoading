@@ -7,6 +7,8 @@ using FFImageLoading.Config;
 using SkiaSharp;
 using FFImageLoading.DataResolvers;
 using FFImageLoading.Extensions;
+using System.Collections.Generic;
+using System.Text;
 
 namespace FFImageLoading.Svg.Platform
 {
@@ -23,11 +25,12 @@ namespace FFImageLoading.Svg.Platform
         /// <param name="vectorWidth">Vector width.</param>
         /// <param name="vectorHeight">Vector height.</param>
         /// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-        public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+        public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
         {
             VectorWidth = vectorWidth;
             VectorHeight = vectorHeight;
             UseDipUnits = useDipUnits;
+            ReplaceStringMap = replaceStringMap;
         }
 
         public Configuration Configuration { get { return ImageService.Instance.Config; } }
@@ -37,6 +40,8 @@ namespace FFImageLoading.Svg.Platform
         public int VectorHeight { get; private set; }
 
         public int VectorWidth { get; private set; }
+
+        public Dictionary<string, string> ReplaceStringMap { get; private set; }
 
         public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
@@ -60,9 +65,29 @@ namespace FFImageLoading.Svg.Platform
             };
             SKPicture picture;
 
-            using (var svgStream = resolvedData.Item1)
+            if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
             {
-                picture = svg.Load(resolvedData?.Item1);
+                using (var svgStream = resolvedData.Item1)
+                {
+                    picture = svg.Load(resolvedData?.Item1);
+                }
+            }
+            else
+            {
+                using (var svgStream = resolvedData.Item1)
+                using (var reader = new StreamReader(svgStream))
+                {
+                    var builder = new StringBuilder(await reader.ReadToEndAsync());
+                    foreach (var map in ReplaceStringMap)
+                    {
+                        builder.Replace(map.Key, map.Value);
+                    }
+
+                    using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
+                    {
+                        picture = svg.Load(svgFinalStream);
+                    }
+                }
             }
 
             double sizeX = 0;
@@ -107,7 +132,8 @@ namespace FFImageLoading.Svg.Platform
 #endif
             }
 
-			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
+            using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
+			//using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
 			using (var canvas = new SKCanvas(bitmap))
 			using (var paint = new SKPaint())
 			{
@@ -120,7 +146,8 @@ namespace FFImageLoading.Svg.Platform
 				canvas.Flush();
 
 				using (var image = SKImage.FromBitmap(bitmap))
-				using (var data = image.Encode(SKImageEncodeFormat.Png, 80))
+				//using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
+				using (var data = image.Encode())
 				{
 					var stream = new MemoryStream();
 					data.SaveTo(stream);

@@ -20,9 +20,9 @@ namespace FFImageLoading.Transformations
 
 		public FlipType FlipType { get; set; }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            return ToFlipped(source, FlipType);
+            return ToFlipped(bitmapSource, FlipType);
         }
 
         public static BitmapHolder ToFlipped(BitmapHolder bmp, FlipType flipMode)

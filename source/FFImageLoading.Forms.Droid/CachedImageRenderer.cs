@@ -67,7 +67,7 @@ namespace FFImageLoading.Forms.Droid
 			if (e.NewElement != null)
 			{
 				e.NewElement.InternalReloadImage = new Action(ReloadImage);
-				e.NewElement.InternalCancel = new Action(Cancel);//TODO
+				e.NewElement.InternalCancel = new Action(Cancel);
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 			}
@@ -331,14 +331,14 @@ namespace FFImageLoading.Forms.Droid
 			UpdateBitmap(null);
 		}
 
-		private async void Cancel()
+		private void Cancel()
 		{
             try
             {
                 var taskToCancel = _currentTask;
                 if (taskToCancel != null && !taskToCancel.IsCancelled)
                 {
-                    await Task.Run(() => taskToCancel?.Cancel());
+                    taskToCancel?.Cancel();
                 }
             }
             catch (Exception ex)

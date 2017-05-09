@@ -23,15 +23,15 @@ namespace FFImageLoading.Transformations
 
 		public FlipType FlipType { get; set; }
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			switch (FlipType)
 			{
 				case FlipType.Vertical:
-					return new UIImage(source.CGImage, source.CurrentScale, UIImageOrientation.DownMirrored);
+					return new UIImage(sourceBitmap.CGImage, sourceBitmap.CurrentScale, UIImageOrientation.DownMirrored);
 
 				case FlipType.Horizontal:
-					return new UIImage(source.CGImage, source.CurrentScale, UIImageOrientation.UpMirrored);
+					return new UIImage(sourceBitmap.CGImage, sourceBitmap.CurrentScale, UIImageOrientation.UpMirrored);
 
 				default:
 					throw new Exception("Invalid FlipType");

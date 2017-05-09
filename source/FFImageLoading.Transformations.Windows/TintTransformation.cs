@@ -60,17 +60,17 @@ namespace FFImageLoading.Transformations
             }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
             if (EnableSolidColor)
             {
-                ToReplacedColor(source, R, G, B, A);
-                return source;
+                ToReplacedColor(bitmapSource, R, G, B, A);
+                return bitmapSource;
             }
 
             RGBAWMatrix = FFColorMatrix.ColorToTintMatrix(R, G, B, A);
 
-            return base.Transform(source);
+            return base.Transform(bitmapSource, path, source, isPlaceholder, key);
         }
 
         public static void ToReplacedColor(BitmapHolder bmp, int r, int g, int b, int a)

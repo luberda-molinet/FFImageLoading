@@ -16,9 +16,9 @@ namespace FFImageLoading.Transformations
 			get { return "SepiaTransformation"; }
 		}
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToSepia(source);
+			return ToSepia(sourceBitmap);
 		}
 
 		public static UIImage ToSepia(UIImage source)

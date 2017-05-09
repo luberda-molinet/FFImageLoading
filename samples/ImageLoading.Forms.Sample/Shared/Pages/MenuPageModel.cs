@@ -201,6 +201,17 @@ namespace FFImageLoading.Forms.Sample
 					})
 				},
 
+                new MenuItem()
+                {
+                	Section = "Transformations",
+                    Title = "Transformations selector example",
+                    Command = new BaseCommand(async (param) =>
+					{
+                        await this.PushPageFromCacheAsync<TransformationsSelectorPageModel>(pm => pm.Reload());
+					})
+
+				},
+
 				new MenuItem() {
 					Section = "SVG",
 					Title = "Simple SVG example",
