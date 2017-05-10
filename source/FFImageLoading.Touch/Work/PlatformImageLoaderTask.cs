@@ -46,10 +46,13 @@ namespace FFImageLoading.Work
                 // Special case to handle WebP decoding on iOS
 
                 string ext = null;
-                if (source == ImageSource.Url)
-                    ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
-                else
-                    ext = Path.GetExtension(path).ToLowerInvariant();
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    if (source == ImageSource.Url)
+                        ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
+                    else
+                        ext = Path.GetExtension(path).ToLowerInvariant();
+                }
                 
                 if (source != ImageSource.Stream && ext == ".webp")
                 {
