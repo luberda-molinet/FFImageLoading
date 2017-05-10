@@ -89,7 +89,11 @@ namespace FFImageLoading.Work
             var vect = Parameters.CustomDataResolver as IVectorDataResolver;
             if (vect != null)
             {
-                KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                else
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
+                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
             }
 
             KeyDownsamplingOnly = string.Empty;
