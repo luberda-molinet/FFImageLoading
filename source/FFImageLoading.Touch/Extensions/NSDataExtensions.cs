@@ -26,7 +26,7 @@ namespace FFImageLoading.Extensions
 
                 if (imageProperties == null)
                 {
-                    return null;
+                    throw new BadImageFormatException("Image is null");
                 }
 
 				if (imageinformation != null)
