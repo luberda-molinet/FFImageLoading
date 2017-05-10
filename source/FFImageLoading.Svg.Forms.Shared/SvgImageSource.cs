@@ -34,7 +34,7 @@ namespace FFImageLoading.Svg.Forms
 
 		public IVectorDataResolver GetVectorDataResolver()
 		{
-			return new SvgDataResolver(VectorWidth, VectorHeight, UseDipUnits);
+            return new SvgDataResolver(VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
 		}
 
 		/// <summary>
