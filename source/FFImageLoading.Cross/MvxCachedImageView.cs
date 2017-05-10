@@ -418,8 +418,20 @@ namespace FFImageLoading.Cross
                 if (OnFileWriteFinished != null)
                     imageLoader.FileWriteFinished(OnFileWriteFinished);
 
+                SetupOnBeforeImageLoading(imageLoader);
+
                 _scheduledWork = imageLoader.Into(this);
             }
+        }
+
+        /// <summary>
+        /// Setups the on before image loading. 
+        /// You can add additional logic here to configure image loader settings before loading
+        /// eg. custom cache keys, svg data resolvers, etc
+        /// </summary>
+        /// <param name="imageLoader">Image loader.</param>
+        protected virtual void SetupOnBeforeImageLoading(Work.TaskParameter imageLoader)
+        {
         }
 
         protected virtual ImageSourceBinding GetImageSourceBinding(string imagePath, Func<CancellationToken, Task<Stream>> imageStream)

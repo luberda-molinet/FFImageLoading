@@ -309,6 +309,8 @@ namespace FFImageLoading.Forms.Droid
 					imageLoader.FileWriteFinished((fileWriteInfo) =>
 						element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
 
+                    element.SetupOnBeforeImageLoading(imageLoader);
+
 					_currentTask = imageLoader.Into(imageView);
 				}
 			}

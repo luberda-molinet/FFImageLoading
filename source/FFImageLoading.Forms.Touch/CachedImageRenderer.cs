@@ -302,6 +302,8 @@ namespace FFImageLoading.Forms.Touch
 				imageLoader.FileWriteFinished((fileWriteInfo) =>
 					element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
 				
+                element.SetupOnBeforeImageLoading(imageLoader);
+
 				_currentTask = imageLoader.Into(Control);	
 			}
 		}
