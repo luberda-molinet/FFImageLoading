@@ -91,6 +91,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.MvvmCross.Sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.MvvmCross.Sample.Droid", "samples\ImageLoading.MvvmCross.Sample\FFImageLoading.MvvmCross.Sample.Droid\FFImageLoading.MvvmCross.Sample.Droid.csproj", "{A3760566-B91D-435F-94A6-31ADF4C7812F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Cross.Svg", "source\FFImageLoading.Cross.Svg\FFImageLoading.Cross.Svg.shproj", "{60678181-1544-4276-9B2A-6239C1046EA5}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4
@@ -1648,5 +1650,6 @@ Global
 		{C234E3F9-8DE1-4105-A793-E0584A538092} = {A420B061-9AF1-40EC-A728-60536C59031E}
 		{087DE224-30F0-4FEF-A960-F93F04182BA6} = {B48F3C95-B33F-4EF5-B223-06356D749A80}
 		{A3760566-B91D-435F-94A6-31ADF4C7812F} = {B48F3C95-B33F-4EF5-B223-06356D749A80}
+		{60678181-1544-4276-9B2A-6239C1046EA5} = {1AFB4004-0EB7-4518-9B65-F1008B7962FC}
 	EndGlobalSection
 EndGlobal

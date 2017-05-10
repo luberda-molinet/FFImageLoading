@@ -9,6 +9,7 @@ using FFImageLoading.DataResolvers;
 using FFImageLoading.Extensions;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace FFImageLoading.Svg.Platform
 {
