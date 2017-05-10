@@ -5,67 +5,34 @@ namespace FFImageLoading.Forms
 {
 	public static class CachedImageEvents
 	{
-		public class ErrorEventArgs : EventArgs
+        public class ErrorEventArgs : FFImageLoading.Args.ErrorEventArgs
 		{
-			public ErrorEventArgs(Exception exception)
-			{
-				Exception = exception;
-			}
-
-			public Exception Exception { get; private set; }
+            public ErrorEventArgs(Exception exception) : base(exception) { }
 		}
 
-		public class SuccessEventArgs : EventArgs
+		public class SuccessEventArgs : FFImageLoading.Args.SuccessEventArgs
 		{
-            public SuccessEventArgs(ImageInformation imageInformation, LoadingResult loadingResult)
-			{
-                ImageInformation = imageInformation;
-                LoadingResult = loadingResult;
-			}
-
-            public ImageInformation ImageInformation { get; private set; }
-
-			public LoadingResult LoadingResult { get; private set; }
+            public SuccessEventArgs(ImageInformation imageInformation, LoadingResult loadingResult) : base(imageInformation, loadingResult) { }
 		}
 
-		public class FinishEventArgs : EventArgs
+		public class FinishEventArgs : FFImageLoading.Args.FinishEventArgs
 		{
-			public FinishEventArgs(IScheduledWork scheduledWork)
-			{
-				ScheduledWork = scheduledWork;
-			}
-
-			public IScheduledWork ScheduledWork { get; private set; }
+            public FinishEventArgs(IScheduledWork scheduledWork) : base(scheduledWork) { }
 		}
 
-		public class DownloadStartedEventArgs : EventArgs
+		public class DownloadStartedEventArgs : FFImageLoading.Args.DownloadStartedEventArgs
 		{
-			public DownloadStartedEventArgs(DownloadInformation downloadInformation)
-			{
-				DownloadInformation = downloadInformation;
-			}
-
-			public DownloadInformation DownloadInformation { get; private set; }
+            public DownloadStartedEventArgs(DownloadInformation downloadInformation) : base(downloadInformation) { }
 		}
 
-		public class DownloadProgressEventArgs : EventArgs
+		public class DownloadProgressEventArgs : FFImageLoading.Args.DownloadProgressEventArgs
 		{
-			public DownloadProgressEventArgs(DownloadProgress downloadProgress)
-			{
-				DownloadProgress = downloadProgress;
-			}
-
-			public DownloadProgress DownloadProgress { get; private set; }
+            public DownloadProgressEventArgs(DownloadProgress downloadProgress) : base(downloadProgress) { }
 		}
 
-		public class FileWriteFinishedEventArgs : EventArgs
+		public class FileWriteFinishedEventArgs : FFImageLoading.Args.FileWriteFinishedEventArgs
 		{
-			public FileWriteFinishedEventArgs(FileWriteInfo fileWriteInfo)
-			{
-				FileWriteInfo = fileWriteInfo;
-			}
-
-			public FileWriteInfo FileWriteInfo { get; private set; }
+            public FileWriteFinishedEventArgs(FileWriteInfo fileWriteInfo) : base(fileWriteInfo) { }
 		}
 	}
 }

@@ -44,16 +44,16 @@ namespace FFImageLoading.Views
 
         IDataResolver CustomErrorPlaceholderDataResolver { get; set; }
 
-        Action<ImageInformation, LoadingResult> OnSuccess { get; set; }
+        event EventHandler<Args.SuccessEventArgs> OnSuccess;
 
-        Action<Exception> OnError { get; set; }
+        event EventHandler<Args.ErrorEventArgs> OnError;
 
-        Action<IScheduledWork> OnFinish { get; set; }
+        event EventHandler<Args.FinishEventArgs> OnFinish;
 
-        Action<DownloadInformation> OnDownloadStarted { get; set; }
+        event EventHandler<Args.DownloadStartedEventArgs> OnDownloadStarted;
 
-        Action<FileWriteInfo> OnFileWriteFinished { get; set; }
+        event EventHandler<Args.DownloadProgressEventArgs> OnDownloadProgress;
 
-        Action<DownloadProgress> OnDownloadProgress { get; set; }
+        event EventHandler<Args.FileWriteFinishedEventArgs> OnFileWriteFinished;
     }
 }

@@ -108,6 +108,12 @@
     <Compile Include="Concurrency\PendingTasksQueue.cs" />
     <Compile Include="Concurrency\ThreadSafeCollection.cs" />
     <Compile Include="Views\ICachedImageView.cs" />
+    <Compile Include="Args\ErrorEventArgs.cs" />
+    <Compile Include="Args\SuccessEventArgs.cs" />
+    <Compile Include="Args\FinishEventArgs.cs" />
+    <Compile Include="Args\DownloadStartedEventArgs.cs" />
+    <Compile Include="Args\DownloadProgressEventArgs.cs" />
+    <Compile Include="Args\FileWriteFinishedEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -146,5 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\" />
+    <Folder Include="Args\" />
   </ItemGroup>
 </Project>

@@ -195,47 +195,17 @@ namespace FFImageLoading.Cross
             set { if (_customErrorPlaceholderDataResolver != value) { _customErrorPlaceholderDataResolver = value; OnPropertyChanged(nameof(CustomErrorPlaceholderDataResolver)); } }
         }
 
-        Action<ImageInformation, LoadingResult> _onSuccess;
-        public Action<ImageInformation, LoadingResult> OnSuccess
-        {
-            get { return _onSuccess; }
-            set { if (_onSuccess != value) { _onSuccess = value; OnPropertyChanged(nameof(OnSuccess)); } }
-        }
+        public event EventHandler<Args.SuccessEventArgs> OnSuccess;
 
-        Action<Exception> _onError;
-        public Action<Exception> OnError
-        {
-            get { return _onError; }
-            set { if (_onError != value) { _onError = value; OnPropertyChanged(nameof(OnError)); } }
-        }
+        public event EventHandler<Args.ErrorEventArgs> OnError;
 
-        Action<IScheduledWork> _onFinish;
-        public Action<IScheduledWork> OnFinish
-        {
-            get { return _onFinish; }
-            set { if (_onFinish != value) { _onFinish = value; OnPropertyChanged(nameof(OnFinish)); } }
-        }
+        public event EventHandler<Args.FinishEventArgs> OnFinish;
 
-        Action<DownloadInformation> _onDownloadStarted;
-        public Action<DownloadInformation> OnDownloadStarted
-        {
-            get { return _onDownloadStarted; }
-            set { if (_onDownloadStarted != value) { _onDownloadStarted = value; OnPropertyChanged(nameof(OnDownloadStarted)); } }
-        }
+        public event EventHandler<Args.DownloadStartedEventArgs> OnDownloadStarted;
 
-        Action<FileWriteInfo> _onFileWriteFinished;
-        public Action<FileWriteInfo> OnFileWriteFinished
-        {
-            get { return _onFileWriteFinished; }
-            set { if (_onFileWriteFinished != value) { _onFileWriteFinished = value; OnPropertyChanged(nameof(OnFileWriteFinished)); } }
-        }
+        public event EventHandler<Args.DownloadProgressEventArgs> OnDownloadProgress;
 
-        Action<DownloadProgress> _onDownloadProgress;
-        public Action<DownloadProgress> OnDownloadProgress
-        {
-            get { return _onDownloadProgress; }
-            set { if (_onDownloadProgress != value) { _onDownloadProgress = value; OnPropertyChanged(nameof(OnDownloadProgress)); } }
-        }
+        public event EventHandler<Args.FileWriteFinishedEventArgs> OnFileWriteFinished;
 
         string _loadingPlaceholderPath;
         public string LoadingPlaceholderImagePath
@@ -395,28 +365,28 @@ namespace FFImageLoading.Cross
                 }
 
                 imageLoader.Finish((work) =>
-                                    {
-                                        OnFinish?.Invoke(work);
-                                        IsLoading = false;
-                                    });
+                {
+                    IsLoading = false;
+                    OnFinish?.Invoke(this, new Args.FinishEventArgs(work)); 
+                });
 
                 imageLoader.Success((imageInformation, loadingResult) =>
                 {
-                    OnSuccess?.Invoke(imageInformation, loadingResult);
+                    OnSuccess?.Invoke(this, new Args.SuccessEventArgs(imageInformation, loadingResult));
                     _lastImageSource = ffSource;
                 });
 
                 if (OnError != null)
-                    imageLoader.Error(OnError);
+                    imageLoader.Error((ex) => OnError?.Invoke(this, new Args.ErrorEventArgs(ex)));
 
                 if (OnDownloadStarted != null)
-                    imageLoader.DownloadStarted(OnDownloadStarted);
+                    imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(this, new Args.DownloadStartedEventArgs(downloadInformation)));
 
-                imageLoader.DownloadProgress((progress) =>
-                                             OnDownloadProgress?.Invoke(progress));
+                if (OnDownloadProgress != null)
+                    imageLoader.DownloadProgress((progress) => OnDownloadProgress(this, new Args.DownloadProgressEventArgs(progress)));
 
                 if (OnFileWriteFinished != null)
-                    imageLoader.FileWriteFinished(OnFileWriteFinished);
+                    imageLoader.FileWriteFinished((info) => OnFileWriteFinished(this, new Args.FileWriteFinishedEventArgs(info)));
 
                 SetupOnBeforeImageLoading(imageLoader);
 
@@ -471,12 +441,6 @@ namespace FFImageLoading.Cross
             if (disposing)
             {
                 _scheduledWork?.Cancel();
-                OnSuccess = null;
-                OnError = null;
-                OnFinish = null;
-                OnDownloadStarted = null;
-                OnDownloadProgress = null;
-                OnFileWriteFinished = null;
             }
 
             base.Dispose(disposing);
