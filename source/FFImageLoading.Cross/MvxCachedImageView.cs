@@ -76,11 +76,13 @@ namespace FFImageLoading.Cross
             }
         }
 
+        public event EventHandler IsLoadingChanged;
+
         bool _isLoading;
         public bool IsLoading
         {
             get { return _isLoading; }
-            set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsLoading)); } }
+            set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsLoading)); IsLoadingChanged?.Invoke(this, EventArgs.Empty); } }
         }
 
         int _retryCount;
