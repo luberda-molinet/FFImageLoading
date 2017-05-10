@@ -11,6 +11,6 @@ namespace FFImageLoading.Work
 
         bool UseDipUnits { get; }
 
-        Dictionary<string, string> ReplaceStringMap { get; }
+        Dictionary<string, string> ReplaceStringMap { get; set; }
     }
 }

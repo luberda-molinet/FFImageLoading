@@ -23,6 +23,10 @@ namespace FFImageLoading.Svg.Platform
             {
                 throw new Exception(DoNotReferenceMessage);
             }
+            set
+            {
+                throw new Exception(DoNotReferenceMessage);
+            }
         }
 
         public bool UseDipUnits

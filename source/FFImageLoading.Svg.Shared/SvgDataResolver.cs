@@ -41,7 +41,7 @@ namespace FFImageLoading.Svg.Platform
 
         public int VectorWidth { get; private set; }
 
-        public Dictionary<string, string> ReplaceStringMap { get; private set; }
+        public Dictionary<string, string> ReplaceStringMap { get; set; }
 
         public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
