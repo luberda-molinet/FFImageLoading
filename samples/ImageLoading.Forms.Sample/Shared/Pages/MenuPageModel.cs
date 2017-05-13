@@ -30,15 +30,6 @@ namespace FFImageLoading.Forms.Sample
 					})
 				},
 
-                new MenuItem() {
-                    Section = "Basic",
-                    Title = "Simple Gif",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SimpleGifPageModel>(pm => pm.Reload());
-                    })
-                },
-
 				new MenuItem() {
 					Section = "Basic",
 					Title = "Placeholders examples",
@@ -222,12 +213,23 @@ namespace FFImageLoading.Forms.Sample
 				},
 
 				new MenuItem() {
-					Section = "SVG",
+					Section = "File formats",
 					Title = "Simple SVG example",
 					Command = new BaseCommand(async (param) =>
 					{
 						await this.PushPageFromCacheAsync<SvgSamplePageModel>();
 					})
+				},
+
+                new MenuItem()
+                {
+                	Section = "File formats",
+                    Title = "Simple Gif example",
+                    Command = new BaseCommand(async (param) =>
+					{
+						await this.PushPageFromCacheAsync<SimpleGifPageModel>(pm => pm.Reload());
+					})
+
 				},
 			};
 
