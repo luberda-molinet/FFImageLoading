@@ -3,7 +3,7 @@
     "Microsoft.Bcl.Build": "1.0.21",
     "Microsoft.Net.Http": "2.2.29",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
-    "Xamarin.Forms": "2.3.3.180",
+    "Xamarin.Forms": "2.3.3.193",
     "Xamvvm.Forms": "1.0.2"
   },
   "frameworks": {

@@ -7,6 +7,12 @@ namespace FFImageLoading.Concurrency
 {
     public class PendingTasksQueue : SimplePriorityQueue<IImageLoaderTask, int>
     {
+        private const int INITIAL_QUEUE_SIZE = 10;
+
+        public PendingTasksQueue():base(CreateQueue<IImageLoaderTask, int>())
+        {
+        }
+
         public override void Remove(IImageLoaderTask item)
         {
             lock (_queue)
@@ -39,6 +45,12 @@ namespace FFImageLoading.Concurrency
                         item.Data.CancelIfNeeded();
                 }
             }
+        }
+
+        private static IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> CreateQueue<TItem, TPriority>()
+            where TPriority : IComparable<TPriority>
+        {
+            return new GenericPriorityQueue<SimpleNode<TItem, TPriority>, TPriority>(INITIAL_QUEUE_SIZE);
         }
     }
 }

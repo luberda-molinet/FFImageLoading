@@ -14,11 +14,11 @@ namespace FFImageLoading.Transformations
             get { return "SepiaTransformation"; }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            ToSepia(source);
+            ToSepia(bitmapSource);
 
-            return source;
+            return bitmapSource;
         }
 
         public static void ToSepia(BitmapHolder bmp)

@@ -6,109 +6,149 @@ using FFImageLoading.Work;
 using FFImageLoading.Config;
 using SkiaSharp;
 using FFImageLoading.DataResolvers;
+using FFImageLoading.Extensions;
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
 
 namespace FFImageLoading.Svg.Platform
 {
-	/// <summary>
-	/// Svg data resolver.
-	/// </summary>
-	public class SvgDataResolver : IVectorDataResolver
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
-		/// Default SVG size is read from SVG file width / height attributes
-		/// You can override it by specyfing vectorWidth / vectorHeight params
-		/// </summary>
-		/// <param name="vectorWidth">Vector width.</param>
-		/// <param name="vectorHeight">Vector height.</param>
-		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
-		{
-			VectorWidth = vectorWidth;
-			VectorHeight = vectorHeight;
-			UseDipUnits = useDipUnits;
-		}
+    /// <summary>
+    /// Svg data resolver.
+    /// </summary>
+    public class SvgDataResolver : IVectorDataResolver
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
+        /// Default SVG size is read from SVG file width / height attributes
+        /// You can override it by specyfing vectorWidth / vectorHeight params
+        /// </summary>
+        /// <param name="vectorWidth">Vector width.</param>
+        /// <param name="vectorHeight">Vector height.</param>
+        /// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+        public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
+        {
+            VectorWidth = vectorWidth;
+            VectorHeight = vectorHeight;
+            UseDipUnits = useDipUnits;
+            ReplaceStringMap = replaceStringMap;
+        }
 
-		public Configuration Configuration { get { return ImageService.Instance.Config; } }
+        public Configuration Configuration { get { return ImageService.Instance.Config; } }
 
-		public bool UseDipUnits { get; private set; }
+        public bool UseDipUnits { get; private set; }
 
-		public int VectorHeight { get; private set; }
+        public int VectorHeight { get; private set; }
 
-		public int VectorWidth { get; private set; }
+        public int VectorWidth { get; private set; }
 
-		public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
-		{
-			ImageSource source = parameters.Source;
+        public Dictionary<string, string> ReplaceStringMap { get; set; }
 
-			if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
-				source = parameters.LoadingPlaceholderSource;
-			else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
-				source = parameters.ErrorPlaceholderSource;
+        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        {
+            ImageSource source = parameters.Source;
 
-			var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
-											.GetResolver(identifier, source, parameters, Configuration)
-											.Resolve(identifier, parameters, token).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
+                source = parameters.LoadingPlaceholderSource;
+            else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
+                source = parameters.ErrorPlaceholderSource;
 
-			if (resolvedData?.Item1 == null)
-				throw new FileNotFoundException(identifier);
+            var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
+                                            .GetResolver(identifier, source, parameters, Configuration)
+                                            .Resolve(identifier, parameters, token).ConfigureAwait(false);
 
-			var svg = new SKSvg()
-			{
-				ThrowOnUnsupportedElement = false,
-			};
-			SKPicture picture;
+            if (resolvedData?.Item1 == null)
+                throw new FileNotFoundException(identifier);
 
-			using (var svgStream = resolvedData.Item1)
-			{
-				picture = svg.Load(resolvedData?.Item1);
-			}
+            var svg = new SKSvg()
+            {
+                ThrowOnUnsupportedElement = false,
+            };
+            SKPicture picture;
 
-			float sizeX = 0;
-			float sizeY = 0;
+            if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
+            {
+                using (var svgStream = resolvedData.Item1)
+                {
+                    picture = svg.Load(resolvedData?.Item1);
+                }
+            }
+            else
+            {
+                using (var svgStream = resolvedData.Item1)
+                using (var reader = new StreamReader(svgStream))
+                {
+                    var builder = new StringBuilder(await reader.ReadToEndAsync());
+                    foreach (var map in ReplaceStringMap)
+                    {
+                        builder.Replace(map.Key, map.Value);
+                    }
 
-			if (VectorWidth == 0 && VectorHeight == 0)
-			{
-				if (picture.Bounds.Width > 0)
-					sizeX = picture.Bounds.Width;
-				else
-					sizeX = 300;
+                    using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
+                    {
+                        picture = svg.Load(svgFinalStream);
+                    }
+                }
+            }
 
-				if (picture.Bounds.Height > 0)
-					sizeY = picture.Bounds.Height;
-				else
-					sizeY = 300;
-			}
-			else if (VectorWidth > 0 && VectorHeight > 0)
-			{
-				sizeX = VectorWidth;
-				sizeY = VectorHeight;
-			}
-			else if (VectorWidth > 0)
-			{
-				sizeX = VectorWidth;
-				sizeY = (VectorWidth / picture.Bounds.Width) * picture.Bounds.Height;
-			}
-			else
-			{
-				sizeX = (VectorHeight / picture.Bounds.Height) * picture.Bounds.Width;
-				sizeY = VectorHeight;
-			}
+            double sizeX = 0;
+            double sizeY = 0;
 
-			using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
+            if (VectorWidth == 0 && VectorHeight == 0)
+            {
+                if (picture.CullRect.Width > 0)
+                    sizeX = picture.CullRect.Width;
+                else
+                    sizeX = 300;
+
+                if (picture.CullRect.Height > 0)
+                    sizeY = picture.CullRect.Height;
+                else
+                    sizeY = 300;
+            }
+            else if (VectorWidth > 0 && VectorHeight > 0)
+            {
+                sizeX = VectorWidth;
+                sizeY = VectorHeight;
+            }
+            else if (VectorWidth > 0)
+            {
+                sizeX = VectorWidth;
+                sizeY = (VectorWidth / picture.CullRect.Width) * picture.CullRect.Height;
+            }
+            else
+            {
+                sizeX = (VectorHeight / picture.CullRect.Height) * picture.CullRect.Width;
+                sizeY = VectorHeight;
+            }
+
+            if (UseDipUnits)
+            {
+#if __ANDROID__
+                sizeX = sizeX.DpToPixels();
+                sizeY = sizeY.DpToPixels();
+#else
+                sizeX = sizeX.PointsToPixels();
+                sizeY = sizeY.PointsToPixels();
+#endif
+            }
+
+            using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
+			//using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
 			using (var canvas = new SKCanvas(bitmap))
 			using (var paint = new SKPaint())
 			{
 				canvas.Clear(SKColors.Transparent);
-				float scaleX = sizeX / picture.Bounds.Width;
-				float scaleY = sizeY / picture.Bounds.Height;
+                float scaleX = (float)sizeX / picture.CullRect.Width;
+				float scaleY = (float)sizeY / picture.CullRect.Height;
 				var matrix = SKMatrix.MakeScale(scaleX, scaleY);
 
 				canvas.DrawPicture(picture, ref matrix, paint);
 				canvas.Flush();
 
 				using (var image = SKImage.FromBitmap(bitmap))
-				using (var data = image.Encode(SKImageEncodeFormat.Png, 80))
+				//using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
+				using (var data = image.Encode())
 				{
 					var stream = new MemoryStream();
 					data.SaveTo(stream);

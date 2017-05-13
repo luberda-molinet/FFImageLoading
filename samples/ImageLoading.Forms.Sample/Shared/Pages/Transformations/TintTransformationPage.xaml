@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.TintTransformationPage"
 		xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
 		xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
@@ -13,7 +13,7 @@
 					Aspect="AspectFit" HeightRequest="400" WidthRequest="400" Source="{Binding ImageUrl}">
 					<ffimageloading:CachedImage.Transformations>
 						<!-- First two digits from HexColor = ALPHA channel -->
-						<fftransformations:TintTransformation HexColor="#60ff0000" EnableSolidColor="true"/>
+						<fftransformations:TintTransformation HexColor="#ffff0000" EnableSolidColor="true"/>
 					</ffimageloading:CachedImage.Transformations>
 				</ffimageloading:CachedImage>
 

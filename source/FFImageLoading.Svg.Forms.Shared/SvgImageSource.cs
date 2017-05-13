@@ -4,6 +4,7 @@ using FFImageLoading.Forms;
 using FFImageLoading.Work;
 using FFImageLoading.Svg.Platform;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Svg.Forms
 {
@@ -12,12 +13,13 @@ namespace FFImageLoading.Svg.Forms
 	/// </summary>
 	public class SvgImageSource : Xamarin.Forms.ImageSource, IVectorImageSource
 	{
-		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits)
+		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits, Dictionary<string, string> replaceStringMap = null)
 		{
 			ImageSource = imageSource;
 			VectorWidth = vectorWidth;
 			VectorHeight = vectorHeight;
 			UseDipUnits = useDipUnits;
+            ReplaceStringMap = replaceStringMap;
 		}
 
 		public Xamarin.Forms.ImageSource ImageSource { get; private set; }
@@ -28,9 +30,11 @@ namespace FFImageLoading.Svg.Forms
 
 		public bool UseDipUnits { get; set; }
 
+        public Dictionary<string, string> ReplaceStringMap { get; set; }
+
 		public IVectorDataResolver GetVectorDataResolver()
 		{
-			return new SvgDataResolver(VectorWidth, VectorHeight, UseDipUnits);
+            return new SvgDataResolver(VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
 		}
 
 		/// <summary>
@@ -42,9 +46,9 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromFile(string file, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromFile(string file, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
-			return new SvgImageSource(Xamarin.Forms.ImageSource.FromFile(file), vectorWidth, vectorHeight, useDipUnits);
+			return new SvgImageSource(Xamarin.Forms.ImageSource.FromFile(file), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 
 		/// <summary>
@@ -56,9 +60,9 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromStream(Func<Stream> stream, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromStream(Func<Stream> stream, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
-			return new SvgImageSource(Xamarin.Forms.ImageSource.FromStream(stream), vectorWidth, vectorHeight, useDipUnits);
+			return new SvgImageSource(Xamarin.Forms.ImageSource.FromStream(stream), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 
 		/// <summary>
@@ -70,9 +74,9 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
-			return new SvgImageSource(Xamarin.Forms.ImageSource.FromUri(uri), vectorWidth, vectorHeight, useDipUnits);
+			return new SvgImageSource(Xamarin.Forms.ImageSource.FromUri(uri), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 
 		/// <summary>
@@ -85,10 +89,10 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			
-			return FromResource(resource, resolvingType.GetTypeInfo().Assembly, vectorWidth, vectorHeight, useDipUnits);
+			return FromResource(resource, resolvingType.GetTypeInfo().Assembly, vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 
 		/// <summary>
@@ -101,7 +105,7 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			if (sourceAssembly == null)
 			{
@@ -116,7 +120,7 @@ namespace FFImageLoading.Svg.Forms
 				}
 			}
 
-			return FromStream(() => sourceAssembly.GetManifestResourceStream(resource), vectorWidth, vectorHeight, useDipUnits);
+            return FromStream(() => sourceAssembly.GetManifestResourceStream(resource), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 	}
 }

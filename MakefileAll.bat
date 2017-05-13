@@ -6,6 +6,7 @@ if "%CI%"=="True" (
     set logger=/l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 )
 set buildargs=/p:Configuration="%config%" /p:Platform="%platform%" /p:NoWarn="%warnings%" /v:minimal %logger%
+set buildargsTests=/p:Configuration="Debug" /p:Platform="%platform%" /p:NoWarn="%warnings%" /v:minimal %logger%
 
 echo Restoring NuGets...
 
@@ -43,6 +44,11 @@ echo Building FFImageLoading.Svg...
 %msbuild% source/FFImageLoading.Svg.Forms.Touch/FFImageLoading.Svg.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Windows/FFImageLoading.Svg.Forms.Windows.csproj %buildargs%
+
+echo Unit testing...
+
+%msbuild% source/Tests/FFImageLoading.Core.Tests/FFImageLoading.Core.Tests.csproj %buildargsTests%
+xunit.console.clr4 source/Tests/FFImageLoading.Core.Tests/bin/Debug/FFImageLoading.Core.Tests.dll /appveyor
 
 echo Generating symbols with Gitlink...
 

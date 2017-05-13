@@ -35,17 +35,23 @@ namespace FFImageLoading.Work
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
-                await Task.Run(async () =>
+                try
                 {
-                    Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                    Parameters.StreamRead = await(Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                }
+                catch(TaskCanceledException ex)
+                {
+                    Parameters.StreamRead = null;
+                    Logger.Error(ex.Message, ex);
+                }
 
-                    if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
-                    {
-                        Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
-                        Parameters.StreamRead.Position = 0;
-                        SetKeys();
-                    }
-                }).ConfigureAwait(false);
+                if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
+                {
+                    Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
+                    Parameters.StreamRead.Position = 0;
+
+					SetKeys();
+                }
             }
         }
 
@@ -83,7 +89,11 @@ namespace FFImageLoading.Work
             var vect = Parameters.CustomDataResolver as IVectorDataResolver;
             if (vect != null)
             {
-                KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                else
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
+                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
             }
 
             KeyDownsamplingOnly = string.Empty;
@@ -98,7 +108,7 @@ namespace FFImageLoading.Work
             KeyTransformationsOnly = string.Empty;
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
-                KeyTransformationsOnly = string.Concat(string.Join(";", Parameters.Transformations.Select(t => t.Key)));
+                KeyTransformationsOnly = string.Concat(";", string.Join(";", Parameters.Transformations.Select(t => t.Key)));
             }
 
             Key = string.Concat(KeyRaw, KeyDownsamplingOnly, KeyTransformationsOnly);
@@ -450,7 +460,7 @@ namespace FFImageLoading.Work
 
                         ThrowIfCancellationRequested();
 
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, TransformPlaceholders, false).ConfigureAwait(false);
+                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
 
                         try
                         {

@@ -74,7 +74,7 @@ namespace FFImageLoading.DataResolvers
 
                 if (bundle != null)
                 {
-                    var path = bundle.PathForResource(file, null);
+                    string path = !string.IsNullOrEmpty(filenamePath) ? bundle.PathForResource(file, null, filenamePath) : bundle.PathForResource(file, null);
 
                     var stream = FileStore.GetInputStream(path, true);
                     var imageInformation = new ImageInformation();
@@ -112,27 +112,25 @@ namespace FFImageLoading.DataResolvers
                                 stream, LoadingResult.CompiledResource, imageInformation);
                         }
                     }
-                    else if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
+
+                    UIImage image = null;
+
+                    try
                     {
-                        UIImage image = null;
+                        await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(filename)).ConfigureAwait(false);
+                    }
+                    catch (Exception) { }
 
-                        try
-                        {
-                            await MainThreadDispatcher.Instance.PostAsync(() => image = UIImage.FromBundle(filename)).ConfigureAwait(false);
-                        }
-                        catch (Exception) { }
+                    if (image != null)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        var stream = image.AsPNG()?.AsStream();
+                        var imageInformation = new ImageInformation();
+                        imageInformation.SetPath(identifier);
+                        imageInformation.SetFilePath(null);
 
-                        if (image != null)
-                        {
-                            token.ThrowIfCancellationRequested();
-                            var stream = image.AsPNG()?.AsStream();
-                            var imageInformation = new ImageInformation();
-                            imageInformation.SetPath(identifier);
-                            imageInformation.SetFilePath(null);
-
-                            return new Tuple<Stream, LoadingResult, ImageInformation>(
-                                stream, LoadingResult.CompiledResource, imageInformation);
-                        }
+                        return new Tuple<Stream, LoadingResult, ImageInformation>(
+                            stream, LoadingResult.CompiledResource, imageInformation);
                     }
                 }
             }

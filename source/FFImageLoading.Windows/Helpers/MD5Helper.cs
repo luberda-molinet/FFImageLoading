@@ -9,23 +9,23 @@ namespace FFImageLoading.Helpers
 {
     public class MD5Helper : IMD5Helper
     {
-        private static HashAlgorithmProvider hashProvider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
-
         public string MD5(Stream input)
         {
+            var hashProvider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
             var hashed = hashProvider.HashData(StreamToByteArray(input).AsBuffer());
             var bytes = hashed.ToArray();
-            return BitConverter.ToString(bytes);
+            return BitConverter.ToString(bytes)?.ToSanitizedKey();
         }
 
         public string MD5(string input)
         {
             var bytes = ComputeHash(Encoding.UTF8.GetBytes(input));
-            return BitConverter.ToString(bytes);
+            return BitConverter.ToString(bytes)?.ToSanitizedKey();
         }
 
         public byte[] ComputeHash(byte[] input)
         {
+            var hashProvider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
             var hashed = hashProvider.HashData(CryptographicBuffer.CreateFromByteArray(input));
             return hashed.ToArray();
         }

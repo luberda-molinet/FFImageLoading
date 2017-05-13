@@ -73,9 +73,7 @@ namespace FFImageLoading.Cache
 		/// <param name="duration">Specifies how long an item should remain in the cache.</param>
 		public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
 		{
-            var sanitizedKey = key.ToSanitizedKey();
-
-            if (!_fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+            if (!_fileWritePendingTasks.TryAdd(key, 1))
             {
                 Logger?.Error("Can't save to disk as another write with the same key is pending: " + key);
                 return;
@@ -91,19 +89,19 @@ namespace FFImageLoading.Cache
                     try
                     {
                         CacheEntry oldEntry;
-                        if (_entries.TryGetValue(sanitizedKey, out oldEntry))
+                        if (_entries.TryGetValue(key, out oldEntry))
                         {
                             string oldFilepath = Path.Combine(_cachePath, oldEntry.FileName);
                             if (File.Exists(oldFilepath))
                                 File.Delete(oldFilepath);
                         }
 
-                        string filename = sanitizedKey + "." + (long)duration.TotalSeconds;
+                        string filename = key + "." + (long)duration.TotalSeconds;
                         string filepath = Path.Combine(_cachePath, filename);
 
                         await FileStore.WriteBytesAsync(filepath, bytes, CancellationToken.None).ConfigureAwait(false);
 
-                        _entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
+                        _entries[key] = new CacheEntry(DateTime.UtcNow, duration, filename);
                         writeFinished?.Invoke();
 
                         if (Configuration.VerboseLogging)
@@ -116,7 +114,7 @@ namespace FFImageLoading.Cache
                     finally
                     {
                         byte finishedTask;
-                        _fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
+                        _fileWritePendingTasks.TryRemove(key, out finishedTask);
 				    }
 			    });
             }
@@ -132,11 +130,9 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public virtual async Task RemoveAsync(string key)
 		{
-            var sanitizedKey = key.ToSanitizedKey();
-
-			await WaitForPendingWriteIfExists(sanitizedKey).ConfigureAwait(false);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 			CacheEntry entry;
-			if (_entries.TryRemove(sanitizedKey, out entry))
+			if (_entries.TryRemove(key, out entry))
 			{
 				string filepath = Path.Combine(_cachePath, entry.FileName);
 
@@ -167,7 +163,7 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public virtual Task<bool> ExistsAsync(string key)
 		{
-            return Task.FromResult(_entries.ContainsKey(key.ToSanitizedKey()));
+            return Task.FromResult(_entries.ContainsKey(key));
 		}
 
 		/// <summary>
@@ -177,13 +173,12 @@ namespace FFImageLoading.Cache
 		/// <param name="key">Key.</param>
 		public virtual async Task<Stream> TryGetStreamAsync(string key)
 		{
-            var sanitizedKey = key.ToSanitizedKey();
-			await WaitForPendingWriteIfExists(sanitizedKey).ConfigureAwait(false);
+			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
 			try
 			{
 				CacheEntry entry;
-				if (!_entries.TryGetValue(sanitizedKey, out entry))
+				if (!_entries.TryGetValue(key, out entry))
 					return null;
 
 				string filepath = Path.Combine(_cachePath, entry.FileName);
@@ -197,10 +192,8 @@ namespace FFImageLoading.Cache
 
 		public virtual Task<string> GetFilePathAsync(string key)
 		{
-            var sanitizedKey = key.ToSanitizedKey();
-
 			CacheEntry entry;
-			if (!_entries.TryGetValue(sanitizedKey, out entry))
+			if (!_entries.TryGetValue(key, out entry))
 				return Task.FromResult<string>(null);
 			
 			return Task.FromResult(Path.Combine(_cachePath, entry.FileName));

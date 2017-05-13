@@ -43,9 +43,9 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            return ToRounded(source, (int)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+            return ToRounded(bitmapSource, (int)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
         }
 
         public static BitmapHolder ToRounded(BitmapHolder source, int rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)

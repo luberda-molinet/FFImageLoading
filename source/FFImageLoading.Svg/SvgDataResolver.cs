@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,19 @@ namespace FFImageLoading.Svg.Platform
 			}
 		}
 
-		public bool UseDipUnits
+        public Dictionary<string, string> ReplaceStringMap
+        {
+            get
+            {
+                throw new Exception(DoNotReferenceMessage);
+            }
+            set
+            {
+                throw new Exception(DoNotReferenceMessage);
+            }
+        }
+
+        public bool UseDipUnits
 		{
 			get
 			{

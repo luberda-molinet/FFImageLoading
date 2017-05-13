@@ -13,11 +13,11 @@ namespace FFImageLoading.Transformations
             get { return "GrayscaleTransformation"; }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
-            ToGrayscale(source);
+            ToGrayscale(bitmapSource);
 
-            return source;
+            return bitmapSource;
         }
 
         public static void ToGrayscale(BitmapHolder bmp)

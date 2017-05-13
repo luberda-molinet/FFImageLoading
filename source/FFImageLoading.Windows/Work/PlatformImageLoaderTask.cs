@@ -42,7 +42,16 @@ namespace FFImageLoading.Work
             try
             {
                 // Special case to handle WebP decoding on Windows
-                if (source != ImageSource.Stream && path.ToLowerInvariant().EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                string ext = null;
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    if (source == ImageSource.Url)
+                        ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
+                    else
+                        ext = Path.GetExtension(path).ToLowerInvariant();
+                }
+                
+                if (source != ImageSource.Stream && ext == ".webp")
                 {
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
@@ -78,7 +87,7 @@ namespace FFImageLoading.Work
 
                         try
                         {
-                            IBitmap bitmapHolder = transformation.Transform(imageIn);
+                            IBitmap bitmapHolder = transformation.Transform(imageIn, path, source, isPlaceholder, Key);
                             imageIn = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)

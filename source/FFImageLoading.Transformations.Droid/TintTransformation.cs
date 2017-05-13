@@ -60,14 +60,14 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			if (EnableSolidColor)
-				return ToSolidColor(source, R, G, B, A);
+				return ToSolidColor(sourceBitmap, R, G, B, A);
 
 			RGBAWMatrix = FFColorMatrix.ColorToTintMatrix(R, G, B, A);
 
-			return base.Transform(source);
+            return base.Transform(sourceBitmap, path, source, isPlaceholder, key);
 		}
 
 		public static Bitmap ToSolidColor(Bitmap sourceBitmap, int r, int g, int b, int a)

@@ -136,10 +136,8 @@ namespace FFImageLoading.Cache
         {
             await initTask.ConfigureAwait(false);
 
-            var sanitizedKey = key.ToSanitizedKey();
-
             CacheEntry entry;
-            if (!entries.TryGetValue(sanitizedKey, out entry))
+            if (!entries.TryGetValue(key, out entry))
                 return null;
 
             return Path.Combine(cacheFolder.Path, entry.FileName);
@@ -154,7 +152,7 @@ namespace FFImageLoading.Cache
         {
             await initTask.ConfigureAwait(false);
 
-            return entries.ContainsKey(key.ToSanitizedKey());
+            return entries.ContainsKey(key);
         }
 
         /// <summary>
@@ -167,9 +165,7 @@ namespace FFImageLoading.Cache
         {
             await initTask.ConfigureAwait(false);
 
-            var sanitizedKey = key.ToSanitizedKey();
-
-            if (!fileWritePendingTasks.TryAdd(sanitizedKey, 1))
+            if (!fileWritePendingTasks.TryAdd(key, 1))
                 return;
 
             await _currentWriteLock.WaitAsync().ConfigureAwait(false); // Make sure we don't add multiple continuations to the same task
@@ -186,7 +182,7 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                        string filename = sanitizedKey + "." + (long)duration.TotalSeconds;
+                        string filename = key + "." + (long)duration.TotalSeconds;
 
                         var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
 
@@ -195,7 +191,7 @@ namespace FFImageLoading.Cache
                             await fs.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
                         }
 
-                        entries[sanitizedKey] = new CacheEntry(DateTime.UtcNow, duration, filename);
+                        entries[key] = new CacheEntry(DateTime.UtcNow, duration, filename);
                         writeFinished?.Invoke();
                     }
                     catch (Exception ex) // Since we don't observe the task (it's not awaited, we should catch all exceptions)
@@ -207,7 +203,7 @@ namespace FFImageLoading.Cache
                     finally
                     {
                         byte finishedTask;
-                        fileWritePendingTasks.TryRemove(sanitizedKey, out finishedTask);
+                        fileWritePendingTasks.TryRemove(key, out finishedTask);
                         fileWriteLock.Release();
                     }
                 });
@@ -227,7 +223,6 @@ namespace FFImageLoading.Cache
         {
             await initTask.ConfigureAwait(false);
 
-            key = key.ToSanitizedKey();
             await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
             try
@@ -256,8 +251,6 @@ namespace FFImageLoading.Cache
         public virtual async Task RemoveAsync(string key)
         {
             await initTask.ConfigureAwait(false);
-
-            key = key.ToSanitizedKey();
 
             await WaitForPendingWriteIfExists(key).ConfigureAwait(false);            
 

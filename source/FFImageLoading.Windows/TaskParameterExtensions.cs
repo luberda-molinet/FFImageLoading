@@ -197,6 +197,16 @@ namespace FFImageLoading
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Loads the image into JPG Stream
+        /// </summary>
+        /// <returns>The JPGS tream async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        public static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        {
+            throw new NotImplementedException();
+        }
+
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
         {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);

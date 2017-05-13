@@ -21,6 +21,13 @@ namespace FFImageLoading.Cross
 	#elif __ANDROID__
 	[Register("ffimageloading.cross.MvxImageLoadingView")]
 	#endif
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    /// OBSOLETE !!!!!!!!!!!!!!!!!!!!!
+    [Obsolete("Please use a new/better MvxCachedImageView")]
 	public class MvxImageLoadingView
 	#if __IOS__
 		: UIImageView
@@ -118,13 +125,24 @@ namespace FFImageLoading.Cross
                 if (string.IsNullOrEmpty(_dataLocationUri))
                     return;
 
-                if (_dataLocationUri.StartsWith("res:"))
+                var dataLocationUriLower = _dataLocationUri.ToLower();
+
+                if (dataLocationUriLower.StartsWith("res:"))
                 {
                     var resourcePath = _dataLocationUri.Split(new[] { "res:" }, StringSplitOptions.None)[1];
                     Source = ImageSource.CompiledResource;
                     DataLocation = resourcePath;
                 }
-                else if (_dataLocationUri.StartsWith("http"))
+#if __ANDROID__
+                else if (dataLocationUriLower.StartsWith("android.resource"))
+                {
+                    var substrings = _dataLocationUri.Split(new[] { "/" }, StringSplitOptions.None);
+                    var resourceName = Context.Resources.GetResourceEntryName(Convert.ToInt32(substrings[substrings.Length - 1]));
+                    Source = ImageSource.CompiledResource;
+                    DataLocation = resourceName;
+                }
+#endif
+                else if (dataLocationUriLower.StartsWith("http"))
                 {
                     Source = ImageSource.Url;
                     DataLocation = _dataLocationUri;
@@ -142,7 +160,10 @@ namespace FFImageLoading.Cross
 			if (disposing)
 			{
 				CleanParameters();
-			}
+        OnSuccess = null;
+        OnError = null;
+        OnFinish = null;
+      }
 			base.Dispose(disposing);
 		}
 
@@ -153,9 +174,6 @@ namespace FFImageLoading.Cross
 				_parameters.Dispose();
 				_parameters = null;
 			}
-			OnSuccess = null;
-			OnError = null;
-			OnFinish = null;
 		}
 
 		private TaskParameter MakeParams()

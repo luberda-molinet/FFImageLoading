@@ -7,7 +7,7 @@ namespace FFImageLoading.Concurrency
     /// <summary>
     /// A helper-interface only needed to make writing unit tests a bit easier (hence the 'internal' access modifier)
     /// </summary>
-    internal interface IFixedSizePriorityQueue<TItem, in TPriority> : IPriorityQueue<TItem, TPriority>
+    public interface IFixedSizePriorityQueue<TItem, in TPriority> : IPriorityQueue<TItem, TPriority>
         where TPriority : IComparable<TPriority>
     {
         /// <summary>
@@ -21,5 +21,13 @@ namespace FFImageLoading.Concurrency
         /// attempting to enqueue another item will cause undefined behavior.
         /// </summary>
         int MaxSize { get; }
+
+#if DEBUG
+        /// <summary>
+        /// <b>Should not be called in production code.</b>
+        /// Checks to make sure the queue is still in a valid state.  Used for testing/debugging the queue.
+        /// </summary>
+        bool IsValidQueue();
+#endif
     }
 }

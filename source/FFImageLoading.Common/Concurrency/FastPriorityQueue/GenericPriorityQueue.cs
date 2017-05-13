@@ -96,7 +96,7 @@ namespace FFImageLoading.Concurrency
         }
 
         /// <summary>
-        /// Enqueue a node to the priority queue.  Lower values are placed in front. Ties are broken by first-in-first-out.
+        /// Enqueue a node to the priority queue.  Higher values are placed in front. Ties are broken by first-in-first-out.
         /// If the queue is full, the result is undefined.
         /// If the node is already enqueued, the result is undefined.
         /// O(log n)
@@ -236,7 +236,7 @@ namespace FFImageLoading.Concurrency
         }
 
         /// <summary>
-        /// Removes the head of the queue (node with minimum priority; ties are broken by order of insertion), and returns it.
+        /// Removes the head of the queue (node with maximum priority; ties are broken by order of insertion), and returns it.
         /// If queue is empty, result is undefined
         /// O(log n)
         /// </summary>
@@ -398,6 +398,7 @@ namespace FFImageLoading.Concurrency
             return GetEnumerator();
         }
 
+#if DEBUG
         /// <summary>
         /// <b>Should not be called in production code.</b>
         /// Checks to make sure the queue is still in a valid state.  Used for testing/debugging the queue.
@@ -419,5 +420,6 @@ namespace FFImageLoading.Concurrency
             }
             return true;
         }
+#endif
     }
 }

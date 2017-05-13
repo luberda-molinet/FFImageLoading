@@ -12,30 +12,45 @@ namespace FFImageLoading.Transformations
 
 		public BlurredTransformation()
 		{
-			Radius = 20d;
+			Radius = 25d;
+			_context = new ContextWrapper(Android.App.Application.Context);
 		}
 
 		public BlurredTransformation(double radius)
 		{
 			Radius = radius;
-			_context = Android.App.Application.Context;
+			_context = new ContextWrapper(Android.App.Application.Context);
 		}
 
-		public double Radius { get; set; }
+		double _radius;
+		public double Radius
+		{
+			get
+			{
+				return _radius;
+			}
+
+			set
+			{
+				_radius = Math.Min(25, Math.Max(value, 0));
+			}
+		}
+
+		public static bool LegacyMode { get; set; } = false;
 
 		public override string Key
 		{
 			get { return string.Format("BlurredTransformation,radius={0}", Radius); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
-		{
-			return ToBlurred(source, _context, (float)Radius);
-		}
+        protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
+        {
+            return ToBlurred(sourceBitmap, _context, (float)Radius);
+        }
 
 		public static Bitmap ToBlurred(Bitmap source, Context context, float radius)
 		{
-			if ((int)Android.OS.Build.VERSION.SdkInt >= 17)
+            if (context != null && !LegacyMode && (int)Android.OS.Build.VERSION.SdkInt >= 17)
 			{
 				Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
 

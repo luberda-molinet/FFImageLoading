@@ -865,6 +865,15 @@ namespace FFImageLoading.Forms
                 SetValue(CacheTypeProperty, value);
             }
         }
+
+        /// <summary>
+        /// Setups the on before image loading. 
+        /// You can add additional logic here to configure image loader settings before loading
+        /// </summary>
+        /// <param name="imageLoader">Image loader.</param>
+        protected internal virtual void SetupOnBeforeImageLoading(Work.TaskParameter imageLoader)
+        {
+        }
     }
 }
 

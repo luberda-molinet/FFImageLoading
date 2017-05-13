@@ -9,6 +9,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Net;
 
 #if SILVERLIGHT
 using FFImageLoading.Concurrency;
@@ -114,7 +115,7 @@ namespace FFImageLoading
                 var md5Helper = userDefinedConfig.MD5Helper ?? new MD5Helper();
                 userDefinedConfig.MD5Helper = md5Helper;
 
-				var httpClient = userDefinedConfig.HttpClient ?? new HttpClient();
+                var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate });
 
 				if (userDefinedConfig.HttpReadTimeout > 0)
 				{

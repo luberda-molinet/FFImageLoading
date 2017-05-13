@@ -43,9 +43,9 @@ namespace FFImageLoading.Transformations
 			}
 		}
 			
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToRounded(source, (float)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+			return ToRounded(sourceBitmap, (float)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
 		}
 
 		public static Bitmap ToRounded(Bitmap source, float rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)

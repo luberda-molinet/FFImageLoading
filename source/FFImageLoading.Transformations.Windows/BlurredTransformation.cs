@@ -22,11 +22,12 @@ namespace FFImageLoading.Transformations
             get { return string.Format("BlurredTransformation,radius={0}", Radius); }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            ToLegacyBlurred(source, (int)Radius);
 
-            return source;
+            ToLegacyBlurred(bitmapSource, (int)Radius);
+
+            return bitmapSource;
         }
 
         // Source: http://incubator.quasimondo.com/processing/superfast_blur.php

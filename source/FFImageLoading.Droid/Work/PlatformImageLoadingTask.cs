@@ -208,7 +208,7 @@ namespace FFImageLoading
 
                         try
                         {
-                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
                             bitmap = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)
@@ -241,11 +241,16 @@ namespace FFImageLoading
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
-        protected override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {
-                return PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                var image = await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                if(!image.HasValidBitmap)
+                {
+                    throw new BadImageFormatException("Bad image format");
+                }
+                return image;
             }
             catch (Exception ex)
             {
