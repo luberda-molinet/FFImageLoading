@@ -147,6 +147,10 @@
     <Compile Include="Pages\StreamListPageCell.xaml.cs">
       <DependentUpon>StreamListPageCell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\SimpleGifPageModel.cs" />
+    <Compile Include="Pages\SimpleGifPage.xaml.cs">
+      <DependentUpon>SimpleGifPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\SvgSamplePageModel.cs" />
     <Compile Include="Pages\SvgSamplePage.xaml.cs">
       <DependentUpon>SvgSamplePage.xaml</DependentUpon>
@@ -286,6 +290,9 @@
     <EmbeddedResource Include="Pages\StreamListPageCell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Pages\SimpleGifPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>			
     <EmbeddedResource Include="Pages\SvgSamplePage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
