@@ -1,78 +1,127 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Foundation;
 using ImageIO;
 using UIKit;
 
 namespace FFImageLoading.Helpers
 {
+    // Converted from: https://github.com/mayoff/uiimage-from-animated-gif/blob/master/uiimage-from-animated-gif/UIImage%2BanimatedGIF.m
     public static class GifHelper
     {
-        public static UIImage AnimateGif(NSData data)
+        public static UIImage AnimateGif(CGImageSource source, nfloat scale)
         {
-            if (data?.Length == 0)
+            if (source == null)
                 return null;
+            
+            var frameCount = source.ImageCount;
 
-            using (var source = CGImageSource.FromData(data))
-                return AnimateGifFromSource(source) ?? UIImage.LoadFromData(data);
-        }
-
-        private static UIImage AnimateGifFromSource(CGImageSource source)
-        {
-            var frameCount = source?.ImageCount;
-
-            // no need to animate
+            // no need to animate, fail safe.
             if (frameCount <= 1)
-                return null;
+                return UIImage.FromImage(source.CreateImage(0, null), scale, UIImageOrientation.Up);
 
             var frames = GetFrames(source);
             var delays = GetDelays(source);
             var totalDuration = delays.Sum();
+            var adjustedFrames = AdjustFramesToSpoofDurations(frames, scale, delays, totalDuration);
 
             // SUPER BASIC. Does not respect variable length frames. No memory optimizations.
-            return UIImage.CreateAnimatedImage(frames.ToArray(), totalDuration);
+            return UIImage.CreateAnimatedImage(adjustedFrames.ToArray(), totalDuration / 100.0);
         }
 
-        private static List<UIImage> GetFrames(CGImageSource source)
+        private static List<CoreGraphics.CGImage> GetFrames(CGImageSource source)
         {
-            var retval = new List<UIImage>();
+            var retval = new List<CoreGraphics.CGImage>();
 
             for (int i = 0; i < source?.ImageCount; i++)
             {
-                using (var frameImage = source.CreateImage(i, null))
-                    retval.Add(UIImage.FromImage(frameImage));
+                var frameImage = source.CreateImage(i, null);
+                retval.Add(frameImage);
             }
 
             return retval;
         }
 
-        private static List<double> GetDelays(CGImageSource source)
+        private static List<int> GetDelays(CGImageSource source)
         {
-            var retval = new List<double>();
+            var retval = new List<int>();
 
             for (int i = 0; i < source?.ImageCount; i++)
             {
+                var delayCentiseconds = 1;
                 var properties = source.GetProperties(i, null);
-                using (var gifProperties = properties.Dictionary["{GIF}"])
+                using (var gifProperties = properties.Dictionary[CGImageProperties.GIFDictionary])
                 {
-                    using (var delayTime = gifProperties.ValueForKey(new NSString("DelayTime")))
+                    if (gifProperties != null)
                     {
-                        var realDuration = double.Parse(delayTime.ToString());
-                        retval.Add(realDuration);
+                        using (var unclampedDelay = gifProperties.ValueForKey(CGImageProperties.GIFUnclampedDelayTime))
+                        {
+                            double delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString()) : 0;
+
+                            if (delayAsDouble == 0)
+                            {
+                                using (var delay = gifProperties.ValueForKey(CGImageProperties.GIFDelayTime))
+                                    delayAsDouble = delay != null ? double.Parse(delay.ToString()) : 0;
+                            }
+
+                            if (delayAsDouble > 0)
+                                delayCentiseconds = (int)(delayAsDouble * 100);
+                        }
                     }
                 }
+
+                retval.Add(delayCentiseconds);
             }
 
             return retval;
         }
 
-        private static int GetLoopCount(CGImageSource source)
+        /* The GIF stores a separate duration for each frame, in units of centiseconds (hundredths of a second).  However, a `UIImage` only has a single, total `duration` property, which is a floating-point number.
+         * To handle this mismatch, I add each source image (from the GIF) to `animation` a varying number of times to match the ratios between the frame durations in the GIF.
+         * For example, suppose the GIF contains three frames.  Frame 0 has duration 3.  Frame 1 has duration 9.  Frame 2 has duration 15.  I divide each duration by the greatest common denominator of all the durations, 
+         * which is 3, and add each frame the resulting number of times.  Thus `animation` will contain frame 0 3/3 = 1 time, then frame 1 9/3 = 3 times, then frame 2 15/3 = 5 times.  
+         * I set `animation.duration` to (3+9+15)/100 = 0.27 seconds. */
+        private static List<UIImage> AdjustFramesToSpoofDurations(List<CoreGraphics.CGImage> images, nfloat scale, List<int> delays, int totalDuration)
         {
-            var var = source.GetProperties(null);
-            using (var gifProperties = var.Dictionary["{GIF}"])
+            var count = images.Count;
+            var gcd = GetGCD(delays);
+            var frameCount = totalDuration / gcd;
+            var frames = new UIImage[frameCount];
+            var f = 0;
+
+            for (var i = 0; i < count; i++)
             {
-                var loopCount = gifProperties.ValueForKey(new NSString("LoopCount"));
-                return int.Parse(loopCount.ToString());
+                var frame = UIImage.FromImage(images[i],scale,UIImageOrientation.Up);
+                for (var j = delays[i] / gcd; j > 0; --j)
+                    frames[f++] = frame;
+            }
+
+            return frames.ToList();
+        }
+
+        private static int GetGCD(List<int> delays)
+        {
+            var gcd = delays[0];
+
+            for (var i = 1; i < delays.Count; ++i)
+                gcd = PairGCD(delays[i], gcd);
+
+            return gcd;
+        }
+
+        private static int PairGCD(int a, int b)
+        {
+            if (a < b)
+                return PairGCD(b, a);
+
+            while (true)
+            {
+                var r = a % b;
+                if (r == 0)
+                    return b;
+
+                a = b;
+                b = r;
             }
         }
     }
