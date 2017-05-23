@@ -11,7 +11,15 @@ namespace FFImageLoading
         ActivityManager _activityManager;
         ActivityManager.MemoryInfo _memoryInfo;
 
-        public PlatformPerformance()
+        public static IPlatformPerformance Create()
+        {
+            if (Application.Context == null)
+                return new EmptyPlatformPerformance();
+
+            return new PlatformPerformance();
+        }
+
+        private PlatformPerformance()
         {
             _runtime = Runtime.GetRuntime();
             _activityManager = (ActivityManager)Application.Context.GetSystemService("activity");
@@ -41,6 +49,24 @@ namespace FFImageLoading
 
             return string.Format("[PERFORMANCE] Memory - Free: {0:0}MB ({1:0}%), Total: {2:0}MB, Heap - Free: {3:0}MB ({4:0}%), Total: {5:0}MB", 
                                  availableMegs, percentAvail, totalMegs, availableMegsHeap, percentAvailHeap, totalMegsHeap);
+        }
+
+        class EmptyPlatformPerformance : IPlatformPerformance
+        {
+            public int GetCurrentManagedThreadId()
+            {
+                return 0;
+            }
+
+            public int GetCurrentSystemThreadId()
+            {
+                return 0;
+            }
+
+            public string GetMemoryInfo()
+            {
+                return "";
+            }
         }
     }
 }
