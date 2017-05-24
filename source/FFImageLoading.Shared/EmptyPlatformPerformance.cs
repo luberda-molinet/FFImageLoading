@@ -1,18 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace FFImageLoading
 {
-    public class PlatformPerformance : IPlatformPerformance
+    class EmptyPlatformPerformance : IPlatformPerformance
     {
-        public static IPlatformPerformance Create()
-        {
-            return new PlatformPerformance();
-        }
-
-        private PlatformPerformance()
-        {
-        }
-
         public int GetCurrentManagedThreadId()
         {
             return 0;
@@ -29,4 +22,3 @@ namespace FFImageLoading
         }
     }
 }
-
