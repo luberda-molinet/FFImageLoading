@@ -25,7 +25,6 @@ namespace FFImageLoading.Helpers
             var totalDuration = delays.Sum();
             var adjustedFrames = AdjustFramesToSpoofDurations(frames, scale, delays, totalDuration);
 
-            // SUPER BASIC. Does not respect variable length frames. No memory optimizations.
             return UIImage.CreateAnimatedImage(adjustedFrames.ToArray(), totalDuration / 100.0);
         }
 
