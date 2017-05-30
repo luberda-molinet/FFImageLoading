@@ -18,7 +18,7 @@ namespace FFImageLoading.Extensions
 		}
 
 		// Shamelessly copied from React-Native: https://github.com/facebook/react-native/blob/2cbc9127560c5f0f89ae5aa6ff863b1818f1c7c3/Libraries/Image/RCTImageUtils.m
-		public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null)
+		public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
 			using (var sourceRef = CGImageSource.FromData(data))
 			{
@@ -51,7 +51,7 @@ namespace FFImageLoading.Extensions
 				}
 
 				// Calculate target size
-				CGSize targetSize = RCTTargetSize(sourceSize, 1, destSize, destScale, resizeMode, false);
+				CGSize targetSize = RCTTargetSize(sourceSize, 1, destSize, destScale, resizeMode, allowUpscale);
 				CGSize targetPixelSize = RCTSizeInPixels(targetSize, destScale);
 				int maxPixelSize = (int)Math.Max(
 					Math.Min(sourceSize.Width, targetPixelSize.Width),
