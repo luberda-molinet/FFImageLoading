@@ -51,17 +51,18 @@ namespace FFImageLoading.Work
                         ext = Path.GetExtension(path).ToLowerInvariant();
                 }
                 
+                bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
                 if (source != ImageSource.Stream && ext == ".webp")
                 {
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
                 else if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
                 {
-                    imageIn = await imageData.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
+                    imageIn = await imageData.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
                 }
                 else
                 {
-                    return await imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
+                    return await imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
                 }
             }
             finally

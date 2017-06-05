@@ -138,6 +138,12 @@ namespace FFImageLoading.Config
 		public InterpolationMode DownsampleInterpolationMode { get; set; }
 
 		/// <summary>
+        /// Gets or sets a value that determines whether upscaling should be used in <see cref="FFImageLoading.Work.TaskParameter.DownSample"/>/<see cref="FFImageLoading.Work.TaskParameter.DownSampleInDip"/> functions if the image is smaller than passed dimensions
+        /// </summary>
+        /// <value><c>true</c> if upscaling is allowed; otherwise, <c>false</c></value>
+        public bool AllowUpscale { get; set; }
+
+        /// <summary>
 		/// Gets or sets the maximum time in seconds to wait to receive HTTP headers before the HTTP request is cancelled.
 		/// </summary>
 		/// <value>The http connect timeout.</value>

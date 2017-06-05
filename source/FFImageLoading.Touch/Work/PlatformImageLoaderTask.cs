@@ -63,6 +63,7 @@ namespace FFImageLoading.Work
                     var nsdata = NSData.FromStream(imageData);
                     int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
                     int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
+                    bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
 
                     if (Parameters.DownSampleUseDipUnits)
                     {
@@ -70,7 +71,7 @@ namespace FFImageLoading.Work
                         downsampleHeight = downsampleHeight.PointsToPixels();
                     }
 
-                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation);
+                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
                 }
             }
             finally
