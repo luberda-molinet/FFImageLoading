@@ -7,7 +7,16 @@ namespace FFImageLoading
 {
     public class PlatformPerformance : IPlatformPerformance
     {
-        public PlatformPerformance()
+        public static IPlatformPerformance Create()
+        {
+            //TODO: Check if is in design mode ??
+            if (false)
+                return new EmptyPlatformPerformance();
+
+            return new PlatformPerformance();
+        }
+
+        private PlatformPerformance()
         {
             var handle = Dlfcn.dlopen("/usr/lib/libSystem.dylib", 0);
             self = Dlfcn.GetIntPtr(handle, "mach_task_self_");

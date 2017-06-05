@@ -123,7 +123,7 @@ namespace FFImageLoading
 				}
                 userDefinedConfig.HttpClient = httpClient;
 
-                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, new PlatformPerformance());
+                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, PlatformPerformance.Create());
                 userDefinedConfig.Scheduler = scheduler;
 
                 if (string.IsNullOrWhiteSpace(userDefinedConfig.DiskCachePath))
@@ -352,7 +352,8 @@ namespace FFImageLoading
         /// <summary>
         /// Cancels tasks that match predicate.
         /// </summary>
-        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>        public void Cancel(Func<IImageLoaderTask, bool> predicate)
+        /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
+        public void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
             Scheduler.Cancel(predicate);
         }
