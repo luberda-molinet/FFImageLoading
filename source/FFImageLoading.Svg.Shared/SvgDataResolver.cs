@@ -11,12 +11,27 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
+#if __IOS__
+using Foundation;
+using UIKit;
+using CoreGraphics;
+#elif __ANDROID__
+using Android.Util;
+using Android.Runtime;
+using Android.Content;
+#endif
+
 namespace FFImageLoading.Svg.Platform
 {
-    /// <summary>
-    /// Svg data resolver.
-    /// </summary>
-    public class SvgDataResolver : IVectorDataResolver
+	/// <summary>
+	/// Svg data resolver.
+	/// </summary>
+#if __IOS__
+    [Preserve(AllMembers = true)]
+#elif __ANDROID__
+	[Preserve(AllMembers = true)]
+#endif
+	public class SvgDataResolver : IVectorDataResolver
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.

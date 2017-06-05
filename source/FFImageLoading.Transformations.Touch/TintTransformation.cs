@@ -1,9 +1,11 @@
 ﻿using System;
 using CoreGraphics;
+using Foundation;
 using UIKit;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class TintTransformation : ColorSpaceTransformation
 	{
 		public TintTransformation() : this(0, 165, 0, 128)
