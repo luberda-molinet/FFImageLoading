@@ -67,26 +67,32 @@ namespace FFImageLoading.Extensions
 						ShouldCache = false,
 				};
 
-				// Get thumbnail
-				using (var imageRef = sourceRef.CreateThumbnail(0, options))
-				{
-					if (imageRef == null)
-					{
-						return null;
-					}
+                UIImage image = null;
 
-					// Return image
-					var image = new UIImage(imageRef, destScale, UIImageOrientation.Up);
+                // gif
+                if (sourceRef.ImageCount > 1)
+                    image = GifHelper.AnimateGif(sourceRef, destScale);
+                else
+                {
+                    // Get thumbnail
+                    using (var imageRef = sourceRef.CreateThumbnail(0, options))
+                    {
+                        if (imageRef != null)
+                        {
+                            // Return image
+                            image = new UIImage(imageRef, destScale, UIImageOrientation.Up);
+                        }
+                    }
+                }
 
-					if (imageinformation != null)
-					{
-						int width = (int)image.Size.Width;
-						int height = (int)image.Size.Height;
-						imageinformation.SetCurrentSize(width.PointsToPixels(), height.PointsToPixels());
-					}
+                if (imageinformation != null && image != null)
+                {
+                    int width = (int)image.Size.Width;
+                    int height = (int)image.Size.Height;
+                    imageinformation.SetCurrentSize(width.PointsToPixels(), height.PointsToPixels());
+                }
 
-					return image;
-				}
+                return image;
 			}
 		}
 
