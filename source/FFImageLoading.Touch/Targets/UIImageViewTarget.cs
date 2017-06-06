@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Threading.Tasks;
 using FFImageLoading.Extensions;
 using FFImageLoading.Work;
@@ -18,7 +18,7 @@ namespace FFImageLoading.Targets
                 return;
 
             var control = Control;
-            if (control == null || control.Image == image)
+            if (control == null || (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1)))
                 return;
 
             var parameters = task.Parameters;
@@ -31,11 +31,20 @@ namespace FFImageLoading.Targets
                 UIView.Transition(control, fadeDuration,
                     UIViewAnimationOptions.TransitionCrossDissolve
                     | UIViewAnimationOptions.BeginFromCurrentState,
-                    () => { control.Image = image; },
+                    () => 
+                    {
+                        if (control.Image == image && control.Image?.Images != null && control.Image.Images.Length > 1)
+                            control.Image = null;
+                    
+                        control.Image = image; 
+                    },
                     () => { });
             }
             else
             {
+                if (control.Image == image && control.Image?.Images != null && control.Image.Images.Length > 1)
+                    control.Image = null;
+
                 control.Image = image;
             }
         }
