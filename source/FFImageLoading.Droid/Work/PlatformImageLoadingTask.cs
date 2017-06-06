@@ -241,15 +241,58 @@ namespace FFImageLoading
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
+        async Task<FFGifDrawable> PlatformGenerateGifImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            if (imageData == null)
+                throw new ArgumentNullException(nameof(imageData));
+
+            ThrowIfCancellationRequested();
+
+            try
+            {
+                //TODO Add caching, transformations, downsampling, etc
+                var gifDecoder = new GifDecoder();
+                await gifDecoder.ReadGifAsync(imageData);
+                ThrowIfCancellationRequested();
+                var bitmap = gifDecoder.GetBitmap();
+                ThrowIfCancellationRequested();
+                return new FFGifDrawable(Context.Resources, bitmap, gifDecoder);
+            }
+            finally
+            {
+                imageData?.Dispose();
+            }
+        }
+
         protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {
-                var image = await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
-                if(!image.HasValidBitmap)
+                SelfDisposingBitmapDrawable image = null;
+
+                string ext = null;
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    if (source == ImageSource.Url)
+                        ext = System.IO.Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
+                    else
+                        ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
+                }
+
+                if (source != ImageSource.Stream && ext == ".gif")
+                {
+                    image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                }
+                else
+                {
+                    image = await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                }
+
+                if (image == null || !image.HasValidBitmap)
                 {
                     throw new BadImageFormatException("Bad image format");
                 }
+
                 return image;
             }
             catch (Exception ex)

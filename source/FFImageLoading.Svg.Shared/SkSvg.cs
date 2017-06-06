@@ -786,9 +786,9 @@ namespace FFImageLoading.Svg.Platform
 						{
 							nt.Values = new float[]
 							{
-									ReadNumber(args[1]), ReadNumber(args[3]), ReadNumber(args[5]),
-									ReadNumber(args[2]), ReadNumber(args[4]), ReadNumber(args[6]),
-									0, 0, 1
+								ReadNumber(args[1]), ReadNumber(args[3]), ReadNumber(args[5]),
+								ReadNumber(args[2]), ReadNumber(args[4]), ReadNumber(args[6]),
+								0, 0, 1
 							};
 						}
 						else
