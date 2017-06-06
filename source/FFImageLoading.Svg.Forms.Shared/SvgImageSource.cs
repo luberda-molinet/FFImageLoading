@@ -11,6 +11,11 @@ namespace FFImageLoading.Svg.Forms
 	/// <summary>
 	/// SVG image source.
 	/// </summary>
+#if __IOS__
+            [Foundation.Preserve(AllMembers = true)]
+#elif __ANDROID__
+	[Android.Runtime.Preserve(AllMembers = true)]
+#endif
 	public class SvgImageSource : Xamarin.Forms.ImageSource, IVectorImageSource
 	{
 		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits, Dictionary<string, string> replaceStringMap = null)

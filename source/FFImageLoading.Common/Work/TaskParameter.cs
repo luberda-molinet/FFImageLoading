@@ -17,14 +17,27 @@ namespace FFImageLoading.Work
             Transformations = new List<ITransformation>();
         }
 
-		/// <summary>
-		/// Constructs a new TaskParameter to load an image from a file.
-		/// </summary>
-		/// <returns>The new TaskParameter.</returns>
-		/// <param name="filepath">Path to the file.</param>
-		public static TaskParameter FromFile(string filepath)
+        /// <summary>
+        /// Constructs a new TaskParameter to load an image from a file.
+        /// </summary>
+        /// <returns>The new TaskParameter.</returns>
+        /// <param name="filepath">Path to the file.</param>
+        public static TaskParameter FromFile(string filepath)
+        {
+            return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath };
+        }
+
+        /// <summary>
+        /// Constructs a new TaskParameter to load an image from a file.
+        /// </summary>
+        /// <returns>The new TaskParameter.</returns>
+        /// <param name="resourceUri">Uri to the resource.</param>
+        public static TaskParameter FromEmbeddedResource(string resourceUri)
 		{
-            return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath }; 
+            if (!resourceUri.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
+                resourceUri = $"resource://{resourceUri}";
+
+            return new TaskParameter() { Source = ImageSource.EmbeddedResource, Path = resourceUri }; 
 		}
 
 		/// <summary>

@@ -20,7 +20,6 @@ namespace FFImageLoading.Forms.Droid
 		{
 			ImageSource = FFImageLoading.Work.ImageSource.Stream;
 			Stream = stream;
-			Path = "Stream";
 		}
 
 		public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
@@ -62,6 +61,12 @@ namespace FFImageLoading.Forms.Droid
 			if (streamImageSource != null)
 			{
 				return new ImageSourceBinding(streamImageSource.Stream);
+			}
+
+			var embeddedResoureSource = source as EmbeddedResourceImageSource;
+			if (embeddedResoureSource != null)
+			{
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, embeddedResoureSource.Uri?.OriginalString);
 			}
 
 			var vectorSource = source as IVectorImageSource;

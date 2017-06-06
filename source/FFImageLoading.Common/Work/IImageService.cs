@@ -9,6 +9,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Reflection;
 
 namespace FFImageLoading
 {
@@ -60,6 +61,17 @@ namespace FFImageLoading
 		/// <returns>The new TaskParameter.</returns>
 		/// <param name="resourceName">Name of the resource in drawable folder without extension</param>
 		TaskParameter LoadCompiledResource(string resourceName);
+
+        /// <summary>
+        /// Constructs a new TaskParameter to load an image from a compiled drawable resource.
+        /// eg. resource://YourProject.Resource.Resource.png
+        /// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
+        /// </summary>
+        /// <returns>The new TaskParameter.</returns>
+        /// <param name="resourceUri">Uri of the resource</param>
+        TaskParameter LoadEmbeddedResource(string resourceUri);
+
+        TaskParameter LoadEmbeddedResource(string resourceName, Assembly resourceAssembly);
 
 		/// <summary>
 		/// Constructs a new TaskParameter to load an image from a Stream.

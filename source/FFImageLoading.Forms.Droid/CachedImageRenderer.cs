@@ -156,6 +156,10 @@ namespace FFImageLoading.Forms.Droid
 				{
 					imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
 				}
+                else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.EmbeddedResource)
+				{
+                    imageLoader = ImageService.Instance.LoadEmbeddedResource(ffSource.Path);
+				}
 
 				if (imageLoader != null)
 				{

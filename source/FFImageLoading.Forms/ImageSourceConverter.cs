@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Xamarin.Forms;
+using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
@@ -16,11 +17,24 @@ namespace FFImageLoading.Forms
 		{
 			var text = value as string;
 
-			if (text != null)
-			{
-				Uri uri;
-				return Uri.TryCreate(text, UriKind.Absolute, out uri) && uri.Scheme != "file" ? ImageSource.FromUri(uri) : ImageSource.FromFile(text);
-			}
+			if (text == null)
+				return null;
+
+            Uri uri;
+
+            if (text != null && Uri.TryCreate(text, UriKind.Absolute, out uri))
+            {
+                if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+                    return ImageSource.FromFile(text);
+                if (uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
+                    return new EmbeddedResourceImageSource(uri);
+
+                return ImageSource.FromUri(uri);
+            }
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                return ImageSource.FromFile(text);
+            }
 
 			throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
 		}

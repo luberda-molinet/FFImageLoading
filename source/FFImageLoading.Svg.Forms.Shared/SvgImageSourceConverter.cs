@@ -4,12 +4,17 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
 {
-    /// <summary>
-    /// SvgImageSourceConverter
-    /// </summary>
+	/// <summary>
+	/// SvgImageSourceConverter
+	/// </summary>
+#if __IOS__
+            [Foundation.Preserve(AllMembers = true)]
+#elif __ANDROID__
+            [Android.Runtime.Preserve(AllMembers = true)]
+#endif
 	public class SvgImageSourceConverter : TypeConverter, IValueConverter
 	{
-		ImageSourceConverter imageSourceConverter = new ImageSourceConverter();
+        FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();
 
         /// <summary>
         /// Convert
@@ -25,7 +30,7 @@ namespace FFImageLoading.Svg.Forms
 			if (string.IsNullOrWhiteSpace(str))
 				return null;
 
-			var xfSource = imageSourceConverter.ConvertFromInvariantString(str) as ImageSource;
+			var xfSource = _imageSourceConverter.ConvertFromInvariantString(str) as ImageSource;
 
 			//TODO Parse width / height eg. image.svg@SVG=0x200  where 200 is width
 			return new SvgImageSource(xfSource, 0, 0, true);
@@ -52,21 +57,19 @@ namespace FFImageLoading.Svg.Forms
         [Obsolete]
         public override object ConvertFrom(CultureInfo culture, object value)
         {
-        	var text = value as string;
+			var text = value as string;
 
-        	if (text != null)
-        	{
-                if (text.ToLower().Contains("svg"))
-                {
-                    var xfSource = imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
-                    return new SvgImageSource(xfSource, 0, 0, true);
-                }
+			if (text == null)
+				return null;
 
-        		Uri uri;
-        		return Uri.TryCreate(text, UriKind.Absolute, out uri) && uri.Scheme != "file" ? ImageSource.FromUri(uri) : ImageSource.FromFile(text);
-        	}
+            var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
 
-        	throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
+            if (text.Contains("svg", StringComparison.OrdinalIgnoreCase))
+            {
+                return new SvgImageSource(xfSource, 0, 0, true);
+            }
+
+            return xfSource;
         }
 	}
 }

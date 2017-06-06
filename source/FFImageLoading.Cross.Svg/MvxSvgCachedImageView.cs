@@ -52,15 +52,15 @@ namespace FFImageLoading.Cross
                 int height = this.Height;
     #endif
 
-    		if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.ToLower().Contains("svg")) || ImageStream != null)
+            if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase)) || ImageStream != null)
     		{
     			imageLoader.WithCustomDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
     		}
-            if (!string.IsNullOrWhiteSpace(LoadingPlaceholderImagePath) && LoadingPlaceholderImagePath.ToLower().Contains("svg"))
+            if (!string.IsNullOrWhiteSpace(LoadingPlaceholderImagePath) && LoadingPlaceholderImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase))
             {
                 imageLoader.WithCustomLoadingPlaceholderDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
             }
-            if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath) && ErrorPlaceholderImagePath.ToLower().Contains("svg"))
+            if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath) && ErrorPlaceholderImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase))
             {
                 imageLoader.WithCustomErrorPlaceholderDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
             }

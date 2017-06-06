@@ -299,10 +299,12 @@
     <EmbeddedResource Include="Pages\Transformations\TransformationsSelectorPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\sample.svg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Pages\" />
     <Folder Include="Pages\Transformations\" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="..\..\..\packages\Fody.2.0.7\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\..\..\packages\Fody.2.0.7\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   <Import Project="..\..\..\packages\Xamarin.Forms.2.3.5.235-pre2\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.3.5.235-pre2\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />

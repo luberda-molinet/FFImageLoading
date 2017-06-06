@@ -63,6 +63,12 @@ namespace FFImageLoading.Forms.Touch
 				return new ImageSourceBinding(streamImageSource.Stream);
 			}
 
+			var embeddedResoureSource = source as EmbeddedResourceImageSource;
+			if (embeddedResoureSource != null)
+			{
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, embeddedResoureSource.Uri?.OriginalString);
+			}
+
             var vectorSource = source as IVectorImageSource;
             if (vectorSource != null)
             {

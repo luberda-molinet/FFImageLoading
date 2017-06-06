@@ -15,21 +15,21 @@ namespace FFImageLoading.Forms.WinRT
 {
     public class ImageSourceBinding
     {
-        public ImageSourceBinding(Work.ImageSource imageSource, string path)
-        {
-            ImageSource = imageSource;
-            Path = path;
-        }
+		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
+		{
+			ImageSource = imageSource;
+			Path = path;
+		}
 
-        public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
-        {
-            ImageSource = Work.ImageSource.Stream;
-            Stream = stream;
-        }
+		public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
+		{
+			ImageSource = FFImageLoading.Work.ImageSource.Stream;
+			Stream = stream;
+		}
 
-        public Work.ImageSource ImageSource { get; private set; }
+		public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
 
-        public string Path { get; private set; }
+		public string Path { get; private set; }
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
@@ -84,6 +84,12 @@ namespace FFImageLoading.Forms.WinRT
             {
                 return new ImageSourceBinding(streamImageSource.Stream);
             }
+
+			var embeddedResoureSource = source as EmbeddedResourceImageSource;
+			if (embeddedResoureSource != null)
+			{
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, embeddedResoureSource.Uri?.OriginalString);
+			}
 
             var vectorSource = source as IVectorImageSource;
             if (vectorSource != null)
