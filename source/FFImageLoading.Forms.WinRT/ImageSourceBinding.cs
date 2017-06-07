@@ -88,7 +88,11 @@ namespace FFImageLoading.Forms.WinRT
 			var embeddedResoureSource = source as EmbeddedResourceImageSource;
 			if (embeddedResoureSource != null)
 			{
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, embeddedResoureSource.Uri?.OriginalString);
+				var uri = embeddedResoureSource.Uri?.OriginalString;
+				if (string.IsNullOrWhiteSpace(uri))
+					return null;
+
+				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
 			}
 
             var vectorSource = source as IVectorImageSource;

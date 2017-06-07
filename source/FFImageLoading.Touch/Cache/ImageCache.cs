@@ -9,14 +9,15 @@ using System.Linq;
 
 namespace FFImageLoading.Cache
 {
-    internal class ImageCache: IMemoryCache<UIImage>
+    internal class ImageCache : IMemoryCache<UIImage>
     {
-        private readonly NSCache _cache;
-        private static IMemoryCache<UIImage> _instance;
-		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-		private readonly IMiniLogger _logger;
+        readonly NSCache _cache;
+        static IMemoryCache<UIImage> _instance;
+		readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+		readonly IMiniLogger _logger;
+        readonly object _lock = new object();
 
-        private ImageCache(int maxCacheSize, IMiniLogger logger)
+        ImageCache(int maxCacheSize, IMiniLogger logger)
         {
 			_logger = logger;
             _cache = new NSCache();
@@ -59,8 +60,11 @@ namespace FFImageLoading.Cache
                 return null;
             
 			var image = (UIImage)_cache.ObjectForKey(new NSString(key));
-            if (image == null)
+            if (image == null || image.Handle == IntPtr.Zero)
+            {
+                Remove(key, false);
                 return null;
+            }
 
 			var imageInformation = GetInfo(key);
 			return new Tuple<UIImage, ImageInformation>(image, imageInformation);
@@ -68,23 +72,39 @@ namespace FFImageLoading.Cache
 
 		public void Add(string key, ImageInformation imageInformation, UIImage value)
         {
-			if (string.IsNullOrWhiteSpace(key) || value == null)
+            if (string.IsNullOrWhiteSpace(key) || value == null || value.Handle == IntPtr.Zero)
 				return;
 
-			_imageInformations.TryAdd(key, imageInformation);
-            _cache.SetCost(value, new NSString(key), value.GetMemorySize());
+            if (_imageInformations.ContainsKey(key))
+                Remove(key, false);
+
+            lock (_lock)
+            {
+                _imageInformations.TryAdd(key, imageInformation);
+                _cache.SetCost(value, new NSString(key), value.GetMemorySize());
+            }
         }
 
 		public void Remove(string key)
 		{
+            Remove(key, true);
+		}
+
+        void Remove(string key, bool log)
+        {
             if (string.IsNullOrWhiteSpace(key))
                 return;
+            
+            if (log && ImageService.Instance.Config.VerboseMemoryCacheLogging)
+                _logger.Debug(string.Format($"Remove from memory cache called for {key}"));
 
-			_logger.Debug(string.Format("Called remove from memory cache for '{0}'", key));
-			_cache.RemoveObjectForKey(new NSString(key));
-			ImageInformation imageInformation;
-			_imageInformations.TryRemove(key, out imageInformation);
-		}
+            lock (_lock)
+            {
+                _cache.RemoveObjectForKey(new NSString(key));
+                ImageInformation imageInformation;
+                _imageInformations.TryRemove(key, out imageInformation);
+            }
+        }
 
 		public void RemoveSimilar(string baseKey)
 		{
@@ -102,8 +122,11 @@ namespace FFImageLoading.Cache
 
 		public void Clear()
 		{
-			_cache.RemoveAllObjects();
-			_imageInformations.Clear();
+            lock (_lock)
+            {
+                _cache.RemoveAllObjects();
+                _imageInformations.Clear();
+            }
 			// Force immediate Garbage collection. Please note that is resource intensive.
 			System.GC.Collect();
 			System.GC.WaitForPendingFinalizers ();

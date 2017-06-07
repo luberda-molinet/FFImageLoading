@@ -598,14 +598,16 @@ namespace FFImageLoading.Forms
 		public static async Task InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar = false)
 		{
 			var fileImageSource = source as FileImageSource;
-
 			if (fileImageSource != null)
 				await ImageService.Instance.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar).ConfigureAwait(false);
 
 			var uriImageSource = source as UriImageSource;
-
 			if (uriImageSource != null)
 				await ImageService.Instance.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
+
+            var embResourceSource = source as EmbeddedResourceImageSource;
+            if (embResourceSource != null)
+              await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);  
 		}
 
 		/// <summary>
