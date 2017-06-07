@@ -121,11 +121,12 @@ namespace FFImageLoading.Forms.Droid
 			var item = obj as ImageSourceBinding;
 
 			if (item == null)
-			{
-				return false;
-			}
+			    return false;
 
-			return this.ImageSource == item.ImageSource && this.Path == item.Path && this.Stream == item.Stream;
+            if (item.Stream != null || this.Stream != null)
+                return false;
+
+            return this.ImageSource == item.ImageSource && this.Path == item.Path;
 		}
 
 		public override int GetHashCode()
