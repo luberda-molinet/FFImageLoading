@@ -125,7 +125,7 @@ namespace FFImageLoading.Svg.Forms
 				}
 			}
 
-            return FromStream(() => sourceAssembly.GetManifestResourceStream(resource), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
+            return new SvgImageSource(new EmbeddedResourceImageSource(resource, sourceAssembly), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 	}
 }
