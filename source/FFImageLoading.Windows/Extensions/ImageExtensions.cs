@@ -19,11 +19,16 @@ namespace FFImageLoading.Extensions
 
             WriteableBitmap writeableBitmap = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(async () =>
+            var waitHandle = new AutoResetEvent(false);
+
+            MainThreadDispatcher.Instance.PostAsync(async () =>
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
+                waitHandle.Set();
             });
+
+            waitHandle.WaitOne(TimeSpan.FromSeconds(5));
 
             return writeableBitmap;
         }
