@@ -48,13 +48,19 @@ Features:
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
 			</group>
 
-
 		</dependencies>
 
 	</metadata>
 
 	<files>
 
+		<!--netstandard1.0-->
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.dll" target="lib\netstandard1.0\FFImageLoading.dll" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.xml" target="lib\netstandard1.0\FFImageLoading.xml" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.pdb" target="lib\netstandard1.0\FFImageLoading.pdb" />
+		<file src="FFImageLoading.BaitAndSwitch\bin\Release\FFImageLoading.Platform.dll" target="lib\netstandard1.0\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.BaitAndSwitch\bin\Release\FFImageLoading.Platform.xml" target="lib\netstandard1.0\FFImageLoading.Platform.xml" />
+	
 		<!--Core PCL-->
 		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.dll" />
 		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.xml" />

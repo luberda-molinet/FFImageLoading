@@ -46,10 +46,11 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
 	</metadata>
 	
     <files>
+
         <!--Core PCL-->
-        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Forms.pdb" />
 
         <!--Xamarin.Android-->
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\MonoAndroid10\FFImageLoading.Forms.dll" />
