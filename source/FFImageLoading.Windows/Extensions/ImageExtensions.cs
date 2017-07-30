@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
