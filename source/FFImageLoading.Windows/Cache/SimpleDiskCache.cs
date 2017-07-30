@@ -26,16 +26,37 @@ namespace FFImageLoading.Cache
         readonly SemaphoreSlim _currentWriteLock = new SemaphoreSlim(1, 1);
         Task initTask = null;
         string cacheFolderName;
+        StorageFolder rootFolder;
         StorageFolder cacheFolder;
         ConcurrentDictionary<string, byte> fileWritePendingTasks = new ConcurrentDictionary<string, byte>();
         ConcurrentDictionary<string, CacheEntry> entries = new ConcurrentDictionary<string, CacheEntry>();
         Task _currentWrite = Task.FromResult<byte>(1);
 
-        public SimpleDiskCache(string cachePath, Configuration configuration)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleDiskCache"/> class. This constructor attempts 
+        /// to create a folder of the given name under the <see cref="ApplicationData.TemporaryFolder"/>.
+        /// </summary>
+        /// <param name="cacheFolderName">The name of the cache folder.</param>
+        /// <param name="configuration">The configuration object.</param>
+        public SimpleDiskCache(string cacheFolderName, Configuration configuration)
         {
             Configuration = configuration;
-            cacheFolder = null;
-            cacheFolderName = cachePath;
+            this.cacheFolderName = cacheFolderName;
+            initTask = Init();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleDiskCache"/> class. This constructor attempts
+        /// to create a folder of the given name under the given root <see cref="StorageFolder"/>.
+        /// </summary>
+        /// <param name="rootFolder">The root folder where the cache folder will be created.</param>
+        /// <param name="cacheFolderName">The cache folder name.</param>
+        /// <param name="configuration">The configuration object.</param>
+        public SimpleDiskCache(StorageFolder rootFolder, string cacheFolderName, Configuration configuration)
+        {
+            Configuration = configuration;
+            this.rootFolder = rootFolder;
+            this.cacheFolderName = cacheFolderName;
             initTask = Init();
         }
 
@@ -56,7 +77,8 @@ namespace FFImageLoading.Cache
         {
             try
             {
-                cacheFolder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                StorageFolder root = rootFolder ?? ApplicationData.Current.TemporaryFolder;
+                cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                 await InitializeEntries().ConfigureAwait(false);
             }
             catch
