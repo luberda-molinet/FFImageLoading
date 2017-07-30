@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using FFImageLoading.Forms;
 using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
@@ -12,6 +13,7 @@ namespace FFImageLoading.Svg.Forms
 #elif __ANDROID__
             [Android.Runtime.Preserve(AllMembers = true)]
 #endif
+    [Preserve(AllMembers = true)]
 	public class SvgImageSourceConverter : TypeConverter, IValueConverter
 	{
         FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();

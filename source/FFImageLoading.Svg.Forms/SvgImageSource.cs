@@ -10,6 +10,7 @@ namespace FFImageLoading.Svg.Forms
 	/// <summary>
 	/// SVG image source.
 	/// </summary>
+    [Preserve(AllMembers = true)]
 	public class SvgImageSource : Xamarin.Forms.ImageSource, IVectorImageSource
 	{
 		const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform version";

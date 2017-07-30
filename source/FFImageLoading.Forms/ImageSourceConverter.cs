@@ -5,6 +5,7 @@ using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
+    [Preserve(AllMembers = true)]
 	public class ImageSourceConverter : TypeConverter
 	{
 		public override bool CanConvertFrom(Type sourceType)

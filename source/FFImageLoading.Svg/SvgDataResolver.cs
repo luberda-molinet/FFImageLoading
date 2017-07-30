@@ -7,6 +7,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Svg.Platform
 {
+    [Preserve(AllMembers=true)]
 	public class SvgDataResolver : IVectorDataResolver
 	{
 		public static string DoNotReferenceMessage

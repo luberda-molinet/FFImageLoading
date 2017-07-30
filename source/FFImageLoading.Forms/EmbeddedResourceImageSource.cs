@@ -9,6 +9,7 @@ namespace FFImageLoading.Forms
 	/// eg. resource://YourProject.Resource.Resource.png
 	/// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
 	/// </summary>
+    [Preserve(AllMembers = true)]
 	public class EmbeddedResourceImageSource : ImageSource
     {
         public EmbeddedResourceImageSource(Uri uri)

@@ -28,6 +28,7 @@ namespace FFImageLoading.Cross
             [Preserve(AllMembers = true)]
             [Register("ffimageloading.cross.MvxSvgCachedImageView")]
     #endif
+
     public class MvxSvgCachedImageView : MvxCachedImageView
     {
     #if __IOS__

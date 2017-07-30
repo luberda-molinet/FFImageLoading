@@ -12,6 +12,7 @@ namespace FFImageLoading.Forms
 	/// CachedImage - Xamarin.Forms Image replacement with caching and downsampling capabilities
 	/// </summary>
 
+    [Preserve(AllMembers = true)]
 	public class CachedImage : View
 	{
 		public CachedImage()
