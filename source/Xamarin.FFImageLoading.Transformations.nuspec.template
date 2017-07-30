@@ -40,9 +40,9 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
 	<files>
 
 		<!--Core PCL-->
-        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Transformations.xml" />
-        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.pdb" target="lib\portable-net45+win8+wpa81+wp8\FFImageLoading.Transformations.pdb" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.pdb" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Transformations.pdb" />
             
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.dll" target="lib\MonoAndroid10\FFImageLoading.Transformations.dll" />
