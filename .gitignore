@@ -59,3 +59,15 @@ samples/ImageLoading.Forms.Sample/WinUWP/project.lock.json
 samples/ImageLoading.Forms.Sample/WinUWP/project.lock.json
 
 source/Tests/FFImageLoading.Core.Tests/.droidres/.ffimageloading.core.tests.droidres.db
+
+source/FFImageLoading.BaitAndSwitch/project.lock.json
+
+source/FFImageLoading.BaitAndSwitch/project.lock.json
+
+source/FFImageLoading.Forms/project.lock.json
+
+source/FFImageLoading.Svg.Forms/project.lock.json
+
+source/FFImageLoading.Svg/project.lock.json
+
+source/FFImageLoading.Transformations/project.lock.json
