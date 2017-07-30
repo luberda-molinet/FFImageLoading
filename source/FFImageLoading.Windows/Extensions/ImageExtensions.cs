@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
@@ -19,11 +20,16 @@ namespace FFImageLoading.Extensions
 
             WriteableBitmap writeableBitmap = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(async () =>
+            var waitHandle = new AutoResetEvent(false);
+
+            MainThreadDispatcher.Instance.PostAsync(async () =>
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
+                waitHandle.Set();
             });
+
+            waitHandle.WaitOne(TimeSpan.FromSeconds(5));
 
             return writeableBitmap;
         }
