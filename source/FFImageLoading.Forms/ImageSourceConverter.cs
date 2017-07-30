@@ -25,7 +25,7 @@ namespace FFImageLoading.Forms
             if (text != null && Uri.TryCreate(text, UriKind.Absolute, out uri))
             {
                 if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
-                    return ImageSource.FromFile(text);
+                    return ImageSource.FromFile(uri.LocalPath);
                 if (uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
                     return new EmbeddedResourceImageSource(uri);
 
