@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class RoundedTransformation : ITransformation
 	{
 		public RoundedTransformation()

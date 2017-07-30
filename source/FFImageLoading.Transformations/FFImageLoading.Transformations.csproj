@@ -62,6 +62,7 @@
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="TintTransformation.cs" />
+    <Compile Include="PreserveAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
