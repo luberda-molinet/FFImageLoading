@@ -299,10 +299,8 @@ namespace FFImageLoading.Work
                 int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, IImageLoaderTask>();
 
-                while (tasksToRun.Count < numberOfTasks && PendingTasks.Count > 0)
+                while (tasksToRun.Count < numberOfTasks && PendingTasks.TryDequeue(out IImageLoaderTask task))
                 {
-                    var task = PendingTasks.Dequeue();
-
                     if (task == null || task.IsCancelled || task.IsCompleted)
                         continue;
 
