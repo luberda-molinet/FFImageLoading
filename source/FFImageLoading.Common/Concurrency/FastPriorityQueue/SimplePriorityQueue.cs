@@ -110,6 +110,35 @@ namespace FFImageLoading.Concurrency
         }
 
         /// <summary>
+        /// Tries to remove the head of the queue
+        /// </summary>
+        /// <param name="item"><see cref="TItem"/></param>
+        /// <returns>If queue is empty <value>false</value>, else <value>true</value></returns>
+        public virtual bool TryDequeue(out TItem item)
+        {
+            lock (_queue)
+            {
+                if (_queue.Count < 1)
+                {
+                    item = default(TItem);
+                    return false;
+                }
+
+                try
+                {
+                    var node = _queue.Dequeue();
+                    item = node.Data;
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    item = default(TItem);
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Enqueue a node to the priority queue.  Higher values are placed in front. Ties are broken by first-in-first-out.
         /// This queue automatically resizes itself, so there's no concern of the queue becoming 'full'.
         /// Duplicates are allowed.
