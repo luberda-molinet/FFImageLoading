@@ -242,7 +242,11 @@ namespace FFImageLoading.Work
         {
             Task.Factory.StartNew(async () =>
             {
-                await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+                try
+                {
+                    await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+                }
+                catch { /* ignored on purpose */ }
             }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
         }
 
