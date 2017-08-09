@@ -282,6 +282,10 @@ namespace FFImageLoading.Cross
             {
                 imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
             }
+            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.EmbeddedResource)
+            {
+                imageLoader = ImageService.Instance.LoadEmbeddedResource(ffSource.Path);
+            }
 
             if (imageLoader != null)
             {
@@ -419,6 +423,10 @@ namespace FFImageLoading.Cross
                 return new ImageSourceBinding(ImageSource.CompiledResource, resourceName);
             }
 
+            if (imagePath.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ImageSourceBinding(ImageSource.EmbeddedResource, imagePath);
+            }
 #if __ANDROID__
             if (imagePath.StartsWith("android.resource", StringComparison.OrdinalIgnoreCase))
             {
