@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace FFImageLoading
 {
+    [Preserve(AllMembers = true)]
     public static class AssemblyExtensions
     {
         public static string GetTypeAssemblyFullName(this Type type)

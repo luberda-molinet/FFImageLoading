@@ -2,6 +2,7 @@
 
 namespace FFImageLoading.Args
 {
+    [Preserve(AllMembers = true)]
     public class FileWriteFinishedEventArgs : EventArgs
     {
         public FileWriteFinishedEventArgs(FileWriteInfo fileWriteInfo)

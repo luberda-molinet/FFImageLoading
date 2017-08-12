@@ -5,6 +5,7 @@ using System.Threading;
 
 namespace FFImageLoading.Cache
 {
+    [Preserve(AllMembers = true)]
     public interface IDiskCache
     {
 		/// <summary>

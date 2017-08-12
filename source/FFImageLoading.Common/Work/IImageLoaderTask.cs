@@ -5,6 +5,7 @@ using FFImageLoading.Config;
 
 namespace FFImageLoading.Work
 {
+    [Preserve(AllMembers = true)]
     public interface IImageLoaderTask : IScheduledWork, IDisposable
     {
         Task Init();

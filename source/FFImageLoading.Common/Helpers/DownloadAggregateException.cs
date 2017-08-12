@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace FFImageLoading
 {
+    [Preserve(AllMembers = true)]
     public class DownloadAggregateException : AggregateException
     {
         public DownloadAggregateException()

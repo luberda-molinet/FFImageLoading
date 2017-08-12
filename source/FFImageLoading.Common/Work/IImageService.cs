@@ -13,6 +13,7 @@ using System.Reflection;
 
 namespace FFImageLoading
 {
+    [Preserve(AllMembers = true)]
     public interface IImageService
     {
 		/// <summary>

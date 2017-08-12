@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace FFImageLoading
 {
+    [Preserve(AllMembers = true)]
     public static class StringExtensions
     {
         public static string ToSanitizedKey(this string key)

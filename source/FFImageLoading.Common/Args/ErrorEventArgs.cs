@@ -2,6 +2,7 @@
 
 namespace FFImageLoading.Args
 {
+    [Preserve(AllMembers = true)]
     public class ErrorEventArgs : EventArgs
     {
         public ErrorEventArgs(Exception exception)
