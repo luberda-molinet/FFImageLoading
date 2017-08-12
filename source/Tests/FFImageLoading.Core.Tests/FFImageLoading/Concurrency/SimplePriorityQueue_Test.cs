@@ -222,6 +222,32 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
             }
         }
 
+        [Fact]
+        public void Given_item_trydequeued_Then_count_decreases()
+        {
+            var request = new Mock<IImageLoaderTask>().Object;
+            var sut = CreatePriorityQueue();
+            sut.Enqueue(request, 0);
+            sut.Enqueue(request, 0);
+            sut.Enqueue(request, 0);
+            var result = sut.TryDequeue(out IImageLoaderTask item);
+
+            Assert.True(result);
+            Assert.Equal(request, item);
+
+            Assert.Equal(2, sut.Count);
+        }
+
+        [Fact]
+        public void Given_queue_is_empty_trydequeue_returns_false()
+        {
+            var sut = CreatePriorityQueue();
+
+            var result = sut.TryDequeue(out IImageLoaderTask item);
+            Assert.True(!result);
+            Assert.Equal(default(IImageLoaderTask), item);
+        }
+
         private SimplePriorityQueue<IImageLoaderTask, int> CreatePriorityQueue()
         {
             var queue = new StubFixedSizePriorityQueue();
