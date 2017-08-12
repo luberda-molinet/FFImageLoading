@@ -6,6 +6,7 @@ using System.Windows.Input;
 using FFImageLoading.Forms.Sample;
 using Xamarin.Forms;
 using Xamvvm;
+using FFImageLoading.Forms.Sample.Pages;
 
 namespace FFImageLoading.Forms.Sample
 {
@@ -81,6 +82,15 @@ namespace FFImageLoading.Forms.Sample
 					Command = new BaseCommand(async (param) =>
 					{
 						await this.PushPageFromCacheAsync<StreamListPageModel>(pm => pm.Reload());
+					})
+				},
+
+				new MenuItem() {
+					Section = "Advanced",
+					Title = "Data url examples",
+					Command = new BaseCommand(async (param) =>
+					{
+                        await this.PushPageFromCacheAsync<DataUrlPageModel>(pm => pm.Reload());
 					})
 				},
 

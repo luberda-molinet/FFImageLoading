@@ -159,6 +159,10 @@
       <DependentUpon>TransformationsSelectorPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Transformations\TransformationsSelectorPageModel.cs" />
+    <Compile Include="Pages\DataUrlPage.xaml.cs">
+      <DependentUpon>DataUrlPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DataUrlPageModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
@@ -180,9 +184,6 @@
     <Reference Include="PropertyChanged">
       <HintPath>..\..\..\packages\PropertyChanged.Fody.1.53.0\lib\portable-net4+sl4+wp8+win8+wpa81+MonoAndroid16+MonoTouch40\PropertyChanged.dll</HintPath>
     </Reference>
-    <Reference Include="SkiaSharp">
-      <HintPath>..\..\..\packages\SkiaSharp.1.57.1\lib\portable-net45+win8+wpa81+wp8\SkiaSharp.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.Forms.Core">
       <HintPath>..\..\..\packages\Xamarin.Forms.2.3.5.256-pre6\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Core.dll</HintPath>
     </Reference>
@@ -191,6 +192,9 @@
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
       <HintPath>..\..\..\packages\Xamarin.Forms.2.3.5.256-pre6\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp">
+      <HintPath>..\..\..\packages\SkiaSharp.1.59.1\lib\portable-net45+win8+wpa81+wp8\SkiaSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +304,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\sample.svg" />
+    <EmbeddedResource Include="Pages\DataUrlPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Pages\" />

@@ -21,9 +21,14 @@ namespace FFImageLoading.Forms
 			if (text == null)
 				return null;
 
+            if (text.IsDataUrl())
+            {
+                return new DataUrlImageSource(text);
+            }
+
             Uri uri;
 
-            if (text != null && Uri.TryCreate(text, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(text, UriKind.Absolute, out uri))
             {
                 if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
                     return ImageSource.FromFile(uri.LocalPath);

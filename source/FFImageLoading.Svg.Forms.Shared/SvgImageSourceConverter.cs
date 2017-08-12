@@ -73,5 +73,22 @@ namespace FFImageLoading.Svg.Forms
 
             return xfSource;
         }
+
+        public override object ConvertFromInvariantString(string value)
+        {
+			var text = value as string;
+
+			if (text == null)
+				return null;
+
+			var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
+
+			if (text.Contains("svg", StringComparison.OrdinalIgnoreCase))
+			{
+				return new SvgImageSource(xfSource, 0, 0, true);
+			}
+
+			return xfSource;
+        }
 	}
 }

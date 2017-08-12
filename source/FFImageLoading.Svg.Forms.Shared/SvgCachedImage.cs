@@ -13,6 +13,8 @@ namespace FFImageLoading.Svg.Forms
     [Preserve(AllMembers = true)]
 	public class SvgCachedImage : CachedImage
     {
+        static FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();
+
         public SvgCachedImage() : base()
         {
         }
@@ -25,6 +27,22 @@ namespace FFImageLoading.Svg.Forms
         static void OnSourcePropertyChanging(BindableObject bindable, object oldValue, object newValue)
         {
             var element = (CachedImage)bindable;
+
+            // HACK for the strange issue when TypeConverter is not respected (somehow FileImageSource is returned !?!?!?!?)
+			var fileSource = newValue as FileImageSource;
+            if (fileSource?.File != null && fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+            {
+                element.Source = SvgImageSource.FromSvgString(fileSource.File, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
+                return;
+            }
+
+            var uriSource = newValue as UriImageSource;
+            if (uriSource?.Uri?.OriginalString != null && uriSource.Uri.OriginalString.IsSvgDataUrl())
+			{
+				element.Source = SvgImageSource.FromSvgString(uriSource.Uri.OriginalString, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
+				return;
+			}
+
             element.Source = newValue as ImageSource;
         }
 

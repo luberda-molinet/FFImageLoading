@@ -115,9 +115,6 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="SkiaSharp">
-      <HintPath>..\..\..\packages\SkiaSharp.1.57.1\lib\XamariniOS\SkiaSharp.dll</HintPath>
-    </Reference>
     <Reference Include="WebP.Touch">
       <HintPath>..\..\..\packages\WebP.Touch.1.0.3\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
@@ -132,6 +129,9 @@
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
       <HintPath>..\..\..\packages\Xamarin.Forms.2.3.5.256-pre6\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp">
+      <HintPath>..\..\..\packages\SkiaSharp.1.59.1\lib\XamariniOS\SkiaSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

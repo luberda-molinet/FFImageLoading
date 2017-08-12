@@ -127,5 +127,19 @@ namespace FFImageLoading.Svg.Forms
 
             return new SvgImageSource(new EmbeddedResourceImageSource(resource, sourceAssembly), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
+
+		/// <summary>
+		/// SvgImageSource FromSvgString.
+		/// </summary>
+		/// <returns>The svg string.</returns>
+		/// <param name="svg">Svg.</param>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		/// <param name="replaceStringMap">Replace string map.</param>
+		public static SvgImageSource FromSvgString(string svg, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
+		{
+            return new SvgImageSource(new DataUrlImageSource(svg), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
+		}
 	}
 }

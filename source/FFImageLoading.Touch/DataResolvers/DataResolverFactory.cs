@@ -27,6 +27,8 @@ namespace FFImageLoading.DataResolvers
                 case ImageSource.CompiledResource:
                     return new BundleDataResolver();
                 case ImageSource.Url:
+                    if (!string.IsNullOrWhiteSpace(identifier) && identifier.IsDataUrl())
+                        return new DataUrlResolver();                    
                     return new UrlDataResolver(configuration);
                 case ImageSource.Stream:
                     return new StreamDataResolver();

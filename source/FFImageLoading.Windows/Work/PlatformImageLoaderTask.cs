@@ -43,7 +43,7 @@ namespace FFImageLoading.Work
             {
                 // Special case to handle WebP decoding on Windows
                 string ext = null;
-                if (!string.IsNullOrWhiteSpace(path))
+                if (!string.IsNullOrWhiteSpace(path) && Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute))
                 {
                     if (source == ImageSource.Url)
                         ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();

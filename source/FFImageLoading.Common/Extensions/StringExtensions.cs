@@ -16,5 +16,18 @@ namespace FFImageLoading
         {
             return source.IndexOf(toCheck, comp) >= 0;
         }
+
+        public static bool IsDataUrl(this string str)
+        {
+            return str.StartsWith("data:", StringComparison.OrdinalIgnoreCase) 
+                      || str.StartsWith("<", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsSvgDataUrl(this string str)
+        {
+            return str.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)
+                      || str.StartsWith("data:text", StringComparison.OrdinalIgnoreCase)
+                      || str.StartsWith("<", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

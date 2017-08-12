@@ -54,7 +54,7 @@
     <Reference Include="Mono.Android" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="SkiaSharp">
-      <HintPath>..\..\packages\SkiaSharp.1.57.1\lib\MonoAndroid\SkiaSharp.dll</HintPath>
+      <HintPath>..\..\packages\SkiaSharp.1.59.1\lib\MonoAndroid\SkiaSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
