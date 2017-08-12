@@ -246,7 +246,10 @@ namespace FFImageLoading.Work
                 {
                     await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
                 }
-                catch { /* ignored on purpose */ }
+                catch (Exception ex)
+                {
+                    Logger.Error("TakeFromPendingTasksAndRun exception", ex);
+                }
             }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
         }
 
@@ -302,8 +305,9 @@ namespace FFImageLoading.Work
 
                 int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, IImageLoaderTask>();
+                IImageLoaderTask task = null;
 
-                while (tasksToRun.Count < numberOfTasks && PendingTasks.TryDequeue(out IImageLoaderTask task))
+                while (tasksToRun.Count < numberOfTasks && PendingTasks.TryDequeue(out task))
                 {
                     if (task == null || task.IsCancelled || task.IsCompleted)
                         continue;
