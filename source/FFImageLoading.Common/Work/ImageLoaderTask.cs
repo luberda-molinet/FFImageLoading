@@ -124,7 +124,11 @@ namespace FFImageLoading.Work
                 var vectLo = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
                 if (vectLo != null)
                 {
-                    KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits);
+                    if (vectLo.ReplaceStringMap == null || vectLo.ReplaceStringMap.Count == 0)
+                        KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits);
+                    else
+                        KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits,
+                                               string.Join(",", vectLo.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
                 }
             }
 
@@ -138,7 +142,11 @@ namespace FFImageLoading.Work
                 var vectEr = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
                 if (vectEr != null)
                 {
-                    KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits);
+                    if (vectEr.ReplaceStringMap == null || vectEr.ReplaceStringMap.Count == 0)
+                        KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits);
+                    else
+                        KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits,
+                                               string.Join(",", vectEr.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
                 }
             }
 
