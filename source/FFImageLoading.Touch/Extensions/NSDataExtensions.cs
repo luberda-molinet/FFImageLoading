@@ -54,8 +54,8 @@ namespace FFImageLoading.Extensions
 				CGSize targetSize = RCTTargetSize(sourceSize, 1, destSize, destScale, resizeMode, allowUpscale);
 				CGSize targetPixelSize = RCTSizeInPixels(targetSize, destScale);
 				int maxPixelSize = (int)Math.Max(
-					Math.Min(sourceSize.Width, targetPixelSize.Width),
-					Math.Min(sourceSize.Height, targetPixelSize.Height)
+                    allowUpscale ? targetPixelSize.Width : Math.Min(sourceSize.Width, targetPixelSize.Width),
+					allowUpscale ? targetPixelSize.Height : Math.Min(sourceSize.Height, targetPixelSize.Height)
 				);
 
 				var options = new CGImageThumbnailOptions()
