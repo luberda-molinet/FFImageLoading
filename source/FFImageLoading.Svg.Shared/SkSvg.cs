@@ -179,6 +179,9 @@ namespace FFImageLoading.Svg.Platform
 
 		private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
 		{
+            if (e.Attribute("display")?.Value == "none")
+                return;
+            
 			// transform matrix
 			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
 			canvas.Save();
@@ -210,6 +213,7 @@ namespace FFImageLoading.Svg.Platform
 						var rx = ReadNumber(e.Attribute("rx"));
 						var ry = ReadNumber(e.Attribute("ry"));
 						var rect = SKRect.Create(x, y, width, height);
+
 						if (rx > 0 || ry > 0)
 						{
 							if (fill != null)
@@ -848,12 +852,33 @@ namespace FFImageLoading.Svg.Platform
 		{
 			var path = new SKPath();
 			var points = pointsData.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-			for (int i = 0; i < points.Length; i++)
-			{
-				var point = points[i];
-				var xy = point.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-				var x = ReadNumber(xy[0]);
-				var y = ReadNumber(xy[1]);
+
+            if (pointsData.Contains(','))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    var point = points[i];
+
+                    var xy = point.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var x = ReadNumber(xy[0]);
+                    var y = ReadNumber(xy[1]);
+
+                    if (i == 0)
+                    {
+                        path.MoveTo(x, y);
+                    }
+                    else
+                    {
+                        path.LineTo(x, y);
+                    }
+                }
+            }
+
+            for (int i = 0; i < points.Length; i=i+2)
+            {
+				var x = ReadNumber(points[i]);
+				var y = ReadNumber(points[i+1]);
+
 				if (i == 0)
 				{
 					path.MoveTo(x, y);
@@ -862,7 +887,8 @@ namespace FFImageLoading.Svg.Platform
 				{
 					path.LineTo(x, y);
 				}
-			}
+            }
+
 			if (closePath)
 			{
 				path.Close();
