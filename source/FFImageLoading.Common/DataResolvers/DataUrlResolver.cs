@@ -18,12 +18,14 @@ namespace FFImageLoading.DataResolvers
             var imageInformation = new ImageInformation();
             imageInformation.SetPath(identifier);
 
-            if (identifier.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+            if (!identifier.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             {
-                var streamXML = new MemoryStream(Encoding.UTF8.GetBytes(identifier));
+                if (parameters.DataEncoding == DataEncodingType.Base64Encoded)
+                {
+                    return GetBase64Stream(identifier, imageInformation);
+                }
 
-                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
-                    streamXML, LoadingResult.EmbeddedResource, imageInformation));
+                return GetRAWStream(identifier, imageInformation);
             }
 
             var mime = string.Empty;
@@ -56,19 +58,29 @@ namespace FFImageLoading.DataResolvers
                 throw new NotImplementedException("Data type not supported");
             }
 
-            if (!encoding.Equals("base64", StringComparison.OrdinalIgnoreCase) 
+            if (!encoding.Equals("base64", StringComparison.OrdinalIgnoreCase)
                 || data.StartsWith("<", StringComparison.OrdinalIgnoreCase))
             {
-                var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-
-                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
-                    stream, LoadingResult.EmbeddedResource, imageInformation));
+                return GetRAWStream(data, imageInformation);
             }
+            
+            return GetBase64Stream(data, imageInformation);    
+        }
 
+        Task<Tuple<Stream, LoadingResult, ImageInformation>> GetBase64Stream(string data, ImageInformation imageInformation)
+        {
             var streamBase64 = new MemoryStream(Convert.FromBase64String(data));
 
             return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
                 streamBase64, LoadingResult.EmbeddedResource, imageInformation));
+        }
+
+        Task<Tuple<Stream, LoadingResult, ImageInformation>> GetRAWStream(string data, ImageInformation imageInformation)
+        {
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
+
+            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+                stream, LoadingResult.EmbeddedResource, imageInformation));
         }
     }
 }

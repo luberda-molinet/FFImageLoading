@@ -8,7 +8,7 @@ using FFImageLoading.Config;
 
 namespace FFImageLoading.Work
 {
-	public class TaskParameter: IDisposable
+	public class TaskParameter : IDisposable
 	{
 		private bool _disposed;
 
@@ -91,6 +91,17 @@ namespace FFImageLoading.Work
 			return new TaskParameter() { Source = ImageSource.Stream, Stream = stream };
 		}
 
+        /// <summary>
+        /// Constructs a new TaskParameter to load an image from a string.
+        /// </summary>
+        /// <returns>The string.</returns>
+        /// <param name="data">Data.</param>
+        /// <param name="dataEncoding">Data encoding.</param>
+        public static TaskParameter FromString(string data, DataEncodingType encoding)
+        {
+            return new TaskParameter() { Source = ImageSource.Url, Path = data, DataEncoding = encoding };
+        }
+
 		public ImageSource Source { get; private set; }
 
 		public string Path { get; private set; }
@@ -159,7 +170,10 @@ namespace FFImageLoading.Work
 		public string CustomCacheKey { get; private set; }
 
 		public int? Priority { get; private set; }
+
         public CacheType? CacheType { get; private set; }
+
+        public DataEncodingType DataEncoding { get; private set; } = DataEncodingType.RAW;
 
 		/// <summary>
 		/// Gets the delay in milliseconds.
