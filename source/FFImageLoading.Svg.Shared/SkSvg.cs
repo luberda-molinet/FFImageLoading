@@ -649,7 +649,7 @@ namespace FFImageLoading.Svg.Platform
 						strokePaint = CreatePaint(true);
 
 					SKColor color;
-					if (SKColor.TryParse(stroke, out color))
+					if (ColorsHelper.TryParse(stroke, out color))
 					{
 						// preserve alpha
 						if (color.Alpha == 255)
@@ -700,7 +700,7 @@ namespace FFImageLoading.Svg.Platform
 						fillPaint = CreatePaint();
 
 					SKColor color;
-					if (SKColor.TryParse(fill, out color))
+                    if (ColorsHelper.TryParse(fill, out color))
 					{
 						// preserve alpha
 						if (color.Alpha == 255)
@@ -1010,7 +1010,7 @@ namespace FFImageLoading.Svg.Platform
 				if (style.TryGetValue("stop-color", out stopColor))
 				{
 					// preserve alpha
-					if (SKColor.TryParse(stopColor, out color) && color.Alpha == 255)
+                    if (ColorsHelper.TryParse(stopColor, out color) && color.Alpha == 255)
 						alpha = color.Alpha;
 				}
 
