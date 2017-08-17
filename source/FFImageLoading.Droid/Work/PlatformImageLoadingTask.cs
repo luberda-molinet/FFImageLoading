@@ -273,7 +273,7 @@ namespace FFImageLoading
                 string ext = null;
                 if (!string.IsNullOrWhiteSpace(path))
                 {
-                    if (source == ImageSource.Url)
+                    if (source == ImageSource.Url && Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute))
                         ext = System.IO.Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
                     else
                         ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
