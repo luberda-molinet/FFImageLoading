@@ -180,6 +180,28 @@ namespace FFImageLoading
         }
 
         /// <summary>
+        /// Loads the string.
+        /// </summary>
+        /// <returns>The string.</returns>
+        /// <param name="data">Data.</param>
+        /// <param name="encoding">Encoding.</param>
+        public TaskParameter LoadString(string data, DataEncodingType encoding = DataEncodingType.RAW)
+        {
+            InitializeIfNeeded();
+            return TaskParameter.FromString(data, encoding);
+        }
+
+        /// <summary>
+        /// Loads the base64 string.
+        /// </summary>
+        /// <returns>The base64 string.</returns>
+        /// <param name="data">Data.</param>
+        public TaskParameter LoadBase64String(string data)
+        {
+            return LoadString(data, DataEncodingType.Base64Encoded);
+        }
+
+        /// <summary>
         /// Constructs a new TaskParameter to load an image from a file from application bundle.
         /// </summary>
         /// <returns>The new TaskParameter.</returns>
