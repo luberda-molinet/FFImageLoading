@@ -18,6 +18,7 @@ namespace FFImageLoading.Svg.Platform
 
 		private static readonly IFormatProvider icult = CultureInfo.InvariantCulture;
 		private static readonly XNamespace xlink = "http://www.w3.org/1999/xlink";
+		private static readonly XNamespace svg = "http://www.w3.org/2000/svg";
 		private static readonly char[] WS = new char[] { ' ', '\t', '\n', '\r' };
 		private static readonly Regex unitRe = new Regex("px|pt|em|ex|pc|cm|mm|in");
 		private static readonly Regex percRe = new Regex("%");
@@ -60,12 +61,47 @@ namespace FFImageLoading.Svg.Platform
 
 		public SKPicture Load(string filename)
 		{
-			return Load(XDocument.Load(filename));
+#if PORTABLE
+            // PCL does not have the ability to read a file and use a context
+            if (createReaderMethod == null)
+            {
+                return Load(XDocument.Load(filename));
+            }
+
+            // we know that there we can access the method via reflection
+            var args = new object[] { filename, null, CreateSvgXmlContext() };
+            using (var reader = (XmlReader)createReaderMethod.Invoke(null, args))
+            {
+                return Load(reader);
+            }
+#else
+			using (var stream = File.OpenRead(filename))
+			{
+				return Load(stream);
+			}
+#endif
 		}
 
 		public SKPicture Load(Stream stream)
 		{
-			return Load(XDocument.Load(stream));
+			using (var reader = XmlReader.Create(stream, null, CreateSvgXmlContext()))
+			{
+				return Load(reader);
+			}
+		}
+
+		public SKPicture Load(XmlReader reader)
+		{
+			return Load(XDocument.Load(reader));
+		}
+
+		private static XmlParserContext CreateSvgXmlContext()
+		{
+			var table = new NameTable();
+			var manager = new XmlNamespaceManager(table);
+			manager.AddNamespace(string.Empty, svg.NamespaceName);
+			manager.AddNamespace("xlink", xlink.NamespaceName);
+			return new XmlParserContext(null, manager, null, XmlSpace.None);
 		}
 
 		private SKPicture Load(XDocument xdoc)
@@ -179,9 +215,9 @@ namespace FFImageLoading.Svg.Platform
 
 		private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
 		{
-            if (e.Attribute("display")?.Value == "none")
-                return;
-            
+			if (e.Attribute("display")?.Value == "none")
+				return;
+
 			// transform matrix
 			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
 			canvas.Save();
@@ -213,7 +249,6 @@ namespace FFImageLoading.Svg.Platform
 						var rx = ReadNumber(e.Attribute("rx"));
 						var ry = ReadNumber(e.Attribute("ry"));
 						var rect = SKRect.Create(x, y, width, height);
-
 						if (rx > 0 || ry > 0)
 						{
 							if (fill != null)
@@ -261,7 +296,7 @@ namespace FFImageLoading.Svg.Platform
 						var d = e.Attribute("d")?.Value;
 						if (!string.IsNullOrWhiteSpace(d))
 						{
-                            var path = GetSKPathFromSVGPath(d);
+							var path = SKPath.ParseSvgPathData(d);
 							if (fill != null)
 								canvas.DrawPath(path, fill);
 							if (stroke != null)
@@ -660,6 +695,32 @@ namespace FFImageLoading.Svg.Platform
 				}
 
 				// stroke attributes
+				var strokeDashArray = GetString(style, "stroke-dasharray");
+				if (!string.IsNullOrWhiteSpace(strokeDashArray))
+				{
+					if ("none".Equals(strokeDashArray, StringComparison.OrdinalIgnoreCase))
+					{
+						// remove any dash
+						if (strokePaint != null)
+							strokePaint.PathEffect = null;
+					}
+					else
+					{
+						if (strokePaint == null)
+							strokePaint = CreatePaint(true);
+
+						// get the dash
+						var dashesStrings = strokeDashArray.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+						var dashes = dashesStrings.Select(ReadNumber).ToArray();
+						if (dashesStrings.Length % 2 == 1)
+							dashes = dashes.Concat(dashes).ToArray();
+						// get the offset
+						var strokeDashOffset = ReadNumber(style, "stroke-dashoffset", 0);
+						// set the effect
+						strokePaint.PathEffect = SKPathEffect.CreateDash(dashes.ToArray(), strokeDashOffset);
+					}
+				}
+
 				var strokeWidth = GetString(style, "stroke-width");
 				if (!string.IsNullOrWhiteSpace(strokeWidth))
 				{
@@ -700,7 +761,7 @@ namespace FFImageLoading.Svg.Platform
 						fillPaint = CreatePaint();
 
 					SKColor color;
-                    if (ColorsHelper.TryParse(fill, out color))
+					if (ColorsHelper.TryParse(fill, out color))
 					{
 						// preserve alpha
 						if (color.Alpha == 255)
@@ -848,23 +909,14 @@ namespace FFImageLoading.Svg.Platform
 			return t;
 		}
 
-        private SKPath GetSKPathFromSVGPath(string svgPath)
-        {
-			if (svgPath[0] != 'M' && svgPath[0] != 'm')
-				svgPath = "M" + svgPath;
-
-			var path = SKPath.ParseSvgPathData(svgPath);
-            return path;
-        }
-
 		private SKPath ReadPolyPath(string pointsData, bool closePath)
 		{
-            var path = GetSKPathFromSVGPath(pointsData);
+			var path = SKPath.ParseSvgPathData("M" + pointsData);
 
-            if (closePath)
-                path?.Close();
+			if (closePath)
+				path?.Close();
 
-            return path;
+			return path;
 		}
 
 		private SKTextAlign ReadTextAlignment(XElement element)
@@ -1010,7 +1062,7 @@ namespace FFImageLoading.Svg.Platform
 				if (style.TryGetValue("stop-color", out stopColor))
 				{
 					// preserve alpha
-                    if (ColorsHelper.TryParse(stopColor, out color) && color.Alpha == 255)
+					if (ColorsHelper.TryParse(stopColor, out color) && color.Alpha == 255)
 						alpha = color.Alpha;
 				}
 
