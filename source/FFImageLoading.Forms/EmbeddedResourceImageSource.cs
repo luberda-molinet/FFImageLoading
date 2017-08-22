@@ -12,14 +12,18 @@ namespace FFImageLoading.Forms
     [Preserve(AllMembers = true)]
 	public class EmbeddedResourceImageSource : ImageSource
     {
+        static string _cachedMainAssembly;
+
         public EmbeddedResourceImageSource(Uri uri)
         {
             var text = uri.OriginalString;
 
             if (string.IsNullOrWhiteSpace(uri.Query))
             {
-                var assemblyName = Application.Current?.GetType()?.GetTypeAssemblyFullName();
-                Uri = new Uri(assemblyName == null ? text : $"{text}?assembly={Uri.EscapeUriString(assemblyName)}");
+                if (_cachedMainAssembly == null)
+                    _cachedMainAssembly = Application.Current?.GetType()?.GetTypeAssemblyFullName();
+
+                Uri = new Uri(_cachedMainAssembly == null ? text : $"{text}?assembly={Uri.EscapeUriString(_cachedMainAssembly)}");
             }
             else if (!uri.Query.Contains("assembly=", StringComparison.OrdinalIgnoreCase))
             {
