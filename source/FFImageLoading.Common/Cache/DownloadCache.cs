@@ -20,7 +20,7 @@ namespace FFImageLoading.Cache
 
         const int BufferSize = 4096;
 
-        public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/", "audio/", "video/", "message" };
+        public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/json", "audio/", "video/", "message" };
 
         protected Configuration Configuration { get; private set; }
 
