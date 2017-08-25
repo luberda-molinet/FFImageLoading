@@ -71,3 +71,5 @@ source/FFImageLoading.Svg.Forms/project.lock.json
 source/FFImageLoading.Svg/project.lock.json
 
 source/FFImageLoading.Transformations/project.lock.json
+
+source/FFImageLoading.Svg.Windows/.droidres/.ffimageloading.svg.windows.droidres.db
