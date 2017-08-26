@@ -51,7 +51,6 @@ namespace FFImageLoading.DataResolvers
                 resolved.Item1.Position = 0;
                 resolved.Item3.SetType(FileHeader.GetImageType(header));
             }
-            System.Diagnostics.Debug.WriteLine(Enum.GetName(typeof(ImageInformation.ImageType), resolved.Item3.Type));
 
             return resolved;
         }

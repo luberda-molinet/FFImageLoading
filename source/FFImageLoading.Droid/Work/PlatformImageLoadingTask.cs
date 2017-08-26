@@ -267,7 +267,7 @@ namespace FFImageLoading
                         ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
                 }
 
-                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.GIF)
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.GIF && GifDecoder.CheckIfAnimated(imageData))
                 {
                     image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
                 }

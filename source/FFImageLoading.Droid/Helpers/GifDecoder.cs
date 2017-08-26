@@ -767,7 +767,6 @@ namespace FFImageLoading.Helpers
             public int Delay;
         }
 
-        //TODO See this: https://github.com/luberda-molinet/FFImageLoading/issues/703
         public static bool CheckIfAnimated(Stream st)
         {
             byte[] byteCode1 = { 0x00, 0x21, 0xF9, 0x04 };
@@ -795,6 +794,8 @@ namespace FFImageLoading.Helpers
                     iCount++;
                 iPos = iPos2 + 1;
             }
+
+            st.Position = 0;
 
             if (iCount > 1) return true;
 
