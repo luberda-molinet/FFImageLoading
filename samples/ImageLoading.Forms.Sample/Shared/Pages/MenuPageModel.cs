@@ -241,6 +241,17 @@ namespace FFImageLoading.Forms.Sample
 					})
 
 				},
+
+				new MenuItem()
+				{
+					Section = "File formats",
+					Title = "Simple WebP example",
+					Command = new BaseCommand(async (param) =>
+					{
+                        await this.PushPageFromCacheAsync<SimpleWebpPageModel>(pm => pm.Reload());
+					})
+
+				},
 			};
 
 			var sorted = menuItems

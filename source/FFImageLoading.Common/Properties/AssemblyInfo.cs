@@ -27,3 +27,5 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("FFImageLoading.Core.Tests")]
 [assembly: InternalsVisibleTo("FFImageLoading.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Svg.Platform")]

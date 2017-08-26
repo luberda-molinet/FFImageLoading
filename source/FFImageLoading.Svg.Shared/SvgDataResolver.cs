@@ -168,7 +168,7 @@ namespace FFImageLoading.Svg.Platform
 					var stream = new MemoryStream();
 					data.SaveTo(stream);
 					stream.Position = 0;
-					//var stream = data?.AsStream();
+                    resolvedData.Item3.SetType(ImageInformation.ImageType.SVG);
 					return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
 				}
 			}

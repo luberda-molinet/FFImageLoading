@@ -6,6 +6,7 @@ using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using FFImageLoading.Config;
 using System.Linq;
+using FFImageLoading.DataResolvers;
 
 namespace FFImageLoading.Work
 {
@@ -395,6 +396,7 @@ namespace FFImageLoading.Work
                 {
                     var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
+                    loadResolver = new WrappedDataResolver(loadResolver);
                     var loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
 
                     using (loadImageData.Item1)
@@ -445,6 +447,7 @@ namespace FFImageLoading.Work
                 {
                     Logger.Debug(string.Format("Generating/retrieving image: {0}", Key));
                     var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
+                    resolver = new WrappedDataResolver(resolver);
                     var imageData = await resolver.Resolve(Parameters.Path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                     loadingResult = imageData.Item2;
 

@@ -54,7 +54,7 @@ namespace FFImageLoading.Work
                         ext = Path.GetExtension(path).ToLowerInvariant();
                 }
                 
-                if (source != ImageSource.Stream && ext == ".webp")
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
                     imageIn = new WebP.Touch.WebPCodec().Decode(imageData);
                 }

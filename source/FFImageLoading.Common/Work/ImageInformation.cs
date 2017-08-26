@@ -30,11 +30,16 @@ namespace FFImageLoading.Work
 			FilePath = filePath;
 		}
 
-		public void SetKey(string cacheKey, string userCustomCacheKey)
+		internal void SetKey(string cacheKey, string userCustomCacheKey)
 		{
 			CacheKey = cacheKey;
 			UserCustomCacheKey = userCustomCacheKey;
 		}
+
+        internal void SetType(ImageType type)
+        {
+            Type = type;
+        }
 
 		public int CurrentWidth { get; private set; }
 
@@ -52,6 +57,8 @@ namespace FFImageLoading.Work
 
 		public string UserCustomCacheKey { get; private set; }
 
+        public ImageType Type { get; private set; }
+
 		internal string BaseKey
 		{
 			get
@@ -62,6 +69,18 @@ namespace FFImageLoading.Work
 				return Path ?? FilePath ?? CacheKey;
 			}
 		}
+
+        public enum ImageType
+        {
+            Unknown,
+            BMP,
+            JPEG,
+            GIF,
+            TIFF,
+            PNG,
+            WEBP,
+            SVG,
+        }
 	}
 }
 
