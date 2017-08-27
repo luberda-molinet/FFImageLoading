@@ -258,15 +258,6 @@ namespace FFImageLoading
             {
                 SelfDisposingBitmapDrawable image = null;
 
-                string ext = null;
-                if (!string.IsNullOrWhiteSpace(path))
-                {
-                    if (source == ImageSource.Url && Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute))
-                        ext = System.IO.Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
-                    else
-                        ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
-                }
-
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.GIF && GifDecoder.CheckIfAnimated(imageData))
                 {
                     image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
