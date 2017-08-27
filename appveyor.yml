@@ -3,8 +3,9 @@ configuration: Release
 platform: Any CPU
 
 environment:
-  ANDROID_HOME: C:\android-sdk
-  AndroidSdkDirectory: C:\android-sdk
+  NUGET_SOURCE: https://www.nuget.org/api/v2/package
+#  ANDROID_HOME: C:\android-sdk
+#  AndroidSdkDirectory: C:\android-sdk
    
 # xamarin:
 #   email: EMAIL@ADDRESS.HE.RE
