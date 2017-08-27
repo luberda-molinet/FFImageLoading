@@ -230,7 +230,8 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
             sut.Enqueue(request, 0);
             sut.Enqueue(request, 0);
             sut.Enqueue(request, 0);
-            var result = sut.TryDequeue(out IImageLoaderTask item);
+            IImageLoaderTask item;
+            var result = sut.TryDequeue(out item);
 
             Assert.True(result);
             Assert.Equal(request, item);
@@ -242,8 +243,8 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
         public void Given_queue_is_empty_trydequeue_returns_false()
         {
             var sut = CreatePriorityQueue();
-
-            var result = sut.TryDequeue(out IImageLoaderTask item);
+            IImageLoaderTask item = null;
+            var result = sut.TryDequeue(out item);
             Assert.True(!result);
             Assert.Equal(default(IImageLoaderTask), item);
         }
