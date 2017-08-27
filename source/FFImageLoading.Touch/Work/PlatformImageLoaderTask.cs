@@ -9,6 +9,7 @@ using FFImageLoading.Extensions;
 using System.Threading;
 using FFImageLoading.Config;
 using FFImageLoading.Cache;
+using ImageIO;
 
 namespace FFImageLoading.Work
 {
@@ -43,24 +44,26 @@ namespace FFImageLoading.Work
 
             try
             {
+                int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
+                int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
+                bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
+
+                if (Parameters.DownSampleUseDipUnits)
+                {
+                    downsampleWidth = downsampleWidth.PointsToPixels();
+                    downsampleHeight = downsampleHeight.PointsToPixels();
+                }
+
                 // Special case to handle WebP decoding on iOS
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
-                    imageIn = new WebP.Touch.WebPCodec().Decode(imageData);
+                    var decodedWebP = new WebP.Touch.WebPCodec().Decode(imageData);
+                    //TODO Add WebP images downsampling!
+                    imageIn = decodedWebP;
                 }
                 else
                 {
                     var nsdata = NSData.FromStream(imageData);
-                    int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
-                    int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
-                    bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
-
-                    if (Parameters.DownSampleUseDipUnits)
-                    {
-                        downsampleWidth = downsampleWidth.PointsToPixels();
-                        downsampleHeight = downsampleHeight.PointsToPixels();
-                    }
-
                     imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
                 }
             }
