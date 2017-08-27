@@ -8,6 +8,7 @@ namespace FFImageLoading.Helpers
     public class MainThreadDispatcher : IMainThreadDispatcher
     {
         static MainThreadDispatcher instance;
+        private CoreDispatcher _dispatcher;
 
         public static MainThreadDispatcher Instance
         {
@@ -25,15 +26,20 @@ namespace FFImageLoading.Helpers
             if (action == null)
                 return;
 
+            if(_dispatcher==null)
+            {
+                _dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            }
+
             // already in UI thread:
-            if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+            if (_dispatcher.HasThreadAccess)
             {
                 action();
             }
             // not in UI thread, ensuring UI thread:
             else
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
+                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
                 //await CoreApplication.GetCurrentView().Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
             }
         }

@@ -52,7 +52,7 @@ namespace FFImageLoading.Work
                 }
                 
                 bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
-                if (source != ImageSource.Stream && ext == ".webp")
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }

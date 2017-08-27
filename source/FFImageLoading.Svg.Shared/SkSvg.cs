@@ -18,6 +18,7 @@ namespace FFImageLoading.Svg.Platform
 
 		private static readonly IFormatProvider icult = CultureInfo.InvariantCulture;
 		private static readonly XNamespace xlink = "http://www.w3.org/1999/xlink";
+		private static readonly XNamespace svg = "http://www.w3.org/2000/svg";
 		private static readonly char[] WS = new char[] { ' ', '\t', '\n', '\r' };
 		private static readonly Regex unitRe = new Regex("px|pt|em|ex|pc|cm|mm|in");
 		private static readonly Regex percRe = new Regex("%");
@@ -60,12 +61,47 @@ namespace FFImageLoading.Svg.Platform
 
 		public SKPicture Load(string filename)
 		{
-			return Load(XDocument.Load(filename));
+#if PORTABLE
+            // PCL does not have the ability to read a file and use a context
+            if (createReaderMethod == null)
+            {
+                return Load(XDocument.Load(filename));
+            }
+
+            // we know that there we can access the method via reflection
+            var args = new object[] { filename, null, CreateSvgXmlContext() };
+            using (var reader = (XmlReader)createReaderMethod.Invoke(null, args))
+            {
+                return Load(reader);
+            }
+#else
+			using (var stream = File.OpenRead(filename))
+			{
+				return Load(stream);
+			}
+#endif
 		}
 
 		public SKPicture Load(Stream stream)
 		{
-			return Load(XDocument.Load(stream));
+			using (var reader = XmlReader.Create(stream, null, CreateSvgXmlContext()))
+			{
+				return Load(reader);
+			}
+		}
+
+		public SKPicture Load(XmlReader reader)
+		{
+			return Load(XDocument.Load(reader));
+		}
+
+		private static XmlParserContext CreateSvgXmlContext()
+		{
+			var table = new NameTable();
+			var manager = new XmlNamespaceManager(table);
+			manager.AddNamespace(string.Empty, svg.NamespaceName);
+			manager.AddNamespace("xlink", xlink.NamespaceName);
+			return new XmlParserContext(null, manager, null, XmlSpace.None);
 		}
 
 		private SKPicture Load(XDocument xdoc)
@@ -179,9 +215,9 @@ namespace FFImageLoading.Svg.Platform
 
 		private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
 		{
-            if (e.Attribute("display")?.Value == "none")
-                return;
-            
+			if (e.Attribute("display")?.Value == "none")
+				return;
+
 			// transform matrix
 			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
 			canvas.Save();
@@ -213,7 +249,6 @@ namespace FFImageLoading.Svg.Platform
 						var rx = ReadNumber(e.Attribute("rx"));
 						var ry = ReadNumber(e.Attribute("ry"));
 						var rect = SKRect.Create(x, y, width, height);
-
 						if (rx > 0 || ry > 0)
 						{
 							if (fill != null)
@@ -261,7 +296,7 @@ namespace FFImageLoading.Svg.Platform
 						var d = e.Attribute("d")?.Value;
 						if (!string.IsNullOrWhiteSpace(d))
 						{
-                            var path = GetSKPathFromSVGPath(d);
+							var path = SKPath.ParseSvgPathData(d);
 							if (fill != null)
 								canvas.DrawPath(path, fill);
 							if (stroke != null)
@@ -649,7 +684,7 @@ namespace FFImageLoading.Svg.Platform
 						strokePaint = CreatePaint(true);
 
 					SKColor color;
-					if (ColorsHelper.TryParse(stroke, out color))
+					if (ColorHelper.TryParse(stroke, out color))
 					{
 						// preserve alpha
 						if (color.Alpha == 255)
@@ -660,6 +695,32 @@ namespace FFImageLoading.Svg.Platform
 				}
 
 				// stroke attributes
+				var strokeDashArray = GetString(style, "stroke-dasharray");
+				if (!string.IsNullOrWhiteSpace(strokeDashArray))
+				{
+					if ("none".Equals(strokeDashArray, StringComparison.OrdinalIgnoreCase))
+					{
+						// remove any dash
+						if (strokePaint != null)
+							strokePaint.PathEffect = null;
+					}
+					else
+					{
+						if (strokePaint == null)
+							strokePaint = CreatePaint(true);
+
+						// get the dash
+						var dashesStrings = strokeDashArray.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+						var dashes = dashesStrings.Select(ReadNumber).ToArray();
+						if (dashesStrings.Length % 2 == 1)
+							dashes = dashes.Concat(dashes).ToArray();
+						// get the offset
+						var strokeDashOffset = ReadNumber(style, "stroke-dashoffset", 0);
+						// set the effect
+						strokePaint.PathEffect = SKPathEffect.CreateDash(dashes.ToArray(), strokeDashOffset);
+					}
+				}
+
 				var strokeWidth = GetString(style, "stroke-width");
 				if (!string.IsNullOrWhiteSpace(strokeWidth))
 				{
@@ -700,7 +761,7 @@ namespace FFImageLoading.Svg.Platform
 						fillPaint = CreatePaint();
 
 					SKColor color;
-                    if (ColorsHelper.TryParse(fill, out color))
+					if (ColorHelper.TryParse(fill, out color))
 					{
 						// preserve alpha
 						if (color.Alpha == 255)
@@ -848,23 +909,14 @@ namespace FFImageLoading.Svg.Platform
 			return t;
 		}
 
-        private SKPath GetSKPathFromSVGPath(string svgPath)
-        {
-			if (svgPath[0] != 'M' && svgPath[0] != 'm')
-				svgPath = "M" + svgPath;
-
-			var path = SKPath.ParseSvgPathData(svgPath);
-            return path;
-        }
-
 		private SKPath ReadPolyPath(string pointsData, bool closePath)
 		{
-            var path = GetSKPathFromSVGPath(pointsData);
+			var path = SKPath.ParseSvgPathData("M" + pointsData);
 
-            if (closePath)
-                path?.Close();
+			if (closePath)
+				path?.Close();
 
-            return path;
+			return path;
 		}
 
 		private SKTextAlign ReadTextAlignment(XElement element)
@@ -1010,7 +1062,7 @@ namespace FFImageLoading.Svg.Platform
 				if (style.TryGetValue("stop-color", out stopColor))
 				{
 					// preserve alpha
-                    if (ColorsHelper.TryParse(stopColor, out color) && color.Alpha == 255)
+					if (ColorHelper.TryParse(stopColor, out color) && color.Alpha == 255)
 						alpha = color.Alpha;
 				}
 
@@ -1106,6 +1158,54 @@ namespace FFImageLoading.Svg.Platform
 			if (p.Length > 3)
 				r.Bottom = r.Top + ReadNumber(p[3]);
 			return r;
+		}
+
+		static class ColorHelper
+		{
+			public static bool TryParse(string str, out SKColor color)
+			{
+				if (str.StartsWith("rgb(", StringComparison.Ordinal))
+				{
+					str = str.Substring(4, str.Length - 4).TrimEnd(')');
+					var values = str.Split(',');
+					var r = Convert.ToInt32(values[0]);
+					var g = Convert.ToInt32(values[1]);
+					var b = Convert.ToInt32(values[2]);
+					str = $"#{r:X2}{g:X2}{b:X2}";
+				}
+
+				if (!SKColor.TryParse(str, out color))
+				{
+					string hexString = null;
+
+					if (HexValues.TryGetValue(str, out hexString))
+					{
+						return SKColor.TryParse(hexString, out color);
+					}
+
+					return false;
+				}
+
+				return true;
+			}
+
+			static Dictionary<string, string> hexValues;
+
+			internal static Dictionary<string, string> HexValues
+			{
+				get
+				{
+					if (hexValues == null)
+					{
+						hexValues = new Dictionary<string, string>()
+					{
+						{"aliceblue","#f0f8ff"},{"antiquewhite","#faebd7"},{"aqua","#00ffff"},{"aquamarine","#7fffd4"},{"azure","#f0ffff"},{"beige","#f5f5dc"},{"bisque","#ffe4c4"},{"black","#000000"},{"blanchedalmond","#ffebcd"},{"blue","#0000ff"},{"blueviolet","#8a2be2"},{"brown","#a52a2a"},{"burlywood","#deb887"},{"cadetblue","#5f9ea0"},{"chartreuse","#7fff00"},{"chocolate","#d2691e"},{"coral","#ff7f50"},{"cornflowerblue","#6495ed"},{"cornsilk","#fff8dc"},{"crimson","#dc143c"},{"cyan","#00ffff"},{"darkblue","#00008b"},{"darkcyan","#008b8b"},{"darkgoldenrod","#b8860b"},{"darkgray","#a9a9a9"},{"darkgreen","#006400"},{"darkgrey","#a9a9a9"},{"darkkhaki","#bdb76b"},{"darkmagenta","#8b008b"},{"darkolivegreen","#556b2f"},{"darkorange","#ff8c00"},{"darkorchid","#9932cc"},{"darkred","#8b0000"},{"darksalmon","#e9967a"},{"darkseagreen","#8fbc8f"},{"darkslateblue","#483d8b"},{"darkslategray","#2f4f4f"},{"darkslategrey","#2f4f4f"},{"darkturquoise","#00ced1"},{"darkviolet","#9400d3"},{"deeppink","#ff1493"},{"deepskyblue","#00bfff"},{"dimgray","#696969"},{"dimgrey","#696969"},{"dodgerblue","#1e90ff"},{"firebrick","#b22222"},{"floralwhite","#fffaf0"},{"forestgreen","#228b22"},{"fuchsia","#ff00ff"},{"gainsboro","#dcdcdc"},{"ghostwhite","#f8f8ff"},{"gold","#ffd700"},{"goldenrod","#daa520"},{"gray","#808080"},{"green","#008000"},{"greenyellow","#adff2f"},{"grey","#808080"},{"honeydew","#f0fff0"},{"hotpink","#ff69b4"},{"indianred","#cd5c5c"},{"indigo","#4b0082"},{"ivory","#fffff0"},{"khaki","#f0e68c"},{"lavender","#e6e6fa"},{"lavenderblush","#fff0f5"},{"lawngreen","#7cfc00"},{"lemonchiffon","#fffacd"},{"lightblue","#add8e6"},{"lightcoral","#f08080"},{"lightcyan","#e0ffff"},{"lightgoldenrodyellow","#fafad2"},{"lightgray","#d3d3d3"},{"lightgreen","#90ee90"},{"lightgrey","#d3d3d3"},{"lightpink","#ffb6c1"},{"lightsalmon","#ffa07a"},{"lightseagreen","#20b2aa"},{"lightskyblue","#87cefa"},{"lightslategray","#778899"},{"lightslategrey","#778899"},{"lightsteelblue","#b0c4de"},{"lightyellow","#ffffe0"},{"lime","#00ff00"},{"limegreen","#32cd32"},{"linen","#faf0e6"},{"magenta","#ff00ff"},{"maroon","#800000"},{"mediumaquamarine","#66cdaa"},{"mediumblue","#0000cd"},{"mediumorchid","#ba55d3"},{"mediumpurple","#9370db"},{"mediumseagreen","#3cb371"},{"mediumslateblue","#7b68ee"},{"mediumspringgreen","#00fa9a"},{"mediumturquoise","#48d1cc"},{"mediumvioletred","#c71585"},{"midnightblue","#191970"},{"mintcream","#f5fffa"},{"mistyrose","#ffe4e1"},{"moccasin","#ffe4b5"},{"navajowhite","#ffdead"},{"navy","#000080"},{"oldlace","#fdf5e6"},{"olive","#808000"},{"olivedrab","#6b8e23"},{"orange","#ffa500"},{"orangered","#ff4500"},{"orchid","#da70d6"},{"palegoldenrod","#eee8aa"},{"palegreen","#98fb98"},{"paleturquoise","#afeeee"},{"palevioletred","#db7093"},{"papayawhip","#ffefd5"},{"peachpuff","#ffdab9"},{"peru","#cd853f"},{"pink","#ffc0cb"},{"plum","#dda0dd"},{"powderblue","#b0e0e6"},{"purple","#800080"},{"rebeccapurple","#663399"},{"red","#ff0000"},{"rosybrown","#bc8f8f"},{"royalblue","#4169e1"},{"saddlebrown","#8b4513"},{"salmon","#fa8072"},{"sandybrown","#f4a460"},{"seagreen","#2e8b57"},{"seashell","#fff5ee"},{"sienna","#a0522d"},{"silver","#c0c0c0"},{"skyblue","#87ceeb"},{"slateblue","#6a5acd"},{"slategray","#708090"},{"slategrey","#708090"},{"snow","#fffafa"},{"springgreen","#00ff7f"},{"steelblue","#4682b4"},{"tan","#d2b48c"},{"teal","#008080"},{"thistle","#d8bfd8"},{"tomato","#ff6347"},{"turquoise","#40e0d0"},{"violet","#ee82ee"},{"wheat","#f5deb3"},{"white","#ffffff"},{"whitesmoke","#f5f5f5"},{"yellow","#ffff00"},{"yellowgreen","#9acd32"}
+					};
+					}
+
+					return hexValues;
+				}
+			}
 		}
 	}
 }

@@ -766,5 +766,40 @@ namespace FFImageLoading.Helpers
             public Bitmap Image;
             public int Delay;
         }
+
+        public static bool CheckIfAnimated(Stream st)
+        {
+            byte[] byteCode1 = { 0x00, 0x21, 0xF9, 0x04 };
+            byte[] byteCode2 = { 0x00, 0x2C };
+            string strTemp;
+            byte[] byteContents;
+            int iCount;
+            int iPos = 0;
+            int iPos1;
+            int iPos2;
+
+            byteContents = new byte[st.Length];
+            st.Read(byteContents, 0, (int)st.Length);
+            strTemp = System.Text.Encoding.ASCII.GetString(byteContents);
+            byteContents = null;
+            iCount = 0;
+            while (iCount < 2)
+            {
+                iPos1 = strTemp.IndexOf(System.Text.Encoding.ASCII.GetString(byteCode1), iPos, StringComparison.Ordinal);
+                if (iPos1 == -1) break;
+                iPos = iPos1 + 1;
+                iPos2 = strTemp.IndexOf(System.Text.Encoding.ASCII.GetString(byteCode2), iPos, StringComparison.Ordinal);
+                if (iPos2 == -1) break;
+                if ((iPos1 + 8) == iPos2)
+                    iCount++;
+                iPos = iPos2 + 1;
+            }
+
+            st.Position = 0;
+
+            if (iCount > 1) return true;
+
+            return false;
+        }
     }
 }

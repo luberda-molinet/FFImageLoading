@@ -164,21 +164,9 @@ namespace FFImageLoading
                         AddInBitmapOptions(options);
                 }
 
-                ThrowIfCancellationRequested();
-
-                if (!imageData.CanSeek || imageData.Position != 0)
+                if (imageData.Position != 0)
                 {
-                    if (imageData.CanSeek)
-                    {
-                        imageData.Position = 0;
-                    }
-                    else
-                    {
-                        var resolver = DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
-                        var resolved = await resolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
-                        imageData?.Dispose();
-                        imageData = resolved.Item1;
-                    }
+                    imageData.Position = 0;
                 }
 
                 ThrowIfCancellationRequested();
@@ -279,7 +267,7 @@ namespace FFImageLoading
                         ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
                 }
 
-                if (source != ImageSource.Stream && ext == ".gif")
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.GIF && GifDecoder.CheckIfAnimated(imageData))
                 {
                     image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
                 }

@@ -118,6 +118,9 @@
     <Compile Include="DataResolvers\DataUrlResolver.cs" />
     <Compile Include="Helpers\PreserveAttribute.cs" />
     <Compile Include="Work\DataEncodingType.cs" />
+    <Compile Include="DataResolvers\WrappedDataResolverFactory.cs" />
+    <Compile Include="DataResolvers\WrappedDataResolver.cs" />
+    <Compile Include="Helpers\FileHeader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>
