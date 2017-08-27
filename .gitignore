@@ -80,3 +80,4 @@ source/FFImageLoading.Common/project.lock.json
 source/FFImageLoading.Common/project.lock.json
 source/FFImageLoading.Common/project.lock.json
 samples/ImageLoading.Forms.Sample/WinUWP/project.lock.json
+*.lock.json
