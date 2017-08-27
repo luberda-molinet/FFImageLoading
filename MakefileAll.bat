@@ -1,4 +1,4 @@
-set msbuild="C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe"
+set msbuild="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\amd64\MsBuild.exe"
 set config=Windows Release
 set platform=AnyCPU
 set warnings=1591,1572,1573,1570,3245
