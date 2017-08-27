@@ -1,7 +1,7 @@
 set msbuild="C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe"
 set config=Windows Release
 set platform=AnyCPU
-set warnings=;1591;
+set warnings=1591,1572,1573,1570,3245
 if "%CI%"=="True" (
     set logger=/l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 )
