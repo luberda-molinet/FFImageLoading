@@ -40,17 +40,7 @@ namespace FFImageLoading.Work
             ThrowIfCancellationRequested();
 
             try
-            {
-                // Special case to handle WebP decoding on Windows
-                string ext = null;
-                if (!string.IsNullOrWhiteSpace(path))
-                {
-                    if (source == ImageSource.Url && Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute))
-                        ext = Path.GetExtension(new Uri(path).LocalPath).ToLowerInvariant();
-                    else
-                        ext = Path.GetExtension(path).ToLowerInvariant();
-                }
-                
+            {              
                 bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
