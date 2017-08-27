@@ -10,7 +10,7 @@ set buildargsTests=/p:Configuration="Debug" /p:Platform="%platform%" /p:NoWarn="
 
 echo Restoring NuGets...
 
-nuget restore
+nuget restore -MsbuildPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin"
 
 echo Building FFImageLoading...
 
