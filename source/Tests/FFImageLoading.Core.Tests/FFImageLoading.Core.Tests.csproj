@@ -74,9 +74,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>

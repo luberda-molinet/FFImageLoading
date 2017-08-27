@@ -1,7 +1,8 @@
 ﻿{
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.1"
+    "Microsoft.Bcl.Build": "1.0.21",
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "NETStandard.Library": "1.6.0"
   },
   "frameworks": {
     "netstandard1.0": {}

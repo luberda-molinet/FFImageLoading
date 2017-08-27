@@ -3,9 +3,9 @@
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
-    <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">/Users/daniel/Projects/PublicGithub/FFImageLoading/source/FFImageLoading.Svg.Forms/project.lock.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/daniel/.nuget/packages/</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/daniel/.nuget/packages/</NuGetPackageFolders>
+    <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">C:\Projects\FFImageLoading\source\FFImageLoading.Svg.Forms\project.lock.json</ProjectAssetsFile>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\daniel\.nuget\packages\</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">ProjectJson</NuGetProjectStyle>
     <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">4.3.0</NuGetToolVersion>
   </PropertyGroup>
@@ -13,6 +13,6 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)xamarin.forms/2.3.5.256-pre6/build/netstandard1.0/Xamarin.Forms.targets" Condition="Exists('$(NuGetPackageRoot)xamarin.forms/2.3.5.256-pre6/build/netstandard1.0/Xamarin.Forms.targets')" />
+    <Import Project="$(NuGetPackageRoot)xamarin.forms\2.3.5.256-pre6\build\netstandard1.0\Xamarin.Forms.targets" Condition="Exists('$(NuGetPackageRoot)xamarin.forms\2.3.5.256-pre6\build\netstandard1.0\Xamarin.Forms.targets')" />
   </ImportGroup>
 </Project>
