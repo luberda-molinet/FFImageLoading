@@ -71,11 +71,8 @@
     <Compile Include="..\FFImageLoading.Shared\ImageService.cs">
       <Link>ImageService.cs</Link>
     </Compile>
-    <Compile Include="Args\ErrorEventArgs.cs" />
-    <Compile Include="Args\FinishEventArgs.cs" />
     <Compile Include="Args\GetImageAsJpgArgs.cs" />
     <Compile Include="Args\GetImageAsPngArgs.cs" />
-    <Compile Include="Args\SuccessEventArgs.cs" />
     <Compile Include="Cache\FFSourceBindingCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
