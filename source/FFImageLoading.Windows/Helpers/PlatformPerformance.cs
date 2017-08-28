@@ -6,14 +6,7 @@ namespace FFImageLoading
     {
         public static IPlatformPerformance Create()
         {
-            try
-            {
-                return new PlatformPerformance();
-            }
-            catch (Exception ex)
-            {
-                return new EmptyPlatformPerformance();
-            }
+            return new PlatformPerformance();
         }
 
         private PlatformPerformance()
