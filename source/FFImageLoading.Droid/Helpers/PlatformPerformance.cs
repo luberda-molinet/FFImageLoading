@@ -13,10 +13,14 @@ namespace FFImageLoading
 
         public static IPlatformPerformance Create()
         {
-            if (Application.Context == null)
+            try
+            {
+                return new PlatformPerformance();
+            }
+            catch (System.Exception ex)
+            {
                 return new EmptyPlatformPerformance();
-
-            return new PlatformPerformance();
+            }
         }
 
         private PlatformPerformance()

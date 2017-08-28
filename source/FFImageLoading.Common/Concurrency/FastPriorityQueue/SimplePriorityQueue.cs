@@ -112,7 +112,7 @@ namespace FFImageLoading.Concurrency
         /// <summary>
         /// Tries to remove the head of the queue
         /// </summary>
-        /// <param name="item"><see cref="TItem"/></param>
+        /// <param name="item"></param>
         /// <returns>If queue is empty <value>false</value>, else <value>true</value></returns>
         public virtual bool TryDequeue(out TItem item)
         {

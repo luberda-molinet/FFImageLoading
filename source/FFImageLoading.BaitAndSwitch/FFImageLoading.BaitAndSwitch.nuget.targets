@@ -13,6 +13,7 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)netstandard.library/2.0.0/build/NETStandard.Library.targets" Condition="Exists('$(NuGetPackageRoot)netstandard.library/2.0.0/build/NETStandard.Library.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.bcl.build/1.0.21/build/Microsoft.Bcl.Build.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.bcl.build/1.0.21/build/Microsoft.Bcl.Build.targets')" />
   </ImportGroup>
 </Project>

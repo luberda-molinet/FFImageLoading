@@ -9,11 +9,14 @@ namespace FFImageLoading
     {
         public static IPlatformPerformance Create()
         {
-            //TODO: Check if is in design mode ??
-            if (false)
+            try
+            {
+                return new PlatformPerformance();
+            }
+            catch (Exception ex)
+            {
                 return new EmptyPlatformPerformance();
-
-            return new PlatformPerformance();
+            }
         }
 
         private PlatformPerformance()
