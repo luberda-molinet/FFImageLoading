@@ -17,6 +17,7 @@ namespace FFImageLoading.Svg.Forms
 
         public SvgCachedImage() : base()
         {
+            ReplaceStringMap = new Dictionary<string, string>();
         }
 
         /// <summary>
