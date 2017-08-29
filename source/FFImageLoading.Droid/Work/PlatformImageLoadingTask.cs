@@ -258,7 +258,7 @@ namespace FFImageLoading
             {
                 SelfDisposingBitmapDrawable image = null;
 
-                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.GIF && GifDecoder.CheckIfAnimated(imageData))
+                if (imageInformation.Type == ImageInformation.ImageType.GIF && Configuration.AnimateGifs && GifDecoder.CheckIfAnimated(imageData))
                 {
                     image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
                 }

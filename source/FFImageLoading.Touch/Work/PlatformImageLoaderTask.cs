@@ -64,7 +64,7 @@ namespace FFImageLoading.Work
                 else
                 {
                     var nsdata = NSData.FromStream(imageData);
-                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
+                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
                 }
             }
             finally

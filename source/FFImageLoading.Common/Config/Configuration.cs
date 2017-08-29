@@ -31,6 +31,7 @@ namespace FFImageLoading.Config
             DiskCacheDuration = TimeSpan.FromDays(30d);
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
+            AnimateGifs = true;
 		}
 
 		/// <summary>
@@ -220,6 +221,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value><c>true</c> if execute callbacks on UIT hread; otherwise, <c>false</c>.</value>
         public bool ExecuteCallbacksOnUIThread { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether image loader should animate gifs.
+        /// </summary>
+        /// <value><c>true</c> if animate gifs; otherwise, <c>false</c>.</value>
+        public bool AnimateGifs { get; set; }
     }
 }
 

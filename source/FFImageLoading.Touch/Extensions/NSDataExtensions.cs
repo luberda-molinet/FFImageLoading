@@ -5,6 +5,7 @@ using CoreGraphics;
 using ImageIO;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
+using FFImageLoading.Config;
 
 namespace FFImageLoading.Extensions
 {
@@ -18,7 +19,7 @@ namespace FFImageLoading.Extensions
 		}
 
 		// Shamelessly copied from React-Native: https://github.com/facebook/react-native/blob/2cbc9127560c5f0f89ae5aa6ff863b1818f1c7c3/Libraries/Image/RCTImageUtils.m
-		public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static UIImage ToImage(this NSData data, CGSize destSize, nfloat destScale, Configuration config, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
 			using (var sourceRef = CGImageSource.FromData(data))
 			{
@@ -70,7 +71,7 @@ namespace FFImageLoading.Extensions
                 UIImage image = null;
 
                 // gif
-                if (sourceRef.ImageCount > 1)
+                if (sourceRef.ImageCount > 1 && config.AnimateGifs)
                     image = GifHelper.AnimateGif(sourceRef, destScale, options);
                 else
                 {
