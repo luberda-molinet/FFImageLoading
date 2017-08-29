@@ -28,8 +28,11 @@ namespace FFImageLoading.Helpers
         const int MAX_STACK_SIZE = 4096;
         Stream input;
         int status;
-        int width; // full image width
-        int height; // full image height
+
+        int insampleSize = 1;
+        bool firstTime = true;
+        int width; 
+        int height; 
         bool gctFlag; // global color table used
         int gctSize; // size of global color table
         int loopCount = 1; // iterations; 0 = repeat forever
@@ -46,7 +49,8 @@ namespace FFImageLoading.Helpers
         int ix, iy, iw, ih; // current image rectangle
         int lrx, lry, lrw, lrh;
         Bitmap image; // current frame
-        Bitmap lastBitmap; // previous frame
+        int[] currentBitmap;
+        int[] lastBitmap1; // previous frame
         byte[] block = new byte[256]; // current data block
         int blockSize = 0; // block size last graphic control extension info
         int dispose = 0; // 0=no action; 1=leave in place; 2=restore to bg; 3=restore to prev
@@ -61,9 +65,11 @@ namespace FFImageLoading.Helpers
         byte[] pixels;
         IList<GifFrame> frames; // frames read from current file
         int frameCount;
+        readonly Func<Stream, BitmapFactory.Options, Task<Bitmap>> _decodingFunc;
 
-        public GifDecoder()
+        public GifDecoder(Func<Stream, BitmapFactory.Options, Task<Bitmap>> decodingFunc)
         {
+            _decodingFunc = decodingFunc;
             status = STATUS_OK;
             frameCount = 0;
             frames = new List<GifFrame>();
@@ -133,10 +139,10 @@ namespace FFImageLoading.Helpers
         /**
          * Creates new frame image from current data (and previous frames as specified by their disposition codes).
          */
-        protected void SetPixels()
+        protected async Task SetPixelsAsync()
         {
-            // expose destination image's pixels as int array
             int[] dest = new int[width * height];
+
             // fill in starting image contents based on last image's dispose code
             if (lastDispose > 0)
             {
@@ -146,16 +152,30 @@ namespace FFImageLoading.Helpers
                     int n = frameCount - 2;
                     if (n > 0)
                     {
-                        lastBitmap = GetFrame(n - 1);
+                        lastBitmap1 = currentBitmap;
                     }
                     else
                     {
-                        lastBitmap = null;
+                        lastBitmap1 = null;
                     }
                 }
-                if (lastBitmap != null)
+                if (currentBitmap != null)
                 {
-                    lastBitmap.GetPixels(dest, 0, width, 0, 0, width, height);
+                    dest = lastBitmap1;
+                    //int[] dest2 = new int[width * height];
+                    //lastBitmap.GetPixels(dest2, 0, width, 0, 0, width, height);
+
+                    //int desti = 0;
+
+                    //for (int i = 0; i < dest2.Length; i = i + insampleSize)
+                    //{
+                    //    for (int ins = 0; ins < insampleSize; ins++)
+                    //    {
+                    //        dest[desti] = dest2[i];
+                    //        desti++;
+                    //    }
+                    //}
+
                     // copy pixels
                     if (lastDispose == 2)
                     {
@@ -233,7 +253,30 @@ namespace FFImageLoading.Helpers
                     }
                 }
             }
-            image = Bitmap.CreateBitmap(dest, width, height, Bitmap.Config.Argb4444);
+
+            byte[] result = new byte[dest.Length * sizeof(int)];
+            Buffer.BlockCopy(dest, 0, result, 0, result.Length);
+
+            currentBitmap = dest;
+
+            //TODO need to optimze that too (bypass encoding to png)
+            using (var bitmap = Bitmap.CreateBitmap(dest, width, height, Bitmap.Config.Argb4444))
+            using (var stream = new MemoryStream())
+            {
+                await bitmap.CompressAsync(Bitmap.CompressFormat.Png, 100, stream);
+                image = await _decodingFunc.Invoke(stream, new BitmapFactory.Options()
+                {
+                    OutWidth = width,
+                    OutHeight = height,
+                });
+
+                if (firstTime)
+                {
+                    height = image.Height;
+                    firstTime = false;
+                    insampleSize = width / image.Width;
+                }
+            }
         }
 
         /**
@@ -670,14 +713,15 @@ namespace FFImageLoading.Helpers
             }
             frameCount++;
             // create new image to receive frame data
-            image = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb4444);
-            SetPixels(); // transfer pixel data to image
+            //image = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb4444);
+            await SetPixelsAsync(); // transfer pixel data to image
             frames.Add(new GifFrame(image, delay)); // add image to frame
                                                            // list
             if (transparency)
             {
                 act[transIndex] = save;
             }
+
             ResetFrame();
         }
 
@@ -689,6 +733,7 @@ namespace FFImageLoading.Helpers
             // logical screen size
             width = ReadShort();
             height = ReadShort();
+
             // packed fields
             int packed = Read();
             gctFlag = (packed & 0x80) != 0; // 1 : global color table flag
@@ -736,7 +781,7 @@ namespace FFImageLoading.Helpers
             lry = iy;
             lrw = iw;
             lrh = ih;
-            lastBitmap = image;
+            lastBitmap1 = currentBitmap;
             lastBgColor = bgColor;
             dispose = 0;
             transparency = false;
@@ -767,6 +812,7 @@ namespace FFImageLoading.Helpers
             public int Delay;
         }
 
+        //TODO need to optimize that!!! (read stream instead converting to string)
         public static bool CheckIfAnimated(Stream st)
         {
             byte[] byteCode1 = { 0x00, 0x21, 0xF9, 0x04 };
