@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using ImageIO;
 using UIKit;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Helpers
 {
     // Converted from: https://github.com/mayoff/uiimage-from-animated-gif/blob/master/uiimage-from-animated-gif/UIImage%2BanimatedGIF.m
     public static class GifHelper
     {
-        public static UIImage AnimateGif(CGImageSource source, nfloat scale, CGImageThumbnailOptions options)
+        public static UIImage AnimateGif(CGImageSource source, nfloat scale, CGImageThumbnailOptions options, TaskParameter parameters)
         {
             if (source == null)
                 return null;
