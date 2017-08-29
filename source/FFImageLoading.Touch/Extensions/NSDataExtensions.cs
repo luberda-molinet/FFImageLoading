@@ -71,7 +71,7 @@ namespace FFImageLoading.Extensions
 
                 // gif
                 if (sourceRef.ImageCount > 1)
-                    image = GifHelper.AnimateGif(sourceRef, destScale);
+                    image = GifHelper.AnimateGif(sourceRef, destScale, options);
                 else
                 {
                     // Get thumbnail

@@ -9,7 +9,7 @@ namespace FFImageLoading.Helpers
     // Converted from: https://github.com/mayoff/uiimage-from-animated-gif/blob/master/uiimage-from-animated-gif/UIImage%2BanimatedGIF.m
     public static class GifHelper
     {
-        public static UIImage AnimateGif(CGImageSource source, nfloat scale)
+        public static UIImage AnimateGif(CGImageSource source, nfloat scale, CGImageThumbnailOptions options)
         {
             if (source == null)
                 return null;
@@ -18,9 +18,14 @@ namespace FFImageLoading.Helpers
 
             // no need to animate, fail safe.
             if (frameCount <= 1)
-                return UIImage.FromImage(source.CreateImage(0, null), scale, UIImageOrientation.Up);
+            {
+                using (var imageRef = source.CreateThumbnail(0, options))
+                {
+                    return new UIImage(imageRef, scale, UIImageOrientation.Up);
+                }
+            }
 
-            var frames = GetFrames(source);
+            var frames = GetFrames(source, options);
             var delays = GetDelays(source);
             var totalDuration = delays.Sum();
             var adjustedFrames = AdjustFramesToSpoofDurations(frames, scale, delays, totalDuration);
@@ -28,13 +33,13 @@ namespace FFImageLoading.Helpers
             return UIImage.CreateAnimatedImage(adjustedFrames.ToArray(), totalDuration / 100.0);
         }
 
-        private static List<CoreGraphics.CGImage> GetFrames(CGImageSource source)
+        private static List<CoreGraphics.CGImage> GetFrames(CGImageSource source, CGImageThumbnailOptions options)
         {
             var retval = new List<CoreGraphics.CGImage>();
 
             for (int i = 0; i < source?.ImageCount; i++)
             {
-                var frameImage = source.CreateImage(i, null);
+                var frameImage = source.CreateThumbnail(i, options);
                 retval.Add(frameImage);
             }
 
@@ -90,7 +95,7 @@ namespace FFImageLoading.Helpers
 
             for (var i = 0; i < count; i++)
             {
-                var frame = UIImage.FromImage(images[i],scale,UIImageOrientation.Up);
+                var frame = UIImage.FromImage(images[i], scale, UIImageOrientation.Up);
                 for (var j = delays[i] / gcd; j > 0; --j)
                     frames[f++] = frame;
             }
