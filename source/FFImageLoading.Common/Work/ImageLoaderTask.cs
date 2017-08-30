@@ -14,6 +14,7 @@ namespace FFImageLoading.Work
     {
         bool _isLoadingPlaceholderLoaded;
         readonly bool _clearCacheOnOutOfMemory;
+        static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
 
         public ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, IDataResolverFactory dataResolverFactory, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher, bool clearCacheOnOutOfMemory)
         {
@@ -397,7 +398,17 @@ namespace FFImageLoading.Work
                     var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                     loadResolver = new WrappedDataResolver(loadResolver);
-                    var loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
+                    Tuple<Stream, LoadingResult, ImageInformation> loadImageData;
+
+                    try
+                    {
+                        await _placeholdersResolveLock.WaitAsync();
+                        loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        _placeholdersResolveLock.Release();
+                    }
 
                     using (loadImageData.Item1)
                     {
