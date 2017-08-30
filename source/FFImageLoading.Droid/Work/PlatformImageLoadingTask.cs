@@ -182,6 +182,13 @@ namespace FFImageLoading
 
             ThrowIfCancellationRequested();
 
+            bitmap = await PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bitmap);
+
+            return bitmap;
+        }
+
+        async Task<Bitmap> PlatformTransformAsync(string path, ImageSource source, bool enableTransformations, bool isPlaceholder, Bitmap bitmap)
+        {
             if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
                 var transformations = Parameters.Transformations.ToList();
@@ -247,9 +254,24 @@ namespace FFImageLoading
 
             try
             {
-                var gifDecoder = new GifDecoder((stream, options) =>
+                int downsampleWidth = 0;
+                int downsampleHeight = 0;
+
+                if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
                 {
-                    return PlatformGenerateBitmapAsync(Guid.NewGuid().ToString(), ImageSource.Stream, stream, new ImageInformation(), enableTransformations, isPlaceholder, options);
+                    downsampleWidth = Parameters.DownSampleSize.Item1;
+                    downsampleHeight = Parameters.DownSampleSize.Item2;
+                }
+
+                if (Parameters.DownSampleUseDipUnits)
+                {
+                    downsampleWidth = downsampleWidth.DpToPixels();
+                    downsampleHeight = downsampleHeight.DpToPixels();
+                }
+
+                var gifDecoder = new GifDecoder(downsampleWidth, downsampleHeight, (bmp) =>
+                {
+                    return PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bmp);
                 });
 
                 await gifDecoder.ReadGifAsync(imageData);

@@ -5,11 +5,13 @@
         xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
         Title="Simple Gif">
     <ContentPage.Content>
-        <ffimageloading:CachedImage WidthRequest="300" HeightRequest="300"
-            DownsampleToViewSize="true" Source="{Binding ImageUrl}">
+        <ContentView HorizontalOptions="Center" VerticalOptions="Center">
+            <ffimageloading:CachedImage HeightRequest="200" DownsampleHeight="200"
+             Source="{Binding ImageUrl}">
             <ffimageloading:CachedImage.Transformations>
                 <fftransformations:CircleTransformation/>
-            </ffimageloading:CachedImage.Transformations>          
-        </ffimageloading:CachedImage>
+            </ffimageloading:CachedImage.Transformations>
+            </ffimageloading:CachedImage>
+        </ContentView>
     </ContentPage.Content>
 </ContentPage>

@@ -12,25 +12,12 @@ namespace FFImageLoading.Helpers
     public class GifDecoder
     {
         object _lock = new object();
-        /**
-         * File read status: No errors.
-         */
         const int STATUS_OK = 0;
-        /**
-         * File read status: Error decoding file (may be partially decoded)
-         */
         const int STATUS_FORMAT_ERROR = 1;
-        /**
-         * File read status: Unable to open source.
-         */
         const int STATUS_OPEN_ERROR = 2;
-        /** max decoder pixel stack size */
         const int MAX_STACK_SIZE = 4096;
         Stream input;
         int status;
-
-        int insampleSize = 1;
-        bool firstTime = true;
         int width; 
         int height; 
         bool gctFlag; // global color table used
@@ -65,10 +52,14 @@ namespace FFImageLoading.Helpers
         byte[] pixels;
         IList<GifFrame> frames; // frames read from current file
         int frameCount;
-        readonly Func<Stream, BitmapFactory.Options, Task<Bitmap>> _decodingFunc;
+        readonly Func<Bitmap, Task<Bitmap>> _decodingFunc;
+        readonly int _downsampleWidth;
+        readonly int _downsampleHeight;
 
-        public GifDecoder(Func<Stream, BitmapFactory.Options, Task<Bitmap>> decodingFunc)
+        public GifDecoder(int downsampleWidth, int downsampleHeight, Func<Bitmap, Task<Bitmap>> decodingFunc)
         {
+            _downsampleHeight = downsampleHeight;
+            _downsampleWidth = downsampleWidth;
             _decodingFunc = decodingFunc;
             status = STATUS_OK;
             frameCount = 0;
@@ -77,13 +68,6 @@ namespace FFImageLoading.Helpers
             lct = null;
         }
 
-        /**
-         * Gets display duration for specified frame.
-         * 
-         * @param n
-         *          int index of frame
-         * @return delay in milliseconds
-         */
         public int GetDelay(int n)
         {
             lock (_lock)
@@ -93,15 +77,11 @@ namespace FFImageLoading.Helpers
                 {
                     delay = frames[n].Delay;
                 }
+
                 return delay;
             }
         }
 
-        /**
-         * Gets the number of frames read from file.
-         * 
-         * @return frame count
-         */
         public int GetFrameCount()
         {
             lock (_lock)
@@ -110,11 +90,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Gets the first (or only) image read.
-         * 
-         * @return BufferedBitmap containing first frame, or null if none.
-         */
         public Bitmap GetBitmap()
         {
             lock (_lock)
@@ -123,11 +98,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Gets the "Netscape" iteration count, if any. A count of 0 means repeat indefinitiely.
-         * 
-         * @return iteration count if one was specified, else 1.
-         */
         public int GetLoopCount()
         {
             lock (_lock)
@@ -136,9 +106,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Creates new frame image from current data (and previous frames as specified by their disposition codes).
-         */
         protected async Task SetPixelsAsync()
         {
             int[] dest = new int[width * height];
@@ -162,19 +129,6 @@ namespace FFImageLoading.Helpers
                 if (currentBitmap != null)
                 {
                     dest = lastBitmap1;
-                    //int[] dest2 = new int[width * height];
-                    //lastBitmap.GetPixels(dest2, 0, width, 0, 0, width, height);
-
-                    //int desti = 0;
-
-                    //for (int i = 0; i < dest2.Length; i = i + insampleSize)
-                    //{
-                    //    for (int ins = 0; ins < insampleSize; ins++)
-                    //    {
-                    //        dest[desti] = dest2[i];
-                    //        desti++;
-                    //    }
-                    //}
 
                     // copy pixels
                     if (lastDispose == 2)
@@ -254,47 +208,95 @@ namespace FFImageLoading.Helpers
                 }
             }
 
-            byte[] result = new byte[dest.Length * sizeof(int)];
-            Buffer.BlockCopy(dest, 0, result, 0, result.Length);
+            bool downsample = false;
+            int downsampleWidth = width;
+            int downsampleHeight = height;
+
+            if (_downsampleWidth == 0 && _downsampleHeight != 0)
+            {
+                downsample = true;
+                downsampleWidth = (int)(((float)_downsampleHeight / height) * width);
+                downsampleHeight = _downsampleHeight;
+            }
+            else if (_downsampleHeight == 0 && _downsampleWidth != 0)
+            {
+                downsample = true;
+                downsampleWidth = _downsampleWidth;
+                downsampleHeight = (int)(((float)_downsampleWidth / width) * height);
+            }
+
+            var result = dest;
+
+            //TODO fix downsampling issue (part of image is cut)
+            downsample = false;
+            if (downsample)
+            {
+                //if (downsampleWidth % 2 > 0)
+                //{
+                //    downsampleWidth--;
+                //}
+                //if (downsampleHeight % 2 > 0)
+                //{
+                //    downsampleHeight--;
+                //}
+
+                //double inSampleSize = 1D;
+
+                //if (height > downsampleHeight || width > downsampleWidth)
+                //{
+                //    int halfHeight = (int)(height / 2);
+                //    int halfWidth = (int)(width / 2);
+
+                //    // Calculate a inSampleSize that is a power of 2 - the decoder will use a value that is a power of two anyway.
+                //    while ((halfHeight / inSampleSize) > downsampleHeight && (halfWidth / inSampleSize) > downsampleWidth)
+                //    {
+                //        inSampleSize *= 2;
+                //    }
+                //}
+
+                //var insample = (int)inSampleSize;
+                //if (insample > 1)
+                //{
+                //    downsample = true;
+
+                //    int idh = 0;
+                //    int idw = 0;
+                //    result = new int[downsampleWidth * downsampleHeight];
+
+                //    for (int h = 0; h < downsampleHeight; h++)
+                //    {
+                //        idh = insample * h;
+
+                //        for (int w = 0; w < downsampleWidth; w++)
+                //        {
+                //            idw = insample * w;
+                //            var destIdx = idh * width + idw;
+
+                //            if (destIdx < dest.Length)
+                //                result[h * downsampleWidth + w] = dest[destIdx];
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    downsample = false;
+                //}
+            }
 
             currentBitmap = dest;
-
-            //TODO need to optimze that too (bypass encoding to png)
-            using (var bitmap = Bitmap.CreateBitmap(dest, width, height, Bitmap.Config.Argb4444))
-            using (var stream = new MemoryStream())
-            {
-                await bitmap.CompressAsync(Bitmap.CompressFormat.Png, 100, stream);
-                image = await _decodingFunc.Invoke(stream, new BitmapFactory.Options()
-                {
-                    OutWidth = width,
-                    OutHeight = height,
-                });
-
-                if (firstTime)
-                {
-                    height = image.Height;
-                    firstTime = false;
-                    insampleSize = width / image.Width;
-                }
-            }
+            var bitmap = Bitmap.CreateBitmap(result, downsample ? downsampleWidth : width, downsample ? downsampleHeight : height, Bitmap.Config.Argb4444);
+            image = await _decodingFunc.Invoke(bitmap).ConfigureAwait(false);
         }
 
-        /**
-         * Reads GIF image from stream
-         * 
-         * @param is
-         *          containing GIF file.
-         * @return read status code (0 = no errors)
-         */
         public async Task<int> ReadGifAsync(Stream inputStream)
         {
             if (inputStream != null)
             {
                 input = inputStream;
-                await ReadHeaderAsync();
+                await ReadHeaderAsync().ConfigureAwait(false);
                 if (!Err())
                 {
-                    await ReadContentsAsync();
+                    await ReadContentsAsync().ConfigureAwait(false);
                     if (frameCount < 0)
                     {
                         status = STATUS_FORMAT_ERROR;
@@ -309,9 +311,6 @@ namespace FFImageLoading.Helpers
             return status;
         }
 
-        /**
-         * Decodes LZW image data into pixel array. Adapted from John Cristy's BitmapMagick.
-         */
         protected async Task DecodeBitmapDataAsync()
         {
             int nullCode = -1;
@@ -358,7 +357,7 @@ namespace FFImageLoading.Helpers
                         if (count == 0)
                         {
                             // Read a new data block.
-                            count = await ReadBlockAsync();
+                            count = await ReadBlockAsync().ConfigureAwait(false);
                             if (count <= 0)
                             {
                                 break;
@@ -435,11 +434,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Gets the image contents of frame n.
-         * 
-         * @return BufferedBitmap representation of frame, or null if n is invalid.
-         */
         public Bitmap GetFrame(int n)
         {
             lock (_lock)
@@ -459,17 +453,11 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Returns true if an error was encountered during reading/decoding
-         */
         protected bool Err()
         {
             return status != STATUS_OK;
         }
 
-        /**
-         * Reads a single byte from the input stream.
-         */
         protected int Read()
         {
             int curByte = 0;
@@ -477,18 +465,13 @@ namespace FFImageLoading.Helpers
             {
                 curByte = input.ReadByte();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 status = STATUS_FORMAT_ERROR;
             }
             return curByte;
         }
 
-        /**
-         * Reads next variable length block from input.
-         * 
-         * @return number of bytes stored in "buffer"
-         */
         protected async Task<int> ReadBlockAsync()
         {
             blockSize = Read();
@@ -520,13 +503,6 @@ namespace FFImageLoading.Helpers
             return n;
         }
 
-        /**
-         * Reads color table as 256 RGB integer values
-         * 
-         * @param ncolors
-         *          int number of colors to read
-         * @return int array containing 256 colors (packed ARGB with full alpha)
-         */
         protected async Task<int[]> ReadColorTableAsync(int ncolors)
         {
             int nbytes = 3 * ncolors;
@@ -561,9 +537,6 @@ namespace FFImageLoading.Helpers
             return tab;
         }
 
-        /**
-         * Main file parser. Reads GIF content blocks.
-         */
         protected async Task ReadContentsAsync()
         {
             // read GIF file content blocks
@@ -574,7 +547,7 @@ namespace FFImageLoading.Helpers
                 switch (code)
                 {
                     case 0x2C: // image separator
-                        await ReadBitmapAsync();
+                        await ReadBitmapAsync().ConfigureAwait(false);
                         break;
                     case 0x21: // extension
                         code = Read();
@@ -584,7 +557,7 @@ namespace FFImageLoading.Helpers
                                 ReadGraphicControlExt();
                                 break;
                             case 0xff: // application extension
-                                await ReadBlockAsync();
+                                await ReadBlockAsync().ConfigureAwait(false);
                                 String app = "";
                                 for (int i = 0; i < 11; i++)
                                 {
@@ -592,21 +565,21 @@ namespace FFImageLoading.Helpers
                                 }
                                 if (app.Equals("NETSCAPE2.0", StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    await ReadNetscapeExtAsync();
+                                    await ReadNetscapeExtAsync().ConfigureAwait(false);
                                 }
                                 else
                                 {
-                                    await SkipAsync(); // don't care
+                                    await SkipAsync().ConfigureAwait(false); // don't care
                                 }
                                 break;
                             case 0xfe:// comment extension
-                                await SkipAsync();
+                                await SkipAsync().ConfigureAwait(false);
                                 break;
                             case 0x01:// plain text extension
-                                await SkipAsync();
+                                await SkipAsync().ConfigureAwait(false);
                                 break;
                             default: // uninteresting extension
-                                await SkipAsync();
+                                await SkipAsync().ConfigureAwait(false);
                                 break;
                         }
                         break;
@@ -621,9 +594,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Reads Graphics Control Extension values
-         */
         protected void ReadGraphicControlExt()
         {
             Read(); // block size
@@ -639,9 +609,6 @@ namespace FFImageLoading.Helpers
             Read(); // block terminator
         }
 
-        /**
-         * Reads GIF file header information.
-         */
         protected async Task ReadHeaderAsync()
         {
             String id = "";
@@ -662,9 +629,6 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        /**
-         * Reads next frame image
-         */
         protected async Task ReadBitmapAsync()
         {
             ix = ReadShort(); // (sub)image position & size
@@ -705,8 +669,8 @@ namespace FFImageLoading.Helpers
             {
                 return;
             }
-            await DecodeBitmapDataAsync(); // decode pixel data
-            await SkipAsync();
+            await DecodeBitmapDataAsync().ConfigureAwait(false); // decode pixel data
+            await SkipAsync().ConfigureAwait(false);
             if (Err())
             {
                 return;
@@ -714,7 +678,7 @@ namespace FFImageLoading.Helpers
             frameCount++;
             // create new image to receive frame data
             //image = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb4444);
-            await SetPixelsAsync(); // transfer pixel data to image
+            await SetPixelsAsync().ConfigureAwait(false); // transfer pixel data to image
             frames.Add(new GifFrame(image, delay)); // add image to frame
                                                            // list
             if (transparency)
@@ -725,9 +689,6 @@ namespace FFImageLoading.Helpers
             ResetFrame();
         }
 
-        /**
-         * Reads Logical Screen Descriptor
-         */
         protected void ReadLSD()
         {
             // logical screen size
@@ -744,14 +705,11 @@ namespace FFImageLoading.Helpers
             pixelAspect = Read(); // pixel aspect ratio
         }
 
-        /**
-         * Reads Netscape extenstion to obtain iteration count
-         */
         protected async Task ReadNetscapeExtAsync()
         {
             do
             {
-                await ReadBlockAsync();
+                await ReadBlockAsync().ConfigureAwait(false);
                 if (block[0] == 1)
                 {
                     // loop count sub-block
@@ -762,18 +720,12 @@ namespace FFImageLoading.Helpers
             } while ((blockSize > 0) && !Err());
         }
 
-        /**
-         * Reads next 16-bit value, LSB first
-         */
         protected int ReadShort()
         {
             // read 16-bit value, LSB first
             return Read() | (Read() << 8);
         }
 
-        /**
-         * Resets frame state for reading next image.
-         */
         protected void ResetFrame()
         {
             lastDispose = dispose;
@@ -789,14 +741,11 @@ namespace FFImageLoading.Helpers
             lct = null;
         }
 
-        /**
-         * Skips variable length blocks up to and including next zero length block.
-         */
         protected async Task SkipAsync()
         {
             do
             {
-                await ReadBlockAsync();
+                await ReadBlockAsync().ConfigureAwait(false);
             } while ((blockSize > 0) && !Err());
         }
 
@@ -812,40 +761,39 @@ namespace FFImageLoading.Helpers
             public int Delay;
         }
 
-        //TODO need to optimize that!!! (read stream instead converting to string)
         public static bool CheckIfAnimated(Stream st)
         {
-            byte[] byteCode1 = { 0x00, 0x21, 0xF9, 0x04 };
-            byte[] byteCode2 = { 0x00, 0x2C };
-            string strTemp;
-            byte[] byteContents;
-            int iCount;
-            int iPos = 0;
-            int iPos1;
-            int iPos2;
-
-            byteContents = new byte[st.Length];
-            st.Read(byteContents, 0, (int)st.Length);
-            strTemp = System.Text.Encoding.ASCII.GetString(byteContents);
-            byteContents = null;
-            iCount = 0;
-            while (iCount < 2)
+            try
             {
-                iPos1 = strTemp.IndexOf(System.Text.Encoding.ASCII.GetString(byteCode1), iPos, StringComparison.Ordinal);
-                if (iPos1 == -1) break;
-                iPos = iPos1 + 1;
-                iPos2 = strTemp.IndexOf(System.Text.Encoding.ASCII.GetString(byteCode2), iPos, StringComparison.Ordinal);
-                if (iPos2 == -1) break;
-                if ((iPos1 + 8) == iPos2)
-                    iCount++;
-                iPos = iPos2 + 1;
+                int headerCount = 0;
+                bool expectSecondPart = false;
+                int firstRead;
+                while ((firstRead = st.ReadByte()) >= 0)
+                {
+                    if (firstRead == 0x00)
+                    {
+                        var secondRead = st.ReadByte();
+                        if (!expectSecondPart && secondRead == 0x2C)
+                        {
+                            expectSecondPart = true;
+                        }
+                        else if (expectSecondPart && secondRead == 0x21 && st.ReadByte() == 0xF9)
+                        {
+                            headerCount++;
+                            expectSecondPart = false;
+                        }
+
+                        if (headerCount > 1)
+                            return true;
+                    }
+                }
+
+                return false;
             }
-
-            st.Position = 0;
-
-            if (iCount > 1) return true;
-
-            return false;
+            finally
+            {
+                st.Position = 0;
+            }
         }
     }
 }
