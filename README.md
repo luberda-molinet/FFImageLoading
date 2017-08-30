@@ -25,7 +25,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 - Error and loading placeholders support
 - Images can be automatically downsampled to specified size (less memory usage)
 - Fluent API which is inspired by Picasso naming
-- SVG & WebP support
+- SVG / WebP / GIF support
 - Image loading Fade-In animations support
 - Can retry image downloads (RetryCount, RetryDelay)
 - Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
