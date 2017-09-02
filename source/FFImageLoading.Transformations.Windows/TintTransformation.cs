@@ -89,6 +89,9 @@ namespace FFImageLoading.Transformations
                 var gNew = g;
                 var bNew = b;
 
+                if (aNew > 255)
+                    aNew = 255;
+
                 if (rNew > 255)
                     rNew = 255;
 
