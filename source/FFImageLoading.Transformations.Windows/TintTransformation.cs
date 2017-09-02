@@ -83,7 +83,7 @@ namespace FFImageLoading.Transformations
             {
                 var c = bmp.GetPixelAsInt(i);
                 var currentAlpha = (c >> 24) & 0x000000FF;
-                var aNew = (int)(currentAlpha * (a / currentAlpha));
+                var aNew = currentAlpha == 0 ? 0 : (int)(currentAlpha * (a / currentAlpha));
 
                 var rNew = r;
                 var gNew = g;
