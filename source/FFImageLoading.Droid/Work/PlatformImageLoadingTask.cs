@@ -193,7 +193,8 @@ namespace FFImageLoading
             {
                 var transformations = Parameters.Transformations.ToList();
 
-                await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                ThrowIfCancellationRequested();
 
                 try
                 {

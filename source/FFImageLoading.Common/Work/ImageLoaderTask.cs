@@ -402,7 +402,8 @@ namespace FFImageLoading.Work
 
                     try
                     {
-                        await _placeholdersResolveLock.WaitAsync();
+                        await _placeholdersResolveLock.WaitAsync(CancellationTokenSource.Token);
+                        ThrowIfCancellationRequested();
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                     }
                     finally

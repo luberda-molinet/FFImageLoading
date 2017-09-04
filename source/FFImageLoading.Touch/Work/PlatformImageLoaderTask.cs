@@ -60,7 +60,8 @@ namespace FFImageLoading.Work
                 // Special case to handle WebP decoding on iOS
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
-                    await _webpLock.WaitAsync();
+                    await _webpLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+                    ThrowIfCancellationRequested();
                     try
                     {
                         var decoder = _webpDecoder as WebP.Touch.WebPCodec;
@@ -95,7 +96,8 @@ namespace FFImageLoading.Work
             {
                 var transformations = Parameters.Transformations.ToList();
 
-                await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                ThrowIfCancellationRequested();
 
                 try
                 {
