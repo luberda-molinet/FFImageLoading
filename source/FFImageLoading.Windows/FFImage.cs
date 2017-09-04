@@ -799,14 +799,17 @@ namespace FFImageLoading
             }
         }
 
-        internal void OnSuccess(Args.SuccessEventArgs e)
+        internal async void OnSuccess(Args.SuccessEventArgs e)
         {
-            var handler = Success;
-            if (handler != null) handler(this, e);
+            await MainThreadDispatcher.Instance.PostAsync(() =>
+            {
+                var handler = Success;
+                if (handler != null) handler(this, e);
 
-            var successCommand = SuccessCommand;
-            if (successCommand != null && successCommand.CanExecute(e))
-                successCommand.Execute(e);
+                var successCommand = SuccessCommand;
+                if (successCommand != null && successCommand.CanExecute(e))
+                    successCommand.Execute(e);
+            });
         }
 
         /// <summary>
@@ -838,14 +841,17 @@ namespace FFImageLoading
             }
         }
 
-        internal void OnError(Args.ErrorEventArgs e)
+        internal async void OnError(Args.ErrorEventArgs e)
         {
-            var handler = Error;
-            if (handler != null) handler(this, e);
+            await MainThreadDispatcher.Instance.PostAsync(() =>
+            {
+                var handler = Error;
+                if (handler != null) handler(this, e);
 
-            var errorCommand = ErrorCommand;
-            if (errorCommand != null && errorCommand.CanExecute(e))
-                errorCommand.Execute(e);
+                var errorCommand = ErrorCommand;
+                if (errorCommand != null && errorCommand.CanExecute(e))
+                    errorCommand.Execute(e);
+            });
         }
 
         /// <summary>
@@ -877,14 +883,17 @@ namespace FFImageLoading
             }
         }
 
-        internal void OnFinish(Args.FinishEventArgs e)
+        internal async void OnFinish(Args.FinishEventArgs e)
         {
-            var handler = Finish;
-            if (handler != null) handler(this, e);
+            await MainThreadDispatcher.Instance.PostAsync(() =>
+            {
+                var handler = Finish;
+                if (handler != null) handler(this, e);
 
-            var finishCommand = FinishCommand;
-            if (finishCommand != null && finishCommand.CanExecute(e))
-                finishCommand.Execute(e);
+                var finishCommand = FinishCommand;
+                if (finishCommand != null && finishCommand.CanExecute(e))
+                    finishCommand.Execute(e);
+            });
         }
 
         public void Dispose()
