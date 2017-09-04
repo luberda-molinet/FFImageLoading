@@ -28,7 +28,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Gets or sets the aspect.
 		/// </summary>
-		/// <value>The aspect.</value> 
+		/// <value>The aspect.</value>
 		public Aspect Aspect
 		{
 			get
@@ -86,17 +86,17 @@ namespace FFImageLoading.Forms
 
         /// <summary>
         /// The source property.
-        /// </summary> 
+        /// </summary>
         public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, propertyChanged: OnSourcePropertyChanged);
 
         static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (newValue != null) 
+            if (newValue != null)
             {
                 BindableObject.SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
             }
         }
-			
+
 		/// <summary>
 		/// Gets or sets the source.
 		/// </summary>
@@ -126,11 +126,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (int)GetValue(RetryCountProperty); 
+				return (int)GetValue(RetryCountProperty);
 			}
 			set
 			{
-				SetValue(RetryCountProperty, value); 
+				SetValue(RetryCountProperty, value);
 			}
 		}
 
@@ -146,11 +146,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (int)GetValue(RetryDelayProperty); 
+				return (int)GetValue(RetryDelayProperty);
 			}
 			set
 			{
-				SetValue(RetryDelayProperty, value); 
+				SetValue(RetryDelayProperty, value);
 			}
 		}
 
@@ -180,18 +180,18 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty DownsampleWidthProperty = BindableProperty.Create(nameof(DownsampleWidth), typeof(double), typeof(CachedImage), 0d);
 
 		/// <summary>
-		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
 		/// Optional DownsampleWidth parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.
 		/// </summary>
 		public double DownsampleWidth
 		{
 			get
 			{
-				return (double)GetValue(DownsampleWidthProperty); 
+				return (double)GetValue(DownsampleWidthProperty);
 			}
 			set
 			{
-				SetValue(DownsampleWidthProperty, value); 
+				SetValue(DownsampleWidthProperty, value);
 			}
 		}
 
@@ -201,18 +201,18 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty DownsampleHeightProperty = BindableProperty.Create(nameof(DownsampleHeight), typeof(double), typeof(CachedImage), 0d);
 
 		/// <summary>
-		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
 		/// Optional DownsampleHeight parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.
 		/// </summary>
 		public double DownsampleHeight
 		{
 			get
 			{
-				return (double)GetValue(DownsampleHeightProperty); 
+				return (double)GetValue(DownsampleHeightProperty);
 			}
 			set
 			{
-				SetValue(DownsampleHeightProperty, value); 
+				SetValue(DownsampleHeightProperty, value);
 			}
 		}
 
@@ -224,7 +224,7 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
 		/// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
-		/// If the view height or width will not return > 0 - it'll fall back 
+		/// If the view height or width will not return > 0 - it'll fall back
 		/// to using DownsampleWidth / DownsampleHeight properties values
 		/// IMPORTANT: That property is tricky when using some auto-layouts as view doesn't have its size defined,
 		/// so it's always safe to have DownsampleWidth / DownsampleHeight set as a fallback
@@ -234,11 +234,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (bool)GetValue(DownsampleToViewSizeProperty); 
+				return (bool)GetValue(DownsampleToViewSizeProperty);
 			}
 			set
 			{
-				SetValue(DownsampleToViewSizeProperty, value); 
+				SetValue(DownsampleToViewSizeProperty, value);
 			}
 		}
 
@@ -248,7 +248,7 @@ namespace FFImageLoading.Forms
         public static readonly BindableProperty DownsampleUseDipUnitsProperty = BindableProperty.Create(nameof(DownsampleUseDipUnits), typeof(bool), typeof(CachedImage), false);
 
 		/// <summary>
-		/// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
+		/// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties
 		/// will use density independent pixels for downsampling
 		/// </summary>
 		/// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
@@ -256,11 +256,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (bool)GetValue(DownsampleUseDipUnitsProperty); 
+				return (bool)GetValue(DownsampleUseDipUnitsProperty);
 			}
 			set
 			{
-				SetValue(DownsampleUseDipUnitsProperty, value); 
+				SetValue(DownsampleUseDipUnitsProperty, value);
 			}
 		}
 
@@ -276,11 +276,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (TimeSpan)GetValue(CacheDurationProperty); 
+				return (TimeSpan)GetValue(CacheDurationProperty);
 			}
 			set
 			{
-				SetValue(CacheDurationProperty, value); 
+				SetValue(CacheDurationProperty, value);
 			}
 		}
 
@@ -296,11 +296,11 @@ namespace FFImageLoading.Forms
         {
             get
             {
-                return (Work.LoadingPriority)GetValue(LoadingPriorityProperty); 
+                return (Work.LoadingPriority)GetValue(LoadingPriorityProperty);
             }
             set
             {
-                SetValue(LoadingPriorityProperty, value); 
+                SetValue(LoadingPriorityProperty, value);
             }
         }
 
@@ -318,11 +318,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (bool?)GetValue(TransparencyEnabledProperty); 
+				return (bool?)GetValue(TransparencyEnabledProperty);
 			}
 			set
 			{
-				SetValue(TransparencyEnabledProperty, value); 
+				SetValue(TransparencyEnabledProperty, value);
 			}
 		}
 
@@ -359,11 +359,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (bool?)GetValue(FadeAnimationEnabledProperty); 
+				return (bool?)GetValue(FadeAnimationEnabledProperty);
 			}
 			set
 			{
-				SetValue(FadeAnimationEnabledProperty, value); 
+				SetValue(FadeAnimationEnabledProperty, value);
 			}
 		}
 
@@ -380,11 +380,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (ImageSource)GetValue(LoadingPlaceholderProperty); 
+				return (ImageSource)GetValue(LoadingPlaceholderProperty);
 			}
 			set
 			{
-				SetValue(LoadingPlaceholderProperty, value); 
+				SetValue(LoadingPlaceholderProperty, value);
 			}
 		}
 
@@ -401,11 +401,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (ImageSource)GetValue(ErrorPlaceholderProperty); 
+				return (ImageSource)GetValue(ErrorPlaceholderProperty);
 			}
 			set
 			{
-				SetValue(ErrorPlaceholderProperty, value); 
+				SetValue(ErrorPlaceholderProperty, value);
 			}
 		}
 
@@ -443,11 +443,11 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-                return (List<Work.ITransformation>)GetValue(TransformationsProperty); 
+                return (List<Work.ITransformation>)GetValue(TransformationsProperty);
 			}
 			set
 			{
-				SetValue(TransformationsProperty, value); 
+				SetValue(TransformationsProperty, value);
 			}
 		}
 
@@ -488,48 +488,88 @@ namespace FFImageLoading.Forms
 			base.OnBindingContextChanged();
 		}
 
-		protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
-		{
-			SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
+              protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
+              {
+                     SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
 
-			double desiredWidth = desiredSize.Request.Width;
-			double desiredHeight = desiredSize.Request.Height;
+                     double desiredWidth = desiredSize.Request.Width;
+                     double desiredHeight = desiredSize.Request.Height;
 
-			if (desiredWidth == 0 || desiredHeight == 0)
-				return new SizeRequest(new Size(0, 0));
+                     if (desiredWidth == 0 || desiredHeight == 0)
+                            return new SizeRequest(new Size(0, 0));
 
 
-			if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
-			{
-				return new SizeRequest(new Size(desiredWidth, desiredHeight));
-			}
+                     if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
+                     {
+                            return new SizeRequest(new Size(desiredWidth, desiredHeight));
+                     }
 
-			if (double.IsPositiveInfinity(widthConstraint))
-			{
-				double factor = heightConstraint / desiredHeight;
-				return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-			}
+                     if (double.IsPositiveInfinity(widthConstraint))
+                     {
+                            double factor = heightConstraint / desiredHeight;
+                            return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+                     }
 
-			if (double.IsPositiveInfinity(heightConstraint))
-			{
-				double factor = widthConstraint / desiredWidth;
-				return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-			}
+                     if (double.IsPositiveInfinity(heightConstraint))
+                     {
+                            double factor = widthConstraint / desiredWidth;
+                            return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+                     }
 
-			double fitsWidthRatio = widthConstraint / desiredWidth;
-			double fitsHeightRatio = heightConstraint / desiredHeight;
-			double ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
+                     double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
+                     double constraintAspect = widthConstraint / heightConstraint;
+                     double width = desiredWidth;
+                     double height = desiredHeight;
 
-			return new SizeRequest(new Size(desiredWidth * ratioFactor, desiredHeight * ratioFactor));
-		}
+                     if (constraintAspect > desiredAspect)
+                     {
+                            // constraint area is proportionally wider than image
+                            switch (Aspect)
+                            {
+                                   case Aspect.AspectFit:
+                                   case Aspect.AspectFill:
+                                          height = Math.Min(desiredHeight, heightConstraint);
+                                          width = desiredWidth * (height / desiredHeight);
+                                          break;
+                                   case Aspect.Fill:
+                                          width = Math.Min(desiredWidth, widthConstraint);
+                                          height = desiredHeight * (width / desiredWidth);
+                                          break;
+                            }
+                     }
+                     else if (constraintAspect < desiredAspect)
+                     {
+                            // constraint area is proportionally taller than image
+                            switch (Aspect)
+                            {
+                                   case Aspect.AspectFit:
+                                   case Aspect.AspectFill:
+                                          width = Math.Min(desiredWidth, widthConstraint);
+                                          height = desiredHeight * (width / desiredWidth);
+                                          break;
+                                   case Aspect.Fill:
+                                          height = Math.Min(desiredHeight, heightConstraint);
+                                          width = desiredWidth * (height / desiredHeight);
+                                          break;
+                            }
+                     }
+                     else
+                     {
+                            // constraint area is same aspect as image
+                            width = Math.Min(desiredWidth, widthConstraint);
+                            height = desiredHeight * (width / desiredWidth);
+                     }
 
-		public void SetIsLoading(bool isLoading)
+                     return new SizeRequest(new Size(width, height));
+              }
+
+              public void SetIsLoading(bool isLoading)
 		{
 			SetValue(IsLoadingPropertyKey, isLoading);
 		}
 
 		internal Action InternalReloadImage;
-			
+
 		/// <summary>
 		/// Reloads the image.
 		/// </summary>
@@ -548,13 +588,13 @@ namespace FFImageLoading.Forms
         /// </summary>
 		public void Cancel()
 		{
-			if (InternalCancel != null) 
+			if (InternalCancel != null)
 			{
 				InternalCancel();
 			}
 		}
 
-		internal Func<GetImageAsJpgArgs, Task<byte[]>> InternalGetImageAsJPG; 
+		internal Func<GetImageAsJpgArgs, Task<byte[]>> InternalGetImageAsJPG;
 
 		/// <summary>
 		/// Gets the image as JPG.
@@ -594,7 +634,7 @@ namespace FFImageLoading.Forms
 		/// </summary>
 		/// <param name="source">Image source.</param>
 		/// <param name="cacheType">Cache type.</param>
-		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
 		/// (downsampling and transformations variants)</param>
 		public static async Task InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar = false)
 		{
@@ -608,7 +648,7 @@ namespace FFImageLoading.Forms
 
             var embResourceSource = source as EmbeddedResourceImageSource;
             if (embResourceSource != null)
-              await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);  
+              await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -616,7 +656,7 @@ namespace FFImageLoading.Forms
 		/// </summary>
 		/// <param name="source">Image key.</param>
 		/// <param name="cacheType">Cache type.</param>
-		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants 
+		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
 		/// (downsampling and transformations variants)</param>
 		public static Task InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar = false)
 		{
@@ -643,15 +683,15 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (ICommand)GetValue(SuccessCommandProperty); 
+				return (ICommand)GetValue(SuccessCommandProperty);
 			}
 			set
 			{
-				SetValue(SuccessCommandProperty, value); 
+				SetValue(SuccessCommandProperty, value);
 			}
 		}
 
-		internal void OnSuccess(CachedImageEvents.SuccessEventArgs e) 
+		internal void OnSuccess(CachedImageEvents.SuccessEventArgs e)
 		{
 			var handler = Success;
 			if (handler != null) handler(this, e);
@@ -681,15 +721,15 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (ICommand)GetValue(ErrorCommandProperty); 
+				return (ICommand)GetValue(ErrorCommandProperty);
 			}
 			set
 			{
-				SetValue(ErrorCommandProperty, value); 
+				SetValue(ErrorCommandProperty, value);
 			}
 		}
 
-		internal void OnError(CachedImageEvents.ErrorEventArgs e) 
+		internal void OnError(CachedImageEvents.ErrorEventArgs e)
 		{
 			var handler = Error;
 			if (handler != null) handler(this, e);
@@ -719,15 +759,15 @@ namespace FFImageLoading.Forms
 		{
 			get
 			{
-				return (ICommand)GetValue(FinishCommandProperty); 
+				return (ICommand)GetValue(FinishCommandProperty);
 			}
 			set
 			{
-				SetValue(FinishCommandProperty, value); 
+				SetValue(FinishCommandProperty, value);
 			}
 		}
 
-		internal void OnFinish(CachedImageEvents.FinishEventArgs e) 
+		internal void OnFinish(CachedImageEvents.FinishEventArgs e)
 		{
 			var handler = Finish;
 			if (handler != null) handler(this, e);
@@ -870,7 +910,7 @@ namespace FFImageLoading.Forms
         }
 
         /// <summary>
-        /// Setups the on before image loading. 
+        /// Setups the on before image loading.
         /// You can add additional logic here to configure image loader settings before loading
         /// </summary>
         /// <param name="imageLoader">Image loader.</param>
