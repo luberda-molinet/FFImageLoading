@@ -370,6 +370,8 @@ namespace FFImageLoading.Work
 
                     if (isLoadingPlaceholder)
                         PlaceholderWeakReference = new WeakReference<TImageContainer>(found.Item1);
+
+                    ThrowIfCancellationRequested();
                     await SetTargetAsync(found.Item1, animated).ConfigureAwait(false);
 
                     if (updateImageInformation)
@@ -485,6 +487,8 @@ namespace FFImageLoading.Work
 
                         var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
 
+                        ThrowIfCancellationRequested();
+
                         try
                         {
                             BeforeLoading(image, false);
@@ -508,6 +512,15 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex)
             {
+                try
+                {
+                    if (CancellationTokenSource?.IsCancellationRequested == false)
+                        CancellationTokenSource.Cancel();
+                }
+                catch (Exception)
+                {
+                }
+
                 if (ex is OperationCanceledException || ex is ObjectDisposedException)
                 {
                     if (Configuration.VerboseLoadingCancelledLogging)
