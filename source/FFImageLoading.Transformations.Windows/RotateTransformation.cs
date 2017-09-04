@@ -42,7 +42,7 @@ namespace FFImageLoading.Transformations
         {
 			if (degrees == 0 || degrees % 360 == 0)
 				return source;
-			
+
             if (ccw)
                 degrees = 360d - degrees;
 
@@ -191,7 +191,7 @@ namespace FFImageLoading.Transformations
                     if (iAlpha > 255) iAlpha = 255;
 
                     var a = iAlpha + 1;
-                    
+
                     var val = (iAlpha << 24)
                                            | ((byte)((iRed * a) >> 8) << 16)
                                            | ((byte)((iGreen * a) >> 8) << 8)

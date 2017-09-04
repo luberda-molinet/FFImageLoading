@@ -27,7 +27,7 @@ namespace FFImageLoading.Helpers
 			{
 				action?.Invoke();
 			}
-			else	
+			else
 			{
                 DispatchQueue.MainQueue.DispatchSync(action);
 			}

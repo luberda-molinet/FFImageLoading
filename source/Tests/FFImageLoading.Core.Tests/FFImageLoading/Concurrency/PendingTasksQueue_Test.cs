@@ -29,7 +29,7 @@ namespace FFImageLoading.Core.Tests.FFImageLoading.Concurrency
             var request = new Mock<IImageLoaderTask>();
             var sut = new PendingTasksQueue();
             sut.Enqueue(request.Object, 0);
-            
+
             sut.Remove(request.Object);
             Assert.Equal(0, sut.Count);
         }

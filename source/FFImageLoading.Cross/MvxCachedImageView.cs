@@ -375,7 +375,7 @@ namespace FFImageLoading.Cross
                 imageLoader.Finish((work) =>
                 {
                     IsLoading = false;
-                    OnFinish?.Invoke(this, new Args.FinishEventArgs(work)); 
+                    OnFinish?.Invoke(this, new Args.FinishEventArgs(work));
                 });
 
                 imageLoader.Success((imageInformation, loadingResult) =>
@@ -403,7 +403,7 @@ namespace FFImageLoading.Cross
         }
 
         /// <summary>
-        /// Setups the on before image loading. 
+        /// Setups the on before image loading.
         /// You can add additional logic here to configure image loader settings before loading
         /// eg. custom cache keys, svg data resolvers, etc
         /// </summary>

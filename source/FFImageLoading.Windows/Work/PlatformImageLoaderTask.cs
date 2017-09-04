@@ -40,7 +40,7 @@ namespace FFImageLoading.Work
             ThrowIfCancellationRequested();
 
             try
-            {              
+            {
                 bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {

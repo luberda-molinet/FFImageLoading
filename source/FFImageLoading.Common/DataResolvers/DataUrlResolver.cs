@@ -63,8 +63,8 @@ namespace FFImageLoading.DataResolvers
             {
                 return GetRAWStream(data, imageInformation);
             }
-            
-            return GetBase64Stream(data, imageInformation);    
+
+            return GetBase64Stream(data, imageInformation);
         }
 
         Task<Tuple<Stream, LoadingResult, ImageInformation>> GetBase64Stream(string data, ImageInformation imageInformation)

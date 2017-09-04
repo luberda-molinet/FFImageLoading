@@ -33,7 +33,7 @@ namespace FFImageLoading.Cache
         Task _currentWrite = Task.FromResult<byte>(1);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleDiskCache"/> class. This constructor attempts 
+        /// Initializes a new instance of the <see cref="SimpleDiskCache"/> class. This constructor attempts
         /// to create a folder of the given name under the <see cref="ApplicationData.TemporaryFolder"/>.
         /// </summary>
         /// <param name="cacheFolderName">The name of the cache folder.</param>
@@ -274,7 +274,7 @@ namespace FFImageLoading.Cache
         {
             await initTask.ConfigureAwait(false);
 
-            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);            
+            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
             CacheEntry oldCacheEntry;
             if (entries.TryRemove(key, out oldCacheEntry))

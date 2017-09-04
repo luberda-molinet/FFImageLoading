@@ -7,7 +7,7 @@ namespace FFImageLoading.Cache
 {
     /// <summary>
     /// This class optimizes the call to "StorageFile.GetFileFromPathAsync" that is time consuming.
-    /// The source of each image is the key of the cache... once a source has been checked the first time, any other control can be skipped 
+    /// The source of each image is the key of the cache... once a source has been checked the first time, any other control can be skipped
     /// </summary>
     public static class FFSourceBindingCache
     {

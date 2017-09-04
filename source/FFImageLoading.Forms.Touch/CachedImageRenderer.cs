@@ -79,7 +79,7 @@ namespace FFImageLoading.Forms.Touch
 			}
 			base.OnElementChanged(e);
 		}
-			
+
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			base.OnElementPropertyChanged(sender, e);
@@ -131,7 +131,7 @@ namespace FFImageLoading.Forms.Touch
 			{
 				if (Control != null)
 					Control.Image = null;
-				
+
 				ImageLoadingFinished(Element);
 			}
 			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -294,7 +294,7 @@ namespace FFImageLoading.Forms.Touch
 					_lastImageSource = ffSource;
 				});
 
-				imageLoader.Error((exception) => 
+				imageLoader.Error((exception) =>
 					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
 
 				imageLoader.DownloadStarted((downloadInformation) =>
@@ -305,10 +305,10 @@ namespace FFImageLoading.Forms.Touch
 
 				imageLoader.FileWriteFinished((fileWriteInfo) =>
 					element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
-				
+
                 element.SetupOnBeforeImageLoading(imageLoader);
 
-				_currentTask = imageLoader.Into(Control);	
+				_currentTask = imageLoader.Into(Control);
 			}
 		}
 
@@ -337,7 +337,7 @@ namespace FFImageLoading.Forms.Touch
 				taskToCancel.Cancel();
 			}
 		}
-			
+
 		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
 		{
 			return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
@@ -378,7 +378,7 @@ namespace FFImageLoading.Forms.Touch
 				image.Dispose();
 			}
 
-			return encoded;	
+			return encoded;
 		}
 	}
 }

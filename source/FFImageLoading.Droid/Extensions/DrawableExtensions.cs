@@ -13,7 +13,7 @@ namespace FFImageLoading
                 return drawable != null && drawable.Handle != IntPtr.Zero && sdDrawable.HasValidBitmap;
             }
 
-            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled; 
+            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled;
         }
 
         public static bool IsValidAndHasValidBitmap(this ISelfDisposingBitmapDrawable drawable)

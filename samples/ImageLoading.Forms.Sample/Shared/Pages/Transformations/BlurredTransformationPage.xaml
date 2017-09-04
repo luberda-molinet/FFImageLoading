@@ -7,7 +7,7 @@
 	<ContentPage.Content>
 		<ScrollView>
 			<StackLayout>
-				
+
 				<ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
 					LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png" DownsampleToViewSize="true"
 					Aspect="AspectFit" HeightRequest="400" WidthRequest="400" Source="{Binding ImageUrl}">
@@ -17,9 +17,9 @@
 				</ffimageloading:CachedImage>
 
 				<Label Text="BlurredTransformation" HorizontalTextAlignment="Center"/>
-				
+
 				<Button Text="Load another image" Command="{Binding LoadAnotherCommand}"/>
-				
+
 			</StackLayout>
 		</ScrollView>
 	</ContentPage.Content>

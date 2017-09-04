@@ -64,7 +64,7 @@ namespace FFImageLoading.Transformations
 							using (Android.Renderscripts.ScriptIntrinsicBlur blur = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, overlayAlloc.Element))
 							{
 								blur.SetInput(overlayAlloc);
-								blur.SetRadius(radius);	
+								blur.SetRadius(radius);
 								blur.ForEach(overlayAlloc);
 								overlayAlloc.CopyTo(bitmap);
 

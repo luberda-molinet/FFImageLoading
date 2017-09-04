@@ -17,7 +17,7 @@ namespace Simple.iOS.Sample
 
 		[Action ("TapTransformation:")]
 		partial void TapTransformation (Foundation.NSObject sender);
-		
+
 		void ReleaseDesignerOutlets ()
 		{
 			if (imageView != null) {

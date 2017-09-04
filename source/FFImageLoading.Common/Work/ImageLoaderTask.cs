@@ -233,7 +233,7 @@ namespace FFImageLoading.Work
         protected void ThrowIfCancellationRequested()
         {
             try
-            {                
+            {
                 CancellationTokenSource?.Token.ThrowIfCancellationRequested();
                 if (!Target.IsTaskValid(this))
                     throw new TaskCanceledException();
@@ -288,7 +288,7 @@ namespace FFImageLoading.Work
             {
                 if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     return false;
-                
+
                 bool isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImagesEnabled.HasValue ? Parameters.FadeAnimationForCachedImagesEnabled.Value : Configuration.FadeAnimationForCachedImages;
                 var result = await TryLoadFromMemoryCacheAsync(Key, true, isFadeAnimationEnabledForCached, false).ConfigureAwait(false);
 

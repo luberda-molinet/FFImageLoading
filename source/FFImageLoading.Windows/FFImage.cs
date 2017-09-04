@@ -207,7 +207,7 @@ namespace FFImageLoading
                 imageLoader.WithPriority(LoadingPriority);
                 imageLoader.WithCache(CacheType);
 
-                imageLoader.Finish((work) => 
+                imageLoader.Finish((work) =>
                     OnFinish(new Args.FinishEventArgs(work)));
 
                 imageLoader.Success((imageInformation, loadingResult) =>
@@ -326,7 +326,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleWidthProperty = DependencyProperty.Register(nameof(DownsampleWidth), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// Optional DownsampleWidth parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.
         /// </summary>
         public double DownsampleWidth
@@ -347,7 +347,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleHeightProperty = DependencyProperty.Register(nameof(DownsampleHeight), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// Optional DownsampleHeight parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.
         /// </summary>
         public double DownsampleHeight
@@ -367,7 +367,7 @@ namespace FFImageLoading
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
-        /// If the view height or width will not return > 0 - it'll fall back 
+        /// If the view height or width will not return > 0 - it'll fall back
         /// to using DownsampleWidth / DownsampleHeight properties values
         /// </summary>
         /// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
@@ -407,7 +407,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register(nameof(DownsampleUseDipUnits), typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
 
         /// <summary>
-        /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
+        /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties
         /// will use density independent pixels for downsampling
         /// </summary>
         /// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
@@ -455,11 +455,11 @@ namespace FFImageLoading
         {
             get
             {
-                return (LoadingPriority)GetValue(LoadingPriorityProperty); 
+                return (LoadingPriority)GetValue(LoadingPriorityProperty);
             }
             set
             {
-                SetValue(LoadingPriorityProperty, value); 
+                SetValue(LoadingPriorityProperty, value);
             }
         }
 
@@ -482,7 +482,7 @@ namespace FFImageLoading
                 SetValue(CacheTypeProperty, value);
             }
         }
-        
+
 
         /// <summary>
         /// The fade animation enabled property.
@@ -507,7 +507,7 @@ namespace FFImageLoading
         /// <summary>
         /// The transform placeholders property.
         /// </summary>
-        /// 
+        ///
         public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>

@@ -190,7 +190,7 @@ namespace FFImageLoading.Transformations
                 if (p < 0)
                 {
                     p += ((4 * x) + 6);
-                }  
+                }
                 else
                 {
                     y--;

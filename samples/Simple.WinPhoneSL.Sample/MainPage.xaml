@@ -14,9 +14,9 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
-    
+
     <ff:FFImage Name="Image"
-                VerticalAlignment="Stretch" 
+                VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
                 TransformPlaceholders="False"
                 LoadingPlaceholder="loading.png"

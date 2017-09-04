@@ -14,7 +14,7 @@ namespace Simple.iOS.Sample
 	{
 		[Action ("TapReloadAll:")]
 		partial void TapReloadAll (Foundation.NSObject sender);
-		
+
 		void ReleaseDesignerOutlets ()
 		{
 		}

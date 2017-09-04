@@ -24,10 +24,10 @@ namespace FFImageLoading.Cache
 			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 
             if (maxCacheSize <= 0)
-                _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory    
+                _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory
             else
                 _cache.TotalCostLimit = (nuint)Math.Min((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
-            
+
             double sizeInMB = Math.Round(_cache.TotalCostLimit /1024d / 1024d, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
@@ -58,7 +58,7 @@ namespace FFImageLoading.Cache
         {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
-            
+
 			var image = (UIImage)_cache.ObjectForKey(new NSString(key));
             if (image == null || image.Handle == IntPtr.Zero)
             {
@@ -94,7 +94,7 @@ namespace FFImageLoading.Cache
         {
             if (string.IsNullOrWhiteSpace(key))
                 return;
-            
+
             if (log && ImageService.Instance.Config.VerboseMemoryCacheLogging)
                 _logger.Debug(string.Format($"Remove from memory cache called for {key}"));
 

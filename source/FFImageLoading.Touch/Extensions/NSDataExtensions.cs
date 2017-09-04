@@ -214,7 +214,7 @@ namespace FFImageLoading.Extensions
 						),
 						RCTCeilSize(sourceSize, destScale)
 					);
-				
+
 				case RCTResizeMode.ScaleAspectFill:
 				default:
 					if (targetAspect <= aspect) { // target is taller than content
@@ -264,7 +264,7 @@ namespace FFImageLoading.Extensions
                 return null;
             }
         }
-                            
+
 	}
 }
 

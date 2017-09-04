@@ -14,7 +14,7 @@ namespace FFImageLoading.Config
 		public Configuration()
 		{
 			// default values here:
-			MaxMemoryCacheSize = 0; 
+			MaxMemoryCacheSize = 0;
 			BitmapOptimizations = true;
 			FadeAnimationEnabled = true;
 			FadeAnimationForCachedImages = false; // by default cached images will not fade when displayed on screen, otherwise it gives the impression that UI is laggy
@@ -189,7 +189,7 @@ namespace FFImageLoading.Config
         public bool VerboseLoadingCancelledLogging { get; set; }
 
         /// <summary>
-        /// Enables / disables  verbose logging. 
+        /// Enables / disables  verbose logging.
         /// IMPORTANT! If it's disabled are other verbose logging options are disabled too
         /// </summary>
         /// <value>The verbose logging.</value>
@@ -216,7 +216,7 @@ namespace FFImageLoading.Config
         public TimeSpan DiskCacheDuration { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether callbacs (OnFinish, OnSuccess, etc) 
+        /// Gets or sets a value indicating whether callbacs (OnFinish, OnSuccess, etc)
         /// should execute on UI thread
         /// </summary>
         /// <value><c>true</c> if execute callbacks on UIT hread; otherwise, <c>false</c>.</value>

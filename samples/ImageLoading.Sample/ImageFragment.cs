@@ -29,7 +29,7 @@ namespace ImageLoading.Sample
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
 			var view = inflater.Inflate (Resource.Layout.fragment_image, container, false);
-		
+
 			using (var textView = view.FindViewById<TextView>(Resource.Id.textView))
 			{
 				textView.Text = _position.ToString();
@@ -46,7 +46,7 @@ namespace ImageLoading.Sample
 				.LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
 				.ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)
 				.Into(_imgDisplay);
-			
+
 			return view;
         }
 

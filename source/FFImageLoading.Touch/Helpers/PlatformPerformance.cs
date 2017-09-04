@@ -84,7 +84,7 @@ namespace FFImageLoading
                 residentSizeMax = (double)memoryInfo.Value.resident_size_max / 1048576d;
             }
 
-            return string.Format("[PERFORMANCE] Memory - resident_size: {0:0}MB, resident_size_max: {1:0}MB, virtual_size: {2:0}MB", 
+            return string.Format("[PERFORMANCE] Memory - resident_size: {0:0}MB, resident_size_max: {1:0}MB, virtual_size: {2:0}MB",
                                  residentSize, residentSizeMax, virtualSize);
         }
     }

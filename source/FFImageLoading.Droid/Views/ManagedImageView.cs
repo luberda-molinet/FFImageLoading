@@ -39,12 +39,12 @@ namespace FFImageLoading.Views
 
 			if (_drawableRef != null)
 			{
-				Drawable drawable = null; 
+				Drawable drawable = null;
 
 				if (_drawableRef.TryGetTarget(out drawable))
 				{
 					UpdateDrawableDisplayedState(drawable, false);
-				}	
+				}
 
 				_drawableRef = null;
 			}
@@ -76,7 +76,7 @@ namespace FFImageLoading.Views
 
                         if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                             SetImageBitmap(bitmap);
-                        
+
                         token.ThrowIfCancellationRequested();
                         await Task.Delay(t);
                     }
@@ -108,7 +108,7 @@ namespace FFImageLoading.Views
                 ImageService.Instance.CancelWorkFor(ImageLoaderTask);
                 ImageLoaderTask = null;
             }
-            
+
         }
 
 		public override void SetImageDrawable(Drawable drawable)

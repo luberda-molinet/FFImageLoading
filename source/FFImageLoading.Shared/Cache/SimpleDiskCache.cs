@@ -66,7 +66,7 @@ namespace FFImageLoading.Cache
 
             if (!androidTempFolder.CanWrite())
                 androidTempFolder.SetWritable(true, false);
-            
+
 #else
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
@@ -198,7 +198,7 @@ namespace FFImageLoading.Cache
 			catch
 			{
 				return null;
-			}	
+			}
 		}
 
 		public virtual Task<string> GetFilePathAsync(string key)
@@ -206,7 +206,7 @@ namespace FFImageLoading.Cache
 			CacheEntry entry;
 			if (!_entries.TryGetValue(key, out entry))
 				return Task.FromResult<string>(null);
-			
+
 			return Task.FromResult(Path.Combine(_cachePath, entry.FileName));
 		}
 
@@ -247,15 +247,15 @@ namespace FFImageLoading.Cache
 			foreach (var kvp in kvps)
 			{
 				CacheEntry oldCacheEntry;
-				if (_entries.TryRemove(kvp.Key, out oldCacheEntry)) 
+				if (_entries.TryRemove(kvp.Key, out oldCacheEntry))
 				{
-					try 
+					try
 					{
                         Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
 						File.Delete(Path.Combine(_cachePath, kvp.Key));
-					} 
+					}
 					// Analysis disable once EmptyGeneralCatchClause
-					catch 
+					catch
 					{
 					}
 				}

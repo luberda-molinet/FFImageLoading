@@ -11,7 +11,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <ff:FFImage Name="Image"
-                VerticalAlignment="Stretch" 
+                VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
                 TransformPlaceholders="False"
                 LoadingPlaceholder="loading.png"

@@ -33,13 +33,13 @@ namespace Simple.iOS.Sample
         {
             base.ViewWillDisappear(animated);
         }
-            
+
         public override void DidReceiveMemoryWarning()
         {
             base.DidReceiveMemoryWarning();
             // Release any cached data, images, etc that aren't in use.
         }
-            
+
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
             base.PrepareForSegue(segue, sender);
@@ -48,7 +48,7 @@ namespace Simple.iOS.Sample
                 var details = (ImageDetailsViewController)segue.DestinationViewController;
                 details.imageURL = currentURL;
             }
-        }            
+        }
 
         public override nint NumberOfSections(UICollectionView collectionView)
         { return 1; }

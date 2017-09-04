@@ -18,8 +18,8 @@ namespace FFImageLoading.Helpers
         const int MAX_STACK_SIZE = 4096;
         Stream input;
         int status;
-        int width; 
-        int height; 
+        int width;
+        int height;
         bool gctFlag; // global color table used
         int gctSize; // size of global color table
         int loopCount = 1; // iterations; 0 = repeat forever

@@ -51,7 +51,7 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Initializes FFImageLoading with a default Configuration. 
+        /// Initializes FFImageLoading with a default Configuration.
         /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
         /// </summary>
         /// <param name="configuration">Configuration.</param>

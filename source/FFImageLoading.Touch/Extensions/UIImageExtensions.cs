@@ -48,11 +48,11 @@ namespace FFImageLoading.Extensions
 						context.InterpolationQuality = CGInterpolationQuality.High;
 					else
 						context.InterpolationQuality = CGInterpolationQuality.Low;
-					
+
 					var resizedImage = UIGraphics.GetImageFromCurrentImageContext();
 
 					return resizedImage;
-				}	
+				}
 			}
 			finally
 			{

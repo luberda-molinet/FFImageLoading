@@ -23,7 +23,7 @@ namespace FFImageLoading.Extensions
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
             {
                 writeableBitmap = new WriteableBitmap(holder.Width, holder.Height);
-                
+
                 for (int x = 0; x < holder.Width; x++)
                     for (int y = 0; y < holder.Height; y++)
                         writeableBitmap.SetPixel(x, y, holder.Pixels[x + y * holder.Width]);
@@ -187,7 +187,7 @@ namespace FFImageLoading.Extensions
                         imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         imageInformation.SetCurrentSize((int)aspectWidth, (int)aspectHeight);
                     }
-                        
+
                     await encoder.FlushAsync();
                     resizedStream.Seek(0);
                 }

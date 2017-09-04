@@ -62,7 +62,7 @@ namespace FFImageLoading.Forms.Droid
 			{
 				var nativeControl = new CachedImageView(Context);
 				SetNativeControl(nativeControl);
-			} 
+			}
 
 			if (e.NewElement != null)
 			{
@@ -75,14 +75,14 @@ namespace FFImageLoading.Forms.Droid
 			UpdateBitmap(e.OldElement);
 			UpdateAspect();
 		}
-			
+
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			base.OnElementPropertyChanged(sender, e);
 
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				UpdateBitmap(null);	
+				UpdateBitmap(null);
 			}
 			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
 			{
@@ -98,10 +98,10 @@ namespace FFImageLoading.Forms.Droid
 			else if (Element.Aspect == Aspect.Fill)
 				Control.SetScaleType(ImageView.ScaleType.FitXy);
 
-			else 
+			else
 				Control.SetScaleType(ImageView.ScaleType.FitCenter);
 		}
-			
+
 		private void UpdateBitmap(CachedImage previous = null)
 		{
 			Xamarin.Forms.ImageSource source = Element.Source;

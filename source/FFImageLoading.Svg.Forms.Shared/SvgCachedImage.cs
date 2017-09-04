@@ -22,7 +22,7 @@ namespace FFImageLoading.Svg.Forms
 
         /// <summary>
         /// The source property.
-        /// </summary> 
+        /// </summary>
         public static new readonly BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(ImageSource), typeof(SvgCachedImage), default(ImageSource), BindingMode.OneWay, propertyChanging: OnSourcePropertyChanging);
 
         static void OnSourcePropertyChanging(BindableObject bindable, object oldValue, object newValue)
@@ -124,7 +124,7 @@ namespace FFImageLoading.Svg.Forms
         public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>));
 
         /// <summary>
-        /// Used to define replacement map which will be used to 
+        /// Used to define replacement map which will be used to
         /// replace text inside SVG file (eg. changing colors values)
         /// </summary>
         /// <value>The replace string map.</value>
@@ -142,7 +142,7 @@ namespace FFImageLoading.Svg.Forms
         }
 
         /// <summary>
-        /// Setups the on before image loading. 
+        /// Setups the on before image loading.
         /// You can add additional logic here to configure image loader settings before loading
         /// </summary>
         /// <param name="imageLoader">Image loader.</param>

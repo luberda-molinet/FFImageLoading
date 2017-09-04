@@ -95,7 +95,7 @@ namespace FFImageLoading.Transformations
 				matrix.PostRotate(targetRotation, rotationPivotX, rotationPivotY);
 				canvas.DrawBitmap(source, matrix, paint);
 
-				return bitmap;				
+				return bitmap;
 			}
 		}
 

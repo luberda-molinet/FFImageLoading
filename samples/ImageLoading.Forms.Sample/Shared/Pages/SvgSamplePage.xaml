@@ -5,27 +5,27 @@
 		xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
 		xmlns:ffimageloadingsvg="clr-namespace:FFImageLoading.Svg.Forms;assembly=FFImageLoading.Svg.Forms"
 		Title="SVG">
-	
+
 	<ContentPage.Resources>
 		<ResourceDictionary>
 	  		<ffimageloadingsvg:SvgImageSourceConverter x:Key="SvgImageSourceConverter"></ffimageloadingsvg:SvgImageSourceConverter>
 		</ResourceDictionary>
 	</ContentPage.Resources>
-	
+
 	<ContentPage.Content>
 		<ScrollView><StackLayout>
-			
+
             <!-- FIRST APPROACH: -->
-            <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" Source="sample.svg"/>  	
+            <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" Source="sample.svg"/>
 
             <!-- SECOND APPROACH (PCL EmbeddedResource): -->
-            <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" Source="resource://FFImageLoading.Forms.Sample.Resources.sample.svg"/>  
-            
+            <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" Source="resource://FFImageLoading.Forms.Sample.Resources.sample.svg"/>
+
 			<!-- THIRD APPROACH: -->
 			<ffimageloading:CachedImage WidthRequest="200" HeightRequest="200"
 				Source="{Binding Source, Converter={StaticResource SvgImageSourceConverter}}">
 			</ffimageloading:CachedImage>
-            
+
 		</StackLayout></ScrollView>
 	</ContentPage.Content>
 </ContentPage>

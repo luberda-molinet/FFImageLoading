@@ -53,7 +53,7 @@ namespace FFImageLoading.Forms.Touch
 
 				if (fileImageSource.File.StartsWith("/", StringComparison.InvariantCultureIgnoreCase) && File.Exists(fileImageSource.File))
 					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
-				
+
 				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
 			}
 

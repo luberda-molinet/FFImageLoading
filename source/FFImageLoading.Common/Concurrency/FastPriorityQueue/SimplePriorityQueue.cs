@@ -12,7 +12,7 @@ namespace FFImageLoading.Concurrency
     /// <typeparam name="TPriority">The priority-type to use for nodes.  Must extend IComparable&lt;TPriority&gt;</typeparam>
     public class SimplePriorityQueue<TItem, TPriority> : IPriorityQueue<TItem, TPriority>
         where TPriority : IComparable<TPriority>
-    {        
+    {
         protected readonly IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> _queue;
 
         public SimplePriorityQueue(IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> queue)
@@ -158,9 +158,9 @@ namespace FFImageLoading.Concurrency
         }
 
         /// <summary>
-        /// Removes an item from the queue.  The item does not need to be the head of the queue.  
+        /// Removes an item from the queue.  The item does not need to be the head of the queue.
         /// If the item is not in the queue, an exception is thrown.  If unsure, check Contains() first.
-        /// If multiple copies of the item are enqueued, only the first one is removed. 
+        /// If multiple copies of the item are enqueued, only the first one is removed.
         /// O(n)
         /// </summary>
         public virtual void Remove(TItem item)

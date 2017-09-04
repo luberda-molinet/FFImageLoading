@@ -55,8 +55,8 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get 
-			{ 
+			get
+			{
 				return string.Format("TintTransformation,R={0},G={1},B={2},A={3},HexColor={4},EnableSolidColor={5}",
 									 R, G, B, A, HexColor, EnableSolidColor);
 			}

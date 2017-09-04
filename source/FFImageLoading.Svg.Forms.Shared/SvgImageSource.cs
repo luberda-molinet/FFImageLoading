@@ -96,7 +96,7 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
 		public static SvgImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
-			
+
 			return FromResource(resource, resolvingType.GetTypeInfo().Assembly, vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
 		}
 

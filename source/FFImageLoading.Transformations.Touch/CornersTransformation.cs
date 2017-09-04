@@ -12,13 +12,13 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType) 
+		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType)
 			: this(cornersSize, cornersSize, cornersSize, cornersSize, cornersTransformType, 1d, 1d)
 		{
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
-			CornerTransformType cornersTransformType) 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
+			CornerTransformType cornersTransformType)
 			: this(topLeftCornerSize, topRightCornerSize, bottomLeftCornerSize, bottomRightCornerSize, cornersTransformType, 1d, 1d)
 		{
 		}
@@ -28,7 +28,7 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			TopLeftCornerSize = topLeftCornerSize;
@@ -63,7 +63,7 @@ namespace FFImageLoading.Transformations
 				CornersTransformType, CropWidthRatio, CropHeightRatio);
 		}
 
-		public static UIImage ToTransformedCorners(UIImage source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public static UIImage ToTransformedCorners(UIImage source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			double sourceWidth = source.Size.Width;
@@ -99,12 +99,12 @@ namespace FFImageLoading.Transformations
 					using (var path = new UIBezierPath())
 					{
 						// TopLeft
-						if (cornersTransformType.HasFlag(CornerTransformType.TopLeftCut)) 
+						if (cornersTransformType.HasFlag(CornerTransformType.TopLeftCut))
 						{
 							path.MoveTo(new CGPoint(0, topLeftCornerSize));
 							path.AddLineTo(new CGPoint(topLeftCornerSize, 0));
 						}
-						else if (cornersTransformType.HasFlag(CornerTransformType.TopLeftRounded)) 
+						else if (cornersTransformType.HasFlag(CornerTransformType.TopLeftRounded))
 						{
 							path.MoveTo(new CGPoint(0, topLeftCornerSize));
 							path.AddQuadCurveToPoint(new CGPoint(topLeftCornerSize, 0), new CGPoint(0, 0));
@@ -115,7 +115,7 @@ namespace FFImageLoading.Transformations
 						}
 
 						// TopRight
-						if (cornersTransformType.HasFlag(CornerTransformType.TopRightCut)) 
+						if (cornersTransformType.HasFlag(CornerTransformType.TopRightCut))
 						{
 							path.AddLineTo(new CGPoint(desiredWidth - topRightCornerSize, 0));
 							path.AddLineTo(new CGPoint(desiredWidth, topRightCornerSize));
@@ -131,7 +131,7 @@ namespace FFImageLoading.Transformations
 						}
 
 						// BottomRight
-						if (cornersTransformType.HasFlag(CornerTransformType.BottomRightCut)) 
+						if (cornersTransformType.HasFlag(CornerTransformType.BottomRightCut))
 						{
 							path.AddLineTo(new CGPoint(desiredWidth, desiredHeight - bottomRightCornerSize));
 							path.AddLineTo(new CGPoint(desiredWidth - bottomRightCornerSize, desiredHeight));
@@ -147,12 +147,12 @@ namespace FFImageLoading.Transformations
 						}
 
 						// BottomLeft
-						if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftCut)) 
+						if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftCut))
 						{
 							path.AddLineTo(new CGPoint(bottomLeftCornerSize, desiredHeight));
 							path.AddLineTo(new CGPoint(0, desiredHeight - bottomLeftCornerSize));
 						}
-						else if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftRounded)) 
+						else if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftRounded))
 						{
 							path.AddLineTo(new CGPoint(bottomLeftCornerSize, desiredHeight));
 							path.AddQuadCurveToPoint(new CGPoint(0, desiredHeight - bottomLeftCornerSize), new CGPoint(0, desiredHeight));

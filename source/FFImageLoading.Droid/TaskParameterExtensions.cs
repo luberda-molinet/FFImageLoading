@@ -57,7 +57,7 @@ namespace FFImageLoading
                 {
                     if (exceptions == null)
                         exceptions = new List<Exception>();
-                    
+
                     exceptions.Add(ex);
                 userErrorCallback?.Invoke(ex);
                 })

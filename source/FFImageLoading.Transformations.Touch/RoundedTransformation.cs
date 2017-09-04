@@ -92,10 +92,10 @@ namespace FFImageLoading.Transformations
 					var drawRect = new CGRect(-cropX, -cropY, sourceWidth, sourceHeight);
 					source.Draw(drawRect);
 
-					if (borderSize > 0d) 
+					if (borderSize > 0d)
 					{
 						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 1000d);
-						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d), 
+						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d),
 							(desiredWidth - borderSize), (desiredHeight - borderSize));
 
 						context.BeginPath();

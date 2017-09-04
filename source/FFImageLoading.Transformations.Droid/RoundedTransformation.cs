@@ -36,13 +36,13 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get 
-			{ 
-				return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}", 
-				Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor); 
+			get
+			{
+				return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}",
+				Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
 			}
 		}
-			
+
 		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			return ToRounded(sourceBitmap, (float)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
@@ -91,7 +91,7 @@ namespace FFImageLoading.Transformations
 				RectF rectF = new RectF(0f, 0f, (float)desiredWidth, (float)desiredHeight);
 				canvas.DrawRoundRect(rectF, rad, rad, paint);
 
-				if (borderSize > 0d) 
+				if (borderSize > 0d)
 				{
 					borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
 					paint.Color = borderHexColor.ToColor(); ;
@@ -99,13 +99,13 @@ namespace FFImageLoading.Transformations
 					paint.StrokeWidth = (float)borderSize;
 					paint.SetShader(null);
 
-					RectF borderRectF = new RectF((float)(0d + borderSize/2d), (float)(0d + borderSize/2d), 
+					RectF borderRectF = new RectF((float)(0d + borderSize/2d), (float)(0d + borderSize/2d),
 						(float)(desiredWidth - borderSize/2d), (float)(desiredHeight - borderSize/2d));
 
 					canvas.DrawRoundRect(borderRectF, rad, rad, paint);
 				}
 
-				return bitmap;				
+				return bitmap;
 			}
 		}
 	}

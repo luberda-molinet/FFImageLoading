@@ -51,7 +51,7 @@ namespace FFImageLoading.Transformations
 			get
 			{
 				if (_rgbawMatrix == null)
-					return string.Format("ColorSpaceTransformation,colorMatrix={0}", 
+					return string.Format("ColorSpaceTransformation,colorMatrix={0}",
 						string.Join(",", _colorMatrix.GetArray()));
 
 				return string.Format("ColorSpaceTransformation,rgbawMatrix={0}",
@@ -67,7 +67,7 @@ namespace FFImageLoading.Transformations
 			var aOffset = rgbawMatrix[3][4];
 
 			_colorMatrix.SetScale(rOffset, gOffset, bOffset, aOffset);
-			var transposed = GetAndroidMatrix(rgbawMatrix);			
+			var transposed = GetAndroidMatrix(rgbawMatrix);
 			_colorMatrix.Set(transposed);
 		}
 
@@ -98,7 +98,7 @@ namespace FFImageLoading.Transformations
 			var config = source.GetConfig();
             		if (config == null)
                 		config = Bitmap.Config.Argb8888;    // This will support transparency
-			
+
 			int width = source.Width;
 			int height = source.Height;
 
@@ -110,7 +110,7 @@ namespace FFImageLoading.Transformations
 				paint.SetColorFilter(new ColorMatrixColorFilter(colorMatrix));
 				canvas.DrawBitmap(source, 0, 0, paint);
 
-				return bitmap;	
+				return bitmap;
 			}
 		}
 	}

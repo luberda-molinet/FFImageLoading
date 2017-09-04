@@ -11,13 +11,13 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType) 
+		public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType)
 			: this(cornersSize, cornersSize, cornersSize, cornersSize, cornersTransformType, 1d, 1d)
 		{
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
-			CornerTransformType cornersTransformType) 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
+			CornerTransformType cornersTransformType)
 			: this(topLeftCornerSize, topRightCornerSize, bottomLeftCornerSize, bottomRightCornerSize, cornersTransformType, 1d, 1d)
 		{
 		}
@@ -27,7 +27,7 @@ namespace FFImageLoading.Transformations
 		{
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			TopLeftCornerSize = topLeftCornerSize;
@@ -49,17 +49,17 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get { return string.Format("CornersTransformation,cornersSizes={0},{1},{2},{3},cornersTransformType={4},cropWidthRatio={5},cropHeightRatio={6},", 
+			get { return string.Format("CornersTransformation,cornersSizes={0},{1},{2},{3},cornersTransformType={4},cropWidthRatio={5},cropHeightRatio={6},",
 				TopLeftCornerSize, TopRightCornerSize, BottomRightCornerSize, BottomLeftCornerSize, CornersTransformType, CropWidthRatio, CropHeightRatio); }
 		}
 
 		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToTransformedCorners(sourceBitmap, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize, 
+			return ToTransformedCorners(sourceBitmap, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
 				CornersTransformType, CropWidthRatio, CropHeightRatio);
 		}
 
-		public static Bitmap ToTransformedCorners(Bitmap source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public static Bitmap ToTransformedCorners(Bitmap source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			double sourceWidth = source.Width;
@@ -106,12 +106,12 @@ namespace FFImageLoading.Transformations
 				paint.AntiAlias = true;
 
 				// TopLeft
-				if (cornersTransformType.HasFlag(CornerTransformType.TopLeftCut)) 
+				if (cornersTransformType.HasFlag(CornerTransformType.TopLeftCut))
 				{
 					path.MoveTo(0, (float)topLeftCornerSize);
 					path.LineTo((float)topLeftCornerSize, 0);
 				}
-				else if (cornersTransformType.HasFlag(CornerTransformType.TopLeftRounded)) 
+				else if (cornersTransformType.HasFlag(CornerTransformType.TopLeftRounded))
 				{
 					path.MoveTo(0, (float)topLeftCornerSize);
 					path.QuadTo(0, 0, (float)topLeftCornerSize, 0);
@@ -122,7 +122,7 @@ namespace FFImageLoading.Transformations
 				}
 
 				// TopRight
-				if (cornersTransformType.HasFlag(CornerTransformType.TopRightCut)) 
+				if (cornersTransformType.HasFlag(CornerTransformType.TopRightCut))
 				{
 					path.LineTo((float)(desiredWidth - topRightCornerSize), 0);
 					path.LineTo((float)desiredWidth, (float)topRightCornerSize);
@@ -138,7 +138,7 @@ namespace FFImageLoading.Transformations
 				}
 
 				// BottomRight
-				if (cornersTransformType.HasFlag(CornerTransformType.BottomRightCut)) 
+				if (cornersTransformType.HasFlag(CornerTransformType.BottomRightCut))
 				{
 					path.LineTo((float)desiredWidth, (float)(desiredHeight - bottomRightCornerSize));
 					path.LineTo((float)(desiredWidth - bottomRightCornerSize), (float)desiredHeight);
@@ -154,12 +154,12 @@ namespace FFImageLoading.Transformations
 				}
 
 				// BottomLeft
-				if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftCut)) 
+				if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftCut))
 				{
 					path.LineTo((float)bottomLeftCornerSize, (float)desiredHeight);
 					path.LineTo(0, (float)(desiredHeight - bottomLeftCornerSize));
 				}
-				else if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftRounded)) 
+				else if (cornersTransformType.HasFlag(CornerTransformType.BottomLeftRounded))
 				{
 					path.LineTo((float)bottomLeftCornerSize, (float)desiredHeight);
 					path.QuadTo(0, (float)desiredHeight, 0, (float)(desiredHeight - bottomLeftCornerSize));
@@ -172,7 +172,7 @@ namespace FFImageLoading.Transformations
 				path.Close();
 				canvas.DrawPath(path, paint);
 
-				return bitmap;				
+				return bitmap;
 			}
 		}
 	}

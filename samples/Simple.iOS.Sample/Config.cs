@@ -13,7 +13,7 @@ namespace Simple.iOS.Sample
         public const string LoadingPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//placeholder.jpg";
         public const string ErrorPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//error.jpg";
 
-        public static List<string> Images = new List<string> 
+        public static List<string> Images = new List<string>
             {
                 "https://fake.com/imageurl.jpg",
                 "https://lh4.googleusercontent.com/-Lfgi-xEMwuk/VNWoy8EDWcI/AAAAAAAAACk/rwsluNfhSZY/w1486-h832-no/photo.jpg",

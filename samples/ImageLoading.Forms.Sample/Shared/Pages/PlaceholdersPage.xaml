@@ -11,6 +11,6 @@
 			</ffimageloading:CachedImage>
 			<Button Text="Loading placeholder" Command="{Binding LoadingPlaceholderCommand}"/>
 			<Button Text="Error placeholder" Command="{Binding ErrorPlaceholderCommand}"/>
-		</StackLayout>		
+		</StackLayout>
 	</ContentPage.Content>
 </ContentPage>

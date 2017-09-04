@@ -55,7 +55,7 @@ namespace FFImageLoading.Forms.WinRT
             {
 				if (string.IsNullOrWhiteSpace(fileImageSource.File))
 					return null;
-				
+
                 StorageFile file = null;
 
                 try

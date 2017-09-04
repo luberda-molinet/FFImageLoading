@@ -69,7 +69,7 @@ namespace FFImageLoading.Cross
 
     	Dictionary<string, string> _replaceStringMap;
     	/// <summary>
-    	/// Used to define replacement map which will be used to 
+    	/// Used to define replacement map which will be used to
     	/// replace text inside SVG file (eg. changing colors values)
     	/// </summary>
     	/// <value>The replace string map.</value>

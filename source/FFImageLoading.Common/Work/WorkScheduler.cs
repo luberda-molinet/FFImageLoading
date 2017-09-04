@@ -29,8 +29,8 @@ namespace FFImageLoading.Work
             SimilarTasks = new ThreadSafeCollection<IImageLoaderTask>();
         }
 
-        protected int MaxParallelTasks 
-        { 
+        protected int MaxParallelTasks
+        {
             get
             {
                 if (Configuration.SchedulerMaxParallelTasksFactory != null)
@@ -187,7 +187,7 @@ namespace FFImageLoading.Work
             {
                 if (!task.IsCompleted)
                     task?.Dispose();
-                
+
                 return;
             }
 
@@ -411,7 +411,7 @@ namespace FFImageLoading.Work
                         _statsTotalRunning,
                         _statsTotalMemoryCacheHits,
                         _statsTotalWaiting));
-            
+
             Logger.Debug(Performance.GetMemoryInfo());
         }
 

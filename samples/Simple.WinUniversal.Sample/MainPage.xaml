@@ -25,7 +25,7 @@
 
         <ff:FFImage Name="Image"
                     Grid.Row="1"
-                    VerticalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
                     TransformPlaceholders="False"
                     LoadingPlaceholder="loading.png"
@@ -40,5 +40,5 @@
                     Source="http://loremflickr.com/600/600/nature?filename=simple.jpg">
 
         </ff:FFImage>
-    </Grid>   
+    </Grid>
 </Page>

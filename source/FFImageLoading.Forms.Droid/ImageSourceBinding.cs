@@ -69,7 +69,7 @@ namespace FFImageLoading.Forms.Droid
 				var uri = embeddedResoureSource.Uri?.OriginalString;
 				if (string.IsNullOrWhiteSpace(uri))
 					return null;
-                
+
                 return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
 			}
 

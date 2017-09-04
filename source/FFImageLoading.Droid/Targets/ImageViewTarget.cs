@@ -34,16 +34,16 @@ namespace FFImageLoading.Targets
         {
             if (task == null || task.IsCancelled)
                 return;
-            
+
             var control = Control;
             if (control == null)
                 return;
-            
+
             control.ImageLoaderTask = null;
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
-        public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated) 
+        public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
         {
             if (task == null || task.IsCancelled)
                 return;

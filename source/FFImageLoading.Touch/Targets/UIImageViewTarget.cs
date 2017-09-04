@@ -27,16 +27,16 @@ namespace FFImageLoading.Targets
                 // fade animation
                 double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
                     parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
-                
+
                 UIView.Transition(control, fadeDuration,
                     UIViewAnimationOptions.TransitionCrossDissolve
                     | UIViewAnimationOptions.BeginFromCurrentState,
-                    () => 
+                    () =>
                     {
                         if (control.Image?.Images != null && control.Image.Images.Length > 1)
                             control.Image = null;
-                    
-                        control.Image = image; 
+
+                        control.Image = image;
                     },
                     () => { });
             }

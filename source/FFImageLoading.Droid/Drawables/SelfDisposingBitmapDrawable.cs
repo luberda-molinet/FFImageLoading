@@ -21,7 +21,7 @@ namespace FFImageLoading.Drawables
     /// <summary>
     /// A BitmapDrawable that uses reference counting to determine when internal resources
     /// should be freed (Disposed).
-    /// 
+    ///
     /// On Android versions Honeycomb and higher the internal Bitmap is Dispose()d but not recycled.
     /// On all other Android versions the Bitmap is recycled then disposed.
     /// </summary>

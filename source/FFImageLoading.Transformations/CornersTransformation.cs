@@ -16,7 +16,7 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
@@ -27,7 +27,7 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);

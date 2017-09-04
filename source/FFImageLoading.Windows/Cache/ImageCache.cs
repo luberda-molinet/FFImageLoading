@@ -95,7 +95,7 @@ namespace FFImageLoading.Cache
         {
             if (string.IsNullOrWhiteSpace(key))
                 return;
-            
+
 			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
             _reusableBitmaps.Remove(key);
         }
@@ -104,7 +104,7 @@ namespace FFImageLoading.Cache
 		{
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
-            
+
             var pattern = baseKey + ";";
 
             var keysToRemove = _reusableBitmaps.Keys.Where(i => i.StartsWith(pattern, StringComparison.OrdinalIgnoreCase)).ToList();

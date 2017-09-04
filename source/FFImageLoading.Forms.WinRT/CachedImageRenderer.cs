@@ -140,7 +140,7 @@ namespace FFImageLoading.Forms.WinRT
         {
 			if (_isDisposed)
 				return;
-			
+
             if (Control != null)
             {
                 Control.ImageOpened -= OnImageOpened;

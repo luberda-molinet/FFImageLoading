@@ -20,7 +20,7 @@ namespace ImageLoading.Sample
         public const string LoadingPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//placeholder.jpg";
         public const string ErrorPlaceholderUrl = "http://files.usvit.alejtech.eu/peto//error.jpg";
 
-        public static List<string> Images = new List<string> 
+        public static List<string> Images = new List<string>
             {
                 "https://lh4.googleusercontent.com/-Lfgi-xEMwuk/VNWoy8EDWcI/AAAAAAAAACk/rwsluNfhSZY/w1486-h832-no/photo.jpg",
                 "https://lh3.googleusercontent.com/-mR70kzF5XXE/VNWo2ZZyQ6I/AAAAAAAAADE/1Jr_gknmDZw/w1319-h832-no/photo.jpg",

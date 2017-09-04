@@ -31,7 +31,7 @@ namespace FFImageLoading.Helpers
 			}
 			else
 			{
-				_handler.Post(action);	
+				_handler.Post(action);
 			}
         }
 

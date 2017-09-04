@@ -37,7 +37,7 @@ namespace FFImageLoading.Work
             if (!resourceUri.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
                 resourceUri = $"resource://{resourceUri}";
 
-            return new TaskParameter() { Source = ImageSource.EmbeddedResource, Path = resourceUri }; 
+            return new TaskParameter() { Source = ImageSource.EmbeddedResource, Path = resourceUri };
 		}
 
 		/// <summary>

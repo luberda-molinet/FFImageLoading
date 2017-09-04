@@ -51,7 +51,7 @@ namespace FFImageLoading
             double totalMegsHeap = (double)_runtime.MaxMemory() / 1048576d;
             double percentAvailHeap = (double)(_runtime.TotalMemory() - _runtime.FreeMemory()) / _runtime.MaxMemory() * 100d;
 
-            return string.Format("[PERFORMANCE] Memory - Free: {0:0}MB ({1:0}%), Total: {2:0}MB, Heap - Free: {3:0}MB ({4:0}%), Total: {5:0}MB", 
+            return string.Format("[PERFORMANCE] Memory - Free: {0:0}MB ({1:0}%), Total: {2:0}MB, Heap - Free: {3:0}MB ({4:0}%), Total: {5:0}MB",
                                  availableMegs, percentAvail, totalMegs, availableMegsHeap, percentAvailHeap, totalMegsHeap);
         }
     }
