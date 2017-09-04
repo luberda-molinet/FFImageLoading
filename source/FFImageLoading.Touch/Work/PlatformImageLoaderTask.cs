@@ -17,6 +17,8 @@ namespace FFImageLoading.Work
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<UIImage, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
+        static readonly SemaphoreSlim _webpLock = new SemaphoreSlim(1, 1);
+        static object _webpDecoder;
 
         public PlatformImageLoaderTask(ITarget<UIImage, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
             : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
@@ -58,9 +60,23 @@ namespace FFImageLoading.Work
                 // Special case to handle WebP decoding on iOS
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
-                    var decodedWebP = new WebP.Touch.WebPCodec().Decode(imageData);
-                    //TODO Add WebP images downsampling!
-                    imageIn = decodedWebP;
+                    await _webpLock.WaitAsync();
+                    try
+                    {
+                        var decoder = _webpDecoder as WebP.Touch.WebPCodec;
+                        if (decoder == null)
+                        {
+                            decoder = new WebP.Touch.WebPCodec();
+                            _webpDecoder = decoder;
+                        }
+                        var decodedWebP = decoder.Decode(imageData);
+                        //TODO Add WebP images downsampling!
+                        imageIn = decodedWebP;   
+                    }
+                    finally
+                    {
+                        _webpLock.Release();
+                    }
                 }
                 else
                 {
