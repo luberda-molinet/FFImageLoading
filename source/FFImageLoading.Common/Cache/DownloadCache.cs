@@ -116,6 +116,7 @@ namespace FFImageLoading.Cache
 
                             using (var cancelReadTimeoutToken = new CancellationTokenSource())
                             {
+                                var readTimeoutToken = cancelReadTimeoutToken.Token;
                                 cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
 
                                 int total = (int)((progressAction != null && response.Content.Headers.ContentLength.HasValue) ? response.Content.Headers.ContentLength.Value : -1);
@@ -137,6 +138,7 @@ namespace FFImageLoading.Cache
                                                 while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
                                                 {
                                                     token.ThrowIfCancellationRequested();
+                                                    readTimeoutToken.ThrowIfCancellationRequested();
                                                     outputStream.Write(buffer, 0, read);
                                                     totalRead += read;
                                                     progressAction(new DownloadProgress() { Total = total, Current = totalRead });
