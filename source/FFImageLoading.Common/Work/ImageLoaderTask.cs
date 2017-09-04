@@ -512,15 +512,6 @@ namespace FFImageLoading.Work
             }
             catch (Exception ex)
             {
-                try
-                {
-                    if (CancellationTokenSource?.IsCancellationRequested == false)
-                        CancellationTokenSource.Cancel();
-                }
-                catch (Exception)
-                {
-                }
-
                 if (ex is OperationCanceledException || ex is ObjectDisposedException)
                 {
                     if (Configuration.VerboseLoadingCancelledLogging)
