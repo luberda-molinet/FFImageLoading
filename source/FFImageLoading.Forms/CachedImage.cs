@@ -15,6 +15,9 @@ namespace FFImageLoading.Forms
     [Preserve(AllMembers = true)]
 	public class CachedImage : View
 	{
+        //TODO It's a breaking change, so change it in major version
+        public static bool FixedOnMeasureBehavior { get; set; } = false;
+
 		public CachedImage()
 		{
 			Transformations = new List<Work.ITransformation>();
@@ -488,82 +491,93 @@ namespace FFImageLoading.Forms
 			base.OnBindingContextChanged();
 		}
 
-              protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
-              {
-                     SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
+        protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
+        {
+            SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
 
-                     double desiredWidth = desiredSize.Request.Width;
-                     double desiredHeight = desiredSize.Request.Height;
+            double desiredWidth = desiredSize.Request.Width;
+            double desiredHeight = desiredSize.Request.Height;
 
-                     if (desiredWidth == 0 || desiredHeight == 0)
-                            return new SizeRequest(new Size(0, 0));
+            if (desiredWidth == 0 || desiredHeight == 0)
+                return new SizeRequest(new Size(0, 0));
 
 
-                     if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
-                     {
-                            return new SizeRequest(new Size(desiredWidth, desiredHeight));
-                     }
+            if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
+            {
+                return new SizeRequest(new Size(desiredWidth, desiredHeight));
+            }
 
-                     if (double.IsPositiveInfinity(widthConstraint))
-                     {
-                            double factor = heightConstraint / desiredHeight;
-                            return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-                     }
+            if (double.IsPositiveInfinity(widthConstraint))
+            {
+                double factor = heightConstraint / desiredHeight;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+            }
 
-                     if (double.IsPositiveInfinity(heightConstraint))
-                     {
-                            double factor = widthConstraint / desiredWidth;
-                            return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-                     }
+            if (double.IsPositiveInfinity(heightConstraint))
+            {
+                double factor = widthConstraint / desiredWidth;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+            }
 
-                     double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
-                     double constraintAspect = widthConstraint / heightConstraint;
-                     double width = desiredWidth;
-                     double height = desiredHeight;
+            //TODO It's a breaking change, so change it in major version
+            if (FixedOnMeasureBehavior)
+            {
 
-                     if (constraintAspect > desiredAspect)
-                     {
-                            // constraint area is proportionally wider than image
-                            switch (Aspect)
-                            {
-                                   case Aspect.AspectFit:
-                                   case Aspect.AspectFill:
-                                          height = Math.Min(desiredHeight, heightConstraint);
-                                          width = desiredWidth * (height / desiredHeight);
-                                          break;
-                                   case Aspect.Fill:
-                                          width = Math.Min(desiredWidth, widthConstraint);
-                                          height = desiredHeight * (width / desiredWidth);
-                                          break;
-                            }
-                     }
-                     else if (constraintAspect < desiredAspect)
-                     {
-                            // constraint area is proportionally taller than image
-                            switch (Aspect)
-                            {
-                                   case Aspect.AspectFit:
-                                   case Aspect.AspectFill:
-                                          width = Math.Min(desiredWidth, widthConstraint);
-                                          height = desiredHeight * (width / desiredWidth);
-                                          break;
-                                   case Aspect.Fill:
-                                          height = Math.Min(desiredHeight, heightConstraint);
-                                          width = desiredWidth * (height / desiredHeight);
-                                          break;
-                            }
-                     }
-                     else
-                     {
-                            // constraint area is same aspect as image
+                double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
+                double constraintAspect = widthConstraint / heightConstraint;
+                double width = desiredWidth;
+                double height = desiredHeight;
+
+                if (constraintAspect > desiredAspect)
+                {
+                    // constraint area is proportionally wider than image
+                    switch (Aspect)
+                    {
+                        case Aspect.AspectFit:
+                        case Aspect.AspectFill:
+                            height = Math.Min(desiredHeight, heightConstraint);
+                            width = desiredWidth * (height / desiredHeight);
+                            break;
+                        case Aspect.Fill:
                             width = Math.Min(desiredWidth, widthConstraint);
                             height = desiredHeight * (width / desiredWidth);
-                     }
+                            break;
+                    }
+                }
+                else if (constraintAspect < desiredAspect)
+                {
+                    // constraint area is proportionally taller than image
+                    switch (Aspect)
+                    {
+                        case Aspect.AspectFit:
+                        case Aspect.AspectFill:
+                            width = Math.Min(desiredWidth, widthConstraint);
+                            height = desiredHeight * (width / desiredWidth);
+                            break;
+                        case Aspect.Fill:
+                            height = Math.Min(desiredHeight, heightConstraint);
+                            width = desiredWidth * (height / desiredHeight);
+                            break;
+                    }
+                }
+                else
+                {
+                    // constraint area is same aspect as image
+                    width = Math.Min(desiredWidth, widthConstraint);
+                    height = desiredHeight * (width / desiredWidth);
+                }
 
-                     return new SizeRequest(new Size(width, height));
-              }
+                return new SizeRequest(new Size(width, height));
+            }
 
-              public void SetIsLoading(bool isLoading)
+            double fitsWidthRatio = widthConstraint / desiredWidth;
+            double fitsHeightRatio = heightConstraint / desiredHeight;
+            double ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
+
+            return new SizeRequest(new Size(desiredWidth * ratioFactor, desiredHeight * ratioFactor));
+        }
+
+        public void SetIsLoading(bool isLoading)
 		{
 			SetValue(IsLoadingPropertyKey, isLoading);
 		}
