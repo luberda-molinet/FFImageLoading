@@ -141,6 +141,11 @@ namespace FFImageLoading
                 var downloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
                 userDefinedConfig.DownloadCache = downloadCache;
 
+#if WINDOWS
+                // To resolve this Windows issues: https://github.com/luberda-molinet/FFImageLoading/issues/439
+                userDefinedConfig.ExecuteCallbacksOnUIThread = true;
+#endif
+
                 Config = userDefinedConfig;
 
                 _initialized = true;
