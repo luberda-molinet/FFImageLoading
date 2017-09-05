@@ -404,13 +404,15 @@ namespace FFImageLoading.Work
 
                     try
                     {
-                        await _placeholdersResolveLock.WaitAsync(CancellationTokenSource.Token);
+                        if (isLoadingPlaceholder)
+                            await _placeholdersResolveLock.WaitAsync(CancellationTokenSource.Token);
                         ThrowIfCancellationRequested();
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                     }
                     finally
                     {
-                        _placeholdersResolveLock.Release();
+                        if (isLoadingPlaceholder)
+                            _placeholdersResolveLock.Release();
                     }
 
                     using (loadImageData.Item1)
@@ -560,6 +562,15 @@ namespace FFImageLoading.Work
             }
             finally
             {
+                try
+                {
+                    if (CancellationTokenSource?.IsCancellationRequested == false)
+                        CancellationTokenSource.Cancel();
+                }
+                catch (Exception)
+                {
+                }
+
                 IsCompleted = true;
 
                 using (Parameters)
