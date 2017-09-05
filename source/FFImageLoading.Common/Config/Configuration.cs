@@ -23,6 +23,7 @@ namespace FFImageLoading.Config
 			DownsampleInterpolationMode = InterpolationMode.Default;
 			HttpHeadersTimeout = 10;
 			HttpReadTimeout = 30;
+            HttpReadBufferSize = 8192;
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
@@ -155,6 +156,12 @@ namespace FFImageLoading.Config
 		/// </summary>
 		/// <value>The http read timeout.</value>
 		public int HttpReadTimeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the http read buffer.
+        /// </summary>
+        /// <value>The size of the http read buffer.</value>
+        public int HttpReadBufferSize { get; set; }
 
 		/// <summary>
 		/// Gets or sets the maximum size of the memory cache in bytes.

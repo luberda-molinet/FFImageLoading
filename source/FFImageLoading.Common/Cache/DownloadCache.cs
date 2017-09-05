@@ -128,7 +128,7 @@ namespace FFImageLoading.Cache
                                     using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                                     {
                                         int totalRead = 0;
-                                        var buffer = new byte[4096];
+                                        var buffer = new byte[Configuration.HttpReadBufferSize];
 
                                         int read = 0;
                                         while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
