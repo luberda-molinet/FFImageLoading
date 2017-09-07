@@ -28,9 +28,9 @@ namespace FFImageLoading.Cache
                 //TODO Does anyone know how we could get available app ram from WinRT API?
                 EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
                 if (deviceInfo.OperatingSystem.ToLower().Contains("phone"))
-                    maxCacheSize = 1000000 * 32; //32MB
+                    maxCacheSize = 1000000 * 64; //64MB
                 else
-                    maxCacheSize = 1000000 * 128; //128MB
+                    maxCacheSize = 1000000 * 256; //256MB
 
                 _logger?.Debug($"Memory cache size: {maxCacheSize} bytes");
             }
