@@ -401,36 +401,45 @@ namespace FFImageLoading.Work
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                     loadResolver = new WrappedDataResolver(loadResolver);
                     Tuple<Stream, LoadingResult, ImageInformation> loadImageData;
+                    bool hasMutex = false;
+                    TImageContainer loadImage;
 
                     try
                     {
-                        if (isLoadingPlaceholder)
-                            await _placeholdersResolveLock.WaitAsync(CancellationTokenSource.Token);
+                        hasMutex = await _placeholdersResolveLock.WaitAsync(TimeSpan.FromSeconds(3), CancellationTokenSource.Token).ConfigureAwait(false);
+                        ThrowIfCancellationRequested();
+
+                        if (await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
+                        {
+                            if (isLoadingPlaceholder)
+                                _isLoadingPlaceholderLoaded = true;
+                            
+                            return;
+                        }
+
                         ThrowIfCancellationRequested();
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
+                        ThrowIfCancellationRequested();
+
+                        using (loadImageData.Item1)
+                        {
+                            loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
+                            if (loadImage != default(TImageContainer))
+                                MemoryCache.Add(key, loadImageData.Item3, loadImage);
+                        }
                     }
                     finally
                     {
-                        if (isLoadingPlaceholder)
+                        if (hasMutex)
                             _placeholdersResolveLock.Release();
                     }
 
-                    using (loadImageData.Item1)
-                    {
-                        ThrowIfCancellationRequested();
+                    ThrowIfCancellationRequested();
 
-                        var loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
+                    if (isLoadingPlaceholder)
+                        PlaceholderWeakReference = new WeakReference<TImageContainer>(loadImage);
 
-                        if (loadImage != default(TImageContainer))
-                            MemoryCache.Add(key, loadImageData.Item3, loadImage);
-
-                        ThrowIfCancellationRequested();
-
-                        if (isLoadingPlaceholder)
-                            PlaceholderWeakReference = new WeakReference<TImageContainer>(loadImage);
-
-                        await SetTargetAsync(loadImage, false).ConfigureAwait(false);
-                    }
+                    await SetTargetAsync(loadImage, false).ConfigureAwait(false);
 
                     if (isLoadingPlaceholder)
                         _isLoadingPlaceholderLoaded = true;
