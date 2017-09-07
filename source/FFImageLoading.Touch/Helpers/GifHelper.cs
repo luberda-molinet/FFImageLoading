@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using ImageIO;
 using UIKit;
 using FFImageLoading.Work;
@@ -61,12 +62,12 @@ namespace FFImageLoading.Helpers
                     {
                         using (var unclampedDelay = gifProperties.ValueForKey(CGImageProperties.GIFUnclampedDelayTime))
                         {
-                            double delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString()) : 0;
+                            double delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString(), CultureInfo.InvariantCulture) : 0;
 
                             if (delayAsDouble == 0)
                             {
                                 using (var delay = gifProperties.ValueForKey(CGImageProperties.GIFDelayTime))
-                                    delayAsDouble = delay != null ? double.Parse(delay.ToString()) : 0;
+                                    delayAsDouble = delay != null ? double.Parse(delay.ToString(), CultureInfo.InvariantCulture) : 0;
                             }
 
                             if (delayAsDouble > 0)
