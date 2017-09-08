@@ -13,7 +13,7 @@ namespace FFImageLoading
             {
                 return new PlatformPerformance();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new EmptyPlatformPerformance();
             }
