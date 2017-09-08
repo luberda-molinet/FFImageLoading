@@ -97,6 +97,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.MvvmCross.Sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.MacOs", "source\FFImageLoading.MacOs\FFImageLoading.MacOs.csproj", "{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FFImageLoading.Shared.IosMac", "source\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.shproj", "{26F4DB3B-EC7F-46DE-8D51-2CB4BA187A16}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4

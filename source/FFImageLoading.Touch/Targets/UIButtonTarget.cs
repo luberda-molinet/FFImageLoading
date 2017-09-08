@@ -6,7 +6,7 @@ using UIKit;
 
 namespace FFImageLoading.Targets
 {
-	public class UIButtonTarget: UIControlTarget<UIButton>
+	public class UIButtonTarget: PControlTarget<UIButton>
 	{
 		public UIButtonTarget(UIButton control) : base(control)
 		{
