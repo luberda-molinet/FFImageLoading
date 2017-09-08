@@ -16,7 +16,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
@@ -27,6 +27,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -36,6 +37,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>		
     <OutputPath>bin\Debug\</OutputPath>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
@@ -48,6 +51,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>

@@ -52,10 +52,6 @@ echo Unit testing...
 %msbuild% source/Tests/FFImageLoading.Core.Tests/FFImageLoading.Core.Tests.csproj %buildargsTests%
 xunit.console.clr4 source/Tests/FFImageLoading.Core.Tests/bin/Debug/FFImageLoading.Core.Tests.dll /appveyor
 
-echo Generating symbols with Gitlink...
-
-GitLink.exe %~dp0 -u https://github.com/luberda-molinet/FFImageLoading
-
 echo Packaging NuGets...
 
 nuget pack source/Xamarin.FFImageLoading.nuspec

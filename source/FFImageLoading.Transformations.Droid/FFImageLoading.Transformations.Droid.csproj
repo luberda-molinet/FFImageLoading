@@ -16,7 +16,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;__ANDROID__;</DefineConstants>
@@ -26,6 +26,8 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>		
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
@@ -36,6 +38,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>		
     <OutputPath>bin\Debug\</OutputPath>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,6 +53,7 @@
     <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
