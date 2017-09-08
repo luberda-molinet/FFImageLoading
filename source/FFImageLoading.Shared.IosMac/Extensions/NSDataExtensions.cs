@@ -36,20 +36,17 @@ namespace FFImageLoading.Extensions
         {
             using (var sourceRef = CGImageSource.FromData(data))
             {
-                var imageProperties = GetImageProperties(sourceRef);
+                if (sourceRef == null)
+                    throw new BadImageFormatException("Decoded image is null or corrupted");
 
-                if (imageProperties == null)
-                {
-                    throw new BadImageFormatException("Image is null");
-                }
+                var imageProperties = sourceRef.GetProperties(0);
 
-                if (imageinformation != null)
-                {
-                    if (imageProperties.PixelWidth.HasValue && imageProperties.PixelHeight.HasValue)
-                        imageinformation.SetOriginalSize(imageProperties.PixelWidth.Value, imageProperties.PixelHeight.Value);
-                }
+                if (imageProperties == null || !imageProperties.PixelWidth.HasValue || !imageProperties.PixelHeight.HasValue)
+                    throw new BadImageFormatException("Can't read image size properties. File corrupted?");
 
-                var sourceSize = new CGSize((nfloat)imageProperties.PixelWidth, (nfloat)imageProperties.PixelHeight);
+                imageinformation.SetOriginalSize(imageProperties.PixelWidth.Value, imageProperties.PixelHeight.Value);
+
+                var sourceSize = new CGSize(imageProperties.PixelWidth.Value, imageProperties.PixelHeight.Value);
 
                 if (destSize.IsEmpty)
                 {
@@ -271,26 +268,6 @@ namespace FFImageLoading.Extensions
 					}
 			}
 		}
-
-        private static CoreGraphics.CGImageProperties GetImageProperties(CGImageSource imageSource)
-        {
-            if (imageSource == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                // Get original image size
-                 return imageSource.GetProperties(0);
-            }
-            catch (ArgumentNullException ex)
-            {
-                ImageService.Instance.Config.Logger.Debug(ex.ToString());
-                return null;
-            }
-        }
-
 	}
 }
 
