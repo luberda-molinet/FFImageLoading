@@ -18,6 +18,7 @@ echo Building FFImageLoading...
 %msbuild% source/FFImageLoading.BaitAndSwitch/FFImageLoading.BaitAndSwitch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Windows/FFImageLoading.Windows.csproj %buildargs%
 %msbuild% source/FFImageLoading.Touch/FFImageLoading.Touch.csproj %buildargs%
+%msbuild% source/FFImageLoading.MacOs/FFImageLoading.MacOs.csproj %buildargs%
 %msbuild% source/FFImageLoading.Droid/FFImageLoading.Droid.csproj %buildargs%
 
 echo Building FFImageLoading.Transformations...
