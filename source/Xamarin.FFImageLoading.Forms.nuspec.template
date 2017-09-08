@@ -13,32 +13,39 @@
        	<requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        	<description>
-Xamarin Forms plugin to load images quickly and easily on Xamarin.Forms.
+			Xamarin Library to load images quickly and easily on Xamarin.Forms.
 
-Features:
+            Ensure you call CachedImageRenderer.Init() on each platform!!!
 
-- Xamarin.Forms - iOS / Android / Windows (WinRT, UWP) support
-- Configurable disk and memory caching
-- Deduplication of similar download/load requests
-- Error and loading placeholders support
-- Images can be automatically downsampled to specified size (less memory usage)
-- WebP support
-- Image loading Fade-In animations support
-- Can retry image downloads (RetryCount, RetryDelay)
-- On Android transparency is disabled by default (configurable). Saves 50% of memory
-- Transformations support built-in and custom native platform ITransformation implementations.
+			Features:
 
-Ensure you call CachedImageRenderer.Init() on each platform!!!
+			- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
+			- Configurable disk and memory caching
+			- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
+			- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
+			- Error and loading placeholders support
+			- Images can be automatically downsampled to specified size (less memory usage)
+			- Fluent API which is inspired by Picasso naming
+			- SVG / WebP / GIF support
+			- Image loading Fade-In animations support
+			- Can retry image downloads (RetryCount, RetryDelay)
+			- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
+			- Transformations support
+			- BlurredTransformation
+			- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+			- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+			- FlipTransformation, RotateTransformation
+			- Supports custom transformations (native platform `ITransformation` implementations)
        	</description>
        
        	<summary>Xamarin Forms plugin to load images quickly and easily.</summary>
-       	<tags>xamarin, forms, xamarin.forms, android, ios, bitmap, image, cache, webp, quick, easy, lru, load, loading, save</tags>
+       	<tags>xamarin, forms, xamarin.forms, mac, windows, android, ios, bitmap, image, cache, webp, quick, easy, lru, load, loading, save</tags>
         
         <dependencies>
         
           <group>
             <dependency id="Xamarin.FFImageLoading" version="@version" />
-            <dependency id="Xamarin.Forms" version="1.4.4.6392" />
+            <dependency id="Xamarin.Forms" version="2.0" />
           </group>
 		  
         </dependencies>
@@ -67,6 +74,14 @@ Ensure you call CachedImageRenderer.Init() on each platform!!!
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.dll" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.dll" />
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.xml" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.xml" />
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.pdb" />
+
+        <!--Xamarin.Mac-->
+        <!-- <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\Xamarin.Mac20\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.dll" />
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.xml" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.xml" />
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.pdb" />         -->
         
         <!--Windows WinRT-->
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Forms.dll" />

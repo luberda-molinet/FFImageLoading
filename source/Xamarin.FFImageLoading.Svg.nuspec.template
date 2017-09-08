@@ -57,6 +57,11 @@ SVG support for FFImageLoading library.
 		<file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.dll" />
         <file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.xml" />
         <file src="FFImageLoading.Svg.Touch\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Platform.pdb" />
+
+        <!--Xamarin.Mac -->
+		<!-- <file src="FFImageLoading.Svg.MacOs\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg.MacOs\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg.MacOs\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Platform.pdb" /> -->
  
 		<!--Windows-->
 		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.dll" target="lib\uap10.0\FFImageLoading.Svg.Platform.dll" />

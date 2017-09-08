@@ -5,7 +5,7 @@
        <id>Xamarin.FFImageLoading.Transformations</id>
        <version>@version</version>
        <title>FFImageLoading Transformations</title>
-       <authors>Molinet Fabien, Daniel Luberda</authors>
+       <authors>Daniel Luberda, Molinet Fabien</authors>
        <owners></owners>
        <licenseUrl>https://raw.githubusercontent.com/luberda-molinet\FFImageLoading/master/LICENSE.md</licenseUrl>
        <projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
@@ -13,19 +13,20 @@
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        <description>
-Transformations for FFImageLoading library.
+            Transformations for FFImageLoading library.
 
-- BlurredTransformation
-- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
-- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation
-- FlipTransformation, RotateTransformation
+			- BlurredTransformation
+			- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+			- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+			- FlipTransformation, RotateTransformation
+			- Supports custom transformations (native platform `ITransformation` implementations)
 
-These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
-Don't forget to add the package in the Droid and Touch projects. This way the correct native implementation is injected.
+            These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
+            Don't forget to add the package in all platform specific projects. This way the correct native implementation is injected.
        </description>
        
        <summary>Xamarin image transformations for FFImageLoading.</summary>
-       <tags>xamarin, android, ios, bitmap, image, webp, transformation, blur, round, circle, effects, corners</tags>
+       <tags>xamarin, android, ios, mac, windows, bitmap, image, webp, transformation, blur, round, circle, effects, corners</tags>
        
        <dependencies>
        
@@ -53,6 +54,11 @@ Don't forget to add the package in the Droid and Touch projects. This way the co
 		<file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.dll" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.dll" />
         <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.xml" />
         <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.pdb" />
+
+		<!--Xamarin.Mac -->
+		<!-- <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.dll" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />         -->
  
 		<!--Windows-->
 		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />

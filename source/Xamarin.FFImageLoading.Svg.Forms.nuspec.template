@@ -13,11 +13,11 @@
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        <description>
-Xamarin.Forms SVG support for FFImageLoading library.
+        Xamarin.Forms SVG support for FFImageLoading library.
        </description>
        
        <summary>Xamarin.Forms SVG support for FFImageLoading.</summary>
-       <tags>xamarin, android, ios, bitmap, image, svg</tags>
+       <tags>xamarin, android, ios, windows, mac, bitmap, image, svg</tags>
        
        <dependencies>
        
@@ -45,6 +45,11 @@ Xamarin.Forms SVG support for FFImageLoading library.
 		<file src="FFImageLoading.Svg.Forms.Touch\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Forms.dll" />
         <file src="FFImageLoading.Svg.Forms.Touch\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Forms.xml" />
         <file src="FFImageLoading.Svg.Forms.Touch\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Svg.Forms.pdb" />
+
+		<!--Xamarin.Mac -->
+		<!-- <file src="FFImageLoading.Svg.Forms.MacOs\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.dll" />
+        <file src="FFImageLoading.Svg.Forms.MacOs\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.xml" />
+        <file src="FFImageLoading.Svg.Forms.MacOs\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.pdb" />         -->
  
 		<!--Windows-->
 		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.dll" target="lib\uap10.0\FFImageLoading.Svg.Forms.dll" />
