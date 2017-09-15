@@ -30,7 +30,6 @@ namespace FFImageLoading.Svg.Platform
         private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
         {
             DtdProcessing = DtdProcessing.Ignore,
-            ValidationType = ValidationType.None,
             IgnoreComments = true,
         };
 
