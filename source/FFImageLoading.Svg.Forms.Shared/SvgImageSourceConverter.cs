@@ -8,11 +8,6 @@ namespace FFImageLoading.Svg.Forms
 	/// <summary>
 	/// SvgImageSourceConverter
 	/// </summary>
-#if __IOS__
-            [Foundation.Preserve(AllMembers = true)]
-#elif __ANDROID__
-            [Android.Runtime.Preserve(AllMembers = true)]
-#endif
     [Preserve(AllMembers = true)]
 	public class SvgImageSourceConverter : TypeConverter, IValueConverter
 	{
@@ -54,24 +49,6 @@ namespace FFImageLoading.Svg.Forms
         public override bool CanConvertFrom(Type sourceType)
         {
         	return sourceType == typeof(string);
-        }
-
-        [Obsolete]
-        public override object ConvertFrom(CultureInfo culture, object value)
-        {
-			var text = value as string;
-
-			if (text == null)
-				return null;
-
-            var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
-
-            if (text.Contains("svg", StringComparison.OrdinalIgnoreCase))
-            {
-                return new SvgImageSource(xfSource, 0, 0, true);
-            }
-
-            return xfSource;
         }
 
         public override object ConvertFromInvariantString(string value)

@@ -13,13 +13,12 @@ namespace FFImageLoading.Forms
 			return sourceType == typeof(string);
 		}
 
-        [Obsolete]
-		public override object ConvertFrom(CultureInfo culture, object value)
-		{
-			var text = value as string;
+        public override object ConvertFromInvariantString(string value)
+        {
+            var text = value as string;
 
-			if (text == null)
-				return null;
+            if (text == null)
+                return null;
 
             if (text.IsDataUrl())
             {
@@ -42,8 +41,8 @@ namespace FFImageLoading.Forms
                 return ImageSource.FromFile(text);
             }
 
-			throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
-		}
+            throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
+        }
 	}
 }
 
