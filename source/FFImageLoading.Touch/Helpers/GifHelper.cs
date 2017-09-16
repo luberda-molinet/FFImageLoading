@@ -32,23 +32,23 @@ namespace FFImageLoading.Helpers
             var totalDuration = delays.Sum();
             var adjustedFrames = AdjustFramesToSpoofDurations(frames, scale, delays, totalDuration);
 
-            return UIImage.CreateAnimatedImage(adjustedFrames.ToArray(), totalDuration / 100.0);
+            return UIImage.CreateAnimatedImage(adjustedFrames, totalDuration / 100.0);
         }
 
-        private static List<CoreGraphics.CGImage> GetFrames(CGImageSource source, CGImageThumbnailOptions options)
+        static CoreGraphics.CGImage[] GetFrames(CGImageSource source, CGImageThumbnailOptions options)
         {
-            var retval = new List<CoreGraphics.CGImage>();
+            var retval = new CoreGraphics.CGImage[source.ImageCount];
 
-            for (int i = 0; i < source?.ImageCount; i++)
+            for (int i = 0; i < source.ImageCount; i++)
             {
                 var frameImage = source.CreateThumbnail(i, options);
-                retval.Add(frameImage);
+                retval[i] = frameImage;
             }
 
             return retval;
         }
 
-        private static List<int> GetDelays(CGImageSource source)
+        static List<int> GetDelays(CGImageSource source)
         {
             var retval = new List<int>();
 
@@ -64,7 +64,7 @@ namespace FFImageLoading.Helpers
                         {
                             double delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString(), CultureInfo.InvariantCulture) : 0;
 
-                            if (delayAsDouble == 0)
+                            if (Math.Abs(delayAsDouble) < double.Epsilon)
                             {
                                 using (var delay = gifProperties.ValueForKey(CGImageProperties.GIFDelayTime))
                                     delayAsDouble = delay != null ? double.Parse(delay.ToString(), CultureInfo.InvariantCulture) : 0;
@@ -87,9 +87,9 @@ namespace FFImageLoading.Helpers
          * For example, suppose the GIF contains three frames.  Frame 0 has duration 3.  Frame 1 has duration 9.  Frame 2 has duration 15.  I divide each duration by the greatest common denominator of all the durations,
          * which is 3, and add each frame the resulting number of times.  Thus `animation` will contain frame 0 3/3 = 1 time, then frame 1 9/3 = 3 times, then frame 2 15/3 = 5 times.
          * I set `animation.duration` to (3+9+15)/100 = 0.27 seconds. */
-        private static List<UIImage> AdjustFramesToSpoofDurations(List<CoreGraphics.CGImage> images, nfloat scale, List<int> delays, int totalDuration)
+        private static UIImage[] AdjustFramesToSpoofDurations(CoreGraphics.CGImage[] images, nfloat scale, List<int> delays, int totalDuration)
         {
-            var count = images.Count;
+            var count = images.Length;
             var gcd = GetGCD(delays);
             var frameCount = totalDuration / gcd;
             var frames = new UIImage[frameCount];
@@ -102,10 +102,10 @@ namespace FFImageLoading.Helpers
                     frames[f++] = frame;
             }
 
-            return frames.ToList();
+            return frames.Where(v => v.CGImage != null).ToArray();
         }
 
-        private static int GetGCD(List<int> delays)
+        static int GetGCD(List<int> delays)
         {
             var gcd = delays[0];
 
@@ -115,7 +115,7 @@ namespace FFImageLoading.Helpers
             return gcd;
         }
 
-        private static int PairGCD(int a, int b)
+        static int PairGCD(int a, int b)
         {
             if (a < b)
                 return PairGCD(b, a);

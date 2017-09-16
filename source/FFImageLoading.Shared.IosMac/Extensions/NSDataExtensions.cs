@@ -5,6 +5,7 @@ using ImageIO;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
+using System.Threading;
 
 #if __MACOS__
 using AppKit;
@@ -18,6 +19,8 @@ namespace FFImageLoading.Extensions
 {
     public static class NSDataExtensions
     {
+        static readonly object _gifLock = new object();
+
         public enum RCTResizeMode : long
         {
 #if __MACOS__
@@ -82,7 +85,12 @@ namespace FFImageLoading.Extensions
 #if __IOS__
                 // gif
                 if (sourceRef.ImageCount > 1 && config.AnimateGifs)
-                    image = GifHelper.AnimateGif(sourceRef, destScale, options, parameters);
+                {
+                    lock (_gifLock)
+                    {
+                        image = GifHelper.AnimateGif(sourceRef, destScale, options, parameters);
+                    }
+                }
                 else
                 {
 

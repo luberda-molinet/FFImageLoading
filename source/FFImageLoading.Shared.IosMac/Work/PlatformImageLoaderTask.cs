@@ -67,13 +67,10 @@ namespace FFImageLoading.Work
                     downsampleHeight = downsampleHeight.PointsToPixels();
                 }
 
-                // No webp support for mac implemented
-                bool isWebp = false;
-#if __IOS__
-				// Special case to handle WebP decoding on iOS
-				if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
+                // Special case to handle WebP decoding on iOS
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
-                    isWebp = true;
+#if __IOS__
                     await _webpLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false);
                     ThrowIfCancellationRequested();
                     try
@@ -92,13 +89,13 @@ namespace FFImageLoading.Work
                     {
                         _webpLock.Release();
                     }
-                }
+#else
+                    throw new NotImplementedException();
 #endif
-                if (!isWebp)
-                {
-                    var nsdata = NSData.FromStream(imageData);
-                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, Parameters, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
                 }
+
+                var nsdata = NSData.FromStream(imageData);
+                imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, Parameters, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
             }
             finally
             {
@@ -155,6 +152,9 @@ namespace FFImageLoading.Work
                         {
                             var tempImage = animatedImages[i];
 
+                            if (tempImage.CGImage == null)
+                                continue;
+
                             foreach (var transformation in transformations)
                             {
                                 ThrowIfCancellationRequested();
@@ -182,7 +182,7 @@ namespace FFImageLoading.Work
                         }
 
                         var oldImageIn = imageIn;
-                        imageIn = PImage.CreateAnimatedImage(animatedImages, imageIn.Duration);
+                        imageIn = PImage.CreateAnimatedImage(animatedImages.Where(v => v.CGImage != null).ToArray(), imageIn.Duration);
                         oldImageIn?.Dispose();
 #endif
                     }
