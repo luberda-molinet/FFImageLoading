@@ -27,7 +27,7 @@ SVG support for FFImageLoading library.
             </group>
 
             <group targetFramework="uap10.0">
-                <dependency id="NETStandard.Library" version="1.6.1">
+                <dependency id="NETStandard.Library" version="1.6.1" />
             </group>                       
 
         </dependencies>
