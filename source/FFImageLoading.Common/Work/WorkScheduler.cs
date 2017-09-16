@@ -154,22 +154,6 @@ namespace FFImageLoading.Work
 
                 await task.Init();
 
-                if (task.Parameters.DelayInMs.HasValue && task.Parameters.DelayInMs.Value > 0)
-                {
-                    await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
-                }
-                else if (Configuration.DelayInMs > 0)
-                {
-                    await Task.Delay(Configuration.DelayInMs);
-                }
-
-                if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
-                {
-                    if (!task.IsCompleted)
-                        task?.Dispose();
-                    return;
-                } 
-
                 // If we have the image in memory then it's pointless to schedule the job: just display it straight away
                 if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
                 {

@@ -462,6 +462,15 @@ namespace FFImageLoading.Work
 
             try
             {
+                if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
+                {
+                    await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
+                }
+                else if (Configuration.DelayInMs > 0)
+                {
+                    await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false); ;
+                }
+
                 if (IsCompleted || IsCancelled || ImageService.ExitTasksEarly)
                     throw new OperationCanceledException();
 

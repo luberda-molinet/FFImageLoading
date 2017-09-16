@@ -33,7 +33,7 @@ namespace FFImageLoading.Config
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
             AnimateGifs = true;
-            DelayInMs = 20;
+            DelayInMs = 25;
 		}
 
 		/// <summary>
