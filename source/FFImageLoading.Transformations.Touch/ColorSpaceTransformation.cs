@@ -88,8 +88,9 @@ namespace FFImageLoading.Transformations
 		public static UIImage ToColorSpace(UIImage source, CGColorSpace colorSpace)
 		{
 			CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
+            var cgImage = source.CGImage;
 
-			using (var context = new CGBitmapContext(IntPtr.Zero, (int)bounds.Width, (int)bounds.Height, 8, 0, colorSpace, CGImageAlphaInfo.None))
+            using (var context = new CGBitmapContext(IntPtr.Zero, (int)bounds.Width, (int)bounds.Height, cgImage.BitsPerComponent, cgImage.BytesPerRow, colorSpace, CGImageAlphaInfo.None))
 			{
 				context.DrawImage(bounds, source.CGImage);
 				using (var imageRef = context.ToImage())
