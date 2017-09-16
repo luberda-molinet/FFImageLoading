@@ -207,28 +207,28 @@ namespace FFImageLoading.Forms.Touch
 				}
 
 				// Downsample
-				if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
-				{
-					if (Element.Height > Element.Width)
-					{
-						imageLoader.DownSampleInDip(height: (int)Element.Height);
-					}
-					else
-					{
-						imageLoader.DownSampleInDip(width: (int)Element.Width);
-					}
-				}
-				else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
-				{
-					if (Element.HeightRequest > Element.WidthRequest)
-					{
-						imageLoader.DownSampleInDip(height: (int)Element.HeightRequest);
-					}
-					else
-					{
-						imageLoader.DownSampleInDip(width: (int)Element.WidthRequest);
-					}
-				}
+                if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
+                {
+                    if (Element.HeightRequest > Element.WidthRequest)
+                    {
+                        imageLoader.DownSampleInDip(height: (int)Element.HeightRequest);
+                    }
+                    else
+                    {
+                        imageLoader.DownSampleInDip(width: (int)Element.WidthRequest);
+                    }
+                }
+                else if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
+                {
+                    if (Element.Height > Element.Width)
+                    {
+                        imageLoader.DownSampleInDip(height: (int)Element.Height);
+                    }
+                    else
+                    {
+                        imageLoader.DownSampleInDip(width: (int)Element.Width);
+                    }
+                }
 				else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
 				{
 					if (Element.DownsampleHeight > Element.DownsampleWidth)
@@ -246,6 +246,12 @@ namespace FFImageLoading.Forms.Touch
 							imageLoader.DownSample(width: (int)Element.DownsampleWidth);
 					}
 				}
+                else if (Element.DownsampleToViewSize)
+                {
+                    // Fallback to a constant value due to a lot people misusing DownsampleToViewSize property
+                    // More here: https://github.com/luberda-molinet/FFImageLoading/wiki/Xamarin.Forms-API#downsampletoviewsize-bool-default-false
+                    imageLoader.DownSample(height: 100);
+                }
 
 				// RetryCount
 				if (Element.RetryCount > 0)
