@@ -87,8 +87,7 @@ namespace FFImageLoading.Views
                 }
                 while (repetitionCounter <= ntimes);
             }
-            catch (ObjectDisposedException) { }
-            catch (OperationCanceledException) { }
+            catch (Exception) { }
         }
 
 		/* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
