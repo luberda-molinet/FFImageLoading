@@ -401,12 +401,13 @@ namespace FFImageLoading.Work
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                     loadResolver = new WrappedDataResolver(loadResolver);
                     Tuple<Stream, LoadingResult, ImageInformation> loadImageData;
-                    bool hasMutex = false;
                     TImageContainer loadImage;
 
+                    if (!await _placeholdersResolveLock.WaitAsync(TimeSpan.FromSeconds(10), CancellationTokenSource.Token).ConfigureAwait(false))
+                        return;
+
                     try
-                    {
-                        hasMutex = await _placeholdersResolveLock.WaitAsync(TimeSpan.FromSeconds(3), CancellationTokenSource.Token).ConfigureAwait(false);
+                    {                        
                         ThrowIfCancellationRequested();
 
                         if (await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
@@ -430,8 +431,7 @@ namespace FFImageLoading.Work
                     }
                     finally
                     {
-                        if (hasMutex)
-                            _placeholdersResolveLock.Release();
+                        _placeholdersResolveLock.Release();
                     }
 
                     ThrowIfCancellationRequested();
