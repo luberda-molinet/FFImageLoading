@@ -57,7 +57,7 @@ namespace FFImageLoading.Cache
 
             var responseBytes = await Retry.DoAsync(
                 async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress, parameters).ConfigureAwait(false),
-                DelayBetweenRetry,
+                parameters.RetryDelayInMs > 0 ? TimeSpan.FromMilliseconds(parameters.RetryDelayInMs) : DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
 
