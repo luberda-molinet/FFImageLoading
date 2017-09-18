@@ -289,6 +289,17 @@ namespace FFImageLoading.Work
                 if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     return false;
 
+                if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
+                {
+                    await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
+                }
+                else if (Configuration.DelayInMs > 0)
+                {
+                    await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false); ;
+                }
+
+                ThrowIfCancellationRequested();
+
                 bool isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImagesEnabled.HasValue ? Parameters.FadeAnimationForCachedImagesEnabled.Value : Configuration.FadeAnimationForCachedImages;
                 var result = await TryLoadFromMemoryCacheAsync(Key, true, isFadeAnimationEnabledForCached, false).ConfigureAwait(false);
 
@@ -462,20 +473,6 @@ namespace FFImageLoading.Work
 
             try
             {
-                if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
-                {
-                    await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
-                }
-                else if (Configuration.DelayInMs > 0)
-                {
-                    await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false); ;
-                }
-
-                if (IsCompleted || IsCancelled || ImageService.ExitTasksEarly)
-                    throw new OperationCanceledException();
-
-                ThrowIfCancellationRequested();
-
                 // LOAD IMAGE
                 if (!(await TryLoadFromMemoryCacheAsync().ConfigureAwait(false)))
                 {
