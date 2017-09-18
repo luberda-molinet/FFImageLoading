@@ -179,13 +179,12 @@ namespace FFImageLoading.Forms.WinRT
         private async void UpdateSource()
         {
             Element.SetIsLoading(true);
-
             Xamarin.Forms.ImageSource source = Element.Source;
-
             Cancel();
-            TaskParameter imageLoader = null;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source, Element).ConfigureAwait(false);
+            var ffSource = ImageSourceBinding.GetImageSourceBinding(source, Element);
+            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element);
+            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element);
 
             if (ffSource == null)
             {
@@ -194,186 +193,31 @@ namespace FFImageLoading.Forms.WinRT
 
                 ImageLoadingFinished(Element);
             }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
+            else
             {
-                imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, Element.CacheDuration);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
-            {
-                imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
-            {
-                imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
-            {
-                imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
-            {
-                imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
-            }
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.EmbeddedResource)
-			{
-				imageLoader = ImageService.Instance.LoadEmbeddedResource(ffSource.Path);
-			}
-
-            if (imageLoader != null)
-            {
-				// CustomKeyFactory
-				if (Element.CacheKeyFactory != null)
-				{
-					var bindingContext = Element.BindingContext;
-					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
-				}
-
-                // LoadingPlaceholder
-                if (Element.LoadingPlaceholder != null)
-                {
-					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
-                    if (placeholderSource != null)
-                        imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-                }
-
-                // ErrorPlaceholder
-                if (Element.ErrorPlaceholder != null)
-                {
-					var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
-                    if (placeholderSource != null)
-                        imageLoader.ErrorPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-                }
-
-				// Enable vector image source
-				var vect1 = Element.Source as IVectorImageSource;
-				var vect2 = Element.LoadingPlaceholder as IVectorImageSource;
-				var vect3 = Element.ErrorPlaceholder as IVectorImageSource;
-				if (vect1 != null)
-				{
-					imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
-				}
-				if (vect2 != null)
-				{
-					imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
-				}
-				if (vect3 != null)
-				{
-					imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
-				}
-				if (Element.CustomDataResolver != null)
-				{
-					imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
-					imageLoader.WithCustomLoadingPlaceholderDataResolver(Element.CustomDataResolver);
-					imageLoader.WithCustomErrorPlaceholderDataResolver(Element.CustomDataResolver);
-				}
-
-				// Downsample
-                if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
-                {
-                    if (Element.HeightRequest > Element.WidthRequest)
-                    {
-                        imageLoader.DownSampleInDip(height: (int)Element.HeightRequest);
-                    }
-                    else
-                    {
-                        imageLoader.DownSampleInDip(width: (int)Element.WidthRequest);
-                    }
-                }
-                else if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
-                {
-                    if (Element.Height > Element.Width)
-                    {
-                        imageLoader.DownSampleInDip(height: (int)Element.Height);
-                    }
-                    else
-                    {
-                        imageLoader.DownSampleInDip(width: (int)Element.Width);
-                    }
-                }
-				else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
-				{
-					if (Element.DownsampleHeight > Element.DownsampleWidth)
-					{
-						if (Element.DownsampleUseDipUnits)
-							imageLoader.DownSampleInDip(height: (int)Element.DownsampleHeight);
-						else
-							imageLoader.DownSample(height: (int)Element.DownsampleHeight);
-					}
-					else
-					{
-						if (Element.DownsampleUseDipUnits)
-							imageLoader.DownSampleInDip(width: (int)Element.DownsampleWidth);
-						else
-							imageLoader.DownSample(width: (int)Element.DownsampleWidth);
-					}
-				}
-                else if (Element.DownsampleToViewSize)
-                {
-                    // Fallback to a constant value due to a lot people misusing DownsampleToViewSize property
-                    // More here: https://github.com/luberda-molinet/FFImageLoading/wiki/Xamarin.Forms-API#downsampletoviewsize-bool-default-false
-                    imageLoader.DownSample(height: 100);
-                }
-
-                // RetryCount
-                if (Element.RetryCount > 0)
-                {
-                    imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
-                }
-
-				if (Element.BitmapOptimizations.HasValue)
-					imageLoader.BitmapOptimizations(Element.BitmapOptimizations.Value);
-
-                // FadeAnimation
-                if (Element.FadeAnimationEnabled.HasValue)
-                    imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
-
-                // TransformPlaceholders
-                if (Element.TransformPlaceholders.HasValue)
-                    imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
-
-                // Transformations
-                if (Element.Transformations != null && Element.Transformations.Count > 0)
-                {
-                    imageLoader.Transform(Element.Transformations);
-                }
-
-                imageLoader.WithPriority(Element.LoadingPriority);
-                if (Element.CacheType.HasValue)
-                {
-                    imageLoader.WithCache(Element.CacheType.Value);
-                }
-
-				if (Element.LoadingDelay.HasValue)
-				{
-					imageLoader.Delay(Element.LoadingDelay.Value);
-				}
-
                 var element = Element;
+                TaskParameter imageLoader = null;
+                element.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
-                imageLoader.Finish((work) =>
+                if (imageLoader != null)
                 {
-                    element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
-                    ImageLoadingFinished(element);
-                });
+                    var finishAction = imageLoader.OnFinish;
+                    var sucessAction = imageLoader.OnSuccess;
 
-                imageLoader.Success((imageInformation, loadingResult) =>
-                    element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
+                    imageLoader.Finish((work) =>
+                    {
+                        finishAction?.Invoke(work);
+                        ImageLoadingFinished(element);
+                    });
 
-                imageLoader.Error((exception) =>
-                    element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+                    imageLoader.Success((imageInformation, loadingResult) =>
+                    {
+                        sucessAction?.Invoke(imageInformation, loadingResult);
+                        _lastImageSource = ffSource;
+                    });
 
-				imageLoader.DownloadStarted((downloadInformation) =>
-					element.OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
-
-				imageLoader.DownloadProgress((progress) =>
-					element.OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
-
-				imageLoader.FileWriteFinished((fileWriteInfo) =>
-					element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
-
-                element.SetupOnBeforeImageLoading(imageLoader);
-
-                _currentTask = imageLoader.Into(Control);
+                    _currentTask = imageLoader.Into(Control);
+                }
             }
         }
 

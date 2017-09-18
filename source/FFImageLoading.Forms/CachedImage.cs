@@ -931,6 +931,179 @@ namespace FFImageLoading.Forms
         protected internal virtual void SetupOnBeforeImageLoading(Work.TaskParameter imageLoader)
         {
         }
+
+        /// <summary>
+        /// Setups the on before image loading.
+        /// You can add additional logic here to configure image loader settings before loading
+        /// </summary>
+        /// <param name="imageLoader">Image loader.</param>
+        protected internal virtual void SetupOnBeforeImageLoading(out Work.TaskParameter imageLoader, IImageSourceBinding source, IImageSourceBinding loadingPlaceholderSource, IImageSourceBinding errorPlaceholderSource)
+        {
+            if (source.ImageSource == Work.ImageSource.Url)
+            {
+                imageLoader = ImageService.Instance.LoadUrl(source.Path, CacheDuration);
+            }
+            else if (source.ImageSource == Work.ImageSource.CompiledResource)
+            {
+                imageLoader = ImageService.Instance.LoadCompiledResource(source.Path);
+            }
+            else if (source.ImageSource == Work.ImageSource.ApplicationBundle)
+            {
+                imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(source.Path);
+            }
+            else if (source.ImageSource == Work.ImageSource.Filepath)
+            {
+                imageLoader = ImageService.Instance.LoadFile(source.Path);
+            }
+            else if (source.ImageSource == Work.ImageSource.Stream)
+            {
+                imageLoader = ImageService.Instance.LoadStream(source.Stream);
+            }
+            else if (source.ImageSource == Work.ImageSource.EmbeddedResource)
+            {
+                imageLoader = ImageService.Instance.LoadEmbeddedResource(source.Path);
+            }
+            else
+            {
+                imageLoader = null;
+                return;
+            }
+
+            // CustomKeyFactory
+            if (CacheKeyFactory != null)
+            {
+                var bindingContext = BindingContext;
+                imageLoader.CacheKey(CacheKeyFactory.GetKey(Source, bindingContext));
+            }
+
+            // LoadingPlaceholder
+            if (LoadingPlaceholder != null)
+            {
+                if (loadingPlaceholderSource != null)
+                    imageLoader.LoadingPlaceholder(loadingPlaceholderSource.Path, loadingPlaceholderSource.ImageSource);
+            }
+
+            // ErrorPlaceholder
+            if (ErrorPlaceholder != null)
+            {
+                
+                if (errorPlaceholderSource != null)
+                    imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
+            }
+
+            // Enable vector image source
+            var vect1 = Source as IVectorImageSource;
+            var vect2 = LoadingPlaceholder as IVectorImageSource;
+            var vect3 = ErrorPlaceholder as IVectorImageSource;
+            if (vect1 != null)
+            {
+                imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
+            }
+            if (vect2 != null)
+            {
+                imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
+            }
+            if (vect3 != null)
+            {
+                imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+            }
+            if (CustomDataResolver != null)
+            {
+                imageLoader.WithCustomDataResolver(CustomDataResolver);
+                imageLoader.WithCustomLoadingPlaceholderDataResolver(CustomDataResolver);
+                imageLoader.WithCustomErrorPlaceholderDataResolver(CustomDataResolver);
+            }
+
+            // Downsample
+            if (DownsampleToViewSize && (WidthRequest > 0 || HeightRequest > 0))
+            {
+                if (HeightRequest > WidthRequest)
+                {
+                    imageLoader.DownSampleInDip(height: (int)HeightRequest);
+                }
+                else
+                {
+                    imageLoader.DownSampleInDip(width: (int)WidthRequest);
+                }
+            }
+            else if (DownsampleToViewSize && (Width > 0 || Height > 0))
+            {
+                if (Height > Width)
+                {
+                    imageLoader.DownSampleInDip(height: (int)Height);
+                }
+                else
+                {
+                    imageLoader.DownSampleInDip(width: (int)Width);
+                }
+            }
+            else if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
+            {
+                if (DownsampleHeight > DownsampleWidth)
+                {
+                    if (DownsampleUseDipUnits)
+                        imageLoader.DownSampleInDip(height: (int)DownsampleHeight);
+                    else
+                        imageLoader.DownSample(height: (int)DownsampleHeight);
+                }
+                else
+                {
+                    if (DownsampleUseDipUnits)
+                        imageLoader.DownSampleInDip(width: (int)DownsampleWidth);
+                    else
+                        imageLoader.DownSample(width: (int)DownsampleWidth);
+                }
+            }
+            else if (DownsampleToViewSize)
+            {
+                // Fallback to a constant value due to a lot people misusing DownsampleToViewSize property
+                // More here: https://github.com/luberda-molinet/FFImageLoading/wiki/Xamarin.Forms-API#downsampletoviewsize-bool-default-false
+                imageLoader.DownSample(height: 100);
+            }
+
+            // RetryCount
+            if (RetryCount > 0)
+            {
+                imageLoader.Retry(RetryCount, RetryDelay);
+            }
+
+            if (BitmapOptimizations.HasValue)
+                imageLoader.BitmapOptimizations(BitmapOptimizations.Value);
+
+            // FadeAnimation
+            if (FadeAnimationEnabled.HasValue)
+                imageLoader.FadeAnimation(FadeAnimationEnabled.Value);
+
+            // TransformPlaceholders
+            if (TransformPlaceholders.HasValue)
+                imageLoader.TransformPlaceholders(TransformPlaceholders.Value);
+
+            // Transformations
+            if (Transformations != null && Transformations.Count > 0)
+            {
+                imageLoader.Transform(Transformations);
+            }
+
+            imageLoader.WithPriority(LoadingPriority);
+            if (CacheType.HasValue)
+            {
+                imageLoader.WithCache(CacheType.Value);
+            }
+
+            if (LoadingDelay.HasValue)
+            {
+                imageLoader.Delay(LoadingDelay.Value);
+            }
+
+            imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
+            imageLoader.DownloadProgress((progress) => OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
+            imageLoader.FileWriteFinished((fileWriteInfo) => OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
+            imageLoader.Error((exception) => OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+            imageLoader.Finish((work) => OnFinish(new CachedImageEvents.FinishEventArgs(work)));
+            imageLoader.Success((imageInformation, loadingResult) => OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
+
+            SetupOnBeforeImageLoading(imageLoader);
+        }
     }
 }
 

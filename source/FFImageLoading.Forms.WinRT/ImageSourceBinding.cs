@@ -13,7 +13,7 @@ namespace FFImageLoading.Forms.WinSL
 namespace FFImageLoading.Forms.WinRT
 #endif
 {
-    public class ImageSourceBinding
+    public class ImageSourceBinding : IImageSourceBinding
     {
 		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
 		{

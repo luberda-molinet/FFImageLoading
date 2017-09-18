@@ -8,7 +8,7 @@ using Foundation;
 namespace FFImageLoading.Forms.Touch
 {
 	[Preserve(AllMembers= true)]
-	internal class ImageSourceBinding
+    internal class ImageSourceBinding : IImageSourceBinding
 	{
 		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
 		{
