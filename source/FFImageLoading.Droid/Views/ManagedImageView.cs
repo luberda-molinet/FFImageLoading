@@ -138,8 +138,6 @@ namespace FFImageLoading.Views
                 ImageService.Instance.CancelWorkFor(ImageLoaderTask);
                 ImageLoaderTask = null;
             }
-
-            CancelGifPlay();
         }
 
 		public override void SetImageDrawable(Drawable drawable)
