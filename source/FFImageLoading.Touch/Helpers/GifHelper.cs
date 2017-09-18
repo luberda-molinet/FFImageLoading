@@ -76,7 +76,7 @@ namespace FFImageLoading.Helpers
                     }
                 }
 
-                retval.Add(delayCentiseconds);
+                retval.Add(Math.Min(10, delayCentiseconds));
             }
 
             return retval;

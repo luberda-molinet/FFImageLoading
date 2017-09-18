@@ -72,13 +72,7 @@ namespace FFImageLoading.Helpers
         {
             lock (_lock)
             {
-                delay = -1;
-                if ((n >= 0) && (n < frameCount))
-                {
-                    delay = frames[n].Delay;
-                }
-
-                return delay;
+                return frames[n].Delay;
             }
         }
 
@@ -604,7 +598,8 @@ namespace FFImageLoading.Helpers
                 dispose = 1; // elect to keep old image if discretionary
             }
             transparency = (packed & 1) != 0;
-            delay = ReadShort() * 10; // delay in milliseconds
+            delay = Math.Max(100, ReadShort() * 10); // delay in milliseconds
+
             transIndex = Read(); // transparent color index
             Read(); // block terminator
         }
