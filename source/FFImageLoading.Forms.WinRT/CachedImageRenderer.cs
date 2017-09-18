@@ -61,6 +61,7 @@ namespace FFImageLoading.Forms.WinRT
     {
         private bool _measured;
         private IScheduledWork _currentTask;
+        private ImageSourceBinding _lastImageSource;
 		private bool _isDisposed = false;
 
         /// <summary>
@@ -182,9 +183,9 @@ namespace FFImageLoading.Forms.WinRT
             Xamarin.Forms.ImageSource source = Element.Source;
             Cancel();
 
-            var ffSource = ImageSourceBinding.GetImageSourceBinding(source, Element);
-            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element);
-            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element);
+            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source, Element).ConfigureAwait(false);
+            var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
+            var errorPlaceholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
 
             if (ffSource == null)
             {
