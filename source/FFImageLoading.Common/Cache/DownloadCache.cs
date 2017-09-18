@@ -142,6 +142,12 @@ namespace FFImageLoading.Cache
                                                 progressAction(new DownloadProgress() { Total = total, Current = totalRead });
                                         }
 
+                                        if (outputStream.Length == 0)
+                                            throw new InvalidDataException("Zero length stream");
+
+                                        if (outputStream.Length < 32)
+                                            throw new InvalidDataException("Invalid stream");
+
                                         return outputStream.ToArray();
                                     }
                                 }

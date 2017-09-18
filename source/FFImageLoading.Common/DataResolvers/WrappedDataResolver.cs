@@ -11,7 +11,6 @@ namespace FFImageLoading.DataResolvers
     public class WrappedDataResolver : IDataResolver
     {
         readonly IDataResolver _resolver;
-        //static readonly byte[]
 
         public WrappedDataResolver(IDataResolver resolver)
         {
@@ -36,6 +35,12 @@ namespace FFImageLoading.DataResolvers
                 }
             }
 
+            if (resolved.Item1.Length == 0)
+                throw new InvalidDataException("Zero length stream");
+
+            if (resolved.Item1.Length < 32)
+                throw new InvalidDataException("Invalid stream");
+            
             if (resolved.Item3.Type == ImageInformation.ImageType.Unknown)
             {
                 //READ HEADER
