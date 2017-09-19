@@ -11,19 +11,15 @@ namespace FFImageLoading
         ActivityManager _activityManager;
         ActivityManager.MemoryInfo _memoryInfo;
 
-        public static IPlatformPerformance Create()
+        public static IPlatformPerformance Create(bool verbose)
         {
-            try
-            {
-                return new PlatformPerformance();
-            }
-            catch (System.Exception ex)
-            {
+            if (!verbose)
                 return new EmptyPlatformPerformance();
-            }
+
+            return new PlatformPerformance();
         }
 
-        private PlatformPerformance()
+        public PlatformPerformance()
         {
             _runtime = Runtime.GetRuntime();
             _activityManager = (ActivityManager)Application.Context.GetSystemService("activity");

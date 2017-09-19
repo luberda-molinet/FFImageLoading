@@ -124,7 +124,7 @@ namespace FFImageLoading
                 }
                 userDefinedConfig.HttpClient = httpClient;
 
-                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, PlatformPerformance.Create());
+                var scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, PlatformPerformance.Create(userDefinedConfig.VerbosePerformanceLogging));
                 userDefinedConfig.Scheduler = scheduler;
 
                 if (string.IsNullOrWhiteSpace(userDefinedConfig.DiskCachePath))
