@@ -43,7 +43,7 @@ namespace FFImageLoading.Forms.WinRT
     /// CachedImage Implementation
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class CachedImageRenderer : ViewRenderer<CachedImage, Image>
+    public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
     {
         private bool _measured;
         private IScheduledWork _currentTask;
@@ -149,6 +149,8 @@ namespace FFImageLoading.Forms.WinRT
 
         void UpdateImage(Windows.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
         {
+            CancelIfNeeded();
+
             if (image == null || imageView == null || _isDisposed)
                 return;
 
@@ -170,7 +172,6 @@ namespace FFImageLoading.Forms.WinRT
             }
 
             image.SetIsLoading(true);
-            CancelIfNeeded();
 
             var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image).ConfigureAwait(false);
             var errorPlaceholderSource = await ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image).ConfigureAwait(false);

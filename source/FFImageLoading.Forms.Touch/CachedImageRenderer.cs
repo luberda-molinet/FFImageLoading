@@ -112,6 +112,8 @@ namespace FFImageLoading.Forms.Touch
 
         void UpdateImage(UIImageView imageView, CachedImage image, CachedImage previousImage)
 		{
+            CancelIfNeeded();
+
             if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
                 return;
 
@@ -133,7 +135,6 @@ namespace FFImageLoading.Forms.Touch
             }
 
             image.SetIsLoading(true);
-            CancelIfNeeded();
 
             var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
             var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);

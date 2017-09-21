@@ -131,6 +131,8 @@ namespace FFImageLoading.Forms.Droid
 
         void UpdateBitmap(CachedImageView imageView, CachedImage image, CachedImage previousImage)
 		{
+            CancelIfNeeded();
+
             if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
                 return;
 
@@ -153,7 +155,6 @@ namespace FFImageLoading.Forms.Droid
             }
 
             image.SetIsLoading(true);
-            CancelIfNeeded();
 
             var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
             var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
