@@ -61,9 +61,9 @@
         <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />         -->
  
 		<!--Windows-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Transformations.pdb" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.pdb" />
 		
 	</files>
 	
