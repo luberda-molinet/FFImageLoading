@@ -121,7 +121,7 @@ namespace FFImageLoading.Svg.Forms
         /// <summary>
         /// The error placeholder property.
         /// </summary>
-        public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>));
+        public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>), propertyChanged: new BindableProperty.BindingPropertyChangedDelegate(HandleReplaceStringMapPropertyChangedDelegate));
 
         /// <summary>
         /// Used to define replacement map which will be used to
@@ -138,6 +138,18 @@ namespace FFImageLoading.Svg.Forms
             {
 
                 SetValue(ReplaceStringMapProperty, value);
+            }
+        }
+
+        static void HandleReplaceStringMapPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (oldValue != newValue)
+            {
+                var cachedImage = bindable as SvgCachedImage;
+                if (cachedImage != null && cachedImage.Source != null)
+                {
+                    cachedImage.ReloadImage();
+                }
             }
         }
 
