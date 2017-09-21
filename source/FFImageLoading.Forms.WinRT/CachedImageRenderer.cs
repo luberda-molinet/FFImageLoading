@@ -13,6 +13,7 @@ using System.Threading;
 using System.Reflection;
 using System.Linq;
 using FFImageLoading.Helpers;
+using Xamarin.Forms;
 
 #if WINDOWS_UWP
 using FFImageLoading.Forms.WinUWP;
@@ -21,14 +22,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls;
-
-#elif SILVERLIGHT
-using FFImageLoading.Forms.WinSL;
-using Xamarin.Forms.Platform.WinPhone;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 #else
 using FFImageLoading.Forms.WinRT;
@@ -39,25 +32,18 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls;
 #endif
 
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 #if WINDOWS_UWP
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinUWP
-#elif SILVERLIGHT
-[assembly: Xamarin.Forms.ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
-namespace FFImageLoading.Forms.WinSL
 #else
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.WinRT
 #endif
 {
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
-#if SILVERLIGHT
-    public class CachedImageRenderer : ViewRenderer<CachedImage, Image>, IDisposable
-#else
+    [Preserve(AllMembers = true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, Image>
-#endif
     {
         private bool _measured;
         private IScheduledWork _currentTask;
@@ -71,16 +57,16 @@ namespace FFImageLoading.Forms.WinRT
         {
         }
 
-        public override Xamarin.Forms.SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
+        public override SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
         {
             var bitmapSource = Control.Source as BitmapSource;
 
             if (bitmapSource == null)
-                return new Xamarin.Forms.SizeRequest();
+                return new SizeRequest();
 
             _measured = true;
 
-            return new Xamarin.Forms.SizeRequest(new Xamarin.Forms.Size()
+            return new SizeRequest(new Size()
             {
                 Width = bitmapSource.PixelWidth,
                 Height = bitmapSource.PixelHeight
@@ -91,66 +77,53 @@ namespace FFImageLoading.Forms.WinRT
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement == null)
-                return;
-
             if (Control == null)
             {
-                Image control = new Image()
+                var control = new Windows.UI.Xaml.Controls.Image()
                 {
-                    Stretch = GetStretch(Xamarin.Forms.Aspect.AspectFill),
+                    Stretch = GetStretch(Aspect.AspectFill),
                 };
                 control.ImageOpened += OnImageOpened;
                 SetNativeControl(control);
 
-				Control.HorizontalAlignment = HorizontalAlignment.Center;
-				Control.VerticalAlignment = VerticalAlignment.Center;
+                Control.HorizontalAlignment = HorizontalAlignment.Center;
+                Control.VerticalAlignment = VerticalAlignment.Center;
+            }
+
+            if (e.OldElement != null)
+            {
+                e.OldElement.InternalReloadImage = null;
+                e.OldElement.InternalCancel = null;
+                e.OldElement.InternalGetImageAsJPG = null;
+                e.OldElement.InternalGetImageAsPNG = null;
             }
 
             if (e.NewElement != null)
             {
-				e.NewElement.InternalReloadImage = new Action(ReloadImage);
-				e.NewElement.InternalCancel = new Action(Cancel);
-				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
-				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
+                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+                e.NewElement.InternalCancel = new Action(CancelIfNeeded);
+                e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+                e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
+
+                UpdateAspect();
+                UpdateImage(Control, Element, e.OldElement);
             }
-
-			if (e.OldElement != null && Control != null && !_isDisposed)
-			{
-				Control.ImageOpened -= OnImageOpened;
-			}
-
-            UpdateSource();
-            UpdateAspect();
         }
 
-#if SILVERLIGHT
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-			if (_isDisposed)
-				return;
-
-            if (Control != null)
+            if (!_isDisposed)
             {
-                Control.ImageOpened -= OnImageOpened;
-            }
-			_isDisposed = true;
-        }
-#else
-		protected override void Dispose(bool disposing)
-        {
-			if (_isDisposed)
-				return;
-
-            if (Control != null)
-            {
-                Control.ImageOpened -= OnImageOpened;
+                _isDisposed = true;
+                if (Control != null)
+                {
+                    Control.ImageOpened -= OnImageOpened;
+                }
+                CancelIfNeeded();
             }
 
-			_isDisposed = true;
             base.Dispose(disposing);
         }
-#endif
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -158,99 +131,102 @@ namespace FFImageLoading.Forms.WinRT
 
             if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
             {
-                UpdateSource();
+                UpdateImage(Control, Element, null);
             }
-            else
+            else if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
             {
-                if (!(e.PropertyName == CachedImage.AspectProperty.PropertyName))
-                    return;
-
                 UpdateAspect();
             }
         }
 
-        private void OnImageOpened(object sender, RoutedEventArgs routedEventArgs)
+        void OnImageOpened(object sender, RoutedEventArgs routedEventArgs)
         {
             if (_measured)
             {
-                ((Xamarin.Forms.IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
+                ((IVisualElementController)Element)?.InvalidateMeasure(Internals.InvalidationTrigger.RendererReady);
             }
         }
 
-        private async void UpdateSource()
+        void UpdateImage(Windows.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
         {
-            Element.SetIsLoading(true);
-            Xamarin.Forms.ImageSource source = Element.Source;
-            Cancel();
+            if (image == null || imageView == null || _isDisposed)
+                return;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(source, Element).ConfigureAwait(false);
-            var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element).ConfigureAwait(false);
-            var errorPlaceholderSource = await ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element).ConfigureAwait(false);
-
+            var ffSource = await ImageSourceBinding.GetImageSourceBinding(image.Source, image).ConfigureAwait(false);
             if (ffSource == null)
             {
-                if (Control != null)
-                    Control.Source = null;
+                if (_lastImageSource == null)
+                    return;
 
-                ImageLoadingFinished(Element);
+                _lastImageSource = null;
+                imageView.Source = null;
+                return;
             }
-            else
+
+            if (previousImage != null && !ffSource.Equals(_lastImageSource))
             {
-                var element = Element;
-                TaskParameter imageLoader = null;
-                element.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+                _lastImageSource = null;
+                imageView.Source = null;
+            }
 
-                if (imageLoader != null)
+            image.SetIsLoading(true);
+            CancelIfNeeded();
+
+            var placeholderSource = await ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image).ConfigureAwait(false);
+            var errorPlaceholderSource = await ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image).ConfigureAwait(false);
+            TaskParameter imageLoader;
+            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+
+            if (imageLoader != null)
+            {
+                var finishAction = imageLoader.OnFinish;
+                var sucessAction = imageLoader.OnSuccess;
+
+                imageLoader.Finish((work) =>
                 {
-                    var finishAction = imageLoader.OnFinish;
-                    var sucessAction = imageLoader.OnSuccess;
+                    finishAction?.Invoke(work);
+                    ImageLoadingFinished(image);
+                });
 
-                    imageLoader.Finish((work) =>
-                    {
-                        finishAction?.Invoke(work);
-                        ImageLoadingFinished(element);
-                    });
+                imageLoader.Success((imageInformation, loadingResult) =>
+                {
+                    sucessAction?.Invoke(imageInformation, loadingResult);
+                    _lastImageSource = ffSource;
+                });
 
-                    imageLoader.Success((imageInformation, loadingResult) =>
-                    {
-                        sucessAction?.Invoke(imageInformation, loadingResult);
-                        _lastImageSource = ffSource;
-                    });
-
-                    _currentTask = imageLoader.Into(Control);
-                }
+                _currentTask = imageLoader.Into(imageView);
             }
         }
 
-        private void UpdateAspect()
+        void UpdateAspect()
         {
             Control.Stretch = GetStretch(Element.Aspect);
         }
 
-        private static Stretch GetStretch(Xamarin.Forms.Aspect aspect)
+        static Stretch GetStretch(Aspect aspect)
         {
             switch (aspect)
             {
-                case Xamarin.Forms.Aspect.AspectFill:
+                case Aspect.AspectFill:
                     return Stretch.UniformToFill;
-                case Xamarin.Forms.Aspect.Fill:
+                case Aspect.Fill:
                     return Stretch.Fill;
                 default:
                     return Stretch.Uniform;
             }
         }
 
-        private void ImageLoadingFinished(CachedImage element)
+        void ImageLoadingFinished(CachedImage element)
         {
 			MainThreadDispatcher.Instance.Post(() =>
 			{
             	if (element != null && !_isDisposed)
 				{
-					var elCtrl = element as Xamarin.Forms.IVisualElementController;
+					var elCtrl = element as IVisualElementController;
 
 					if (elCtrl != null)
 					{
-                        ((Xamarin.Forms.IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
+                        ((IVisualElementController)Element)?.InvalidateMeasure(Internals.InvalidationTrigger.RendererReady);
                     }
 
                     element.SetIsLoading(false);
@@ -258,31 +234,35 @@ namespace FFImageLoading.Forms.WinRT
 			});
         }
 
-		private void ReloadImage()
+		void ReloadImage()
 		{
-			UpdateSource();
+            UpdateImage(Control, Element, null);
 		}
 
-		private void Cancel()
-		{
-			var taskToCancel = _currentTask;
-			if (taskToCancel != null && !taskToCancel.IsCancelled)
-			{
-				taskToCancel.Cancel();
-			}
-		}
+        void CancelIfNeeded()
+        {
+            try
+            {
+                var taskToCancel = _currentTask;
+                if (taskToCancel != null && !taskToCancel.IsCancelled)
+                {
+                    taskToCancel.Cancel();
+                }
+            }
+            catch (Exception) { }
+        }
 
-		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+		Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
 			return GetImageAsByteAsync(BitmapEncoder.JpegEncoderId, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+		Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
 			return GetImageAsByteAsync(BitmapEncoder.PngEncoderId, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
-        private async Task<byte[]> GetImageAsByteAsync(Guid format, int quality, int desiredWidth, int desiredHeight)
+        async Task<byte[]> GetImageAsByteAsync(Guid format, int quality, int desiredWidth, int desiredHeight)
         {
             if (Control == null || Control.Source == null)
                 return null;
@@ -362,15 +342,8 @@ namespace FFImageLoading.Forms.WinRT
             }
         }
 
-        private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
+        async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
         {
-#if SILVERLIGHT
-            using (var ms = new MemoryStream())
-            {
-                bitmap.SaveJpeg(ms, bitmap.PixelWidth, bitmap.PixelHeight, 0, 100);
-                return ms.ToArray();
-            }
-#else
             byte[] tempPixels;
             using (var sourceStream = bitmap.PixelBuffer.AsStream())
             {
@@ -379,7 +352,6 @@ namespace FFImageLoading.Forms.WinRT
             }
 
             return tempPixels;
-#endif
         }
     }
 }

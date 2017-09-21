@@ -39,45 +39,47 @@ namespace FFImageLoading.Forms.Touch
 
         protected override void Dispose(bool disposing)
 		{
-			if (_isDisposed)
-				return;
+            if (!_isDisposed)
+            {
+                _isDisposed = true;
+                CancelIfNeeded();
+            }
 
-			if (disposing && Control != null)
-			{
-				UIImage image = Control.Image;
-				if (image != null)
-				{
-					image.Dispose();
-					image = null;
-				}
-			}
-
-			_isDisposed = true;
-			base.Dispose(disposing);
+            base.Dispose(disposing);
 		}
 
 		protected override void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
 		{
-			if (Control == null)
-			{
-				SetNativeControl(new UIImageView(CGRect.Empty) {
-					ContentMode = UIViewContentMode.ScaleAspectFit,
-					ClipsToBounds = true
-				});
-			}
+            base.OnElementChanged(e);
 
-			if (e.NewElement != null)
-			{
-				SetAspect();
-				SetImage(e.OldElement);
-				SetOpacity();
+            if (Control == null)
+            {
+                SetNativeControl(new UIImageView(CGRect.Empty)
+                {
+                    ContentMode = UIViewContentMode.ScaleAspectFit,
+                    ClipsToBounds = true
+                });
+            }
 
-				e.NewElement.InternalReloadImage = new Action(ReloadImage);
-				e.NewElement.InternalCancel = new Action(Cancel);
-				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
-				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
-			}
-			base.OnElementChanged(e);
+            if (e.OldElement != null)
+            {
+                e.OldElement.InternalReloadImage = null;
+                e.OldElement.InternalCancel = null;
+                e.OldElement.InternalGetImageAsJPG = null;
+                e.OldElement.InternalGetImageAsPNG = null;
+            }
+
+            if (e.NewElement != null)
+            {
+                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+                e.NewElement.InternalCancel = new Action(CancelIfNeeded);
+                e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+                e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
+
+                SetAspect();
+                UpdateImage(Control, Element, e.OldElement);
+                SetOpacity();
+            }
 		}
 
 		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -86,7 +88,7 @@ namespace FFImageLoading.Forms.Touch
 
 			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
 			{
-				SetImage();
+                UpdateImage(Control, Element, null);
 			}
 			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
 			{
@@ -98,70 +100,68 @@ namespace FFImageLoading.Forms.Touch
 			}
 		}
 
-		private void SetAspect()
+		void SetAspect()
 		{
 			Control.ContentMode = Element.Aspect.ToUIViewContentMode();
 		}
 
-		private void SetOpacity()
+		void SetOpacity()
 		{
 			Control.Opaque = Element.IsOpaque;
 		}
 
-		private void SetImage(CachedImage oldElement = null)
+        void UpdateImage(UIImageView imageView, CachedImage image, CachedImage previousImage)
 		{
-			Xamarin.Forms.ImageSource source = Element.Source;
+            if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
+                return;
 
-			var ffSource = ImageSourceBinding.GetImageSourceBinding(source, Element);
-			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element);
-            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element);
-
-			if (oldElement != null && _lastImageSource != null && ffSource != null && !ffSource.Equals(_lastImageSource)
-				&& (string.IsNullOrWhiteSpace(placeholderSource?.Path) || placeholderSource?.Stream != null))
-			{
-				_lastImageSource = null;
-				Control.Image = null;
-			}
-
-			Element.SetIsLoading(true);
-
-			Cancel();
-
+            var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
             if (ffSource == null)
             {
-                if (Control != null)
-                    Control.Image = null;
+                if (_lastImageSource == null)
+                    return;
 
-                ImageLoadingFinished(Element);
+                _lastImageSource = null;
+                imageView.Image = null;
+                return;
             }
-            else
+
+            if (previousImage != null && !ffSource.Equals(_lastImageSource))
             {
-                var element = Element;
-                TaskParameter imageLoader = null;
-                element.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+                _lastImageSource = null;
+                imageView.Image = null;
+            }
 
-                if (imageLoader != null)
+            image.SetIsLoading(true);
+            CancelIfNeeded();
+
+            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
+            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
+            TaskParameter imageLoader;
+            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+
+            if (imageLoader != null)
+            {
+                var finishAction = imageLoader.OnFinish;
+                var sucessAction = imageLoader.OnSuccess;
+
+                imageLoader.Finish((work) =>
                 {
-                    var finishAction = imageLoader.OnFinish;
-                    var sucessAction = imageLoader.OnSuccess;
+                    finishAction?.Invoke(work);
+                    ImageLoadingFinished(image);
+                });
 
-                    imageLoader.Finish((work) => {
-                        finishAction?.Invoke(work);
-                        ImageLoadingFinished(element);
-                    });
+                imageLoader.Success((imageInformation, loadingResult) =>
+                {
+                    sucessAction?.Invoke(imageInformation, loadingResult);
+                    _lastImageSource = ffSource;
+                });
 
-                    imageLoader.Success((imageInformation, loadingResult) =>
-                    {
-                        sucessAction?.Invoke(imageInformation, loadingResult);
-                        _lastImageSource = ffSource;
-                    });
-
-                    _currentTask = imageLoader.Into(Control);
-                }
+                _currentTask = imageLoader.Into(imageView);
             }
 		}
 
-		private void ImageLoadingFinished(CachedImage element)
+		void ImageLoadingFinished(CachedImage element)
 		{
 			MainThreadDispatcher.Instance.Post(() =>
 			{
@@ -173,31 +173,35 @@ namespace FFImageLoading.Forms.Touch
 			});
 		}
 
-		private void ReloadImage()
+		void ReloadImage()
 		{
-			SetImage(null);
+            UpdateImage(Control, Element, null);
 		}
 
-		private void Cancel()
-		{
-			var taskToCancel = _currentTask;
-			if (taskToCancel != null && !taskToCancel.IsCancelled)
-			{
-				taskToCancel.Cancel();
-			}
-		}
+        void CancelIfNeeded()
+        {
+            try
+            {
+                var taskToCancel = _currentTask;
+                if (taskToCancel != null && !taskToCancel.IsCancelled)
+                {
+                    taskToCancel.Cancel();
+                }
+            }
+            catch (Exception) { }
+        }
 
-		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+		Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
 		{
 			return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+		Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
 		{
 			return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
 		}
 
-		private async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+		async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
 		{
 			UIImage image = null;
 
