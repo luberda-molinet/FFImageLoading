@@ -6,9 +6,6 @@ namespace FFImageLoading
     {
         public static IPlatformPerformance Create(bool verbose)
         {
-            if (!verbose)
-                return new EmptyPlatformPerformance();
-
             return new PlatformPerformance();
         }
 
