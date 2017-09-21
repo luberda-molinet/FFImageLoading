@@ -143,11 +143,11 @@ namespace FFImageLoading.Forms.WinRT
         {
             if (_measured)
             {
-                ((IVisualElementController)Element)?.InvalidateMeasure(Internals.InvalidationTrigger.RendererReady);
+                ((IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
             }
         }
 
-        void UpdateImage(Windows.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
+        async void UpdateImage(Windows.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
         {
             CancelIfNeeded();
 
@@ -227,7 +227,7 @@ namespace FFImageLoading.Forms.WinRT
 
 					if (elCtrl != null)
 					{
-                        ((IVisualElementController)Element)?.InvalidateMeasure(Internals.InvalidationTrigger.RendererReady);
+                        ((IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
                     }
 
                     element.SetIsLoading(false);
