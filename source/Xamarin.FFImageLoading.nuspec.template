@@ -104,12 +104,12 @@
 		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.Mac20\FFImageLoading.pdb" />		
 
         <!--Windows-->
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.xml" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.Platform.pdb" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\portable-netcore45+wpa81\FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\portable-netcore45+wpa81\FFImageLoading.xml" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\portable-netcore45+wpa81\FFImageLoading.pdb" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\uap10.0+wpa81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\uap10.0+wpa81\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\uap10.0+wpa81\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\uap10.0+wpa81\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\uap10.0+wpa81\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\uap10.0+wpa81\FFImageLoading.pdb" />
 	
 	</files>
 
