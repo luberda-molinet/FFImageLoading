@@ -1059,6 +1059,8 @@ namespace FFImageLoading.Forms
                 // Fallback to a constant value due to a lot people misusing DownsampleToViewSize property
                 // More here: https://github.com/luberda-molinet/FFImageLoading/wiki/Xamarin.Forms-API#downsampletoviewsize-bool-default-false
                 imageLoader.DownSample(height: 100);
+
+                ImageService.Instance.Config.Logger?.Error("DownsampleToViewSize failed - view is expandable in both dimensions, so it doesn't have a size. Please use DownsampleWidth or DownsampleHeight property.");
             }
 
             // RetryCount
