@@ -71,7 +71,7 @@ namespace FFImageLoading.Forms.Droid
 		{
 			base.OnElementChanged(e);
 
-            if (Control == null)
+            if (Control == null && Element != null && !_isDisposed)
             {
                 var nativeControl = new CachedImageView(Context);
                 SetNativeControl(nativeControl);

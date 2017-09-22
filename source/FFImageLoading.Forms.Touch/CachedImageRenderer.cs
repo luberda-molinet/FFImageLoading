@@ -69,7 +69,7 @@ namespace FFImageLoading.Forms.Mac
         {
             base.OnElementChanged(e);
 
-            if (Control == null)
+            if (Control == null && Element != null && !_isDisposed)
             {
 #if __IOS__
                 SetNativeControl(new PImageView(CGRect.Empty)

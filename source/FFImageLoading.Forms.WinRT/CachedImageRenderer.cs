@@ -77,7 +77,7 @@ namespace FFImageLoading.Forms.WinRT
         {
             base.OnElementChanged(e);
 
-            if (Control == null)
+            if (Control == null && Element != null && !_isDisposed)
             {
                 var control = new Windows.UI.Xaml.Controls.Image()
                 {
