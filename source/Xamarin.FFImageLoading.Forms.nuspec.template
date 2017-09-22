@@ -76,12 +76,12 @@ Features:
         <file src="FFImageLoading.Forms.Touch\bin\Release\FFImageLoading.Forms.Touch.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Forms.Touch.pdb" />
 
         <!--Xamarin.Mac-->
-        <!-- <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.dll" />
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.xml" target="lib\Xamarin.Mac20\FFImageLoading.Forms.xml" />
         <file src="FFImageLoading.Forms\bin\Release\FFImageLoading.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.pdb" />
-        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.dll" />
-        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.xml" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.xml" />
-        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.pdb" />         -->
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.Mac.dll" target="lib\Xamarin.Mac20\FFImageLoading.Forms.Mac.dll" />
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.Mac.xml" target="lib\Xamarin.Mac20\FFImageLoading.Forms.Mac.xml" />
+        <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.Mac.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.Mac.pdb" />
         
         <!--Windows WinRT-->
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\win81+wpa81\FFImageLoading.Forms.dll" />

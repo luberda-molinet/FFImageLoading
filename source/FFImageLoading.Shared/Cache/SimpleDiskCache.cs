@@ -67,13 +67,16 @@ namespace FFImageLoading.Cache
             if (!androidTempFolder.CanWrite())
                 androidTempFolder.SetWritable(true, false);
 
-#else
+#elif __IOS__
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
             string cachePath = Path.Combine(tmpPath, cacheName);
+#elif __MACOS__
+            string tmpPath = Path.GetTempPath();
+            string cachePath = Path.Combine(tmpPath, cacheName);
 #endif
 
-			return new SimpleDiskCache(cachePath, configuration);
+            return new SimpleDiskCache(cachePath, configuration);
         }
 
 		/// <summary>
