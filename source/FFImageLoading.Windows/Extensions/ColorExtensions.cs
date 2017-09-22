@@ -7,23 +7,41 @@ namespace FFImageLoading.Extensions
     {
         public const int SizeOfArgb = 4;
 
-        public static int ToInt(this Color color)
+        //public static int ToInt(this Color color)
+        //{
+        //    var col = 0;
+
+        //    if (color.A != 0)
+        //    {
+        //        var a = color.A + 1;
+        //        col = (color.A << 24)
+        //          | ((byte)((color.R * a) >> 8) << 16)
+        //          | ((byte)((color.G * a) >> 8) << 8)
+        //          | ((byte)((color.B * a) >> 8));
+        //    }
+
+        //    return col;
+        //}
+
+        public static int Transparent = 0;
+
+        public static int ToInt(int a, int r, int g, int b)
         {
             var col = 0;
 
-            if (color.A != 0)
+            if (a != 0)
             {
-                var a = color.A + 1;
-                col = (color.A << 24)
-                  | ((byte)((color.R * a) >> 8) << 16)
-                  | ((byte)((color.G * a) >> 8) << 8)
-                  | ((byte)((color.B * a) >> 8));
+                var a1 = a + 1;
+                col = (a << 24)
+                  | ((byte)((r * a1) >> 8) << 16)
+                  | ((byte)((g * a1) >> 8) << 8)
+                  | ((byte)((b * a1) >> 8));
             }
 
             return col;
         }
 
-        public static Color ToColorFromHex(this string hexColor)
+        public static int ToColorFromHex(this string hexColor)
         {
             if (string.IsNullOrWhiteSpace(hexColor))
                 throw new ArgumentException("Invalid color string.", nameof(hexColor));
@@ -31,7 +49,7 @@ namespace FFImageLoading.Extensions
             if (!hexColor.StartsWith("#", StringComparison.Ordinal))
                 hexColor.Insert(0, "#");
 
-            Color color = Colors.Transparent;
+            int color = Transparent;
 
             switch (hexColor.Length)
             {
@@ -43,7 +61,7 @@ namespace FFImageLoading.Extensions
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 
-                        color = Color.FromArgb(a, r, g, b);
+                        color = ToInt(a, r, g, b);
                         break;
                     }
                 case 7:
@@ -53,7 +71,7 @@ namespace FFImageLoading.Extensions
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 
-                        color = Color.FromArgb(255, r, g, b);
+                        color = ToInt(255, r, g, b);
                         break;
                     }
                 case 5:
@@ -68,7 +86,7 @@ namespace FFImageLoading.Extensions
                         g = (byte)(g << 4 | g);
                         b = (byte)(b << 4 | b);
 
-                        color = Color.FromArgb(a, r, g, b);
+                        color = ToInt(a, r, g, b);
                         break;
                     }
                 case 4:
@@ -81,7 +99,7 @@ namespace FFImageLoading.Extensions
                         g = (byte)(g << 4 | g);
                         b = (byte)(b << 4 | b);
 
-                        color = Color.FromArgb(255, r, g, b);
+                        color = ToInt(255, r, g, b);
                         break;
                     }
                 default:

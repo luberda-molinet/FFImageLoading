@@ -1,6 +1,5 @@
 ﻿using FFImageLoading.Extensions;
 using FFImageLoading.Work;
-using Windows.UI;
 
 namespace FFImageLoading.Transformations
 {
@@ -105,7 +104,7 @@ namespace FFImageLoading.Transformations
             int w = bitmap.Width;
             int h = bitmap.Height;
 
-            int transparentColor = Colors.Transparent.ToInt();
+            int transparentColor = ColorExtensions.Transparent;
 
             for (int y = 0; y < h; y++)
             {
