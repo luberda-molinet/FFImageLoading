@@ -3,7 +3,7 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class SvgSamplePageModel : BasePageModel
 	{
 		public SvgSamplePageModel()

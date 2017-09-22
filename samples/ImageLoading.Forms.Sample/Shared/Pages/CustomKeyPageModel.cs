@@ -5,7 +5,7 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class CustomKeyPageModel : ListPageModel
 	{
 		public CustomKeyPageModel()

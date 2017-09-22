@@ -3,7 +3,7 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class BasicPageModel : BasePageModel
 	{
 		public void Reload()

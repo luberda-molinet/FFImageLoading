@@ -2,7 +2,7 @@
 
 namespace FFImageLoading.Forms.Sample
 {
-    [PropertyChanged.ImplementPropertyChanged]
+    
     public class SimpleGifPageModel : BasePageModel
     {
         public void Reload()

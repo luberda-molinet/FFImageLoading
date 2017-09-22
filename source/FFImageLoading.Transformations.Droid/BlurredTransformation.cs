@@ -153,7 +153,8 @@ namespace FFImageLoading.Transformations
 				yi=x;
 				for (y=0;y<h;y++){
 					// Preserve alpha channel: ( 0xff000000 & pix[yi] )
-					pix[yi] = (int)((0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum]);
+                    var rgb = (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
+                    pix[yi] = ((int)(0xff000000 & pix[yi]) | rgb);
 					if(x==0){
 						vmin[y]=Math.Min(y+radius+1,hm)*w;
 						vmax[y]=Math.Max(y-radius,0)*w;

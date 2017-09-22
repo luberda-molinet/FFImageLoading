@@ -13,7 +13,7 @@ namespace FFImageLoading.Cache
 
         readonly int _high_watermark;
         readonly int _low_watermark;
-        bool _has_exceeded_high_watermark;
+        //bool _has_exceeded_high_watermark;
 
         public ByteBoundStrongLruCache(int highWatermark, int lowWatermark)
         {

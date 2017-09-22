@@ -5,7 +5,7 @@ using FFImageLoading.Transformations;
 
 namespace FFImageLoading.Forms.Sample
 {
-    [PropertyChanged.ImplementPropertyChanged]
+    
     public class TransformationsSelectorPageModel : BaseTransformationPageModel
     {
         public TransformationsSelectorPageModel()

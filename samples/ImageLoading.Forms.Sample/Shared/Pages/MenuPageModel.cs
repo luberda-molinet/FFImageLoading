@@ -10,7 +10,7 @@ using FFImageLoading.Forms.Sample.Pages;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class MenuPageModel : BasePageModel
 	{
 		public MenuPageModel()
@@ -279,7 +279,7 @@ namespace FFImageLoading.Forms.Sample
 			}
 		}
 
-		[PropertyChanged.ImplementPropertyChanged]
+		
 		public class MenuItem : BaseModel
 		{
 			public string Section { get; set; }

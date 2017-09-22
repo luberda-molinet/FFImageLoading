@@ -7,7 +7,7 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class ListPageModel : BasePageModel
 	{
 		public ListPageModel()
@@ -91,7 +91,7 @@ namespace FFImageLoading.Forms.Sample
 			Items = new ObservableCollection<ListItem>(list);
 		}
 
-		[PropertyChanged.ImplementPropertyChanged]
+		
 		public class ListItem : BaseModel
 		{
 			public string ImageUrl { get; set; }

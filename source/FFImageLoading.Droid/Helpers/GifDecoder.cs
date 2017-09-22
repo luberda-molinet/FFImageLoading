@@ -525,7 +525,8 @@ namespace FFImageLoading.Helpers
                     int r = ((int)c[j++]) & 0xff;
                     int g = ((int)c[j++]) & 0xff;
                     int b = ((int)c[j++]) & 0xff;
-                    tab[i++] = (int)(0xff000000 | (r << 16) | (g << 8) | b);
+                    var rgb = (r << 16) | (g << 8) | b;
+                    tab[i++] = (int)(0xff000000 | rgb);
                 }
             }
             return tab;
