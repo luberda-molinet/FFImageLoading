@@ -34,6 +34,7 @@ echo Building FFImageLoading.Forms...
 %msbuild% source/FFImageLoading.Forms.WinRT/FFImageLoading.Forms.WinRT.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.WinUWP/FFImageLoading.Forms.WinUWP.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj %buildargs%
+%msbuild% source/FFImageLoading.Forms.Mac/FFImageLoading.Forms.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj %buildargs%
 
 echo Building FFImageLoading.Svg...
