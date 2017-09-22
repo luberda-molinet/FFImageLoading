@@ -1,6 +1,5 @@
 ﻿{
   "dependencies": {
-    "Microsoft.Bcl.Build": "1.0.21",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.4.0",
     "SkiaSharp": "1.59.1"
   },

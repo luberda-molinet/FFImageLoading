@@ -52,15 +52,15 @@ Features:
 			</group>				
 
 			<group targetFramework="wpa81">
-				<dependency id="Microsoft.Net.Http" version="2.2.29" />
+				<!-- <dependency id="System.Net.Http" version="4.1.0" /> -->
 			</group> 	
 
 			<group targetFramework="win81">
-				<dependency id="Microsoft.Net.Http" version="2.2.29" />
+				<!-- <dependency id="System.Net.Http" version="4.1.0" /> -->
 			</group> 				
 
 			<group targetFramework="uap10.0">
-				<dependency id="Microsoft.Net.Http" version="2.2.29" />
+				<!-- <dependency id="System.Net.Http" version="4.1.0" /> -->
 			</group>
 
 		</dependencies>
