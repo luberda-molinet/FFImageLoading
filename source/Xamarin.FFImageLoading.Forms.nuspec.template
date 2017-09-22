@@ -84,12 +84,12 @@ Features:
         <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.pdb" />         -->
         
         <!--Windows WinRT-->
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.pdb" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.xml" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.pdb" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\win81+wpa81\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\win81+wpa81\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.pdb" target="lib\win81+wpa81\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\win81+wpa81\FFImageLoading.Forms.WinRT.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\win81+wpa81\FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\win81+wpa81\FFImageLoading.Forms.WinRT.pdb" />
 
         <!--Windows WinUWP-->
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.dll" target="lib\uap10.0\FFImageLoading.Forms.dll" />

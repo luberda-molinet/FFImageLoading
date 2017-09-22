@@ -61,9 +61,9 @@ Don't forget to add the package in all platform specific projects. This way the 
         <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />         -->
  
 		<!--Windows RT-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.pdb" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\win81+wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\win81+wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\win81+wpa81\FFImageLoading.Transformations.pdb" />
 
 		<!--Windows UWP-->
 		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\uap10.0\FFImageLoading.Transformations.dll" />

@@ -51,7 +51,7 @@ Features:
 			<group targetFramework="Xamarin.Mac20">
 			</group>				
 
-			<group targetFramework="win81+wpa81+winrt+winrt45">
+			<group targetFramework="win81+wpa81">
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
 			</group> 	
 
@@ -112,12 +112,12 @@ Features:
         <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\uap10.0\FFImageLoading.pdb" />
 
         <!--Windows RT-->
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.xml" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.pdb" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.xml" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.pdb" />			
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\win81+wpa81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\win81+wpa81\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\win81+wpa81\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\win81+wpa81\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\win81+wpa81\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\win81+wpa81\FFImageLoading.pdb" />			
 	
 	</files>
 
