@@ -41,6 +41,19 @@ namespace FFImageLoading.Cross
             public MvxSvgCachedImageView(Context context, IAttributeSet attrs) : base(context, attrs) { }
     #endif
 
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            base.OnPropertyChanged(propertyName);
+
+            if (propertyName == nameof(ReplaceStringMap))
+            {
+                if (_lastImageSource != null)
+                {
+                    UpdateImageLoadingTask();
+                }
+            }
+        }
+
     	protected override void SetupOnBeforeImageLoading(TaskParameter imageLoader)
     	{
     		base.SetupOnBeforeImageLoading(imageLoader);

@@ -47,6 +47,7 @@ namespace FFImageLoading.Cross
 
         protected IScheduledWork _scheduledWork;
         protected ImageSourceBinding _lastImageSource;
+        protected bool _isDisposed;
 
         protected void Initialize()
         {
@@ -239,6 +240,24 @@ namespace FFImageLoading.Cross
             set { if (_imageStream != value) { _imageStream = value; OnPropertyChanged(nameof(ImageStream)); } }
         }
 
+        public void Cancel()
+        {
+            try
+            {
+                var taskToCancel = _scheduledWork;
+                if (taskToCancel != null && !taskToCancel.IsCancelled)
+                {
+                    taskToCancel.Cancel();
+                }
+            }
+            catch (Exception) { }
+        }
+
+        public void Reload()
+        {
+            UpdateImageLoadingTask();
+        }
+
         protected virtual void UpdateImageLoadingTask()
         {
             var ffSource = GetImageSourceBinding(ImagePath, ImageStream);
@@ -246,10 +265,7 @@ namespace FFImageLoading.Cross
 
             IsLoading = true;
 
-            if (_scheduledWork != null && !_scheduledWork.IsCancelled)
-            {
-                _scheduledWork?.Cancel();
-            }
+            Cancel();
 
             TaskParameter imageLoader = null;
 
@@ -450,9 +466,10 @@ namespace FFImageLoading.Cross
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!_isDisposed)
             {
-                _scheduledWork?.Cancel();
+                _isDisposed = true;
+                Cancel();
             }
 
             base.Dispose(disposing);
