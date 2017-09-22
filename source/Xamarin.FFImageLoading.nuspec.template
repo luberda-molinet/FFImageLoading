@@ -51,9 +51,13 @@ Features:
 			<group targetFramework="Xamarin.Mac20">
 			</group>				
 
-			<group targetFramework="win81+wpa81">
+			<group targetFramework="wpa81">
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
 			</group> 	
+
+			<group targetFramework="win81">
+				<dependency id="Microsoft.Net.Http" version="2.2.29" />
+			</group> 				
 
 			<group targetFramework="uap10.0">
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
