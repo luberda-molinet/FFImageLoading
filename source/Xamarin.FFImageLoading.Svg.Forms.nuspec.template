@@ -51,7 +51,7 @@
         <file src="FFImageLoading.Svg.Forms.MacOs\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.xml" />
         <file src="FFImageLoading.Svg.Forms.MacOs\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.pdb" />         -->
  
-		<!--Windows-->
+		<!--Windows UWP-->
 		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.dll" target="lib\uap10.0\FFImageLoading.Svg.Forms.dll" />
 		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.xml" target="lib\uap10.0\FFImageLoading.Svg.Forms.xml" />
 		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.pdb" target="lib\uap10.0\FFImageLoading.Svg.Forms.pdb" />	

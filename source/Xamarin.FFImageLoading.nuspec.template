@@ -13,27 +13,27 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 
 		<description>
-			Xamarin Library to load images quickly and easily.
+Xamarin Library to load images quickly and easily.
 
-			Features:
+Features:
 
-			- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
-			- Configurable disk and memory caching
-			- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
-			- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
-			- Error and loading placeholders support
-			- Images can be automatically downsampled to specified size (less memory usage)
-			- Fluent API which is inspired by Picasso naming
-			- SVG / WebP / GIF support
-			- Image loading Fade-In animations support
-			- Can retry image downloads (RetryCount, RetryDelay)
-			- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
-			- Transformations support
-			- BlurredTransformation
-			- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
-			- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
-			- FlipTransformation, RotateTransformation
-			- Supports custom transformations (native platform `ITransformation` implementations)
+- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
+- Configurable disk and memory caching
+- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
+- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
+- Error and loading placeholders support
+- Images can be automatically downsampled to specified size (less memory usage)
+- Fluent API which is inspired by Picasso naming
+- SVG / WebP / GIF support
+- Image loading Fade-In animations support
+- Can retry image downloads (RetryCount, RetryDelay)
+- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
+- Transformations support
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+- FlipTransformation, RotateTransformation
+- Supports custom transformations (native platform `ITransformation` implementations)
 		</description>
 
 		<summary>Xamarin library to load images quickly and easily on Xamarin.iOS / Xamarin.Android / Xamarin.Mac / Windows</summary>
@@ -51,11 +51,11 @@
 			<group targetFramework="Xamarin.Mac20">
 			</group>				
 
-			<group targetFramework="portable-netcore45+wpa81">
+			<group targetFramework="win81+wpa81+winrt+winrt45">
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
 			</group> 	
 
-			<group targetFramework="portable-wp8">
+			<group targetFramework="uap10.0">
 				<dependency id="Microsoft.Net.Http" version="2.2.29" />
 			</group>
 
@@ -103,13 +103,21 @@
 		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.xml" target="lib\Xamarin.Mac20\FFImageLoading.xml" />
 		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.Mac20\FFImageLoading.pdb" />		
 
-        <!--Windows-->
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\uap10.0+wpa81\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\uap10.0+wpa81\FFImageLoading.Platform.xml" />
-		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\uap10.0+wpa81\FFImageLoading.Platform.pdb" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\uap10.0+wpa81\FFImageLoading.dll" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\uap10.0+wpa81\FFImageLoading.xml" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\uap10.0+wpa81\FFImageLoading.pdb" />
+        <!--Windows UWP-->
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\uap10.0\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\uap10.0\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\uap10.0\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\uap10.0\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\uap10.0\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\uap10.0\FFImageLoading.pdb" />
+
+        <!--Windows RT-->
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.pdb" />			
 	
 	</files>
 

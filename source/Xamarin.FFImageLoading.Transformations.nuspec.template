@@ -13,16 +13,16 @@
        <requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        <description>
-            Transformations for FFImageLoading library.
+Transformations for FFImageLoading library.
 
-			- BlurredTransformation
-			- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
-			- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
-			- FlipTransformation, RotateTransformation
-			- Supports custom transformations (native platform `ITransformation` implementations)
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+- FlipTransformation, RotateTransformation
+- Supports custom transformations (native platform `ITransformation` implementations)
 
-            These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
-            Don't forget to add the package in all platform specific projects. This way the correct native implementation is injected.
+These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
+Don't forget to add the package in all platform specific projects. This way the correct native implementation is injected.
        </description>
        
        <summary>Xamarin image transformations for FFImageLoading.</summary>
@@ -60,11 +60,16 @@
         <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.xml" />
         <file src="FFImageLoading.Transformations.MacOs\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />         -->
  
-		<!--Windows-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\uap10.0+wpa81\FFImageLoading.Transformations.pdb" />
-		
+		<!--Windows RT-->
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Transformations.pdb" />
+
+		<!--Windows UWP-->
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\uap10.0\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\uap10.0\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\uap10.0\FFImageLoading.Transformations.pdb" />
+	    	
 	</files>
 	
 </package>

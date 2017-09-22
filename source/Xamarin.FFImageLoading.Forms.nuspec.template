@@ -13,29 +13,29 @@
        	<requireLicenseAcceptance>false</requireLicenseAcceptance>
        
        	<description>
-			Xamarin Library to load images quickly and easily on Xamarin.Forms.
+Xamarin Library to load images quickly and easily on Xamarin.Forms.
 
-            Ensure you call CachedImageRenderer.Init() on each platform!!!
+Ensure you call CachedImageRenderer.Init() on each platform!!!
 
-			Features:
+Features:
 
-			- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
-			- Configurable disk and memory caching
-			- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
-			- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
-			- Error and loading placeholders support
-			- Images can be automatically downsampled to specified size (less memory usage)
-			- Fluent API which is inspired by Picasso naming
-			- SVG / WebP / GIF support
-			- Image loading Fade-In animations support
-			- Can retry image downloads (RetryCount, RetryDelay)
-			- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
-			- Transformations support
-			- BlurredTransformation
-			- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
-			- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
-			- FlipTransformation, RotateTransformation
-			- Supports custom transformations (native platform `ITransformation` implementations)
+- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
+- Configurable disk and memory caching
+- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
+- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
+- Error and loading placeholders support
+- Images can be automatically downsampled to specified size (less memory usage)
+- Fluent API which is inspired by Picasso naming
+- SVG / WebP / GIF support
+- Image loading Fade-In animations support
+- Can retry image downloads (RetryCount, RetryDelay)
+- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
+- Transformations support
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+- FlipTransformation, RotateTransformation
+- Supports custom transformations (native platform `ITransformation` implementations)
        	</description>
        
        	<summary>Xamarin Forms plugin to load images quickly and easily.</summary>
@@ -84,12 +84,12 @@
         <file src="FFImageLoading.Forms.MacOs\bin\Release\FFImageLoading.Forms.MacOs.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Forms.MacOs.pdb" />         -->
         
         <!--Windows WinRT-->
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\wpa81\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\wpa81\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.pdb" target="lib\wpa81\FFImageLoading.Forms.pdb" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\wpa81\FFImageLoading.Forms.WinRT.dll" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\wpa81\FFImageLoading.Forms.WinRT.xml" />
-        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\wpa81\FFImageLoading.Forms.WinRT.pdb" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.dll" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.dll" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.xml" />
+        <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\win81+wpa81+winrt+winrt45\FFImageLoading.Forms.WinRT.pdb" />
 
         <!--Windows WinUWP-->
         <file src="FFImageLoading.Forms.WinUWP\bin\Release\FFImageLoading.Forms.dll" target="lib\uap10.0\FFImageLoading.Forms.dll" />
