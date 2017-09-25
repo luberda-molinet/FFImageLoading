@@ -36,7 +36,7 @@ namespace FFImageLoading.Forms.Droid
         bool _isDisposed;
 		IScheduledWork _currentTask;
 		ImageSourceBinding _lastImageSource;
-        readonly MotionEventHelper _motionEventHelper = new MotionEventHelper();
+        readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;
 
 		public CachedImageRenderer()
 		{
@@ -53,7 +53,7 @@ namespace FFImageLoading.Forms.Droid
             if (base.OnTouchEvent(e))
                 return true;
 
-            return _motionEventHelper.HandleMotionEvent(Parent, e);
+            return CachedImage.FixedAndroidMotionEventHandler ? _motionEventHelper.HandleMotionEvent(Parent, e) : false;
         }
 
         protected override void Dispose(bool disposing)
@@ -92,7 +92,7 @@ namespace FFImageLoading.Forms.Droid
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-                _motionEventHelper.UpdateElement(e.NewElement);
+                //_motionEventHelper.UpdateElement(e.NewElement);
                 UpdateBitmap(Control, Element, e.OldElement);
                 UpdateAspect();
 			}
@@ -302,7 +302,7 @@ namespace FFImageLoading.Forms.Droid
                     catch (Exception) { }
                 }
 
-                return false;
+                return true;
             }
 
             public void UpdateElement(VisualElement element)
