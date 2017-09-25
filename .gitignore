@@ -1,5 +1,7 @@
 *.cache
 *.nupkg
+*.nuget.props
+*.nuget.targets
 
 ## Xamarin stuff
 Components
