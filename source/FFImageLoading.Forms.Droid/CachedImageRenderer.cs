@@ -92,7 +92,7 @@ namespace FFImageLoading.Forms.Droid
 				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
 				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-                //_motionEventHelper.UpdateElement(e.NewElement);
+                _motionEventHelper.UpdateElement(e.NewElement);
                 UpdateBitmap(Control, Element, e.OldElement);
                 UpdateAspect();
 			}
