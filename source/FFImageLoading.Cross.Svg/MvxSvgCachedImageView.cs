@@ -31,16 +31,20 @@ namespace FFImageLoading.Cross
 
     public class MvxSvgCachedImageView : MvxCachedImageView
     {
-    #if __IOS__
-            public MvxSvgCachedImageView() { Initialize(); }
-            public MvxSvgCachedImageView(IntPtr handle) : base(handle) { }
-            public MvxSvgCachedImageView(CGRect frame) : base(frame) { }
-    #elif __ANDROID__
-            public MvxSvgCachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { }
-            public MvxSvgCachedImageView(Context context) : base(context) { }
-            public MvxSvgCachedImageView(Context context, IAttributeSet attrs) : base(context, attrs) { }
-    #endif
+#if __IOS__
+        public MvxSvgCachedImageView() : base() { } 
+        public MvxSvgCachedImageView(IntPtr handle) : base(handle) { }
+        public MvxSvgCachedImageView(CGRect frame) : base(frame) { }
+#elif __ANDROID__
+        public MvxSvgCachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { }
+        public MvxSvgCachedImageView(Context context) : base(context) { }
+        public MvxSvgCachedImageView(Context context, IAttributeSet attrs) : base(context, attrs) { }
 
+#elif __WINDOWS__
+        public MvxSvgCachedImageView() : base() { }
+#endif
+
+#if !__WINDOWS__
         protected override void OnPropertyChanged(string propertyName)
         {
             base.OnPropertyChanged(propertyName);
@@ -54,17 +58,22 @@ namespace FFImageLoading.Cross
             }
         }
 
-    	protected override void SetupOnBeforeImageLoading(TaskParameter imageLoader)
+#endif
+
+        protected override void SetupOnBeforeImageLoading(TaskParameter imageLoader)
     	{
     		base.SetupOnBeforeImageLoading(imageLoader);
 
-    #if __IOS__
-                int width = (int)this.Bounds.Width;
-                int height = (int)this.Bounds.Height;
-    #elif __ANDROID__
-                int width = this.Width;
-                int height = this.Height;
-    #endif
+#if __IOS__
+            int width = (int)this.Bounds.Width;
+            int height = (int)this.Bounds.Height;
+#elif __ANDROID__
+            int width = this.Width;
+            int height = this.Height;
+#elif __WINDOWS__
+            int width = (int)this.Width;
+            int height = (int)this.Height;                
+#endif
 
             if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase)) || ImageStream != null)
     		{
@@ -80,7 +89,11 @@ namespace FFImageLoading.Cross
             }
     	}
 
-    	Dictionary<string, string> _replaceStringMap;
+#if __WINDOWS__
+        public Dictionary<string, string> ReplaceStringMap { get { return (Dictionary<string, string>)GetValue(ReplaceStringMapProperty); } set { SetValue(ReplaceStringMapProperty, value); } }
+        public static readonly Windows.UI.Xaml.DependencyProperty ReplaceStringMapProperty = Windows.UI.Xaml.DependencyProperty.Register(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(MvxCachedImageView), new Windows.UI.Xaml.PropertyMetadata(default(Dictionary<string, string>), OnImageChanged));
+#else
+        Dictionary<string, string> _replaceStringMap;
     	/// <summary>
     	/// Used to define replacement map which will be used to
     	/// replace text inside SVG file (eg. changing colors values)
@@ -91,5 +104,6 @@ namespace FFImageLoading.Cross
     		get { return _replaceStringMap; }
     		set { if (_replaceStringMap != value) { _replaceStringMap = value; OnPropertyChanged(nameof(ReplaceStringMap)); } }
     	}
+#endif
     }
 }

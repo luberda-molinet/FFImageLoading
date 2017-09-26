@@ -9,22 +9,14 @@ using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
-
-#if SILVERLIGHT
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-#else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-#endif
 
 namespace FFImageLoading
 {
+    [Obsolete("Please use MvxCachedImageView / MvxSvgCachedImageView")]
 	public sealed class FFImage : ContentControl, IDisposable
     {
         private Image internalImage;
@@ -710,9 +702,6 @@ namespace FFImageLoading
 
         private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
         {
-#if SILVERLIGHT
-            return await Task.FromResult(bitmap.ToByteArray());
-#else
             byte[] tempPixels;
             using (var sourceStream = bitmap.PixelBuffer.AsStream())
             {
@@ -721,7 +710,6 @@ namespace FFImageLoading
             }
 
             return tempPixels;
-#endif
         }
 
         /// <summary>
@@ -896,11 +884,7 @@ namespace FFImageLoading
         {
             get
             {
-#if SILVERLIGHT
-                return Application.Current.RootVisual != null && DesignerProperties.GetIsInDesignMode(Application.Current.RootVisual);
-#else
                 return Windows.ApplicationModel.DesignMode.DesignModeEnabled;
-#endif
             }
         }
     }

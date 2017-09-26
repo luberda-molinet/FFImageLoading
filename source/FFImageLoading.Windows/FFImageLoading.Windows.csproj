@@ -33,7 +33,7 @@
     <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;__WINDOWS__;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
@@ -41,7 +41,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;WINDOWS</DefineConstants>
+    <DefineConstants>DEBUG;WINDOWS;__WINDOWS__;</DefineConstants>
     <Optimize>false</Optimize>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
@@ -53,7 +53,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;__WINDOWS__;</DefineConstants>
     <Optimize>true</Optimize>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
@@ -95,6 +95,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
+    <Compile Include="Views\MvxCachedImageView.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="FFImage.cs" />
     <Compile Include="Cache\ICacheKeyFactory.cs" />

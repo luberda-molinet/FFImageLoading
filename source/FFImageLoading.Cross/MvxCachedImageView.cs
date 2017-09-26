@@ -88,14 +88,14 @@ namespace FFImageLoading.Cross
             set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsLoading)); IsLoadingChanged?.Invoke(this, EventArgs.Empty); } }
         }
 
-        int _retryCount;
+        int _retryCount = 3;
         public int RetryCount
         {
             get { return _retryCount; }
             set { if (_retryCount != value) { _retryCount = value; OnPropertyChanged(nameof(RetryCount)); } }
         }
 
-        int _retryDelay;
+        int _retryDelay = 500;
         public int RetryDelay
         {
             get { return _retryDelay; }
@@ -452,9 +452,16 @@ namespace FFImageLoading.Cross
             }
 #endif
 
-            Uri uri;
-            if (Uri.TryCreate(imagePath, UriKind.Absolute, out uri) && uri.Scheme != "file")
+            if (imagePath.IsDataUrl())
             {
+                return new ImageSourceBinding(ImageSource.Url, imagePath);
+            }
+
+            if (Uri.TryCreate(imagePath, UriKind.Absolute, out uri))
+            {
+                if (uri.Scheme == "file")
+                    return new ImageSourceBinding(ImageSource.Filepath, uri.LocalPath);
+
                 return new ImageSourceBinding(ImageSource.Url, imagePath);
             }
 
