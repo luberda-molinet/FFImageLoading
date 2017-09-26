@@ -457,6 +457,7 @@ namespace FFImageLoading.Cross
                 return new ImageSourceBinding(ImageSource.Url, imagePath);
             }
 
+            Uri uri;
             if (Uri.TryCreate(imagePath, UriKind.Absolute, out uri))
             {
                 if (uri.Scheme == "file")
