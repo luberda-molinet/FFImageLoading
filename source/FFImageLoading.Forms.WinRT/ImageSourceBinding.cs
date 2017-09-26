@@ -7,8 +7,6 @@ using System.Threading;
 
 #if WINDOWS_UWP
 namespace FFImageLoading.Forms.WinUWP
-#elif SILVERLIGHT
-namespace FFImageLoading.Forms.WinSL
 #else
 namespace FFImageLoading.Forms.WinRT
 #endif
@@ -43,6 +41,9 @@ namespace FFImageLoading.Forms.WinRT
             var uriImageSource = source as UriImageSource;
             if (uriImageSource != null)
             {
+                if (uriImageSource.Uri.Scheme == "file")
+                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
+                
 				var uri = uriImageSource.Uri?.OriginalString;
 				if (string.IsNullOrWhiteSpace(uri))
 					return null;
