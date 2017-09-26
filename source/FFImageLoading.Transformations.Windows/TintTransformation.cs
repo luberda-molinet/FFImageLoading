@@ -33,11 +33,11 @@ namespace FFImageLoading.Transformations
             set
             {
                 _hexColor = value;
-                var cuint = (uint)value.ToColorFromHex();
-                A = (byte)(cuint >> 24);
-                R = (byte)((cuint >> 16) & 0xff);
-                G = (byte)((cuint >> 8) & 0xff);
-                B = (byte)(cuint & 0xff);
+                var color = value.ToColorFromHex();
+                A = color.A;
+                R = color.R;
+                G = color.G;
+                B = color.B;
             }
         }
 

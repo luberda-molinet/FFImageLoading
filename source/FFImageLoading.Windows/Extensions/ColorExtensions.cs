@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFImageLoading.Helpers;
+using System;
 using Windows.UI;
 
 namespace FFImageLoading.Extensions
@@ -7,49 +8,37 @@ namespace FFImageLoading.Extensions
     {
         public const int SizeOfArgb = 4;
 
-        //public static int ToInt(this Color color)
-        //{
-        //    var col = 0;
-
-        //    if (color.A != 0)
-        //    {
-        //        var a = color.A + 1;
-        //        col = (color.A << 24)
-        //          | ((byte)((color.R * a) >> 8) << 16)
-        //          | ((byte)((color.G * a) >> 8) << 8)
-        //          | ((byte)((color.B * a) >> 8));
-        //    }
-
-        //    return col;
-        //}
-
-        public static int Transparent = 0;
-
-        public static int ToInt(int a, int r, int g, int b)
+        public static int ToInt(this ColorHolder color)
         {
             var col = 0;
 
-            if (a != 0)
+            if (color.A != 0)
             {
-                var a1 = a + 1;
-                col = (a << 24)
-                  | ((byte)((r * a1) >> 8) << 16)
-                  | ((byte)((g * a1) >> 8) << 8)
-                  | ((byte)((b * a1) >> 8));
+                var a = color.A + 1;
+                col = (color.A << 24)
+                  | ((byte)((color.R * a) >> 8) << 16)
+                  | ((byte)((color.G * a) >> 8) << 8)
+                  | ((byte)((color.B * a) >> 8));
             }
 
             return col;
         }
 
-        public static int ToColorFromHex(this string hexColor)
+        public static ColorHolder Transparent = new ColorHolder(0, 255, 255, 255);
+
+        //public static int ToInt(int a, int r, int g, int b)
+        //{
+        //    byte[] bytes = new byte[] { Convert.ToByte(b), Convert.ToByte(g), Convert.ToByte(r), Convert.ToByte(a) };
+        //    return BitConverter.ToInt32(bytes, 0);
+        //}
+
+        public static ColorHolder ToColorFromHex(this string hexColor)
         {
             if (string.IsNullOrWhiteSpace(hexColor))
                 throw new ArgumentException("Invalid color string.", nameof(hexColor));
 
             if (!hexColor.StartsWith("#", StringComparison.Ordinal))
                 hexColor.Insert(0, "#");
-
-            int color = Transparent;
 
             switch (hexColor.Length)
             {
@@ -61,8 +50,7 @@ namespace FFImageLoading.Extensions
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 
-                        color = ToInt(a, r, g, b);
-                        break;
+                        return new ColorHolder(a, r, g, b);
                     }
                 case 7:
                     {
@@ -71,8 +59,7 @@ namespace FFImageLoading.Extensions
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 
-                        color = ToInt(255, r, g, b);
-                        break;
+                        return new ColorHolder(255, r, g, b);
                     }
                 case 5:
                     {
@@ -86,8 +73,7 @@ namespace FFImageLoading.Extensions
                         g = (byte)(g << 4 | g);
                         b = (byte)(b << 4 | b);
 
-                        color = ToInt(a, r, g, b);
-                        break;
+                        return new ColorHolder(a, r, g, b);
                     }
                 case 4:
                     {
@@ -99,14 +85,11 @@ namespace FFImageLoading.Extensions
                         g = (byte)(g << 4 | g);
                         b = (byte)(b << 4 | b);
 
-                        color = ToInt(255, r, g, b);
-                        break;
+                        return new ColorHolder(255, r, g, b);
                     }
                 default:
                     throw new FormatException(string.Format("The {0} string is not a recognized HexColor format.", hexColor));
             }
-
-            return color;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FFImageLoading.Extensions;
+using FFImageLoading.Helpers;
 using System;
 using Windows.UI;
 
@@ -33,20 +34,20 @@ namespace FFImageLoading.Work
             *(int*)numPtr = color;
         }
 
-        //public void SetPixel(int x, int y, Color color)
-        //{
-        //    int pixelPos = (y * Width + x);
-        //    SetPixel(pixelPos, color);
-        //}
+        public void SetPixel(int x, int y, ColorHolder color)
+        {
+            int pixelPos = (y * Width + x);
+            SetPixel(pixelPos, color);
+        }
 
-        //public void SetPixel(int pos, Color color)
-        //{
-        //    int bytePos = pos * 4;
-        //    PixelData[bytePos] = color.A;
-        //    PixelData[bytePos + 1] = color.R;
-        //    PixelData[bytePos + 2] = color.G;
-        //    PixelData[bytePos + 3] = color.B;
-        //}
+        public void SetPixel(int pos, ColorHolder color)
+        {
+            int bytePos = pos * 4;
+            PixelData[bytePos] = color.A;
+            PixelData[bytePos + 1] = color.R;
+            PixelData[bytePos + 2] = color.G;
+            PixelData[bytePos + 3] = color.B;
+        }
 
         public int GetPixelAsInt(int x, int y)
         {

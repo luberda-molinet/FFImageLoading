@@ -104,7 +104,7 @@ namespace FFImageLoading.Transformations
             int w = bitmap.Width;
             int h = bitmap.Height;
 
-            int transparentColor = ColorExtensions.Transparent;
+            var transparentColor = ColorExtensions.Transparent;
 
             for (int y = 0; y < h; y++)
             {
