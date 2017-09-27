@@ -20,33 +20,33 @@ using System.Reflection;
 [assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
 {
-	/// <summary>
-	/// CachedImage Implementation
-	/// </summary>
-	[Preserve(AllMembers=true)]
-	public class CachedImageRenderer : ViewRenderer<CachedImage, CachedImageView>
-	{
-		/// <summary>
-		///   Used for registration with dependency service
-		/// </summary>
-		public static void Init()
-		{
+    /// <summary>
+    /// CachedImage Implementation
+    /// </summary>
+    [Preserve(AllMembers=true)]
+    public class CachedImageRenderer : ViewRenderer<CachedImage, CachedImageView>
+    {
+        /// <summary>
+        ///   Used for registration with dependency service
+        /// </summary>
+        public static void Init()
+        {
         }
 
         bool _isDisposed;
-		IScheduledWork _currentTask;
-		ImageSourceBinding _lastImageSource;
+        IScheduledWork _currentTask;
+        ImageSourceBinding _lastImageSource;
         readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;
 
-		public CachedImageRenderer()
-		{
-			AutoPackage = false;
-		}
+        public CachedImageRenderer()
+        {
+            AutoPackage = false;
+        }
 
-		public CachedImageRenderer(IntPtr javaReference, JniHandleOwnership transfer) : this()
-		{
-			AutoPackage = false;
-		}
+        public CachedImageRenderer(IntPtr javaReference, JniHandleOwnership transfer) : this()
+        {
+            AutoPackage = false;
+        }
 
         public override bool OnTouchEvent(MotionEvent e)
         {
@@ -67,9 +67,9 @@ namespace FFImageLoading.Forms.Droid
             base.Dispose(disposing);
         }
 
-		protected override void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
-		{
-			base.OnElementChanged(e);
+        protected override void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
+        {
+            base.OnElementChanged(e);
 
             if (Control == null && Element != null && !_isDisposed)
             {
@@ -85,52 +85,52 @@ namespace FFImageLoading.Forms.Droid
                 e.OldElement.InternalGetImageAsPNG = null;
             }
 
-			if (e.NewElement != null)
-			{
-				e.NewElement.InternalReloadImage = new Action(ReloadImage);
+            if (e.NewElement != null)
+            {
+                e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
-				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
-				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
+                e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+                e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-                _motionEventHelper.UpdateElement(e.NewElement);
+                _motionEventHelper?.UpdateElement(e.NewElement);
                 UpdateBitmap(Control, Element, e.OldElement);
                 UpdateAspect();
-			}
-		}
+            }
+        }
 
-		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			base.OnElementPropertyChanged(sender, e);
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
 
-			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
-			{
+            if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
+            {
                 UpdateBitmap(Control, Element, null);
-			}
-			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
-			{
-				UpdateAspect();
-			}
-		}
+            }
+            if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
+            {
+                UpdateAspect();
+            }
+        }
 
         protected override CachedImageView CreateNativeControl()
         {
             return new CachedImageView(Context);
         }
 
-		void UpdateAspect()
-		{
-			if (Element.Aspect == Aspect.AspectFill)
-				Control.SetScaleType(ImageView.ScaleType.CenterCrop);
+        void UpdateAspect()
+        {
+            if (Element.Aspect == Aspect.AspectFill)
+                Control.SetScaleType(ImageView.ScaleType.CenterCrop);
 
-			else if (Element.Aspect == Aspect.Fill)
-				Control.SetScaleType(ImageView.ScaleType.FitXy);
+            else if (Element.Aspect == Aspect.Fill)
+                Control.SetScaleType(ImageView.ScaleType.FitXy);
 
-			else
-				Control.SetScaleType(ImageView.ScaleType.FitCenter);
-		}
+            else
+                Control.SetScaleType(ImageView.ScaleType.FitCenter);
+        }
 
         void UpdateBitmap(CachedImageView imageView, CachedImage image, CachedImage previousImage)
-		{
+        {
             CancelIfNeeded();
 
             if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
@@ -180,27 +180,27 @@ namespace FFImageLoading.Forms.Droid
 
                 _currentTask = imageLoader.Into(imageView);
             }
-		}
+        }
 
-		void ImageLoadingFinished(CachedImage element)
-		{
-			MainThreadDispatcher.Instance.Post(() =>
-			{
-				if (element != null && !_isDisposed)
-				{
-					((IVisualElementController)element).NativeSizeChanged();
+        void ImageLoadingFinished(CachedImage element)
+        {
+            MainThreadDispatcher.Instance.Post(() =>
+            {
+                if (element != null && !_isDisposed)
+                {
+                    ((IVisualElementController)element).NativeSizeChanged();
                     element.SetIsLoading(false);
-				}
-			});
-		}
+                }
+            });
+        }
 
-		void ReloadImage()
-		{
-			UpdateBitmap(Control, Element, null);
-		}
+        void ReloadImage()
+        {
+            UpdateBitmap(Control, Element, null);
+        }
 
-		void CancelIfNeeded()
-		{
+        void CancelIfNeeded()
+        {
             try
             {
                 var taskToCancel = _currentTask;
@@ -210,63 +210,63 @@ namespace FFImageLoading.Forms.Droid
                 }
             }
             catch (Exception) { }
-		}
+        }
 
-		Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
-		{
-			return GetImageAsByteAsync(Bitmap.CompressFormat.Jpeg, args.Quality, args.DesiredWidth, args.DesiredHeight);
-		}
+        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        {
+            return GetImageAsByteAsync(Bitmap.CompressFormat.Jpeg, args.Quality, args.DesiredWidth, args.DesiredHeight);
+        }
 
-		Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
-		{
-			return GetImageAsByteAsync(Bitmap.CompressFormat.Png, 90, args.DesiredWidth, args.DesiredHeight);
-		}
+        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        {
+            return GetImageAsByteAsync(Bitmap.CompressFormat.Png, 90, args.DesiredWidth, args.DesiredHeight);
+        }
 
-		async Task<byte[]> GetImageAsByteAsync(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
-		{
-			if (Control == null)
-				return null;
+        async Task<byte[]> GetImageAsByteAsync(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
+        {
+            if (Control == null)
+                return null;
 
-			var drawable = Control.Drawable as BitmapDrawable;
+            var drawable = Control.Drawable as BitmapDrawable;
 
-			if (drawable == null || drawable.Bitmap == null)
-				return null;
+            if (drawable == null || drawable.Bitmap == null)
+                return null;
 
-			Bitmap bitmap = drawable.Bitmap;
+            Bitmap bitmap = drawable.Bitmap;
 
-			if (desiredWidth != 0 || desiredHeight != 0)
-			{
-				double widthRatio = (double)desiredWidth / (double)bitmap.Width;
-				double heightRatio = (double)desiredHeight / (double)bitmap.Height;
+            if (desiredWidth != 0 || desiredHeight != 0)
+            {
+                double widthRatio = (double)desiredWidth / (double)bitmap.Width;
+                double heightRatio = (double)desiredHeight / (double)bitmap.Height;
 
-				double scaleRatio = Math.Min(widthRatio, heightRatio);
+                double scaleRatio = Math.Min(widthRatio, heightRatio);
 
-				if (desiredWidth == 0)
-					scaleRatio = heightRatio;
+                if (desiredWidth == 0)
+                    scaleRatio = heightRatio;
 
-				if (desiredHeight == 0)
-					scaleRatio = widthRatio;
+                if (desiredHeight == 0)
+                    scaleRatio = widthRatio;
 
-				int aspectWidth = (int)((double)bitmap.Width * scaleRatio);
-				int aspectHeight = (int)((double)bitmap.Height * scaleRatio);
+                int aspectWidth = (int)((double)bitmap.Width * scaleRatio);
+                int aspectHeight = (int)((double)bitmap.Height * scaleRatio);
 
-				bitmap = Bitmap.CreateScaledBitmap(bitmap, aspectWidth, aspectHeight, true);
-			}
+                bitmap = Bitmap.CreateScaledBitmap(bitmap, aspectWidth, aspectHeight, true);
+            }
 
-			using (var stream = new MemoryStream())
-			{
-				await bitmap.CompressAsync(format, quality, stream).ConfigureAwait(false);
-				var compressed = stream.ToArray();
+            using (var stream = new MemoryStream())
+            {
+                await bitmap.CompressAsync(format, quality, stream).ConfigureAwait(false);
+                var compressed = stream.ToArray();
 
-				if (desiredWidth != 0 || desiredHeight != 0)
-				{
-					bitmap.Recycle();
-					bitmap.Dispose();
-				}
+                if (desiredWidth != 0 || desiredHeight != 0)
+                {
+                    bitmap.Recycle();
+                    bitmap.Dispose();
+                }
 
-				return compressed;
-			}
-		}
+                return compressed;
+            }
+        }
 
         internal class MotionEventHelper
         {
@@ -335,6 +335,6 @@ namespace FFImageLoading.Forms.Droid
                 return false;
             }
         }
-	}
+    }
 }
 
