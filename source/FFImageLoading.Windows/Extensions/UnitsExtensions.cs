@@ -1,6 +1,7 @@
 ﻿using FFImageLoading.Helpers;
 using System;
 using Windows.Graphics.Display;
+using System.Reflection;
 
 namespace FFImageLoading.Extensions
 {
@@ -17,7 +18,18 @@ namespace FFImageLoading.Extensions
         {
             await MainThreadDispatcher.Instance.PostAsync(() =>
             {
-                resolutionScale = (double)DisplayInformation.GetForCurrentView().ResolutionScale / 100.0d;
+                var displayInfo = DisplayInformation.GetForCurrentView();
+                object found = null;
+
+                try
+                {
+                    found = displayInfo.GetType().GetRuntimeProperty("RawPixelsPerViewPixel")?.GetValue(displayInfo);
+                }
+                catch (Exception)
+                {
+                }
+
+                resolutionScale = found == null ? 1d : (double)found;
             }).ConfigureAwait(false);
         }
 
