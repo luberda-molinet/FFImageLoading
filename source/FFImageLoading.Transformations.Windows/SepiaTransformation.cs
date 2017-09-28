@@ -29,11 +29,11 @@ namespace FFImageLoading.Transformations
 
             for (var i = 0; i < len; i++)
             {
-                var c = bmp.GetPixelAsInt(i);
-                var a = (c >> 24) & 0x000000FF;
-                var r = (c >> 16) & 0x000000FF;
-                var g = (c >> 8) & 0x000000FF;
-                var b = (c) & 0x000000FF;
+                var color = bmp.GetPixel(i);
+                int a = color.A;
+                int r = color.R;
+                int g = color.G;
+                int b = color.B;
 
                 var rNew = (int)Math.Min((.393 * r) + (.769 * g) + (.189 * (b)), 255.0);
                 var gNew = (int)Math.Min((.349 * r) + (.686 * g) + (.168 * (b)), 255.0);
@@ -48,7 +48,7 @@ namespace FFImageLoading.Transformations
                 if (bNew > 255)
                     bNew = 255;
 
-                bmp.SetPixel(i, (a << 24) | (rNew << 16) | (gNew << 8) | bNew);
+                bmp.SetPixel(i, new ColorHolder(a, rNew, gNew, bNew));
             }
         }
     }

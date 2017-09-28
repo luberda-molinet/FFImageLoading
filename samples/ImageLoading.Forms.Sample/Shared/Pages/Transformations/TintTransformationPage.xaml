@@ -13,7 +13,7 @@
                     Aspect="AspectFit" HeightRequest="400" WidthRequest="400" Source="{Binding ImageUrl}">
                     <ffimageloading:CachedImage.Transformations>
                         <!-- First two digits from HexColor = ALPHA channel -->
-                        <fftransformations:TintTransformation HexColor="#ffff0000" EnableSolidColor="true"/>
+                        <fftransformations:TintTransformation HexColor="#ccff0000" EnableSolidColor="true"/>
                     </ffimageloading:CachedImage.Transformations>
                 </ffimageloading:CachedImage>
 

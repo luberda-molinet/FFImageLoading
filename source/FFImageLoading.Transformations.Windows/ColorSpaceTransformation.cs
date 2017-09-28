@@ -8,9 +8,9 @@ namespace FFImageLoading.Transformations
     {
         float[][] _rgbawMatrix;
 
-		public ColorSpaceTransformation() : this(FFColorMatrix.InvertColorMatrix)
-		{
-		}
+        public ColorSpaceTransformation() : this(FFColorMatrix.InvertColorMatrix)
+        {
+        }
 
         public ColorSpaceTransformation(float[][] rgbawMatrix)
         {
@@ -20,21 +20,21 @@ namespace FFImageLoading.Transformations
             RGBAWMatrix = rgbawMatrix;
         }
 
-		public float[][] RGBAWMatrix
-		{
-			get
-			{
-				return _rgbawMatrix;
-			}
+        public float[][] RGBAWMatrix
+        {
+            get
+            {
+                return _rgbawMatrix;
+            }
 
-			set
-			{
-				if (value.Length != 5 || value.Any(v => v.Length != 5))
-					throw new ArgumentException("Wrong size of RGBAW color matrix");
+            set
+            {
+                if (value.Length != 5 || value.Any(v => v.Length != 5))
+                    throw new ArgumentException("Wrong size of RGBAW color matrix");
 
-				_rgbawMatrix = value;
-			}
-		}
+                _rgbawMatrix = value;
+            }
+        }
 
         public override string Key
         {
@@ -85,42 +85,18 @@ namespace FFImageLoading.Transformations
 
             for (var i = 0; i < len; i++)
             {
-                var c = bmp.GetPixelAsInt(i);
-                var a = (c >> 24) & 0x000000FF;
-                var r = (c >> 16) & 0x000000FF;
-                var g = (c >> 8) & 0x000000FF;
-                var b = (c) & 0x000000FF;
+                var color = bmp.GetPixel(i);
+                var a = color.A;
+                var r = color.R;
+                var g = color.G;
+                var b = color.B;
 
                 var rNew = (int)(r * r0 + g * g0 + b * b0 + a * a0 + rOffset);
                 var gNew = (int)(r * r1 + g * g1 + b * b1 + a * a1 + gOffset);
                 var bNew = (int)(r * r2 + g * g2 + b * b2 + a * a2 + bOffset);
                 var aNew = (int)(r * r3 + g * g3 + b * b3 + a * a3 + aOffset);
 
-                if (rNew > 255)
-                    rNew = 255;
-
-                if (gNew > 255)
-                    gNew = 255;
-
-                if (bNew > 255)
-                    bNew = 255;
-
-                if (aNew > 255)
-                    aNew = 255;
-
-                if (rNew < 0)
-                    rNew = 0;
-
-                if (gNew < 0)
-                    gNew = 0;
-
-                if (bNew < 0)
-                    bNew = 0;
-
-                if (aNew < 0)
-                    aNew = 0;
-
-                bmp.SetPixel(i, (aNew << 24) | (rNew << 16) | (gNew << 8) | bNew);
+                bmp.SetPixel(i, new ColorHolder(aNew, rNew, gNew, bNew));
             }
         }
     }

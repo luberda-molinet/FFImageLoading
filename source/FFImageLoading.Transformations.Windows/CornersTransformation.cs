@@ -5,9 +5,9 @@ namespace FFImageLoading.Transformations
 {
     public class CornersTransformation : TransformationBase
     {
-		public CornersTransformation() : this(20d, CornerTransformType.TopRightRounded)
-		{
-		}
+        public CornersTransformation() : this(20d, CornerTransformType.TopRightRounded)
+        {
+        }
 
         public CornersTransformation(double cornersSize, CornerTransformType cornersTransformType)
             : this(cornersSize, cornersSize, cornersSize, cornersSize, cornersTransformType, 1d, 1d)
@@ -28,36 +28,36 @@ namespace FFImageLoading.Transformations
         public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
             CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
         {
-			TopLeftCornerSize = topLeftCornerSize;
-			TopRightCornerSize = topRightCornerSize;
-			BottomLeftCornerSize = bottomLeftCornerSize;
-			BottomRightCornerSize = bottomRightCornerSize;
-			CornersTransformType = cornersTransformType;
-			CropWidthRatio = cropWidthRatio;
-			CropHeightRatio = cropHeightRatio;
+            TopLeftCornerSize = topLeftCornerSize;
+            TopRightCornerSize = topRightCornerSize;
+            BottomLeftCornerSize = bottomLeftCornerSize;
+            BottomRightCornerSize = bottomRightCornerSize;
+            CornersTransformType = cornersTransformType;
+            CropWidthRatio = cropWidthRatio;
+            CropHeightRatio = cropHeightRatio;
         }
 
-		public double TopLeftCornerSize { get; set; }
-		public double TopRightCornerSize { get; set; }
-		public double BottomLeftCornerSize { get; set; }
-		public double BottomRightCornerSize { get; set; }
-		public double CropWidthRatio { get; set; }
-		public double CropHeightRatio { get; set; }
-		public CornerTransformType CornersTransformType { get; set; }
+        public double TopLeftCornerSize { get; set; }
+        public double TopRightCornerSize { get; set; }
+        public double BottomLeftCornerSize { get; set; }
+        public double BottomRightCornerSize { get; set; }
+        public double CropWidthRatio { get; set; }
+        public double CropHeightRatio { get; set; }
+        public CornerTransformType CornersTransformType { get; set; }
 
-		public override string Key
-		{
-			get
-			{
-				return string.Format("CornersTransformation,cornersSizes={0},{1},{2},{3},cornersTransformType={4},cropWidthRatio={5},cropHeightRatio={6},",
-			  TopLeftCornerSize, TopRightCornerSize, BottomRightCornerSize, BottomLeftCornerSize, CornersTransformType, CropWidthRatio, CropHeightRatio);
-			}
-		}
+        public override string Key
+        {
+            get
+            {
+                return string.Format("CornersTransformation,cornersSizes={0},{1},{2},{3},cornersTransformType={4},cropWidthRatio={5},cropHeightRatio={6},",
+              TopLeftCornerSize, TopRightCornerSize, BottomRightCornerSize, BottomLeftCornerSize, CornersTransformType, CropWidthRatio, CropHeightRatio);
+            }
+        }
 
         protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
             return ToTransformedCorners(bitmapSource, TopLeftCornerSize, TopRightCornerSize, BottomLeftCornerSize, BottomRightCornerSize,
-				CornersTransformType, CropWidthRatio, CropHeightRatio);
+                CornersTransformType, CropWidthRatio, CropHeightRatio);
         }
 
         public static BitmapHolder ToTransformedCorners(BitmapHolder source, double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
@@ -104,7 +104,7 @@ namespace FFImageLoading.Transformations
             int w = bitmap.Width;
             int h = bitmap.Height;
 
-            var transparentColor = ColorExtensions.Transparent;
+            var transparentColor = ColorHolder.Transparent;
 
             for (int y = 0; y < h; y++)
             {

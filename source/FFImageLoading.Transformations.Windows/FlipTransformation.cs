@@ -4,13 +4,13 @@ namespace FFImageLoading.Transformations
 {
     public class FlipTransformation : TransformationBase
     {
-		public FlipTransformation() : this(FlipType.Horizontal)
-		{
-		}
+        public FlipTransformation() : this(FlipType.Horizontal)
+        {
+        }
 
         public FlipTransformation(FlipType flipType)
         {
-			FlipType = flipType;
+            FlipType = flipType;
         }
 
         public override string Key
@@ -18,7 +18,7 @@ namespace FFImageLoading.Transformations
             get { return string.Format("FlipTransformation,Type={0}", FlipType); }
         }
 
-		public FlipType FlipType { get; set; }
+        public FlipType FlipType { get; set; }
 
         protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
@@ -41,7 +41,7 @@ namespace FFImageLoading.Transformations
                     for (var x = 0; x < w; x++)
                     {
                         var srcInd = y * w + x;
-                        result.SetPixel(i, bmp.GetPixelAsInt(srcInd));
+                        result.SetPixel(i, bmp.GetPixel(srcInd));
                         i++;
                     }
                 }
@@ -54,7 +54,7 @@ namespace FFImageLoading.Transformations
                     for (var x = w - 1; x >= 0; x--)
                     {
                         var srcInd = y * w + x;
-                        result.SetPixel(i, bmp.GetPixelAsInt(srcInd));
+                        result.SetPixel(i, bmp.GetPixel(srcInd));
                         i++;
                     }
                 }

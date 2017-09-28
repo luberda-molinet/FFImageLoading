@@ -22,18 +22,6 @@ namespace FFImageLoading.Work
 
         public int PixelCount { get { return (int)(PixelData.Length / 4); } }
 
-        public void SetPixel(int x, int y, int color)
-        {
-            int pixelPos = (y * Width + x);
-            SetPixel(pixelPos, color);
-        }
-
-        public unsafe void SetPixel(int pos, int color)
-        {
-            fixed (byte* numPtr = &PixelData[pos * 4])
-            *(int*)numPtr = color;
-        }
-
         public void SetPixel(int x, int y, ColorHolder color)
         {
             int pixelPos = (y * Width + x);
@@ -43,33 +31,27 @@ namespace FFImageLoading.Work
         public void SetPixel(int pos, ColorHolder color)
         {
             int bytePos = pos * 4;
-            PixelData[bytePos] = color.A;
-            PixelData[bytePos + 1] = color.R;
-            PixelData[bytePos + 2] = color.G;
-            PixelData[bytePos + 3] = color.B;
+            PixelData[bytePos] = color.B;
+            PixelData[bytePos + 1] = color.G;
+            PixelData[bytePos + 2] = color.R;
+            PixelData[bytePos + 3] = color.A;
         }
 
-        public int GetPixelAsInt(int x, int y)
-        {
-            int pixelPos = (y * Width + x);
-            return GetPixelAsInt(pixelPos);
-        }
-
-        public int GetPixelAsInt(int pos)
-        {
-            return BitConverter.ToInt32(PixelData, pos * 4);
-        }
-
-        public Color GetPixelAsColor(int x, int y)
-        {
-            int pixelPos = (y * Width + x) ;
-            return GetPixelAsColor(pixelPos);
-        }
-
-        public Color GetPixelAsColor(int pos)
+        public ColorHolder GetPixel(int pos)
         {
             int bytePos = pos * 4;
-            return Color.FromArgb(PixelData[bytePos], PixelData[bytePos + 1], PixelData[bytePos + 2], PixelData[bytePos + 3]);
+            var b = PixelData[bytePos];
+            var g = PixelData[bytePos + 1];
+            var r = PixelData[bytePos + 2];
+            var a = PixelData[bytePos + 3];
+
+            return new ColorHolder(a, r, g, b);
+        }
+
+        public ColorHolder GetPixel(int x, int y)
+        {
+            int pixelPos = (y * Width + x);
+            return GetPixel(pixelPos);
         }
 
         public void FreePixels()

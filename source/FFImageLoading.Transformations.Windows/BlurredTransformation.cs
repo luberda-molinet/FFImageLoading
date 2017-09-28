@@ -5,17 +5,17 @@ namespace FFImageLoading.Transformations
 {
     public class BlurredTransformation : TransformationBase
     {
-		public BlurredTransformation()
-		{
-			Radius = 20d;
-		}
+        public BlurredTransformation()
+        {
+            Radius = 20d;
+        }
 
         public BlurredTransformation(double radius)
         {
             Radius = radius;
         }
 
-		public double Radius { get; set; }
+        public double Radius { get; set; }
 
         public override string Key
         {
@@ -42,7 +42,7 @@ namespace FFImageLoading.Transformations
             int[] r = new int[wh];
             int[] g = new int[wh];
             int[] b = new int[wh];
-            int rsum, gsum, bsum, x, y, i, p, p1, p2, yp, yi, yw;
+            int rsum, gsum, bsum, x, y, i, yp, yi, yw;
             int[] vmin = new int[Math.Max(w, h)];
             int[] vmax = new int[Math.Max(w, h)];
 
@@ -59,10 +59,10 @@ namespace FFImageLoading.Transformations
                 rsum = gsum = bsum = 0;
                 for (i = -radius; i <= radius; i++)
                 {
-                    p = source.GetPixelAsInt(yi + Math.Min(wm, Math.Max(i, 0)));
-                    rsum += (p & 0xff0000) >> 16;
-                    gsum += (p & 0x00ff00) >> 8;
-                    bsum += p & 0x0000ff;
+                    var p = source.GetPixel(yi + Math.Min(wm, Math.Max(i, 0)));
+                    rsum += p.R;
+                    gsum += p.G;
+                    bsum += p.B;
                 }
                 for (x = 0; x < w; x++)
                 {
@@ -76,12 +76,12 @@ namespace FFImageLoading.Transformations
                         vmin[x] = Math.Min(x + radius + 1, wm);
                         vmax[x] = Math.Max(x - radius, 0);
                     }
-                    p1 = source.GetPixelAsInt(yw + vmin[x]);
-                    p2 = source.GetPixelAsInt(yw + vmax[x]);
+                    var p1 = source.GetPixel(yw + vmin[x]);
+                    var p2 = source.GetPixel(yw + vmax[x]);
 
-                    rsum += ((p1 & 0xff0000) - (p2 & 0xff0000)) >> 16;
-                    gsum += ((p1 & 0x00ff00) - (p2 & 0x00ff00)) >> 8;
-                    bsum += (p1 & 0x0000ff) - (p2 & 0x0000ff);
+                    rsum += p1.R - p2.R;
+                    gsum += p1.G - p2.G;
+                    bsum += p1.B - p2.B;
                     yi++;
                 }
                 yw += w;
@@ -103,14 +103,16 @@ namespace FFImageLoading.Transformations
                 for (y = 0; y < h; y++)
                 {
                     // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                    source.SetPixel(yi, (int)((0xff000000 & (uint)source.GetPixelAsInt(yi)) | (uint)(dv[rsum] << 16) | (uint)(dv[gsum] << 8) | (uint)dv[bsum]));
+                    var oldColor = source.GetPixel(yi);
+                    var newColor = new ColorHolder(oldColor.A, dv[rsum], dv[gsum], dv[bsum]);
+                    source.SetPixel(yi, newColor);
                     if (x == 0)
                     {
                         vmin[y] = Math.Min(y + radius + 1, hm) * w;
                         vmax[y] = Math.Max(y - radius, 0) * w;
                     }
-                    p1 = x + vmin[y];
-                    p2 = x + vmax[y];
+                    var p1 = x + vmin[y];
+                    var p2 = x + vmax[y];
 
                     rsum += r[p1] - r[p2];
                     gsum += g[p1] - g[p2];
