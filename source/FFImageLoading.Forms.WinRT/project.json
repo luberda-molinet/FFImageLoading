@@ -1,7 +1,7 @@
 ﻿{
   "supports": {},
   "dependencies": {
-    "Xamarin.Forms": "2.4.0.275-pre3"
+    "Xamarin.Forms": "2.4.0.280"
   },
   "frameworks": {
     "WindowsPhoneApp,Version=v8.1": {}
