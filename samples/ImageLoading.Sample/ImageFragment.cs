@@ -18,8 +18,8 @@ namespace ImageLoading.Sample
 {
     public class ImageFragment : Fragment
     {
-		private int _position;
-		private ImageViewAsync _imgDisplay;
+        private int _position;
+        private ImageViewAsync _imgDisplay;
 
         public ImageFragment(int position = 0)
         {
@@ -28,37 +28,37 @@ namespace ImageLoading.Sample
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-			var view = inflater.Inflate (Resource.Layout.fragment_image, container, false);
+            var view = inflater.Inflate (Resource.Layout.fragment_image, container, false);
 
-			using (var textView = view.FindViewById<TextView>(Resource.Id.textView))
-			{
-				textView.Text = _position.ToString();
-			}
+            using (var textView = view.FindViewById<TextView>(Resource.Id.textView))
+            {
+                textView.Text = _position.ToString();
+            }
 
-			_imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
-			var urlToImage = Config.Images[_position];
+            _imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
+            var urlToImage = Config.Images[_position];
 
-			ImageService.Instance.LoadUrl(urlToImage)
-				.Retry(3, 200)
-				.DownSample(300, 300)
-				.Transform(new CircleTransformation())
-				.Transform(new GrayscaleTransformation())
-				.LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
-				.ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)
-				.Into(_imgDisplay);
+            ImageService.Instance.LoadUrl(urlToImage)
+                .Retry(3, 200)
+                .DownSample(300, 300)
+                .Transform(new CircleTransformation())
+                .Transform(new GrayscaleTransformation())
+                .LoadingPlaceholder(Config.LoadingPlaceholderPath, ImageSource.ApplicationBundle)
+                .ErrorPlaceholder(Config.ErrorPlaceholderPath, ImageSource.ApplicationBundle)
+                .Into(_imgDisplay);
 
-			return view;
+            return view;
         }
 
-		public override void OnDestroyView()
-		{
-			if (_imgDisplay != null)
-			{
-				_imgDisplay.Dispose();
-				_imgDisplay = null;
-			}
+        public override void OnDestroyView()
+        {
+            if (_imgDisplay != null)
+            {
+                _imgDisplay.TryDispose();
+                _imgDisplay = null;
+            }
 
-			base.OnDestroyView();
-		}
+            base.OnDestroyView();
+        }
     }
 }

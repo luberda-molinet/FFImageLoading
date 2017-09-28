@@ -52,7 +52,7 @@ namespace FFImageLoading.Work
                     Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
                     Parameters.StreamRead.Position = 0;
 
-					SetKeys();
+                    SetKeys();
                 }
             }
         }
@@ -616,15 +616,9 @@ namespace FFImageLoading.Work
         {
             if (!_isDisposed)
             {
-                try
-                {
-                    Target?.SetImageLoadingTask(null);
-                    Parameters?.Dispose();
-                    CancellationTokenSource?.Dispose();
-                }
-                catch (ObjectDisposedException)
-                {
-                }
+                Target?.SetImageLoadingTask(null);
+                Parameters.TryDispose();
+                CancellationTokenSource.TryDispose();
 
                 _isDisposed = true;
             }

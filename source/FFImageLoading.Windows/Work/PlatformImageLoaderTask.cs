@@ -57,7 +57,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
 
             ThrowIfCancellationRequested();

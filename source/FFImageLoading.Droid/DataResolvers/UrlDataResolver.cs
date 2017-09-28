@@ -24,7 +24,7 @@ namespace FFImageLoading.DataResolvers
 
             if (token.IsCancellationRequested)
             {
-                downloadedData?.ImageStream?.Dispose();
+                downloadedData?.ImageStream.TryDispose();
                 token.ThrowIfCancellationRequested();
             }
 

@@ -29,7 +29,7 @@ namespace FFImageLoading
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
-                parameters?.Dispose();
+                parameters.TryDispose();
                 return null;
             }
 
@@ -112,7 +112,7 @@ namespace FFImageLoading
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
-                parameters?.Dispose();
+                parameters.TryDispose();
                 return null;
             }
 
@@ -122,25 +122,25 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
-		/// <summary>
-		/// Invalidate the image corresponding to given parameters from given caches.
-		/// </summary>
-		/// <param name="parameters">Image parameters.</param>
-		/// <param name="cacheType">Cache type.</param>
-		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
-		{
+        /// <summary>
+        /// Invalidate the image corresponding to given parameters from given caches.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        /// <param name="cacheType">Cache type.</param>
+        public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
+        {
             var target = new Target<SelfDisposingBitmapDrawable, object>();
             using (var task = CreateTask(parameters, target))
             {
                 var key = task.Key;
                 await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
             }
-		}
+        }
 
-		/// <summary>
-		/// Preloads the image request into memory cache/disk cache for future use.
-		/// </summary>
-		/// <param name="parameters">Image parameters.</param>
+        /// <summary>
+        /// Preloads the image request into memory cache/disk cache for future use.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
         public static IImageLoaderTask Preload(this TaskParameter parameters)
         {
             if (parameters.Priority == null)
@@ -259,9 +259,9 @@ namespace FFImageLoading
         }
 
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
-		{
+        {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
-		}
+        }
     }
 }
 

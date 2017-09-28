@@ -37,11 +37,11 @@ namespace FFImageLoading.Extensions
 
             var newSize = new CGSize(aspectWidth, aspectHeight);
 #if __MACOS__
-			var resizedImage = new PImage(newSize);
-			resizedImage.LockFocus();
-			image.Draw(new CGRect(CGPoint.Empty, newSize), CGRect.Empty, NSCompositingOperation.SourceOver, 1.0f);
-			resizedImage.UnlockFocus();
-			return resizedImage;
+            var resizedImage = new PImage(newSize);
+            resizedImage.LockFocus();
+            image.Draw(new CGRect(CGPoint.Empty, newSize), CGRect.Empty, NSCompositingOperation.SourceOver, 1.0f);
+            resizedImage.UnlockFocus();
+            return resizedImage;
 #elif __IOS__
             UIGraphics.BeginImageContextWithOptions(newSize, false, (nfloat)1.0);
 
@@ -70,7 +70,7 @@ namespace FFImageLoading.Extensions
             finally
             {
                 UIGraphics.EndImageContext();
-                image.Dispose();
+                image.TryDispose();
             }
 #endif
         }
@@ -86,17 +86,17 @@ namespace FFImageLoading.Extensions
 #endif
         }
 
-		public static System.IO.Stream AsJpegStream(this PImage image, int quality = 80)
-		{
+        public static System.IO.Stream AsJpegStream(this PImage image, int quality = 80)
+        {
 #if __IOS__
             return image.AsJPEG((nfloat)quality).AsStream();
 #elif __MACOS__
             // todo: jpeg quality?
-			var imageRep = new NSBitmapImageRep(image.AsTiff());
+            var imageRep = new NSBitmapImageRep(image.AsTiff());
             return imageRep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg)
                            .AsStream();
 #endif
-		}
+        }
     }
 }
 

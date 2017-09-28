@@ -99,7 +99,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
 
             ThrowIfCancellationRequested();
@@ -138,7 +138,7 @@ namespace FFImageLoading.Work
                             finally
                             {
                                 if (old != null && old != imageIn && old.Handle != imageIn.Handle)
-                                    old.Dispose();
+                                    old.TryDispose();
                             }
                         }
                     }
@@ -174,7 +174,7 @@ namespace FFImageLoading.Work
                                 finally
                                 {
                                     if (old != null && old != tempImage && old.Handle != tempImage.Handle)
-                                        old.Dispose();
+                                    old.TryDispose();
                                 }
                             }
 
@@ -183,7 +183,7 @@ namespace FFImageLoading.Work
 
                         var oldImageIn = imageIn;
                         imageIn = PImage.CreateAnimatedImage(animatedImages.Where(v => v.CGImage != null).ToArray(), imageIn.Duration);
-                        oldImageIn?.Dispose();
+                        oldImageIn.TryDispose();
 #endif
                     }
                 }

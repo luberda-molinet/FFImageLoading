@@ -8,12 +8,12 @@ using FFImageLoading.Config;
 
 namespace FFImageLoading.DataResolvers
 {
-	public class UrlDataResolver : IDataResolver
-	{
-		public UrlDataResolver(Configuration configuration)
+    public class UrlDataResolver : IDataResolver
+    {
+        public UrlDataResolver(Configuration configuration)
         {
             Configuration = configuration;
-		}
+        }
 
         protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
         protected Configuration Configuration { get; private set; }
@@ -25,7 +25,7 @@ namespace FFImageLoading.DataResolvers
 
             if (token.IsCancellationRequested)
             {
-                downloadedData?.ImageStream?.Dispose();
+                downloadedData?.ImageStream.TryDispose();
                 token.ThrowIfCancellationRequested();
             }
 
