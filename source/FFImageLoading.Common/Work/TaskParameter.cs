@@ -511,6 +511,8 @@ namespace FFImageLoading.Work
                 OnFileWriteFinished = null;
                 Transformations = null;
                 Stream = null;
+                StreamRead.TryDispose();
+                StreamRead = null;
 
                 _disposed = true;
             }
