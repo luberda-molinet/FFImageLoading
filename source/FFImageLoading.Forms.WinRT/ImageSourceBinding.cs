@@ -13,25 +13,25 @@ namespace FFImageLoading.Forms.WinRT
 {
     public class ImageSourceBinding : IImageSourceBinding
     {
-		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
-		{
-			ImageSource = imageSource;
-			Path = path;
-		}
+        public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
+        {
+            ImageSource = imageSource;
+            Path = path;
+        }
 
-		public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
-		{
-			ImageSource = FFImageLoading.Work.ImageSource.Stream;
-			Stream = stream;
-		}
+        public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
+        {
+            ImageSource = FFImageLoading.Work.ImageSource.Stream;
+            Stream = stream;
+        }
 
-		public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
+        public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
 
-		public string Path { get; private set; }
+        public string Path { get; private set; }
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-		internal static async Task<ImageSourceBinding> GetImageSourceBinding(ImageSource source, CachedImage element)
+        internal static async Task<ImageSourceBinding> GetImageSourceBinding(ImageSource source, CachedImage element)
         {
             if (source == null)
             {
@@ -40,22 +40,22 @@ namespace FFImageLoading.Forms.WinRT
 
             var uriImageSource = source as UriImageSource;
             if (uriImageSource != null)
-            {
+            {                
+                var uri = uriImageSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
+
                 if (uriImageSource.Uri.Scheme == "file")
                     return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
-                
-				var uri = uriImageSource.Uri?.OriginalString;
-				if (string.IsNullOrWhiteSpace(uri))
-					return null;
 
-				return new ImageSourceBinding(Work.ImageSource.Url, uri);
+                return new ImageSourceBinding(Work.ImageSource.Url, uri);
             }
 
             var fileImageSource = source as FileImageSource;
             if (fileImageSource != null)
             {
-				if (string.IsNullOrWhiteSpace(fileImageSource.File))
-					return null;
+                if (string.IsNullOrWhiteSpace(fileImageSource.File))
+                    return null;
 
                 StorageFile file = null;
 
@@ -65,7 +65,7 @@ namespace FFImageLoading.Forms.WinRT
 
                     if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
-						file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
+                        file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
                     }
                 }
                 catch (Exception)
@@ -86,24 +86,24 @@ namespace FFImageLoading.Forms.WinRT
                 return new ImageSourceBinding(streamImageSource.Stream);
             }
 
-			var embeddedResoureSource = source as EmbeddedResourceImageSource;
-			if (embeddedResoureSource != null)
-			{
-				var uri = embeddedResoureSource.Uri?.OriginalString;
-				if (string.IsNullOrWhiteSpace(uri))
-					return null;
+            var embeddedResoureSource = source as EmbeddedResourceImageSource;
+            if (embeddedResoureSource != null)
+            {
+                var uri = embeddedResoureSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
 
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
-			}
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
+            }
 
-			var dataUrlSource = source as DataUrlImageSource;
-			if (dataUrlSource != null)
-			{
-				if (string.IsNullOrWhiteSpace(dataUrlSource.DataUrl))
-					return null;
+            var dataUrlSource = source as DataUrlImageSource;
+            if (dataUrlSource != null)
+            {
+                if (string.IsNullOrWhiteSpace(dataUrlSource.DataUrl))
+                    return null;
 
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, dataUrlSource.DataUrl);
-			}
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, dataUrlSource.DataUrl);
+            }
 
             var vectorSource = source as IVectorImageSource;
             if (vectorSource != null)
@@ -142,8 +142,8 @@ namespace FFImageLoading.Forms.WinRT
                     }
                 }
 
-				return await GetImageSourceBinding(vectorSource.ImageSource, element).ConfigureAwait(false);
-			}
+                return await GetImageSourceBinding(vectorSource.ImageSource, element).ConfigureAwait(false);
+            }
 
             throw new NotImplementedException("ImageSource type not supported");
         }

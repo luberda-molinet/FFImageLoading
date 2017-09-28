@@ -7,87 +7,87 @@ using Android.Runtime;
 
 namespace FFImageLoading.Forms.Droid
 {
-	[Preserve(AllMembers = true)]
+    [Preserve(AllMembers = true)]
     internal class ImageSourceBinding : IImageSourceBinding
-	{
-		public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
-		{
-			ImageSource = imageSource;
-			Path = path;
-		}
+    {
+        public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
+        {
+            ImageSource = imageSource;
+            Path = path;
+        }
 
-		public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
-		{
-			ImageSource = FFImageLoading.Work.ImageSource.Stream;
-			Stream = stream;
-		}
+        public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
+        {
+            ImageSource = FFImageLoading.Work.ImageSource.Stream;
+            Stream = stream;
+        }
 
-		public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
+        public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
 
-		public string Path { get; private set; }
+        public string Path { get; private set; }
 
-		public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
+        public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-		internal static ImageSourceBinding GetImageSourceBinding(ImageSource source, CachedImage element)
-		{
-			if (source == null)
-			{
-				return null;
-			}
+        internal static ImageSourceBinding GetImageSourceBinding(ImageSource source, CachedImage element)
+        {
+            if (source == null)
+            {
+                return null;
+            }
 
-			var uriImageSource = source as UriImageSource;
-			if (uriImageSource != null)
-			{
+            var uriImageSource = source as UriImageSource;
+            if (uriImageSource != null)
+            {
+                var uri = uriImageSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
+
                 if (uriImageSource.Uri.Scheme == "file")
                     return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
 
-				var uri = uriImageSource.Uri?.OriginalString;
-				if (string.IsNullOrWhiteSpace(uri))
-					return null;
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uri);
+            }
 
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uri);
-			}
+            var fileImageSource = source as FileImageSource;
+            if (fileImageSource != null)
+            {
+                if (string.IsNullOrWhiteSpace(fileImageSource.File))
+                    return null;
 
-			var fileImageSource = source as FileImageSource;
-			if (fileImageSource != null)
-			{
-				if (string.IsNullOrWhiteSpace(fileImageSource.File))
-					return null;
+                if (!string.IsNullOrWhiteSpace(System.IO.Path.GetDirectoryName(fileImageSource.File)) && File.Exists(fileImageSource.File))
+                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
 
-				if (!string.IsNullOrWhiteSpace(System.IO.Path.GetDirectoryName(fileImageSource.File)) && File.Exists(fileImageSource.File))
-					return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, fileImageSource.File);
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
+            }
 
-				return new ImageSourceBinding(FFImageLoading.Work.ImageSource.CompiledResource, fileImageSource.File);
-			}
+            var streamImageSource = source as StreamImageSource;
+            if (streamImageSource != null)
+            {
+                return new ImageSourceBinding(streamImageSource.Stream);
+            }
 
-			var streamImageSource = source as StreamImageSource;
-			if (streamImageSource != null)
-			{
-				return new ImageSourceBinding(streamImageSource.Stream);
-			}
-
-			var embeddedResoureSource = source as EmbeddedResourceImageSource;
-			if (embeddedResoureSource != null)
-			{
-				var uri = embeddedResoureSource.Uri?.OriginalString;
-				if (string.IsNullOrWhiteSpace(uri))
-					return null;
+            var embeddedResoureSource = source as EmbeddedResourceImageSource;
+            if (embeddedResoureSource != null)
+            {
+                var uri = embeddedResoureSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
 
                 return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
-			}
+            }
 
             var dataUrlSource = source as DataUrlImageSource;
-			if (dataUrlSource != null)
-			{
+            if (dataUrlSource != null)
+            {
                 if (string.IsNullOrWhiteSpace(dataUrlSource.DataUrl))
-					return null;
+                    return null;
 
                 return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, dataUrlSource.DataUrl);
-			}
+            }
 
-			var vectorSource = source as IVectorImageSource;
-			if (vectorSource != null)
-			{
+            var vectorSource = source as IVectorImageSource;
+            if (vectorSource != null)
+            {
                 if (vectorSource.VectorHeight == 0 && vectorSource.VectorHeight == 0)
                 {
                     if (element.Height > 0d && !double.IsInfinity(element.Height))
@@ -122,36 +122,36 @@ namespace FFImageLoading.Forms.Droid
                     }
                 }
 
-				return GetImageSourceBinding(vectorSource.ImageSource, element);
-			}
+                return GetImageSourceBinding(vectorSource.ImageSource, element);
+            }
 
-			throw new NotImplementedException("ImageSource type not supported");
-		}
+            throw new NotImplementedException("ImageSource type not supported");
+        }
 
-		public override bool Equals(object obj)
-		{
-			var item = obj as ImageSourceBinding;
+        public override bool Equals(object obj)
+        {
+            var item = obj as ImageSourceBinding;
 
-			if (item == null)
-			    return false;
+            if (item == null)
+                return false;
 
             if (item.Stream != null || this.Stream != null)
                 return false;
 
             return this.ImageSource == item.ImageSource && this.Path == item.Path;
-		}
+        }
 
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				int hash = 17;
-				hash = hash * 23 + this.ImageSource.GetHashCode();
-				hash = hash * 23 + Path.GetHashCode();
-				hash = hash * 23 + Stream.GetHashCode();
-				return  hash;
-			}
-		}
-	}
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + this.ImageSource.GetHashCode();
+                hash = hash * 23 + Path.GetHashCode();
+                hash = hash * 23 + Stream.GetHashCode();
+                return  hash;
+            }
+        }
+    }
 }
 
