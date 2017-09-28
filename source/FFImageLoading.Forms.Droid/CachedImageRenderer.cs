@@ -261,7 +261,7 @@ namespace FFImageLoading.Forms.Droid
                 if (desiredWidth != 0 || desiredHeight != 0)
                 {
                     bitmap.Recycle();
-                    bitmap.Dispose();
+                    bitmap.TryDispose();
                 }
 
                 return compressed;

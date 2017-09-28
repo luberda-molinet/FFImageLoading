@@ -124,8 +124,8 @@ namespace FFImageLoading.Work
             }
         }
 
-		public virtual async void LoadImage(IImageLoaderTask task)
-		{
+        public virtual async void LoadImage(IImageLoaderTask task)
+        {
             try
             {
                 Interlocked.Increment(ref _loadCount);
@@ -136,19 +136,19 @@ namespace FFImageLoading.Work
                 if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
                 {
                     if (!task.IsCompleted)
-                        task?.Dispose();
+                        task.TryDispose();
                     return;
                 }
 
                 if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
                 {
-    				LogSchedulerStats();
+                    LogSchedulerStats();
                 }
 
                 if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
                 {
                     Logger.Error("ImageService: null path ignored");
-                    task?.Dispose();
+                    task.TryDispose();
                     return;
                 }
 
@@ -158,7 +158,7 @@ namespace FFImageLoading.Work
                 if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
                 {
                     Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                    task?.Dispose();
+                    task.TryDispose();
                     return;
                 }
 
@@ -180,7 +180,7 @@ namespace FFImageLoading.Work
             if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
             {
                 if (!task.IsCompleted)
-                    task?.Dispose();
+                    task.TryDispose();
 
                 return;
             }
@@ -385,12 +385,12 @@ namespace FFImageLoading.Work
                         {
                             SimilarTasks.Remove(similar);
 
-							LoadImage(similar);
+                            LoadImage(similar);
                         }
                     }
                 }
 
-                pendingTask?.Dispose();
+                pendingTask.TryDispose();
                 await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false);
             }
         }

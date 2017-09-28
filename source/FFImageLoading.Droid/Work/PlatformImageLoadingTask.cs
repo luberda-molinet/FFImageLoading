@@ -177,7 +177,7 @@ namespace FFImageLoading
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
 
             ThrowIfCancellationRequested();
@@ -220,7 +220,7 @@ namespace FFImageLoading
                             if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
                             {
                                 old?.Recycle();
-                                old?.Dispose();
+                                old.TryDispose();
                             }
                         }
                     }
@@ -283,7 +283,7 @@ namespace FFImageLoading
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
         }
 

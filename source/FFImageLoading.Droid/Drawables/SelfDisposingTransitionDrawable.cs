@@ -197,7 +197,7 @@
 //            lock (monitor)
 //            {
 //                if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
-//                    Bitmap.Dispose();
+//                    Bitmap.TryDispose();
 
 //                is_bitmap_disposed = true;
 //            }

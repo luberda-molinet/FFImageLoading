@@ -269,7 +269,7 @@ namespace FFImageLoading.Forms.Mac
                 return null;
 
             var encoded = imageData.ToArray();
-            imageData.Dispose();
+            imageData.TryDispose();
             return encoded;
 #elif __MACOS__
 
@@ -283,7 +283,7 @@ namespace FFImageLoading.Forms.Mac
 
             if (desiredWidth != 0 || desiredHeight != 0)
             {
-                image.Dispose();
+                image.TryDispose();
             }
 
             return encoded;

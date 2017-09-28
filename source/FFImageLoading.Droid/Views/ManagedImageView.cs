@@ -13,21 +13,21 @@ using System.Threading;
 namespace FFImageLoading.Views
 {
     public class ManagedImageView : ImageView
-	{
-		WeakReference<Drawable> _drawableRef;
+    {
+        WeakReference<Drawable> _drawableRef;
         CancellationTokenSource _tcs;
 
-		public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-		{
-		}
+        public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
 
-		public ManagedImageView(Context context) : base(context)
-		{
-		}
+        public ManagedImageView(Context context) : base(context)
+        {
+        }
 
         public ManagedImageView(Context context, IAttributeSet attrs) : base(context, attrs)
-		{
-		}
+        {
+        }
 
         public ManagedImageView(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle)
         {
@@ -40,7 +40,7 @@ namespace FFImageLoading.Views
                 try
                 {
                     CancelGifPlay();
-                    _tcs?.Dispose();
+                    _tcs?.TryDispose();
                 }
                 catch (Exception) { }
 
@@ -112,22 +112,18 @@ namespace FFImageLoading.Views
                 }
                 finally
                 {
-                    try
-                    {
-                        tokenSource?.Dispose();
-                    }
-                    catch (Exception) { }
+                    tokenSource.TryDispose();
                 }
             }, token);
         }
 
-		/* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
-		protected override void OnDetachedFromWindow()
-		{
-			SetImageDrawable(null);
-			base.OnDetachedFromWindow();
-		}
-		*/
+        /* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
+        protected override void OnDetachedFromWindow()
+        {
+            SetImageDrawable(null);
+            base.OnDetachedFromWindow();
+        }
+        */
 
         public IImageLoaderTask ImageLoaderTask { get; set; }
 
@@ -140,15 +136,17 @@ namespace FFImageLoading.Views
             }
         }
 
-		public override void SetImageDrawable(Drawable drawable)
-		{
+        public override void SetImageDrawable(Drawable drawable)
+        {
             var previous = Drawable;
 
             var gifDrawable = drawable as FFGifDrawable;
             if (gifDrawable != null)
             {
                 CancelGifPlay();
+                var oldTcs = _tcs;
                 _tcs = new CancellationTokenSource();
+                oldTcs.TryDispose();
 
                 _drawableRef = new WeakReference<Drawable>(drawable);
                 UpdateDrawableDisplayedState(drawable, true);
@@ -168,10 +166,10 @@ namespace FFImageLoading.Views
                 UpdateDrawableDisplayedState(drawable, true);
                 UpdateDrawableDisplayedState(previous, false);
             }
-		}
+        }
 
-		public override void SetImageResource(int resId)
-		{
+        public override void SetImageResource(int resId)
+        {
             CancelGifPlay();
 
             var previous = Drawable;
@@ -179,10 +177,10 @@ namespace FFImageLoading.Views
             _drawableRef = null;
             base.SetImageResource(resId);
             UpdateDrawableDisplayedState(previous, false);
-		}
+        }
 
-		public override void SetImageURI(global::Android.Net.Uri uri)
-		{
+        public override void SetImageURI(global::Android.Net.Uri uri)
+        {
             CancelGifPlay();
 
             var previous = Drawable;
@@ -190,31 +188,31 @@ namespace FFImageLoading.Views
             _drawableRef = null;
             base.SetImageURI(uri);
             UpdateDrawableDisplayedState(previous, false);
-		}
+        }
 
-		void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
-		{
-			if (drawable == null || drawable.Handle == IntPtr.Zero)
-				return;
+        void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
+        {
+            if (drawable == null || drawable.Handle == IntPtr.Zero)
+                return;
 
-			var selfDisposingBitmapDrawable = drawable as ISelfDisposingBitmapDrawable;
-			if (selfDisposingBitmapDrawable != null)
-			{
-				if (selfDisposingBitmapDrawable.HasValidBitmap)
-					selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
-			}
-			else
-			{
-				var layerDrawable = drawable as LayerDrawable;
-				if (layerDrawable != null)
-				{
-					for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
-					{
-						UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
-					}
-				}
-			}
-		}
-	}
+            var selfDisposingBitmapDrawable = drawable as ISelfDisposingBitmapDrawable;
+            if (selfDisposingBitmapDrawable != null)
+            {
+                if (selfDisposingBitmapDrawable.HasValidBitmap)
+                    selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
+            }
+            else
+            {
+                var layerDrawable = drawable as LayerDrawable;
+                if (layerDrawable != null)
+                {
+                    for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
+                    {
+                        UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
+                    }
+                }
+            }
+        }
+    }
 
 }

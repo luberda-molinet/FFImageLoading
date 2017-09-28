@@ -55,7 +55,7 @@ namespace FFImageLoading
         /// <param name="imageScale">Optional scale factor to use when interpreting the image data. If unspecified it will use the device scale (ie: Retina = 2, non retina = 1)</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIButton button, float imageScale = -1f)
         {
-			var target = new UIButtonTarget(button);
+            var target = new UIButtonTarget(button);
             return parameters.Into(imageScale, target);
         }
 #endif
@@ -110,7 +110,7 @@ namespace FFImageLoading
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
-                parameters?.Dispose();
+                parameters.TryDispose();
                 return null;
             }
 
@@ -134,38 +134,38 @@ namespace FFImageLoading
         }
 #endif
 
-		/// <summary>
-		/// Invalidate the image corresponding to given parameters from given caches.
-		/// </summary>
-		/// <param name="parameters">Image parameters.</param>
-		/// <param name="cacheType">Cache type.</param>
-		public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
-		{
+        /// <summary>
+        /// Invalidate the image corresponding to given parameters from given caches.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        /// <param name="cacheType">Cache type.</param>
+        public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
+        {
             var target = new Target<PImage, object>();
-			using (var task = CreateTask(parameters, 1, target))
-			{
+            using (var task = CreateTask(parameters, 1, target))
+            {
                 var key = task.Key;
-				await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
-			}
-		}
+                await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+            }
+        }
 
-		/// <summary>
-		/// Preloads the image request into memory cache/disk cache for future use.
-		/// </summary>
-		/// <param name="parameters">Image parameters.</param>
-		public static IImageLoaderTask Preload(this TaskParameter parameters)
-		{
+        /// <summary>
+        /// Preloads the image request into memory cache/disk cache for future use.
+        /// </summary>
+        /// <param name="parameters">Image parameters.</param>
+        public static IImageLoaderTask Preload(this TaskParameter parameters)
+        {
             if (parameters.Priority == null)
             {
                 parameters.WithPriority(LoadingPriority.Low);
             }
 
-			parameters.Preload = true;
+            parameters.Preload = true;
             var target = new Target<PImage, object>();
-			var task = CreateTask(parameters, 1f, target);
-			ImageService.Instance.LoadImage(task);
+            var task = CreateTask(parameters, 1f, target);
+            ImageService.Instance.LoadImage(task);
             return task;
-		}
+        }
 
         /// <summary>
         /// Preloads the image request into memory cache/disk cache for future use.
@@ -265,21 +265,21 @@ namespace FFImageLoading
         }
 
         private static IImageLoaderTask CreateTask<TImageView>(this TaskParameter parameters, float imageScale, ITarget<PImage, TImageView> target) where TImageView: class
-		{
+        {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, ImageService.Instance, ImageService.Instance.Config, MainThreadDispatcher.Instance);
-		}
+        }
 
         private static IScheduledWork Into<TImageView>(this TaskParameter parameters, float imageScale, ITarget<PImage, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
-                parameters?.Dispose();
+                parameters.TryDispose();
                 return null;
             }
 
-			var task = CreateTask(parameters, imageScale, target);
-			ImageService.Instance.LoadImage(task);
+            var task = CreateTask(parameters, imageScale, target);
+            ImageService.Instance.LoadImage(task);
             return task;
         }
 
