@@ -1,5 +1,6 @@
 ﻿using System;
 using FFImageLoading.Work;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Transformations
 {
@@ -116,7 +117,7 @@ namespace FFImageLoading.Transformations
                         if (y == 0)
                         {
                             // center of image, no rotation needed
-                            newSource.SetPixel(i * newWidth + j, source.GetPixelAsInt(iCentreY * oldw + iCentreX));
+                            newSource.SetPixel(i * newWidth + j, source.GetPixel(iCentreY * oldw + iCentreX));
                             continue;
                         }
                         if (y < 0)
@@ -158,21 +159,21 @@ namespace FFImageLoading.Transformations
                     fDeltaX = fTrueX - iFloorX;
                     fDeltaY = fTrueY - iFloorY;
 
-                    var clrTopLeft = source.GetPixelAsInt(iFloorY * oldw + iFloorX);
-                    var clrTopRight = source.GetPixelAsInt(iFloorY * oldw + iCeilingX);
-                    var clrBottomLeft = source.GetPixelAsInt(iCeilingY * oldw + iFloorX);
-                    var clrBottomRight = source.GetPixelAsInt(iCeilingY * oldw + iCeilingX);
+                    var clrTopLeft = source.GetPixel(iFloorY * oldw + iFloorX);
+                    var clrTopRight = source.GetPixel(iFloorY * oldw + iCeilingX);
+                    var clrBottomLeft = source.GetPixel(iCeilingY * oldw + iFloorX);
+                    var clrBottomRight = source.GetPixel(iCeilingY * oldw + iCeilingX);
 
-                    fTopAlpha = (1 - fDeltaX) * ((clrTopLeft >> 24) & 0xFF) + fDeltaX * ((clrTopRight >> 24) & 0xFF);
-                    fTopRed = (1 - fDeltaX) * ((clrTopLeft >> 16) & 0xFF) + fDeltaX * ((clrTopRight >> 16) & 0xFF);
-                    fTopGreen = (1 - fDeltaX) * ((clrTopLeft >> 8) & 0xFF) + fDeltaX * ((clrTopRight >> 8) & 0xFF);
-                    fTopBlue = (1 - fDeltaX) * (clrTopLeft & 0xFF) + fDeltaX * (clrTopRight & 0xFF);
+                    fTopAlpha = (1 - fDeltaX) * (clrTopLeft.A) + fDeltaX * (clrTopRight.A);
+                    fTopRed = (1 - fDeltaX) * (clrTopLeft.R) + fDeltaX * (clrTopRight.R);
+                    fTopGreen = (1 - fDeltaX) * (clrTopLeft.G) + fDeltaX * (clrTopRight.G);
+                    fTopBlue = (1 - fDeltaX) * (clrTopLeft.B) + fDeltaX * (clrTopRight.B);
 
                     // linearly interpolate horizontally between bottom neighbors
-                    fBottomAlpha = (1 - fDeltaX) * ((clrBottomLeft >> 24) & 0xFF) + fDeltaX * ((clrBottomRight >> 24) & 0xFF);
-                    fBottomRed = (1 - fDeltaX) * ((clrBottomLeft >> 16) & 0xFF) + fDeltaX * ((clrBottomRight >> 16) & 0xFF);
-                    fBottomGreen = (1 - fDeltaX) * ((clrBottomLeft >> 8) & 0xFF) + fDeltaX * ((clrBottomRight >> 8) & 0xFF);
-                    fBottomBlue = (1 - fDeltaX) * (clrBottomLeft & 0xFF) + fDeltaX * (clrBottomRight & 0xFF);
+                    fBottomAlpha = (1 - fDeltaX) * (clrBottomLeft.A) + fDeltaX * (clrBottomRight.A);
+                    fBottomRed = (1 - fDeltaX) * (clrBottomLeft.R) + fDeltaX * (clrBottomRight.R);
+                    fBottomGreen = (1 - fDeltaX) * (clrBottomLeft.G) + fDeltaX * (clrBottomRight.G);
+                    fBottomBlue = (1 - fDeltaX) * (clrBottomLeft.B) + fDeltaX * (clrBottomRight.B);
 
                     // linearly interpolate vertically between top and bottom interpolated results
                     iRed = (int)(Math.Round((1 - fDeltaY) * fTopRed + fDeltaY * fBottomRed));
@@ -180,23 +181,9 @@ namespace FFImageLoading.Transformations
                     iBlue = (int)(Math.Round((1 - fDeltaY) * fTopBlue + fDeltaY * fBottomBlue));
                     iAlpha = (int)(Math.Round((1 - fDeltaY) * fTopAlpha + fDeltaY * fBottomAlpha));
 
-                    // make sure color values are valid
-                    if (iRed < 0) iRed = 0;
-                    if (iRed > 255) iRed = 255;
-                    if (iGreen < 0) iGreen = 0;
-                    if (iGreen > 255) iGreen = 255;
-                    if (iBlue < 0) iBlue = 0;
-                    if (iBlue > 255) iBlue = 255;
-                    if (iAlpha < 0) iAlpha = 0;
-                    if (iAlpha > 255) iAlpha = 255;
-
                     var a = iAlpha + 1;
 
-                    var val = (iAlpha << 24)
-                                           | ((byte)((iRed * a) >> 8) << 16)
-                                           | ((byte)((iGreen * a) >> 8) << 8)
-                                           | ((byte)((iBlue * a) >> 8));
-                    newSource.SetPixel(i * newWidth + j, val);
+                    newSource.SetPixel(i * newWidth + j, new ColorHolder(iAlpha, iRed, iGreen, iBlue));
                 }
             }
 

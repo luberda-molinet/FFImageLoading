@@ -41,7 +41,7 @@ namespace FFImageLoading.Transformations
                     for (var x = 0; x < w; x++)
                     {
                         var srcInd = y * w + x;
-                        result.SetPixel(i, bmp.GetPixelAsInt(srcInd));
+                        result.SetPixel(i, bmp.GetPixel(srcInd));
                         i++;
                     }
                 }
@@ -54,7 +54,7 @@ namespace FFImageLoading.Transformations
                     for (var x = w - 1; x >= 0; x--)
                     {
                         var srcInd = y * w + x;
-                        result.SetPixel(i, bmp.GetPixelAsInt(srcInd));
+                        result.SetPixel(i, bmp.GetPixel(srcInd));
                         i++;
                     }
                 }
