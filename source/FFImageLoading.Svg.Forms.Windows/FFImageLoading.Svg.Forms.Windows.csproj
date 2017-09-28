@@ -240,7 +240,7 @@
       <Version>1.59.1</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms">
-      <Version>2.4.0.275-pre3</Version>
+      <Version>2.4.0.280</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems" Label="Shared" />
