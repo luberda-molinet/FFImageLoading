@@ -26,10 +26,11 @@ using FFImageLoading.Forms.Mac;
 using System.IO;
 #endif
 
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 #if __IOS__
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
 #elif __MACOS__
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Mac
 #endif
 {

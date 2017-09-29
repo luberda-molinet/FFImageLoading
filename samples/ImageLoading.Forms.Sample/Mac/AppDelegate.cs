@@ -2,6 +2,7 @@
 using Foundation;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.MacOS;
+using FFImageLoading.Forms.Mac;
 
 namespace FFImageLoading.Forms.Sample.Mac
 {
@@ -27,6 +28,7 @@ namespace FFImageLoading.Forms.Sample.Mac
         public override void DidFinishLaunching(NSNotification notification)
         {
             Xamarin.Forms.Forms.Init();
+            CachedImageRenderer.Init();
             LoadApplication(new App());
             base.DidFinishLaunching(notification);
         }
