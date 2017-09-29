@@ -201,7 +201,7 @@ namespace FFImageLoading.Forms.WinRT
 
         void UpdateAspect()
         {
-            if (Control == null || Element == null)
+            if (Control == null || Element == null || _isDisposed)
                 return;
             Control.Stretch = GetStretch(Element.Aspect);
         }

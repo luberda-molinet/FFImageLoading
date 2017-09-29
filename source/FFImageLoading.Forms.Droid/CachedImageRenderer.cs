@@ -119,7 +119,7 @@ namespace FFImageLoading.Forms.Droid
 
         void UpdateAspect()
         {
-            if (Control == null || Element == null)
+            if (Control == null || Element == null || _isDisposed)
                 return;
 
             if (Element.Aspect == Aspect.AspectFill)
