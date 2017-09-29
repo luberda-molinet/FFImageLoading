@@ -119,6 +119,9 @@ namespace FFImageLoading.Forms.Droid
 
         void UpdateAspect()
         {
+            if (Control == null || Element == null)
+                return;
+
             if (Element.Aspect == Aspect.AspectFill)
                 Control.SetScaleType(ImageView.ScaleType.CenterCrop);
 

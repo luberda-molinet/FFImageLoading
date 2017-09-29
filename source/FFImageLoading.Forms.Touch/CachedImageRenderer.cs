@@ -123,6 +123,8 @@ namespace FFImageLoading.Forms.Mac
 
         void SetAspect()
         {
+            if (Control == null || Element == null)
+                return;
 #if __IOS__
             Control.ContentMode = Element.Aspect.ToUIViewContentMode();
 #elif __MACOS__
@@ -144,6 +146,8 @@ namespace FFImageLoading.Forms.Mac
 
         void SetOpacity()
         {
+            if (Control == null || Element == null)
+                return;
 #if __IOS__
             Control.Opaque = Element.IsOpaque;
 #elif __MACOS__            

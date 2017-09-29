@@ -48,7 +48,7 @@ namespace FFImageLoading.Forms.WinRT
         private bool _measured;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
-		private bool _isDisposed = false;
+        private bool _isDisposed = false;
 
         /// <summary>
         ///   Used for registration with dependency service
@@ -201,6 +201,8 @@ namespace FFImageLoading.Forms.WinRT
 
         void UpdateAspect()
         {
+            if (Control == null || Element == null)
+                return;
             Control.Stretch = GetStretch(Element.Aspect);
         }
 
@@ -219,26 +221,26 @@ namespace FFImageLoading.Forms.WinRT
 
         void ImageLoadingFinished(CachedImage element)
         {
-			MainThreadDispatcher.Instance.Post(() =>
-			{
-            	if (element != null && !_isDisposed)
-				{
-					var elCtrl = element as IVisualElementController;
+            MainThreadDispatcher.Instance.Post(() =>
+            {
+                if (element != null && !_isDisposed)
+                {
+                    var elCtrl = element as IVisualElementController;
 
-					if (elCtrl != null)
-					{
+                    if (elCtrl != null)
+                    {
                         ((IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
                     }
 
                     element.SetIsLoading(false);
                 }
-			});
+            });
         }
 
-		void ReloadImage()
-		{
+        void ReloadImage()
+        {
             UpdateImage(Control, Element, null);
-		}
+        }
 
         void CancelIfNeeded()
         {
@@ -253,14 +255,14 @@ namespace FFImageLoading.Forms.WinRT
             catch (Exception) { }
         }
 
-		Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
-			return GetImageAsByteAsync(BitmapEncoder.JpegEncoderId, args.Quality, args.DesiredWidth, args.DesiredHeight);
+            return GetImageAsByteAsync(BitmapEncoder.JpegEncoderId, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-		Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
-			return GetImageAsByteAsync(BitmapEncoder.PngEncoderId, 90, args.DesiredWidth, args.DesiredHeight);
+            return GetImageAsByteAsync(BitmapEncoder.PngEncoderId, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
         async Task<byte[]> GetImageAsByteAsync(Guid format, int quality, int desiredWidth, int desiredHeight)
@@ -349,7 +351,7 @@ namespace FFImageLoading.Forms.WinRT
             using (var sourceStream = bitmap.PixelBuffer.AsStream())
             {
                 tempPixels = new byte[sourceStream.Length];
-				await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
+                await sourceStream.ReadAsync(tempPixels, 0, tempPixels.Length).ConfigureAwait(false);
             }
 
             return tempPixels;
