@@ -23,6 +23,7 @@ namespace FFImageLoading.Svg.Platform
         private static readonly Regex unitRe = new Regex("px|pt|em|ex|pc|cm|mm|in");
         private static readonly Regex percRe = new Regex("%");
         private static readonly Regex fillUrlRe = new Regex(@"url\s*\(\s*#([^\)]+)\)");
+        private static readonly Regex clipPathUrlRe = new Regex(@"url\s*\(\s*#([^\)]+)\)");
         private static readonly Regex keyValueRe = new Regex(@"\s*([\w-]+)\s*:\s*(.*)");
         private static readonly Regex WSRe = new Regex(@"\s{2,}");
 
@@ -32,6 +33,20 @@ namespace FFImageLoading.Svg.Platform
             DtdProcessing = DtdProcessing.Ignore,
             IgnoreComments = true,
         };
+
+#if PORTABLE
+        // basically use reflection to try and find a method that supports a 
+        // file path AND a XmlParserContext...
+        private static readonly MethodInfo createReaderMethod;
+
+        static SKSvg()
+        {
+            // try and find `Create(string, XmlReaderSettings, XmlParserContext)`
+            createReaderMethod = typeof(XmlReader).GetRuntimeMethod(
+                nameof(XmlReader.Create),
+                new[] { typeof(string), typeof(XmlReaderSettings), typeof(XmlParserContext) });
+        }
+#endif
 
         public SKSvg()
             : this(DefaultPPI, SKSize.Empty)
@@ -197,7 +212,13 @@ namespace FFImageLoading.Svg.Platform
                     canvas.ClipRect(ViewBox);
                 }
 
-                LoadElements(svg.Elements(), canvas);
+                // read style
+                SKPaint stroke = null;
+                SKPaint fill = CreatePaint();
+                var style = ReadPaints(svg, ref stroke, ref fill, true);
+
+                // read elements
+                LoadElements(svg.Elements(), canvas, stroke, fill);
 
                 Picture = recorder.EndRecording();
             }
@@ -205,17 +226,12 @@ namespace FFImageLoading.Svg.Platform
             return Picture;
         }
 
-        private void LoadElements(IEnumerable<XElement> elements, SKCanvas canvas)
+        private void LoadElements(IEnumerable<XElement> elements, SKCanvas canvas, SKPaint stroke, SKPaint fill)
         {
             foreach (var e in elements)
             {
-                ReadElement(e, canvas);
+                ReadElement(e, canvas, stroke, fill);
             }
-        }
-
-        private void ReadElement(XElement e, SKCanvas canvas)
-        {
-            ReadElement(e, canvas, null, CreatePaint());
         }
 
         private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
@@ -228,6 +244,13 @@ namespace FFImageLoading.Svg.Platform
             canvas.Save();
             canvas.Concat(ref transform);
 
+            // clip-path
+            var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
+            if (clipPath != null)
+            {
+                canvas.ClipPath(clipPath);
+            }
+
             // SVG element
             var elementName = e.Name.LocalName;
             var isGroup = elementName == "g";
@@ -238,6 +261,36 @@ namespace FFImageLoading.Svg.Platform
             // parse elements
             switch (elementName)
             {
+                case "image":
+                    {
+                        var uri = ReadHrefString(e);
+                        if (uri != null)
+                        {
+                            var x = ReadNumber(e.Attribute("x"));
+                            var y = ReadNumber(e.Attribute("y"));
+                            var width = ReadNumber(e.Attribute("width"));
+                            var height = ReadNumber(e.Attribute("height"));
+
+                            if (uri.StartsWith("data:"))
+                            {
+                                var bytes = ReadBytes(uri);
+                                using (var data = SKData.CreateCopy(bytes))
+                                using (var image = SKImage.FromEncodedData(data))
+                                {
+                                    if (image != null)
+                                    {
+                                        var rect = SKRect.Create(x, y, width, height);
+                                        canvas.DrawImage(image, rect);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                LogOrThrow($"Remote images are not supported");
+                            }
+                        }
+                        break;
+                    }
                 case "text":
                     if (stroke != null || fill != null)
                     {
@@ -245,87 +298,19 @@ namespace FFImageLoading.Svg.Platform
                     }
                     break;
                 case "rect":
-                    if (stroke != null || fill != null)
-                    {
-                        var x = ReadNumber(e.Attribute("x"));
-                        var y = ReadNumber(e.Attribute("y"));
-                        var width = ReadNumber(e.Attribute("width"));
-                        var height = ReadNumber(e.Attribute("height"));
-                        var rx = ReadNumber(e.Attribute("rx"));
-                        var ry = ReadNumber(e.Attribute("ry"));
-                        var rect = SKRect.Create(x, y, width, height);
-                        if (rx > 0 || ry > 0)
-                        {
-                            if (fill != null)
-                                canvas.DrawRoundRect(rect, rx, ry, fill);
-                            if (stroke != null)
-                                canvas.DrawRoundRect(rect, rx, ry, stroke);
-                        }
-                        else
-                        {
-                            if (fill != null)
-                                canvas.DrawRect(rect, fill);
-                            if (stroke != null)
-                                canvas.DrawRect(rect, stroke);
-                        }
-                    }
-                    break;
                 case "ellipse":
-                    if (stroke != null || fill != null)
-                    {
-                        var cx = ReadNumber(e.Attribute("cx"));
-                        var cy = ReadNumber(e.Attribute("cy"));
-                        var rx = ReadNumber(e.Attribute("rx"));
-                        var ry = ReadNumber(e.Attribute("ry"));
-                        if (fill != null)
-                            canvas.DrawOval(cx, cy, rx, ry, fill);
-                        if (stroke != null)
-                            canvas.DrawOval(cx, cy, rx, ry, stroke);
-                    }
-                    break;
                 case "circle":
-                    if (stroke != null || fill != null)
-                    {
-                        var cx = ReadNumber(e.Attribute("cx"));
-                        var cy = ReadNumber(e.Attribute("cy"));
-                        var rr = ReadNumber(e.Attribute("r"));
-                        if (fill != null)
-                            canvas.DrawCircle(cx, cy, rr, fill);
-                        if (stroke != null)
-                            canvas.DrawCircle(cx, cy, rr, stroke);
-                    }
-                    break;
                 case "path":
-                    if (stroke != null || fill != null)
-                    {
-                        var d = e.Attribute("d")?.Value;
-                        if (!string.IsNullOrWhiteSpace(d))
-                        {
-                            var path = SKPath.ParseSvgPathData(d);
-                            if (fill != null)
-                                canvas.DrawPath(path, fill);
-                            if (stroke != null)
-                                canvas.DrawPath(path, stroke);
-                        }
-                    }
-                    break;
                 case "polygon":
                 case "polyline":
-                    if (stroke != null || fill != null)
+                case "line":
+                    var elementPath = ParseElement(e);
+                    if ((stroke != null || fill != null) && elementPath != null)
                     {
-                        var close = elementName == "polygon";
-                        var p = e.Attribute("points")?.Value;
-                        if (!string.IsNullOrWhiteSpace(p))
-                        {
-                            p = "M" + p;
-                            if (close)
-                                p += " Z";
-                            var path = SKPath.ParseSvgPathData(p);
-                            if (fill != null)
-                                canvas.DrawPath(path, fill);
-                            if (stroke != null)
-                                canvas.DrawPath(path, stroke);
-                        }
+                        if (fill != null)
+                            canvas.DrawPath(elementPath, fill);
+                        if (stroke != null)
+                            canvas.DrawPath(elementPath, stroke);
                     }
                     break;
                 case "g":
@@ -373,16 +358,6 @@ namespace FFImageLoading.Svg.Platform
                         }
                     }
                     break;
-                case "line":
-                    if (stroke != null)
-                    {
-                        var x1 = ReadNumber(e.Attribute("x1"));
-                        var x2 = ReadNumber(e.Attribute("x2"));
-                        var y1 = ReadNumber(e.Attribute("y1"));
-                        var y2 = ReadNumber(e.Attribute("y2"));
-                        canvas.DrawLine(x1, y1, x2, y2, stroke);
-                    }
-                    break;
                 case "switch":
                     if (e.HasElements)
                     {
@@ -420,6 +395,105 @@ namespace FFImageLoading.Svg.Platform
             canvas.Restore();
         }
 
+        private SKPath ParseElement(XElement e)
+        {
+            var path = new SKPath();
+
+            var elementName = e.Name.LocalName;
+            switch (elementName)
+            {
+                case "rect":
+                    var rect = ParseRoundedRect(e);
+                    if (rect.IsRounded())
+                        path.AddRoundedRect(rect.Rect, rect.RadiusX, rect.RadiusY);
+                    else
+                        path.AddRect(rect.Rect);
+                    break;
+                case "ellipse":
+                    var oval = ParseOval(e);
+                    path.AddOval(oval.BoundingRect);
+                    break;
+                case "circle":
+                    var circle = ParseCircle(e);
+                    path.AddCircle(circle.Center.X, circle.Center.Y, circle.Radius);
+                    break;
+                case "path":
+                    var d = e.Attribute("d")?.Value;
+                    if (!string.IsNullOrWhiteSpace(d))
+                    {
+                        path.Dispose();
+                        path = SKPath.ParseSvgPathData(d);
+                    }
+                    break;
+                case "polygon":
+                case "polyline":
+                    var close = elementName == "polygon";
+                    var p = e.Attribute("points")?.Value;
+                    if (!string.IsNullOrWhiteSpace(p))
+                    {
+                        p = "M" + p;
+                        if (close)
+                            p += " Z";
+                        path.Dispose();
+                        path = SKPath.ParseSvgPathData(p);
+                    }
+                    break;
+                case "line":
+                    var line = ParseLine(e);
+                    path.MoveTo(line.P1);
+                    path.LineTo(line.P2);
+                    break;
+                default:
+                    path.Dispose();
+                    path = null;
+                    break;
+            }
+
+            return path;
+        }
+
+        private SKOval ParseOval(XElement e)
+        {
+            var cx = ReadNumber(e.Attribute("cx"));
+            var cy = ReadNumber(e.Attribute("cy"));
+            var rx = ReadNumber(e.Attribute("rx"));
+            var ry = ReadNumber(e.Attribute("ry"));
+
+            return new SKOval(new SKPoint(cx, cy), rx, ry);
+        }
+
+        private SKCircle ParseCircle(XElement e)
+        {
+            var cx = ReadNumber(e.Attribute("cx"));
+            var cy = ReadNumber(e.Attribute("cy"));
+            var rr = ReadNumber(e.Attribute("r"));
+
+            return new SKCircle(new SKPoint(cx, cy), rr);
+        }
+
+        private SKLine ParseLine(XElement e)
+        {
+            var x1 = ReadNumber(e.Attribute("x1"));
+            var x2 = ReadNumber(e.Attribute("x2"));
+            var y1 = ReadNumber(e.Attribute("y1"));
+            var y2 = ReadNumber(e.Attribute("y2"));
+
+            return new SKLine(new SKPoint(x1, y1), new SKPoint(x2, y2));
+        }
+
+        private SKRoundedRect ParseRoundedRect(XElement e)
+        {
+            var x = ReadNumber(e.Attribute("x"));
+            var y = ReadNumber(e.Attribute("y"));
+            var width = ReadNumber(e.Attribute("width"));
+            var height = ReadNumber(e.Attribute("height"));
+            var rx = ReadOptionalNumber(e.Attribute("rx"));
+            var ry = ReadOptionalNumber(e.Attribute("ry"));
+            var rect = SKRect.Create(x, y, width, height);
+
+            return new SKRoundedRect(rect, rx ?? ry ?? 0, ry ?? rx ?? 0);
+        }
+
         private void ReadText(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
         {
             // TODO: stroke
@@ -429,13 +503,21 @@ namespace FFImageLoading.Svg.Platform
             var xy = new SKPoint(x, y);
 
             ReadFontAttributes(e, fill);
-            fill.TextAlign = ReadTextAlignment(e);
+            var textAlign = ReadTextAlignment(e);
+            var baselineShift = ReadBaselineShift(e);
 
-            ReadTextSpans(e, canvas, xy, stroke, fill);
+            ReadTextSpans(e, canvas, xy, textAlign, baselineShift, stroke, fill);
         }
 
-        private void ReadTextSpans(XElement e, SKCanvas canvas, SKPoint location, SKPaint stroke, SKPaint fill)
+        private void ReadTextSpans(XElement e, SKCanvas canvas, SKPoint location, SKTextAlign textAlign, float baselineShift, SKPaint stroke, SKPaint fill)
         {
+            var spans = new SKText(textAlign);
+
+            // textAlign is used for all spans within the <text> element. If different textAligns would be needed, it is necessary to use
+            // several <text> elements instead of <tspan> elements
+            var currentBaselineShift = baselineShift;
+            fill.TextAlign = SKTextAlign.Left;  // fixed alignment for all spans
+
             var nodes = e.Nodes().ToArray();
             for (int i = 0; i < nodes.Length; i++)
             {
@@ -457,9 +539,7 @@ namespace FFImageLoading.Svg.Platform
                             textSegments[count - 1] = textSegments[count - 1].TrimEnd();
                         var text = WSRe.Replace(string.Concat(textSegments), " ");
 
-                        canvas.DrawText(text, location.X, location.Y, fill);
-
-                        location.X += fill.MeasureText(text);
+                        spans.Append(new SKTextSpan(text, fill.Clone(), baselineShift: currentBaselineShift));
                     }
                 }
                 else if (c.NodeType == XmlNodeType.Element)
@@ -467,22 +547,28 @@ namespace FFImageLoading.Svg.Platform
                     var ce = (XElement)c;
                     if (ce.Name.LocalName == "tspan")
                     {
-                        var spanFill = fill.Clone();
-
                         // the current span may want to change the cursor position
-                        location.X = ReadOptionalNumber(ce.Attribute("x")) ?? location.X;
-                        location.Y = ReadOptionalNumber(ce.Attribute("y")) ?? location.Y;
+                        var x = ReadOptionalNumber(ce.Attribute("x"));
+                        var y = ReadOptionalNumber(ce.Attribute("y"));
 
+                        var spanFill = fill.Clone();
                         ReadFontAttributes(ce, spanFill);
 
-                        var text = ce.Value.Trim();
+                        // Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element !
+                        currentBaselineShift = ReadBaselineShift(ce);
 
-                        canvas.DrawText(text, location.X, location.Y, spanFill);
+                        // Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element !
+                        currentBaselineShift = ReadBaselineShift(ce);
 
-                        location.X += spanFill.MeasureText(text);
+                        var text = ce.Value; //.Trim();
+                        spans.Append(new SKTextSpan(text, spanFill, x, y, currentBaselineShift));
+
+                        spans.Append(new SKTextSpan(text, spanFill, x, y, currentBaselineShift));
                     }
                 }
             }
+
+            canvas.DrawText(location.X, location.Y, spans);
         }
 
         private void ReadFontAttributes(XElement e, SKPaint paint)
@@ -646,7 +732,7 @@ namespace FFImageLoading.Svg.Platform
         private Dictionary<string, string> ReadStyle(XElement e)
         {
             // get from local attributes
-            var dic = e.Attributes().ToDictionary(k => k.Name.LocalName, v => v.Value);
+            var dic = e.Attributes().Where(a => HasSvgNamespace(a.Name)).ToDictionary(k => k.Name.LocalName, v => v.Value);
 
             var style = e.Attribute("style")?.Value;
             if (!string.IsNullOrWhiteSpace(style))
@@ -660,6 +746,14 @@ namespace FFImageLoading.Svg.Platform
             }
 
             return dic;
+        }
+
+        private static bool HasSvgNamespace(XName name)
+        {
+            return
+                string.IsNullOrEmpty(name.Namespace?.NamespaceName) ||
+                name.Namespace == svg ||
+                name.Namespace == xlink;
         }
 
         private Dictionary<string, string> ReadPaints(XElement e, ref SKPaint stroke, ref SKPaint fill, bool isGroup)
@@ -917,6 +1011,69 @@ namespace FFImageLoading.Svg.Platform
             return t;
         }
 
+        private SKPath ReadClipPath(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            SKPath result = null;
+            var read = false;
+            var urlM = clipPathUrlRe.Match(raw);
+            if (urlM.Success)
+            {
+                var id = urlM.Groups[1].Value.Trim();
+
+                XElement defE;
+                if (defs.TryGetValue(id, out defE))
+                {
+                    result = ReadClipPathDefinition(defE);
+                    if (result != null)
+                    {
+                        read = true;
+                    }
+                }
+                else
+                {
+                    LogOrThrow($"Invalid clip-path url reference: {id}");
+                }
+            }
+
+            if (!read)
+            {
+                LogOrThrow($"Unsupported clip-path: {raw}");
+            }
+
+            return result;
+        }
+
+        private SKPath ReadClipPathDefinition(XElement e)
+        {
+            if (e.Name.LocalName != "clipPath" || !e.HasElements)
+            {
+                return null;
+            }
+
+            var result = new SKPath();
+
+            foreach (var ce in e.Elements())
+            {
+                var path = ParseElement(ce);
+                if (path != null)
+                {
+                    result.AddPath(path);
+                }
+
+                else
+                {
+                    LogOrThrow($"SVG element '{ce.Name.LocalName}' is not supported in clipPath.");
+                }
+            }
+
+            return result;
+        }
+
         private SKTextAlign ReadTextAlignment(XElement element)
         {
             string value = null;
@@ -944,6 +1101,27 @@ namespace FFImageLoading.Svg.Platform
                 default:
                     return SKTextAlign.Left;
             }
+        }
+
+        private float ReadBaselineShift(XElement element)
+        {
+            string value = null;
+            if (element != null)
+            {
+                var attrib = element.Attribute("baseline-shift");
+                if (attrib != null && !string.IsNullOrWhiteSpace(attrib.Value))
+                    value = attrib.Value;
+                else
+                {
+                    var style = element.Attribute("style");
+                    if (style != null && !string.IsNullOrWhiteSpace(style.Value))
+                    {
+                        value = GetString(ReadStyle(style.Value), "baseline-shift");
+                    }
+                }
+            }
+
+            return ReadNumber(value);
         }
 
         private SKShader ReadGradient(XElement defE)
@@ -1034,13 +1212,18 @@ namespace FFImageLoading.Svg.Platform
 
         private XElement ReadHref(XElement e)
         {
-            var href = e.Attribute(xlink + "href")?.Value?.Substring(1);
+            var href = ReadHrefString(e)?.Substring(1);
             XElement child;
             if (string.IsNullOrEmpty(href) || !defs.TryGetValue(href, out child))
             {
                 child = null;
             }
             return child;
+        }
+
+        private static string ReadHrefString(XElement e)
+        {
+            return (e.Attribute("href") ?? e.Attribute(xlink + "href"))?.Value;
         }
 
         private SortedDictionary<float, SKColor> ReadStops(XElement e)
@@ -1091,6 +1274,21 @@ namespace FFImageLoading.Svg.Platform
                 value = ReadNumber(strValue);
             }
             return value;
+        }
+
+        private byte[] ReadBytes(string uri)
+        {
+            if (!string.IsNullOrEmpty(uri))
+            {
+                var offset = uri.IndexOf(",");
+                if (offset != -1 && offset - 1 < uri.Length)
+                {
+                    uri = uri.Substring(offset + 1);
+                    return Convert.FromBase64String(uri);
+                }
+            }
+
+            return null;
         }
 
         private float ReadNumber(string raw)

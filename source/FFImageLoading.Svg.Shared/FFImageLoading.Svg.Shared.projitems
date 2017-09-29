@@ -11,5 +11,12 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SkSvg.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SvgDataResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKCanvasExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKCircle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKLine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKOval.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKRoundedRect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKText.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKTextSpan.cs" />
   </ItemGroup>
 </Project>
