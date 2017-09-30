@@ -20,5 +20,10 @@ namespace FFImageLoading
         {
             return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
         }
+
+        public static bool IsValidAndHasValidBitmap(this SelfDisposingBitmapDrawable drawable)
+        {
+            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
+        }
     }
 }

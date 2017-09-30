@@ -11,6 +11,7 @@ using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
+using FFImageLoading.Views;
 
 namespace FFImageLoading
 {
@@ -51,7 +52,16 @@ namespace FFImageLoading
                 if (animated)
                 {
                     SelfDisposingBitmapDrawable placeholderDrawable = null;
-                    if (PlaceholderWeakReference != null && PlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+                    PlaceholderWeakReference?.TryGetTarget(out placeholderDrawable);
+
+                    if (placeholderDrawable == null)
+                    {
+                        // Enable fade animation when no placeholder is set and the previous image is not null
+                        var imageView = PlatformTarget.Control as ImageViewAsync;
+                        placeholderDrawable = imageView?.Drawable as SelfDisposingBitmapDrawable;
+                    }
+
+                    if (placeholderDrawable.IsValidAndHasValidBitmap())
                     {
                         int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
                             Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
