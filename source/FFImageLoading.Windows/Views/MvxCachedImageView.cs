@@ -160,6 +160,8 @@ namespace FFImageLoading.Views
             ((MvxCachedImageView)d)._internalImage.VerticalAlignment = ((VerticalAlignment)e.NewValue);
         }
 
+        public string CustomCacheKey { get; set; }
+
         public event EventHandler<SuccessEventArgs> OnSuccess;
         public event EventHandler<ErrorEventArgs> OnError;
         public event EventHandler<FinishEventArgs> OnFinish;
@@ -190,18 +192,19 @@ namespace FFImageLoading.Views
             var ffSource = GetImageSourceBinding(ImagePath, ImageStream);
             var placeholderSource = GetImageSourceBinding(LoadingPlaceholderImagePath, null);
 
-            IsLoading = true;
-
             Cancel();
-
             TaskParameter imageLoader = null;
 
             if (ffSource == null)
             {
                 _internalImage.Source = null;
                 IsLoading = false;
+                return;
             }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
+
+            IsLoading = true;
+
+            if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
             {
                 imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, CacheDuration);
             }
@@ -228,14 +231,6 @@ namespace FFImageLoading.Views
 
             if (imageLoader != null)
             {
-                //TODO
-                // CustomKeyFactory
-                //if (Element.CacheKeyFactory != null)
-                //{
-                //    var bindingContext = Element.BindingContext;
-                //    imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
-                //}
-
                 // LoadingPlaceholder
                 if (placeholderSource != null)
                 {
@@ -335,6 +330,9 @@ namespace FFImageLoading.Views
                 if (OnFileWriteFinished != null)
                     imageLoader.FileWriteFinished((info) => OnFileWriteFinished(this, new Args.FileWriteFinishedEventArgs(info)));
 
+                if (!string.IsNullOrWhiteSpace(CustomCacheKey))
+                    imageLoader.CacheKey(CustomCacheKey);
+
                 SetupOnBeforeImageLoading(imageLoader);
 
                 _scheduledWork = imageLoader.Into(_internalImage);
@@ -362,11 +360,6 @@ namespace FFImageLoading.Views
                 return new ImageSourceBinding(ImageSource.CompiledResource, resourceName);
             }
 
-            if (imagePath.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
-            {
-                return new ImageSourceBinding(ImageSource.EmbeddedResource, imagePath);
-            }
-
             if (imagePath.IsDataUrl())
             {
                 return new ImageSourceBinding(ImageSource.Url, imagePath);
@@ -377,6 +370,12 @@ namespace FFImageLoading.Views
             {
                 if (uri.Scheme == "file")
                     return new ImageSourceBinding(ImageSource.Filepath, uri.LocalPath);
+
+                if (uri.Scheme == "resource")
+                    return new ImageSourceBinding(ImageSource.EmbeddedResource, imagePath);
+
+                if (uri.Scheme == "app")
+                    return new ImageSourceBinding(ImageSource.CompiledResource, uri.LocalPath);
 
                 return new ImageSourceBinding(ImageSource.Url, imagePath);
             }
