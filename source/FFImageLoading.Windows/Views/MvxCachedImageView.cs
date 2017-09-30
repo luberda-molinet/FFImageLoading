@@ -354,6 +354,9 @@ namespace FFImageLoading.Views
             if (string.IsNullOrWhiteSpace(imagePath) && imageStream == null)
                 return null;
 
+            if (imageStream != null)
+                return new ImageSourceBinding(ImageSource.Stream, "Stream");
+
             if (imagePath.StartsWith("res:", StringComparison.OrdinalIgnoreCase))
             {
                 var resourceName = imagePath.Split(new[] { "res:" }, StringSplitOptions.None)[1];
