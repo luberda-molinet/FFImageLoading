@@ -3,14 +3,14 @@
 namespace FFImageLoading.Work
 {
     public class Target<TImageContainer, TImageView>: ITarget<TImageContainer, TImageView>
-	{
-        public virtual TImageView Control { get { throw new NotImplementedException(); }}
+    {
+        public virtual TImageView Control => default(TImageView);
 
-		public virtual bool IsValid { get; } = true;
+        public virtual bool IsValid { get; } = true;
 
         public virtual bool IsTaskValid(IImageLoaderTask task) => IsValid;
 
-		public virtual bool UsesSameNativeControl(IImageLoaderTask task) => false;
+        public virtual bool UsesSameNativeControl(IImageLoaderTask task) => false;
 
         public virtual void SetAsEmpty(IImageLoaderTask task) {  }
 

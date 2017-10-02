@@ -180,7 +180,25 @@ namespace FFImageLoading.Work
         /// <value>The delay in milliseconds.</value>
         public int? DelayInMs { get; private set; }
 
-        public bool Preload { get; internal set; }
+        bool preload;
+        public bool Preload
+        {
+            get
+            {
+                return preload;
+            }
+
+            internal set
+            {
+                preload = value;
+
+                if (value)
+                {
+                    FadeAnimationEnabled = false;
+                    FadeAnimationForCachedImagesEnabled = false;
+                }
+            }
+        }
 
         public TaskParameter Transform(ITransformation transformation)
         {
