@@ -139,7 +139,14 @@ namespace FFImageLoading
                 int exifRotation = 0;
                 if (source == ImageSource.Filepath)
                 {
-                    exifRotation = path.GetExifRotationDegrees();
+                    try
+                    {
+                        exifRotation = path.GetExifRotationDegrees();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Reading EXIF orientation failed", ex);
+                    }
                 }
 
                 ThrowIfCancellationRequested();
