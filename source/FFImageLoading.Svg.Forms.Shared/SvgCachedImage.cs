@@ -11,8 +11,12 @@ namespace FFImageLoading.Svg.Forms
             [Android.Runtime.Preserve(AllMembers = true)]
 #endif
     [Preserve(AllMembers = true)]
-	public class SvgCachedImage : CachedImage
+    public class SvgCachedImage : CachedImage
     {
+        public static void Init()
+        {
+        }
+
         static FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();
 
         public SvgCachedImage() : base()
@@ -30,7 +34,7 @@ namespace FFImageLoading.Svg.Forms
             var element = (CachedImage)bindable;
 
             // HACK for the strange issue when TypeConverter is not respected (somehow FileImageSource is returned !?!?!?!?)
-			var fileSource = newValue as FileImageSource;
+            var fileSource = newValue as FileImageSource;
             if (fileSource?.File != null && fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
             {
                 element.Source = SvgImageSource.FromSvgString(fileSource.File, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
@@ -39,10 +43,10 @@ namespace FFImageLoading.Svg.Forms
 
             var uriSource = newValue as UriImageSource;
             if (uriSource?.Uri?.OriginalString != null && uriSource.Uri.OriginalString.IsSvgDataUrl())
-			{
-				element.Source = SvgImageSource.FromSvgString(uriSource.Uri.OriginalString, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
-				return;
-			}
+            {
+                element.Source = SvgImageSource.FromSvgString(uriSource.Uri.OriginalString, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
+                return;
+            }
 
             element.Source = newValue as ImageSource;
         }
@@ -54,14 +58,14 @@ namespace FFImageLoading.Svg.Forms
         [TypeConverter(typeof(SvgImageSourceConverter))]
         public new ImageSource Source
         {
-        	get
-        	{
-        		return (ImageSource)GetValue(SourceProperty);
-        	}
-        	set
-        	{
-        		SetValue(SourceProperty, value);
-        	}
+            get
+            {
+                return (ImageSource)GetValue(SourceProperty);
+            }
+            set
+            {
+                SetValue(SourceProperty, value);
+            }
         }
 
         /// <summary>
@@ -71,7 +75,7 @@ namespace FFImageLoading.Svg.Forms
 
         static void OnLoadingPlaceholderPropertyChanging(BindableObject bindable, object oldValue, object newValue)
         {
-        	var element = (CachedImage)bindable;
+            var element = (CachedImage)bindable;
             element.LoadingPlaceholder = newValue as ImageSource;
         }
 
@@ -81,14 +85,14 @@ namespace FFImageLoading.Svg.Forms
         [TypeConverter(typeof(SvgImageSourceConverter))]
         public new ImageSource LoadingPlaceholder
         {
-        	get
-        	{
-        		return (ImageSource)GetValue(LoadingPlaceholderProperty);
-        	}
-        	set
-        	{
-        		SetValue(LoadingPlaceholderProperty, value);
-        	}
+            get
+            {
+                return (ImageSource)GetValue(LoadingPlaceholderProperty);
+            }
+            set
+            {
+                SetValue(LoadingPlaceholderProperty, value);
+            }
         }
 
         /// <summary>
@@ -98,8 +102,8 @@ namespace FFImageLoading.Svg.Forms
 
         static void OnErrorPlaceholderPropertyChanging(BindableObject bindable, object oldValue, object newValue)
         {
-        	var element = (CachedImage)bindable;
-        	element.ErrorPlaceholder = newValue as ImageSource;
+            var element = (CachedImage)bindable;
+            element.ErrorPlaceholder = newValue as ImageSource;
         }
 
         /// <summary>
@@ -108,14 +112,14 @@ namespace FFImageLoading.Svg.Forms
         [TypeConverter(typeof(SvgImageSourceConverter))]
         public new ImageSource ErrorPlaceholder
         {
-        	get
-        	{
-        		return (ImageSource)GetValue(ErrorPlaceholderProperty);
-        	}
-        	set
-        	{
-        		SetValue(ErrorPlaceholderProperty, value);
-        	}
+            get
+            {
+                return (ImageSource)GetValue(ErrorPlaceholderProperty);
+            }
+            set
+            {
+                SetValue(ErrorPlaceholderProperty, value);
+            }
         }
 
         /// <summary>
