@@ -8,27 +8,27 @@ using Android.Graphics.Drawables;
 namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageViewAsync>
-	{
-		readonly WeakReference<ImageViewAsync> _controlWeakReference;
+    {
+        readonly WeakReference<ImageViewAsync> _controlWeakReference;
 
-		public ImageViewTarget(ImageViewAsync control)
-		{
-			_controlWeakReference = new WeakReference<ImageViewAsync>(control);
-		}
+        public ImageViewTarget(ImageViewAsync control)
+        {
+            _controlWeakReference = new WeakReference<ImageViewAsync>(control);
+        }
 
-		public override bool IsValid
-		{
-			get
-			{
-				return Control != null;
-			}
-		}
+        public override bool IsValid
+        {
+            get
+            {
+                return Control != null && Control.Handle != IntPtr.Zero;
+            }
+        }
 
-		public override bool IsTaskValid(IImageLoaderTask task)
-		{
+        public override bool IsTaskValid(IImageLoaderTask task)
+        {
             var controlTask = Control?.ImageLoaderTask;
             return IsValid && (controlTask == null || controlTask == task);
-		}
+        }
 
         public override void SetAsEmpty(IImageLoaderTask task)
         {
@@ -62,34 +62,34 @@ namespace FFImageLoading.Targets
                 Control.ImageLoaderTask = task;
         }
 
-		public override bool UsesSameNativeControl(IImageLoaderTask task)
-		{
+        public override bool UsesSameNativeControl(IImageLoaderTask task)
+        {
             var otherTarget = task.Target as ImageViewTarget;
-			if (otherTarget == null)
-				return false;
+            if (otherTarget == null)
+                return false;
 
-			var control = Control;
-			var otherControl = otherTarget.Control;
-			if (control == null || otherControl == null)
-				return false;
+            var control = Control;
+            var otherControl = otherTarget.Control;
+            if (control == null || otherControl == null)
+                return false;
 
             return control.Handle == otherControl.Handle;
-		}
+        }
 
         public override ImageViewAsync Control
-		{
-			get
-			{
-				ImageViewAsync control;
-				if (!_controlWeakReference.TryGetTarget(out control))
-					return null;
+        {
+            get
+            {
+                ImageViewAsync control;
+                if (!_controlWeakReference.TryGetTarget(out control))
+                    return null;
 
-				if (control == null || control.Handle == IntPtr.Zero)
-					return null;
+                if (control == null || control.Handle == IntPtr.Zero)
+                    return null;
 
                 return control;
-			}
-		}
-	}
+            }
+        }
+    }
 }
 

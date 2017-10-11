@@ -16,6 +16,7 @@ namespace FFImageLoading.Views
     {
         WeakReference<Drawable> _drawableRef;
         CancellationTokenSource _tcs;
+        readonly object _lock = new object();
 
         public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
@@ -138,33 +139,36 @@ namespace FFImageLoading.Views
 
         public override void SetImageDrawable(Drawable drawable)
         {
-            var previous = Drawable;
-
-            var gifDrawable = drawable as FFGifDrawable;
-            if (gifDrawable != null)
+            lock (_lock)
             {
-                CancelGifPlay();
-                var oldTcs = _tcs;
-                _tcs = new CancellationTokenSource();
-                oldTcs.TryDispose();
+                var previous = Drawable;
 
-                _drawableRef = new WeakReference<Drawable>(drawable);
-                UpdateDrawableDisplayedState(drawable, true);
-                UpdateDrawableDisplayedState(previous, false);
-
-                PlayGif(gifDrawable, _tcs);
-            }
-            else
-            {
-                if (drawable == null || drawable is ISelfDisposingBitmapDrawable)
+                var gifDrawable = drawable as FFGifDrawable;
+                if (gifDrawable != null)
                 {
                     CancelGifPlay();
-                }
+                    var oldTcs = _tcs;
+                    _tcs = new CancellationTokenSource();
+                    oldTcs.TryDispose();
 
-                _drawableRef = new WeakReference<Drawable>(drawable);
-                base.SetImageDrawable(drawable);
-                UpdateDrawableDisplayedState(drawable, true);
-                UpdateDrawableDisplayedState(previous, false);
+                    _drawableRef = new WeakReference<Drawable>(drawable);
+                    UpdateDrawableDisplayedState(drawable, true);
+                    UpdateDrawableDisplayedState(previous, false);
+
+                    PlayGif(gifDrawable, _tcs);
+                }
+                else
+                {
+                    if (drawable == null || drawable is ISelfDisposingBitmapDrawable)
+                    {
+                        CancelGifPlay();
+                    }
+
+                    _drawableRef = new WeakReference<Drawable>(drawable);
+                    base.SetImageDrawable(drawable);
+                    UpdateDrawableDisplayedState(drawable, true);
+                    UpdateDrawableDisplayedState(previous, false);
+                }
             }
         }
 
