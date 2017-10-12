@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using FFImageLoading.Cache;
 using FFImageLoading.Work;
 using System.IO;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading

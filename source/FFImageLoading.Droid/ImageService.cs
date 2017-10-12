@@ -11,6 +11,7 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading by Daniel Luberda
     /// </summary>
+    [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<SelfDisposingBitmapDrawable>
     {
         static IImageService _instance;

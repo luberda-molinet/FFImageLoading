@@ -1,4 +1,5 @@
 ﻿using System;
+using FFImageLoading.Work;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Targets
@@ -18,7 +19,7 @@ namespace FFImageLoading.Targets
                 _imageWeakReference.SetTarget(image);
         }
 
-        public PImage PImage
+        public WriteableBitmap PImage
         {
             get
             {

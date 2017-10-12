@@ -11,6 +11,7 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading by Daniel Luberda
     /// </summary>
+    [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<MockBitmap>
     {
         const string DoNotReference = "You are referencing the portable assembly - you need to reference the platform specific assembly";
