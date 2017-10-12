@@ -101,15 +101,17 @@ namespace FFImageLoading.Work
             return new TaskParameter() { Source = ImageSource.Url, Path = data, DataEncoding = encoding };
         }
 
+
+        internal Stream StreamRead { get; set; }
+
+        internal string StreamChecksum { get; set; }
+
+
         public ImageSource Source { get; private set; }
 
         public string Path { get; private set; }
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
-
-        internal Stream StreamRead { get; set; }
-
-        internal string StreamChecksum { get; set; }
 
         public TimeSpan? CacheDuration { get; private set; }
 
@@ -174,10 +176,6 @@ namespace FFImageLoading.Work
 
         public DataEncodingType DataEncoding { get; private set; } = DataEncodingType.RAW;
 
-        /// <summary>
-        /// Gets the delay in milliseconds.
-        /// </summary>
-        /// <value>The delay in milliseconds.</value>
         public int? DelayInMs { get; private set; }
 
         bool preload;
@@ -200,19 +198,29 @@ namespace FFImageLoading.Work
             }
         }
 
+        /// <summary>
+        /// Sets transformation for image loading task
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="transformation">Transformation.</param>
         public TaskParameter Transform(ITransformation transformation)
         {
             if (transformation == null)
-                throw new NullReferenceException("The transformation argument was null.");
+                throw new ArgumentNullException(nameof(transformation));
 
             Transformations.Add(transformation);
             return this;
         }
 
+        /// <summary>
+        /// Sets transformations for image loading task
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="transformations">Transformations.</param>
         public TaskParameter Transform(IEnumerable<ITransformation> transformations)
         {
             if (transformations == null)
-                throw new ArgumentNullException("The transformations argument was null");
+                throw new ArgumentNullException(nameof(transformations));
 
             Transformations.AddRange(transformations);
             return this;
@@ -221,6 +229,7 @@ namespace FFImageLoading.Work
         /// <summary>
         /// Defines the placeholder used while loading.
         /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="path">Path to the file.</param>
         /// <param name="source">Source for the path: local, web, assets</param>
         public TaskParameter LoadingPlaceholder(string path, ImageSource source = ImageSource.Filepath)
@@ -233,6 +242,7 @@ namespace FFImageLoading.Work
         /// <summary>
         /// Defines the placeholder used when an error occurs.
         /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="filepath">Path to the file.</param>
         /// <param name="source">Source for the path: local, web, assets</param>
         public TaskParameter ErrorPlaceholder(string filepath, ImageSource source = ImageSource.Filepath)
@@ -303,7 +313,7 @@ namespace FFImageLoading.Work
         /// <summary>
         /// Forces task to use custom resolver.
         /// </summary>
-        /// <returns>The custom resolver.</returns>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="resolver">Resolver.</param>
         public TaskParameter WithCustomDataResolver(IDataResolver resolver = null)
         {
@@ -311,12 +321,22 @@ namespace FFImageLoading.Work
             return this;
         }
 
+        /// <summary>
+        /// Forces task to use custom resolver for loading placeholder.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="resolver">Resolver.</param>
         public TaskParameter WithCustomLoadingPlaceholderDataResolver(IDataResolver resolver = null)
         {
             CustomLoadingPlaceholderDataResolver = resolver;
             return this;
         }
 
+        /// <summary>
+        /// Forces task to use custom resolver for error placeholder.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="resolver">Resolver.</param>
         public TaskParameter WithCustomErrorPlaceholderDataResolver(IDataResolver resolver = null)
         {
             CustomErrorPlaceholderDataResolver = resolver;
@@ -334,6 +354,11 @@ namespace FFImageLoading.Work
             return this;
         }
 
+        /// <summary>
+        /// Select cache types used for image loading task.
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="cacheType">Cache type.</param>
         public TaskParameter WithCache(CacheType cacheType)
         {
             CacheType = cacheType;
@@ -352,6 +377,11 @@ namespace FFImageLoading.Work
             return this;
         }
 
+        /// <summary>
+        /// Enables / disables bitmap optimizations
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="enabled">If set to <c>true</c> enabled.</param>
         public TaskParameter BitmapOptimizations(bool enabled)
         {
             BitmapOptimizationsEnabled = enabled;
@@ -412,6 +442,7 @@ namespace FFImageLoading.Work
         /// <summary>
         /// Delay the task by the specified milliseconds.
         /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="milliseconds">Milliseconds to wait prior to start the task.</param>
         public TaskParameter Delay(int milliseconds)
         {
@@ -427,7 +458,7 @@ namespace FFImageLoading.Work
         public TaskParameter Success(Action action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnSuccess = (s, r) => action();
             return this;
@@ -441,7 +472,7 @@ namespace FFImageLoading.Work
         public TaskParameter Success(Action<ImageInformation, LoadingResult> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnSuccess = action;
             return this;
@@ -455,7 +486,7 @@ namespace FFImageLoading.Work
         public TaskParameter Error(Action<Exception> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnError = action;
             return this;
@@ -469,7 +500,7 @@ namespace FFImageLoading.Work
         public TaskParameter Finish(Action<IScheduledWork> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnFinish = action;
             return this;
@@ -483,7 +514,7 @@ namespace FFImageLoading.Work
         public TaskParameter DownloadStarted(Action<DownloadInformation> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnDownloadStarted = action;
             return this;
@@ -492,12 +523,12 @@ namespace FFImageLoading.Work
         /// <summary>
         /// This callback can be used for reading download progress
         /// </summary>
-        /// <returns>The progress.</returns>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="action">Action.</param>
         public TaskParameter DownloadProgress(Action<DownloadProgress> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnDownloadProgress = action;
             return this;
@@ -506,12 +537,12 @@ namespace FFImageLoading.Work
         /// <summary>
         /// Called after file is succesfully written to the disk
         /// </summary>
-        /// <returns>The write ended.</returns>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="action">Action.</param>
         public TaskParameter FileWriteFinished(Action<FileWriteInfo> action)
         {
             if (action == null)
-                throw new Exception("Given lambda should not be null.");
+                throw new ArgumentNullException(nameof(action));
 
             OnFileWriteFinished = action;
             return this;

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -70,8 +70,8 @@
     <Reference Include="System.IO" />
     <Reference Include="System.Collections" />
   </ItemGroup>
-  <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
+  <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
@@ -80,7 +80,6 @@
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
-    <Compile Include="TaskParameterExtensions.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
@@ -97,10 +96,8 @@
     <Compile Include="DataResolvers\BundleDataResolver.cs" />
     <Compile Include="DataResolvers\ResourceDataResolver.cs" />
     <Compile Include="DataResolvers\FileDataResolver.cs" />
-    <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="Work\PlatformImageLoadingTask.cs" />
     <Compile Include="DataResolvers\DataResolverFactory.cs" />
-    <Compile Include="DataResolvers\StreamDataResolver.cs" />
     <Compile Include="Drawables\ISelfDisposingBitmapDrawable.cs" />
     <Compile Include="Drawables\SelfDisposingTransitionDrawable.cs" />
     <Compile Include="Extensions\DrawableExtensions.cs" />
@@ -110,6 +107,11 @@
     <Compile Include="Cache\StrongCache.cs" />
     <Compile Include="Helpers\GifDecoder.cs" />
     <Compile Include="Drawables\FFGifDrawable.cs" />
+    <Compile Include="ImageService.cs" />
+    <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
+      <Link>Extensions\TaskParameterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

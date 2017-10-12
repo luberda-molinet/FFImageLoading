@@ -11,14 +11,6 @@ namespace FFImageLoading
         ActivityManager _activityManager;
         ActivityManager.MemoryInfo _memoryInfo;
 
-        public static IPlatformPerformance Create(bool verbose)
-        {
-            if (!verbose)
-                return new EmptyPlatformPerformance();
-
-            return new PlatformPerformance();
-        }
-
         public PlatformPerformance()
         {
             _runtime = Runtime.GetRuntime();

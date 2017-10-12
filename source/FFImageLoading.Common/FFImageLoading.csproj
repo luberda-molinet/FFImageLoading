@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -124,6 +124,10 @@
     <Compile Include="DataResolvers\WrappedDataResolver.cs" />
     <Compile Include="Helpers\FileHeader.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Helpers\EmptyPlatformPerformance.cs" />
+    <Compile Include="ImageServiceBase.cs" />
+    <Compile Include="DataResolvers\UrlDataResolver.cs" />
+    <Compile Include="DataResolvers\StreamDataResolver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

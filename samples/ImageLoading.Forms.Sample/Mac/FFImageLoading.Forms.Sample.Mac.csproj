@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\..\packages\Xamarin.Forms.2.4.0.280\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.4.0.280\build\netstandard1.0\Xamarin.Forms.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -117,10 +117,6 @@
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.MacOs\FFImageLoading.MacOs.csproj">
-      <Project>{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}</Project>
-      <Name>FFImageLoading.MacOs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Svg\FFImageLoading.Svg.csproj">
       <Project>{E5C8FBB7-595D-43FE-B900-46027D0D4F69}</Project>
       <Name>FFImageLoading.Svg</Name>
@@ -132,6 +128,10 @@
     <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations\FFImageLoading.Transformations.csproj">
       <Project>{E68FD3BB-5851-45CC-9B33-DE6AB28B9984}</Project>
       <Name>FFImageLoading.Transformations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Mac\FFImageLoading.Mac.csproj">
+      <Project>{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}</Project>
+      <Name>FFImageLoading.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

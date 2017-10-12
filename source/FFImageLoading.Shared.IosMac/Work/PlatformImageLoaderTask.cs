@@ -30,8 +30,7 @@ namespace FFImageLoading.Work
         static object _webpDecoder;
 #endif
 
-        public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
-            : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
+        public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
             // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
             ScaleHelper.Init();
@@ -39,6 +38,9 @@ namespace FFImageLoading.Work
 
         protected override Task SetTargetAsync(PImage image, bool animated)
         {
+            if (Target == null)
+                return Task.FromResult(true);
+            
             return MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();

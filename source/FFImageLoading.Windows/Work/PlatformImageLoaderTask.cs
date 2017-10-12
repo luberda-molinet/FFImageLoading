@@ -15,14 +15,15 @@ namespace FFImageLoading.Work
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
-        public PlatformImageLoaderTask(ITarget<WriteableBitmap, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
-            : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, false)
+        public PlatformImageLoaderTask(ITarget<WriteableBitmap, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
-
         }
 
         protected override Task SetTargetAsync(WriteableBitmap image, bool animated)
         {
+            if (Target == null)
+                return Task.FromResult(true);
+            
             return MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();

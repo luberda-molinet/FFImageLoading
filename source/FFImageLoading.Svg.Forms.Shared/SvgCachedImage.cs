@@ -11,6 +11,9 @@ namespace FFImageLoading.Svg.Forms
             [Android.Runtime.Preserve(AllMembers = true)]
 #endif
     [Preserve(AllMembers = true)]
+    /// <summary>
+    /// SvgCachedImage by Daniel Luberda
+    /// </summary>
     public class SvgCachedImage : CachedImage
     {
         public static void Init()

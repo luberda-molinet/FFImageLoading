@@ -65,6 +65,7 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <returns>The cache.</returns>
         /// <param name="cacheName">Cache name.</param>
+        [Obsolete]
         public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
         {
             return new SimpleDiskCache(cacheName, configuration);

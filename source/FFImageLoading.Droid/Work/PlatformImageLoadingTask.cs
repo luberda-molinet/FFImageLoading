@@ -19,8 +19,7 @@ namespace FFImageLoading
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
-        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
-            : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
+        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
         }
 
@@ -34,6 +33,9 @@ namespace FFImageLoading
 
         protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
+            if (Target == null)
+                return;
+
             ThrowIfCancellationRequested();
 
             var ffDrawable = image as FFBitmapDrawable;

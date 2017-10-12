@@ -45,11 +45,12 @@ namespace FFImageLoading.Cache
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
-		/// <summary>
-		/// Creates new cache default instance.
-		/// </summary>
-		/// <returns>The cache.</returns>
-		/// <param name="cacheName">Cache name.</param>
+        /// <summary>
+        /// Creates new cache default instance.
+        /// </summary>
+        /// <returns>The cache.</returns>
+        /// <param name="cacheName">Cache name.</param>
+        [Obsolete]
         public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
         {
 #if __ANDROID__
@@ -79,14 +80,14 @@ namespace FFImageLoading.Cache
             return new SimpleDiskCache(cachePath, configuration);
         }
 
-		/// <summary>
-		/// Adds the file to cache and file saving queue if it does not exists.
-		/// </summary>
-		/// <param name="key">Key to store/retrieve the file.</param>
-		/// <param name="bytes">File data in bytes.</param>
-		/// <param name="duration">Specifies how long an item should remain in the cache.</param>
-		public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
-		{
+        /// <summary>
+        /// Adds the file to cache and file saving queue if it does not exists.
+        /// </summary>
+        /// <param name="key">Key to store/retrieve the file.</param>
+        /// <param name="bytes">File data in bytes.</param>
+        /// <param name="duration">Specifies how long an item should remain in the cache.</param>
+        public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
+        {
             if (!_fileWritePendingTasks.TryAdd(key, 1))
             {
                 Logger?.Error("Can't save to disk as another write with the same key is pending: " + key);
@@ -129,140 +130,140 @@ namespace FFImageLoading.Cache
                     {
                         byte finishedTask;
                         _fileWritePendingTasks.TryRemove(key, out finishedTask);
-				    }
-			    });
+                    }
+                });
             }
             finally
             {
                 _currentWriteLock.Release();
             }
-		}
+        }
 
-		/// <summary>
-		/// Removes the specified cache entry.
-		/// </summary>
-		/// <param name="key">Key.</param>
-		public virtual async Task RemoveAsync(string key)
-		{
-			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
-			CacheEntry entry;
-			if (_entries.TryRemove(key, out entry))
-			{
-				string filepath = Path.Combine(_cachePath, entry.FileName);
+        /// <summary>
+        /// Removes the specified cache entry.
+        /// </summary>
+        /// <param name="key">Key.</param>
+        public virtual async Task RemoveAsync(string key)
+        {
+            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
+            CacheEntry entry;
+            if (_entries.TryRemove(key, out entry))
+            {
+                string filepath = Path.Combine(_cachePath, entry.FileName);
 
-				if (File.Exists(filepath))
-					File.Delete(filepath);
-			}
-		}
+                if (File.Exists(filepath))
+                    File.Delete(filepath);
+            }
+        }
 
-		/// <summary>
-		/// Clears all cache entries.
-		/// </summary>
-		public virtual async Task ClearAsync()
-		{
-			while (_fileWritePendingTasks.Count != 0)
-			{
-				await Task.Delay(20).ConfigureAwait(false);
-			}
+        /// <summary>
+        /// Clears all cache entries.
+        /// </summary>
+        public virtual async Task ClearAsync()
+        {
+            while (_fileWritePendingTasks.Count != 0)
+            {
+                await Task.Delay(20).ConfigureAwait(false);
+            }
 
-			Directory.Delete(_cachePath, true);
-			Directory.CreateDirectory (_cachePath);
-			_entries.Clear();
-		}
+            Directory.Delete(_cachePath, true);
+            Directory.CreateDirectory (_cachePath);
+            _entries.Clear();
+        }
 
-		/// <summary>
-		/// Checks if cache entry exists/
-		/// </summary>
-		/// <returns>The async.</returns>
-		/// <param name="key">Key.</param>
-		public virtual Task<bool> ExistsAsync(string key)
-		{
+        /// <summary>
+        /// Checks if cache entry exists/
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="key">Key.</param>
+        public virtual Task<bool> ExistsAsync(string key)
+        {
             return Task.FromResult(_entries.ContainsKey(key));
-		}
+        }
 
-		/// <summary>
-		/// Tries to get cached file as stream.
-		/// </summary>
-		/// <returns>The get stream.</returns>
-		/// <param name="key">Key.</param>
-		public virtual async Task<Stream> TryGetStreamAsync(string key)
-		{
-			await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
+        /// <summary>
+        /// Tries to get cached file as stream.
+        /// </summary>
+        /// <returns>The get stream.</returns>
+        /// <param name="key">Key.</param>
+        public virtual async Task<Stream> TryGetStreamAsync(string key)
+        {
+            await WaitForPendingWriteIfExists(key).ConfigureAwait(false);
 
-			try
-			{
-				CacheEntry entry;
-				if (!_entries.TryGetValue(key, out entry))
-					return null;
+            try
+            {
+                CacheEntry entry;
+                if (!_entries.TryGetValue(key, out entry))
+                    return null;
 
-				string filepath = Path.Combine(_cachePath, entry.FileName);
-				return FileStore.GetInputStream(filepath, false);
-			}
-			catch
-			{
-				return null;
-			}
-		}
+                string filepath = Path.Combine(_cachePath, entry.FileName);
+                return FileStore.GetInputStream(filepath, false);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
-		public virtual Task<string> GetFilePathAsync(string key)
-		{
-			CacheEntry entry;
-			if (!_entries.TryGetValue(key, out entry))
-				return Task.FromResult<string>(null);
+        public virtual Task<string> GetFilePathAsync(string key)
+        {
+            CacheEntry entry;
+            if (!_entries.TryGetValue(key, out entry))
+                return Task.FromResult<string>(null);
 
-			return Task.FromResult(Path.Combine(_cachePath, entry.FileName));
-		}
+            return Task.FromResult(Path.Combine(_cachePath, entry.FileName));
+        }
 
-		protected async Task WaitForPendingWriteIfExists(string key)
-		{
-			while (_fileWritePendingTasks.ContainsKey(key))
-			{
-				await Task.Delay(20).ConfigureAwait(false);
-			}
-		}
+        protected async Task WaitForPendingWriteIfExists(string key)
+        {
+            while (_fileWritePendingTasks.ContainsKey(key))
+            {
+                await Task.Delay(20).ConfigureAwait(false);
+            }
+        }
 
-		protected void InitializeEntries()
-		{
-			foreach (FileInfo fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
-			{
-				string key = Path.GetFileNameWithoutExtension(fileInfo.Name);
-				TimeSpan duration = GetDuration(fileInfo.Extension);
-				_entries.TryAdd(key, new CacheEntry() { Origin = fileInfo.CreationTimeUtc, TimeToLive = duration, FileName = fileInfo.Name });
-			}
-		}
+        protected void InitializeEntries()
+        {
+            foreach (FileInfo fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
+            {
+                string key = Path.GetFileNameWithoutExtension(fileInfo.Name);
+                TimeSpan duration = GetDuration(fileInfo.Extension);
+                _entries.TryAdd(key, new CacheEntry() { Origin = fileInfo.CreationTimeUtc, TimeToLive = duration, FileName = fileInfo.Name });
+            }
+        }
 
-		protected TimeSpan GetDuration(string text)
-		{
-			string textToParse = text.Split(new[] { '.'}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        protected TimeSpan GetDuration(string text)
+        {
+            string textToParse = text.Split(new[] { '.'}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
             if (string.IsNullOrWhiteSpace(textToParse))
                 return Configuration.DiskCacheDuration;
 
-			int duration;
-			return int.TryParse(textToParse, out duration) ? TimeSpan.FromSeconds(duration) : Configuration.DiskCacheDuration;
-		}
+            int duration;
+            return int.TryParse(textToParse, out duration) ? TimeSpan.FromSeconds(duration) : Configuration.DiskCacheDuration;
+        }
 
         protected virtual void CleanCallback(object state)
-		{
-			KeyValuePair<string, CacheEntry>[] kvps;
-			var now = DateTime.UtcNow;
-			kvps = _entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).ToArray();
+        {
+            KeyValuePair<string, CacheEntry>[] kvps;
+            var now = DateTime.UtcNow;
+            kvps = _entries.Where(kvp => kvp.Value.Origin + kvp.Value.TimeToLive < now).ToArray();
 
-			foreach (var kvp in kvps)
-			{
-				CacheEntry oldCacheEntry;
-				if (_entries.TryRemove(kvp.Key, out oldCacheEntry))
-				{
-					try
-					{
+            foreach (var kvp in kvps)
+            {
+                CacheEntry oldCacheEntry;
+                if (_entries.TryRemove(kvp.Key, out oldCacheEntry))
+                {
+                    try
+                    {
                         Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
-						File.Delete(Path.Combine(_cachePath, kvp.Key));
-					}
-					// Analysis disable once EmptyGeneralCatchClause
-					catch
-					{
-					}
-				}
-			}
-		}
+                        File.Delete(Path.Combine(_cachePath, kvp.Key));
+                    }
+                    // Analysis disable once EmptyGeneralCatchClause
+                    catch
+                    {
+                    }
+                }
+            }
+        }
     }
 }

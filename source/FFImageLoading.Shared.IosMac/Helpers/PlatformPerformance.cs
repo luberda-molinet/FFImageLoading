@@ -7,14 +7,6 @@ namespace FFImageLoading
 {
     public class PlatformPerformance : IPlatformPerformance
     {
-        public static IPlatformPerformance Create(bool verbose)
-        {
-            if (!verbose)
-                return new EmptyPlatformPerformance();
-
-            return new PlatformPerformance();
-        }
-
         public PlatformPerformance()
         {
             var handle = Dlfcn.dlopen("/usr/lib/libSystem.dylib", 0);

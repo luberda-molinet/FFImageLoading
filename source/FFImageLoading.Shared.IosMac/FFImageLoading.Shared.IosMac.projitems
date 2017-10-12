@@ -13,8 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataResolvers\BundleDataResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataResolvers\DataResolverFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataResolvers\FileDataResolver.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataResolvers\StreamDataResolver.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataResolvers\UrlDataResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\NSDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\PImageExtensions.cs" />
@@ -28,7 +26,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Transformations\TransformationBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Work\BitmapHolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Work\PlatformImageLoaderTask.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TaskParameterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Cache\" />

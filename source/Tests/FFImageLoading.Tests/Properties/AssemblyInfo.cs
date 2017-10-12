@@ -1,0 +1,1 @@
+﻿[assembly: FFImageLoading.Mock.MockFFImageLoading]

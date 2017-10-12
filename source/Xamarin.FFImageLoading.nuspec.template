@@ -100,12 +100,12 @@ Features:
 		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.iOS10\FFImageLoading.pdb" />
 
 		<!--Xamarin.Mac -->
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.Platform.dll" target="lib\Xamarin.Mac20\FFImageLoading.Platform.dll" />
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.Platform.xml" target="lib\Xamarin.Mac20\FFImageLoading.Platform.xml" />
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Platform.pdb" />
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.dll" target="lib\Xamarin.Mac20\FFImageLoading.dll" />
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.xml" target="lib\Xamarin.Mac20\FFImageLoading.xml" />
-		<file src="FFImageLoading.MacOs\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.Mac20\FFImageLoading.pdb" />		
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.dll" target="lib\Xamarin.Mac20\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.xml" target="lib\Xamarin.Mac20\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Platform.pdb" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.dll" target="lib\Xamarin.Mac20\FFImageLoading.dll" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.xml" target="lib\Xamarin.Mac20\FFImageLoading.xml" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.Mac20\FFImageLoading.pdb" />		
 
         <!--Windows UWP-->
 		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\uap10.0\FFImageLoading.Platform.dll" />

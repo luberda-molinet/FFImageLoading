@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -50,10 +50,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.BaitAndSwitch\FFImageLoading.BaitAndSwitch.csproj">
-      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
-      <Name>FFImageLoading.BaitAndSwitch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>
@@ -61,6 +57,10 @@
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj">
+      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
+      <Name>FFImageLoading.Mock</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

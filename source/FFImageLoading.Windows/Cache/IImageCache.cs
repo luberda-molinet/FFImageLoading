@@ -1,9 +1,4 @@
-﻿#if SILVERLIGHT
-using System.Windows.Media.Imaging;
-#else
-using Windows.UI.Xaml.Media.Imaging;
-#endif
-
+﻿using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Cache
 {
