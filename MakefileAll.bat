@@ -51,8 +51,9 @@ echo Building FFImageLoading.Svg...
 
 echo Unit testing...
 
-%msbuild% source/Tests/FFImageLoading.Core.Tests/FFImageLoading.Core.Tests.csproj %buildargsTests%
-xunit.console.clr4 source/Tests/FFImageLoading.Core.Tests/bin/Debug/FFImageLoading.Core.Tests.dll /appveyor
+%msbuild% source/Tests/FFImageLoading.Tests/FFImageLoading.Tests.csproj %buildargsTests%
+REM xunit.console.clr4 source/Tests/FFImageLoading.Tests/bin/Debug/FFImageLoading.Core.Tests.dll /appveyor
+dotnet test
 
 echo Packaging NuGets...
 
