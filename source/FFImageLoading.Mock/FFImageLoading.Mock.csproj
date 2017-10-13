@@ -49,7 +49,6 @@
     <Compile Include="Mock\MockImageCache.cs" />
     <Compile Include="Mock\MockMD5Helper.cs" />
     <Compile Include="Mock\MockDiskCache.cs" />
-    <Compile Include="Mock\MockFFImageLoadingAttribute.cs" />
     <Compile Include="Mock\MockFile.cs" />
     <Compile Include="Extensions\TaskParameterExtensions.cs" />
     <Compile Include="Mock\PlatformImageLoaderTask.cs" />
@@ -68,8 +67,5 @@
   <ItemGroup>
     <None Include="project.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mock\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

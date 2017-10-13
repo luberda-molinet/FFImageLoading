@@ -36,32 +36,7 @@ namespace FFImageLoading
             }
         }
 
-        static bool EnableMockImageService
-        {
-            get
-            {
-                try
-                {
-                    var assemblyMethod = typeof(Assembly).GetRuntimeMethods()
-                                .Where(m => m.Name.Equals("GetExecutingAssembly"))
-                                .FirstOrDefault();
-                    var assembly = assemblyMethod?.Invoke(null, null) as Assembly;
-                    if (assembly != null)
-                    {
-                        var attributes = assembly.GetCustomAttributes(typeof(MockFFImageLoadingAttribute));
-                        if (attributes != null && attributes.Count() > 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                }
-
-                return false;
-            }
-        }
+        public static bool EnableMockImageService { get; set; }
 
         protected override IMemoryCache<MockBitmap> MemoryCache => MockImageCache.Instance;
         protected override IMD5Helper CreatePlatformMD5HelperInstance() => new MockMD5Helper();

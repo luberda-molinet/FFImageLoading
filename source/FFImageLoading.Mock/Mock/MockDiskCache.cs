@@ -49,7 +49,7 @@ namespace FFImageLoading.Mock
                 return Task.FromResult<Stream>(new MemoryStream(file.Data));
             }
 
-            return null;
+            return Task.FromResult<Stream>(null);
         }
     }
 }
