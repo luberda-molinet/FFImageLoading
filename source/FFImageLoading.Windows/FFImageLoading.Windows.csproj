@@ -82,6 +82,7 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\UnitsExtensions.cs" />
+    <Compile Include="Extensions\WriteableBitmapExtensions.cs" />
     <Compile Include="FFImageSourceBinding.cs" />
     <Compile Include="Helpers\ColorHolder.cs" />
     <Compile Include="Helpers\MainThreadDispatcher.cs" />

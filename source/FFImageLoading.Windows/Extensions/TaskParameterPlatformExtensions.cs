@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using FFImageLoading.Cache;
 using FFImageLoading.Work;
 using System.IO;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
+using FFImageLoading.Targets;
+using FFImageLoading.Extensions;
 
 namespace FFImageLoading
 {
@@ -20,9 +20,12 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The PNG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
+        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
         {
-            throw new NotImplementedException();
+            var result = await AsBitmapDrawableAsync(parameters);
+            var stream = await result.AsPngStreamAsync();
+
+            return stream;
         }
 
         /// <summary>
@@ -30,9 +33,12 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
-            throw new NotImplementedException();
+            var result = await AsBitmapDrawableAsync(parameters);
+            var stream = await result.AsJpegStreamAsync();
+
+            return stream;
         }
 
         /// <summary>
@@ -42,9 +48,9 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, Image imageView)
         {
-            var target = new ImageViewTarget(imageView);
+            var target = new ImageTarget(imageView);
 
-            if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
+            if (parameters.Source != Work.ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
                 parameters.TryDispose();
@@ -107,10 +113,10 @@ namespace FFImageLoading
                 .Finish(scheduledWork =>
                 {
                     finishCallback?.Invoke(scheduledWork);
-                    tcs.TrySetResult(target.BitmapDrawable);
+                    tcs.TrySetResult(target.Bitmap);
                 });
 
-            if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
+            if (parameters.Source != Work.ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
                 target.SetAsEmpty(null);
                 parameters.TryDispose();

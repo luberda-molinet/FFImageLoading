@@ -19,7 +19,7 @@ namespace FFImageLoading.Targets
                 _imageWeakReference.SetTarget(image);
         }
 
-        public WriteableBitmap PImage
+        public WriteableBitmap Bitmap
         {
             get
             {

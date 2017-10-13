@@ -4,6 +4,9 @@ using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage;
+using FFImageLoading.DataResolvers;
+using System.Linq;
 
 namespace FFImageLoading
 {
@@ -32,7 +35,7 @@ namespace FFImageLoading
 
         protected override void PlatformSpecificConfiguration(Config.Configuration configuration)
         {
-            base.OnConfigurationChanged(configuration);
+            base.PlatformSpecificConfiguration(configuration);
 
             configuration.ClearMemoryCacheOnOutOfMemory = false;
             configuration.ExecuteCallbacksOnUIThread = true;
@@ -59,10 +62,10 @@ namespace FFImageLoading
             }
             else
             {
-                var rootPath = Directory.GetParent(path).FullName;
-                folderName = new DirectoryInfo(path).Name;
-                rootFolder = StorageFolder.GetFolderFromPathAsync(Config.DiskCachePath)
-                                          .ConfigureAwait(false).GetAwaiter().GetResult();
+                var separated = Config.DiskCachePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                folderName = separated.Last();
+                var rootPath = Config.DiskCachePath.Substring(0, Config.DiskCachePath.LastIndexOf(folderName));
+                rootFolder = StorageFolder.GetFolderFromPathAsync(rootPath).GetAwaiter().GetResult();
             }
 
             return new SimpleDiskCache(rootFolder, folderName, Config);
