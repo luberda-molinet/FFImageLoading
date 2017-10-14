@@ -115,26 +115,26 @@ namespace FFImageLoading.Transformations
             }
 
             //TODO draws a border - we should optimize that and add some anti-aliasing
-            if (borderSize > 0d)
-            {
-                borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
-                var borderColor = ColorHolder.Transparent;
+            //if (borderSize > 0d)
+            //{
+            //    borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
+            //    var borderColor = ColorHolder.Transparent;
 
-                try
-                {
-                    borderColor = borderHexColor.ToColorFromHex();
-                }
-                catch (Exception)
-                {
-                }
+            //    try
+            //    {
+            //        borderColor = borderHexColor.ToColorFromHex();
+            //    }
+            //    catch (Exception)
+            //    {
+            //    }
 
-                int intBorderSize = (int)Math.Ceiling(borderSize);
+            //    int intBorderSize = (int)Math.Ceiling(borderSize);
 
-                for (int i = 2; i < intBorderSize; i++)
-                {
-                    CircleAA(bitmap, i, borderColor);
-                }
-            }
+            //    for (int i = 0; i < intBorderSize; i++)
+            //    {
+            //        CircleAA(bitmap, i, borderColor);
+            //    }
+            //}
 
             return bitmap;
         }
@@ -202,23 +202,30 @@ namespace FFImageLoading.Transformations
         // helper function, draws pixel and mirrors it
         static void SetPixel4(BitmapHolder bitmap, int centerX, int centerY, int deltaX, int deltaY, ColorHolder color)
         {
-            bitmap.SetPixel(centerX + deltaX, centerY + deltaY, color);
-            bitmap.SetPixel(centerX - deltaX, centerY + deltaY, color);
-            bitmap.SetPixel(centerX + deltaX, centerY - deltaY, color);
-            bitmap.SetPixel(centerX - deltaX, centerY - deltaY, color);
+            if (centerX + deltaX < bitmap.Width && centerY + deltaY < bitmap.Height)
+                bitmap.SetPixel(centerX + deltaX, centerY + deltaY, color);
+
+            if (centerX - deltaX >= 0 && centerY + deltaY < bitmap.Height)
+                bitmap.SetPixel(centerX - deltaX, centerY + deltaY, color);
+
+            if (centerX + deltaX < bitmap.Width && centerY - deltaY >= 0)
+                bitmap.SetPixel(centerX + deltaX, centerY - deltaY, color);
+
+            if (centerX - deltaX >= 0 && centerY - deltaY >= 0)
+                bitmap.SetPixel(centerX - deltaX, centerY - deltaY, color);
         }
 
         static void CircleAA(BitmapHolder bitmap, int size, ColorHolder color)
         {
-            if (size % 2 != 0)
-                size++;
+            //if (size % 2 != 0)
+            //    size++;
 
             int centerX = bitmap.Width / 2;
             double radiusX = (bitmap.Width - size) / 2;
             int centerY = bitmap.Height / 2;
             double radiusY = (bitmap.Height - size) / 2;
 
-            const int maxTransparency = 127; // default: 127
+            const int maxTransparency = 255; // default: 127
             double radiusX2 = radiusX * radiusX;
             double radiusY2 = radiusY * radiusY;
 
@@ -230,6 +237,8 @@ namespace FFImageLoading.Transformations
                 double y = Math.Floor(radiusY * Math.Sqrt(1 - x * x / radiusX2));
                 double error = y - Math.Floor(y);
                 int transparency = (int)Math.Round(error * maxTransparency);
+                
+                //SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y), color);
                 SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y), new ColorHolder(transparency, color.R, color.G, color.B));
                 SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y) + 1, new ColorHolder(maxTransparency - transparency, color.R, color.G, color.B));
             }

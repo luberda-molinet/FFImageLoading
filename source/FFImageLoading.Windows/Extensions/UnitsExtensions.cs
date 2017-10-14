@@ -35,7 +35,7 @@ namespace FFImageLoading.Extensions
 
         static void WaitForResolutionScaleInit()
         {
-            while (resolutionScale == -1d) { /* wait */ }
+            while (resolutionScale < 0d) { /* wait */ }
         }
 
         public static int PointsToPixels(this double points)

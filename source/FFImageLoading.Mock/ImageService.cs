@@ -36,6 +36,10 @@ namespace FFImageLoading
             }
         }
 
+        /// <summary>
+        /// Set this to use FFImageLoading in a unit test environment. 
+        /// Instead throwing DoNotReference exception - use Mock implementation
+        /// </summary>
         public static bool EnableMockImageService { get; set; }
 
         protected override IMemoryCache<MockBitmap> MemoryCache => MockImageCache.Instance;

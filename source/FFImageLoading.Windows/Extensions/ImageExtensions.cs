@@ -160,6 +160,7 @@ namespace FFImageLoading.Extensions
                 {
                     resizedStream = new InMemoryRandomAccessStream();
 					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                    
                     double widthRatio = (double)width / decoder.PixelWidth;
                     double heightRatio = (double)height / decoder.PixelHeight;
 
@@ -175,7 +176,7 @@ namespace FFImageLoading.Extensions
                     uint aspectWidth = (uint)Math.Floor(decoder.PixelWidth * scaleRatio);
 
                     if (interpolationMode == InterpolationMode.None)
-                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.NearestNeighbor;
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Cubic;
                     else if (interpolationMode == InterpolationMode.Low)
                         encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
                     else if (interpolationMode == InterpolationMode.Medium)
@@ -183,7 +184,7 @@ namespace FFImageLoading.Extensions
                     else if (interpolationMode == InterpolationMode.High)
                         encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Fant;
                     else
-                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Cubic;
 
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;

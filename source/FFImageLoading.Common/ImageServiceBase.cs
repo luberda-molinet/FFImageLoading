@@ -118,7 +118,13 @@ namespace FFImageLoading
                 var httpClient = userDefinedConfig.HttpClient ?? new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate });
                 if (userDefinedConfig.HttpReadTimeout > 0)
                 {
-                    httpClient.Timeout = TimeSpan.FromSeconds(userDefinedConfig.HttpReadTimeout);
+                    try
+                    {
+                        httpClient.Timeout = TimeSpan.FromSeconds(userDefinedConfig.HttpReadTimeout);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
 
                 userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(), userDefinedConfig.VerboseLogging);
