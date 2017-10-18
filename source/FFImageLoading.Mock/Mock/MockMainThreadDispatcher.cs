@@ -17,5 +17,10 @@ namespace FFImageLoading.Mock
 
             return Task.FromResult(true);
         }
+
+        public Task PostAsync(Func<Task> action)
+        {
+            return action?.Invoke();
+        }
     }
 }
