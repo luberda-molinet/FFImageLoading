@@ -107,7 +107,13 @@ namespace FFImageLoading.Views
         public static readonly DependencyProperty BitmapOptimizationsProperty = DependencyProperty.Register(nameof(BitmapOptimizations), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
 
         public bool? FadeAnimationEnabled { get { return (bool?)GetValue(FadeAnimationEnabledProperty); } set { SetValue(FadeAnimationEnabledProperty, value); } }
-        public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register(nameof(FadeAnimationEnabled), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
+        public static readonly DependencyProperty FadeAnimationEnabledProperty = DependencyProperty.Register(nameof(FadeAnimationEnabled), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
+
+        public bool? FadeAnimationForCachedImages { get { return (bool?)GetValue(FadeAnimationForCachedImagesProperty); } set { SetValue(FadeAnimationForCachedImagesProperty, value); } }
+        public static readonly DependencyProperty FadeAnimationForCachedImagesProperty = DependencyProperty.Register(nameof(FadeAnimationForCachedImages), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
+
+        public int? FadeAnimationDuration { get { return (int?)GetValue(FadeAnimationDurationProperty); } set { SetValue(FadeAnimationDurationProperty, value); } }
+        public static readonly DependencyProperty FadeAnimationDurationProperty = DependencyProperty.Register(nameof(FadeAnimationDuration), typeof(int?), typeof(MvxCachedImageView), new PropertyMetadata(default(int?)));
 
         public bool? TransformPlaceholders { get { return (bool?)GetValue(TransformPlaceholdersProperty); } set { SetValue(TransformPlaceholdersProperty, value); } }
         public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
@@ -283,7 +289,11 @@ namespace FFImageLoading.Views
 
                 // FadeAnimation
                 if (FadeAnimationEnabled.HasValue)
-                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value);
+                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, duration: FadeAnimationDuration);
+
+                // FadeAnimationForCachedImages
+                if (FadeAnimationEnabled.HasValue && FadeAnimationForCachedImages.HasValue)
+                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, FadeAnimationForCachedImages.Value, FadeAnimationDuration);
 
                 // TransformPlaceholders
                 if (TransformPlaceholders.HasValue)

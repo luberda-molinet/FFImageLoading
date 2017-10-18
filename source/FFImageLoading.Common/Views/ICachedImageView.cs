@@ -32,6 +32,10 @@ namespace FFImageLoading.Views
 
         bool? FadeAnimationEnabled { get; set; }
 
+        int? FadeAnimationDuration { get; set; }
+
+        bool? FadeAnimationForCachedImages { get; set; }
+
         bool? TransformPlaceholders { get; set; }
 
         CacheType? CacheType { get; set; }

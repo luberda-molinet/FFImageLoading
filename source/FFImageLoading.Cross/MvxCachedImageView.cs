@@ -158,6 +158,20 @@ namespace FFImageLoading.Cross
             set { if (_fadeAnimationEnabled != value) { _fadeAnimationEnabled = value; OnPropertyChanged(nameof(FadeAnimationEnabled)); } }
         }
 
+        bool? _fadeAnimationForCachedImages;
+        public bool? FadeAnimationForCachedImages
+        {
+            get { return _fadeAnimationForCachedImages; }
+            set { if (_fadeAnimationForCachedImages != value) { _fadeAnimationForCachedImages = value; OnPropertyChanged(nameof(FadeAnimationForCachedImages)); } }
+        }
+
+        int? _fadeAnimationDuration;
+        public int? FadeAnimationDuration
+        {
+            get { return _fadeAnimationDuration; }
+            set { if (_fadeAnimationDuration != value) { _fadeAnimationDuration = value; OnPropertyChanged(nameof(FadeAnimationDuration)); } }
+        }
+
         bool? _transformPlaceholders;
         public bool? TransformPlaceholders
         {
@@ -365,7 +379,11 @@ namespace FFImageLoading.Cross
 
                 // FadeAnimation
                 if (FadeAnimationEnabled.HasValue)
-                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value);
+                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, duration: FadeAnimationDuration);
+
+                // FadeAnimationForCachedImages
+                if (FadeAnimationEnabled.HasValue && FadeAnimationForCachedImages.HasValue)
+                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, FadeAnimationForCachedImages.Value, FadeAnimationDuration);
 
                 // TransformPlaceholders
                 if (TransformPlaceholders.HasValue)

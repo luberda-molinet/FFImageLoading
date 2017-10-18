@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
 using FFImageLoading.Cache;
+using FFImageLoading.Views;
 
 namespace FFImageLoading.Forms
 {
@@ -353,6 +354,26 @@ namespace FFImageLoading.Forms
         }
 
         /// <summary>
+        /// The fade animation for cached images enabled property.
+        /// </summary>
+        public static readonly BindableProperty FadeAnimationForCachedImagesProperty = BindableProperty.Create(nameof(FadeAnimationForCachedImages), typeof(bool?), typeof(CachedImage), default(bool?));
+
+        /// <summary>
+        /// Indicates if the fade animation effect for cached images should be enabled. By default this value comes from ImageService.Instance.Config.FadeAnimationForCachedImages.
+        /// </summary>
+        public bool? FadeAnimationForCachedImages
+        {
+            get
+            {
+                return (bool?)GetValue(FadeAnimationForCachedImagesProperty);
+            }
+            set
+            {
+                SetValue(FadeAnimationForCachedImagesProperty, value);
+            }
+        }
+
+        /// <summary>
         /// The fade animation enabled property.
         /// </summary>
         public static readonly BindableProperty FadeAnimationEnabledProperty = BindableProperty.Create(nameof(FadeAnimationEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
@@ -369,6 +390,26 @@ namespace FFImageLoading.Forms
             set
             {
                 SetValue(FadeAnimationEnabledProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// The fade animation duration property.
+        /// </summary>
+        public static readonly BindableProperty FadeAnimationDurationProperty = BindableProperty.Create(nameof(FadeAnimationDuration), typeof(int?), typeof(CachedImage), default(int?));
+
+        /// <summary>
+        /// Sets fade animation effect duration. By default this value comes from ImageService.Instance.Config.FadeAnimationDuration.
+        /// </summary>
+        public int? FadeAnimationDuration
+        {
+            get
+            {
+                return (int?)GetValue(FadeAnimationDurationProperty);
+            }
+            set
+            {
+                SetValue(FadeAnimationDurationProperty, value);
             }
         }
 
@@ -1076,7 +1117,11 @@ namespace FFImageLoading.Forms
 
             // FadeAnimation
             if (FadeAnimationEnabled.HasValue)
-                imageLoader.FadeAnimation(FadeAnimationEnabled.Value);
+                imageLoader.FadeAnimation(FadeAnimationEnabled.Value, duration: FadeAnimationDuration);
+
+            // FadeAnimationForCachedImages
+            if (FadeAnimationEnabled.HasValue && FadeAnimationForCachedImages.HasValue)
+                imageLoader.FadeAnimation(FadeAnimationEnabled.Value, FadeAnimationForCachedImages.Value, FadeAnimationDuration);
 
             // TransformPlaceholders
             if (TransformPlaceholders.HasValue)
