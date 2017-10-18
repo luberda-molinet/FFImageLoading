@@ -6,33 +6,20 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher: IMainThreadDispatcher
     {
-		static Handler _handler = new Handler(Looper.MainLooper);
-
-		static MainThreadDispatcher instance;
-
-		public static MainThreadDispatcher Instance
-		{
-			get
-			{
-				if (instance == null)
-					instance = new MainThreadDispatcher();
-
-				return instance;
-			}
-		}
+        static Handler _handler = new Handler(Looper.MainLooper);
 
         public void Post(Action action)
         {
-			Looper currentLooper = Looper.MyLooper();
+            Looper currentLooper = Looper.MyLooper();
 
-			if(currentLooper != null && currentLooper.Thread == Looper.MainLooper.Thread)
-			{
-				action();
-			}
-			else
-			{
-				_handler.Post(action);
-			}
+            if(currentLooper != null && currentLooper.Thread == Looper.MainLooper.Thread)
+            {
+                action();
+            }
+            else
+            {
+                _handler.Post(action);
+            }
         }
 
         public Task PostAsync(Action action)

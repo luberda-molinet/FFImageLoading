@@ -49,6 +49,7 @@ namespace FFImageLoading.Forms.Mac
         /// </summary>
         public static new void Init()
         {
+            ScaleHelper.Init();
             // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 #pragma warning disable 0219
             var dummy = new CachedImageRenderer();
@@ -210,7 +211,7 @@ namespace FFImageLoading.Forms.Mac
 
         void ImageLoadingFinished(CachedImage element)
         {
-            MainThreadDispatcher.Instance.Post(() =>
+            ImageService.Instance.Config.MainThreadDispatcher.Post(() =>
             {
                 if (element != null && !_isDisposed)
                 {
@@ -252,7 +253,7 @@ namespace FFImageLoading.Forms.Mac
         {
             PImage image = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(() =>
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (Control != null)
                     image = Control.Image;

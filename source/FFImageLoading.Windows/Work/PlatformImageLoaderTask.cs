@@ -17,6 +17,8 @@ namespace FFImageLoading.Work
 
         public PlatformImageLoaderTask(ITarget<WriteableBitmap, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
+            // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
+            ScaleHelper.Init();
         }
 
         protected override Task SetTargetAsync(WriteableBitmap image, bool animated)

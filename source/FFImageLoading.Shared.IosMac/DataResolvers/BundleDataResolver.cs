@@ -113,7 +113,7 @@ namespace FFImageLoading.DataResolvers
 
                         try
                         {
-                            await MainThreadDispatcher.Instance.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
+                            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => asset = new NSDataAsset(filename)).ConfigureAwait(false);
                         }
                         catch (Exception) { }
 
@@ -135,9 +135,9 @@ namespace FFImageLoading.DataResolvers
                     try
                     {
 #if __IOS__
-                        await MainThreadDispatcher.Instance.PostAsync(() => image = PImage.FromBundle(filename)).ConfigureAwait(false);
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(filename)).ConfigureAwait(false);
 #elif __MACOS__
-                        await MainThreadDispatcher.Instance.PostAsync(() => image = NSImage.ImageNamed(filename)).ConfigureAwait(false);
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = NSImage.ImageNamed(filename)).ConfigureAwait(false);
 #endif
                     }
                     catch (Exception) { }
@@ -146,7 +146,7 @@ namespace FFImageLoading.DataResolvers
                     {
                         token.ThrowIfCancellationRequested();
 
-						var stream = image.AsPngStream();
+                        var stream = image.AsPngStream();
 
                         var imageInformation = new ImageInformation();
                         imageInformation.SetPath(identifier);

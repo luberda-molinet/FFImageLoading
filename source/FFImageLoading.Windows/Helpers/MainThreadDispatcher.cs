@@ -7,19 +7,7 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher : IMainThreadDispatcher
     {
-        static MainThreadDispatcher instance;
         private CoreDispatcher _dispatcher;
-
-        public static MainThreadDispatcher Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new MainThreadDispatcher();
-
-                return instance;
-            }
-        }
 
         public async void Post(Action action)
         {

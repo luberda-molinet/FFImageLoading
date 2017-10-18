@@ -20,7 +20,7 @@ namespace FFImageLoading.Extensions
 
             WriteableBitmap writeableBitmap = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(async () =>
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
@@ -56,7 +56,7 @@ namespace FFImageLoading.Extensions
                         downscaledImage.Seek(0);
                         WriteableBitmap resizedBitmap = null;
 
-                        await MainThreadDispatcher.Instance.PostAsync(async () =>
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
                         {
                             resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                             await resizedBitmap.SetSourceAsync(downscaledImage);
@@ -77,7 +77,7 @@ namespace FFImageLoading.Extensions
                         imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     }
 
-                    await MainThreadDispatcher.Instance.PostAsync(async () =>
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         await bitmap.SetSourceAsync(image);
@@ -153,13 +153,13 @@ namespace FFImageLoading.Extensions
             }
 
             IRandomAccessStream resizedStream = imageStream;
-			var decoder = await BitmapDecoder.CreateAsync(imageStream);
+            var decoder = await BitmapDecoder.CreateAsync(imageStream);
             if ((height > 0 && decoder.PixelHeight > height) || (width > 0 && decoder.PixelWidth > width) || allowUpscale)
             {
                 using (imageStream)
                 {
                     resizedStream = new InMemoryRandomAccessStream();
-					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                    BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
                     
                     double widthRatio = (double)width / decoder.PixelWidth;
                     double heightRatio = (double)height / decoder.PixelHeight;

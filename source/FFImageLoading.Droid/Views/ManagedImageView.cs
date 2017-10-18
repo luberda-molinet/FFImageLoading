@@ -96,7 +96,7 @@ namespace FFImageLoading.Views
 
                             if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                             {
-                                await MainThreadDispatcher.Instance.PostAsync(() => base.SetImageBitmap(bitmap)).ConfigureAwait(false);
+                                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => base.SetImageBitmap(bitmap)).ConfigureAwait(false);
                             }
 
                             token.ThrowIfCancellationRequested();

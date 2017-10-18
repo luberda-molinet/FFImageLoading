@@ -6,6 +6,11 @@ namespace FFImageLoading.Mock
 {
     public class MockMainThreadDispatcher : IMainThreadDispatcher
     {
+        public void Post(Action action)
+        {
+            action();
+        }
+
         public Task PostAsync(Action action)
         {
             action();

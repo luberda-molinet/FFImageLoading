@@ -11,10 +11,11 @@ namespace FFImageLoading.Config
     /// </summary>
     public class Configuration
     {
+        public static Configuration Default { get; } = new Configuration();
+
         public Configuration()
         {
             // default values here:
-            MaxMemoryCacheSize = 0;
             BitmapOptimizations = true;
             FadeAnimationEnabled = true;
             FadeAnimationForCachedImages = false; // by default cached images will not fade when displayed on screen, otherwise it gives the impression that UI is laggy

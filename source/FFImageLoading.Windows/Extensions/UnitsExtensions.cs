@@ -1,48 +1,13 @@
-﻿using FFImageLoading.Helpers;
-using System;
-using Windows.Graphics.Display;
-using System.Reflection;
+﻿using System;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Extensions
 {
     public static class UnitsExtensions
     {
-        static UnitsExtensions()
-        {
-            InitResolutionScale();
-        }
-
-        static double resolutionScale = -1d;
-
-        static async void InitResolutionScale()
-        {
-            await MainThreadDispatcher.Instance.PostAsync(() =>
-            {
-                var displayInfo = DisplayInformation.GetForCurrentView();
-                object found = null;
-
-                try
-                {
-                    found = displayInfo.GetType().GetRuntimeProperty("RawPixelsPerViewPixel")?.GetValue(displayInfo);
-                }
-                catch (Exception)
-                {
-                }
-
-                resolutionScale = found == null ? 1d : (double)found;
-            }).ConfigureAwait(false);
-        }
-
-        static void WaitForResolutionScaleInit()
-        {
-            while (resolutionScale < 0d) { /* wait */ }
-        }
-
         public static int PointsToPixels(this double points)
         {
-            WaitForResolutionScaleInit();
-
-            return (int)Math.Floor(points * resolutionScale);
+            return (int)Math.Floor(points * ScaleHelper.Scale);
         }
 
         public static int PixelsToPoints(this double px)
@@ -50,9 +15,7 @@ namespace FFImageLoading.Extensions
             if (px == 0d)
                 return 0;
 
-            WaitForResolutionScaleInit();
-
-            return (int)Math.Floor(px / resolutionScale);
+            return (int)Math.Floor(px / ScaleHelper.Scale);
         }
 
         public static int PointsToPixels(this int points)

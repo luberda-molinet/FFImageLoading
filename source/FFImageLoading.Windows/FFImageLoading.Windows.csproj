@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
     <Compile Include="Targets\BitmapTarget.cs" />
+    <Compile Include="Helpers\ScaleHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

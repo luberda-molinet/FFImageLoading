@@ -272,7 +272,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The cache duration property.
         /// </summary>
-        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), ImageService.Instance.Config.DiskCacheDuration);
+        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), Config.Configuration.Default.DiskCacheDuration);
 
         /// <summary>
         /// How long the file will be cached on disk.

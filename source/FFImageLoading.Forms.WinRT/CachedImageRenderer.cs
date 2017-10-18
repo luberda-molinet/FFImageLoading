@@ -55,6 +55,7 @@ namespace FFImageLoading.Forms.WinRT
         /// </summary>
         public static void Init()
         {
+            ScaleHelper.Init();
         }
 
         public override SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
@@ -221,7 +222,7 @@ namespace FFImageLoading.Forms.WinRT
 
         void ImageLoadingFinished(CachedImage element)
         {
-            MainThreadDispatcher.Instance.Post(() =>
+            ImageService.Instance.Config.MainThreadDispatcher.Post(() =>
             {
                 if (element != null && !_isDisposed)
                 {

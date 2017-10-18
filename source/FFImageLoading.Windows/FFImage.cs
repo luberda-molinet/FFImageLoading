@@ -17,13 +17,13 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace FFImageLoading
 {
     [Obsolete("Please use MvxCachedImageView / MvxSvgCachedImageView")]
-	public sealed class FFImage : ContentControl, IDisposable
+    public sealed class FFImage : ContentControl, IDisposable
     {
         private Image internalImage;
         private IScheduledWork _currentTask;
 
         public FFImage()
-		{
+        {
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             HorizontalAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
@@ -36,7 +36,7 @@ namespace FFImageLoading
             };
             Content = internalImage;
 
-			Transformations = new List<ITransformation>();
+            Transformations = new List<ITransformation>();
             DownsampleMode = InterpolationMode.Default;
         }
 
@@ -87,9 +87,9 @@ namespace FFImageLoading
             {
                 if (internalImage != null)
                 {
-                    await MainThreadDispatcher.Instance.PostAsync(() => {
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => {
                         internalImage.Source = null;
-					});
+                    });
                 }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -111,9 +111,9 @@ namespace FFImageLoading
 
             if (imageLoader != null)
             {
-				// CustomKeyFactory
-				if (CacheKeyFactory != null)
-				{
+                // CustomKeyFactory
+                if (CacheKeyFactory != null)
+                {
                     var dataContext = DataContext;
                     imageLoader.CacheKey(CacheKeyFactory.GetKey(Source, dataContext));
                 }
@@ -418,7 +418,7 @@ namespace FFImageLoading
         /// <summary>
         /// The cache duration property.
         /// </summary>
-        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(int), typeof(FFImage), new PropertyMetadata(ImageService.Instance.Config.DiskCacheDuration.Days));
+        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(int), typeof(FFImage), new PropertyMetadata(Config.Configuration.Default.DiskCacheDuration.Days));
 
         /// <summary>
         /// How long the file will be cached on disk.

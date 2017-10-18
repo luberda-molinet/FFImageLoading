@@ -4,25 +4,33 @@ namespace FFImageLoading.Helpers
 {
     public static class ScaleHelper
     {
+        static nfloat? _scale;
         public static nfloat Scale
         {
-            get;
-            private set;
+            get
+            {
+                if (!_scale.HasValue)
+                {
+                    Init();
+                }
+
+                return _scale.Value;
+            }
         }
 
         public static void Init()
         {
-            if (Scale > 0)
+            if (_scale.HasValue)
                 return;
 
-            MainThreadDispatcher.Instance.Post(() =>
+            ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
 #if __IOS__
-                Scale = UIKit.UIScreen.MainScreen.Scale;
+                _scale = UIKit.UIScreen.MainScreen.Scale;
 #elif __MACOS__
-                Scale = AppKit.NSScreen.MainScreen.BackingScaleFactor;
+                _scale = AppKit.NSScreen.MainScreen.BackingScaleFactor;
 #endif
-            });
+            }).ConfigureAwait(false).GetAwaiter().GetResult();;
         }
     }
 }
