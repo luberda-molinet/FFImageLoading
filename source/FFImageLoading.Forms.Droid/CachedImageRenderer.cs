@@ -185,9 +185,9 @@ namespace FFImageLoading.Forms.Droid
             }
         }
 
-        void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingFinished(CachedImage element)
         {
-            ImageService.Instance.Config.MainThreadDispatcher.Post(() =>
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {

@@ -14,7 +14,7 @@ namespace FFImageLoading.Helpers
             if (action == null)
                 return;
 
-            if(_dispatcher==null)
+            if(_dispatcher == null)
             {
                 _dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             }
@@ -34,13 +34,32 @@ namespace FFImageLoading.Helpers
 
         public Task PostAsync(Action action)
         {
-            var tcs = new TaskCompletionSource<object>();
-            Post(() => {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(() =>
+            {
                 try
                 {
-                    if (action != null)
-                        action();
-                    tcs.SetResult(string.Empty);
+                    action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public Task PostAsync(Func<Task> action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(async () =>
+            {
+                try
+                {
+                    await action?.Invoke();
+                    tcs.SetResult(true);
                 }
                 catch (Exception ex)
                 {

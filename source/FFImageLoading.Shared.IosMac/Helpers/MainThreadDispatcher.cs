@@ -53,5 +53,40 @@ namespace FFImageLoading.Helpers
 
             return tcs.Task;
         }
+
+        public async Task PostAsync(Func<Task> action)
+        {
+            var tcs = new TaskCompletionSource<object>();
+
+            if (NSThread.Current.IsMainThread)
+            {
+                try
+                {
+                    await action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            }
+            else
+            {
+                DispatchQueue.MainQueue.DispatchAsync(async () =>
+                {
+                    try
+                    {
+                        await action?.Invoke();
+                        tcs.SetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.SetException(ex);
+                    }
+                });
+            }
+
+            await tcs.Task;
+        }
     }
 }

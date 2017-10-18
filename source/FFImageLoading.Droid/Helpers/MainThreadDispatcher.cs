@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers
 {
-    public class MainThreadDispatcher: IMainThreadDispatcher
+    public class MainThreadDispatcher : IMainThreadDispatcher
     {
         static Handler _handler = new Handler(Looper.MainLooper);
 
@@ -12,9 +12,9 @@ namespace FFImageLoading.Helpers
         {
             Looper currentLooper = Looper.MyLooper();
 
-            if(currentLooper != null && currentLooper.Thread == Looper.MainLooper.Thread)
+            if (currentLooper != null && currentLooper.Thread == Looper.MainLooper.Thread)
             {
-                action();
+                action?.Invoke();
             }
             else
             {
@@ -24,13 +24,35 @@ namespace FFImageLoading.Helpers
 
         public Task PostAsync(Action action)
         {
-            var tcs = new TaskCompletionSource<object>();
-            Post(() => {
-                try {
-                    if (action != null)
-                        action();
-                    tcs.SetResult(string.Empty);
-                } catch (Exception ex) {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(() =>
+            {
+                try
+                {
+                    action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public Task PostAsync(Func<Task> action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(async () =>
+            {
+                try
+                {
+                    await action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
                     tcs.SetException(ex);
                 }
             });
