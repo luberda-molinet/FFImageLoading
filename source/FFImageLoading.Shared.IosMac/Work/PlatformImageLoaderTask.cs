@@ -85,7 +85,7 @@ namespace FFImageLoading.Work
                         }
                         var decodedWebP = decoder.Decode(imageData);
                         //TODO Add WebP images downsampling!
-                        imageIn = decodedWebP;   
+                        imageIn = decodedWebP;
                     }
                     finally
                     {
@@ -95,9 +95,11 @@ namespace FFImageLoading.Work
                     throw new NotImplementedException();
 #endif
                 }
-
-                var nsdata = NSData.FromStream(imageData);
-                imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, Parameters, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
+                else
+                {
+                    var nsdata = NSData.FromStream(imageData);
+                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, Parameters, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
+                }
             }
             finally
             {
