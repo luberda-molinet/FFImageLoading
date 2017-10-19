@@ -5,12 +5,12 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
 {
-	/// <summary>
-	/// SvgImageSourceConverter
-	/// </summary>
+    /// <summary>
+    /// SvgImageSourceConverter
+    /// </summary>
     [Preserve(AllMembers = true)]
-	public class SvgImageSourceConverter : TypeConverter, IValueConverter
-	{
+    public class SvgImageSourceConverter : TypeConverter, IValueConverter
+    {
         FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();
 
         /// <summary>
@@ -21,17 +21,14 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			var str = value as string;
-			if (string.IsNullOrWhiteSpace(str))
-				return null;
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var str = value as string;
+            if (string.IsNullOrWhiteSpace(str))
+                return null;
 
-			var xfSource = _imageSourceConverter.ConvertFromInvariantString(str) as ImageSource;
-
-			//TODO Parse width / height eg. image.svg@SVG=0x200  where 200 is width
-			return new SvgImageSource(xfSource, 0, 0, true);
-		}
+            return ConvertFromInvariantString(str);
+        }
 
         /// <summary>
         /// ConvertBack
@@ -41,31 +38,30 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			throw new NotImplementedException();
-		}
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
 
         public override bool CanConvertFrom(Type sourceType)
         {
-        	return sourceType == typeof(string);
+            return sourceType == typeof(string);
         }
 
         public override object ConvertFromInvariantString(string value)
         {
-			var text = value as string;
+            var text = value as string;
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
 
-			if (text == null)
-				return null;
+            var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
 
-			var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
+            if (text.IsSvgFileUrl() || text.IsSvgDataUrl())
+            {
+                return new SvgImageSource(xfSource, 0, 0, true);
+            }
 
-			if (text.Contains("svg", StringComparison.OrdinalIgnoreCase))
-			{
-				return new SvgImageSource(xfSource, 0, 0, true);
-			}
-
-			return xfSource;
+            return xfSource;
         }
-	}
+    }
 }

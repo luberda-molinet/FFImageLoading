@@ -24,6 +24,12 @@ namespace FFImageLoading
                       || str.StartsWith("<", StringComparison.OrdinalIgnoreCase);
         }
 
+        public static bool IsSvgFileUrl(this string str)
+        {
+            return !string.IsNullOrWhiteSpace(str)
+                && str.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)[0].EndsWith("svg", StringComparison.OrdinalIgnoreCase);
+        }
+
         public static bool IsSvgDataUrl(this string str)
         {
             return str.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)

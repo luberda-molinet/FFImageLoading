@@ -39,17 +39,53 @@ namespace FFImageLoading.Svg.Forms
 
             // HACK for the strange issue when TypeConverter is not respected (somehow FileImageSource is returned !?!?!?!?)
             var fileSource = newValue as FileImageSource;
-            if (fileSource?.File != null && fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+            if (fileSource?.File != null)
             {
-                element.Source = SvgImageSource.FromSvgString(fileSource.File, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
-                return;
+                if (fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+                {
+                    element.Source = new SvgImageSource(fileSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
+                else if (fileSource.File.IsSvgFileUrl())
+                {
+                    element.Source = new SvgImageSource(fileSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
             }
 
             var uriSource = newValue as UriImageSource;
-            if (uriSource?.Uri?.OriginalString != null && uriSource.Uri.OriginalString.IsSvgDataUrl())
+            if (uriSource?.Uri?.OriginalString != null)
             {
-                element.Source = SvgImageSource.FromSvgString(uriSource.Uri.OriginalString, replaceStringMap: ((SvgCachedImage)element).ReplaceStringMap);
-                return;
+                if (uriSource.Uri.OriginalString.IsSvgDataUrl())
+                {
+                    element.Source = new SvgImageSource(uriSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
+                else if (uriSource.Uri.OriginalString.IsSvgFileUrl())
+                {
+                    element.Source = new SvgImageSource(uriSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
+            }
+
+            var dataUrlSource = newValue as DataUrlImageSource;
+            if (dataUrlSource?.DataUrl != null)
+            {
+                if (dataUrlSource.DataUrl.IsSvgDataUrl())
+                {
+                    element.Source = new SvgImageSource(dataUrlSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
+            }
+
+            var embeddedSource = newValue as EmbeddedResourceImageSource;
+            if (embeddedSource?.Uri?.OriginalString != null)
+            {
+                if (embeddedSource.Uri.OriginalString.IsSvgFileUrl())
+                {
+                    element.Source = new SvgImageSource(embeddedSource, 0, 0, true, ((SvgCachedImage)element).ReplaceStringMap);
+                    return;
+                }
             }
 
             element.Source = newValue as ImageSource;

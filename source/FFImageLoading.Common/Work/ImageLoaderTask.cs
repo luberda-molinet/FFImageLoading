@@ -432,7 +432,7 @@ namespace FFImageLoading.Work
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                         ThrowIfCancellationRequested();
 
-                        using (loadImageData.Item1)
+                        using ( loadImageData.Item1)
                         {
                             loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
                             if (loadImage != default(TImageContainer))

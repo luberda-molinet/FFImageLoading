@@ -61,8 +61,8 @@ namespace FFImageLoading.Cross
 #endif
 
         protected override void SetupOnBeforeImageLoading(TaskParameter imageLoader)
-    	{
-    		base.SetupOnBeforeImageLoading(imageLoader);
+        {
+            base.SetupOnBeforeImageLoading(imageLoader);
 
 #if __IOS__
             int width = (int)this.Bounds.Width;
@@ -75,35 +75,35 @@ namespace FFImageLoading.Cross
             int height = (int)this.Height;                
 #endif
 
-            if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase)) || ImageStream != null)
-    		{
-    			imageLoader.WithCustomDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
-    		}
-            if (!string.IsNullOrWhiteSpace(LoadingPlaceholderImagePath) && LoadingPlaceholderImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase))
+            if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.IsSvgFileUrl()) || ImageStream != null)
+            {
+                imageLoader.WithCustomDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
+            }
+            if (!string.IsNullOrWhiteSpace(LoadingPlaceholderImagePath) && LoadingPlaceholderImagePath.IsSvgFileUrl())
             {
                 imageLoader.WithCustomLoadingPlaceholderDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
             }
-            if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath) && ErrorPlaceholderImagePath.Contains("svg", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath) && ErrorPlaceholderImagePath.IsSvgFileUrl())
             {
                 imageLoader.WithCustomErrorPlaceholderDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));
             }
-    	}
+        }
 
 #if __WINDOWS__
         public Dictionary<string, string> ReplaceStringMap { get { return (Dictionary<string, string>)GetValue(ReplaceStringMapProperty); } set { SetValue(ReplaceStringMapProperty, value); } }
         public static readonly Windows.UI.Xaml.DependencyProperty ReplaceStringMapProperty = Windows.UI.Xaml.DependencyProperty.Register(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(MvxCachedImageView), new Windows.UI.Xaml.PropertyMetadata(default(Dictionary<string, string>), OnImageChanged));
 #else
         Dictionary<string, string> _replaceStringMap;
-    	/// <summary>
-    	/// Used to define replacement map which will be used to
-    	/// replace text inside SVG file (eg. changing colors values)
-    	/// </summary>
-    	/// <value>The replace string map.</value>
-    	public Dictionary<string, string> ReplaceStringMap
-    	{
-    		get { return _replaceStringMap; }
-    		set { if (_replaceStringMap != value) { _replaceStringMap = value; OnPropertyChanged(nameof(ReplaceStringMap)); } }
-    	}
+        /// <summary>
+        /// Used to define replacement map which will be used to
+        /// replace text inside SVG file (eg. changing colors values)
+        /// </summary>
+        /// <value>The replace string map.</value>
+        public Dictionary<string, string> ReplaceStringMap
+        {
+            get { return _replaceStringMap; }
+            set { if (_replaceStringMap != value) { _replaceStringMap = value; OnPropertyChanged(nameof(ReplaceStringMap)); } }
+        }
 #endif
     }
 }
