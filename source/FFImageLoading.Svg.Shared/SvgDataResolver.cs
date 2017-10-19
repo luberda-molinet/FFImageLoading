@@ -23,16 +23,18 @@ using Android.Content;
 
 namespace FFImageLoading.Svg.Platform
 {
-	/// <summary>
-	/// Svg data resolver.
-	/// </summary>
+    /// <summary>
+    /// Svg data resolver.
+    /// </summary>
 #if __IOS__
     [Preserve(AllMembers = true)]
 #elif __ANDROID__
-	[Preserve(AllMembers = true)]
+    [Preserve(AllMembers = true)]
 #endif
-	public class SvgDataResolver : IVectorDataResolver
+    public class SvgDataResolver : IVectorDataResolver
     {
+        static readonly object _encodingLock = new object();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
         /// Default SVG size is read from SVG file width / height attributes
@@ -85,7 +87,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 using (var svgStream = resolvedData.Item1)
                 {
-                    picture = svg.Load(resolvedData?.Item1);
+                    picture = svg.Load(svgStream);
                 }
             }
             else
@@ -148,30 +150,33 @@ namespace FFImageLoading.Svg.Platform
 #endif
             }
 
-            using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
-			//using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
-			using (var canvas = new SKCanvas(bitmap))
-			using (var paint = new SKPaint())
-			{
-				canvas.Clear(SKColors.Transparent);
-                float scaleX = (float)sizeX / picture.CullRect.Width;
-				float scaleY = (float)sizeY / picture.CullRect.Height;
-				var matrix = SKMatrix.MakeScale(scaleX, scaleY);
+            lock (_encodingLock)
+            {
+                using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
+                //using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
+                using (var canvas = new SKCanvas(bitmap))
+                using (var paint = new SKPaint())
+                {
+                    canvas.Clear(SKColors.Transparent);
+                    float scaleX = (float)sizeX / picture.CullRect.Width;
+                    float scaleY = (float)sizeY / picture.CullRect.Height;
+                    var matrix = SKMatrix.MakeScale(scaleX, scaleY);
 
-				canvas.DrawPicture(picture, ref matrix, paint);
-				canvas.Flush();
+                    canvas.DrawPicture(picture, ref matrix, paint);
+                    canvas.Flush();
 
-				using (var image = SKImage.FromBitmap(bitmap))
-				//using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
-				using (var data = image.Encode())
-				{
-					var stream = new MemoryStream();
-					data.SaveTo(stream);
-					stream.Position = 0;
-                    resolvedData.Item3.SetType(ImageInformation.ImageType.SVG);
-					return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
-				}
-			}
-		}
-	}
+                    using (var image = SKImage.FromBitmap(bitmap))
+                    //using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
+                    using (var data = image.Encode())
+                    {
+                        var stream = new MemoryStream();
+                        data.SaveTo(stream);
+                        stream.Position = 0;
+                        resolvedData.Item3.SetType(ImageInformation.ImageType.SVG);
+                        return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
+                    }
+                }
+            }
+        }
+    }
 }
