@@ -36,7 +36,7 @@ namespace FFImageLoading
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
             var result = await AsBitmapDrawableAsync(parameters);
-            var stream = await result.AsJpegStreamAsync();
+            var stream = await result.AsJpegStreamAsync(quality);
 
             return stream;
         }

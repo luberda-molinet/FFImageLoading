@@ -311,7 +311,7 @@ namespace FFImageLoading.Forms.WinRT
                     {
                         ScaledWidth = aspectWidth,
                         ScaledHeight = aspectHeight,
-                        InterpolationMode = BitmapInterpolationMode.Linear
+                        InterpolationMode = BitmapInterpolationMode.Cubic
                     };
                     PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                         BitmapPixelFormat.Bgra8,
@@ -332,7 +332,20 @@ namespace FFImageLoading.Forms.WinRT
 
             using (var stream = new InMemoryRandomAccessStream())
             {
-                var encoder = await BitmapEncoder.CreateAsync(format, stream);
+                BitmapEncoder encoder;
+
+                if (format == BitmapEncoder.JpegEncoderId)
+                {
+                    var propertySet = new BitmapPropertySet();
+                    var qualityValue = new BitmapTypedValue((double)quality / 100d, Windows.Foundation.PropertyType.Single);
+                    propertySet.Add("ImageQuality", qualityValue);
+
+                    encoder = await BitmapEncoder.CreateAsync(format, stream, propertySet);
+                }
+                else
+                {
+                    encoder = await BitmapEncoder.CreateAsync(format, stream);
+                }
 
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                     pixelsWidth, pixelsHeight, 96, 96, pixels);
