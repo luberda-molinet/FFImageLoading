@@ -91,13 +91,20 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
+        [Obsolete("Use AsWriteableBitmapAsync")]
+        public static Task<WriteableBitmap> AsBitmapDrawableAsync(this TaskParameter parameters)
+        {
+            return AsWriteableBitmapAsync(parameters);
+        }
+
+
         /// <summary>
-        /// Loads and gets BitmapDrawable using defined parameters.
+        /// Loads and gets WriteableBitmap using defined parameters.
         /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
-        /// <returns>The bitmap drawable async.</returns>
+        /// <returns>The WriteableBitmap.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<WriteableBitmap> AsBitmapDrawableAsync(this TaskParameter parameters)
+        public static Task<WriteableBitmap> AsWriteableBitmapAsync(this TaskParameter parameters)
         {
             var target = new BitmapTarget();
             var userErrorCallback = parameters.OnError;
