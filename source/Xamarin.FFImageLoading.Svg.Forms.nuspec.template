@@ -31,10 +31,13 @@
 	</metadata>
 	
 	<files>
+		<!--Net Standard-->
+        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\netstandard1.0\FFImageLoading.Svg.Forms.dll" />
+        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\netstandard1.0\FFImageLoading.Svg.Forms.xml" />
 
 		<!--Core PCL-->
-        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Svg.Forms.dll" />
-        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Svg.Forms.xml" />
+        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Svg.Forms.dll" />
+        <file src="FFImageLoading.Svg.Forms\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Svg.Forms.xml" />
             
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Svg.Forms.Droid\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\MonoAndroid10\FFImageLoading.Svg.Forms.dll" />
@@ -52,9 +55,9 @@
         <file src="FFImageLoading.Svg.Forms.Mac\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.pdb" />         -->
  
 		<!--Windows UWP-->
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.dll" target="lib\uap10.0\FFImageLoading.Svg.Forms.dll" />
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.xml" target="lib\uap10.0\FFImageLoading.Svg.Forms.xml" />
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.pdb" target="lib\uap10.0\FFImageLoading.Svg.Forms.pdb" />	
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.dll" target="lib\uap\FFImageLoading.Svg.Forms.dll" />
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.xml" target="lib\uap\FFImageLoading.Svg.Forms.xml" />
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.pdb" target="lib\uap\FFImageLoading.Svg.Forms.pdb" />	
 
 	</files>
 	

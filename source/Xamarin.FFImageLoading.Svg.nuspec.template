@@ -26,7 +26,7 @@ SVG support for FFImageLoading library.
                 <dependency id="SkiaSharp" version="1.59.1" />
             </group>
 
-            <group targetFramework="uap10.0">
+            <group targetFramework="uap">
                 <dependency id="NETStandard.Library" version="1.6.1" />
             </group>                       
 
@@ -40,10 +40,13 @@ SVG support for FFImageLoading library.
 	</metadata>
 	
 	<files>
+		<!--Net Standard-->
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\netstandard1.0\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\netstandard1.0\FFImageLoading.Svg.Platform.xml" />
 
 		<!--Core PCL-->
-        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Svg.Platform.dll" />
-        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-net45+win8+wpa81+wp8+netstandard1.0\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Svg.Platform.xml" />
  
 		<!--Xamarin.Android-->
 		<file src="FFImageLoading.Svg.Droid\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Svg.Platform.dll" />
@@ -61,9 +64,9 @@ SVG support for FFImageLoading library.
         <file src="FFImageLoading.Svg.Mac\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Platform.pdb" /> -->
  
 		<!--Windows UWP-->
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.dll" target="lib\uap10.0\FFImageLoading.Svg.Platform.dll" />
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.xml" target="lib\uap10.0\FFImageLoading.Svg.Platform.xml" />
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap10.0\FFImageLoading.Svg.Platform.pdb" />	
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.dll" target="lib\uap\FFImageLoading.Svg.Platform.dll" />
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.xml" target="lib\uap\FFImageLoading.Svg.Platform.xml" />
+		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap\FFImageLoading.Svg.Platform.pdb" />	
 
 	</files>
 	
