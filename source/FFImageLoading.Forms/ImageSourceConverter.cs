@@ -6,12 +6,12 @@ using System.Reflection;
 namespace FFImageLoading.Forms
 {
     [Preserve(AllMembers = true)]
-	public class ImageSourceConverter : TypeConverter
-	{
-		public override bool CanConvertFrom(Type sourceType)
-		{
-			return sourceType == typeof(string);
-		}
+    public class ImageSourceConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(Type sourceType)
+        {
+            return sourceType == typeof(string);
+        }
 
         public override object ConvertFromInvariantString(string value)
         {
@@ -43,6 +43,6 @@ namespace FFImageLoading.Forms
 
             throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
         }
-	}
+    }
 }
 

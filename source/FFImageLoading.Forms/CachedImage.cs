@@ -93,14 +93,24 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The source property.
         /// </summary>
-        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, propertyChanged: OnSourcePropertyChanged);
+        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, coerceValue: CoerceImageSource, propertyChanged: OnSourcePropertyChanged);
+
+        static object CoerceImageSource(BindableObject bindable, object newValue)
+        {
+            return ((CachedImage)bindable).CoerceImageSource(newValue);
+        }
 
         static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (newValue != null)
             {
-                BindableObject.SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
+                SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
             }
+        }
+
+        protected virtual ImageSource CoerceImageSource(object newValue)
+        {
+            return newValue as ImageSource;;
         }
 
         /// <summary>
@@ -416,7 +426,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The loading placeholder property.
         /// </summary>
-        public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create(nameof(LoadingPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource));
+        public static readonly BindableProperty LoadingPlaceholderProperty = BindableProperty.Create(nameof(LoadingPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource), coerceValue: CoerceImageSource);
 
         /// <summary>
         /// Gets or sets the loading placeholder image.
@@ -437,7 +447,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The error placeholder property.
         /// </summary>
-        public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create(nameof(ErrorPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource));
+        public static readonly BindableProperty ErrorPlaceholderProperty = BindableProperty.Create(nameof(ErrorPlaceholder), typeof(ImageSource), typeof(CachedImage), default(ImageSource), coerceValue: CoerceImageSource);
 
         /// <summary>
         /// Gets or sets the error placeholder image.
@@ -526,9 +536,9 @@ namespace FFImageLoading.Forms
         //
         protected override void OnBindingContextChanged()
         {
-            if (this.Source != null)
+            if (Source != null)
             {
-                BindableObject.SetInheritedBindingContext(Source, BindingContext);
+                SetInheritedBindingContext(Source, BindingContext);
             }
 
             base.OnBindingContextChanged();

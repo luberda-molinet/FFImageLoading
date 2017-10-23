@@ -9,10 +9,8 @@ namespace FFImageLoading.Svg.Forms
     /// SvgImageSourceConverter
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class SvgImageSourceConverter : TypeConverter, IValueConverter
+    public class SvgImageSourceConverter : FFImageLoading.Forms.ImageSourceConverter, IValueConverter
     {
-        FFImageLoading.Forms.ImageSourceConverter _imageSourceConverter = new FFImageLoading.Forms.ImageSourceConverter();
-
         /// <summary>
         /// Convert
         /// </summary>
@@ -54,7 +52,7 @@ namespace FFImageLoading.Svg.Forms
             if (string.IsNullOrWhiteSpace(text))
                 return null;
 
-            var xfSource = _imageSourceConverter.ConvertFromInvariantString(text) as ImageSource;
+            var xfSource = base.ConvertFromInvariantString(value) as ImageSource;
 
             if (text.IsSvgFileUrl() || text.IsSvgDataUrl())
             {
