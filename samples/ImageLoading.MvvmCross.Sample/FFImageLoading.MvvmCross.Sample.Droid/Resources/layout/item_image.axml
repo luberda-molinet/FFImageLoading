@@ -7,7 +7,7 @@
     <ffimageloading.cross.MvxCachedImageView
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        local:MvxBind="LoadingPlaceholderImagePath 'res:place.jpg'; ErrorPlaceholderImagePath 'res:place.jpg'; Transformations Transformations; DownSampleWidth DownSampleWidth; ImagePath Url" />
+        local:MvxBind="LoadingPlaceholderImagePath 'res:place.jpg'; ErrorPlaceholderImagePath 'res:place.jpg'; Transformations Transformations; DownsampleWidth DownsampleWidth; ImagePath Url" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

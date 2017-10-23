@@ -33,6 +33,7 @@ namespace FFImageLoading.MvvmCross.Sample.iOS
                     _imageControl.TransformPlaceholders = true;
 
                     var set = this.CreateBindingSet<CustomTableViewCell, Image>();
+                    set.Bind(_imageControl).For(v => v.DownsampleWidth).To(vm => vm.DownsampleWidth);
                     set.Bind(_imageControl).For(v => v.Transformations).To(vm => vm.Transformations);
                     set.Bind(_imageControl).For(v => v.ImagePath).To(vm => vm.Url);
                     set.Apply();
