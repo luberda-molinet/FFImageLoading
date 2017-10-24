@@ -20,8 +20,9 @@ namespace FFImageLoading
 
         public static bool IsDataUrl(this string str)
         {
-            return str.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-                      || str.StartsWith("<", StringComparison.OrdinalIgnoreCase);
+            return !string.IsNullOrWhiteSpace(str) && (
+                    str.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
+                    || str.StartsWith("<", StringComparison.OrdinalIgnoreCase));
         }
 
         public static bool IsSvgFileUrl(this string str)
@@ -32,9 +33,10 @@ namespace FFImageLoading
 
         public static bool IsSvgDataUrl(this string str)
         {
-            return str.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)
-                      || str.StartsWith("data:text", StringComparison.OrdinalIgnoreCase)
-                      || str.StartsWith("<", StringComparison.OrdinalIgnoreCase);
+            return !string.IsNullOrWhiteSpace(str) && (
+                    str.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)
+                    || str.StartsWith("data:text", StringComparison.OrdinalIgnoreCase)
+                    || str.StartsWith("<", StringComparison.OrdinalIgnoreCase));
         }
     }
 }
