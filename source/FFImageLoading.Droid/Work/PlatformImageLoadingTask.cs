@@ -289,12 +289,12 @@ namespace FFImageLoading
                     downsampleHeight = downsampleHeight.DpToPixels();
                 }
 
-                var gifDecoder = new GifDecoder(downsampleWidth, downsampleHeight, (bmp) =>
+                var gifDecoder = new PlatformGifHelper();
+
+                await gifDecoder.ReadGifAsync(imageData, Parameters, (bmp) =>
                 {
                     return PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bmp);
                 });
-
-                await gifDecoder.ReadGifAsync(imageData);
                 ThrowIfCancellationRequested();
                 var bitmap = gifDecoder.GetBitmap();
                 ThrowIfCancellationRequested();
@@ -312,7 +312,7 @@ namespace FFImageLoading
             {
                 SelfDisposingBitmapDrawable image = null;
 
-                if (imageInformation.Type == ImageInformation.ImageType.GIF && Configuration.AnimateGifs && GifDecoder.CheckIfAnimated(imageData))
+                if (imageInformation.Type == ImageInformation.ImageType.GIF && Configuration.AnimateGifs && GifHelper.CheckIfAnimated(imageData))
                 {
                     image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
                 }

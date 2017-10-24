@@ -1,23 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using Android.Graphics;
-
-/* Translated to C# from Java class https://code.google.com/archive/p/android-gifview/source/default/source/ */
 using System.IO;
 using System.Threading.Tasks;
-using System.Linq;
+using FFImageLoading.Work;
 
 namespace FFImageLoading.Helpers
 {
-    public class GifDecoder
+    public static class GifHelper
+    {
+        public static bool CheckIfAnimated(Stream st)
+        {
+            try
+            {
+                int headerCount = 0;
+                bool expectSecondPart = false;
+                int firstRead;
+                while ((firstRead = st.ReadByte()) >= 0)
+                {
+                    if (firstRead == 0x00)
+                    {
+                        var secondRead = st.ReadByte();
+                        if (!expectSecondPart && secondRead == 0x2C)
+                        {
+                            expectSecondPart = true;
+                        }
+                        else if (expectSecondPart && secondRead == 0x21 && st.ReadByte() == 0xF9)
+                        {
+                            headerCount++;
+                            expectSecondPart = false;
+                        }
+
+                        if (headerCount > 1)
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+            finally
+            {
+                st.Position = 0;
+            }
+        }
+    }
+
+    internal abstract class GifHelperBase<TBitmap>
     {
         object _lock = new object();
         const int STATUS_OK = 0;
         const int STATUS_FORMAT_ERROR = 1;
         const int STATUS_OPEN_ERROR = 2;
+        int status;
         const int MAX_STACK_SIZE = 4096;
         Stream input;
-        int status;
         int width;
         int height;
         bool gctFlag; // global color table used
@@ -35,7 +70,7 @@ namespace FFImageLoading.Helpers
         int lctSize; // local color table size
         int ix, iy, iw, ih; // current image rectangle
         int lrx, lry, lrw, lrh;
-        Bitmap image; // current frame
+        TBitmap image; // current frame
         int[] currentBitmap;
         int[] lastBitmap1; // previous frame
         byte[] block = new byte[256]; // current data block
@@ -45,28 +80,20 @@ namespace FFImageLoading.Helpers
         bool transparency = false; // use transparent color
         int delay = 0; // delay in milliseconds
         int transIndex; // transparent color index
-                                  // LZW decoder working arrays
+                        // LZW decoder working arrays
         short[] prefix;
         byte[] suffix;
         byte[] pixelStack;
         byte[] pixels;
-        IList<GifFrame> frames; // frames read from current file
+        IList<GifFrame> frames = new List<GifFrame>(); // frames read from current file
         int frameCount;
-        readonly Func<Bitmap, Task<Bitmap>> _decodingFunc;
-        readonly int _downsampleWidth;
-        readonly int _downsampleHeight;
+        Func<TBitmap, Task<TBitmap>> _decodingFunc;
+        int? _downsampleWidth;
+        int? _downsampleHeight;
+        bool _downsample;
 
-        public GifDecoder(int downsampleWidth, int downsampleHeight, Func<Bitmap, Task<Bitmap>> decodingFunc)
-        {
-            _downsampleHeight = downsampleHeight;
-            _downsampleWidth = downsampleWidth;
-            _decodingFunc = decodingFunc;
-            status = STATUS_OK;
-            frameCount = 0;
-            frames = new List<GifFrame>();
-            gct = null;
-            lct = null;
-        }
+        protected abstract int DipToPixels(int dips);
+        protected abstract Task<TBitmap> ToBitmapAsync(int[] data, int width, int height);
 
         public int GetDelay(int n)
         {
@@ -84,7 +111,7 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        public Bitmap GetBitmap()
+        public TBitmap GetBitmap()
         {
             lock (_lock)
             {
@@ -102,7 +129,7 @@ namespace FFImageLoading.Helpers
 
         protected async Task SetPixelsAsync()
         {
-            int[] dest = new int[width * height];
+            int[] result = new int[width * height];
 
             // fill in starting image contents based on last image's dispose code
             if (lastDispose > 0)
@@ -122,7 +149,7 @@ namespace FFImageLoading.Helpers
                 }
                 if (currentBitmap != null)
                 {
-                    dest = lastBitmap1;
+                    result = lastBitmap1;
 
                     // copy pixels
                     if (lastDispose == 2)
@@ -139,7 +166,7 @@ namespace FFImageLoading.Helpers
                             int n2 = n1 + lrw;
                             for (int k = n1; k < n2; k++)
                             {
-                                dest[k] = c;
+                                result[k] = c;
                             }
                         }
                     }
@@ -195,44 +222,34 @@ namespace FFImageLoading.Helpers
                         int c = act[index];
                         if (c != 0)
                         {
-                            dest[dx] = c;
+                            result[dx] = c;
                         }
                         dx++;
                     }
                 }
             }
 
-            bool downsample = false;
-            int downsampleWidth = width;
-            int downsampleHeight = height;
-
-            if (_downsampleWidth == 0 && _downsampleHeight != 0)
-            {
-                downsample = true;
-                downsampleWidth = (int)(((float)_downsampleHeight / height) * width);
-                downsampleHeight = _downsampleHeight;
-            }
-            else if (_downsampleHeight == 0 && _downsampleWidth != 0)
-            {
-                downsample = true;
-                downsampleWidth = _downsampleWidth;
-                downsampleHeight = (int)(((float)_downsampleWidth / width) * height);
-            }
-
-            var result = dest;
+            currentBitmap = result;
+            TBitmap bitmap;
 
             //TODO fix downsampling issue (part of image is cut)
-            downsample = false;
-            if (downsample)
+            _downsample = false;
+            if (_downsample)
             {
-                //if (downsampleWidth % 2 > 0)
-                //{
-                //    downsampleWidth--;
-                //}
-                //if (downsampleHeight % 2 > 0)
-                //{
-                //    downsampleHeight--;
-                //}
+                int downsampleWidth = width;
+                int downsampleHeight = height;
+
+                if (_downsampleWidth.Value == 0 && _downsampleHeight.Value != 0)
+                {
+                    downsampleWidth = (int)(((float)_downsampleHeight.Value / height) * width);
+                    downsampleHeight = _downsampleHeight.Value;
+                }
+                else if (_downsampleHeight.Value == 0 && _downsampleWidth.Value != 0)
+                {
+                    downsampleWidth = _downsampleWidth.Value;
+                    downsampleHeight = (int)(((float)_downsampleWidth.Value / width) * height);
+                }
+
 
                 //double inSampleSize = 1D;
 
@@ -271,41 +288,59 @@ namespace FFImageLoading.Helpers
                 //        }
                 //    }
                 //}
-                //else
-                //{
-                //    downsample = false;
-                //}
+                //bitmap = await ToBitmapAsync(result, _downsample ? downsampleWidth : width, _downsample ? downsampleHeight : height);
+                bitmap = await ToBitmapAsync(result, downsampleWidth, downsampleHeight);
+            }
+            else
+            {
+                bitmap = await ToBitmapAsync(result, width, height);
             }
 
-            currentBitmap = dest;
-            var bitmap = Bitmap.CreateBitmap(result, downsample ? downsampleWidth : width, downsample ? downsampleHeight : height, Bitmap.Config.Argb4444);
             image = await _decodingFunc.Invoke(bitmap).ConfigureAwait(false);
         }
 
-        public async Task<int> ReadGifAsync(Stream inputStream)
+        public async Task ReadGifAsync(Stream inputStream, TaskParameter parameters, Func<TBitmap, Task<TBitmap>> decodingFunc)
         {
+            var dip = parameters.DownSampleUseDipUnits;
+            _downsample = parameters.DownSampleSize != null;
+
+            if (_downsample)
+            {
+                _downsampleWidth = parameters.DownSampleSize.Item1;
+                _downsampleHeight = parameters.DownSampleSize.Item2;
+
+                if (dip)
+                {
+                    _downsampleWidth = DipToPixels(_downsampleWidth.Value);
+                    _downsampleHeight = DipToPixels(_downsampleHeight.Value);
+                }
+            }
+
+            _decodingFunc = decodingFunc;
+
             if (inputStream != null)
             {
                 input = inputStream;
                 await ReadHeaderAsync().ConfigureAwait(false);
-                if (!Err())
+                if (!Err)
                 {
                     await ReadContentsAsync().ConfigureAwait(false);
                     if (frameCount < 0)
                     {
-                        status = STATUS_FORMAT_ERROR;
+                        throw new Exception("GIF parsing error");
                     }
                 }
             }
             else
             {
-                status = STATUS_OPEN_ERROR;
+                throw new ArgumentNullException(nameof(inputStream));
             }
 
-            return status;
+            if (status != STATUS_OK)
+                throw new Exception("GIF parsing error");
         }
 
-        protected async Task DecodeBitmapDataAsync()
+        async Task DecodeBitmapDataAsync()
         {
             int nullCode = -1;
             int npix = iw * ih;
@@ -428,31 +463,20 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        public Bitmap GetFrame(int n)
+        public TBitmap GetFrame(int n)
         {
             lock (_lock)
             {
                 if (frameCount <= 0)
-                    return null;
+                    return default(TBitmap);
                 n = n % frameCount;
                 return frames[n].Image;
             }
         }
 
-        public bool ContainsBitmap(Bitmap bitmap)
-        {
-            lock (_lock)
-            {
-                return frames.Any(v => v.Image == bitmap);
-            }
-        }
+        bool Err => status != STATUS_OK;
 
-        protected bool Err()
-        {
-            return status != STATUS_OK;
-        }
-
-        protected int Read()
+        int Read()
         {
             int curByte = 0;
             try
@@ -466,7 +490,7 @@ namespace FFImageLoading.Helpers
             return curByte;
         }
 
-        protected async Task<int> ReadBlockAsync()
+        async Task<int> ReadBlockAsync()
         {
             blockSize = Read();
             int n = 0;
@@ -497,7 +521,7 @@ namespace FFImageLoading.Helpers
             return n;
         }
 
-        protected async Task<int[]> ReadColorTableAsync(int ncolors)
+        async Task<int[]> ReadColorTableAsync(int ncolors)
         {
             int nbytes = 3 * ncolors;
             int[] tab = null;
@@ -532,11 +556,11 @@ namespace FFImageLoading.Helpers
             return tab;
         }
 
-        protected async Task ReadContentsAsync()
+        async Task ReadContentsAsync()
         {
             // read GIF file content blocks
             bool done = false;
-            while (!(done || Err()))
+            while (!(done || Err))
             {
                 int code = Read();
                 switch (code)
@@ -558,7 +582,7 @@ namespace FFImageLoading.Helpers
                                 {
                                     app += (char)block[i];
                                 }
-                                if (app.Equals("NETSCAPE2.0", StringComparison.InvariantCultureIgnoreCase))
+                                if (app.Equals("NETSCAPE2.0", StringComparison.OrdinalIgnoreCase))
                                 {
                                     await ReadNetscapeExtAsync().ConfigureAwait(false);
                                 }
@@ -589,7 +613,7 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        protected void ReadGraphicControlExt()
+        void ReadGraphicControlExt()
         {
             Read(); // block size
             int packed = Read(); // packed fields
@@ -605,27 +629,27 @@ namespace FFImageLoading.Helpers
             Read(); // block terminator
         }
 
-        protected async Task ReadHeaderAsync()
+        async Task ReadHeaderAsync()
         {
             String id = "";
             for (int i = 0; i < 6; i++)
             {
                 id += (char)Read();
             }
-            if (!id.StartsWith("GIF", StringComparison.InvariantCultureIgnoreCase))
+            if (!id.StartsWith("GIF", StringComparison.OrdinalIgnoreCase))
             {
                 status = STATUS_FORMAT_ERROR;
                 return;
             }
             ReadLSD();
-            if (gctFlag && !Err())
+            if (gctFlag && !Err)
             {
                 gct = await ReadColorTableAsync(gctSize);
                 bgColor = gct[bgIndex];
             }
         }
 
-        protected async Task ReadBitmapAsync()
+        async Task ReadBitmapAsync()
         {
             ix = ReadShort(); // (sub)image position & size
             iy = ReadShort();
@@ -661,13 +685,13 @@ namespace FFImageLoading.Helpers
             {
                 status = STATUS_FORMAT_ERROR; // no color table defined
             }
-            if (Err())
+            if (Err)
             {
                 return;
             }
             await DecodeBitmapDataAsync().ConfigureAwait(false); // decode pixel data
             await SkipAsync().ConfigureAwait(false);
-            if (Err())
+            if (Err)
             {
                 return;
             }
@@ -676,7 +700,7 @@ namespace FFImageLoading.Helpers
             //image = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb4444);
             await SetPixelsAsync().ConfigureAwait(false); // transfer pixel data to image
             frames.Add(new GifFrame(image, delay)); // add image to frame
-                                                           // list
+                                                    // list
             if (transparency)
             {
                 act[transIndex] = save;
@@ -685,7 +709,7 @@ namespace FFImageLoading.Helpers
             ResetFrame();
         }
 
-        protected void ReadLSD()
+        void ReadLSD()
         {
             // logical screen size
             width = ReadShort();
@@ -701,7 +725,7 @@ namespace FFImageLoading.Helpers
             pixelAspect = Read(); // pixel aspect ratio
         }
 
-        protected async Task ReadNetscapeExtAsync()
+        async Task ReadNetscapeExtAsync()
         {
             do
             {
@@ -713,16 +737,16 @@ namespace FFImageLoading.Helpers
                     int b2 = ((int)block[2]) & 0xff;
                     loopCount = (b2 << 8) | b1;
                 }
-            } while ((blockSize > 0) && !Err());
+            } while ((blockSize > 0) && !Err);
         }
 
-        protected int ReadShort()
+        int ReadShort()
         {
             // read 16-bit value, LSB first
             return Read() | (Read() << 8);
         }
 
-        protected void ResetFrame()
+        void ResetFrame()
         {
             lastDispose = dispose;
             lrx = ix;
@@ -737,59 +761,24 @@ namespace FFImageLoading.Helpers
             lct = null;
         }
 
-        protected async Task SkipAsync()
+        async Task SkipAsync()
         {
             do
             {
                 await ReadBlockAsync().ConfigureAwait(false);
-            } while ((blockSize > 0) && !Err());
+            } while ((blockSize > 0) && !Err);
         }
 
-        class GifFrame
+        internal class GifFrame
         {
-            public GifFrame(Bitmap im, int del)
+            public GifFrame(TBitmap im, int del)
             {
                 Image = im;
                 Delay = del;
             }
 
-            public Bitmap Image;
+            public TBitmap Image;
             public int Delay;
-        }
-
-        public static bool CheckIfAnimated(Stream st)
-        {
-            try
-            {
-                int headerCount = 0;
-                bool expectSecondPart = false;
-                int firstRead;
-                while ((firstRead = st.ReadByte()) >= 0)
-                {
-                    if (firstRead == 0x00)
-                    {
-                        var secondRead = st.ReadByte();
-                        if (!expectSecondPart && secondRead == 0x2C)
-                        {
-                            expectSecondPart = true;
-                        }
-                        else if (expectSecondPart && secondRead == 0x21 && st.ReadByte() == 0xF9)
-                        {
-                            headerCount++;
-                            expectSecondPart = false;
-                        }
-
-                        if (headerCount > 1)
-                            return true;
-                    }
-                }
-
-                return false;
-            }
-            finally
-            {
-                st.Position = 0;
-            }
         }
     }
 }

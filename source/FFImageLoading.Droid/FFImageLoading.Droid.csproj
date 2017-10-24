@@ -105,13 +105,13 @@
     <Compile Include="Cache\LRUCache.cs" />
     <Compile Include="Cache\IByteSizeAware.cs" />
     <Compile Include="Cache\StrongCache.cs" />
-    <Compile Include="Helpers\GifDecoder.cs" />
     <Compile Include="Drawables\FFGifDrawable.cs" />
     <Compile Include="ImageService.cs" />
     <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
       <Link>Extensions\TaskParameterExtensions.cs</Link>
     </Compile>
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
+    <Compile Include="Helpers\PlatformGifHelper.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

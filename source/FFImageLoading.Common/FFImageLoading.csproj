@@ -128,6 +128,7 @@
     <Compile Include="ImageServiceBase.cs" />
     <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="Helpers\GifDecoderBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

@@ -79,7 +79,7 @@ namespace FFImageLoading.Views
                 try
                 {
                     token.ThrowIfCancellationRequested();
-                    var gifDecoder = gifDrawable.GifDecoder;
+                    var gifDecoder = gifDrawable.GifHelper;
                     int n = gifDecoder.GetFrameCount();
                     //int ntimes = gifDecoder.GetLoopCount();
                     //TODO DISABLED for endless loop
