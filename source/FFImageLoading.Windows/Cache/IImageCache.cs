@@ -2,7 +2,7 @@
 
 namespace FFImageLoading.Cache
 {
-    interface IImageCache : IMemoryCache<WriteableBitmap>
+    interface IImageCache : IMemoryCache<BitmapSource>
     {
     }
 }

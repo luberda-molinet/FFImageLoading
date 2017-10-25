@@ -46,17 +46,17 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public void Add(string key, ImageInformation imageInformation, WriteableBitmap bitmap)
+        public void Add(string key, ImageInformation imageInformation, BitmapSource bitmap)
         {
             if (string.IsNullOrWhiteSpace(key) || bitmap == null)
                 return;
 
-            _reusableBitmaps.TryAdd(key, new Tuple<WriteableBitmap, ImageInformation>(bitmap, imageInformation));
+            _reusableBitmaps.TryAdd(key, new Tuple<BitmapSource, ImageInformation>(bitmap, imageInformation));
         }
 
 		public ImageInformation GetInfo(string key)
 		{
-			Tuple<WriteableBitmap, ImageInformation> cacheEntry;
+			Tuple<BitmapSource, ImageInformation> cacheEntry;
 			if (_reusableBitmaps.TryGetValue (key, out cacheEntry))
 			{
 				return cacheEntry.Item2;
@@ -65,16 +65,16 @@ namespace FFImageLoading.Cache
 			return null;
 		}
 
-        public Tuple<WriteableBitmap, ImageInformation> Get(string key)
+        public Tuple<BitmapSource, ImageInformation> Get(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            Tuple<WriteableBitmap, ImageInformation> cacheEntry;
+            Tuple<BitmapSource, ImageInformation> cacheEntry;
 
             if (_reusableBitmaps.TryGetValue(key, out cacheEntry) && cacheEntry.Item1 != null)
             {
-                return new Tuple<WriteableBitmap, ImageInformation>(cacheEntry.Item1, cacheEntry.Item2);
+                return new Tuple<BitmapSource, ImageInformation>(cacheEntry.Item1, cacheEntry.Item2);
             }
 
             return null;
