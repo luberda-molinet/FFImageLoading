@@ -17,7 +17,7 @@ namespace FFImageLoading.Cache
     {
         private static IImageCache _instance;
         private readonly WriteableBitmapLRUCache _reusableBitmaps;
-		private readonly IMiniLogger _logger;
+        private readonly IMiniLogger _logger;
 
         private ImageCache(int maxCacheSize, IMiniLogger logger)
         {
@@ -54,16 +54,16 @@ namespace FFImageLoading.Cache
             _reusableBitmaps.TryAdd(key, new Tuple<BitmapSource, ImageInformation>(bitmap, imageInformation));
         }
 
-		public ImageInformation GetInfo(string key)
-		{
-			Tuple<BitmapSource, ImageInformation> cacheEntry;
-			if (_reusableBitmaps.TryGetValue (key, out cacheEntry))
-			{
-				return cacheEntry.Item2;
-			}
+        public ImageInformation GetInfo(string key)
+        {
+            Tuple<BitmapSource, ImageInformation> cacheEntry;
+            if (_reusableBitmaps.TryGetValue (key, out cacheEntry))
+            {
+                return cacheEntry.Item2;
+            }
 
-			return null;
-		}
+            return null;
+        }
 
         public Tuple<BitmapSource, ImageInformation> Get(string key)
         {
@@ -96,12 +96,12 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
+            _logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
             _reusableBitmaps.Remove(key);
         }
 
-		public void RemoveSimilar(string baseKey)
-		{
+        public void RemoveSimilar(string baseKey)
+        {
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
 
@@ -112,6 +112,6 @@ namespace FFImageLoading.Cache
             {
                 Remove(key);
             }
-		}
+        }
     }
 }
