@@ -274,21 +274,6 @@ namespace FFImageLoading
 
             try
             {
-                int downsampleWidth = 0;
-                int downsampleHeight = 0;
-
-                if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
-                {
-                    downsampleWidth = Parameters.DownSampleSize.Item1;
-                    downsampleHeight = Parameters.DownSampleSize.Item2;
-                }
-
-                if (Parameters.DownSampleUseDipUnits)
-                {
-                    downsampleWidth = downsampleWidth.DpToPixels();
-                    downsampleHeight = downsampleHeight.DpToPixels();
-                }
-
                 var gifDecoder = new PlatformGifHelper();
 
                 await gifDecoder.ReadGifAsync(imageData, Parameters, (bmp) =>
