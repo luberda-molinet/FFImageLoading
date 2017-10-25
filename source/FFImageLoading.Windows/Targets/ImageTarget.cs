@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Targets
 {
-    public class ImageTarget : Target<WriteableBitmap, Image>
+    public class ImageTarget : Target<BitmapSource, Image>
     {
         private readonly WeakReference<Image> _controlWeakReference;
 
@@ -37,7 +37,7 @@ namespace FFImageLoading.Targets
             control.Source = null;
         }
 
-        public override void Set(IImageLoaderTask task, WriteableBitmap image, bool animated)
+        public override void Set(IImageLoaderTask task, BitmapSource image, bool animated)
         {
             if (task.IsCancelled)
                 return;

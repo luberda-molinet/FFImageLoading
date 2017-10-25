@@ -8,13 +8,13 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Cache
 {
-    public class WriteableBitmapLRUCache : LRUCache<string, Tuple<WriteableBitmap, ImageInformation>>
+    public class WriteableBitmapLRUCache : LRUCache<string, Tuple<BitmapSource, ImageInformation>>
     {
         public WriteableBitmapLRUCache(int capacity) : base(capacity)
         {
         }
 
-        public override int GetValueSize(Tuple<WriteableBitmap, ImageInformation> value)
+        public override int GetValueSize(Tuple<BitmapSource, ImageInformation> value)
         {
             if (value?.Item2 == null)
                 return 0;

@@ -14,7 +14,7 @@ namespace FFImageLoading
     /// FFImageLoading by Daniel Luberda
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class ImageService : ImageServiceBase<WriteableBitmap>
+    public class ImageService : ImageServiceBase<BitmapSource>
     {
         static IImageService _instance;
 
@@ -41,7 +41,7 @@ namespace FFImageLoading
             configuration.ExecuteCallbacksOnUIThread = true;
         }
 
-        protected override IMemoryCache<WriteableBitmap> MemoryCache => ImageCache.Instance;
+        protected override IMemoryCache<BitmapSource> MemoryCache => ImageCache.Instance;
         protected override IMD5Helper CreatePlatformMD5HelperInstance() => new MD5Helper();
         protected override IMiniLogger CreatePlatformLoggerInstance() => new MiniLogger();
         protected override IPlatformPerformance CreatePlatformPerformanceInstance() => new PlatformPerformance();
@@ -71,7 +71,7 @@ namespace FFImageLoading
             return new SimpleDiskCache(rootFolder, folderName, Config);
         }
 
-        internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
+        internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
         {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, Instance);
         }

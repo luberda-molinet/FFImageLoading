@@ -120,7 +120,7 @@ namespace FFImageLoading
                 .Finish(scheduledWork =>
                 {
                     finishCallback?.Invoke(scheduledWork);
-                    tcs.TrySetResult(target.Bitmap);
+                    tcs.TrySetResult(target.BitmapSource as WriteableBitmap);
                 });
 
             if (parameters.Source != Work.ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
