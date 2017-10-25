@@ -33,7 +33,7 @@ namespace FFImageLoading.Svg.Forms
             {
                 if (fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new SvgImageSource(fileSource, 0, 0, true, ReplaceStringMap);
+                    return new SvgImageSource(new DataUrlImageSource(fileSource.File), 0, 0, true, ReplaceStringMap);
                 }
                 else if (fileSource.File.IsSvgFileUrl())
                 {
