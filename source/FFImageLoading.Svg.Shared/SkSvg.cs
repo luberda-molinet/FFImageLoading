@@ -859,8 +859,7 @@ namespace FFImageLoading.Svg.Platform
                 }
                 else
                 {
-                    if (fillPaint == null)
-                        fillPaint = CreatePaint();
+                    fillPaint = CreatePaint();
 
                     SKColor color;
                     if (ColorHelper.TryParse(fill, out color))
