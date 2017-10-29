@@ -31,6 +31,10 @@ namespace FFImageLoading.Forms.Droid
         /// </summary>
         public static void Init()
         {
+#pragma warning disable 0219
+            var ignore1 = typeof(CachedImageRenderer);
+            var ignore2 = typeof(CachedImage);
+#pragma warning restore 0219
         }
 
         bool _isDisposed;
