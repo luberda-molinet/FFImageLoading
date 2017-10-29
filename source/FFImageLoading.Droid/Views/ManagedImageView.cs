@@ -100,7 +100,7 @@ namespace FFImageLoading.Views
                             }
 
                             token.ThrowIfCancellationRequested();
-                            await Task.Delay(t, token).ConfigureAwait(false);
+                            await Delay.DelayAsync(t - 2);
                         }
                         if (ntimes != 0)
                         {
