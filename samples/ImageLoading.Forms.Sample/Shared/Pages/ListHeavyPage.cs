@@ -6,132 +6,132 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	public class ListHeavyPage : ContentPage, IBasePage<ListHeavyPageModel>
-	{
-		public ListHeavyPage()
-		{
-			Title = "HeavyList Demo";
+    public class ListHeavyPage : ContentPage, IBasePage<ListHeavyPageModel>
+    {
+        public ListHeavyPage()
+        {
+            Title = "HeavyList Demo";
 
-			var listView = new ListView(ListViewCachingStrategy.RecycleElement)
-			{
-				ItemTemplate = new DataTemplate(typeof(ListHeavyCell)),
-				HasUnevenRows = false,
-				RowHeight = 110,
-			};
-			listView.SetBinding<ListHeavyPageModel>(ListView.ItemsSourceProperty, v => v.Items);
+            var listView = new ListView(ListViewCachingStrategy.RecycleElement)
+            {
+                ItemTemplate = new DataTemplate(typeof(ListHeavyCell)),
+                HasUnevenRows = false,
+                RowHeight = 110,
+            };
+            listView.SetBinding<ListHeavyPageModel>(ListView.ItemsSourceProperty, v => v.Items);
 
-			listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
+            listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
-			Content = listView;
-		}
+            Content = listView;
+        }
 
-		class ListHeavyCell : ViewCell
-		{
-			readonly CachedImage image1 = null;
-			readonly CachedImage image2 = null;
-			readonly CachedImage image3 = null;
-			readonly CachedImage image4 = null;
+        class ListHeavyCell : ViewCell
+        {
+            readonly CachedImage image1 = null;
+            readonly CachedImage image2 = null;
+            readonly CachedImage image3 = null;
+            readonly CachedImage image4 = null;
 
 
-			public ListHeavyCell()
-			{
-				image1 = new CachedImage()
-				{
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					HeightRequest = 100,
-					DownsampleToViewSize = true,
-					Aspect = Aspect.AspectFill,
-					TransformPlaceholders = false,
-					LoadingPlaceholder = "loading.png",
-					ErrorPlaceholder = "error.png",
-				};
+            public ListHeavyCell()
+            {
+                image1 = new CachedImage()
+                {
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    HeightRequest = 100,
+                    DownsampleToViewSize = true,
+                    Aspect = Aspect.AspectFill,
+                    TransformPlaceholders = false,
+                    LoadingPlaceholder = "loading.png",
+                    ErrorPlaceholder = "error.png",
+                };
 
-				image2 = new CachedImage()
-				{
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					HeightRequest = 100,
-					DownsampleToViewSize = true,
-					Aspect = Aspect.AspectFill,
-					TransformPlaceholders = false,
-					LoadingPlaceholder = "loading.png",
-					ErrorPlaceholder = "error.png",
-				};
+                image2 = new CachedImage()
+                {
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    HeightRequest = 100,
+                    DownsampleToViewSize = true,
+                    Aspect = Aspect.AspectFill,
+                    TransformPlaceholders = false,
+                    LoadingPlaceholder = "loading.png",
+                    ErrorPlaceholder = "error.png",
+                };
 
-				image3 = new CachedImage()
-				{
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					HeightRequest = 100,
-					DownsampleToViewSize = true,
-					Aspect = Aspect.AspectFill,
-					TransformPlaceholders = true,
-					LoadingPlaceholder = "loading.png",
-					ErrorPlaceholder = "error.png",
-					Transformations = new List<Work.ITransformation>() {
-						new CornersTransformation(50, CornerTransformType.RightRounded)
-					}
-				};
+                image3 = new CachedImage()
+                {
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    HeightRequest = 100,
+                    DownsampleToViewSize = true,
+                    Aspect = Aspect.AspectFill,
+                    TransformPlaceholders = true,
+                    LoadingPlaceholder = "loading.png",
+                    ErrorPlaceholder = "error.png",
+                    Transformations = new List<Work.ITransformation>() {
+                        new CornersTransformation(50, CornerTransformType.RightRounded)
+                    }
+                };
 
-				image4 = new CachedImage()
-				{
-					HorizontalOptions = LayoutOptions.FillAndExpand,
-					HeightRequest = 100,
-					DownsampleToViewSize = true,
-					Aspect = Aspect.AspectFill,
-					TransformPlaceholders = true,
-					LoadingPlaceholder = "loading.png",
-					ErrorPlaceholder = "error.png",
-					Transformations = new List<Work.ITransformation>() {
-						new GrayscaleTransformation()
-					}
-				};
+                image4 = new CachedImage()
+                {
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    HeightRequest = 100,
+                    DownsampleToViewSize = true,
+                    Aspect = Aspect.AspectFill,
+                    TransformPlaceholders = true,
+                    LoadingPlaceholder = "loading.png",
+                    ErrorPlaceholder = "error.png",
+                    Transformations = new List<Work.ITransformation>() {
+                        new GrayscaleTransformation()
+                    }
+                };
 
-				var root = new AbsoluteLayout()
-				{
-					Padding = 5,
-				};
+                var root = new AbsoluteLayout()
+                {
+                    Padding = 5,
+                };
 
-				AbsoluteLayout.SetLayoutFlags(image1, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds(image1, new Rectangle(0d, 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image1, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image1, new Rectangle(0d, 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags(image2, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds(image2, new Rectangle(0.25d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image2, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image2, new Rectangle(0.25d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags(image3, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds(image3, new Rectangle(0.50d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image3, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image3, new Rectangle(0.50d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				AbsoluteLayout.SetLayoutFlags(image4, AbsoluteLayoutFlags.All);
-				AbsoluteLayout.SetLayoutBounds(image4, new Rectangle(0.75d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutFlags(image4, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(image4, new Rectangle(0.75d / (1d - 0.25d), 0d, 0.25d, 1d));
 
-				root.Children.Add(image1);
-				root.Children.Add(image2);
-				root.Children.Add(image3);
-				root.Children.Add(image4);
+                root.Children.Add(image1);
+                root.Children.Add(image2);
+                root.Children.Add(image3);
+                root.Children.Add(image4);
 
-				View = root;
-			}
+                View = root;
+            }
 
-			protected override void OnBindingContextChanged()
-			{
-				base.OnBindingContextChanged();
+            protected override void OnBindingContextChanged()
+            {
+                base.OnBindingContextChanged();
 
-				var item = BindingContext as ListHeavyPageModel.ListHeavyItem;
+                var item = BindingContext as ListHeavyPageModel.ListHeavyItem;
 
-				if (item == null)
-				{
-					image1.Source = null;
-					image2.Source = null;
-					image3.Source = null;
-					image4.Source = null;
-				}
-				else
-				{
-					image1.Source = item.Image1Url;
-					image2.Source = item.Image2Url;
-					image3.Source = item.Image3Url;
-					image4.Source = item.Image4Url;
-				}
-			}
-		}
-	}
+                if (item == null)
+                {
+                    image1.Source = null;
+                    image2.Source = null;
+                    image3.Source = null;
+                    image4.Source = null;
+                }
+                else
+                {
+                    image1.Source = item.Image1Url;
+                    image2.Source = item.Image2Url;
+                    image3.Source = item.Image3Url;
+                    image4.Source = item.Image4Url;
+                }
+            }
+        }
+    }
 }
 
