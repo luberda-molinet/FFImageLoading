@@ -17,7 +17,7 @@ using FFImageLoading.Views;
 using Android.Views;
 using System.Reflection;
 
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+//[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Droid
 {
     /// <summary>
@@ -29,12 +29,25 @@ namespace FFImageLoading.Forms.Droid
         /// <summary>
         ///   Used for registration with dependency service
         /// </summary>
-        public static void Init()
+        public static void Init(bool enableFastRenderer)
         {
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
+
+            RegisterRenderer(typeof(CachedImage), enableFastRenderer ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
+        }
+
+        static void RegisterRenderer(Type type, Type renderer)
+        {
+            var assembly = typeof(Xamarin.Forms.Image).Assembly;
+            Type registrarType = assembly.GetType("Xamarin.Forms.Internals.Registrar") ?? assembly.GetType("Xamarin.Forms.Registrar");
+            var registrarProperty = registrarType.GetProperty("Registered", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+
+            var registrar = registrarProperty.GetValue(registrarType, null);
+            var registerMethod = registrar.GetType().GetRuntimeMethod("Register", new[] { typeof(Type), typeof(Type) });
+            registerMethod.Invoke(registrar, new[] { type, renderer });
         }
 
         bool _isDisposed;

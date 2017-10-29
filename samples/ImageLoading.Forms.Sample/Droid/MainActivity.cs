@@ -23,7 +23,7 @@ namespace FFImageLoading.Forms.Sample.Droid
 
             base.OnCreate(bundle);
 
-            CachedImageRenderer.Init();
+            CachedImageRenderer.Init(enableFastRenderer: true);
 
             var config = new FFImageLoading.Config.Configuration()
             {

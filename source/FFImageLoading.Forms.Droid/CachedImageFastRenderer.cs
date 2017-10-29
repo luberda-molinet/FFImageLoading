@@ -25,13 +25,14 @@ namespace FFImageLoading.Forms.Droid
     /// CachedImage Implementation
     /// </summary>
     [Preserve(AllMembers = true)]
-    internal class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
+    public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
+        static Type _elementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
         bool _isDisposed;
         CachedImage _element;
         int? _defaultLabelFor;
         VisualElementTracker _visualElementTracker;
-        IVisualElementRenderer _visualElementRenderer;
+        IDisposable _visualElementRenderer;
         IScheduledWork _currentTask;
         ImageSourceBinding _lastImageSource;
         readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
@@ -89,7 +90,7 @@ namespace FFImageLoading.Forms.Droid
         {
             this.EnsureId();
 
-            // TODO 
+            // TODO Xamarin-Internal class - Is it necessary? 
             // ElevationHelper.SetElevation(this, e.NewElement);
             ElementChanged?.Invoke(this, new VisualElementChangedEventArgs(e.OldElement, e.NewElement));
 
@@ -160,14 +161,13 @@ namespace FFImageLoading.Forms.Droid
 
             if (_visualElementRenderer == null)
             {
-                // TODO
-                //_visualElementRenderer = new VisualElementRenderer(this);
+                _visualElementRenderer = (IDisposable)Activator.CreateInstance(_elementRendererType, this);
             }
 
             _motionEventHelper.UpdateElement(element);
             OnElementChanged(new ElementChangedEventArgs<CachedImage>(oldElement, _element));
 
-            // TODO
+            // TODO Xamarin-Internal class - Is it necessary? 
             // _element?.SendViewInitialized(Control);
         }
 
