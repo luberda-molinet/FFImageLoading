@@ -15,7 +15,13 @@ namespace FFImageLoading.Helpers
             if (miliseconds >= 60)
                 return Task.Delay(miliseconds);
 
-            return Task.Factory.StartNew(() => { new System.Threading.ManualResetEventSlim(false).Wait(miliseconds); }, TaskCreationOptions.PreferFairness);
+            return Task.Factory.StartNew(() => 
+            {
+                using (var mres = new System.Threading.ManualResetEventSlim(false))
+                {
+                    mres.Wait(miliseconds);
+                }
+            }, TaskCreationOptions.PreferFairness);
         }
     }
 }
