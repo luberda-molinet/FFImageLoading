@@ -5,6 +5,7 @@ using FFImageLoading.Config;
 
 namespace FFImageLoading.Cache
 {
+    [Preserve(AllMembers = true)]
 	public interface IDownloadCache
 	{
         Task<CacheStream> DownloadAndCacheIfNeededAsync (string url, TaskParameter parameters, Configuration configuration, CancellationToken token);

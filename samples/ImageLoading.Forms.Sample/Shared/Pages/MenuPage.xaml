@@ -6,21 +6,21 @@
 		Title="FFImageLoading">
 	<ContentPage.Content>
 
-		<ListView HasUnevenRows="true" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="true" 
+		<ListView HasUnevenRows="true" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="true"
 				SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
-			
+
 			<ListView.Behaviors>
 				<xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
 			</ListView.Behaviors>
-			
+
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<TextCell TextColor="Black" DetailColor="Gray"
 						Text="{Binding Title}" Detail="{Binding Details}" Command="{Binding Command}"/>
 				</DataTemplate>
 			</ListView.ItemTemplate>
-			
+
 		</ListView>
-		
+
 	</ContentPage.Content>
 </ContentPage>

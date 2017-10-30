@@ -57,7 +57,7 @@ namespace Simple.WinPhoneSL.Sample
 
         }
 
-        // Code to execute when a contract activation such as a file open or save picker returns 
+        // Code to execute when a contract activation such as a file open or save picker returns
         // with the picked file or other return values
         private void Application_ContractActivated(object sender, Windows.ApplicationModel.Activation.IActivatedEventArgs e)
         {

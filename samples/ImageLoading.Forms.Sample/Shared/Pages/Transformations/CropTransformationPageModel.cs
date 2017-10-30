@@ -7,7 +7,7 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
+	
 	public class CropTransformationPageModel : BasePageModel
 	{
 		double mX = 0f;

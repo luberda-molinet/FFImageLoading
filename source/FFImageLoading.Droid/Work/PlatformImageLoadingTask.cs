@@ -11,6 +11,7 @@ using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
+using FFImageLoading.Views;
 
 namespace FFImageLoading
 {
@@ -18,8 +19,7 @@ namespace FFImageLoading
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
-        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
-            : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, true)
+        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
         }
 
@@ -33,6 +33,9 @@ namespace FFImageLoading
 
         protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
+            if (Target == null)
+                return;
+
             ThrowIfCancellationRequested();
 
             var ffDrawable = image as FFBitmapDrawable;
@@ -51,7 +54,16 @@ namespace FFImageLoading
                 if (animated)
                 {
                     SelfDisposingBitmapDrawable placeholderDrawable = null;
-                    if (PlaceholderWeakReference != null && PlaceholderWeakReference.TryGetTarget(out placeholderDrawable) && placeholderDrawable != null)
+                    PlaceholderWeakReference?.TryGetTarget(out placeholderDrawable);
+
+                    if (placeholderDrawable == null)
+                    {
+                        // Enable fade animation when no placeholder is set and the previous image is not null
+                        var imageView = PlatformTarget.Control as ImageViewAsync;
+                        placeholderDrawable = imageView?.Drawable as SelfDisposingBitmapDrawable;
+                    }
+
+                    if (placeholderDrawable.IsValidAndHasValidBitmap())
                     {
                         int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
                             Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
@@ -88,7 +100,7 @@ namespace FFImageLoading
             image?.SetIsRetained(false);
         }
 
-        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        async Task<Bitmap> PlatformGenerateBitmapAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder, BitmapFactory.Options options = null)
         {
             Bitmap bitmap = null;
 
@@ -97,15 +109,17 @@ namespace FFImageLoading
 
             ThrowIfCancellationRequested();
 
-            // First decode with inJustDecodeBounds=true to check dimensions
-            var options = new BitmapFactory.Options
-            {
-                InJustDecodeBounds = true
-            };
-
             try
             {
-                await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+                if (options == null)
+                {
+                    // First decode with inJustDecodeBounds=true to check dimensions
+                    options = new BitmapFactory.Options
+                    {
+                        InJustDecodeBounds = true,
+                    };
+                    await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+                }
 
                 ThrowIfCancellationRequested();
 
@@ -127,7 +141,14 @@ namespace FFImageLoading
                 int exifRotation = 0;
                 if (source == ImageSource.Filepath)
                 {
-                    exifRotation = path.GetExifRotationDegrees();
+                    try
+                    {
+                        exifRotation = path.GetExifRotationDegrees();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Reading EXIF orientation failed", ex);
+                    }
                 }
 
                 ThrowIfCancellationRequested();
@@ -152,7 +173,7 @@ namespace FFImageLoading
                         downsampleHeight = downsampleHeight.DpToPixels();
                     }
 
-                    options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight);
+                    options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight, Parameters.AllowUpscale ?? Configuration.AllowUpscale);
 
                     if (options.InSampleSize > 1)
                         imageInformation.SetCurrentSize(
@@ -164,21 +185,9 @@ namespace FFImageLoading
                         AddInBitmapOptions(options);
                 }
 
-                ThrowIfCancellationRequested();
-
-                if (!imageData.CanSeek || imageData.Position != 0)
+                if (imageData.Position != 0)
                 {
-                    if (imageData.CanSeek)
-                    {
-                        imageData.Position = 0;
-                    }
-                    else
-                    {
-                        var resolver = DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
-                        var resolved = await resolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
-                        imageData?.Dispose();
-                        imageData = resolved.Item1;
-                    }
+                    imageData.Position = 0;
                 }
 
                 ThrowIfCancellationRequested();
@@ -187,16 +196,24 @@ namespace FFImageLoading
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
 
             ThrowIfCancellationRequested();
 
+            bitmap = await PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bitmap);
+
+            return bitmap;
+        }
+
+        async Task<Bitmap> PlatformTransformAsync(string path, ImageSource source, bool enableTransformations, bool isPlaceholder, Bitmap bitmap)
+        {
             if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
                 var transformations = Parameters.Transformations.ToList();
 
-                await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                ThrowIfCancellationRequested();
 
                 try
                 {
@@ -208,7 +225,7 @@ namespace FFImageLoading
 
                         try
                         {
-                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap));
+                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
                             bitmap = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)
@@ -222,7 +239,7 @@ namespace FFImageLoading
                             if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
                             {
                                 old?.Recycle();
-                                old?.Dispose();
+                                old.TryDispose();
                             }
                         }
                     }
@@ -233,6 +250,13 @@ namespace FFImageLoading
                 }
             }
 
+            return bitmap;
+        }
+
+        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            var bitmap = await PlatformGenerateBitmapAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+
             if (isPlaceholder)
             {
                 return new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
@@ -241,11 +265,53 @@ namespace FFImageLoading
             return new FFBitmapDrawable(Context.Resources, bitmap);
         }
 
-        protected override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        async Task<FFGifDrawable> PlatformGenerateGifImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            if (imageData == null)
+                throw new ArgumentNullException(nameof(imageData));
+
+            ThrowIfCancellationRequested();
+
+            try
+            {
+                var gifDecoder = new PlatformGifHelper();
+
+                await gifDecoder.ReadGifAsync(imageData, Parameters, (bmp) =>
+                {
+                    return PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bmp);
+                });
+                ThrowIfCancellationRequested();
+                var bitmap = gifDecoder.GetBitmap();
+                ThrowIfCancellationRequested();
+                return new FFGifDrawable(Context.Resources, bitmap, gifDecoder);
+            }
+            finally
+            {
+                imageData.TryDispose();
+            }
+        }
+
+        protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             try
             {
-                return PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                SelfDisposingBitmapDrawable image = null;
+
+                if (imageInformation.Type == ImageInformation.ImageType.GIF && Configuration.AnimateGifs && GifHelper.CheckIfAnimated(imageData))
+                {
+                    image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                }
+                else
+                {
+                    image = await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
+                }
+
+                if (image == null || !image.HasValidBitmap)
+                {
+                    throw new BadImageFormatException("Bad image format");
+                }
+
+                return image;
             }
             catch (Exception ex)
             {
@@ -266,8 +332,9 @@ namespace FFImageLoading
         /// <param name="options"></param>
         /// <param name="reqWidth"></param>
         /// <param name="reqHeight"></param>
+        /// <param name="allowUpscale"></param>
         /// <returns></returns>
-        int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight)
+        public static int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight, bool allowUpscale)
         {
             // Raw height and width of image
             float height = options.OutHeight;
@@ -281,7 +348,7 @@ namespace FFImageLoading
 
             double inSampleSize = 1D;
 
-            if (height > reqHeight || width > reqWidth)
+            if (height > reqHeight || width > reqWidth || allowUpscale)
             {
                 int halfHeight = (int)(height / 2);
                 int halfWidth = (int)(width / 2);

@@ -48,7 +48,7 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <param name="logger">Logger for debug messages</param>
         /// <param name="highWatermark">Maximum number of bytes the reuse pool will hold before starting evictions.
-        /// <param name="lowWatermark">Number of bytes the reuse pool will be drained down to after the high watermark is exceeded.</param> 
+        /// <param name="lowWatermark">Number of bytes the reuse pool will be drained down to after the high watermark is exceeded.</param>
         public ReuseBitmapDrawableCache(IMiniLogger logger, int highWatermark, int lowWatermark, bool verboseLogging = false)
         {
             _verboseLogging = verboseLogging;
@@ -147,7 +147,7 @@ namespace FFImageLoading.Cache
                       width += 1;
 
                     if (height % 2 != 0)
-                      height += 1; 
+                      height += 1;
                 }
 
                 int byteCount = width * height * GetBytesPerPixel(candidate.GetConfig());
@@ -194,7 +194,7 @@ namespace FFImageLoading.Cache
                 current_cache_byte_count += byteCount * (decrement ? -1 : 1);
 
                 // DISABLED - performance is better without it
-                //if (causedByEviction) 
+                //if (causedByEviction)
                 //{
                 //	current_evicted_byte_count += byteCount;
                 //	// Kick the gc if we've accrued more than our desired threshold.
@@ -219,7 +219,7 @@ namespace FFImageLoading.Cache
             ProcessRemoval(e.Value, e.Evicted);
 
             if (_verboseLogging && e.Evicted)
-                log?.Debug("[MEMORY_CACHE] Evicted image from reuse pool " + e.Key);                        
+                log?.Debug("[MEMORY_CACHE] Evicted image from reuse pool " + e.Key);
         }
 
         void ProcessRemoval(TValue value, bool evicted)

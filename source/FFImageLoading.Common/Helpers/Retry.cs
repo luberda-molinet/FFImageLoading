@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading
 {
+    [Preserve(AllMembers = true)]
     public static class Retry
     {
         public static async Task<T> DoAsync<T>(Func<Task<T>> action, TimeSpan retryInterval, int retryCount, Action onRetry = null)

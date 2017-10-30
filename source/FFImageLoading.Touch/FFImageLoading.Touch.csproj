@@ -12,7 +12,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -30,6 +31,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>		
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <Optimize>true</Optimize>
@@ -44,6 +47,7 @@
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -58,38 +62,25 @@
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Net.Http" />
     <Reference Include="WebP.Touch">
-      <HintPath>..\..\packages\WebP.Touch.1.0.2\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
+      <HintPath>..\..\packages\WebP.Touch.1.0.4\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Targets\" />
-    <Folder Include="DataResolvers\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Cache\ImageCache.cs" />
-    <Compile Include="Extensions\UIImageExtensions.cs" />
-    <Compile Include="Work\PlatformImageLoaderTask.cs" />
-    <Compile Include="TaskParameterExtensions.cs" />
-    <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Transformations\TransformationBase.cs" />
-    <Compile Include="Extensions\UnitsExtensions.cs" />
-    <Compile Include="Helpers\MainThreadDispatcher.cs" />
-    <Compile Include="Helpers\ScaleHelper.cs" />
-    <Compile Include="Extensions\NSDataExtensions.cs" />
-    <Compile Include="Helpers\PlatformPerformance.cs" />
-    <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Targets\UIBarItemTarget.cs" />
     <Compile Include="Targets\UIButtonTarget.cs" />
-    <Compile Include="Targets\UIControlTarget.cs" />
-    <Compile Include="Targets\UIImageViewTarget.cs" />
-    <Compile Include="Targets\UIImageTarget.cs" />
-    <Compile Include="DataResolvers\BundleDataResolver.cs" />
-    <Compile Include="DataResolvers\DataResolverFactory.cs" />
-    <Compile Include="DataResolvers\FileDataResolver.cs" />
-    <Compile Include="DataResolvers\UrlDataResolver.cs" />
-    <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="Helpers\GifHelper.cs" />
+    <Compile Include="ImageService.cs" />
+    <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
+      <Link>Extensions\TaskParameterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
   </ItemGroup>
+  <Import Project="..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems')" />
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
@@ -97,8 +88,8 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy FileWidth="80" TabWidth="4" TabsToSpaces="True" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="80" TabsToSpaces="True" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="True" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>

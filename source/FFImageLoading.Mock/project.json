@@ -1,0 +1,9 @@
+﻿{
+  "dependencies": {
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "NETStandard.Library": "2.0.0"
+  },
+  "frameworks": {
+    "netstandard1.1": {}
+  }
+}

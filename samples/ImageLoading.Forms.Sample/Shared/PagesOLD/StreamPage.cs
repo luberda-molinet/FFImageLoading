@@ -37,7 +37,7 @@ namespace FFImageLoading.Forms.Sample.Pages
 					cachedImage.Source = streamSource;
 
 				})
-					
+
 			};
 
 			Content =  new StackLayout() {

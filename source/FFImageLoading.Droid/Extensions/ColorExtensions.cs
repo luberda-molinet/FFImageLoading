@@ -13,17 +13,10 @@ namespace FFImageLoading
             if (!hexColor.StartsWith("#", StringComparison.Ordinal))
                 hexColor = hexColor.Insert(0, "#");
 
-            Color color = Color.Transparent;
+            if (hexColor.Length != 4 && hexColor.Length != 5 && hexColor.Length != 7 && hexColor.Length != 9)
+                 throw new FormatException(string.Format("The {0} string is not a recognized HexColor format.", hexColor));
 
-            try
-            {
-                color = Color.ParseColor(hexColor);
-            }
-            catch (Exception)
-            {
-            }
-
-            return color;
+            return Color.ParseColor(hexColor);
         }
     }
 }

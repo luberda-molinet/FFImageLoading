@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ffimageloading.cross.MvxCachedImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        local:MvxBind="LoadingPlaceholderImagePath 'res:place.jpg'; ErrorPlaceholderImagePath 'res:place.jpg'; Transformations Transformations; DownsampleWidth DownsampleWidth; ImagePath Url" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        local:MvxBind="Text Url" />
+</LinearLayout>

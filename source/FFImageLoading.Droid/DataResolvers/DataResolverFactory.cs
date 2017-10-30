@@ -6,17 +6,6 @@ namespace FFImageLoading.DataResolvers
 {
     public class DataResolverFactory : IDataResolverFactory
     {
-        static DataResolverFactory instance;
-        internal static DataResolverFactory Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new DataResolverFactory();
-                return instance;
-            }
-        }
-
         public IDataResolver GetResolver(string identifier, ImageSource source, TaskParameter parameters, Configuration configuration)
         {
             switch (source)
@@ -28,11 +17,15 @@ namespace FFImageLoading.DataResolvers
                 case ImageSource.Filepath:
                     return new FileDataResolver();
                 case ImageSource.Url:
+                    if (!string.IsNullOrWhiteSpace(identifier) && identifier.IsDataUrl())
+                        return new DataUrlResolver();
                     return new UrlDataResolver(configuration);
                 case ImageSource.Stream:
                     return new StreamDataResolver();
+                case ImageSource.EmbeddedResource:
+                    return new EmbeddedResourceResolver();
                 default:
-                    throw new ArgumentException("Unknown type of ImageSource");
+                    throw new NotSupportedException("Unknown type of ImageSource");
             }
         }
     }

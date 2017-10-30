@@ -79,7 +79,7 @@ namespace FFImageLoading.Cache
                         Remove(key);
                         return false;
                     }
-                        
+
                     _lruList.Remove(node);
                     _lruList.AddLast(node);
                     return true;
@@ -134,7 +134,7 @@ namespace FFImageLoading.Cache
             {
                 this.RemoveFirst();
             }
-            
+
             return true;
         }
 

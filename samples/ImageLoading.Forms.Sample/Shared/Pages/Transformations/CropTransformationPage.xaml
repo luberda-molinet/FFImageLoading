@@ -7,22 +7,22 @@
 	<ContentPage.Content>
 		<ScrollView>
 			<StackLayout>
-				
+
 				<ffimageloading:CachedImage x:Name="image"
 					LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png"
-					Aspect="AspectFit" Source="{Binding ImageUrl}" 
+					Aspect="AspectFit" Source="{Binding ImageUrl}"
 					Transformations="{Binding Transformations}" CacheType="Disk">
 
 					<ffimageloading:CachedImage.GestureRecognizers>
 						<PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
 						<PanGestureRecognizer PanUpdated="OnPanUpdated" />
 					</ffimageloading:CachedImage.GestureRecognizers>
-					
+
 				</ffimageloading:CachedImage>
 
 				<Label Text="CropTransformation" HorizontalTextAlignment="Center"/>
 				<Label Text="Use pan or pinch gestures to crop" HorizontalTextAlignment="Center" FontSize="8"/>
-				
+
 			</StackLayout>
 		</ScrollView>
 	</ContentPage.Content>

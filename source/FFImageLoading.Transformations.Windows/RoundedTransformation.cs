@@ -1,15 +1,15 @@
 ﻿using FFImageLoading.Extensions;
+using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using System;
-using Windows.UI;
 
 namespace FFImageLoading.Transformations
 {
     public class RoundedTransformation : TransformationBase
     {
-		public RoundedTransformation() : this(30d)
-		{
-		}
+        public RoundedTransformation() : this(30d)
+        {
+        }
 
         public RoundedTransformation(double radius) : this(radius, 1d, 1d)
         {
@@ -21,31 +21,31 @@ namespace FFImageLoading.Transformations
 
         public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
         {
-			Radius = radius;
-			CropWidthRatio = cropWidthRatio;
-			CropHeightRatio = cropHeightRatio;
-			BorderSize = borderSize;
-			BorderHexColor = borderHexColor;
+            Radius = radius;
+            CropWidthRatio = cropWidthRatio;
+            CropHeightRatio = cropHeightRatio;
+            BorderSize = borderSize;
+            BorderHexColor = borderHexColor;
         }
 
-		public double Radius { get; set; }
-		public double CropWidthRatio { get; set; }
-		public double CropHeightRatio { get; set; }
-		public double BorderSize { get; set; }
-		public string BorderHexColor { get; set; }
+        public double Radius { get; set; }
+        public double CropWidthRatio { get; set; }
+        public double CropHeightRatio { get; set; }
+        public double BorderSize { get; set; }
+        public string BorderHexColor { get; set; }
 
-		public override string Key
-		{
-			get
-			{
-				return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}",
-				Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
-			}
-		}
-
-        protected override BitmapHolder Transform(BitmapHolder source)
+        public override string Key
         {
-            return ToRounded(source, (int)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+            get
+            {
+                return string.Format("RoundedTransformation,radius={0},cropWidthRatio={1},cropHeightRatio={2},borderSize={3},borderHexColor={4}",
+                Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+            }
+        }
+
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
+        {
+            return ToRounded(bitmapSource, (int)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
         }
 
         public static BitmapHolder ToRounded(BitmapHolder source, int rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
@@ -85,7 +85,7 @@ namespace FFImageLoading.Transformations
             int w = (int)desiredWidth;
             int h = (int)desiredHeight;
 
-            int transparentColor = Colors.Transparent.ToInt();
+            var transparentColor = ColorHolder.Transparent;
 
             for (int y = 0; y < h; y++)
             {
@@ -115,28 +115,26 @@ namespace FFImageLoading.Transformations
             }
 
             //TODO draws a border - we should optimize that and add some anti-aliasing
-            if (borderSize > 0d)
-            {
-                borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
-                int borderColor = Colors.Transparent.ToInt();
+            //if (borderSize > 0d)
+            //{
+            //    borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 500d);
+            //    var borderColor = ColorHolder.Transparent;
 
-                try
-                {
-                    if (!borderHexColor.StartsWith("#", StringComparison.Ordinal))
-                        borderHexColor = borderHexColor.Insert(0, "#");
-                    borderColor = borderHexColor.ToColorFromHex().ToInt();
-                }
-                catch (Exception)
-                {
-                }
+            //    try
+            //    {
+            //        borderColor = borderHexColor.ToColorFromHex();
+            //    }
+            //    catch (Exception)
+            //    {
+            //    }
 
-                int intBorderSize = (int)Math.Ceiling(borderSize);
+            //    int intBorderSize = (int)Math.Ceiling(borderSize);
 
-                for (int i = 2; i < intBorderSize; i++)
-                {
-                    CircleAA(bitmap, i, borderColor);
-                }
-            }
+            //    for (int i = 0; i < intBorderSize; i++)
+            //    {
+            //        CircleAA(bitmap, i, borderColor);
+            //    }
+            //}
 
             return bitmap;
         }
@@ -190,7 +188,7 @@ namespace FFImageLoading.Transformations
                 if (p < 0)
                 {
                     p += ((4 * x) + 6);
-                }  
+                }
                 else
                 {
                     y--;
@@ -202,25 +200,32 @@ namespace FFImageLoading.Transformations
         }
 
         // helper function, draws pixel and mirrors it
-        static void SetPixel4(BitmapHolder bitmap, int centerX, int centerY, int deltaX, int deltaY, int color)
+        static void SetPixel4(BitmapHolder bitmap, int centerX, int centerY, int deltaX, int deltaY, ColorHolder color)
         {
-            bitmap.SetPixel(centerX + deltaX, centerY + deltaY, color);
-            bitmap.SetPixel(centerX - deltaX, centerY + deltaY, color);
-            bitmap.SetPixel(centerX + deltaX, centerY - deltaY, color);
-            bitmap.SetPixel(centerX - deltaX, centerY - deltaY, color);
+            if (centerX + deltaX < bitmap.Width && centerY + deltaY < bitmap.Height)
+                bitmap.SetPixel(centerX + deltaX, centerY + deltaY, color);
+
+            if (centerX - deltaX >= 0 && centerY + deltaY < bitmap.Height)
+                bitmap.SetPixel(centerX - deltaX, centerY + deltaY, color);
+
+            if (centerX + deltaX < bitmap.Width && centerY - deltaY >= 0)
+                bitmap.SetPixel(centerX + deltaX, centerY - deltaY, color);
+
+            if (centerX - deltaX >= 0 && centerY - deltaY >= 0)
+                bitmap.SetPixel(centerX - deltaX, centerY - deltaY, color);
         }
 
-        static void CircleAA(BitmapHolder bitmap, int size, int color)
+        static void CircleAA(BitmapHolder bitmap, int size, ColorHolder color)
         {
-            if (size % 2 != 0)
-                size++;
+            //if (size % 2 != 0)
+            //    size++;
 
             int centerX = bitmap.Width / 2;
             double radiusX = (bitmap.Width - size) / 2;
             int centerY = bitmap.Height / 2;
             double radiusY = (bitmap.Height - size) / 2;
 
-            const int maxTransparency = 127; // default: 127
+            const int maxTransparency = 255; // default: 127
             double radiusX2 = radiusX * radiusX;
             double radiusY2 = radiusY * radiusY;
 
@@ -232,10 +237,10 @@ namespace FFImageLoading.Transformations
                 double y = Math.Floor(radiusY * Math.Sqrt(1 - x * x / radiusX2));
                 double error = y - Math.Floor(y);
                 int transparency = (int)Math.Round(error * maxTransparency);
-                int alpha = color | (transparency << 24);
-                int alpha2 = color | ((maxTransparency - transparency) << 24);
-                SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y), alpha);
-                SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y) + 1, alpha2);
+                
+                //SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y), color);
+                SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y), new ColorHolder(transparency, color.R, color.G, color.B));
+                SetPixel4(bitmap, centerX, centerY, x, (int)Math.Floor(y) + 1, new ColorHolder(maxTransparency - transparency, color.R, color.G, color.B));
             }
 
             // right and left halves
@@ -246,10 +251,8 @@ namespace FFImageLoading.Transformations
                 double x = Math.Floor(radiusX * Math.Sqrt(1 - y * y / radiusY2));
                 double error = x - Math.Floor(x);
                 int transparency = (int)Math.Round(error * maxTransparency);
-                int alpha = color | (transparency << 24);
-                int alpha2 = color | ((maxTransparency - transparency) << 24);
-                SetPixel4(bitmap, centerX, centerY, (int)Math.Floor(x), y, alpha);
-                SetPixel4(bitmap, centerX, centerY, (int)Math.Floor(x) + 1, y, alpha2);
+                SetPixel4(bitmap, centerX, centerY, (int)Math.Floor(x), y, new ColorHolder(transparency, color.R, color.G, color.B));
+                SetPixel4(bitmap, centerX, centerY, (int)Math.Floor(x) + 1, y, new ColorHolder(maxTransparency - transparency, color.R, color.G, color.B));
             }
         }
     }

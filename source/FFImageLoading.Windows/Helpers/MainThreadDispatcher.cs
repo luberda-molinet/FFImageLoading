@@ -7,46 +7,59 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher : IMainThreadDispatcher
     {
-        static MainThreadDispatcher instance;
-
-        public static MainThreadDispatcher Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new MainThreadDispatcher();
-
-                return instance;
-            }
-        }
+        private CoreDispatcher _dispatcher;
 
         public async void Post(Action action)
         {
             if (action == null)
                 return;
 
+            if(_dispatcher == null)
+            {
+                _dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            }
+
             // already in UI thread:
-            if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+            if (_dispatcher.HasThreadAccess)
             {
                 action();
             }
             // not in UI thread, ensuring UI thread:
             else
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
+                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
                 //await CoreApplication.GetCurrentView().Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
             }
         }
 
         public Task PostAsync(Action action)
         {
-            var tcs = new TaskCompletionSource<object>();
-            Post(() => {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(() =>
+            {
                 try
                 {
-                    if (action != null)
-                        action();
-                    tcs.SetResult(string.Empty);
+                    action?.Invoke();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public Task PostAsync(Func<Task> action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Post(async () =>
+            {
+                try
+                {
+                    await action?.Invoke();
+                    tcs.SetResult(true);
                 }
                 catch (Exception ex)
                 {

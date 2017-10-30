@@ -6,9 +6,11 @@ using FFImageLoading.Helpers;
 using System.Threading;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
+using System.Linq;
 
 namespace FFImageLoading.Cache
 {
+    [Preserve(AllMembers = true)]
     public class DownloadCache : IDownloadCache
     {
         public DownloadCache(Configuration configuration)
@@ -17,6 +19,8 @@ namespace FFImageLoading.Cache
         }
 
         const int BufferSize = 4096;
+
+        public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/json", "audio/", "video/", "message" };
 
         protected Configuration Configuration { get; private set; }
 
@@ -52,8 +56,8 @@ namespace FFImageLoading.Cache
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
             var responseBytes = await Retry.DoAsync(
-                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress).ConfigureAwait(false),
-                DelayBetweenRetry,
+                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress, parameters).ConfigureAwait(false),
+                parameters.RetryDelayInMs > 0 ? TimeSpan.FromMilliseconds(parameters.RetryDelayInMs) : DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
 
@@ -83,7 +87,7 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction)
+        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
         {
             using (var cancelHeadersToken = new CancellationTokenSource())
             {
@@ -101,40 +105,51 @@ namespace FFImageLoading.Cache
                             if (response.Content == null)
                                 throw new HttpRequestException("No Content");
 
+                            var mediaType = response.Content.Headers?.ContentType?.MediaType;
+                            if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
+                                    throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                            }
+
+                            ModifyParametersAfterResponse(response, parameters);
+
                             using (var cancelReadTimeoutToken = new CancellationTokenSource())
                             {
+                                var readTimeoutToken = cancelReadTimeoutToken.Token;
                                 cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
 
-                                int total = (int)((progressAction != null && response.Content.Headers.ContentLength.HasValue) ? response.Content.Headers.ContentLength.Value : -1);
-                                var canReportProgress = total != -1 && progressAction != null;
+                                int total = (int)(response.Content.Headers.ContentLength ?? -1);
+                                var canReportProgress = progressAction != null;
 
                                 try
                                 {
-                                    return await Task.Run(async () =>
+                                    using (var outputStream = new MemoryStream())
+                                    using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                                     {
-                                        if (canReportProgress)
+                                        int totalRead = 0;
+                                        var buffer = new byte[Configuration.HttpReadBufferSize];
+
+                                        int read = 0;
+                                        while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                                         {
-                                            using (var outputStream = new MemoryStream())
-                                            using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                                            {
-                                                int totalRead = 0;
-                                                var buffer = new byte[4096];
+                                            token.ThrowIfCancellationRequested();
+                                            readTimeoutToken.ThrowIfCancellationRequested();
+                                            outputStream.Write(buffer, 0, read);
+                                            totalRead += read;
 
-                                                int read = 0;
-                                                while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
-                                                {
-                                                    token.ThrowIfCancellationRequested();
-                                                    outputStream.Write(buffer, 0, read);
-                                                    totalRead += read;
-                                                    progressAction(new DownloadProgress() { Total = total, Current = totalRead });
-                                                }
-
-                                                return outputStream.ToArray();
-                                            }
+                                            if (canReportProgress)
+                                                progressAction(new DownloadProgress() { Total = total, Current = totalRead });
                                         }
 
-                                        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                                    }, cancelReadTimeoutToken.Token).ConfigureAwait(false);
+                                        if (outputStream.Length == 0)
+                                            throw new InvalidDataException("Zero length stream");
+
+                                        if (outputStream.Length < 32)
+                                            throw new InvalidDataException("Invalid stream");
+
+                                        return outputStream.ToArray();
+                                    }
                                 }
                                 catch (OperationCanceledException)
                                 {
@@ -155,6 +170,12 @@ namespace FFImageLoading.Cache
                     }
                 }
             }
+        }
+
+        protected virtual void ModifyParametersAfterResponse(HttpResponseMessage response, TaskParameter parameters)
+        {
+            // YOUR CUSTOM LOGIC HERE
+            // eg: parameters.CacheDuration = response.Headers.CacheControl.MaxAge;
         }
 
         protected virtual bool AllowDiskCaching(CacheType? cacheType)

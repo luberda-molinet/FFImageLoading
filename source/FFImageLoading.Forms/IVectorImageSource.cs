@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms
 {
+    [Preserve(AllMembers = true)]
 	public interface IVectorImageSource
 	{
 		IVectorDataResolver GetVectorDataResolver();
@@ -14,5 +16,7 @@ namespace FFImageLoading.Forms
 		int VectorHeight { get; set; }
 
 		bool UseDipUnits { get; set; }
+
+        Dictionary<string, string> ReplaceStringMap { get; set; }
 	}
 }

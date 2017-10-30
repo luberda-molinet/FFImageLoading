@@ -32,9 +32,10 @@ namespace FFImageLoading.Cache
 
     public class ImageCache<TValue> : IImageCache<TValue> where TValue: Java.Lang.Object, ISelfDisposingBitmapDrawable
 	{
-        private readonly ReuseBitmapDrawableCache<TValue> _cache;
-		private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-		private readonly IMiniLogger _logger;
+        readonly ReuseBitmapDrawableCache<TValue> _cache;
+		readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+		readonly IMiniLogger _logger;
+        readonly object _lock = new object();
 
         public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
 		{
@@ -64,8 +65,11 @@ namespace FFImageLoading.Cache
 
 		public void Clear()
 		{
-			_cache.Clear();
-			_imageInformations.Clear();
+            lock (_lock)
+            {
+                _cache.Clear();
+                _imageInformations.Clear();
+            }
 		}
 
 		public ImageInformation GetInfo(string key)
@@ -88,6 +92,12 @@ namespace FFImageLoading.Cache
 
             if (_cache.TryGetValue(key, out drawable))
 			{
+                if (!drawable.IsValidAndHasValidBitmap())
+                {
+                    Remove(key, false);
+                    return null;
+                }
+
 				var imageInformation = GetInfo(key);
 				return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
 			}
@@ -97,24 +107,39 @@ namespace FFImageLoading.Cache
 
 		public void Add(string key, ImageInformation imageInformation, TValue bitmap)
 		{
-            if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap() || _cache.ContainsKey(key))
+            if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap())
 				return;
 
-			_imageInformations.TryAdd(key, imageInformation);
-			_cache.Add(key, bitmap);
+            if (_imageInformations.ContainsKey(key) || _cache.ContainsKey(key))
+                Remove(key, false);
+
+            lock (_lock)
+            {
+                _imageInformations.TryAdd(key, imageInformation);
+                _cache.Add(key, bitmap);
+            }
 		}
 
 		public void Remove(string key)
 		{
+            Remove(key, true);
+		}
+
+        void Remove(string key, bool log)
+        {
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-            if (ImageService.Instance.Config.VerboseMemoryCacheLogging)
-			    _logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
-			_cache.Remove(key);
-			ImageInformation imageInformation;
-			_imageInformations.TryRemove(key, out imageInformation);
-		}
+            if (log && ImageService.Instance.Config.VerboseMemoryCacheLogging)
+                _logger.Debug(string.Format($"Remove from memory cache called for {key}"));
+
+            lock (_lock)
+            {
+                _cache.Remove(key);
+                ImageInformation imageInformation;
+                _imageInformations.TryRemove(key, out imageInformation);
+            }
+        }
 
 		public void RemoveSimilar(string baseKey)
 		{

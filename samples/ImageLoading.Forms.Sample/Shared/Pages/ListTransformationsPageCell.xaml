@@ -11,7 +11,7 @@
 			<ColumnDefinition Width="150" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
-		
+
 		<ffimageloading:CachedImage x:Name="Image" HorizontalOptions="Center" VerticalOptions="Center"
 			LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png" DownsampleToViewSize="true"
 			Aspect="AspectFill" HeightRequest="150" WidthRequest="150">
@@ -20,7 +20,7 @@
 				<fftransformations:RoundedTransformation Radius="60"/>
 			</ffimageloading:CachedImage.Transformations>
 		</ffimageloading:CachedImage>
-		
+
 		<Label x:Name="Label" Grid.Column="1" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
 	</Grid>
 </ViewCell>

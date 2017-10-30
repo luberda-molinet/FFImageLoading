@@ -15,13 +15,13 @@ namespace Simple.iOS.Sample
         private string _imageURL;
         public string imageURL
         {
-            set 
+            set
             {
                 if(value!=_imageURL)
                 {
                     _imageURL = value;
                     UpdateContent();
-                }                
+                }
             }
             get { return _imageURL; }
         }
@@ -32,10 +32,12 @@ namespace Simple.iOS.Sample
 
         protected void UpdateContent()
         {
+            imageView.Image = null;
+
             ImageService.Instance.LoadUrl(imageURL)
-                        .ErrorPlaceholder("error@2x.png", ImageSource.ApplicationBundle)
-                        .LoadingPlaceholder("placeholder.png", ImageSource.CompiledResource)
-                        .Into(imageView);            
+                        .ErrorPlaceholder("error.png", ImageSource.ApplicationBundle)
+                        .LoadingPlaceholder("placeholder", ImageSource.CompiledResource)
+                        .Into(imageView);
         }
     }
 }

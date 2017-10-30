@@ -25,7 +25,7 @@ namespace FFImageLoading.Extensions
 
 		public static int DpToPixels(this int dp)
 		{
-			return DpToPixels((double)dp); 
+			return DpToPixels((double)dp);
 		}
 
 		public static int PixelsToDp(this int px)

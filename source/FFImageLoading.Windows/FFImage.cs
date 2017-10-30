@@ -9,29 +9,21 @@ using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
-
-#if SILVERLIGHT
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-#else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-#endif
 
 namespace FFImageLoading
 {
-	public sealed class FFImage : ContentControl, IDisposable
+    [Obsolete("Please use MvxCachedImageView / MvxSvgCachedImageView")]
+    public sealed class FFImage : ContentControl, IDisposable
     {
         private Image internalImage;
         private IScheduledWork _currentTask;
 
         public FFImage()
-		{
+        {
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             HorizontalAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
@@ -44,7 +36,7 @@ namespace FFImageLoading
             };
             Content = internalImage;
 
-			Transformations = new List<ITransformation>();
+            Transformations = new List<ITransformation>();
             DownsampleMode = InterpolationMode.Default;
         }
 
@@ -95,9 +87,9 @@ namespace FFImageLoading
             {
                 if (internalImage != null)
                 {
-                    await MainThreadDispatcher.Instance.PostAsync(() => {
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => {
                         internalImage.Source = null;
-					});
+                    });
                 }
             }
             else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
@@ -119,9 +111,9 @@ namespace FFImageLoading
 
             if (imageLoader != null)
             {
-				// CustomKeyFactory
-				if (CacheKeyFactory != null)
-				{
+                // CustomKeyFactory
+                if (CacheKeyFactory != null)
+                {
                     var dataContext = DataContext;
                     imageLoader.CacheKey(CacheKeyFactory.GetKey(Source, dataContext));
                 }
@@ -207,7 +199,7 @@ namespace FFImageLoading
                 imageLoader.WithPriority(LoadingPriority);
                 imageLoader.WithCache(CacheType);
 
-                imageLoader.Finish((work) => 
+                imageLoader.Finish((work) =>
                     OnFinish(new Args.FinishEventArgs(work)));
 
                 imageLoader.Success((imageInformation, loadingResult) =>
@@ -236,6 +228,48 @@ namespace FFImageLoading
         private void StretchPropertyChanged(Stretch stretch)
         {
             internalImage.Stretch = stretch;
+        }
+
+        /// <summary>
+        /// The horizontal alignment property of the underlying image.
+        /// </summary>
+        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(FFImage), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
+
+        public HorizontalAlignment HorizontalImageAlignment
+        {
+            get { return (HorizontalAlignment)GetValue(HorizontalImageAlignmentProperty); }
+            set { SetValue(HorizontalImageAlignmentProperty, value); }
+        }
+
+        private static void HorizontalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FFImage)d).HorizontalImageAlignmentPropertyChanged((HorizontalAlignment)e.NewValue);
+        }
+
+        private void HorizontalImageAlignmentPropertyChanged(HorizontalAlignment horizontalAlignment)
+        {
+            internalImage.HorizontalAlignment = horizontalAlignment;
+        }
+
+        /// <summary>
+        /// The vertical alignment property of the underlying image.
+        /// </summary>
+        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(FFImage), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
+
+        public VerticalAlignment VerticalImageAlignment
+        {
+            get { return (VerticalAlignment)GetValue(VerticalImageAlignmentProperty); }
+            set { SetValue(VerticalImageAlignmentProperty, value); }
+        }
+
+        private static void VerticalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FFImage)d).VerticalImageAlignmentPropertyChanged((VerticalAlignment)e.NewValue);
+        }
+
+        private void VerticalImageAlignmentPropertyChanged(VerticalAlignment verticalAlignment)
+        {
+            internalImage.VerticalAlignment = verticalAlignment;
         }
 
         /// <summary>
@@ -284,7 +318,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleWidthProperty = DependencyProperty.Register(nameof(DownsampleWidth), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// Optional DownsampleWidth parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.
         /// </summary>
         public double DownsampleWidth
@@ -305,7 +339,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleHeightProperty = DependencyProperty.Register(nameof(DownsampleHeight), typeof(double), typeof(FFImage), new PropertyMetadata(default(double)));
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect. 
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// Optional DownsampleHeight parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.
         /// </summary>
         public double DownsampleHeight
@@ -325,7 +359,7 @@ namespace FFImageLoading
         /// <summary>
         /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
         /// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
-        /// If the view height or width will not return > 0 - it'll fall back 
+        /// If the view height or width will not return > 0 - it'll fall back
         /// to using DownsampleWidth / DownsampleHeight properties values
         /// </summary>
         /// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
@@ -365,7 +399,7 @@ namespace FFImageLoading
         public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register(nameof(DownsampleUseDipUnits), typeof(bool), typeof(FFImage), new PropertyMetadata(default(bool)));
 
         /// <summary>
-        /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties 
+        /// If set to <c>true</c> DownsampleWidth and DownsampleHeight properties
         /// will use density independent pixels for downsampling
         /// </summary>
         /// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
@@ -384,7 +418,7 @@ namespace FFImageLoading
         /// <summary>
         /// The cache duration property.
         /// </summary>
-        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(int), typeof(FFImage), new PropertyMetadata(ImageService.Instance.Config.DiskCacheDuration.Days));
+        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(int), typeof(FFImage), new PropertyMetadata(Config.Configuration.Default.DiskCacheDuration.Days));
 
         /// <summary>
         /// How long the file will be cached on disk.
@@ -413,11 +447,11 @@ namespace FFImageLoading
         {
             get
             {
-                return (LoadingPriority)GetValue(LoadingPriorityProperty); 
+                return (LoadingPriority)GetValue(LoadingPriorityProperty);
             }
             set
             {
-                SetValue(LoadingPriorityProperty, value); 
+                SetValue(LoadingPriorityProperty, value);
             }
         }
 
@@ -440,7 +474,7 @@ namespace FFImageLoading
                 SetValue(CacheTypeProperty, value);
             }
         }
-        
+
 
         /// <summary>
         /// The fade animation enabled property.
@@ -465,7 +499,7 @@ namespace FFImageLoading
         /// <summary>
         /// The transform placeholders property.
         /// </summary>
-        /// 
+        ///
         public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(FFImage), new PropertyMetadata(true));
 
         /// <summary>
@@ -668,9 +702,6 @@ namespace FFImageLoading
 
         private async Task<byte[]> GetBytesFromBitmapAsync(WriteableBitmap bitmap)
         {
-#if SILVERLIGHT
-            return await Task.FromResult(bitmap.ToByteArray());
-#else
             byte[] tempPixels;
             using (var sourceStream = bitmap.PixelBuffer.AsStream())
             {
@@ -679,7 +710,6 @@ namespace FFImageLoading
             }
 
             return tempPixels;
-#endif
         }
 
         /// <summary>
@@ -854,11 +884,7 @@ namespace FFImageLoading
         {
             get
             {
-#if SILVERLIGHT
-                return Application.Current.RootVisual != null && DesignerProperties.GetIsInDesignMode(Application.Current.RootVisual);
-#else
                 return Windows.ApplicationModel.DesignMode.DesignModeEnabled;
-#endif
             }
         }
     }

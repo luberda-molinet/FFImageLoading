@@ -8,11 +8,12 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
@@ -22,6 +23,8 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -30,6 +33,8 @@
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <OutputPath>bin\Debug\</OutputPath>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,7 +45,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -70,5 +76,8 @@
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
   </ItemGroup>
 </Project>

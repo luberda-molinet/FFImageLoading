@@ -5,7 +5,7 @@ using UIKit;
 
 namespace FFImageLoading.Targets
 {
-	public class UIBarItemTarget: UIControlTarget<UIBarItem>
+	public class UIBarItemTarget: PControlTarget<UIBarItem>
 	{
         // For some reason the UIBarItem .NET instance can be garbaged even though the control still exists (especially with UITabBarItem).
         // So we keep a strong reference for that case.

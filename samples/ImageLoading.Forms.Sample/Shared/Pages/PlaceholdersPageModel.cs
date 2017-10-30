@@ -4,7 +4,6 @@ using System.Windows.Input;
 
 namespace FFImageLoading.Forms.Sample
 {
-	[PropertyChanged.ImplementPropertyChanged]
 	public class PlaceholdersPageModel : BasePageModel
 	{
 		public PlaceholdersPageModel()

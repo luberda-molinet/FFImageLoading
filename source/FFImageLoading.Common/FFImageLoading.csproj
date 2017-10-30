@@ -8,15 +8,14 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading</RootNamespace>
     <AssemblyName>FFImageLoading</AssemblyName>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;SILVERLIGHT;</DefineConstants>
@@ -26,6 +25,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -41,13 +41,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
     <DefineConstants>DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <PlatformTarget>anycpu</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -106,34 +107,43 @@
     <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueueNode.cs" />
     <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueue.cs" />
     <Compile Include="Concurrency\PendingTasksQueue.cs" />
+    <Compile Include="Concurrency\ThreadSafeCollection.cs" />
+    <Compile Include="Views\ICachedImageView.cs" />
+    <Compile Include="Args\ErrorEventArgs.cs" />
+    <Compile Include="Args\SuccessEventArgs.cs" />
+    <Compile Include="Args\FinishEventArgs.cs" />
+    <Compile Include="Args\DownloadStartedEventArgs.cs" />
+    <Compile Include="Args\DownloadProgressEventArgs.cs" />
+    <Compile Include="Args\FileWriteFinishedEventArgs.cs" />
+    <Compile Include="DataResolvers\EmbeddedResourceResolver.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="DataResolvers\DataUrlResolver.cs" />
+    <Compile Include="Helpers\PreserveAttribute.cs" />
+    <Compile Include="Work\DataEncodingType.cs" />
+    <Compile Include="DataResolvers\WrappedDataResolverFactory.cs" />
+    <Compile Include="DataResolvers\WrappedDataResolver.cs" />
+    <Compile Include="Helpers\FileHeader.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Helpers\EmptyPlatformPerformance.cs" />
+    <Compile Include="ImageServiceBase.cs" />
+    <Compile Include="DataResolvers\UrlDataResolver.cs" />
+    <Compile Include="DataResolvers\StreamDataResolver.cs" />
+    <Compile Include="Helpers\GifDecoderBase.cs" />
+    <Compile Include="Helpers\Delay.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy FileWidth="80" TabWidth="4" TabsToSpaces="True" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="80" TabsToSpaces="True" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="True" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup />
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Extensions">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Collections" />
     <Reference Include="System.Diagnostics.Debug" />
@@ -141,5 +151,13 @@
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.Extensions" />
     <Reference Include="System.Threading" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
+    <Folder Include="Args\" />
+    <Folder Include="DataResolvers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
   </ItemGroup>
 </Project>

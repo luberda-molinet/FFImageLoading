@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
@@ -19,7 +20,7 @@ namespace FFImageLoading.Extensions
 
             WriteableBitmap writeableBitmap = null;
 
-            await MainThreadDispatcher.Instance.PostAsync(async () =>
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
@@ -40,7 +41,7 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, ImageInformation imageInformation = null)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, bool allowUpscale, ImageInformation imageInformation = null)
         {
             if (imageStream == null)
                 return null;
@@ -49,13 +50,13 @@ namespace FFImageLoading.Extensions
             {
                 if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
                 {
-                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits, imageInformation).ConfigureAwait(false))
+                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits, allowUpscale, imageInformation).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
                         downscaledImage.Seek(0);
                         WriteableBitmap resizedBitmap = null;
 
-                        await MainThreadDispatcher.Instance.PostAsync(async () =>
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
                         {
                             resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                             await resizedBitmap.SetSourceAsync(downscaledImage);
@@ -76,7 +77,7 @@ namespace FFImageLoading.Extensions
                         imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     }
 
-                    await MainThreadDispatcher.Instance.PostAsync(async () =>
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         await bitmap.SetSourceAsync(image);
@@ -87,7 +88,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public async static Task<BitmapHolder> ToBitmapHolderAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, ImageInformation imageInformation = null)
+        public async static Task<BitmapHolder> ToBitmapHolderAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, bool allowUpscale, ImageInformation imageInformation = null)
         {
             if (imageStream == null)
                 return null;
@@ -96,7 +97,7 @@ namespace FFImageLoading.Extensions
             {
                 if (downscale != null && (downscale.Item1 > 0 || downscale.Item2 > 0))
                 {
-                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits, imageInformation).ConfigureAwait(false))
+                    using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits, allowUpscale, imageInformation).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
                         PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
@@ -143,7 +144,7 @@ namespace FFImageLoading.Extensions
             }
         }
 
-        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, int width, int height, InterpolationMode interpolationMode, bool useDipUnits, ImageInformation imageInformation = null)
+        public static async Task<IRandomAccessStream> ResizeImage(this IRandomAccessStream imageStream, int width, int height, InterpolationMode interpolationMode, bool useDipUnits, bool allowUpscale, ImageInformation imageInformation = null)
         {
             if (useDipUnits)
             {
@@ -152,13 +153,14 @@ namespace FFImageLoading.Extensions
             }
 
             IRandomAccessStream resizedStream = imageStream;
-			var decoder = await BitmapDecoder.CreateAsync(imageStream);
-            if ((height > 0 && decoder.PixelHeight > height) || (width > 0 && decoder.PixelWidth > width))
+            var decoder = await BitmapDecoder.CreateAsync(imageStream);
+            if ((height > 0 && decoder.PixelHeight > height) || (width > 0 && decoder.PixelWidth > width) || allowUpscale)
             {
                 using (imageStream)
                 {
                     resizedStream = new InMemoryRandomAccessStream();
-					BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                    BitmapEncoder encoder = await BitmapEncoder.CreateForTranscodingAsync(resizedStream, decoder);
+                    
                     double widthRatio = (double)width / decoder.PixelWidth;
                     double heightRatio = (double)height / decoder.PixelHeight;
 
@@ -174,7 +176,7 @@ namespace FFImageLoading.Extensions
                     uint aspectWidth = (uint)Math.Floor(decoder.PixelWidth * scaleRatio);
 
                     if (interpolationMode == InterpolationMode.None)
-                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.NearestNeighbor;
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Cubic;
                     else if (interpolationMode == InterpolationMode.Low)
                         encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
                     else if (interpolationMode == InterpolationMode.Medium)
@@ -182,7 +184,7 @@ namespace FFImageLoading.Extensions
                     else if (interpolationMode == InterpolationMode.High)
                         encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Fant;
                     else
-                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Linear;
+                        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Cubic;
 
                     encoder.BitmapTransform.ScaledHeight = aspectHeight;
                     encoder.BitmapTransform.ScaledWidth = aspectWidth;

@@ -1,10 +1,7 @@
 ﻿{
   "supports": {},
   "dependencies": {
-    "Microsoft.Bcl": "1.1.10",
-    "Microsoft.Bcl.Build": "1.0.21",
-    "Microsoft.Net.Http": "2.2.29",
-    "Xamarin.Forms": "2.3.3.193"
+    "Xamarin.Forms": "2.4.0.280"
   },
   "frameworks": {
     "WindowsPhoneApp,Version=v8.1": {}

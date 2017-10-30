@@ -34,16 +34,16 @@ namespace FFImageLoading.Transformations
 
 		public override string Key
 		{
-			get 
-			{ 
-				return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}", 
-				ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio); 
+			get
+			{
+				return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}",
+				ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
 			}
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToCropped(source, ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
+			return ToCropped(sourceBitmap, ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
 		}
 
 		public static Bitmap ToCropped(Bitmap source, double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
@@ -106,7 +106,7 @@ namespace FFImageLoading.Transformations
 				RectF rectF = new RectF(0, 0, (int)desiredWidth, (int)desiredHeight);
 				canvas.DrawRect(rectF, paint);
 
-				return bitmap;				
+				return bitmap;
 			}
 		}
 	}

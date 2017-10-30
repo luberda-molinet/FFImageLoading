@@ -14,7 +14,7 @@ namespace Simple.iOS.Sample
 	{
 		[Outlet]
 		UIKit.UIImageView imageView { get; set; }
-		
+
 		void ReleaseDesignerOutlets ()
 		{
 			if (imageView != null) {

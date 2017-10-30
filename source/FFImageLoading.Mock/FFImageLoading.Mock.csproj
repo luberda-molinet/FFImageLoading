@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FFImageLoading</RootNamespace>
+    <AssemblyName>FFImageLoading.Platform</AssemblyName>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ImageService.cs" />
+    <Compile Include="Mock\MockBitmap.cs" />
+    <Compile Include="Mock\MockLogger.cs" />
+    <Compile Include="Mock\MockImageCache.cs" />
+    <Compile Include="Mock\MockMD5Helper.cs" />
+    <Compile Include="Mock\MockDiskCache.cs" />
+    <Compile Include="Mock\MockFile.cs" />
+    <Compile Include="Extensions\TaskParameterExtensions.cs" />
+    <Compile Include="Mock\PlatformImageLoaderTask.cs" />
+    <Compile Include="Mock\MockImageView.cs" />
+    <Compile Include="Mock\MockMainThreadDispatcher.cs" />
+    <Compile Include="Mock\MockDataResolverFactory.cs" />
+    <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
+      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
+      <Name>FFImageLoading</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup />
+</Project>

@@ -3,6 +3,7 @@ using System.IO;
 
 namespace FFImageLoading.Cache
 {
+    [Preserve(AllMembers = true)]
 	public class CacheStream
 	{
         public CacheStream(Stream stream, bool retrievedFromDiskCache, string filePath)

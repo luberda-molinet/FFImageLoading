@@ -8,8 +8,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -22,6 +23,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -30,6 +32,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -39,13 +42,14 @@
   <ItemGroup>
     <Compile Include="SvgImageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgImageSourceConverter.cs" />
+    <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgCachedImage.cs">
+      <Link>SvgCachedImage.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgImageSourceConverter.cs">
+      <Link>SvgImageSourceConverter.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.BaitAndSwitch\FFImageLoading.BaitAndSwitch.csproj">
-      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
-      <Name>FFImageLoading.BaitAndSwitch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>
@@ -54,21 +58,14 @@
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj">
+      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
+      <Name>FFImageLoading.Mock</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Xamarin.Forms.Core">
-      <HintPath>..\..\packages\Xamarin.Forms.2.3.3.193\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Platform">
-      <HintPath>..\..\packages\Xamarin.Forms.2.3.3.193\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Xaml">
-      <HintPath>..\..\packages\Xamarin.Forms.2.3.3.193\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="project.json" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\..\packages\Xamarin.Forms.2.3.3.193\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.3.3.193\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />
+  <Import Project="..\..\packages\Xamarin.Forms.2.3.5.256-pre6\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.3.5.256-pre6\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+Xamarin.iOS10+xamarinmac20\Xamarin.Forms.targets')" />
 </Project>

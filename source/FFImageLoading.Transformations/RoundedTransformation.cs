@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class RoundedTransformation : ITransformation
 	{
 		public RoundedTransformation()
@@ -31,7 +32,7 @@ namespace FFImageLoading.Transformations
 		public double BorderSize { get; set; }
 		public string BorderHexColor { get; set; }
 
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}

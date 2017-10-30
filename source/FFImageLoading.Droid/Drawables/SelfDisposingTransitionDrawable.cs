@@ -145,7 +145,7 @@
 //                {
 //                    cache_ref_count++;
 //                }
-//                else 
+//                else
 //                {
 //                    cache_ref_count--;
 //                }
@@ -197,7 +197,7 @@
 //            lock (monitor)
 //            {
 //                if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
-//                    Bitmap.Dispose();
+//                    Bitmap.TryDispose();
 
 //                is_bitmap_disposed = true;
 //            }

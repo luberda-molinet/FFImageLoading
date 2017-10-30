@@ -44,9 +44,9 @@ namespace FFImageLoading.Transformations
 		public double BorderSize { get; set; }
 		public string BorderHexColor { get; set; }
 
-		protected override UIImage Transform(UIImage source)
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return ToRounded(source, (nfloat)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
+			return ToRounded(sourceBitmap, (nfloat)Radius, CropWidthRatio, CropHeightRatio, BorderSize, BorderHexColor);
 		}
 
 		public static UIImage ToRounded(UIImage source, nfloat rad, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
@@ -92,10 +92,10 @@ namespace FFImageLoading.Transformations
 					var drawRect = new CGRect(-cropX, -cropY, sourceWidth, sourceHeight);
 					source.Draw(drawRect);
 
-					if (borderSize > 0d) 
+					if (borderSize > 0d)
 					{
 						borderSize = (borderSize * (desiredWidth + desiredHeight) / 2d / 1000d);
-						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d), 
+						var borderRect = new CGRect((0d + borderSize/2d), (0d + borderSize/2d),
 							(desiredWidth - borderSize), (desiredHeight - borderSize));
 
 						context.BeginPath();

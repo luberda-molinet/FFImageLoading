@@ -12,7 +12,7 @@ namespace FFImageLoading.Transformations
 
 		public BlurredTransformation()
 		{
-			Radius = 20d;
+			Radius = 25d;
 			_context = new ContextWrapper(Android.App.Application.Context);
 		}
 
@@ -43,14 +43,14 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("BlurredTransformation,radius={0}", Radius); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
-		{
-			return ToBlurred(source, _context, (float)Radius);
-		}
+        protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
+        {
+            return ToBlurred(sourceBitmap, _context, (float)Radius);
+        }
 
 		public static Bitmap ToBlurred(Bitmap source, Context context, float radius)
 		{
-			if (!LegacyMode && (int)Android.OS.Build.VERSION.SdkInt >= 17)
+            if (context != null && !LegacyMode && (int)Android.OS.Build.VERSION.SdkInt >= 17)
 			{
 				Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
 
@@ -64,7 +64,7 @@ namespace FFImageLoading.Transformations
 							using (Android.Renderscripts.ScriptIntrinsicBlur blur = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, overlayAlloc.Element))
 							{
 								blur.SetInput(overlayAlloc);
-								blur.SetRadius(radius);	
+								blur.SetRadius(radius);
 								blur.ForEach(overlayAlloc);
 								overlayAlloc.CopyTo(bitmap);
 
@@ -153,7 +153,8 @@ namespace FFImageLoading.Transformations
 				yi=x;
 				for (y=0;y<h;y++){
 					// Preserve alpha channel: ( 0xff000000 & pix[yi] )
-					pix[yi] = (int)((0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum]);
+                    var rgb = (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
+                    pix[yi] = ((int)(0xff000000 & pix[yi]) | rgb);
 					if(x==0){
 						vmin[y]=Math.Min(y+radius+1,hm)*w;
 						vmax[y]=Math.Max(y-radius,0)*w;

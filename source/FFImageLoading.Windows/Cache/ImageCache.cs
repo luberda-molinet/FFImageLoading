@@ -17,7 +17,7 @@ namespace FFImageLoading.Cache
     {
         private static IImageCache _instance;
         private readonly WriteableBitmapLRUCache _reusableBitmaps;
-		private readonly IMiniLogger _logger;
+        private readonly IMiniLogger _logger;
 
         private ImageCache(int maxCacheSize, IMiniLogger logger)
         {
@@ -28,9 +28,9 @@ namespace FFImageLoading.Cache
                 //TODO Does anyone know how we could get available app ram from WinRT API?
                 EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
                 if (deviceInfo.OperatingSystem.ToLower().Contains("phone"))
-                    maxCacheSize = 1000000 * 32; //32MB
+                    maxCacheSize = 1000000 * 64; //64MB
                 else
-                    maxCacheSize = 1000000 * 128; //128MB
+                    maxCacheSize = 1000000 * 256; //256MB
 
                 _logger?.Debug($"Memory cache size: {maxCacheSize} bytes");
             }
@@ -46,35 +46,35 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public void Add(string key, ImageInformation imageInformation, WriteableBitmap bitmap)
+        public void Add(string key, ImageInformation imageInformation, BitmapSource bitmap)
         {
             if (string.IsNullOrWhiteSpace(key) || bitmap == null)
                 return;
 
-            _reusableBitmaps.TryAdd(key, new Tuple<WriteableBitmap, ImageInformation>(bitmap, imageInformation));
+            _reusableBitmaps.TryAdd(key, new Tuple<BitmapSource, ImageInformation>(bitmap, imageInformation));
         }
 
-		public ImageInformation GetInfo(string key)
-		{
-			Tuple<WriteableBitmap, ImageInformation> cacheEntry;
-			if (_reusableBitmaps.TryGetValue (key, out cacheEntry))
-			{
-				return cacheEntry.Item2;
-			}
+        public ImageInformation GetInfo(string key)
+        {
+            Tuple<BitmapSource, ImageInformation> cacheEntry;
+            if (_reusableBitmaps.TryGetValue (key, out cacheEntry))
+            {
+                return cacheEntry.Item2;
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-        public Tuple<WriteableBitmap, ImageInformation> Get(string key)
+        public Tuple<BitmapSource, ImageInformation> Get(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            Tuple<WriteableBitmap, ImageInformation> cacheEntry;
+            Tuple<BitmapSource, ImageInformation> cacheEntry;
 
             if (_reusableBitmaps.TryGetValue(key, out cacheEntry) && cacheEntry.Item1 != null)
             {
-                return new Tuple<WriteableBitmap, ImageInformation>(cacheEntry.Item1, cacheEntry.Item2);
+                return new Tuple<BitmapSource, ImageInformation>(cacheEntry.Item1, cacheEntry.Item2);
             }
 
             return null;
@@ -95,16 +95,16 @@ namespace FFImageLoading.Cache
         {
             if (string.IsNullOrWhiteSpace(key))
                 return;
-            
-			_logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
+
+            _logger.Debug (string.Format ("Called remove from memory cache for '{0}'", key));
             _reusableBitmaps.Remove(key);
         }
 
-		public void RemoveSimilar(string baseKey)
-		{
+        public void RemoveSimilar(string baseKey)
+        {
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
-            
+
             var pattern = baseKey + ";";
 
             var keysToRemove = _reusableBitmaps.Keys.Where(i => i.StartsWith(pattern, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -112,6 +112,6 @@ namespace FFImageLoading.Cache
             {
                 Remove(key);
             }
-		}
+        }
     }
 }

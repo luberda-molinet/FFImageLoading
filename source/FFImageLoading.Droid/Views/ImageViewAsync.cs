@@ -5,6 +5,7 @@ using Android.Runtime;
 
 namespace FFImageLoading.Views
 {
+    [Preserve(AllMembers = true)]
 	[Register("ffimageloading.views.ImageViewAsync")]
 	public class ImageViewAsync : ManagedImageView
 	{

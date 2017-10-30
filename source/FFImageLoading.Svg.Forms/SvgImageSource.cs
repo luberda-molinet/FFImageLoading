@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using FFImageLoading.Forms;
@@ -9,6 +10,7 @@ namespace FFImageLoading.Svg.Forms
 	/// <summary>
 	/// SVG image source.
 	/// </summary>
+    [Preserve(AllMembers = true)]
 	public class SvgImageSource : Xamarin.Forms.ImageSource, IVectorImageSource
 	{
 		const string DoNotReference = "You are referencing the Portable version in your App - you need to reference the platform version";
@@ -20,7 +22,7 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="vectorWidth"></param>
         /// <param name="vectorHeight"></param>
         /// <param name="useDipUnits"></param>
-		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits)
+		public SvgImageSource(Xamarin.Forms.ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -46,6 +48,12 @@ namespace FFImageLoading.Svg.Forms
 		public bool UseDipUnits { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the replace string map. It can be used eg. to replace color strings inside SVG file
+        /// </summary>
+        /// <value>The replace string map.</value>
+        public Dictionary<string, string> ReplaceStringMap { get; set; }
+
+        /// <summary>
         /// GetVectorDataResolver
         /// </summary>
         /// <returns>IVectorDataResolver</returns>
@@ -63,7 +71,7 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromFile(string file, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromFile(string file, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -77,7 +85,7 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromStream(Func<Stream> stream, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromStream(Func<Stream> stream, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -91,7 +99,7 @@ namespace FFImageLoading.Svg.Forms
 		/// <param name="vectorWidth">Vector width.</param>
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromUri(Uri uri, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -106,7 +114,7 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="vectorHeight"></param>
         /// <param name="useDipUnits"></param>
         /// <returns></returns>
-		public static ImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromResource(string resource, Type resolvingType, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
@@ -121,9 +129,23 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="vectorHeight"></param>
         /// <param name="useDipUnits"></param>
         /// <returns></returns>
-		public static ImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true)
+		public static SvgImageSource FromResource(string resource, Assembly sourceAssembly = null, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
 		{
 			throw new Exception(DoNotReference);
 		}
+
+		/// <summary>
+		/// SvgImageSource FromSvgString.
+		/// </summary>
+		/// <returns>The svg string.</returns>
+		/// <param name="svg">Svg.</param>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		/// <param name="replaceStringMap">Replace string map.</param>
+		public static SvgImageSource FromSvgString(string svg, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
+        {
+            throw new Exception(DoNotReference);
+        }
 	}
 }

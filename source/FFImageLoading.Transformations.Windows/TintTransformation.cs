@@ -1,5 +1,6 @@
 ﻿using FFImageLoading.Extensions;
 using FFImageLoading.Work;
+using System;
 
 namespace FFImageLoading.Transformations
 {
@@ -34,10 +35,10 @@ namespace FFImageLoading.Transformations
             {
                 _hexColor = value;
                 var color = value.ToColorFromHex();
-                R = (int)color.R;
-                G = (int)color.G;
-                B = (int)color.B;
-                A = (int)color.A;
+                A = color.A;
+                R = color.R;
+                G = color.G;
+                B = color.B;
             }
         }
 
@@ -60,17 +61,17 @@ namespace FFImageLoading.Transformations
             }
         }
 
-        protected override BitmapHolder Transform(BitmapHolder source)
+        protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
             if (EnableSolidColor)
             {
-                ToReplacedColor(source, R, G, B, A);
-                return source;
+                ToReplacedColor(bitmapSource, R, G, B, A);
+                return bitmapSource;
             }
 
             RGBAWMatrix = FFColorMatrix.ColorToTintMatrix(R, G, B, A);
 
-            return base.Transform(source);
+            return base.Transform(bitmapSource, path, source, isPlaceholder, key);
         }
 
         public static void ToReplacedColor(BitmapHolder bmp, int r, int g, int b, int a)
@@ -78,27 +79,31 @@ namespace FFImageLoading.Transformations
             var nWidth = bmp.Width;
             var nHeight = bmp.Height;
             var len = bmp.PixelCount;
+            float percentage = (float)a / 255;
+            float left = 1 - percentage;
+            int rMin = (int)(r - (r * left));
+            int gMin = (int)(g - (g * left));
+            int bMin = (int)(b - (b * left));
+            int rMax = (int)(r + (r * left));
+            int gMax = (int)(g + (g * left));
+            int bMax = (int)(b + (b * left));
 
             for (var i = 0; i < len; i++)
             {
-                var c = bmp.GetPixelAsInt(i);
-                var currentAlpha = (c >> 24) & 0x000000FF;
-                var aNew = (int)(currentAlpha * (a / currentAlpha));
+                var color = bmp.GetPixel(i);
+                int currentAlpha = color.A;
+                var aNew = currentAlpha == 0 ? 0 : (int)(currentAlpha * (a / currentAlpha));
+                var curR = color.R;
+                var curG = color.G;
+                var curB = color.B;
+                int rNew = (int)(curR + (255 - curR) * (percentage * r / 255));
+                int gNew = (int)(curG + (255 - curG) * (percentage * g / 255));
+                int bNew = (int)(curB + (255 - curB) * (percentage * b / 255));
+                rNew = Math.Min(Math.Max(rMin, rNew), rMax);
+                gNew = Math.Min(Math.Max(gMin, gNew), gMax);
+                bNew = Math.Min(Math.Max(bMin, bNew), bMax);
 
-                var rNew = r;
-                var gNew = g;
-                var bNew = b;
-
-                if (rNew > 255)
-                    rNew = 255;
-
-                if (gNew > 255)
-                    gNew = 255;
-
-                if (bNew > 255)
-                    bNew = 255;
-
-                bmp.SetPixel(i, (aNew << 24) | (rNew << 16) | (gNew << 8) | bNew);
+                bmp.SetPixel(i, new ColorHolder(color.A, rNew, gNew, bNew));
             }
         }
     }

@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class RotateTransformation : ITransformation
 	{
 		public RotateTransformation()
@@ -37,7 +38,7 @@ namespace FFImageLoading.Transformations
 			}
 		}
 
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}

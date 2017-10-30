@@ -10,8 +10,8 @@
 
 namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class AppResources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal AppResources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to add.
         /// </summary>
@@ -68,7 +68,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 return ResourceManager.GetString("AppBarButtonText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Menu Item.
         /// </summary>
@@ -77,7 +77,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 return ResourceManager.GetString("AppBarMenuItemText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to MY APPLICATION.
         /// </summary>
@@ -86,7 +86,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 return ResourceManager.GetString("ApplicationTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to LeftToRight.
         /// </summary>
@@ -95,7 +95,7 @@ namespace FFImageLoading.Forms.Sample.WinPhoneSL.Resources {
                 return ResourceManager.GetString("ResourceFlowDirection", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to en-US.
         /// </summary>

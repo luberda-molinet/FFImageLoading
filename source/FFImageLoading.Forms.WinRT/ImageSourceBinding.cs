@@ -7,15 +7,13 @@ using System.Threading;
 
 #if WINDOWS_UWP
 namespace FFImageLoading.Forms.WinUWP
-#elif SILVERLIGHT
-namespace FFImageLoading.Forms.WinSL
 #else
 namespace FFImageLoading.Forms.WinRT
 #endif
 {
-    public class ImageSourceBinding
+    public class ImageSourceBinding : IImageSourceBinding
     {
-        public ImageSourceBinding(Work.ImageSource imageSource, string path)
+        public ImageSourceBinding(FFImageLoading.Work.ImageSource imageSource, string path)
         {
             ImageSource = imageSource;
             Path = path;
@@ -23,17 +21,17 @@ namespace FFImageLoading.Forms.WinRT
 
         public ImageSourceBinding(Func<CancellationToken, Task<Stream>> stream)
         {
-            ImageSource = Work.ImageSource.Stream;
+            ImageSource = FFImageLoading.Work.ImageSource.Stream;
             Stream = stream;
         }
 
-        public Work.ImageSource ImageSource { get; private set; }
+        public FFImageLoading.Work.ImageSource ImageSource { get; private set; }
 
         public string Path { get; private set; }
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-		internal static async Task<ImageSourceBinding> GetImageSourceBinding(ImageSource source, CachedImage element)
+        internal static async Task<ImageSourceBinding> GetImageSourceBinding(ImageSource source, CachedImage element)
         {
             if (source == null)
             {
@@ -42,20 +40,23 @@ namespace FFImageLoading.Forms.WinRT
 
             var uriImageSource = source as UriImageSource;
             if (uriImageSource != null)
-            {
-				var uri = uriImageSource.Uri?.OriginalString;
-				if (string.IsNullOrWhiteSpace(uri))
-					return null;
+            {                
+                var uri = uriImageSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
 
-				return new ImageSourceBinding(Work.ImageSource.Url, uri);
+                if (uriImageSource.Uri.Scheme == "file")
+                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
+
+                return new ImageSourceBinding(Work.ImageSource.Url, uri);
             }
 
             var fileImageSource = source as FileImageSource;
             if (fileImageSource != null)
             {
-				if (string.IsNullOrWhiteSpace(fileImageSource.File))
-					return null;
-				
+                if (string.IsNullOrWhiteSpace(fileImageSource.File))
+                    return null;
+
                 StorageFile file = null;
 
                 try
@@ -64,7 +65,7 @@ namespace FFImageLoading.Forms.WinRT
 
                     if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
-						file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
+                        file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
                     }
                 }
                 catch (Exception)
@@ -85,42 +86,64 @@ namespace FFImageLoading.Forms.WinRT
                 return new ImageSourceBinding(streamImageSource.Stream);
             }
 
-			var vectorSource = source as IVectorImageSource;
-			if (vectorSource != null)
-			{
-				if (element.Height > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorHeight = (int)element.Height;
-				}
-				else if (element.Width > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorWidth = (int)element.Width;
-				}
-				else if (element.HeightRequest > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorHeight = (int)element.HeightRequest;
-				}
-				else if (element.WidthRequest > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorWidth = (int)element.WidthRequest;
-				}
-				else if (element.MinimumHeightRequest > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorHeight = (int)element.MinimumHeightRequest;
-				}
-				else if (element.MinimumWidthRequest > 0d)
-				{
-					vectorSource.UseDipUnits = true;
-					vectorSource.VectorWidth = (int)element.MinimumWidthRequest;
-				}
+            var embeddedResoureSource = source as EmbeddedResourceImageSource;
+            if (embeddedResoureSource != null)
+            {
+                var uri = embeddedResoureSource.Uri?.OriginalString;
+                if (string.IsNullOrWhiteSpace(uri))
+                    return null;
 
-				return await GetImageSourceBinding(vectorSource.ImageSource, element).ConfigureAwait(false);
-			}
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.EmbeddedResource, uri);
+            }
+
+            var dataUrlSource = source as DataUrlImageSource;
+            if (dataUrlSource != null)
+            {
+                if (string.IsNullOrWhiteSpace(dataUrlSource.DataUrl))
+                    return null;
+
+                return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, dataUrlSource.DataUrl);
+            }
+
+            var vectorSource = source as IVectorImageSource;
+            if (vectorSource != null)
+            {
+                if (vectorSource.VectorHeight == 0 && vectorSource.VectorHeight == 0)
+                {
+                    if (element.Height > 0d && !double.IsInfinity(element.Height))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorHeight = (int)element.Height;
+                    }
+                    else if (element.Width > 0d && !double.IsInfinity(element.Width))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorWidth = (int)element.Width;
+                    }
+                    else if (element.HeightRequest > 0d && !double.IsInfinity(element.HeightRequest))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorHeight = (int)element.HeightRequest;
+                    }
+                    else if (element.WidthRequest > 0d && !double.IsInfinity(element.WidthRequest))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorWidth = (int)element.WidthRequest;
+                    }
+                    else if (element.MinimumHeightRequest > 0d && !double.IsInfinity(element.MinimumHeightRequest))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorHeight = (int)element.MinimumHeightRequest;
+                    }
+                    else if (element.MinimumWidthRequest > 0d && !double.IsInfinity(element.MinimumWidthRequest))
+                    {
+                        vectorSource.UseDipUnits = true;
+                        vectorSource.VectorWidth = (int)element.MinimumWidthRequest;
+                    }
+                }
+
+                return await GetImageSourceBinding(vectorSource.ImageSource, element).ConfigureAwait(false);
+            }
 
             throw new NotImplementedException("ImageSource type not supported");
         }

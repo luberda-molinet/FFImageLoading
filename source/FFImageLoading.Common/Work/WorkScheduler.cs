@@ -12,8 +12,7 @@ namespace FFImageLoading.Work
 {
     public class WorkScheduler : IWorkScheduler
     {
-        readonly object _runningTasksLock = new object();
-        readonly object _similarTasksLock = new object();
+        readonly object _lock = new object();
 
         int _statsTotalPending;
         int _statsTotalRunning;
@@ -27,11 +26,11 @@ namespace FFImageLoading.Work
             Performance = performance;
             PendingTasks = new PendingTasksQueue();
             RunningTasks = new Dictionary<string, IImageLoaderTask>();
-            SimilarTasks = new List<IImageLoaderTask>();
+            SimilarTasks = new ThreadSafeCollection<IImageLoaderTask>();
         }
 
-        protected int MaxParallelTasks 
-        { 
+        protected int MaxParallelTasks
+        {
             get
             {
                 if (Configuration.SchedulerMaxParallelTasksFactory != null)
@@ -44,24 +43,20 @@ namespace FFImageLoading.Work
         protected IPlatformPerformance Performance { get; private set; }
         protected PendingTasksQueue PendingTasks { get; private set; }
         protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; }
-        protected List<IImageLoaderTask> SimilarTasks { get; private set; }
+        protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; }
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
-            lock (_similarTasksLock)
+            lock (_lock)
             {
                 foreach (var task in PendingTasks.Where(p => predicate(p)))
                 {
                     task?.Cancel();
                 }
 
-                var items = SimilarTasks.Where(v => predicate(v)).ToList();
-                foreach (var item in items)
-                {
-                    SimilarTasks.Remove(item);
-                }
+                SimilarTasks.RemoveAll(predicate);
             }
         }
 
@@ -78,7 +73,7 @@ namespace FFImageLoading.Work
             {
                 Logger.Debug("ExitTasksEarly enabled.");
 
-                lock (_similarTasksLock)
+                lock (_lock)
                 {
                     foreach (var task in PendingTasks)
                         task?.Cancel();
@@ -121,7 +116,7 @@ namespace FFImageLoading.Work
         {
             if (task != null)
             {
-                lock (_similarTasksLock)
+                lock (_lock)
                 {
                     PendingTasks.Remove(task);
                     SimilarTasks.Remove(task);
@@ -129,49 +124,44 @@ namespace FFImageLoading.Work
             }
         }
 
-		public virtual async void LoadImage(IImageLoaderTask task)
-		{
-			Interlocked.Increment(ref _loadCount);
-
-			if (task == null)
-				return;
-
-            if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
-			{
-                if (!task.IsCompleted)
-				    task?.Dispose();
-				return;
-			}
-
-            if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
-            {
-                LogSchedulerStats();
-            }
-
-            if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
-            {
-                Logger.Error("ImageService: null path ignored");
-                task?.Dispose();
-                return;
-            }
-
-			if (task.Parameters.DelayInMs != null && task.Parameters.DelayInMs > 0)
-			{
-				await Task.Delay(task.Parameters.DelayInMs.Value).ConfigureAwait(false);
-			}
-
-            await task.Init();
-
-			// If we have the image in memory then it's pointless to schedule the job: just display it straight away
-			if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
-			{
-                Interlocked.Increment(ref _statsTotalMemoryCacheHits);
-                task?.Dispose();
-                return;
-			}
-
+        public virtual async void LoadImage(IImageLoaderTask task)
+        {
             try
             {
+                Interlocked.Increment(ref _loadCount);
+
+                if (task == null)
+                    return;
+
+                if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
+                {
+                    if (!task.IsCompleted)
+                        task.TryDispose();
+                    return;
+                }
+
+                if (Configuration.VerbosePerformanceLogging && (_loadCount % 10) == 0)
+                {
+                    LogSchedulerStats();
+                }
+
+                if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
+                {
+                    Logger.Error("ImageService: null path ignored");
+                    task.TryDispose();
+                    return;
+                }
+
+                await task.Init();
+
+                // If we have the image in memory then it's pointless to schedule the job: just display it straight away
+                if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
+                {
+                    Interlocked.Increment(ref _statsTotalMemoryCacheHits);
+                    task.TryDispose();
+                    return;
+                }
+
                 QueueImageLoadingTask(task);
             }
             catch (Exception ex)
@@ -190,8 +180,8 @@ namespace FFImageLoading.Work
             if (task.IsCancelled || task.IsCompleted || ExitTasksEarly)
             {
                 if (!task.IsCompleted)
-                    task?.Dispose();
-                
+                    task.TryDispose();
+
                 return;
             }
 
@@ -238,10 +228,7 @@ namespace FFImageLoading.Work
             {
                 Interlocked.Increment(ref _statsTotalWaiting);
                 Logger.Debug(string.Format("Wait for similar request for key: {0}", task.Key));
-                lock (_similarTasksLock)
-                {
-                    SimilarTasks.Add(task);
-                }
+                SimilarTasks.Add(task);
             }
         }
 
@@ -249,7 +236,14 @@ namespace FFImageLoading.Work
         {
             Task.Factory.StartNew(async () =>
             {
-                await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+                try
+                {
+                    await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("TakeFromPendingTasksAndRun exception", ex);
+                }
             }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
         }
 
@@ -287,7 +281,7 @@ namespace FFImageLoading.Work
             int urlTasksCount = 0;
             int preloadTasksCount = 0;
 
-            lock (_runningTasksLock)
+            lock (_lock)
             {
                 if (RunningTasks.Count >= MaxParallelTasks)
                 {
@@ -305,11 +299,10 @@ namespace FFImageLoading.Work
 
                 int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, IImageLoaderTask>();
+                IImageLoaderTask task = null;
 
-                while (tasksToRun.Count < numberOfTasks && PendingTasks.Count > 0)
+                while (tasksToRun.Count < numberOfTasks && PendingTasks.TryDequeue(out task))
                 {
-                    var task = PendingTasks.Dequeue();
-
                     if (task == null || task.IsCancelled || task.IsCompleted)
                         continue;
 
@@ -318,11 +311,8 @@ namespace FFImageLoading.Work
                     string rawKey = task.KeyRaw;
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
                     {
-                        lock (_similarTasksLock)
-                        {
-                            SimilarTasks.Add(task);
-                            continue;
-                        }
+                        SimilarTasks.Add(task);
+                        continue;
                     }
 
                     if (preloadOrUrlTasksCount != 0)
@@ -383,26 +373,24 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                lock (_runningTasksLock)
+                lock (_lock)
                 {
                     RunningTasks.Remove(keyRaw);
 
-                    lock (_similarTasksLock)
+                    if (SimilarTasks.Count > 0)
                     {
-                        if (SimilarTasks.Count > 0)
+                        SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
+                        var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw);
+                        foreach (var similar in similarItems)
                         {
-                            SimilarTasks.RemoveAll(v => v == null || v.IsCompleted || v.IsCancelled);
-                            var similarItems = SimilarTasks.Where(v => v.KeyRaw == keyRaw).ToList();
-                            foreach (var similar in similarItems)
-                            {
-                                SimilarTasks.Remove(similar);
-                                LoadImage(similar);
-                            }
+                            SimilarTasks.Remove(similar);
+
+                            LoadImage(similar);
                         }
                     }
                 }
 
-                pendingTask?.Dispose();
+                pendingTask.TryDispose();
                 await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false);
             }
         }
@@ -417,7 +405,7 @@ namespace FFImageLoading.Work
                         _statsTotalRunning,
                         _statsTotalMemoryCacheHits,
                         _statsTotalWaiting));
-            
+
             Logger.Debug(Performance.GetMemoryInfo());
         }
 

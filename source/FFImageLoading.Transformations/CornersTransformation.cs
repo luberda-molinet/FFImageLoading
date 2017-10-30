@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class CornersTransformation : ITransformation
 	{
 		public CornersTransformation()
@@ -15,7 +16,7 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
@@ -26,7 +27,7 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize, 
+		public CornersTransformation(double topLeftCornerSize, double topRightCornerSize, double bottomLeftCornerSize, double bottomRightCornerSize,
 			CornerTransformType cornersTransformType, double cropWidthRatio, double cropHeightRatio)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
@@ -40,7 +41,7 @@ namespace FFImageLoading.Transformations
 		public double CropHeightRatio { get; set; }
 		public CornerTransformType CornersTransformType { get; set; }
 
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}

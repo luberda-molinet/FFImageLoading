@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.BasicPage"
-		xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
-		xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
-		xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
-		Title="Basic">
-	<ContentPage.Content>
-		<ffimageloading:CachedImage WidthRequest="300" HeightRequest="300"
-			DownsampleToViewSize="true" Source="{Binding ImageUrl}">
-		</ffimageloading:CachedImage>
-	</ContentPage.Content>
+        xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
+        xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+        xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+        Title="Basic">
+    <ContentPage.Content>
+        <ffimageloading:CachedImage WidthRequest="300" HeightRequest="300"
+            DownsampleToViewSize="true" Source="{Binding ImageUrl}">
+        </ffimageloading:CachedImage>
+    </ContentPage.Content>
 </ContentPage>

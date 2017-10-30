@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)MvxImageLoadingView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MvxCachedImageView.cs" />
   </ItemGroup>
 </Project>

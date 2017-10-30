@@ -11,18 +11,21 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace FFImageLoading.Work
 {
-    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<WriteableBitmap, TImageView> where TImageView : class
+    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<BitmapSource, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
-        public PlatformImageLoaderTask(ITarget<WriteableBitmap, TImageView> target, TaskParameter parameters, IImageService imageService, Configuration configuration, IMainThreadDispatcher mainThreadDispatcher)
-            : base(ImageCache.Instance, configuration.DataResolverFactory ?? DataResolvers.DataResolverFactory.Instance, target, parameters, imageService, configuration, mainThreadDispatcher, false)
+        public PlatformImageLoaderTask(ITarget<BitmapSource, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
-
+            // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
+            ScaleHelper.Init();
         }
 
-        protected override Task SetTargetAsync(WriteableBitmap image, bool animated)
+        protected override Task SetTargetAsync(BitmapSource image, bool animated)
         {
+            if (Target == null)
+                return Task.FromResult(true);
+            
             return MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
@@ -30,7 +33,7 @@ namespace FFImageLoading.Work
             });
         }
 
-        protected async override Task<WriteableBitmap> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected async override Task<BitmapSource> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             BitmapHolder imageIn = null;
 
@@ -41,23 +44,23 @@ namespace FFImageLoading.Work
 
             try
             {
-                // Special case to handle WebP decoding on Windows
-                if (source != ImageSource.Stream && path.ToLowerInvariant().EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
+                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
                     throw new NotImplementedException("Webp is not implemented on Windows");
                 }
                 else if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
                 {
-                    imageIn = await imageData.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
+                    imageIn = await imageData.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
                 }
                 else
                 {
-                    return await imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, imageInformation).ConfigureAwait(false);
+                    return await imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
                 }
             }
             finally
             {
-                imageData?.Dispose();
+                imageData.TryDispose();
             }
 
             ThrowIfCancellationRequested();
@@ -66,7 +69,8 @@ namespace FFImageLoading.Work
             {
                 var transformations = Parameters.Transformations.ToList();
 
-                await _decodingLock.WaitAsync().ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+                ThrowIfCancellationRequested();
 
                 try
                 {
@@ -78,7 +82,7 @@ namespace FFImageLoading.Work
 
                         try
                         {
-                            IBitmap bitmapHolder = transformation.Transform(imageIn);
+                            IBitmap bitmapHolder = transformation.Transform(imageIn, path, source, isPlaceholder, Key);
                             imageIn = bitmapHolder.ToNative();
                         }
                         catch (Exception ex)

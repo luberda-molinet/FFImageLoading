@@ -26,9 +26,9 @@ namespace FFImageLoading.Transformations
 			get { return string.Format("CircleTransformation,borderSize={0},borderHexColor={1}", BorderSize, BorderHexColor); }
 		}
 
-		protected override Bitmap Transform(Bitmap source)
+		protected override Bitmap Transform(Bitmap sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
-			return RoundedTransformation.ToRounded(source, 0f, 1f, 1f, BorderSize, BorderHexColor);
+			return RoundedTransformation.ToRounded(sourceBitmap, 0f, 1f, 1f, BorderSize, BorderHexColor);
 		}
 	}
 }

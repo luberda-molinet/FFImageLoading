@@ -16,7 +16,7 @@
 //		{
 //			if (imageView == null || imageView.Handle == IntPtr.Zero)
 //				return null;
-			
+
 //			var drawable = imageView.Drawable;
 
 //			var asyncDrawable = drawable as IAsyncDrawable;

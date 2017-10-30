@@ -7,12 +7,12 @@
 	<ContentPage.Content>
 		<ScrollView>
 			<StackLayout>
-				
+
 				<ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
 					LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png" DownsampleToViewSize="true"
 					Aspect="AspectFit" HeightRequest="400" WidthRequest="400" Source="{Binding ImageUrl}">
 					<ffimageloading:CachedImage.Transformations>
-						<fftransformations:CornersTransformation 
+						<fftransformations:CornersTransformation
 							CornersTransformType="BottomLeftCut,TopRightRounded"
 							BottomLeftCornerSize="20"
 							TopRightCornerSize="30"/>
@@ -20,9 +20,9 @@
 				</ffimageloading:CachedImage>
 
 				<Label Text="CornersTransformation" HorizontalTextAlignment="Center"/>
-				
+
 				<Button Text="Load another image" Command="{Binding LoadAnotherCommand}"/>
-				
+
 			</StackLayout>
 		</ScrollView>
 	</ContentPage.Content>

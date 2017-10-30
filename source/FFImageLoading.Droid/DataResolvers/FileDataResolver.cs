@@ -26,7 +26,7 @@ namespace FFImageLoading.DataResolvers
             imageInformation.SetFilePath(identifier);
 
             return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
-                stream, LoadingResult.Disk, imageInformation));          
+                stream, LoadingResult.Disk, imageInformation));
         }
     }
 }

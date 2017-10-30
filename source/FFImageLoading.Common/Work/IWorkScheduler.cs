@@ -20,10 +20,10 @@ namespace FFImageLoading.Work
 
         void RemovePendingTask(IImageLoaderTask task);
 
-        /// <summary>      
-        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.        
-        /// </summary>        
-        /// <param name="key">Key for cache lookup.</param>       
+        /// <summary>
+        /// Schedules the image loading. If image is found in cache then it returns it, otherwise it loads it.
+        /// </summary>
+        /// <param name="key">Key for cache lookup.</param>
         /// <param name="task">Image loading task.</param>
         void LoadImage(IImageLoaderTask task);
     }

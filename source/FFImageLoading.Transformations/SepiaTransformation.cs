@@ -3,9 +3,10 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
-	public class SepiaTransformation: ITransformation
+    [Preserve(AllMembers = true)]
+	public class SepiaTransformation : ITransformation
 	{
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}

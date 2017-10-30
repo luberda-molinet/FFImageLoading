@@ -72,24 +72,25 @@ namespace FFImageLoading.Transformations
 			_colorMatrix.AVector = new CIVector(ma[0][3], ma[1][3], ma[2][3], ma[3][3]);
 			_colorMatrix.BiasVector = new CIVector(ma[0][4], ma[1][4], ma[2][4], ma[3][4]);
 		}
-			
-		protected override UIImage Transform(UIImage source)
+
+		protected override UIImage Transform(UIImage sourceBitmap, string path, Work.ImageSource source, bool isPlaceholder, string key)
 		{
 			if (_colorMatrix != null)
 			{
-				return ToFilter(source, _colorMatrix);
+				return ToFilter(sourceBitmap, _colorMatrix);
 			}
 			else
 			{
-				return ToColorSpace(source, _colorSpace);
+				return ToColorSpace(sourceBitmap, _colorSpace);
 			}
 		}
 
 		public static UIImage ToColorSpace(UIImage source, CGColorSpace colorSpace)
 		{
 			CGRect bounds = new CGRect(0, 0, source.Size.Width, source.Size.Height);
+            var cgImage = source.CGImage;
 
-			using (var context = new CGBitmapContext(IntPtr.Zero, (int)bounds.Width, (int)bounds.Height, 8, 0, colorSpace, CGImageAlphaInfo.None)) 
+            using (var context = new CGBitmapContext(IntPtr.Zero, (int)bounds.Width, (int)bounds.Height, cgImage.BitsPerComponent, cgImage.BytesPerRow, colorSpace, CGImageAlphaInfo.None))
 			{
 				context.DrawImage(bounds, source.CGImage);
 				using (var imageRef = context.ToImage())
@@ -108,7 +109,7 @@ namespace FFImageLoading.Transformations
 				using (var resultImage = context.CreateCGImage(filter.OutputImage, inputImage.Extent))
 				{
 					return new UIImage(resultImage);
-				}	
+				}
 			}
 		}
 	}

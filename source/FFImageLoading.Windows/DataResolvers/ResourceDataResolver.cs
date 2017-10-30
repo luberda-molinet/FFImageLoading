@@ -16,7 +16,8 @@ namespace FFImageLoading.DataResolvers
         public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             StorageFile file = null;
-            await _cacheLock.WaitAsync();
+            await _cacheLock.WaitAsync(token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
 
             try
             {

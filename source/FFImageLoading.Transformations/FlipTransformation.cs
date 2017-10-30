@@ -3,6 +3,7 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
+    [Preserve(AllMembers = true)]
 	public class FlipTransformation : ITransformation
 	{
 		public FlipTransformation()
@@ -15,12 +16,12 @@ namespace FFImageLoading.Transformations
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public IBitmap Transform(IBitmap source)
+        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
 			throw new Exception(Common.DoNotReferenceMessage);
 		}
 
-		public FlipType FlipType { get; set; }
+        public FlipType FlipType { get; set; }
 
 		public string Key
 		{

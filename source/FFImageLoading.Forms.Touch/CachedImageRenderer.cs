@@ -1,379 +1,321 @@
 ﻿using CoreGraphics;
+using CoreAnimation;
 using System;
 using System.ComponentModel;
-using UIKit;
-using Xamarin.Forms.Platform.iOS;
 using Xamarin.Forms;
 using FFImageLoading.Work;
 using Foundation;
 using FFImageLoading.Forms;
-using FFImageLoading.Forms.Touch;
 using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
 
-[assembly:ExportRenderer(typeof (CachedImage), typeof (CachedImageRenderer))]
-namespace FFImageLoading.Forms.Touch
-{
-	/// <summary>
-	/// CachedImage Implementation
-	/// </summary>
-	[Preserve(AllMembers = true)]
-	public class CachedImageRenderer : ViewRenderer<CachedImage, UIImageView>
-	{
-		private bool _isDisposed;
-		private IScheduledWork _currentTask;
-		private ImageSourceBinding _lastImageSource;
+#if __IOS__
+using UIKit;
+using PImage = UIKit.UIImage;
+using PImageView = UIKit.UIImageView;
+using Xamarin.Forms.Platform.iOS;
+using FFImageLoading.Forms.Touch;
+#elif __MACOS__
+using AppKit;
+using PImage = AppKit.NSImage;
+using PImageView = FFImageLoading.Forms.Mac.CachedImageRenderer.FormsNSImageView;
+using Xamarin.Forms.Platform.MacOS;
+using FFImageLoading.Forms.Mac;
+using System.IO;
+#endif
 
-		/// <summary>
-		///   Used for registration with dependency service
-		/// </summary>
-		public static new void Init()
-		{
-			// needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
-			#pragma warning disable 0219
-			var dummy = new CachedImageRenderer();
-			#pragma warning restore 0219
-		}
+#if __IOS__
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+namespace FFImageLoading.Forms.Touch
+#elif __MACOS__
+[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+namespace FFImageLoading.Forms.Mac
+#endif
+{
+    /// <summary>
+    /// CachedImage Implementation
+    /// </summary>
+    [Preserve(AllMembers = true)]
+    public class CachedImageRenderer : ViewRenderer<CachedImage, PImageView>
+    {
+        private bool _isDisposed;
+        private IScheduledWork _currentTask;
+        private ImageSourceBinding _lastImageSource;
+
+        /// <summary>
+        ///   Used for registration with dependency service
+        /// </summary>
+        public static new void Init()
+        {
+            ScaleHelper.Init();
+            // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
+#pragma warning disable 0219
+            var ignore1 = typeof(CachedImageRenderer);
+            var ignore2 = typeof(CachedImage);
+#pragma warning restore 0219
+        }
 
         protected override void Dispose(bool disposing)
-		{
-			if (_isDisposed)
-				return;
+        {
+            if (!_isDisposed)
+            {
+                _isDisposed = true;
+                CancelIfNeeded();
+            }
 
-			if (disposing && Control != null)
-			{
-				UIImage image = Control.Image;
-				if (image != null)
-				{
-					image.Dispose();
-					image = null;
-				}
-			}
+            base.Dispose(disposing);
+        }
 
-			_isDisposed = true;
-			base.Dispose(disposing);
-		}
+        protected override void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
+        {
+            base.OnElementChanged(e);
 
-		protected override void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
-		{
-			if (Control == null)
-			{
-				SetNativeControl(new UIImageView(CGRect.Empty) {
-					ContentMode = UIViewContentMode.ScaleAspectFit,
-					ClipsToBounds = true
-				});
-			}
+            if (Control == null && Element != null && !_isDisposed)
+            {
+#if __IOS__
+                SetNativeControl(new PImageView(CGRect.Empty)
+                {
+                    ContentMode = UIViewContentMode.ScaleAspectFit,
+                    ClipsToBounds = true
+                });
+#elif __MACOS__
+                SetNativeControl(new PImageView());
+#endif
+            }
 
-			if (e.NewElement != null)
-			{
-				SetAspect();
-				SetImage(e.OldElement);
-				SetOpacity();
+            if (e.OldElement != null)
+            {
+                e.OldElement.InternalReloadImage = null;
+                e.OldElement.InternalCancel = null;
+                e.OldElement.InternalGetImageAsJPG = null;
+                e.OldElement.InternalGetImageAsPNG = null;
+            }
 
-				e.NewElement.InternalReloadImage = new Action(ReloadImage);
-				e.NewElement.InternalCancel = new Action(Cancel);
-				e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
-				e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
-			}
-			base.OnElementChanged(e);
-		}
-			
-		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			base.OnElementPropertyChanged(sender, e);
+            if (e.NewElement != null)
+            {
+                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+                e.NewElement.InternalCancel = new Action(CancelIfNeeded);
+                e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
+                e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-			if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
-			{
-				SetImage();
-			}
-			if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
-			{
-				SetOpacity();
-			}
-			if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
-			{
-				SetAspect();
-			}
-		}
+                SetAspect();
+                UpdateImage(Control, Element, e.OldElement);
+                SetOpacity();
+            }
+        }
 
-		private void SetAspect()
-		{
-			Control.ContentMode = Element.Aspect.ToUIViewContentMode();
-		}
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
 
-		private void SetOpacity()
-		{
-			Control.Opaque = Element.IsOpaque;
-		}
+            if (e.PropertyName == CachedImage.SourceProperty.PropertyName)
+            {
+                UpdateImage(Control, Element, null);
+            }
+            if (e.PropertyName == CachedImage.IsOpaqueProperty.PropertyName)
+            {
+                SetOpacity();
+            }
+            if (e.PropertyName == CachedImage.AspectProperty.PropertyName)
+            {
+                SetAspect();
+            }
+        }
 
-		private void SetImage(CachedImage oldElement = null)
-		{
-			Xamarin.Forms.ImageSource source = Element.Source;
+        void SetAspect()
+        {
+            if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
+                return;
+#if __IOS__
+            Control.ContentMode = Element.Aspect.ToUIViewContentMode();
+#elif __MACOS__
+            switch (Element.Aspect)
+            {
+                case Aspect.AspectFill:
+                    Control.Layer.ContentsGravity = CALayer.GravityResizeAspectFill;
+                    break;
+                case Aspect.Fill:
+                    Control.Layer.ContentsGravity = CALayer.GravityResize;
+                    break;
+                case Aspect.AspectFit:
+                default:
+                    Control.Layer.ContentsGravity = CALayer.GravityResizeAspect;
+                    break;
+            }
+#endif
+        }
 
-			var ffSource = ImageSourceBinding.GetImageSourceBinding(source, Element);
-			var placeholderSource = ImageSourceBinding.GetImageSourceBinding(Element.LoadingPlaceholder, Element);
+        void SetOpacity()
+        {
+            if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
+                return;
+#if __IOS__
+            Control.Opaque = Element.IsOpaque;
+#elif __MACOS__            
+            Control.SetIsOpaque(Element.IsOpaque);
+#endif
+        }
 
-			if (oldElement != null && _lastImageSource != null && ffSource != null && !ffSource.Equals(_lastImageSource)
-				&& (string.IsNullOrWhiteSpace(placeholderSource?.Path) || placeholderSource?.Stream != null))
-			{
-				_lastImageSource = null;
-				Control.Image = null;
-			}
+        void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
+        {
+            CancelIfNeeded();
 
-			Element.SetIsLoading(true);
+            if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
+                return;
 
-			Cancel();
-			TaskParameter imageLoader = null;
+            var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
+            if (ffSource == null)
+            {
+                if (_lastImageSource == null)
+                    return;
 
-			if (ffSource == null)
-			{
-				if (Control != null)
-					Control.Image = null;
-				
-				ImageLoadingFinished(Element);
-			}
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
-			{
-				imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, Element.CacheDuration);
-			}
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
-			{
-				imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
-			}
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
-			{
-				imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
-			}
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
-			{
-				imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
-			}
-			else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
-			{
-				imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
-			}
+                _lastImageSource = null;
+                imageView.Image = null;
+                return;
+            }
 
-			if (imageLoader != null)
-			{
-				// CustomKeyFactory
-				if (Element.CacheKeyFactory != null)
-				{
-					var bindingContext = Element.BindingContext;
-					imageLoader.CacheKey(Element.CacheKeyFactory.GetKey(source, bindingContext));
-				}
+            if (previousImage != null && !ffSource.Equals(_lastImageSource))
+            {
+                _lastImageSource = null;
+                imageView.Image = null;
+            }
 
-				// LoadingPlaceholder
-				if (Element.LoadingPlaceholder != null)
-				{
-					if (placeholderSource != null)
-						imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-				}
+            image.SetIsLoading(true);
 
-				// ErrorPlaceholder
-				if (Element.ErrorPlaceholder != null)
-				{
-					var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(Element.ErrorPlaceholder, Element);
-					if (errorPlaceholderSource != null)
-						imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
-				}
+            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
+            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
+            TaskParameter imageLoader;
+            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
-				// Enable vector image source
-				var vect1 = Element.Source as IVectorImageSource;
-				var vect2 = Element.LoadingPlaceholder as IVectorImageSource;
-				var vect3 = Element.ErrorPlaceholder as IVectorImageSource;
-				if (vect1 != null)
-				{
-					imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
-				}
-				if (vect2 != null)
-				{
-					imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
-				}
-				if (vect3 != null)
-				{
-					imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
-				}
-				if (Element.CustomDataResolver != null)
-				{
-					imageLoader.WithCustomDataResolver(Element.CustomDataResolver);
-					imageLoader.WithCustomLoadingPlaceholderDataResolver(Element.CustomDataResolver);
-					imageLoader.WithCustomErrorPlaceholderDataResolver(Element.CustomDataResolver);
-				}
+            if (imageLoader != null)
+            {
+                var finishAction = imageLoader.OnFinish;
+                var sucessAction = imageLoader.OnSuccess;
 
-				// Downsample
-				if (Element.DownsampleToViewSize && (Element.Width > 0 || Element.Height > 0))
-				{
-					if (Element.Height > Element.Width)
-					{
-						imageLoader.DownSampleInDip(height: (int)Element.Height);
-					}
-					else
-					{
-						imageLoader.DownSampleInDip(width: (int)Element.Width);
-					}
-				}
-				else if (Element.DownsampleToViewSize && (Element.WidthRequest > 0 || Element.HeightRequest > 0))
-				{
-					if (Element.HeightRequest > Element.WidthRequest)
-					{
-						imageLoader.DownSampleInDip(height: (int)Element.HeightRequest);
-					}
-					else
-					{
-						imageLoader.DownSampleInDip(width: (int)Element.WidthRequest);
-					}
-				}
-				else if ((int)Element.DownsampleHeight != 0 || (int)Element.DownsampleWidth != 0)
-				{
-					if (Element.DownsampleHeight > Element.DownsampleWidth)
-					{
-						if (Element.DownsampleUseDipUnits)
-							imageLoader.DownSampleInDip(height: (int)Element.DownsampleHeight);
-						else
-							imageLoader.DownSample(height: (int)Element.DownsampleHeight);
-					}
-					else
-					{
-						if (Element.DownsampleUseDipUnits)
-							imageLoader.DownSampleInDip(width: (int)Element.DownsampleWidth);
-						else
-							imageLoader.DownSample(width: (int)Element.DownsampleWidth);
-					}
-				}
+                imageLoader.Finish((work) =>
+                {
+                    finishAction?.Invoke(work);
+                    ImageLoadingFinished(image);
+                });
 
-				// RetryCount
-				if (Element.RetryCount > 0)
-				{
-					imageLoader.Retry(Element.RetryCount, Element.RetryDelay);
-				}
+                imageLoader.Success((imageInformation, loadingResult) =>
+                {
+                    sucessAction?.Invoke(imageInformation, loadingResult);
+                    _lastImageSource = ffSource;
+                });
 
-				if (Element.BitmapOptimizations.HasValue)
-					imageLoader.BitmapOptimizations(Element.BitmapOptimizations.Value);
+                _currentTask = imageLoader.Into(imageView);
+            }
+        }
 
-				// FadeAnimation
-				if (Element.FadeAnimationEnabled.HasValue)
-					imageLoader.FadeAnimation(Element.FadeAnimationEnabled.Value);
-
-				// TransformPlaceholders
-				if (Element.TransformPlaceholders.HasValue)
-					imageLoader.TransformPlaceholders(Element.TransformPlaceholders.Value);
-
-				// Transformations
-				if (Element.Transformations != null && Element.Transformations.Count > 0)
-				{
-					imageLoader.Transform(Element.Transformations);
-				}
-
-                imageLoader.WithPriority(Element.LoadingPriority);
-			    if (Element.CacheType.HasValue)
-			    {
-                    imageLoader.WithCache(Element.CacheType.Value);
+        async void ImageLoadingFinished(CachedImage element)
+        {
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            {
+                if (element != null && !_isDisposed)
+                {
+                    ((IVisualElementController)element).NativeSizeChanged();
+                    element.SetIsLoading(false);
                 }
+            });
+        }
 
-				if (Element.LoadingDelay.HasValue)
-				{
-					imageLoader.Delay(Element.LoadingDelay.Value);
-				}
+        void ReloadImage()
+        {
+            UpdateImage(Control, Element, null);
+        }
 
-				var element = Element;
+        void CancelIfNeeded()
+        {
+            try
+            {
+                var taskToCancel = _currentTask;
+                if (taskToCancel != null && !taskToCancel.IsCancelled)
+                {
+                    taskToCancel.Cancel();
+                }
+            }
+            catch (Exception) { }
+        }
 
-				imageLoader.Finish((work) => {
-					element.OnFinish(new CachedImageEvents.FinishEventArgs(work));
-					ImageLoadingFinished(element);
-				});
+        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        {
+            return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
+        }
 
-				imageLoader.Success((imageInformation, loadingResult) =>
-				{
-					element.OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult));
-					_lastImageSource = ffSource;
-				});
+        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        {
+            return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
+        }
 
-				imageLoader.Error((exception) => 
-					element.OnError(new CachedImageEvents.ErrorEventArgs(exception)));
+        async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+        {
+            PImage image = null;
 
-				imageLoader.DownloadStarted((downloadInformation) =>
-					element.OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            {
+                if (Control != null)
+                    image = Control.Image;
+            }).ConfigureAwait(false);
 
-				imageLoader.DownloadProgress((progress) =>
-					element.OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
+            if (image == null)
+                return null;
 
-				imageLoader.FileWriteFinished((fileWriteInfo) =>
-					element.OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
-				
-				_currentTask = imageLoader.Into(Control);	
-			}
-		}
+            if (desiredWidth != 0 || desiredHeight != 0)
+            {
+                image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
+            }
 
-		private void ImageLoadingFinished(CachedImage element)
-		{
-			MainThreadDispatcher.Instance.Post(() =>
-			{
-				if (element != null && !_isDisposed)
-				{
-					((IVisualElementController)element).NativeSizeChanged();
-					element.SetIsLoading(false);
-				}
-			});
-		}
+#if __IOS__
 
-		private void ReloadImage()
-		{
-			SetImage(null);
-		}
+            NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
 
-		private void Cancel()
-		{
-			var taskToCancel = _currentTask;
-			if (taskToCancel != null && !taskToCancel.IsCancelled)
-			{
-				taskToCancel.Cancel();
-			}
-		}
-			
-		private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
-		{
-			return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
-		}
+            if (imageData == null || imageData.Length == 0)
+                return null;
 
-		private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
-		{
-			return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
-		}
+            var encoded = imageData.ToArray();
+            imageData.TryDispose();
+            return encoded;
+#elif __MACOS__
 
-		private async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
-		{
-			UIImage image = null;
+            byte[] encoded;
+            using (MemoryStream ms = new MemoryStream())
+            using (var stream = usePNG ? image.AsPngStream() : image.AsJpegStream(quality))
+            {
+                stream.CopyTo(ms);
+                encoded = ms.ToArray();
+            }
 
-			await MainThreadDispatcher.Instance.PostAsync(() => {
-				if (Control != null)
-					image = Control.Image;
-			}).ConfigureAwait(false);
+            if (desiredWidth != 0 || desiredHeight != 0)
+            {
+                image.TryDispose();
+            }
 
-			if (image == null)
-				return null;
+            return encoded;
+#endif
+        }
 
-			if (desiredWidth != 0 || desiredHeight != 0)
-			{
-				image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
-			}
+#if __MACOS__
+        public class FormsNSImageView : NSImageView
+        {
+            bool _isOpaque;
 
-			NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+            public FormsNSImageView()
+            {
+                Layer = new CALayer();
+                WantsLayer = true;
+            }
 
-			if (imageData == null || imageData.Length == 0)
-				return null;
+            public void SetIsOpaque(bool isOpaque)
+            {
+                _isOpaque = isOpaque;
+            }
 
-			var encoded = imageData.ToArray();
-			imageData.Dispose();
-
-			if (desiredWidth != 0 || desiredHeight != 0)
-			{
-				image.Dispose();
-			}
-
-			return encoded;	
-		}
-	}
+            public override bool IsOpaque => _isOpaque;
+        }
+#endif
+    }
 }
 
