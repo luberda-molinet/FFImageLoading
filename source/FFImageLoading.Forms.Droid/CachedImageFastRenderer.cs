@@ -27,7 +27,8 @@ namespace FFImageLoading.Forms.Droid
     [Preserve(AllMembers = true)]
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
-        static Type _elementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
+        public static Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
+        static MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions").GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
         bool _isDisposed;
         CachedImage _element;
         int? _defaultLabelFor;
@@ -88,7 +89,8 @@ namespace FFImageLoading.Forms.Droid
 
         void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
         {
-            this.EnsureId();
+            //this.EnsureId();
+            _viewExtensionsMethod.Invoke(null, new[] { this });
 
             // TODO Xamarin-Internal class - Is it necessary? 
             // ElevationHelper.SetElevation(this, e.NewElement);
@@ -161,7 +163,7 @@ namespace FFImageLoading.Forms.Droid
 
             if (_visualElementRenderer == null)
             {
-                _visualElementRenderer = (IDisposable)Activator.CreateInstance(_elementRendererType, this);
+                _visualElementRenderer = (IDisposable)Activator.CreateInstance(ElementRendererType, this);
             }
 
             _motionEventHelper.UpdateElement(element);

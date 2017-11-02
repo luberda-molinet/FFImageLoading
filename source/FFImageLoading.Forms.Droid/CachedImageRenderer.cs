@@ -29,14 +29,25 @@ namespace FFImageLoading.Forms.Droid
         /// <summary>
         ///   Used for registration with dependency service
         /// </summary>
-        public static void Init(bool enableFastRenderer)
+        public static void Init(bool? enableFastRenderer = default(bool?))
         {
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
 
-            RegisterRenderer(typeof(CachedImage), enableFastRenderer ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
+            var enabled = false;
+
+            if (enableFastRenderer.HasValue)
+            {
+                enabled = enableFastRenderer.Value;
+            }
+            else
+            {
+                enabled = CachedImageFastRenderer.ElementRendererType != null;
+            }
+
+            RegisterRenderer(typeof(CachedImage), enabled ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
         }
 
         static void RegisterRenderer(Type type, Type renderer)
