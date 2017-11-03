@@ -21,8 +21,8 @@ namespace FFImageLoading.DataResolvers
             if (!_resourceIdentifiersCache.TryGetValue(resourceName, out resourceId))
             {
                 token.ThrowIfCancellationRequested();
-                resourceId = Context.Resources.GetIdentifier(resourceName.ToLower(), "drawable", Context.PackageName);
-                _resourceIdentifiersCache.TryAdd(resourceName.ToLower(), resourceId);
+                resourceId = Context.Resources.GetIdentifier(resourceName.ToLowerInvariant(), "drawable", Context.PackageName);
+                _resourceIdentifiersCache.TryAdd(resourceName.ToLowerInvariant(), resourceId);
             }
 
             if (resourceId == 0)
