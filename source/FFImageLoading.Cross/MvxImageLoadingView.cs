@@ -125,7 +125,7 @@ namespace FFImageLoading.Cross
                 if (string.IsNullOrEmpty(_dataLocationUri))
                     return;
 
-                var dataLocationUriLower = _dataLocationUri.ToLower();
+                var dataLocationUriLower = _dataLocationUri.ToLowerInvariant();
 
                 if (dataLocationUriLower.StartsWith("res:"))
                 {
