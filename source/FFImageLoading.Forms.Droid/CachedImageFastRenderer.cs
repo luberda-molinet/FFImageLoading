@@ -28,7 +28,7 @@ namespace FFImageLoading.Forms.Droid
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
         public static Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
-        static MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions").GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
+        static MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
         bool _isDisposed;
         CachedImage _element;
         int? _defaultLabelFor;

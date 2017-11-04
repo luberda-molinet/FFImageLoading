@@ -33,7 +33,8 @@ namespace FFImageLoading.Forms.Droid
         {
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
-            var ignore2 = typeof(CachedImage);
+            var ignore2 = typeof(CachedImageFastRenderer);
+            var ignore3 = typeof(CachedImage);
 #pragma warning restore 0219
 
             var enabled = false;
