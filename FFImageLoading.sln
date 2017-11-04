@@ -95,7 +95,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Mac", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Forms.Sample.Mac", "samples\ImageLoading.Forms.Sample\Mac\FFImageLoading.Forms.Sample.Mac.csproj", "{75D24499-446D-47DD-9C9A-295E40010CF1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFImageLoading.Tests", "source\Tests\FFImageLoading.Tests\FFImageLoading.Tests.csproj", "{844EF512-7E52-4515-AC00-5FF50800F2B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Tests", "source\Tests\FFImageLoading.Tests\FFImageLoading.Tests.csproj", "{844EF512-7E52-4515-AC00-5FF50800F2B5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Mock", "source\FFImageLoading.Mock\FFImageLoading.Mock.csproj", "{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}"
 EndProject
