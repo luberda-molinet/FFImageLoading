@@ -18,6 +18,7 @@ using Android.Views;
 using System.Reflection;
 
 //[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
+using System.Linq;
 namespace FFImageLoading.Forms.Droid
 {
     /// <summary>
@@ -66,6 +67,8 @@ namespace FFImageLoading.Forms.Droid
         IScheduledWork _currentTask;
         ImageSourceBinding _lastImageSource;
         readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;
+        readonly static Type _platformDefaultRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.Platform+DefaultRenderer");
+        readonly static MethodInfo _platformDefaultRendererTypeNotifyFakeHandling = _platformDefaultRendererType?.GetMethod("NotifyFakeHandling", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
         public CachedImageRenderer()
         {
@@ -312,29 +315,24 @@ namespace FFImageLoading.Forms.Droid
                     return false;
                 }
 
-                var renderer = parent as VisualElementRenderer<Xamarin.Forms.View>;
-                if (renderer == null)
+                var rendererType = parent.GetType();
+                if (!_platformDefaultRendererType.IsAssignableFrom(rendererType))
                 {
                     return false;
                 }
 
-                var type = parent.GetType();
-                if (type.Name.Contains("DefaultRenderer"))
+                try
                 {
-                    try
+                    // Let the container know that we're "fake" handling this event
+                    if (_platformDefaultRendererTypeNotifyFakeHandling != null)
                     {
-                        // Let the container know that we're "fake" handling this event
-                        var method = type.GetTypeInfo().GetDeclaredMethod("NotifyFakeHandling");
-                        if (method != null)
-                        {
-                            method.Invoke(parent, null);
-                            return true;
-                        }
+                        _platformDefaultRendererTypeNotifyFakeHandling.Invoke(parent, null);
+                        return true;
                     }
-                    catch (Exception) { }
                 }
+                catch (Exception) { }
 
-                return true;
+                return false;
             }
 
             public void UpdateElement(VisualElement element)

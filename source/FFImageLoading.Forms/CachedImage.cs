@@ -19,7 +19,7 @@ namespace FFImageLoading.Forms
         //TODO It's a breaking change, so change it in major version
         public static bool FixedOnMeasureBehavior { get; set; } = false;
 
-        public static bool FixedAndroidMotionEventHandler { get; set; } = false;
+        public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
         public CachedImage()
         {

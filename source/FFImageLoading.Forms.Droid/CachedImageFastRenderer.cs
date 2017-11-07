@@ -27,8 +27,10 @@ namespace FFImageLoading.Forms.Droid
     [Preserve(AllMembers = true)]
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
-        public static Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
+        internal static Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
         static MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
+        static MethodInfo _ElementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
+
         bool _isDisposed;
         CachedImage _element;
         int? _defaultLabelFor;
@@ -119,8 +121,10 @@ namespace FFImageLoading.Forms.Droid
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-            if (base.OnTouchEvent(e))
+            if ((bool)_ElementRendererTypeOnTouchEvent.Invoke(_visualElementRenderer, new[] { e }) || base.OnTouchEvent(e))
+            {
                 return true;
+            }
 
             return CachedImage.FixedAndroidMotionEventHandler ? _motionEventHelper.HandleMotionEvent(Parent, e) : false;
         }
