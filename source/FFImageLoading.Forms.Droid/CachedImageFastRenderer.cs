@@ -265,14 +265,14 @@ namespace FFImageLoading.Forms.Droid
 
             if (imageLoader != null)
             {
-                //var finishAction = imageLoader.OnFinish;
+                var finishAction = imageLoader.OnFinish;
                 var sucessAction = imageLoader.OnSuccess;
 
-                //imageLoader.Finish((work) =>
-                //{
-                //    finishAction?.Invoke(work);
-                //    // ImageLoadingFinished(image);
-                //});
+                imageLoader.Finish((work) =>
+                {
+                    finishAction?.Invoke(work);
+                    image.SetIsLoading(false);
+                });
 
                 imageLoader.Success((imageInformation, loadingResult) =>
                 {
