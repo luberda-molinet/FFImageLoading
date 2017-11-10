@@ -1,4 +1,4 @@
-# FFImageLoading - Fast & Furious Image Loading [![AppVeyor][ci-img]][ci-link]
+# FFImageLoading - Fast & Furious Image Loading [![AppVeyor][ci-img]][ci-link] [![Donate][donate-img]][donate-link]
 
 Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (UWP, WinRT).
 
@@ -44,6 +44,9 @@ https://github.com/luberda-molinet/FFImageLoading/wiki
 
 [ci-img]: https://img.shields.io/appveyor/ci/daniel-luberda/ffimageloading.svg
 [ci-link]: https://ci.appveyor.com/project/daniel-luberda/ffimageloading
+
+[donate-img]: http://img.shields.io/paypal/donate.png?color=green
+[donate-link]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CAQBVTDP2TPPU
 
 [ffil-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.svg
 [ffil-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading

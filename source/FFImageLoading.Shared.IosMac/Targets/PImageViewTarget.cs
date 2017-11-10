@@ -79,6 +79,6 @@ namespace FFImageLoading.Targets
 
             control.Image = null;
         }
-	}
+    }
 }
 

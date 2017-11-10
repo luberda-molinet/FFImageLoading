@@ -28,6 +28,7 @@ namespace FFImageLoading.Svg.Platform
         private static readonly Regex WSRe = new Regex(@"\s{2,}");
 
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
+        private Dictionary<string, string> styles;
         private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
         {
             DtdProcessing = DtdProcessing.Ignore,
@@ -261,6 +262,11 @@ namespace FFImageLoading.Svg.Platform
             // parse elements
             switch (elementName)
             {
+                case "style":
+                    {
+                        styles = CssHelpers.ParseSelectors(e.Value);
+                        break;
+                    }
                 case "image":
                     {
                         var uri = ReadHrefString(e);
@@ -733,6 +739,29 @@ namespace FFImageLoading.Svg.Platform
         {
             // get from local attributes
             var dic = e.Attributes().Where(a => HasSvgNamespace(a.Name)).ToDictionary(k => k.Name.LocalName, v => v.Value);
+
+            string className;
+            string glStyle;
+
+            if (styles != null && styles.TryGetValue(e.Name.LocalName, out glStyle))
+            {
+                // get from stlye attribute
+                var styleDic = ReadStyle(glStyle);
+
+                // overwrite
+                foreach (var pair in styleDic)
+                    dic[pair.Key] = pair.Value;
+            }
+            if (styles != null && dic.TryGetValue("class", out className)
+                && styles.TryGetValue("." + className, out glStyle))
+            {
+                // get from stlye attribute
+                var styleDic = ReadStyle(glStyle);
+
+                // overwrite
+                foreach (var pair in styleDic)
+                    dic[pair.Key] = pair.Value;
+            }
 
             var style = e.Attribute("style")?.Value;
             if (!string.IsNullOrWhiteSpace(style))
