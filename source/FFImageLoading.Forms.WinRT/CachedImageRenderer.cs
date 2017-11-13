@@ -252,6 +252,8 @@ namespace FFImageLoading.Forms.WinRT
                 {
                     taskToCancel.Cancel();
                 }
+
+                _currentTask = null;
             }
             catch (Exception) { }
         }

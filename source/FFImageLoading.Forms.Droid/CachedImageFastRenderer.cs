@@ -315,6 +315,8 @@ namespace FFImageLoading.Forms.Droid
                 {
                     taskToCancel.Cancel();
                 }
+
+                _currentTask = null;
             }
             catch (Exception) { }
         }
