@@ -110,6 +110,20 @@ namespace FFImageLoading.Forms
 
         protected virtual ImageSource CoerceImageSource(object newValue)
         {
+            var uriImageSource = newValue as UriImageSource;
+
+            if (uriImageSource?.Uri?.OriginalString != null)
+            {
+                if (uriImageSource.Uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+                    return ImageSource.FromFile(uriImageSource.Uri.LocalPath);
+
+                if (uriImageSource.Uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
+                    return new EmbeddedResourceImageSource(uriImageSource.Uri);
+
+                if (uriImageSource.Uri.OriginalString.IsDataUrl())
+                    return new DataUrlImageSource(uriImageSource.Uri.OriginalString);
+            }
+            
             return newValue as ImageSource;;
         }
 

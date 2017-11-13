@@ -45,9 +45,6 @@ namespace FFImageLoading.Forms.WinRT
                 if (string.IsNullOrWhiteSpace(uri))
                     return null;
 
-                if (uriImageSource.Uri.Scheme == "file")
-                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
-
                 return new ImageSourceBinding(Work.ImageSource.Url, uri);
             }
 

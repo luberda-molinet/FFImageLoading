@@ -28,7 +28,9 @@ namespace FFImageLoading.Svg.Forms
 
         protected override ImageSource CoerceImageSource(object newValue)
         {
-            var fileSource = newValue as FileImageSource;
+            var source = base.CoerceImageSource(newValue);;
+
+            var fileSource = source as FileImageSource;
             if (fileSource?.File != null)
             {
                 if (fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
@@ -41,7 +43,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var uriSource = newValue as UriImageSource;
+            var uriSource = source as UriImageSource;
             if (uriSource?.Uri?.OriginalString != null)
             {
                 if (uriSource.Uri.OriginalString.IsSvgDataUrl())
@@ -54,7 +56,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var dataUrlSource = newValue as DataUrlImageSource;
+            var dataUrlSource = source as DataUrlImageSource;
             if (dataUrlSource?.DataUrl != null)
             {
                 if (dataUrlSource.DataUrl.IsSvgDataUrl())
@@ -63,7 +65,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var embeddedSource = newValue as EmbeddedResourceImageSource;
+            var embeddedSource = source as EmbeddedResourceImageSource;
             if (embeddedSource?.Uri?.OriginalString != null)
             {
                 if (embeddedSource.Uri.OriginalString.IsSvgFileUrl())
@@ -72,7 +74,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            return base.CoerceImageSource(newValue);
+            return source;
         }
 
         /// <summary>
