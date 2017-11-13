@@ -44,6 +44,7 @@ namespace FFImageLoading.Forms.Sample
                     TransformPlaceholders = false,
                     LoadingPlaceholder = "loading.png",
                     ErrorPlaceholder = "error.png",
+                    LoadingDelay = 50,
                 };
 
                 image2 = new CachedImage()
@@ -55,6 +56,7 @@ namespace FFImageLoading.Forms.Sample
                     TransformPlaceholders = false,
                     LoadingPlaceholder = "loading.png",
                     ErrorPlaceholder = "error.png",
+                    LoadingDelay = 50,
                 };
 
                 image3 = new CachedImage()
@@ -68,7 +70,8 @@ namespace FFImageLoading.Forms.Sample
                     ErrorPlaceholder = "error.png",
                     Transformations = new List<Work.ITransformation>() {
                         new CornersTransformation(50, CornerTransformType.RightRounded)
-                    }
+                    },
+                    LoadingDelay = 50,
                 };
 
                 image4 = new CachedImage()
@@ -82,7 +85,8 @@ namespace FFImageLoading.Forms.Sample
                     ErrorPlaceholder = "error.png",
                     Transformations = new List<Work.ITransformation>() {
                         new GrayscaleTransformation()
-                    }
+                    },
+                    LoadingDelay = 50,
                 };
 
                 var root = new AbsoluteLayout()
