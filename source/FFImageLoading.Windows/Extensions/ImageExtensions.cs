@@ -100,7 +100,9 @@ namespace FFImageLoading.Extensions
                     using (var downscaledImage = await image.ResizeImage(downscale.Item1, downscale.Item2, mode, downscaleDipUnits, allowUpscale, imageInformation).ConfigureAwait(false))
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
-                        PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+                        PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync(
+                            BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight, new BitmapTransform(),
+                            ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
 
                         var bytes = pixelDataProvider.DetachPixelData();
 
@@ -110,7 +112,9 @@ namespace FFImageLoading.Extensions
                 else
                 {
                     BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
-                    PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync();
+                    PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync(
+                        BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight, new BitmapTransform(), 
+                        ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
 
                     if (imageInformation != null)
                     {
