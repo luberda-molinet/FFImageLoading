@@ -223,8 +223,8 @@ namespace FFImageLoading.Forms.Droid
             {
                 if (element != null && !_isDisposed)
                 {
-                    ((IVisualElementController)element).NativeSizeChanged();
                     element.SetIsLoading(false);
+                    ((IVisualElementController)element).NativeSizeChanged();
                 }
             });
         }

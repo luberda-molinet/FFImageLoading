@@ -226,14 +226,13 @@ namespace FFImageLoading.Forms.WinRT
             {
                 if (element != null && !_isDisposed)
                 {
+                    element.SetIsLoading(false);
                     var elCtrl = element as IVisualElementController;
 
                     if (elCtrl != null)
                     {
                         ((IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
                     }
-
-                    element.SetIsLoading(false);
                 }
             });
         }
