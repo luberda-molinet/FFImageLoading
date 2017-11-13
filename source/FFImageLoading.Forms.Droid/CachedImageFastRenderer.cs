@@ -39,6 +39,7 @@ namespace FFImageLoading.Forms.Droid
         IScheduledWork _currentTask;
         ImageSourceBinding _lastImageSource;
         readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
+        readonly object _updateBitmapLock = new object();
 
         public CachedImageFastRenderer(Context context) : base(context)
         {
@@ -233,54 +234,58 @@ namespace FFImageLoading.Forms.Droid
 
         void UpdateBitmap(CachedImageView imageView, CachedImage image, CachedImage previousImage)
         {
-            CancelIfNeeded();
-
-            if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
-                return;
-
-            var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
-            if (ffSource == null)
+            lock (_updateBitmapLock)
             {
-                if (_lastImageSource == null)
+                CancelIfNeeded();
+
+                if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
                     return;
 
-                _lastImageSource = null;
-                imageView.SetImageResource(global::Android.Resource.Color.Transparent);
-                return;
-            }
-
-            if (previousImage != null && !ffSource.Equals(_lastImageSource))
-            {
-                _lastImageSource = null;
-                imageView.SkipInvalidate();
-                Control.SetImageResource(global::Android.Resource.Color.Transparent);
-            }
-
-            image.SetIsLoading(true);
-
-            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
-            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-            TaskParameter imageLoader;
-            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
-
-            if (imageLoader != null)
-            {
-                var finishAction = imageLoader.OnFinish;
-                var sucessAction = imageLoader.OnSuccess;
-
-                imageLoader.Finish((work) =>
+                var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
+                if (ffSource == null)
                 {
-                    finishAction?.Invoke(work);
-                    ImageLoadingFinished(image);
-                });
+                    if (_lastImageSource == null)
+                        return;
 
-                imageLoader.Success((imageInformation, loadingResult) =>
+                    _lastImageSource = null;
+                    imageView.SetImageResource(global::Android.Resource.Color.Transparent);
+                    return;
+                }
+
+                if (previousImage != null && !ffSource.Equals(_lastImageSource))
                 {
-                    sucessAction?.Invoke(imageInformation, loadingResult);
-                    _lastImageSource = ffSource;
-                });
+                    _lastImageSource = null;
+                    imageView.SkipInvalidate();
+                    Control.SetImageResource(global::Android.Resource.Color.Transparent);
+                }
 
-                _currentTask = imageLoader.Into(imageView);
+                image.SetIsLoading(true);
+
+                var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
+                var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
+                TaskParameter imageLoader;
+                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+
+                if (imageLoader != null)
+                {
+                    var finishAction = imageLoader.OnFinish;
+                    var sucessAction = imageLoader.OnSuccess;
+
+                    imageLoader.Finish((work) =>
+                    {
+                        finishAction?.Invoke(work);
+                        ImageLoadingFinished(image);
+                    });
+
+                    imageLoader.Success((imageInformation, loadingResult) =>
+                    {
+                        sucessAction?.Invoke(imageInformation, loadingResult);
+                        _lastImageSource = ffSource;
+                    });
+
+                    if (!_isDisposed)
+                        _currentTask = imageLoader.Into(imageView);
+                }
             }
         }
 

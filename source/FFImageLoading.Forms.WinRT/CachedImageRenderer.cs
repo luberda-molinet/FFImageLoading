@@ -196,7 +196,8 @@ namespace FFImageLoading.Forms.WinRT
                     _lastImageSource = ffSource;
                 });
 
-                _currentTask = imageLoader.Into(imageView);
+                if (!_isDisposed)
+                    _currentTask = imageLoader.Into(imageView);
             }
         }
 

@@ -43,6 +43,7 @@ namespace FFImageLoading.Forms.Mac
         private bool _isDisposed;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
+        readonly object _updateBitmapLock = new object();
 
         /// <summary>
         ///   Used for registration with dependency service
@@ -160,53 +161,57 @@ namespace FFImageLoading.Forms.Mac
 
         void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
         {
-            CancelIfNeeded();
-
-            if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
-                return;
-
-            var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
-            if (ffSource == null)
+            lock (_updateBitmapLock)
             {
-                if (_lastImageSource == null)
+                CancelIfNeeded();
+
+                if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
                     return;
 
-                _lastImageSource = null;
-                imageView.Image = null;
-                return;
-            }
-
-            if (previousImage != null && !ffSource.Equals(_lastImageSource))
-            {
-                _lastImageSource = null;
-                imageView.Image = null;
-            }
-
-            image.SetIsLoading(true);
-
-            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
-            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-            TaskParameter imageLoader;
-            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
-
-            if (imageLoader != null)
-            {
-                var finishAction = imageLoader.OnFinish;
-                var sucessAction = imageLoader.OnSuccess;
-
-                imageLoader.Finish((work) =>
+                var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
+                if (ffSource == null)
                 {
-                    finishAction?.Invoke(work);
-                    ImageLoadingFinished(image);
-                });
+                    if (_lastImageSource == null)
+                        return;
 
-                imageLoader.Success((imageInformation, loadingResult) =>
+                    _lastImageSource = null;
+                    imageView.Image = null;
+                    return;
+                }
+
+                if (previousImage != null && !ffSource.Equals(_lastImageSource))
                 {
-                    sucessAction?.Invoke(imageInformation, loadingResult);
-                    _lastImageSource = ffSource;
-                });
+                    _lastImageSource = null;
+                    imageView.Image = null;
+                }
 
-                _currentTask = imageLoader.Into(imageView);
+                image.SetIsLoading(true);
+
+                var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
+                var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
+                TaskParameter imageLoader;
+                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+
+                if (imageLoader != null)
+                {
+                    var finishAction = imageLoader.OnFinish;
+                    var sucessAction = imageLoader.OnSuccess;
+
+                    imageLoader.Finish((work) =>
+                    {
+                        finishAction?.Invoke(work);
+                        ImageLoadingFinished(image);
+                    });
+
+                    imageLoader.Success((imageInformation, loadingResult) =>
+                    {
+                        sucessAction?.Invoke(imageInformation, loadingResult);
+                        _lastImageSource = ffSource;
+                    });
+
+                    if (!_isDisposed)
+                        _currentTask = imageLoader.Into(imageView);
+                }
             }
         }
 
