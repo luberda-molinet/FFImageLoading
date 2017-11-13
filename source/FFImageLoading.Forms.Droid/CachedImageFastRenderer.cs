@@ -271,7 +271,7 @@ namespace FFImageLoading.Forms.Droid
                 imageLoader.Finish((work) =>
                 {
                     finishAction?.Invoke(work);
-                    image.SetIsLoading(false);
+                    ImageLoadingFinished(image);
                 });
 
                 imageLoader.Success((imageInformation, loadingResult) =>
@@ -284,17 +284,17 @@ namespace FFImageLoading.Forms.Droid
             }
         }
 
-        //async void ImageLoadingFinished(CachedImage element)
-        //{
-        //    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-        //    {
-        //        if (element != null && !_isDisposed)
-        //        {
-        //            ((IVisualElementController)element).NativeSizeChanged();
-        //            element.SetIsLoading(false);
-        //        }
-        //    });
-        //}
+        async void ImageLoadingFinished(CachedImage element)
+        {
+            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            {
+                if (element != null && !_isDisposed)
+                {
+                    ((IVisualElementController)element).NativeSizeChanged();
+                    element.SetIsLoading(false);
+                }
+            });
+        }
 
         void ReloadImage()
         {
