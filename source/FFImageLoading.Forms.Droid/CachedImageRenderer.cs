@@ -34,22 +34,23 @@ namespace FFImageLoading.Forms.Droid
         {
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
-            var ignore2 = typeof(CachedImageFastRenderer);
+            // var ignore2 = typeof(CachedImageFastRenderer);
             var ignore3 = typeof(CachedImage);
 #pragma warning restore 0219
 
-            var enabled = false;
+            //var enabled = false;
 
-            if (enableFastRenderer.HasValue)
-            {
-                enabled = enableFastRenderer.Value;
-            }
-            else
-            {
-                enabled = CachedImageFastRenderer.ElementRendererType != null;
-            }
+            //if (enableFastRenderer.HasValue)
+            //{
+            //    enabled = enableFastRenderer.Value;
+            //}
+            //else
+            //{
+            //    enabled = CachedImageFastRenderer.ElementRendererType != null;
+            //}
 
-            RegisterRenderer(typeof(CachedImage), enabled ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
+            //RegisterRenderer(typeof(CachedImage), enabled ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
+            RegisterRenderer(typeof(CachedImage), typeof(CachedImageRenderer));
         }
 
         static void RegisterRenderer(Type type, Type renderer)
