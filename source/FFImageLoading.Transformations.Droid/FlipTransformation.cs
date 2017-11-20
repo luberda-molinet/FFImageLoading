@@ -8,6 +8,10 @@ namespace FFImageLoading.Transformations
 	[Preserve(AllMembers = true)]
 	public class FlipTransformation: TransformationBase
 	{
+		public FlipTransformation() : this(FlipType.Horizontal)
+		{
+		}
+		
 		public FlipTransformation(FlipType flipType)
 		{
 			FlipType = flipType;
