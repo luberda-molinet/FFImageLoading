@@ -1,6 +1,7 @@
 os: Visual Studio 2017
 configuration: Release
 platform: Any CPU
+clone_depth: 1
 
 #environment:
 #  ANDROID_HOME: C:\android-sdk
@@ -22,6 +23,7 @@ build_script:
  - cmd: .\MakefileAll.bat
   
 before_build:
+- cmd: dotnet --version
 - ps: >-
     $nuspec1 = "source\Xamarin.FFImageLoading.nuspec"
     
@@ -71,5 +73,12 @@ before_build:
         
     (Get-Content $nuspec5template).replace('@version', $version) | Set-Content $nuspec5
   
+test_script:
+  # restore packages for our unit tests
+  - cmd: dotnet restore ./source/Tests/FFImageLoading.Tests.csproj --verbosity m
+  # run the unit tests (requires changing into the test directory)
+  - cmd: cd source/Tests
+  - cmd: dotnet xunit
+
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg
