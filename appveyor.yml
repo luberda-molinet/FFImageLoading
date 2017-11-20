@@ -77,8 +77,7 @@ test_script:
   # restore packages for our unit tests
   # - cmd: dotnet restore .\source/Tests/FFImageLoading.Tests.csproj --verbosity m
   # run the unit tests (requires changing into the test directory)
-  - cmd: cd .\source\Tests
-  - cmd: dotnet xunit
+  - ps: dotnet test .\source\Tests\FFImageLoading.Tests\FFImageLoading.Tests.csproj
 
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg
