@@ -75,9 +75,9 @@ before_build:
   
 test_script:
   # restore packages for our unit tests
-  - cmd: dotnet restore ./source/Tests/FFImageLoading.Tests.csproj --verbosity m
+  # - cmd: dotnet restore .\source/Tests/FFImageLoading.Tests.csproj --verbosity m
   # run the unit tests (requires changing into the test directory)
-  - cmd: cd source/Tests
+  - cmd: cd .\source\Tests
   - cmd: dotnet xunit
 
 artifacts:
