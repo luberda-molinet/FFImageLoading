@@ -18,6 +18,7 @@ using Android.Views;
 using System.Reflection;
 using Android.Content;
 using AView = Android.Views.View;
+using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 
 namespace FFImageLoading.Forms.Droid
 {
@@ -41,16 +42,20 @@ namespace FFImageLoading.Forms.Droid
         readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
         readonly object _updateBitmapLock = new object();
 
-        public CachedImageFastRenderer(Context context) : base(context)
-        {
-        }
-
         [Obsolete("This constructor is obsolete as of version 3.0. Please use ImageRenderer(Context) instead.")]
         public CachedImageFastRenderer() : base(Xamarin.Forms.Forms.Context)
         {
         }
 
-        public CachedImageFastRenderer(IntPtr javaReference, JniHandleOwnership transfer) : base(Xamarin.Forms.Forms.Context)
+        public CachedImageFastRenderer(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
+
+        public CachedImageFastRenderer(Context context) : base(context)
+        {
+        }
+
+        public CachedImageFastRenderer(Context context, Android.Util.IAttributeSet attrs): base(context, attrs)
         {
         }
 
@@ -65,13 +70,13 @@ namespace FFImageLoading.Forms.Droid
                 {
                     if (_visualElementTracker != null)
                     {
-                        _visualElementTracker.Dispose();
+                        _visualElementTracker.TryDispose();
                         _visualElementTracker = null;
                     }
 
                     if (_visualElementRenderer != null)
                     {
-                        _visualElementRenderer.Dispose();
+                        _visualElementRenderer.TryDispose();
                         _visualElementRenderer = null;
                     }
 
@@ -92,11 +97,9 @@ namespace FFImageLoading.Forms.Droid
 
         void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
         {
-            //this.EnsureId();
             _viewExtensionsMethod.Invoke(null, new[] { this });
 
-            // TODO Xamarin-Internal class - Is it necessary? 
-            // ElevationHelper.SetElevation(this, e.NewElement);
+            ElevationHelper.SetElevation(this, e.NewElement);
             ElementChanged?.Invoke(this, new VisualElementChangedEventArgs(e.OldElement, e.NewElement));
 
             if (e.OldElement != null)
@@ -374,6 +377,38 @@ namespace FFImageLoading.Forms.Droid
                 }
 
                 return compressed;
+            }
+        }
+
+        static bool? s_isLollipopOrNewer;
+        internal static bool IsLollipopOrNewer
+        {
+            get
+            {
+                if (!s_isLollipopOrNewer.HasValue)
+                    s_isLollipopOrNewer = (int)Android.OS.Build.VERSION.SdkInt >= 21;
+                return s_isLollipopOrNewer.Value;
+            }
+        }
+
+        internal static class ElevationHelper
+        {
+            internal static void SetElevation(global::Android.Views.View view, VisualElement element)
+            {
+                if (view == null || element == null || !IsLollipopOrNewer)
+                {
+                    return;
+                }
+
+                var iec = element as IElementConfiguration<VisualElement>;
+                var elevation = iec?.On<Xamarin.Forms.PlatformConfiguration.Android>().GetElevation();
+
+                if (!elevation.HasValue)
+                {
+                    return;
+                }
+
+                view.Elevation = elevation.Value;
             }
         }
     }
