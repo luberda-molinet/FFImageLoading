@@ -503,7 +503,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The transformations property.
         /// </summary>
-        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>(), propertyChanged: new BindableProperty.BindingPropertyChangedDelegate(HandleTransformationsPropertyChangedDelegate));
+        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>(), propertyChanged: HandleTransformationsPropertyChangedDelegate);
 
         /// <summary>
         /// Gets or sets the transformations.
