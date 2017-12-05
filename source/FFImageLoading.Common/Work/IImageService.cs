@@ -125,10 +125,16 @@ namespace FFImageLoading
         void SetPauseWork(bool pauseWork);
 
         /// <summary>
-        /// Cancel any loading work for the given ImageView
+        /// Cancel any loading work for the given task
         /// </summary>
         /// <param name="task">Image loading task to cancel.</param>
         void CancelWorkFor(IImageLoaderTask task);
+
+        /// <summary>
+        /// Cancel any loading work for the given view
+        /// </summary>
+        /// <param name="view">Image loading task to cancel.</param>
+        void CancelWorkForView(object view);
 
         /// <summary>
         /// Removes a pending image loading task from the work queue.

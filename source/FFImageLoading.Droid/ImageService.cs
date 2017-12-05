@@ -5,6 +5,7 @@ using FFImageLoading.Drawables;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using FFImageLoading.DataResolvers;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading
 {
@@ -14,6 +15,7 @@ namespace FFImageLoading
     [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<SelfDisposingBitmapDrawable>
     {
+        static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
         static IImageService _instance;
 
         /// <summary>
@@ -70,6 +72,51 @@ namespace FFImageLoading
         internal static IImageLoaderTask CreateTask(TaskParameter parameters)
         {
             return new PlatformImageLoaderTask<object>(null, parameters, Instance);
+        }
+
+        protected override void SetTaskForTarget(IImageLoaderTask currentTask)
+        {
+            var targetView = currentTask?.Target?.TargetControl;
+
+            if (!(targetView is Android.Views.View))
+                return;
+
+            lock (_viewsReferences)
+            {
+                if (_viewsReferences.TryGetValue(targetView, out var existingTask))
+                {
+                    try
+                    {
+                        if (existingTask != null && !existingTask.IsCancelled && !existingTask.IsCompleted)
+                        {
+                            existingTask.Cancel();
+                        }
+                    }
+                    catch (ObjectDisposedException) { }
+
+                    _viewsReferences.Remove(targetView);
+                }
+
+                _viewsReferences.Add(targetView, currentTask);
+            }
+        }
+
+        public override void CancelWorkForView(object view)
+        {
+            lock (_viewsReferences)
+            {
+                if (_viewsReferences.TryGetValue(view, out var existingTask))
+                {
+                    try
+                    {
+                        if (existingTask != null && !existingTask.IsCancelled && !existingTask.IsCompleted)
+                        {
+                            existingTask.Cancel();
+                        }
+                    }
+                    catch (ObjectDisposedException) { }
+                }
+            }
         }
     }
 }

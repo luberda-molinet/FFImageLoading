@@ -23,7 +23,7 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
+        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
         static readonly SemaphoreSlim _webpLock = new SemaphoreSlim(1, 1);
 
 #if __IOS__

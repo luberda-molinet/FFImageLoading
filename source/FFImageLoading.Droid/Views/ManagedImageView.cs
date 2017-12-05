@@ -126,15 +126,9 @@ namespace FFImageLoading.Views
         }
         */
 
-        public IImageLoaderTask ImageLoaderTask { get; set; }
-
         public void CancelLoading()
         {
-            if (ImageLoaderTask != null)
-            {
-                ImageService.Instance.CancelWorkFor(ImageLoaderTask);
-                ImageLoaderTask = null;
-            }
+            ImageService.Instance.CancelWorkForView(this);
         }
 
         public override void SetImageDrawable(Drawable drawable)

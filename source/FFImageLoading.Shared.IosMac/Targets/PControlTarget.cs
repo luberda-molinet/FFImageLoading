@@ -29,25 +29,6 @@ namespace FFImageLoading.Targets
             }
         }
 
-        public override bool IsTaskValid(IImageLoaderTask task)
-        {
-            return IsValid;
-        }
-
-        public override bool UsesSameNativeControl(IImageLoaderTask task)
-        {
-            var otherTarget = task.Target as PControlTarget<TControl>;
-            if (otherTarget == null)
-                return false;
-
-            var control = Control;
-            var otherControl = otherTarget.Control;
-            if (control == null || otherControl == null)
-                return false;
-
-            return control.Handle == otherControl.Handle;
-        }
-
         public override TControl Control
         {
             get

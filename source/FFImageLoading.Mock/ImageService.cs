@@ -59,6 +59,16 @@ namespace FFImageLoading
         {
             return new PlatformImageLoaderTask<object>(null, parameters, Instance);
         }
+
+        protected override void SetTaskForTarget(IImageLoaderTask currentTask)
+        {
+            // throw new NotImplementedException();
+        }
+
+        public override void CancelWorkForView(object view)
+        {
+            // throw new NotImplementedException();
+        }
     }
 }
 

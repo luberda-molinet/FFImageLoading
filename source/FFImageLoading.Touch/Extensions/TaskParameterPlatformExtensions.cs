@@ -5,6 +5,7 @@ using System.IO;
 using UIKit;
 using FFImageLoading.Targets;
 using FFImageLoading.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading
 {
@@ -43,6 +44,7 @@ namespace FFImageLoading
         public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView)
         {
             var target = new PImageViewTarget(imageView);
+
             return parameters.Into(target);
         }
 
@@ -158,6 +160,7 @@ namespace FFImageLoading
             }
 
             var task = ImageService.CreateTask(parameters, target);
+
             ImageService.Instance.LoadImage(task);
             return task;
         }

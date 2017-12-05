@@ -18,13 +18,9 @@ namespace FFImageLoading.Work
 
         string KeyRaw { get; }
 
-        void CancelIfNeeded();
-
         Task<bool> TryLoadFromMemoryCacheAsync();
 
         Task RunAsync();
-
-        bool UsesSameNativeControl(IImageLoaderTask anotherTask);
 
         ITarget Target { get; }
 

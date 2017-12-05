@@ -186,10 +186,6 @@ namespace FFImageLoading.Work
             }
 
             IImageLoaderTask similarRunningTask = null;
-            if (!task.Parameters.Preload)
-            {
-                PendingTasks.CancelWhenUsesSameNativeControl(task);
-            }
 
             similarRunningTask = PendingTasks.FirstOrDefaultByRawKey(task.KeyRaw);
             if (similarRunningTask == null)

@@ -23,11 +23,6 @@ namespace FFImageLoading.Targets
             }
         }
 
-        public override bool IsTaskValid(IImageLoaderTask task)
-        {
-            return IsValid;
-        }
-
         public override void SetAsEmpty(IImageLoaderTask task)
         {
             var control = Control;
@@ -70,20 +65,6 @@ namespace FFImageLoading.Targets
             {
                 control.Source = image;
             }
-        }
-
-        public override bool UsesSameNativeControl(IImageLoaderTask task)
-        {
-            var otherTarget = task.Target as ImageTarget;
-            if (otherTarget == null)
-                return false;
-
-            var control = Control;
-            var otherControl = otherTarget.Control;
-            if (control == null || otherControl == null)
-                return false;
-
-            return control == otherControl;
         }
 
         public override Image Control

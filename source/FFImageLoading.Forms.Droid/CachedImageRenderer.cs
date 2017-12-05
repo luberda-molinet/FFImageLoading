@@ -243,13 +243,7 @@ namespace FFImageLoading.Forms.Droid
         {
             try
             {
-                var taskToCancel = _currentTask;
-                if (taskToCancel != null && !taskToCancel.IsCancelled)
-                {
-                    taskToCancel.Cancel();
-                }
-
-                _currentTask = null;
+                _currentTask?.Cancel();
             }
             catch (Exception) { }
         }

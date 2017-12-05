@@ -35,17 +35,17 @@ namespace FFImageLoading.Concurrency
             }
         }
 
-        public void CancelWhenUsesSameNativeControl(IImageLoaderTask task)
-        {
-            lock (_queue)
-            {
-                foreach (var item in _queue)
-                {
-                    if (item.Data != null && item.Data.UsesSameNativeControl(task))
-                        item.Data.CancelIfNeeded();
-                }
-            }
-        }
+        //public void CancelWhenUsesSameNativeControl(IImageLoaderTask task)
+        //{
+        //    lock (_queue)
+        //    {
+        //        foreach (var item in _queue)
+        //        {
+        //            if (item.Data != null && item.Data.UsesSameNativeControl(task))
+        //                item.Data.Cancel();
+        //        }
+        //    }
+        //}
 
         private static IFixedSizePriorityQueue<SimpleNode<TItem, TPriority>, TPriority> CreateQueue<TItem, TPriority>()
             where TPriority : IComparable<TPriority>

@@ -57,33 +57,5 @@ namespace FFImageLoading.Tests.Concurrency
             var result = sut.FirstOrDefaultByRawKey("foo");
             Assert.Null(result);
         }
-
-        [Fact]
-        public void Given_no_similar_native_control_Then_not_cancelled()
-        {
-            var request = new Mock<IImageLoaderTask>();
-            request
-                .Setup(r => r.UsesSameNativeControl(It.IsAny<IImageLoaderTask>()))
-                .Returns(() => false);
-            var sut = new PendingTasksQueue();
-            sut.Enqueue(request.Object, 0);
-
-            sut.CancelWhenUsesSameNativeControl(request.Object);
-            request.Verify(r => r.CancelIfNeeded(), Times.Never);
-        }
-
-        [Fact]
-        public void Given_similar_native_control_Then_cancelled()
-        {
-            var request = new Mock<IImageLoaderTask>();
-            request
-                .Setup(r => r.UsesSameNativeControl(It.IsAny<IImageLoaderTask>()))
-                .Returns(() => true);
-            var sut = new PendingTasksQueue();
-            sut.Enqueue(request.Object, 0);
-
-            sut.CancelWhenUsesSameNativeControl(request.Object);
-            request.Verify(r => r.CancelIfNeeded());
-        }
     }
 }

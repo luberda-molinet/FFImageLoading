@@ -265,11 +265,7 @@ namespace FFImageLoading.Cross
         {
             try
             {
-                var taskToCancel = _scheduledWork;
-                if (taskToCancel != null && !taskToCancel.IsCancelled)
-                {
-                    taskToCancel.Cancel();
-                }
+                _scheduledWork?.Cancel();
             }
             catch (Exception) { }
         }

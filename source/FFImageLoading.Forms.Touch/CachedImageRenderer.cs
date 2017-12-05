@@ -236,11 +236,7 @@ namespace FFImageLoading.Forms.Mac
         {
             try
             {
-                var taskToCancel = _currentTask;
-                if (taskToCancel != null && !taskToCancel.IsCancelled)
-                {
-                    taskToCancel.Cancel();
-                }
+                _currentTask?.Cancel();
             }
             catch (Exception) { }
         }

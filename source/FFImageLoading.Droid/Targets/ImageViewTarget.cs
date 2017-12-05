@@ -24,12 +24,6 @@ namespace FFImageLoading.Targets
             }
         }
 
-        public override bool IsTaskValid(IImageLoaderTask task)
-        {
-            var controlTask = Control?.ImageLoaderTask;
-            return IsValid && (controlTask == null || controlTask == task);
-        }
-
         public override void SetAsEmpty(IImageLoaderTask task)
         {
             if (task == null || task.IsCancelled)
@@ -39,7 +33,6 @@ namespace FFImageLoading.Targets
             if (control == null)
                 return;
 
-            control.ImageLoaderTask = null;
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
@@ -54,26 +47,6 @@ namespace FFImageLoading.Targets
 
             control.SetImageDrawable(image);
             control.Invalidate();
-        }
-
-        public override void SetImageLoadingTask(IImageLoaderTask task)
-        {
-            if (IsValid)
-                Control.ImageLoaderTask = task;
-        }
-
-        public override bool UsesSameNativeControl(IImageLoaderTask task)
-        {
-            var otherTarget = task.Target as ImageViewTarget;
-            if (otherTarget == null)
-                return false;
-
-            var control = Control;
-            var otherControl = otherTarget.Control;
-            if (control == null || otherControl == null)
-                return false;
-
-            return control.Handle == otherControl.Handle;
         }
 
         public override ImageViewAsync Control

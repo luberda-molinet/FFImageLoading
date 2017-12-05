@@ -27,7 +27,6 @@ namespace FFImageLoading.Work
             ImageInformation = new ImageInformation();
             CanUseMemoryCache = true;
             SetKeys();
-            Target?.SetImageLoadingTask(this);
         }
 
         public async Task Init()
@@ -232,24 +231,19 @@ namespace FFImageLoading.Work
             try
             {
                 CancellationTokenSource?.Token.ThrowIfCancellationRequested();
-                if (Target != null && !Target.IsTaskValid(this))
-                    throw new TaskCanceledException();
             }
             catch (ObjectDisposedException)
             {
             }
         }
 
-        public virtual bool UsesSameNativeControl(IImageLoaderTask anotherTask)
-        {
-            return Target != null && Target.UsesSameNativeControl(anotherTask);
-        }
-
         public void Cancel()
         {
             if (!_isDisposed)
             {
-                Target?.SetImageLoadingTask(null);
+                if (IsCancelled || IsCompleted)
+                    return;
+                
                 ImageService.RemovePendingTask(this);
 
                 try
@@ -263,12 +257,6 @@ namespace FFImageLoading.Work
                 if (Configuration.VerboseLoadingCancelledLogging)
                     Logger.Debug(string.Format("Image loading cancelled: {0}", Key));
             }
-        }
-
-        public void CancelIfNeeded()
-        {
-            if (!IsCancelled && !IsCompleted)
-                Cancel();
         }
 
         protected abstract Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder);
@@ -285,15 +273,6 @@ namespace FFImageLoading.Work
             {
                 if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     return false;
-
-                if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
-                {
-                    await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
-                }
-                else if (Configuration.DelayInMs > 0)
-                {
-                    await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false); ;
-                }
 
                 ThrowIfCancellationRequested();
 
@@ -476,6 +455,15 @@ namespace FFImageLoading.Work
                 // LOAD IMAGE
                 if (!(await TryLoadFromMemoryCacheAsync().ConfigureAwait(false)))
                 {
+                    if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
+                    {
+                        await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
+                    }
+                    else if (!Parameters.Preload && Configuration.DelayInMs > 0)
+                    {
+                        await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false);
+                    }
+
                     Logger.Debug(string.Format("Generating/retrieving image: {0}", Key));
                     var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
                     resolver = new WrappedDataResolver(resolver);
@@ -618,7 +606,6 @@ namespace FFImageLoading.Work
         {
             if (!_isDisposed)
             {
-                Target?.SetImageLoadingTask(null);
                 Parameters.TryDispose();
                 CancellationTokenSource.TryDispose();
 

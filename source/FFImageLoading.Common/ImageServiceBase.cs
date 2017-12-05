@@ -26,6 +26,8 @@ namespace FFImageLoading
         protected abstract IPlatformPerformance CreatePlatformPerformanceInstance();
         protected abstract IMainThreadDispatcher CreateMainThreadDispatcherInstance();
         protected abstract IDataResolverFactory CreateDataResolverFactoryInstance();
+        protected abstract void SetTaskForTarget(IImageLoaderTask currentTask);
+        public abstract void CancelWorkForView(object view);
 
         Configuration _config;
         public Configuration Config
@@ -212,6 +214,9 @@ namespace FFImageLoading
             if (task == null)
                 return;
 
+            if (!task.Parameters.Preload)
+                SetTaskForTarget(task);
+            
             Scheduler.LoadImage(task);
         }
 
