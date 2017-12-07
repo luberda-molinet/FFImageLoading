@@ -7,17 +7,17 @@ namespace FFImageLoading.Helpers
     {
         public void Debug(string message)
         {
-			Console.WriteLine(message);
+            Console.WriteLine(message);
         }
 
-		public void Error(string errorMessage)
-		{
-			Console.WriteLine(errorMessage);
-		}
+        public void Error(string errorMessage)
+        {
+            Console.WriteLine(errorMessage);
+        }
 
         public void Error(string errorMessage, Exception ex)
         {
-			Error(errorMessage + Environment.NewLine + ex.ToString());
+            Error(errorMessage + Environment.NewLine + ex.ToString());
         }
     }
 }

@@ -49,11 +49,9 @@ echo Building FFImageLoading.Svg...
 %msbuild% source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Windows/FFImageLoading.Svg.Forms.Windows.csproj %buildargs%
 
-echo Unit testing...
+echo Building Unit tests...
 
-REM %msbuild% source/Tests/FFImageLoading.Tests/FFImageLoading.Tests.csproj %buildargsTests%
-REM xunit.console.clr4 source/Tests/FFImageLoading.Tests/bin/Debug/FFImageLoading.Core.Tests.dll /appveyor
-REM dotnet test
+%msbuild% source/Tests/FFImageLoading.Tests/FFImageLoading.Tests.csproj %buildargsRelease%
 
 echo Packaging NuGets...
 
