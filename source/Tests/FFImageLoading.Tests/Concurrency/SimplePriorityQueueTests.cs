@@ -202,22 +202,29 @@ namespace FFImageLoading.Tests.Concurrency
         }
 
         [Fact]
-        public void Given_items_Then_enumerate_by_priority()
+        public void Given_items_Then_enqueue_by_priority()
         {
             var request4 = new Mock<IImageLoaderTask>().Object;
             var request7 = new Mock<IImageLoaderTask>().Object;
             var request5 = new Mock<IImageLoaderTask>().Object;
-            var requests = new[] { request7, request5, request4 };
+            
             var sut = CreatePriorityQueue();
             sut.Enqueue(request4, 4);
             sut.Enqueue(request7, 7);
             sut.Enqueue(request5, 5);
 
+            var result1 = sut.Dequeue();
+            var result2 = sut.Dequeue();
+            var result3 = sut.Dequeue();
+
+            var requests = new[] { request7, request5, request4 };
+            var results = new[] { result1, result2, result3 };
+
             int i = 0;
-            foreach (var requestEnumerated in sut)
+            foreach (var result in results)
             {
-                var current = requests[i];
-                Assert.Same(current, requestEnumerated);
+
+                Assert.Same(requests[i], result);
                 i++;
             }
         }
@@ -251,8 +258,7 @@ namespace FFImageLoading.Tests.Concurrency
 
         private SimplePriorityQueue<IImageLoaderTask, int> CreatePriorityQueue()
         {
-            var queue = new StubFixedSizePriorityQueue();
-            return new SimplePriorityQueue<IImageLoaderTask, int>(queue);
+            return new SimplePriorityQueue<IImageLoaderTask, int>();
         }
     }
 }
