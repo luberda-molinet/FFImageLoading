@@ -38,3 +38,9 @@ nuget.exe
 *.droidres.db
 UpgradeLog*
 project.lock.json
+source/FFImageLoading.Common/AssemblyTFMAttribute.cs
+source/FFImageLoading.Forms/AssemblyTFMAttribute.cs
+source/FFImageLoading.Mock/AssemblyTFMAttribute.cs
+source/FFImageLoading.Svg.Forms/AssemblyTFMAttribute.cs
+source/FFImageLoading.Svg/AssemblyTFMAttribute.cs
+source/FFImageLoading.Transformations/AssemblyTFMAttribute.cs
