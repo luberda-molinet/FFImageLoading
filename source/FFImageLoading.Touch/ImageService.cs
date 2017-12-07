@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 using FFImageLoading.Cache;
+using FFImageLoading.Config;
 using FFImageLoading.DataResolvers;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
@@ -34,23 +35,23 @@ namespace FFImageLoading
         }
 
         protected override IMemoryCache<UIImage> MemoryCache => ImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance() => new MD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance() => new MiniLogger();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance() => new PlatformPerformance();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance() => new MainThreadDispatcher();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance() => new DataResolverFactory();
+        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
+        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
+        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new PlatformPerformance();
+        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MainThreadDispatcher();
+        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new DataResolverFactory();
 
-        protected override IDiskCache CreatePlatformDiskCacheInstance()
+        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration)
         {
-            if (string.IsNullOrWhiteSpace(Config.DiskCachePath))
+            if (string.IsNullOrWhiteSpace(configuration.DiskCachePath))
             {
                 var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
                 string cachePath = Path.Combine(tmpPath, "FFSimpleDiskCache");
-                Config.DiskCachePath = cachePath;
+                configuration.DiskCachePath = cachePath;
             }
 
-            return new SimpleDiskCache(Config.DiskCachePath, Config);
+            return new SimpleDiskCache(configuration.DiskCachePath, configuration);
         }
 
         internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class

@@ -26,7 +26,7 @@ namespace FFImageLoading.Helpers
             if (_scale.HasValue)
                 return;
 
-            ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            new MainThreadDispatcher().PostAsync(() =>
             {
                 var displayInfo = DisplayInformation.GetForCurrentView();
                 object found = null;

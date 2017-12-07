@@ -23,7 +23,7 @@ namespace FFImageLoading.Helpers
             if (_scale.HasValue)
                 return;
 
-            ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            new MainThreadDispatcher().PostAsync(() =>
             {
 #if __IOS__
                 _scale = UIKit.UIScreen.MainScreen.Scale;

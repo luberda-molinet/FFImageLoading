@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FFImageLoading.Config;
 using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
@@ -44,29 +45,29 @@ namespace FFImageLoading
         }
 
         protected override IMemoryCache<BitmapSource> MemoryCache => ImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance() => new MD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance() => new MiniLogger();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance() => new PlatformPerformance();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance() => new MainThreadDispatcher();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance() => new DataResolverFactory();
+        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
+        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
+        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new PlatformPerformance();
+        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MainThreadDispatcher();
+        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new DataResolverFactory();
 
-        protected override IDiskCache CreatePlatformDiskCacheInstance()
+        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration)
         {
             StorageFolder rootFolder = null;
             string folderName = null;
 
-            if (string.IsNullOrWhiteSpace(Config.DiskCachePath))
+            if (string.IsNullOrWhiteSpace(configuration.DiskCachePath))
             {
                 rootFolder = ApplicationData.Current.TemporaryFolder;
                 folderName = "FFSimpleDiskCache";
                 string cachePath = Path.Combine(rootFolder.Path, folderName);
-                Config.DiskCachePath = cachePath;
+                configuration.DiskCachePath = cachePath;
             }
             else
             {
-                var separated = Config.DiskCachePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                var separated = configuration.DiskCachePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
                 folderName = separated.Last();
-                var rootPath = Config.DiskCachePath.Substring(0, Config.DiskCachePath.LastIndexOf(folderName));
+                var rootPath = configuration.DiskCachePath.Substring(0, configuration.DiskCachePath.LastIndexOf(folderName));
                 rootFolder = StorageFolder.GetFolderFromPathAsync(rootPath).GetAwaiter().GetResult();
             }
 

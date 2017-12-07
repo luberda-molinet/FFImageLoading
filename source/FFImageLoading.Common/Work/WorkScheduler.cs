@@ -14,10 +14,10 @@ namespace FFImageLoading.Work
     {
         readonly object _lock = new object();
 
-        int _statsTotalPending;
-        int _statsTotalRunning;
-        int _statsTotalMemoryCacheHits;
-        int _statsTotalWaiting;
+        long _statsTotalPending;
+        long _statsTotalRunning;
+        long _statsTotalMemoryCacheHits;
+        long _statsTotalWaiting;
         long _loadCount;
 
         public WorkScheduler(Configuration configuration, IPlatformPerformance performance)

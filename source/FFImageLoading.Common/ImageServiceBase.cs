@@ -20,12 +20,12 @@ namespace FFImageLoading
 
         protected virtual void PlatformSpecificConfiguration(Configuration configuration) { }
 
-        protected abstract IMD5Helper CreatePlatformMD5HelperInstance();
-        protected abstract IMiniLogger CreatePlatformLoggerInstance();
-        protected abstract IDiskCache CreatePlatformDiskCacheInstance();
-        protected abstract IPlatformPerformance CreatePlatformPerformanceInstance();
-        protected abstract IMainThreadDispatcher CreateMainThreadDispatcherInstance();
-        protected abstract IDataResolverFactory CreateDataResolverFactoryInstance();
+        protected abstract IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration);
+        protected abstract IMiniLogger CreatePlatformLoggerInstance(Configuration configuration);
+        protected abstract IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration);
+        protected abstract IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration);
+        protected abstract IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration);
+        protected abstract IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration);
         protected abstract void SetTaskForTarget(IImageLoaderTask currentTask);
         public abstract void CancelWorkForView(object view);
 
@@ -34,8 +34,11 @@ namespace FFImageLoading
         {
             get
             {
-                InitializeIfNeeded(_config);
-                return _config;
+                lock (_initializeLock)
+                {
+                    InitializeIfNeeded(_config);
+                    return _config;
+                }
             }
         }
 
@@ -99,12 +102,12 @@ namespace FFImageLoading
 
         void InitializeIfNeeded(Configuration userDefinedConfig = null)
         {
-            if (_initialized)
+            if (_initialized && userDefinedConfig == null)
                 return;
 
             lock (_initializeLock)
             {
-                if (_isInitializing || _initialized)
+                if (_isInitializing || (_initialized && userDefinedConfig == null))
                     return;
 
                 _isInitializing = true;
@@ -129,14 +132,14 @@ namespace FFImageLoading
                     }
                 }
 
-                userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(), userDefinedConfig.VerboseLogging);
-                userDefinedConfig.MD5Helper = userDefinedConfig.MD5Helper ?? CreatePlatformMD5HelperInstance();
+                userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(userDefinedConfig), userDefinedConfig.VerboseLogging);
+                userDefinedConfig.MD5Helper = userDefinedConfig.MD5Helper ?? CreatePlatformMD5HelperInstance(userDefinedConfig);
                 userDefinedConfig.HttpClient = httpClient;
-                userDefinedConfig.Scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, (userDefinedConfig.VerbosePerformanceLogging ? CreatePlatformPerformanceInstance() : new EmptyPlatformPerformance()));
-                userDefinedConfig.DiskCache = userDefinedConfig.DiskCache ?? CreatePlatformDiskCacheInstance();
+                userDefinedConfig.Scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, (userDefinedConfig.VerbosePerformanceLogging ? CreatePlatformPerformanceInstance(userDefinedConfig) : new EmptyPlatformPerformance()));
+                userDefinedConfig.DiskCache = userDefinedConfig.DiskCache ?? CreatePlatformDiskCacheInstance(userDefinedConfig);
                 userDefinedConfig.DownloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
-                userDefinedConfig.MainThreadDispatcher = userDefinedConfig.MainThreadDispatcher ?? CreateMainThreadDispatcherInstance();
-                userDefinedConfig.DataResolverFactory = userDefinedConfig.DataResolverFactory ?? CreateDataResolverFactoryInstance();
+                userDefinedConfig.MainThreadDispatcher = userDefinedConfig.MainThreadDispatcher ?? CreateMainThreadDispatcherInstance(userDefinedConfig);
+                userDefinedConfig.DataResolverFactory = userDefinedConfig.DataResolverFactory ?? CreateDataResolverFactoryInstance(userDefinedConfig);
 
                 _initialized = true;
                 _isInitializing = false;
