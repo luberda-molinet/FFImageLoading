@@ -436,6 +436,9 @@ namespace FFImageLoading.Work
                 }
                 catch (Exception ex)
                 {
+                    if (ex is OperationCanceledException)
+                        throw;
+
                     Logger.Error("Setting placeholder failed", ex);
                 }
             }
