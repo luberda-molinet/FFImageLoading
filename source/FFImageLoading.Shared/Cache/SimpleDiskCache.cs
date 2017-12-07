@@ -75,6 +75,9 @@ namespace FFImageLoading.Cache
 #elif __MACOS__
             string tmpPath = Path.GetTempPath();
             string cachePath = Path.Combine(tmpPath, cacheName);
+#elif __TIZEN__
+            var appCachePath = Tizen.Applications.Application.Current.DirectoryInfo.Cache;
+            string cachePath = Path.Combine(appCachePath, "FFSimpleDiskCache");
 #endif
 
             return new SimpleDiskCache(cachePath, configuration);

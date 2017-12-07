@@ -28,6 +28,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.WinRT")]
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.WinSL")]
 [assembly: InternalsVisibleTo("FFImageLoading.Forms.WinUWP")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Tizen")]
 
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
