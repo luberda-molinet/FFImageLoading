@@ -118,7 +118,7 @@ namespace FFImageLoading.Work
             {
                 lock (_lock)
                 {
-                    PendingTasks.Remove(task);
+                    PendingTasks.TryRemove(task);
                     SimilarTasks.Remove(task);
                 }
             }
@@ -199,18 +199,7 @@ namespace FFImageLoading.Work
                     || task.Parameters.Priority.Value > similarRunningTask.Parameters.Priority.Value))
                 {
                     similarRunningTask.Parameters.WithPriority(task.Parameters.Priority.Value);
-
-                    if (PendingTasks.Contains(similarRunningTask))
-                    {
-                        try
-                        {
-                            PendingTasks.UpdatePriority(similarRunningTask, task.Parameters.Priority.Value);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error("PendingTasks.UpdatePriority", ex);
-                        }
-                    }
+                    PendingTasks.TryUpdatePriority(similarRunningTask, task.Parameters.Priority.Value);
                 }
 
                 if (task.Parameters.OnDownloadProgress != null)

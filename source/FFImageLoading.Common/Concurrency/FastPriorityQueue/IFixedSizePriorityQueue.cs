@@ -21,13 +21,5 @@ namespace FFImageLoading.Concurrency
         /// attempting to enqueue another item will cause undefined behavior.
         /// </summary>
         int MaxSize { get; }
-
-#if DEBUG
-        /// <summary>
-        /// <b>Should not be called in production code.</b>
-        /// Checks to make sure the queue is still in a valid state.  Used for testing/debugging the queue.
-        /// </summary>
-        bool IsValidQueue();
-#endif
     }
 }
