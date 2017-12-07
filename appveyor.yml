@@ -1,7 +1,10 @@
 os: Visual Studio 2017
 configuration: Release
-platform: Any CPU
+# platform: Any CPU // https://github.com/appveyor/ci/issues/1915
 clone_depth: 1
+
+environment:
+  CLI_VERSION: 2.0.3
 
 #environment:
 #  ANDROID_HOME: C:\android-sdk
@@ -72,12 +75,9 @@ before_build:
     (Get-Content $nuspec4template).replace('@version', $version) | Set-Content $nuspec4
         
     (Get-Content $nuspec5template).replace('@version', $version) | Set-Content $nuspec5
-  
-test_script:
-  # restore packages for our unit tests
-  # - cmd: dotnet restore .\source/Tests/FFImageLoading.Tests.csproj --verbosity m
-  # run the unit tests (requires changing into the test directory)
-  - ps: dotnet test .\source\Tests\FFImageLoading.Tests\FFImageLoading.Tests.csproj
+
+test_script: 
+ cmd: dotnet test source\Tests\FFImageLoading.Tests -c %CONFIGURATION%
 
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg

@@ -101,6 +101,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Mock", "sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFImageLoading.Mac", "source\FFImageLoading.Mac\FFImageLoading.Mac.csproj", "{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspec", "Nuspec", "{5C360F03-BA00-4697-B698-73682B8F510F}"
+	ProjectSection(SolutionItems) = preProject
+		source\Xamarin.FFImageLoading.Forms.nuspec.template = source\Xamarin.FFImageLoading.Forms.nuspec.template
+		source\Xamarin.FFImageLoading.nuspec.template = source\Xamarin.FFImageLoading.nuspec.template
+		source\Xamarin.FFImageLoading.Svg.Forms.nuspec.template = source\Xamarin.FFImageLoading.Svg.Forms.nuspec.template
+		source\Xamarin.FFImageLoading.Svg.nuspec.template = source\Xamarin.FFImageLoading.Svg.nuspec.template
+		source\Xamarin.FFImageLoading.Transformations.nuspec.template = source\Xamarin.FFImageLoading.Transformations.nuspec.template
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		source\FFImageLoading.Cross\FFImageLoading.Cross.projitems*{1597f7d4-432c-4f26-b508-0f6faf0b9711}*SharedItemsImports = 4
