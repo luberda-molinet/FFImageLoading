@@ -111,8 +111,16 @@ Features:
 		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\wpa81\FFImageLoading.Platform.pdb" />
         <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\wpa81\FFImageLoading.dll" />
         <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\wpa81\FFImageLoading.xml" />
-        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\wpa81\FFImageLoading.pdb" />			
-	
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\wpa81\FFImageLoading.pdb" />
+
+        <!--Tizen-->
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.Platform.dll" target="lib\tizen40\FFImageLoading.Platform.dll" />
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.Platform.xml" target="lib\tizen40\FFImageLoading.Platform.xml" />
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.Platform.pdb" target="lib\tizen40\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.dll" target="lib\tizen40\FFImageLoading.dll" />
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.xml" target="lib\tizen40\FFImageLoading.xml" />
+        <file src="FFImageLoading.Tizen\bin\Release\tizen40\FFImageLoading.pdb" target="lib\tizen40\FFImageLoading.pdb" />
+
 	</files>
 
 </package>

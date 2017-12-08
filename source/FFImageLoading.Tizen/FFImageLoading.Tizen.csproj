@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>tizen40</TargetFramework>
+    <AssemblyName>FFImageLoading.Platform</AssemblyName>
+    <RootNamespace>FFImageLoading</RootNamespace>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tizen.NET" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
+
+</Project>

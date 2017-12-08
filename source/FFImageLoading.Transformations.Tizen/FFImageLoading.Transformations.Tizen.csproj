@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>tizen40</TargetFramework>
+    <AssemblyName>FFImageLoading.Transformations</AssemblyName>
+    <RootNamespace>FFImageLoading.Transformations</RootNamespace>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tizen.NET" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Tizen\FFImageLoading.Tizen.csproj" />
+  </ItemGroup>
+
+</Project>

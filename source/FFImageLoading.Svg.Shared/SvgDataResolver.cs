@@ -144,6 +144,9 @@ namespace FFImageLoading.Svg.Platform
 #if __ANDROID__
                 sizeX = sizeX.DpToPixels();
                 sizeY = sizeY.DpToPixels();
+#elif __TIZEN__
+                sizeX = sizeX.DpToPixels();
+                sizeY = sizeY.DpToPixels();
 #else
                 sizeX = sizeX.PointsToPixels();
                 sizeY = sizeY.PointsToPixels();

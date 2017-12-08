@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>tizen40</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tizen.NET" Version="4.0.0">
+      <ExcludeAssets>Runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Tizen.NET.Sdk" Version="1.0.0" />
+    <PackageReference Include="Xamarin.Forms.Platform.Tizen" Version="2.5.0.77107" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Tizen\FFImageLoading.Forms.Tizen.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms.Tizen\FFImageLoading.Svg.Forms.Tizen.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Tizen\FFImageLoading.Svg.Tizen.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Tizen\FFImageLoading.Tizen.csproj" />
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Tizen\FFImageLoading.Transformations.Tizen.csproj" />
+    <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj" />
+  </ItemGroup>
+
+</Project>
