@@ -107,5 +107,5 @@ namespace Simple.TizenForms.Sample
             public ImageSource Source { get; set; }
             public string Title { get; set; }
         }
-	}
+    }
 }
