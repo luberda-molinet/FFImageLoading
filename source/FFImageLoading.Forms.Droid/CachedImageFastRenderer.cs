@@ -125,7 +125,11 @@ namespace FFImageLoading.Forms.Droid
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-            if ((bool)_ElementRendererTypeOnTouchEvent.Invoke(_visualElementRenderer, new[] { e }) || base.OnTouchEvent(e))
+            if (_ElementRendererTypeOnTouchEvent != null && (bool)_ElementRendererTypeOnTouchEvent.Invoke(_visualElementRenderer, new[] { e }))
+            {
+                return true;
+            }
+            else if (base.OnTouchEvent(e))
             {
                 return true;
             }
