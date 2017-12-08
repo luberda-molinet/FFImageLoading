@@ -29,7 +29,9 @@ namespace FFImageLoading.Targets
 
             if (control == null) return;
 #if __MACOS__
-            if (control.Image == image) return;
+            if (control.Layer.Contents == image.CGImage) return;
+            control.Layer.Contents = image.CGImage; 
+            return;
 #elif __IOS__
             if (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1))
                 return;
