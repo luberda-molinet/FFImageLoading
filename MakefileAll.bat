@@ -30,6 +30,7 @@ echo Building FFImageLoading.Transformations...
 %msbuild% source/FFImageLoading.Transformations.Windows/FFImageLoading.Transformations.Windows.csproj %buildargs%
 %msbuild% source/FFImageLoading.Transformations.Touch/FFImageLoading.Transformations.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Transformations.Droid/FFImageLoading.Transformations.Droid.csproj %buildargs%
+%msbuild% source/FFImageLoading.Transformations.Mac/FFImageLoading.Transformations.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Transformations.Tizen/FFImageLoading.Transformations.Tizen.csproj %buildargsRelease%
 
 echo Building FFImageLoading.Forms...
