@@ -15,6 +15,12 @@ namespace FFImageLoading.Tests.ImageServiceTests
 
         const string RemoteImage = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
 
+        public static string GetRandomImageUrl(int width = 100, int height = 100)
+        {
+            return string.Format("http://loremflickr.com/{1}/{2}/nature?filename={0}.jpg",
+                Guid.NewGuid().ToString("N"), width, height);
+        }
+
         [Fact]
         public void CanInitialize()
         {
@@ -84,6 +90,47 @@ namespace FFImageLoading.Tests.ImageServiceTests
 
             var cachedMemory = Mock.MockImageCache.Instance.Get(RemoteImage);
             Assert.Null(cachedMemory);
+        }
+
+        [Fact]
+        public async Task CanPreloadMultipleUrlImageSources()
+        {
+            IList<Task> tasks = new List<Task>();
+            int downloadsCount = 0;
+
+            for (int i = 0; i < 5; i++)
+            {
+                tasks.Add(ImageService.Instance.LoadUrl(GetRandomImageUrl())
+                          .DownloadStarted((obj) =>
+                          {
+                              downloadsCount++;
+                          })
+                          .PreloadAsync());
+            }
+
+            await Task.WhenAll(tasks);
+            Assert.Equal(5, downloadsCount);
+        }
+
+        [Fact]
+        public async Task CanWaitForSameUrlImageSources()
+        {
+            IList<Task> tasks = new List<Task>();
+            int downloadsCount = 0;
+            var source = GetRandomImageUrl();
+
+            for (int i = 0; i < 5; i++)
+            {
+                tasks.Add(ImageService.Instance.LoadUrl(source)
+                          .DownloadStarted((obj) =>
+                            {
+                                downloadsCount++;
+                            })
+                          .PreloadAsync());
+            }
+
+            await Task.WhenAll(tasks);
+            Assert.Equal(1, downloadsCount);
         }
     }
 }
