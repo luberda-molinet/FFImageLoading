@@ -22,6 +22,7 @@ echo Building FFImageLoading...
 %msbuild% source/FFImageLoading.Touch/FFImageLoading.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Mac/FFImageLoading.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Droid/FFImageLoading.Droid.csproj %buildargs%
+%msbuild% source/FFImageLoading.Tizen/FFImageLoading.Tizen.csproj %buildargsRelease%
 
 echo Building FFImageLoading.Transformations...
 
@@ -29,6 +30,7 @@ echo Building FFImageLoading.Transformations...
 %msbuild% source/FFImageLoading.Transformations.Windows/FFImageLoading.Transformations.Windows.csproj %buildargs%
 %msbuild% source/FFImageLoading.Transformations.Touch/FFImageLoading.Transformations.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Transformations.Droid/FFImageLoading.Transformations.Droid.csproj %buildargs%
+%msbuild% source/FFImageLoading.Transformations.Tizen/FFImageLoading.Transformations.Tizen.csproj %buildargsRelease%
 
 echo Building FFImageLoading.Forms...
 
@@ -37,6 +39,7 @@ echo Building FFImageLoading.Forms...
 %msbuild% source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.Mac/FFImageLoading.Forms.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Forms.Droid/FFImageLoading.Forms.Droid.csproj %buildargs%
+%msbuild% source/FFImageLoading.Forms.Tizen/FFImageLoading.Forms.Tizen.csproj %buildargsRelease%
 
 echo Building FFImageLoading.Svg...
 
@@ -44,10 +47,12 @@ echo Building FFImageLoading.Svg...
 %msbuild% source/FFImageLoading.Svg.Touch/FFImageLoading.Svg.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Droid/FFImageLoading.Svg.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Windows/FFImageLoading.Svg.Windows.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Tizen/FFImageLoading.Svg.Tizen.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Svg.Forms/FFImageLoading.Svg.Forms.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Touch/FFImageLoading.Svg.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Windows/FFImageLoading.Svg.Forms.Windows.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Forms.Tizen/FFImageLoading.Svg.Forms.Tizen.csproj %buildargsRelease%
 
 echo Building Unit tests...
 

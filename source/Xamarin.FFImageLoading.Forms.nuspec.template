@@ -112,6 +112,14 @@ Features:
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.xml" target="lib\wpa81\FFImageLoading.Forms.WinRT.xml" />
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.WinRT.pdb" target="lib\wpa81\FFImageLoading.Forms.WinRT.pdb" />
 
+        <!--Tizen-->
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.dll" target="lib\tizen40\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.xml" target="lib\tizen40\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.pdb" target="lib\tizen40\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Tizen.dll" target="lib\tizen40\FFImageLoading.Forms.Tizen.dll" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Tizen.xml" target="lib\tizen40\FFImageLoading.Forms.Tizen.xml" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Tizen.pdb" target="lib\tizen40\FFImageLoading.Forms.Tizen.pdb" />
+
     </files>
     
 </package>
