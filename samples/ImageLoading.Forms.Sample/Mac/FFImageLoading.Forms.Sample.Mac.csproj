@@ -117,14 +117,6 @@
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg\FFImageLoading.Svg.csproj">
-      <Project>{E5C8FBB7-595D-43FE-B900-46027D0D4F69}</Project>
-      <Name>FFImageLoading.Svg</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms\FFImageLoading.Svg.Forms.csproj">
-      <Project>{DE555E87-187D-4768-8053-B2D3195B6792}</Project>
-      <Name>FFImageLoading.Svg.Forms</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\FFImageLoading.Mac\FFImageLoading.Mac.csproj">
       <Project>{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}</Project>
       <Name>FFImageLoading.Mac</Name>
@@ -132,6 +124,14 @@
     <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Mac\FFImageLoading.Transformations.Mac.csproj">
       <Project>{CFDF882F-588F-4CE4-BFBF-9D4E3A991BB0}</Project>
       <Name>FFImageLoading.Transformations.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms.Mac\FFImageLoading.Svg.Forms.Mac.csproj">
+      <Project>{411B82F4-4F6B-49A0-8E28-260FB65B386F}</Project>
+      <Name>FFImageLoading.Svg.Forms.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Mac\FFImageLoading.Svg.Mac.csproj">
+      <Project>{EAEFDF02-E6BB-4ACD-925A-F8BCCD479DA3}</Project>
+      <Name>FFImageLoading.Svg.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

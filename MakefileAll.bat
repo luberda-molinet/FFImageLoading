@@ -48,11 +48,13 @@ echo Building FFImageLoading.Svg...
 %msbuild% source/FFImageLoading.Svg.Touch/FFImageLoading.Svg.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Droid/FFImageLoading.Svg.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Windows/FFImageLoading.Svg.Windows.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Mac/FFImageLoading.Svg.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Svg.Tizen/FFImageLoading.Svg.Tizen.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Svg.Forms/FFImageLoading.Svg.Forms.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Touch/FFImageLoading.Svg.Forms.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Droid/FFImageLoading.Svg.Forms.Droid.csproj %buildargs%
 %msbuild% source/FFImageLoading.Svg.Forms.Windows/FFImageLoading.Svg.Forms.Windows.csproj %buildargs%
+%msbuild% source/FFImageLoading.Svg.Forms.Mac/FFImageLoading.Svg.Forms.Mac.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Svg.Forms.Tizen/FFImageLoading.Svg.Forms.Tizen.csproj %buildargsRelease%
 
 echo Building Unit tests...
