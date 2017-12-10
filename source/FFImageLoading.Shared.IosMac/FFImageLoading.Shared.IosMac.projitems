@@ -20,9 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MainThreadDispatcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\PlatformPerformance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\ScaleHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Targets\PControlTarget.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Targets\PImageTarget.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Targets\PImageViewTarget.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transformations\TransformationBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Work\BitmapHolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Work\PlatformImageLoaderTask.cs" />
@@ -32,7 +29,6 @@
     <Folder Include="$(MSBuildThisFileDirectory)DataResolvers\" />
     <Folder Include="$(MSBuildThisFileDirectory)Extensions\" />
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Targets\" />
     <Folder Include="$(MSBuildThisFileDirectory)Transformations\" />
     <Folder Include="$(MSBuildThisFileDirectory)Work\" />
   </ItemGroup>

@@ -61,6 +61,9 @@
       <Link>Extensions\TaskParameterExtensions.cs</Link>
     </Compile>
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
+    <Compile Include="Targets\NSImageTarget.cs" />
+    <Compile Include="Targets\NSImageViewTarget.cs" />
+    <Compile Include="Targets\NSViewTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
@@ -71,6 +74,7 @@
   <ItemGroup>
     <Folder Include="Work\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Targets\" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems')" />
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />

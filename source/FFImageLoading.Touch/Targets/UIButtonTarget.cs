@@ -6,11 +6,11 @@ using UIKit;
 
 namespace FFImageLoading.Targets
 {
-	public class UIButtonTarget: PControlTarget<UIButton>
-	{
-		public UIButtonTarget(UIButton control) : base(control)
-		{
-		}
+    public class UIButtonTarget: UIViewTarget<UIButton>
+    {
+        public UIButtonTarget(UIButton control) : base(control)
+        {
+        }
 
         public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
@@ -34,6 +34,6 @@ namespace FFImageLoading.Targets
 
             control.SetImage(null, UIControlState.Normal);
         }
-	}
+    }
 }
 

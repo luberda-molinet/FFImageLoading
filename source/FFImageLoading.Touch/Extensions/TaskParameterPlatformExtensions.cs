@@ -43,7 +43,7 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView)
         {
-            var target = new PImageViewTarget(imageView);
+            var target = new UIImageViewTarget(imageView);
 
             return parameters.Into(target);
         }
@@ -120,7 +120,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters)
         {
-            var target = new PImageTarget();
+            var target = new UIImageTarget();
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<UIImage>();
