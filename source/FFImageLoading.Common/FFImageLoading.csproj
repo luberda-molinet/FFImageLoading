@@ -131,6 +131,7 @@
     <Compile Include="Helpers\GifDecoderBase.cs" />
     <Compile Include="Helpers\Delay.cs" />
     <Compile Include="Concurrency\FastPriorityQueue\CustomComparer.cs" />
+    <Compile Include="Helpers\IImageFileDecoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

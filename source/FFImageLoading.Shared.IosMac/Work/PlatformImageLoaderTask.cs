@@ -8,6 +8,7 @@ using FFImageLoading.Extensions;
 using System.Threading;
 using FFImageLoading.Config;
 using FFImageLoading.Cache;
+using FFImageLoading.Helpers;
 using ImageIO;
 using System.Collections.Generic;
 
@@ -25,10 +26,7 @@ namespace FFImageLoading.Work
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
         static readonly SemaphoreSlim _webpLock = new SemaphoreSlim(1, 1);
-
-#if __IOS__
-        static object _webpDecoder;
-#endif
+        static IImageFileDecoder<PImage> _webpDecoder = new WebPDecoder();
 
         public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
@@ -72,18 +70,11 @@ namespace FFImageLoading.Work
                 // Special case to handle WebP decoding on iOS
                 if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
                 {
-#if __IOS__
                     await _webpLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false);
                     ThrowIfCancellationRequested();
                     try
                     {
-                        var decoder = _webpDecoder as WebP.Touch.WebPCodec;
-                        if (decoder == null)
-                        {
-                            decoder = new WebP.Touch.WebPCodec();
-                            _webpDecoder = decoder;
-                        }
-                        var decodedWebP = decoder.Decode(imageData);
+                        var decodedWebP = _webpDecoder.Decode(imageData);
                         //TODO Add WebP images downsampling!
                         imageIn = decodedWebP;
                     }
@@ -91,9 +82,6 @@ namespace FFImageLoading.Work
                     {
                         _webpLock.Release();
                     }
-#else
-                    throw new NotImplementedException();
-#endif
                 }
                 else
                 {
