@@ -75,8 +75,20 @@ namespace FFImageLoading.Work
                     try
                     {
                         var decodedWebP = _webpDecoder.Decode(imageData);
-                        //TODO Add WebP images downsampling!
-                        imageIn = decodedWebP;
+
+                        if (downsampleWidth != 0 || downsampleHeight != 0)
+                        {
+                            using (decodedWebP)
+                            {
+                                var isDefaultMode = Parameters.DownSampleInterpolationMode == InterpolationMode.Default;
+                                var interpolationMode = isDefaultMode ? Configuration.DownsampleInterpolationMode : Parameters.DownSampleInterpolationMode;
+                                imageIn = decodedWebP.ResizeUIImage(downsampleWidth, downsampleHeight, interpolationMode);
+                            }
+                        }
+                        else
+                        {
+                            imageIn = decodedWebP;
+                        }
                     }
                     finally
                     {
