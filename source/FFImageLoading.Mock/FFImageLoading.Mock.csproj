@@ -57,6 +57,8 @@
     <Compile Include="Mock\MockMainThreadDispatcher.cs" />
     <Compile Include="Mock\MockDataResolverFactory.cs" />
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
+    <Compile Include="Mock\MockDecoder.cs" />
+    <Compile Include="Extensions\UnitExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

@@ -185,5 +185,19 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
         void Cancel(Func<TaskParameter, bool> predicate);
+
+        /// <summary>
+        /// Dps to pixels.
+        /// </summary>
+        /// <returns>The to pixels.</returns>
+        /// <param name="dp">Dp.</param>
+        int DpToPixels(double dp);
+
+        /// <summary>
+        /// Pixelses to dp.
+        /// </summary>
+        /// <returns>The to dp.</returns>
+        /// <param name="px">Px.</param>
+        double PixelsToDp(double px);
     }
 }

@@ -67,7 +67,6 @@
     <Compile Include="Targets\NSImageTarget.cs" />
     <Compile Include="Targets\NSImageViewTarget.cs" />
     <Compile Include="Targets\NSViewTarget.cs" />
-    <Compile Include="Helpers\WebPDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">

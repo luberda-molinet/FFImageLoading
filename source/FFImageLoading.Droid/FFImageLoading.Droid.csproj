@@ -111,7 +111,8 @@
       <Link>Extensions\TaskParameterExtensions.cs</Link>
     </Compile>
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
-    <Compile Include="Helpers\PlatformGifHelper.cs" />
+    <Compile Include="Decoders\GifDecoder.cs" />
+    <Compile Include="Decoders\BaseDecoder.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -130,5 +131,8 @@
       <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
       <Name>FFImageLoading</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Decoders\" />
   </ItemGroup>
 </Project>

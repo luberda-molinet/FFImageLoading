@@ -128,5 +128,18 @@ namespace FFImageLoading
                 }
             }
         }
+
+        public override int DpToPixels(double dp)
+        {
+            return (int)Math.Floor(dp * ScaleHelper.Scale);
+        }
+
+        public override double PixelsToDp(double px)
+        {
+            if (Math.Abs(px) < double.Epsilon)
+                return 0d;
+
+            return Math.Floor(px / ScaleHelper.Scale);
+        }
     }
 }

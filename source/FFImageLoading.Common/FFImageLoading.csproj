@@ -128,10 +128,15 @@
     <Compile Include="ImageServiceBase.cs" />
     <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
-    <Compile Include="Helpers\GifDecoderBase.cs" />
     <Compile Include="Helpers\Delay.cs" />
     <Compile Include="Concurrency\FastPriorityQueue\CustomComparer.cs" />
-    <Compile Include="Helpers\IImageFileDecoder.cs" />
+    <Compile Include="Decoders\IDecoder.cs" />
+    <Compile Include="Decoders\IDecodedImage.cs" />
+    <Compile Include="Decoders\DecodedImage.cs" />
+    <Compile Include="Helpers\GifHelper.cs" />
+    <Compile Include="Helpers\GifHelperBase.cs" />
+    <Compile Include="Decoders\IAnimatedImage.cs" />
+    <Compile Include="Decoders\AnimatedImage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>
@@ -158,6 +163,7 @@
     <Folder Include="Views\" />
     <Folder Include="Args\" />
     <Folder Include="DataResolvers\" />
+    <Folder Include="Decoders\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

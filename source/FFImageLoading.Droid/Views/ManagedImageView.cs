@@ -79,8 +79,8 @@ namespace FFImageLoading.Views
                 try
                 {
                     token.ThrowIfCancellationRequested();
-                    var gifDecoder = gifDrawable.GifHelper;
-                    int n = gifDecoder.GetFrameCount();
+                    var animatedImages = gifDrawable.AnimatedImages;
+                    int n = animatedImages.Length;
                     //int ntimes = gifDecoder.GetLoopCount();
                     //TODO DISABLED for endless loop
                     int ntimes = 0;
@@ -91,8 +91,8 @@ namespace FFImageLoading.Views
                         for (int i = 0; i < n; i++)
                         {
                             token.ThrowIfCancellationRequested();
-                            var bitmap = gifDecoder.GetFrame(i);
-                            int t = gifDecoder.GetDelay(i);
+                            var bitmap = animatedImages[i].Image;
+                            int t = animatedImages[i].Delay;
 
                             if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                             {

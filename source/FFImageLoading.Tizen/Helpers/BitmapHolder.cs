@@ -1,18 +1,13 @@
 ﻿using System;
+using FFImageLoading.Work;
+using ElmSharp;
+using FFImageLoading.Views;
 
-#if __MACOS__
-using AppKit;
-using PImage = AppKit.NSImage;
-#elif __IOS__
-using UIKit;
-using PImage = UIKit.UIImage;
-#endif
-
-namespace FFImageLoading.Work
+namespace FFImageLoading
 {
-    public class BitmapHolder: IBitmap
+    public class BitmapHolder : IBitmap
     {
-        public BitmapHolder(PImage bitmap)
+        public BitmapHolder(SharedEvasImage bitmap)
         {
             NativeBitmap = bitmap;
         }
@@ -33,7 +28,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        internal PImage NativeBitmap
+        internal SharedEvasImage NativeBitmap
         {
             get;
             private set;
@@ -42,10 +37,9 @@ namespace FFImageLoading.Work
 
     public static class IBitmapExtensions
     {
-        public static PImage ToNative(this IBitmap bitmap)
+        public static SharedEvasImage ToNative(this IBitmap bitmap)
         {
             return ((BitmapHolder)bitmap).NativeBitmap;
         }
     }
 }
-

@@ -16,12 +16,12 @@ namespace FFImageLoading.Transformations
         [Obsolete("Use the new override")]
         protected virtual BitmapHolder Transform(BitmapHolder bitmapHolder)
         {
-        	return null;
+            return null;
         }
 
         protected virtual BitmapHolder Transform(BitmapHolder bitmapHolder, string path, ImageSource source, bool isPlaceholder, string key)
         {
-        	return bitmapHolder;
+            return bitmapHolder;
         }
     }
 }

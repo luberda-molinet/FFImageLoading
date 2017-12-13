@@ -48,11 +48,11 @@ namespace FFImageLoading.Drawables
         {
         }
 
-        internal FFGifDrawable(Resources resources, Bitmap bitmap, PlatformGifHelper gifHelper) : base(resources, bitmap)
+        internal FFGifDrawable(Resources resources, Bitmap bitmap, IAnimatedImage<Bitmap>[] animatedImages) : base(resources, bitmap)
         {
-            GifHelper = gifHelper;
+            AnimatedImages = animatedImages;
         }
 
-        internal PlatformGifHelper GifHelper { get; private set; }
+        internal IAnimatedImage<Bitmap>[] AnimatedImages { get; private set; }
     }
 }

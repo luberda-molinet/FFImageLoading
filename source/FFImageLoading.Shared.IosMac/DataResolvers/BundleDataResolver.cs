@@ -22,11 +22,8 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
     {
-#if __MACOS__
-        readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG" };
-#elif __IOS__
-        readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG", "webp", "WEBP" };
-#endif
+        readonly string[] fileTypes = { null, "png", "jpg", "jpeg", "PNG", "JPG", "JPEG", "webp", "WEBP", "gif", "GIF" };
+
         public virtual async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             NSBundle bundle = null;

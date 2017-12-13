@@ -16,6 +16,9 @@
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Decoders\" />
+  </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
 
 </Project>

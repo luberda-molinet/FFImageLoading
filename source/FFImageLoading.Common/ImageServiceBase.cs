@@ -29,6 +29,9 @@ namespace FFImageLoading
         protected abstract void SetTaskForTarget(IImageLoaderTask currentTask);
         public abstract void CancelWorkForView(object view);
 
+        public abstract int DpToPixels(double dp);
+        public abstract double PixelsToDp(double px);
+
         Configuration _config;
         public Configuration Config
         {

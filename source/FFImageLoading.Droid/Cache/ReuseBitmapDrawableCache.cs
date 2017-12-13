@@ -315,6 +315,24 @@ namespace FFImageLoading.Cache
             }
         }
 
+        public void AddToReusePool(TValue value)
+        {
+            lock (monitor)
+            {
+                value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
+                value.Displayed += OnEntryDisplayed;
+                value.SetIsRetained(false);
+                value.SetIsCached(true);
+
+                displayed_cache.Remove(value.InCacheKey);
+
+                if (reuse_pool.ContainsKey(value.InCacheKey))
+                    reuse_pool.Remove(value.InCacheKey);
+
+                reuse_pool.Add(value.InCacheKey, value);
+            }
+        }
+
         public void Add(string key, TValue value)
         {
             if (string.IsNullOrEmpty(key))

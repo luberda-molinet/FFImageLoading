@@ -8,10 +8,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Imaging;
+using FFImageLoading.Decoders;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Work
 {
-    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<BitmapSource, TImageView> where TImageView : class
+    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<BitmapHolder, BitmapSource, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
 
@@ -33,93 +35,82 @@ namespace FFImageLoading.Work
             });
         }
 
-        protected async override Task<BitmapSource> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected override int DpiToPixels(int size)
         {
-            BitmapHolder imageIn = null;
+            return size.DpToPixels();
+        }
 
-            if (imageData == null)
-                throw new ArgumentNullException(nameof(imageData));
-
-            ThrowIfCancellationRequested();
-
-            try
+        protected override IDecoder<BitmapHolder> ResolveDecoder(ImageInformation.ImageType type)
+        {
+            switch (type)
             {
-                bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
-                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
-                {
-                    throw new NotImplementedException("Webp is not implemented on Windows");
-                }
-                else if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-                {
-                    imageIn = await imageData.ToBitmapHolderAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
-                }
-                else
-                {
-                    return await imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
-                }
-            }
-            finally
-            {
-                imageData.TryDispose();
-            }
-
-            ThrowIfCancellationRequested();
-
-            if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-            {
-                var transformations = Parameters.Transformations.ToList();
-
-                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
-                ThrowIfCancellationRequested();
-
-                try
-                {
-                    foreach (var transformation in transformations)
-                    {
-                        ThrowIfCancellationRequested();
-
-                        var old = imageIn;
-
-                        try
-                        {
-                            IBitmap bitmapHolder = transformation.Transform(imageIn, path, source, isPlaceholder, Key);
-                            imageIn = bitmapHolder.ToNative();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
-                            throw;
-                        }
-                        finally
-                        {
-                            if (old != null && old != imageIn && old.PixelData != imageIn.PixelData)
-                            {
-                                old.FreePixels();
-                                old = null;
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    _decodingLock.Release();
-                }
-            }
-
-            try
-            {
-                return await imageIn.ToBitmapImageAsync();
-            }
-            finally
-            {
-                imageIn.FreePixels();
-                imageIn = null;
+                case ImageInformation.ImageType.GIF:
+                case ImageInformation.ImageType.WEBP:
+                    throw new NotImplementedException();
+                default:
+                    return new BaseDecoder();
             }
         }
 
-        protected override int DpiToPixels(int size)
+        protected override async Task<BitmapHolder> TransformAsync(BitmapHolder bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            return size.PointsToPixels();
+            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            ThrowIfCancellationRequested();
+
+            try
+            {
+                foreach (var transformation in transformations)
+                {
+                    ThrowIfCancellationRequested();
+
+                    var old = bitmap;
+
+                    try
+                    {
+                        IBitmap bitmapHolder = transformation.Transform(bitmap, path, source, isPlaceholder, Key);
+                        bitmap = bitmapHolder.ToNative();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                        throw;
+                    }
+                    finally
+                    {
+                        if (old != null && old != bitmap && old.PixelData != bitmap.PixelData)
+                        {
+                            old.FreePixels();
+                            old = null;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                _decodingLock.Release();
+            }
+
+            return bitmap;
+        }
+
+        protected override async Task<BitmapSource> GenerateImageFromDecoderContainerAsync(IDecodedImage<BitmapHolder> decoded, ImageInformation imageInformation, bool isPlaceholder)
+        {
+            if (decoded.IsAnimated)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                try
+                {
+                    return await decoded.Image.ToBitmapImageAsync();
+                }
+                finally
+                {
+                    decoded.Image.FreePixels();
+                    decoded.Image = null;
+                }
+            }
         }
     }
 }

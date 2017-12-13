@@ -4,61 +4,9 @@ using System.IO;
 using System.Threading.Tasks;
 using FFImageLoading.Work;
 
-namespace FFImageLoading.Helpers
+namespace FFImageLoading
 {
-    public static class GifHelper
-    {
-        public static bool CheckIfAnimated(Stream st)
-        {
-            try
-            {
-                int headerCount = 0;
-                bool sequenceStartCand = false;
-                int readByte;
-                while ((readByte = st.ReadByte()) >= 0)
-                {
-                    if (readByte == 0x00)
-                    {
-                        sequenceStartCand = true;
-                        continue;
-                    }
-
-                    //header made up of:
-                    // * a static 4-byte sequence (\x00\x21\xF9\x04)
-                    // * 4 variable bytes
-                    // * a static 2-byte sequence (\x00\x2C) (some variants may use \x00\x21 ?)
-                    if (sequenceStartCand && readByte == 0x21 && st.ReadByte() == 0xF9 && st.ReadByte() == 0x04
-                        && st.ReadByte() != -1 && st.ReadByte() != -1 && st.ReadByte() != -1 && st.ReadByte() != -1
-                        && st.ReadByte() == 0x00)
-                    {
-                        readByte = st.ReadByte();
-                        if (readByte == 0x2C || readByte == 0x21)
-                        {
-                            headerCount++;
-
-                            if (headerCount > 1)
-                                return true;
-                        }
-                    }
-                    else if (readByte == 0x00)
-                    {
-                        sequenceStartCand = true;
-                        continue;
-                    }
-
-                    sequenceStartCand = false;
-                }
-
-                return false;
-            }
-            finally
-            {
-                st.Position = 0;
-            }
-        }
-    }
-
-    internal abstract class GifHelperBase<TBitmap>
+    public abstract class GifHelperBase<TNativeImageContainer>
     {
         object _lock = new object();
         const int STATUS_OK = 0;
@@ -84,7 +32,8 @@ namespace FFImageLoading.Helpers
         int lctSize; // local color table size
         int ix, iy, iw, ih; // current image rectangle
         int lrx, lry, lrw, lrh;
-        TBitmap image; // current frame
+        TNativeImageContainer image; // current frame
+        TaskParameter parameters;
         int[] currentBitmap;
         int[] lastBitmap1; // previous frame
         byte[] block = new byte[256]; // current data block
@@ -99,49 +48,18 @@ namespace FFImageLoading.Helpers
         byte[] suffix;
         byte[] pixelStack;
         byte[] pixels;
-        IList<GifFrame> frames = new List<GifFrame>(); // frames read from current file
+        List<GifFrame> frames = new List<GifFrame>(); // frames read from current file
         int frameCount;
-        Func<TBitmap, Task<TBitmap>> _decodingFunc;
         int? _downsampleWidth;
         int? _downsampleHeight;
         bool _downsample;
 
+        public List<GifFrame> Frames { get { return frames; } }
+
         protected abstract int DipToPixels(int dips);
-        protected abstract Task<TBitmap> ToBitmapAsync(int[] data, int width, int height);
+        protected abstract Task<TNativeImageContainer> ToBitmapAsync(int[] data, int width, int height);
 
-        public int GetDelay(int n)
-        {
-            lock (_lock)
-            {
-                return frames[n].Delay;
-            }
-        }
-
-        public int GetFrameCount()
-        {
-            lock (_lock)
-            {
-                return frameCount;
-            }
-        }
-
-        public TBitmap GetBitmap()
-        {
-            lock (_lock)
-            {
-                return GetFrame(0);
-            }
-        }
-
-        public int GetLoopCount()
-        {
-            lock (_lock)
-            {
-                return loopCount;
-            }
-        }
-
-        protected async Task SetPixelsAsync()
+        async Task SetPixelsAsync()
         {
             int[] result = new int[width * height];
 
@@ -244,7 +162,7 @@ namespace FFImageLoading.Helpers
             }
 
             currentBitmap = result;
-            TBitmap bitmap;
+            TNativeImageContainer bitmap;
 
             //TODO fix downsampling issue (part of image is cut)
             _downsample = false;
@@ -310,11 +228,12 @@ namespace FFImageLoading.Helpers
                 bitmap = await ToBitmapAsync(result, width, height);
             }
 
-            image = await _decodingFunc.Invoke(bitmap).ConfigureAwait(false);
+            image = bitmap;
         }
 
-        public async Task ReadGifAsync(Stream inputStream, TaskParameter parameters, Func<TBitmap, Task<TBitmap>> decodingFunc)
+        public async Task ReadGifAsync(Stream inputStream, string path, TaskParameter parameters)
         {
+            this.parameters = parameters;
             var dip = parameters.DownSampleUseDipUnits;
             _downsample = parameters.DownSampleSize != null;
 
@@ -329,8 +248,6 @@ namespace FFImageLoading.Helpers
                     _downsampleHeight = DipToPixels(_downsampleHeight.Value);
                 }
             }
-
-            _decodingFunc = decodingFunc;
 
             if (inputStream != null)
             {
@@ -477,12 +394,12 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        public TBitmap GetFrame(int n)
+        TNativeImageContainer GetFrame(int n)
         {
             lock (_lock)
             {
                 if (frameCount <= 0)
-                    return default(TBitmap);
+                    return default(TNativeImageContainer);
                 n = n % frameCount;
                 return frames[n].Image;
             }
@@ -783,15 +700,15 @@ namespace FFImageLoading.Helpers
             } while ((blockSize > 0) && !Err);
         }
 
-        internal class GifFrame
+        public class GifFrame
         {
-            public GifFrame(TBitmap im, int del)
+            public GifFrame(TNativeImageContainer im, int del)
             {
                 Image = im;
                 Delay = del;
             }
 
-            public TBitmap Image;
+            public TNativeImageContainer Image;
             public int Delay;
         }
     }

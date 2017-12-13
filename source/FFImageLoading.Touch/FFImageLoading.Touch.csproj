@@ -68,12 +68,12 @@
   <ItemGroup>
     <Folder Include="Targets\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Targets\UIBarItemTarget.cs" />
     <Compile Include="Targets\UIButtonTarget.cs" />
-    <Compile Include="Helpers\GifHelper.cs" />
     <Compile Include="ImageService.cs" />
     <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
       <Link>Extensions\TaskParameterExtensions.cs</Link>
@@ -82,7 +82,6 @@
     <Compile Include="Targets\UIViewTarget.cs" />
     <Compile Include="Targets\UIImageViewTarget.cs" />
     <Compile Include="Targets\UIImageTarget.cs" />
-    <Compile Include="Helpers\WebPDecoder.cs" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared.IosMac\FFImageLoading.Shared.IosMac.projitems')" />
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />

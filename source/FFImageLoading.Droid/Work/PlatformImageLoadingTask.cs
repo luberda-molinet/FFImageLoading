@@ -12,12 +12,15 @@ using FFImageLoading.Extensions;
 using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using FFImageLoading.Views;
+using FFImageLoading.Decoders;
+using System.Collections.Generic;
 
 namespace FFImageLoading
 {
-    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<SelfDisposingBitmapDrawable, TImageView> where TImageView : class
+    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<Bitmap, SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
         static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
+        GifDecoder _gifDecoder = new GifDecoder();
 
         public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
@@ -100,218 +103,59 @@ namespace FFImageLoading
             image?.SetIsRetained(false);
         }
 
-        async Task<Bitmap> PlatformGenerateBitmapAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder, BitmapFactory.Options options = null)
+        protected override int DpiToPixels(int size)
         {
-            Bitmap bitmap = null;
+            return size.DpToPixels();
+        }
 
-            if (imageData == null)
-                throw new ArgumentNullException(nameof(imageData));
+        protected override IDecoder<Bitmap> ResolveDecoder(ImageInformation.ImageType type)
+        {
+            switch (type)
+            {
+                case ImageInformation.ImageType.GIF:
+                    return new GifDecoder();
 
+                default:
+                    return new BaseDecoder();
+            }
+        }
+
+        protected override async Task<Bitmap> TransformAsync(Bitmap bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
+        {
+            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
             {
-                if (options == null)
+                foreach (var transformation in transformations)
                 {
-                    // First decode with inJustDecodeBounds=true to check dimensions
-                    options = new BitmapFactory.Options
-                    {
-                        InJustDecodeBounds = true,
-                    };
-                    await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
-                }
+                    ThrowIfCancellationRequested();
 
-                ThrowIfCancellationRequested();
+                    var old = bitmap;
 
-                options.InPurgeable = true;
-                options.InJustDecodeBounds = false;
-                options.InDither = true;
-
-                imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
-                imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
-
-                if (!Configuration.BitmapOptimizations || (Parameters.BitmapOptimizationsEnabled.HasValue && !Parameters.BitmapOptimizationsEnabled.Value))
-                {
-                    // Same quality but no transparency channel. This allows to save 50% of memory: 1 pixel=2bytes instead of 4.
-                    options.InPreferredConfig = Bitmap.Config.Rgb565;
-                    options.InPreferQualityOverSpeed = false;
-                }
-
-                // CHECK IF BITMAP IS EXIF ROTATED
-                int exifRotation = 0;
-                if (source == ImageSource.Filepath)
-                {
                     try
                     {
-                        exifRotation = path.GetExifRotationDegrees();
+                        var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
+                        bitmap = bitmapHolder.ToNative();
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("Reading EXIF orientation failed", ex);
+                        Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                        throw;
                     }
-                }
-
-                ThrowIfCancellationRequested();
-
-                // DOWNSAMPLE
-                if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
-                {
-                    // Calculate inSampleSize
-                    int downsampleWidth = Parameters.DownSampleSize.Item1;
-                    int downsampleHeight = Parameters.DownSampleSize.Item2;
-
-                    // if image is rotated, swap width/height
-                    if (exifRotation == 90 || exifRotation == 270)
+                    finally
                     {
-                        downsampleWidth = Parameters.DownSampleSize.Item2;
-                        downsampleHeight = Parameters.DownSampleSize.Item1;
-                    }
-
-                    if (Parameters.DownSampleUseDipUnits)
-                    {
-                        downsampleWidth = downsampleWidth.DpToPixels();
-                        downsampleHeight = downsampleHeight.DpToPixels();
-                    }
-
-                    options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight, Parameters.AllowUpscale ?? Configuration.AllowUpscale);
-
-                    if (options.InSampleSize > 1)
-                        imageInformation.SetCurrentSize(
-                            (int)((double)options.OutWidth / options.InSampleSize),
-                            (int)((double)options.OutHeight / options.InSampleSize));
-
-                    // If we're running on Honeycomb or newer, try to use inBitmap
-                    if (Utils.HasHoneycomb())
-                        AddInBitmapOptions(options);
-                }
-
-                if (imageData.Position != 0)
-                {
-                    imageData.Position = 0;
-                }
-
-                ThrowIfCancellationRequested();
-
-                bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
-            }
-            finally
-            {
-                imageData.TryDispose();
-            }
-
-            ThrowIfCancellationRequested();
-
-            bitmap = await PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bitmap);
-
-            return bitmap;
-        }
-
-        async Task<Bitmap> PlatformTransformAsync(string path, ImageSource source, bool enableTransformations, bool isPlaceholder, Bitmap bitmap)
-        {
-            if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-            {
-                var transformations = Parameters.Transformations.ToList();
-
-                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
-                ThrowIfCancellationRequested();
-
-                try
-                {
-                    foreach (var transformation in transformations)
-                    {
-                        ThrowIfCancellationRequested();
-
-                        var old = bitmap;
-
-                        try
+                        // Transformation succeeded, so garbage the source
+                        if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
                         {
-                            var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
-                            bitmap = bitmapHolder.ToNative();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
-                            throw;
-                        }
-                        finally
-                        {
-                            // Transformation succeeded, so garbage the source
-                            if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
-                            {
-                                old?.Recycle();
-                                old.TryDispose();
-                            }
+                            // Adding to pool gives us a better performance
+                            ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(old) { InCacheKey = Guid.NewGuid().ToString() });
+                            // Old and less efficient:
+                            //old?.Recycle();
+                            //old.TryDispose();
                         }
                     }
                 }
-                finally
-                {
-                    _decodingLock.Release();
-                }
-            }
-
-            return bitmap;
-        }
-
-        async Task<SelfDisposingBitmapDrawable> PlatformGenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
-        {
-            var bitmap = await PlatformGenerateBitmapAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
-
-            if (isPlaceholder)
-            {
-                return new SelfDisposingBitmapDrawable(Context.Resources, bitmap);
-            }
-
-            return new FFBitmapDrawable(Context.Resources, bitmap);
-        }
-
-        async Task<FFGifDrawable> PlatformGenerateGifImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
-        {
-            if (imageData == null)
-                throw new ArgumentNullException(nameof(imageData));
-
-            ThrowIfCancellationRequested();
-
-            try
-            {
-                var gifDecoder = new PlatformGifHelper();
-
-                await gifDecoder.ReadGifAsync(imageData, Parameters, (bmp) =>
-                {
-                    return PlatformTransformAsync(path, source, enableTransformations, isPlaceholder, bmp);
-                });
-                ThrowIfCancellationRequested();
-                var bitmap = gifDecoder.GetBitmap();
-                ThrowIfCancellationRequested();
-                return new FFGifDrawable(Context.Resources, bitmap, gifDecoder);
-            }
-            finally
-            {
-                imageData.TryDispose();
-            }
-        }
-
-        protected async override Task<SelfDisposingBitmapDrawable> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
-        {
-            try
-            {
-                SelfDisposingBitmapDrawable image = null;
-
-                if (imageInformation.Type == ImageInformation.ImageType.GIF && Configuration.AnimateGifs && GifHelper.CheckIfAnimated(imageData))
-                {
-                    image = await PlatformGenerateGifImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
-                }
-                else
-                {
-                    image = await PlatformGenerateImageAsync(path, source, imageData, imageInformation, enableTransformations, isPlaceholder);
-                }
-
-                if (image == null || !image.HasValidBitmap)
-                {
-                    throw new BadImageFormatException("Bad image format");
-                }
-
-                return image;
             }
             catch (Exception ex)
             {
@@ -323,73 +167,53 @@ namespace FFImageLoading
 
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Calculate an inSampleSize for use in a {@link android.graphics.BitmapFactory.Options} object when decoding
-        /// the closest inSampleSize that is a power of 2 and will result in the final decoded bitmap
-        /// </summary>
-        /// <param name="options"></param>
-        /// <param name="reqWidth"></param>
-        /// <param name="reqHeight"></param>
-        /// <param name="allowUpscale"></param>
-        /// <returns></returns>
-        public static int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight, bool allowUpscale)
-        {
-            // Raw height and width of image
-            float height = options.OutHeight;
-            float width = options.OutWidth;
-
-            if (reqWidth == 0)
-                reqWidth = (int)((reqHeight / height) * width);
-
-            if (reqHeight == 0)
-                reqHeight = (int)((reqWidth / width) * height);
-
-            double inSampleSize = 1D;
-
-            if (height > reqHeight || width > reqWidth || allowUpscale)
-            {
-                int halfHeight = (int)(height / 2);
-                int halfWidth = (int)(width / 2);
-
-                // Calculate a inSampleSize that is a power of 2 - the decoder will use a value that is a power of two anyway.
-                while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth)
-                {
-                    inSampleSize *= 2;
-                }
-            }
-
-            return (int)inSampleSize;
-        }
-
-        void AddInBitmapOptions(BitmapFactory.Options options)
-        {
-            // inBitmap only works with mutable bitmaps so force the decoder to
-            // return mutable bitmaps.
-            options.InMutable = true;
-
-            // Try and find a bitmap to use for inBitmap
-            ISelfDisposingBitmapDrawable bitmapDrawable = null;
-            try
-            {
-                bitmapDrawable = ImageCache.Instance.GetBitmapDrawableFromReusableSet(options);
-                var bitmap = bitmapDrawable == null ? null : bitmapDrawable.Bitmap;
-
-                if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
-                {
-                    options.InBitmap = bitmapDrawable.Bitmap;
-                }
-            }
             finally
             {
-                bitmapDrawable?.SetIsRetained(false);
+                _decodingLock.Release();
             }
+
+            return bitmap;
         }
 
-        protected override int DpiToPixels(int size)
+        protected override Task<SelfDisposingBitmapDrawable> GenerateImageFromDecoderContainerAsync(IDecodedImage<Bitmap> decoded, ImageInformation imageInformation, bool isPlaceholder)
         {
-            return size.DpToPixels();
+            try
+            {
+                SelfDisposingBitmapDrawable result;
+
+                if (decoded.IsAnimated)
+                {
+                    result = new FFGifDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
+                }
+                else
+                {
+                    if (isPlaceholder)
+                    {
+                        result = new SelfDisposingBitmapDrawable(Context.Resources, decoded.Image);
+                    }
+                    else
+                    {
+                        result = new FFBitmapDrawable(Context.Resources, decoded.Image);
+                    }
+                }
+
+                if (result == null || !result.HasValidBitmap)
+                {
+                    throw new BadImageFormatException("Not a valid bitmap");
+                }
+
+                return Task.FromResult(result);
+            }
+            catch (Exception ex)
+            {
+                var javaException = ex as Java.Lang.Throwable;
+                if (javaException != null && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+                {
+                    throw new OutOfMemoryException();
+                }
+
+                throw;
+            }
         }
     }
 }

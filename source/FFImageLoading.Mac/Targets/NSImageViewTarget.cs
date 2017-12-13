@@ -21,14 +21,24 @@ namespace FFImageLoading.Targets
             if (control.Layer.Contents == image.CGImage) return;
 
             var parameters = task.Parameters;
-            if (animated)
+            control.Animates = true;
+            var representations = image.Representations();
+
+            if (representations.Length > 1)
             {
-                //TODO fade animation
                 control.Layer.Contents = image.CGImage;
             }
             else
             {
-                control.Layer.Contents = image.CGImage;
+                if (animated)
+                {
+                    //TODO fade animation
+                    control.Layer.Contents = image.CGImage;
+                }
+                else
+                {
+                    control.Layer.Contents = image.CGImage;
+                }
             }
         }
 

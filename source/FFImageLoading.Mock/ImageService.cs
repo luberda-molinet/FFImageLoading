@@ -70,6 +70,16 @@ namespace FFImageLoading
         {
             // throw new NotImplementedException();
         }
+
+        public override int DpToPixels(double dp)
+        {
+            return (int)dp;
+        }
+
+        public override double PixelsToDp(double px)
+        {
+            return px;
+        }
     }
 }
 

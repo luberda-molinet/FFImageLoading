@@ -16,6 +16,8 @@ namespace FFImageLoading
     [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<SelfDisposingBitmapDrawable>
     {
+        readonly Android.Util.DisplayMetrics _metrics = Android.Content.Res.Resources.System.DisplayMetrics;
+
         static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
         static IImageService _instance;
 
@@ -118,6 +120,20 @@ namespace FFImageLoading
                     catch (ObjectDisposedException) { }
                 }
             }
+        }
+
+        public override int DpToPixels(double dp)
+        {
+            double px = dp * ((float)_metrics.DensityDpi / 160f);
+            return (int)Math.Floor(px);
+        }
+
+        public override double PixelsToDp(double px)
+        {
+            if (Math.Abs(px) < double.Epsilon)
+                return 0;
+
+            return px / ((float)_metrics.DensityDpi / 160f);
         }
     }
 }

@@ -94,16 +94,6 @@ namespace FFImageLoading
             }
         }
 
-        internal static int DpToPixels(double size)
-        {
-            return (int)Math.Round(size * s_dpi.Value / 160.0);
-        }
-
-        internal static double PixelToDP(int size)
-        {
-            return size / (s_dpi.Value / 160.0);
-        }
-
         internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<SharedEvasImage, TImageView> target) where TImageView : class
         {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, Instance);
@@ -112,6 +102,16 @@ namespace FFImageLoading
         internal static IImageLoaderTask CreateTask(TaskParameter parameters)
         {
             return new PlatformImageLoaderTask<object>(null, parameters, Instance);
+        }
+
+        public override int DpToPixels(double dp)
+        {
+            return (int)Math.Round(dp * s_dpi.Value / 160.0);
+        }
+
+        public override double PixelsToDp(double px)
+        {
+            return px / (s_dpi.Value / 160.0);
         }
     }
 }

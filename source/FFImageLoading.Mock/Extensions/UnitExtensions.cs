@@ -1,4 +1,6 @@
-﻿namespace FFImageLoading.Extensions
+﻿using System;
+
+namespace FFImageLoading
 {
     public static class UnitsExtensions
     {
@@ -11,4 +13,3 @@
         public static double PixelsToDp(this double px) => ImageService.Instance.PixelsToDp(px);
     }
 }
-

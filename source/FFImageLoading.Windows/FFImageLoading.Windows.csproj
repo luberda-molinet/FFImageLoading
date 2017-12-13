@@ -104,6 +104,7 @@
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
     <Compile Include="Targets\BitmapTarget.cs" />
     <Compile Include="Helpers\ScaleHelper.cs" />
+    <Compile Include="Decoders\BaseDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -117,6 +118,9 @@
       <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
       <Name>FFImageLoading</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Decoders\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>
