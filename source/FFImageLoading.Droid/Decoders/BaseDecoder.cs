@@ -48,17 +48,17 @@ namespace FFImageLoading.Decoders
 
             // CHECK IF BITMAP IS EXIF ROTATED
             int exifRotation = 0;
-            if (source == ImageSource.Filepath)
+            try
             {
-                try
-                {
-                    exifRotation = path.GetExifRotationDegrees();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Reading EXIF orientation failed", ex);
-                }
+                exifRotation = imageData.GetExifRotationDegrees();
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Reading EXIF orientation failed", ex);
+            }
+
+            if (imageData.Position != 0)
+                imageData.Position = 0;
 
             // DOWNSAMPLE
             if (parameters.DownSampleSize != null && (parameters.DownSampleSize.Item1 > 0 || parameters.DownSampleSize.Item2 > 0))
@@ -66,13 +66,6 @@ namespace FFImageLoading.Decoders
                 // Calculate inSampleSize
                 int downsampleWidth = parameters.DownSampleSize.Item1;
                 int downsampleHeight = parameters.DownSampleSize.Item2;
-
-                // if image is rotated, swap width/height
-                if (exifRotation == 90 || exifRotation == 270)
-                {
-                    downsampleWidth = parameters.DownSampleSize.Item2;
-                    downsampleHeight = parameters.DownSampleSize.Item1;
-                }
 
                 if (parameters.DownSampleUseDipUnits)
                 {
@@ -93,11 +86,17 @@ namespace FFImageLoading.Decoders
             }
 
             if (imageData.Position != 0)
-            {
                 imageData.Position = 0;
-            }
 
             bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+
+            // if image is rotated, swap width/height
+            if (exifRotation != 0)
+            {
+                var oldBitmap = bitmap;
+                bitmap = bitmap.ToRotatedBitmap(exifRotation);
+                ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(oldBitmap) { InCacheKey = Guid.NewGuid().ToString() });
+            }
 
             return new DecodedImage<Bitmap>() { Image = bitmap };
         }

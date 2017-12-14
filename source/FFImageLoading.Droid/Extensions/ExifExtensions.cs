@@ -1,26 +1,28 @@
 ﻿using System;
 using Android.Graphics;
-using Android.Media;
+using Android.Support.Media;
+using System.IO;
 
 namespace FFImageLoading.Extensions
 {
     public static class ExifExtensions
     {
-        public static int GetExifRotationDegrees(this string filePath)
+        public static int GetExifRotationDegrees(this Stream stream)
         {
             int rotation = 0;
-            var exifInt = new ExifInterface(filePath);
-            int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, (int)Orientation.Normal);
+            var exifInt = new ExifInterface(stream);
+
+            int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, ExifInterface.OrientationNormal);
 
             switch (exifRotation)
             {
-                case (int) Orientation.Rotate270:
+                case ExifInterface.OrientationRotate270:
                     rotation = 270;
                     break;
-                case (int) Orientation.Rotate180:
+                case ExifInterface.OrientationRotate180:
                     rotation = 180;
                     break;
-                case (int) Orientation.Rotate90:
+                case ExifInterface.OrientationRotate90:
                     rotation = 90;
                     break;
                 default:
