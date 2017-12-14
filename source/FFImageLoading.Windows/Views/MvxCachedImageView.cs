@@ -22,6 +22,9 @@ namespace FFImageLoading.Views
         protected ImageSourceBinding _lastImageSource;
         protected bool _isDisposed;
 
+        /// <summary>
+        /// MvxCachedImageView by Daniel Luberda
+        /// </summary>
         public MvxCachedImageView()
         {
             HorizontalContentAlignment = HorizontalAlignment.Stretch;

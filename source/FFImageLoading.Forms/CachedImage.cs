@@ -20,6 +20,9 @@ namespace FFImageLoading.Forms
 
         public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
+        /// <summary>
+        /// CachedImage by Daniel Luberda
+        /// </summary>
         public CachedImage()
         {
             Transformations = new List<Work.ITransformation>();
