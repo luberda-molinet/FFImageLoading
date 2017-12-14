@@ -103,6 +103,9 @@ namespace FFImageLoading.Work
             {
                 try
                 {
+                    if (decoded.Image.HasWriteableBitmap)
+                        return decoded.Image.WriteableBitmap;
+
                     return await decoded.Image.ToBitmapImageAsync();
                 }
                 finally

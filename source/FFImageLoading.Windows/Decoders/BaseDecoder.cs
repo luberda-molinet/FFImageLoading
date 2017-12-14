@@ -18,8 +18,16 @@ namespace FFImageLoading.Decoders
                 throw new ArgumentNullException(nameof(imageData));
 
             bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
-            imageIn = await imageData.ToBitmapHolderAsync(parameters.DownSampleSize, parameters.DownSampleUseDipUnits, parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
-            // imageData.ToBitmapImageAsync(Parameters.DownSampleSize, Parameters.DownSampleUseDipUnits, Parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
+
+            if (parameters.Transformations == null || parameters.Transformations.Count == 0)
+            {
+                var bitmap = await imageData.ToBitmapImageAsync(parameters.DownSampleSize, parameters.DownSampleUseDipUnits, parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
+                imageIn = new BitmapHolder(bitmap);
+            }
+            else
+            {
+                imageIn = await imageData.ToBitmapHolderAsync(parameters.DownSampleSize, parameters.DownSampleUseDipUnits, parameters.DownSampleInterpolationMode, allowUpscale, imageInformation).ConfigureAwait(false);
+            }
 
             return new DecodedImage<BitmapHolder>() { Image = imageIn };
         }
