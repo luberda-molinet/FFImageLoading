@@ -129,7 +129,6 @@
     <Compile Include="ImageServiceBase.cs" />
     <Compile Include="DataResolvers\UrlDataResolver.cs" />
     <Compile Include="DataResolvers\StreamDataResolver.cs" />
-    <Compile Include="Helpers\Delay.cs" />
     <Compile Include="Concurrency\FastPriorityQueue\CustomComparer.cs" />
     <Compile Include="Decoders\IDecoder.cs" />
     <Compile Include="Decoders\IDecodedImage.cs" />

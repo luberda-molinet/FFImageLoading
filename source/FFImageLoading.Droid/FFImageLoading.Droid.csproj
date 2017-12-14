@@ -120,6 +120,7 @@
     <Compile Include="Extensions\TaskParameterPlatformExtensions.cs" />
     <Compile Include="Decoders\GifDecoder.cs" />
     <Compile Include="Decoders\BaseDecoder.cs" />
+    <Compile Include="Helpers\HighResolutionTimer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
