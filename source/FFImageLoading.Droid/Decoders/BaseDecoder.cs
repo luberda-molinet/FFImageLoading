@@ -48,13 +48,18 @@ namespace FFImageLoading.Decoders
 
             // CHECK IF BITMAP IS EXIF ROTATED
             int exifRotation = 0;
-            try
+
+            if ((source == ImageSource.Filepath || source == ImageSource.Stream || source == ImageSource.Url)
+                && imageInformation.Type != ImageInformation.ImageType.SVG)
             {
-                exifRotation = imageData.GetExifRotationDegrees();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Reading EXIF orientation failed", ex);
+                try
+                {
+                    exifRotation = imageData.GetExifRotationDegrees();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Reading EXIF orientation failed", ex);
+                }
             }
 
             if (imageData.Position != 0)
