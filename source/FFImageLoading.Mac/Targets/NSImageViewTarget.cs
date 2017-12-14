@@ -21,12 +21,13 @@ namespace FFImageLoading.Targets
             if (control.Layer.Contents == image.CGImage) return;
 
             var parameters = task.Parameters;
-            control.Animates = true;
             var representations = image.Representations();
 
             if (representations.Length > 1)
             {
-                control.Layer.Contents = image.CGImage;
+                control.Layer.Contents = null;
+                control.Image = image;
+                control.Animates = true;
             }
             else
             {
