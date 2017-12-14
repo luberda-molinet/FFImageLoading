@@ -20,7 +20,7 @@ namespace FFImageLoading.Tests.Concurrency
             var request = new Mock<IImageLoaderTask>();
             var sut = new PendingTasksQueue();
 
-            Assert.Equal(false, sut.TryRemove(request.Object));
+            Assert.False(sut.TryRemove(request.Object));
         }
 
         [Fact]

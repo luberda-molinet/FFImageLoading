@@ -43,6 +43,7 @@ namespace FFImageLoading.Svg.Platform
         /// <param name="vectorWidth">Vector width.</param>
         /// <param name="vectorHeight">Vector height.</param>
         /// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+        /// <param name="replaceStringMap">Replace string map.</param>
         public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
         {
             VectorWidth = vectorWidth;
@@ -141,16 +142,8 @@ namespace FFImageLoading.Svg.Platform
 
             if (UseDipUnits)
             {
-#if __ANDROID__
                 sizeX = sizeX.DpToPixels();
                 sizeY = sizeY.DpToPixels();
-#elif __TIZEN__
-                sizeX = sizeX.DpToPixels();
-                sizeY = sizeY.DpToPixels();
-#else
-                sizeX = sizeX.PointsToPixels();
-                sizeY = sizeY.PointsToPixels();
-#endif
             }
 
             lock (_encodingLock)

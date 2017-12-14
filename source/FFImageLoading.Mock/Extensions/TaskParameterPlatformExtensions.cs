@@ -25,6 +25,7 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
+        /// <param name="quality">Quality.</param>
         public static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
             return Task.FromResult<Stream>(new MemoryStream());

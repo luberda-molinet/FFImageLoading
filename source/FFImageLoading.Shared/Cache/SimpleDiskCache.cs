@@ -24,9 +24,10 @@ namespace FFImageLoading.Cache
         ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FFImageLoading.Cache.SimpleDiskCache"/> class.
+        /// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.SimpleDiskCache"/> class.
         /// </summary>
         /// <param name="cachePath">Cache path.</param>
+        /// <param name="configuration">Configuration.</param>
         public SimpleDiskCache(string cachePath, Configuration configuration)
         {
             _cachePath = Path.GetFullPath(cachePath);
@@ -45,11 +46,13 @@ namespace FFImageLoading.Cache
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
+
         /// <summary>
-        /// Creates new cache default instance.
+        /// Creates the cache.
         /// </summary>
         /// <returns>The cache.</returns>
         /// <param name="cacheName">Cache name.</param>
+        /// <param name="configuration">Configuration.</param>
         [Obsolete]
         public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
         {
@@ -83,12 +86,13 @@ namespace FFImageLoading.Cache
             return new SimpleDiskCache(cachePath, configuration);
         }
 
-        /// <summary>
+            /// <summary>
         /// Adds the file to cache and file saving queue if it does not exists.
         /// </summary>
         /// <param name="key">Key to store/retrieve the file.</param>
         /// <param name="bytes">File data in bytes.</param>
         /// <param name="duration">Specifies how long an item should remain in the cache.</param>
+        /// <param name="writeFinished">Write finished.</param>
         public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
         {
             if (!_fileWritePendingTasks.TryAdd(key, 1))

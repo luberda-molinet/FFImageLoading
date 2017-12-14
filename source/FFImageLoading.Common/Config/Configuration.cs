@@ -93,17 +93,6 @@ namespace FFImageLoading.Config
         public IMainThreadDispatcher MainThreadDispatcher { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
-        /// </summary>
-        /// <value><c>true</c> if FFIMageLoading loads images with transparency; otherwise, <c>false</c>.</value>
-        [Obsolete]
-        public bool LoadWithTransparencyChannel
-        {
-            get { return BitmapOptimizations; }
-            set { BitmapOptimizations = value; }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="T:FFImageLoading.Config.Configuration"/> bitmap
         /// memory optimizations.
         /// </summary>

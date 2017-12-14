@@ -152,8 +152,8 @@ namespace FFImageLoading.Extensions
         {
             if (useDipUnits)
             {
-                width = width.PointsToPixels();
-                height = height.PointsToPixels();
+                width = width.DpToPixels();
+                height = height.DpToPixels();
             }
 
             IRandomAccessStream resizedStream = imageStream;

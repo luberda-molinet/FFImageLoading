@@ -97,7 +97,7 @@ namespace FFImageLoading
         /// Constructs a new TaskParameter to load an image from a Stream.
         /// </summary>
         /// <returns>The new TaskParameter.</returns>
-        /// <param name="resourceName">A function that allows a CancellationToken and returns the Stream to use. This function will be invoked by LoadStream().</param>
+        /// <param name="stream">Stream.</param>
         TaskParameter LoadStream(Func<CancellationToken, Task<Stream>> stream);
 
         /// <summary>

@@ -10,6 +10,7 @@
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <NoWarn>1591</NoWarn>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

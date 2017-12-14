@@ -9,11 +9,10 @@ using FFImageLoading.Views;
 
 namespace FFImageLoading.Forms
 {
+    [Preserve(AllMembers = true)]
     /// <summary>
     /// CachedImage by Daniel Luberda
     /// </summary>
-
-    [Preserve(AllMembers = true)]
     public class CachedImage : View
     {
         //TODO It's a breaking change, so change it in major version
@@ -735,7 +734,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// Invalidates cache for a specified key.
         /// </summary>
-        /// <param name="source">Image key.</param>
+        /// <param name="key">Image key.</param>
         /// <param name="cacheType">Cache type.</param>
         /// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
         /// (downsampling and transformations variants)</param>
@@ -1004,6 +1003,9 @@ namespace FFImageLoading.Forms
         /// You can add additional logic here to configure image loader settings before loading
         /// </summary>
         /// <param name="imageLoader">Image loader.</param>
+        /// <param name="source">Source.</param>
+        /// <param name="loadingPlaceholderSource">Loading placeholder source.</param>
+        /// <param name="errorPlaceholderSource">Error placeholder source.</param>
         protected internal virtual void SetupOnBeforeImageLoading(out Work.TaskParameter imageLoader, IImageSourceBinding source, IImageSourceBinding loadingPlaceholderSource, IImageSourceBinding errorPlaceholderSource)
         {
             if (source.ImageSource == Work.ImageSource.Url)

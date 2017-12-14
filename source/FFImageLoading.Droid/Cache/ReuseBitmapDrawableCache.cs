@@ -43,12 +43,14 @@ namespace FFImageLoading.Cache
         readonly IMiniLogger log;
         readonly bool _verboseLogging;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ReuseBitmapDrawableCache"/> class.
         /// </summary>
         /// <param name="logger">Logger for debug messages</param>
-        /// <param name="highWatermark">Maximum number of bytes the reuse pool will hold before starting evictions.
+        /// <param name="highWatermark">Maximum number of bytes the reuse pool will hold before starting evictions.</param>
         /// <param name="lowWatermark">Number of bytes the reuse pool will be drained down to after the high watermark is exceeded.</param>
+        /// <param name="verboseLogging">If set to <c>true</c> verbose logging.</param>
         public ReuseBitmapDrawableCache(IMiniLogger logger, int highWatermark, int lowWatermark, bool verboseLogging = false)
         {
             _verboseLogging = verboseLogging;
@@ -60,6 +62,7 @@ namespace FFImageLoading.Cache
             reuse_pool.EntryRemoved += OnEntryRemovedFromReusePool;
         }
 
+
         /// <summary>
         /// Attempts to find a bitmap suitable for reuse based on the given dimensions.
         /// Note that any returned instance will have SetIsRetained(true) called on it
@@ -69,9 +72,7 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <returns>A ISelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
         /// when finished using it.</returns>
-        /// <param name="width">Width of the image to be written to the bitmap allocation.</param>
-        /// <param name="height">Height of the image to be written to the bitmap allocation.</param>
-        /// <param name="inSampleSize">DownSample factor.</param>
+        /// <param name="options">Options.</param>
         public TValue GetReusableBitmapDrawable(BitmapFactory.Options options)
         {
             if (reuse_pool == null)

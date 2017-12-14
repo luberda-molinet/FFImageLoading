@@ -19,6 +19,7 @@ namespace FFImageLoading.Svg.Platform
         /// <param name="vectorWidth">Vector width.</param>
         /// <param name="vectorHeight">Vector height.</param>
         /// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+        /// <param name="replaceStringMap">Replace string map.</param>
         public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
         {
             throw new Exception(DoNotReferenceMessage);

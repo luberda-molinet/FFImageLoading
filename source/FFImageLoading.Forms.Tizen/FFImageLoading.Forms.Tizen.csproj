@@ -5,6 +5,7 @@
     <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateDependencyFile>False</GenerateDependencyFile>
+    <NoWarn>1591</NoWarn>        
   </PropertyGroup>
 
   <ItemGroup>

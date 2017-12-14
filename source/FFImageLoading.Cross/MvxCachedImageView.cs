@@ -28,6 +28,9 @@ namespace FFImageLoading.Cross
     [Preserve(AllMembers = true)]
     [Register("ffimageloading.cross.MvxCachedImageView")]
 #endif
+    /// <summary>
+    /// MvxCachedImageView by Daniel Luberda
+    /// </summary>
     public class MvxCachedImageView
 #if __IOS__
         : UIImageView, ICachedImageView, INotifyPropertyChanged

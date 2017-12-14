@@ -6,6 +6,7 @@
     <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
+    <NoWarn>1591</NoWarn> 
   </PropertyGroup>
 
   <ItemGroup>
