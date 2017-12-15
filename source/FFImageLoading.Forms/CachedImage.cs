@@ -15,9 +15,7 @@ namespace FFImageLoading.Forms
     /// </summary>
     public class CachedImage : View
     {
-        //TODO It's a breaking change, so change it in major version
-        public static bool FixedOnMeasureBehavior { get; set; } = false;
-
+        public static bool FixedOnMeasureBehavior { get; set; } = true;
         public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
         /// <summary>
