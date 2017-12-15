@@ -20,10 +20,13 @@ namespace FFImageLoading.Decoders
 {
     public class WebPDecoder : IDecoder<PImage>
     {
-        WebPCodec _decoder = new WebPCodec();
+        WebPCodec _decoder;
 
         public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
+            if (_decoder == null)
+                _decoder = new WebPCodec();
+
             var result = new DecodedImage<PImage>();
             result.Image = _decoder.Decode(stream);
 
