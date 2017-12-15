@@ -1,15 +1,16 @@
-# FFImageLoading - Fast & Furious Image Loading [![AppVeyor][ci-img]][ci-link] [![Donate][donate-img]][donate-link]
+# FFImageLoading - Fast & Furious Image Loading 
+[![AppVeyor][ci-img]][ci-link] [![Donate][donate-img]][donate-link]
 
-Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (UWP, WinRT).
+Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac / Xamarin.Tizen and Windows (UWP, WinRT).
 
 *Authors: Daniel Luberda, Fabien Molinet. If you would like to help maintaining the project, just let us know!*
 
-| iOS / Android / Mac / Windows | Xamarin.Forms |
+| iOS / Android / Mac / Windows / Tizen | Xamarin.Forms |
 |:--------------------------------:|:-------------:|
 | [![NuGet][ffil-img]][ffil-link] [![NuGet][preffil-img]][preffil-link] | [![NuGet][forms-img]][forms-link] [![NuGet][preforms-img]][preforms-link] |
 | [![][demo-droid-img]][demo-droid-src] [![][demo-win-img]][demo-win-src] [![][demo-mvvmcross-img]][demo-mvvmcross-src] | [![][demo-forms-img]][demo-forms-src] |
 
-| Addon | iOS / Android / Mac / Windows | Xamarin.Forms |
+| Addon | iOS / Android / Mac / Tizen / Windows | Xamarin.Forms |
 |:-----:|:-----------------------:|:-------------:|
 | Transformations | [![NuGet][trans-img]][trans-link] [![NuGet][pretrans-img]][pretrans-link] | [![NuGet][trans-img]][trans-link] [![NuGet][pretrans-img]][pretrans-link] |
 | SVG support | [![NuGet][svg-img]][svg-link] [![NuGet][presvg-img]][presvg-link] | [![NuGet][svgforms-img]][svgforms-link] [![NuGet][presvgforms-img]][presvgforms-link] |
@@ -18,7 +19,7 @@ Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin
 
 ## Features
 
-- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
+- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac, Xamarin.Tizen and Windows (WinRT, UWP) support
 - Configurable disk and memory caching
 - Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
 - Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
