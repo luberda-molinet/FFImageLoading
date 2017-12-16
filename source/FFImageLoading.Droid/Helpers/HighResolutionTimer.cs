@@ -29,14 +29,9 @@ namespace FFImageLoading
                 return;
 
             _isRunning = true;
-
-            Task.Factory.StartNew(() => ExecuteTimer(), TaskCreationOptions.PreferFairness);
-
-
-            //Task.Run(() => ExecuteTimer());
-            //Thread thread = new Thread(ExecuteTimer);
-            //thread.Priority = ThreadPriority.BelowNormal;
-            //thread.Start();
+            Thread thread = new Thread(ExecuteTimer);
+            thread.Priority = ThreadPriority.BelowNormal;
+            thread.Start();
         }
 
         public void Stop()
@@ -53,46 +48,48 @@ namespace FFImageLoading
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            while (_isRunning)
+            try
             {
-                for (int i = 0; i < count; i++)
+                while (_isRunning)
                 {
-                    if (!_isRunning)
-                        break;
-
-                    var image = _animatedImage[i];
-
-                    nextTrigger += (image.Delay + DelayOffset);
-
-                    while (true)
+                    for (int i = 0; i < count; i++)
                     {
-                        elapsed = stopwatch.ElapsedTicks * TickFrequency;
-                        float diff = nextTrigger - elapsed;
-                        if (diff <= 0f)
-                            break;
+                        if (!_isRunning) return;
 
-                        if (diff < 1f)
-                            Thread.SpinWait(10);
-                        else if (diff < 5f)
-                            Thread.SpinWait(100);
-                        else if (diff < 15f)
-                            Thread.Sleep(1);
-                        else
-                            Thread.Sleep(10);
+                        var image = _animatedImage[i];
 
-                        if (!_isRunning)
-                            return;
+                        nextTrigger += (image.Delay + DelayOffset);
+
+                        while (true)
+                        {
+                            if (!_isRunning) return;
+
+                            elapsed = stopwatch.ElapsedTicks * TickFrequency;
+                            float diff = nextTrigger - elapsed;
+                            if (diff <= 0f)
+                                break;
+
+                            if (diff < 1f)
+                                Thread.SpinWait(10);
+                            else if (diff < 5f)
+                                Thread.SpinWait(100);
+                            else if (diff < 15f)
+                                Thread.Sleep(1);
+                            else
+                                Thread.Sleep(10);
+                        }
+
+                        if (!_isRunning) return;
+
+                        float delay = elapsed - nextTrigger;
+                        _action.Invoke(image);
                     }
-
-                    float delay = elapsed - nextTrigger;
-                    _action.Invoke(image);
-
-                    if (!_isRunning)
-                        break;
                 }
             }
-
-            stopwatch.Stop();
+            finally
+            {
+                stopwatch.Stop();
+            }
         }
     }
 }

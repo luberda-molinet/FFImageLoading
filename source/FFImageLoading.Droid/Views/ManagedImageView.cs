@@ -70,6 +70,7 @@ namespace FFImageLoading.Views
         {
             try
             {
+                _animationTimer?.Stop();
                 _tcs?.Cancel();
             }
             catch (ObjectDisposedException) { }
@@ -90,28 +91,27 @@ namespace FFImageLoading.Views
 
                 try
                 {
-                    if (token.IsCancellationRequested)
-                        _animationTimer.Stop();
-
                     var bitmap = image.Image;
 
-                    if (_isDisposed)
+                    if (_isDisposed || !_animationTimer.Enabled)
                         return;
 
                     if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                     {
-                        if (_isDisposed)
+                        if (_isDisposed || !_animationTimer.Enabled)
                             return;
-                        
-                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => base.SetImageBitmap(bitmap)).ConfigureAwait(false);
-                    }
 
-                    if (token.IsCancellationRequested)
-                        _animationTimer.Stop();
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+                        {
+                            if (_isDisposed || !_animationTimer.Enabled)
+                                return;
+                            
+                            base.SetImageBitmap(bitmap);;
+                        }).ConfigureAwait(false);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _animationTimer.Stop();
                     ImageService.Instance.Config.Logger.Error("GIF", ex);
                 }
                 finally
