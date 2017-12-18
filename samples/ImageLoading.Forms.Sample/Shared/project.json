@@ -1,0 +1,13 @@
+﻿{
+  "dependencies": {
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "NETStandard.Library": "2.0.1",
+    "PropertyChanged.Fody": "2.2.4",
+    "SkiaSharp": "1.59.2",
+    "Xamarin.Forms": "2.5.0.121934",
+    "Xamvvm.Forms": "1.0.4"
+  },
+  "frameworks": {
+    "netstandard1.4": {}
+  }
+}

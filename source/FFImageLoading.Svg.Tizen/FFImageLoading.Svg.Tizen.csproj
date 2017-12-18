@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>tizen40</TargetFramework>
+    <TargetFramework>tizen4.0</TargetFramework>
     <TizenCreateTpkOnBuild>false</TizenCreateTpkOnBuild>
     <AssemblyName>FFImageLoading.Svg.Platform</AssemblyName>
     <RootNamespace>FFImageLoading.Svg.Platform</RootNamespace>
