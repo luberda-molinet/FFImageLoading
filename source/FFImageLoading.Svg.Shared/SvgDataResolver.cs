@@ -108,7 +108,7 @@ namespace FFImageLoading.Svg.Platform
                     var builder = new StringBuilder(inputString);
 
                     foreach (var map in ReplaceStringMap
-                             .Where(v => !v.Key.StartsWith("regex:", StringComparison.InvariantCultureIgnoreCase)))
+                             .Where(v => !v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
                     {
                         builder.Replace(map.Key, map.Value);
                     }
