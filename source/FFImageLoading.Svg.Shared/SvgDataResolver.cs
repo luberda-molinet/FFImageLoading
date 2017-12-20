@@ -10,6 +10,7 @@ using FFImageLoading.Extensions;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 #if __IOS__
 using Foundation;
@@ -96,8 +97,18 @@ namespace FFImageLoading.Svg.Platform
                 using (var svgStream = resolvedData.Item1)
                 using (var reader = new StreamReader(svgStream))
                 {
-                    var builder = new StringBuilder(await reader.ReadToEndAsync());
-                    foreach (var map in ReplaceStringMap)
+                    var inputString = await reader.ReadToEndAsync();
+
+                    foreach (var map in ReplaceStringMap
+                             .Where(v => v.Key.StartsWith("regex:", StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        inputString = Regex.Replace(inputString, map.Key.Substring(0, 6), map.Value);
+                    }
+
+                    var builder = new StringBuilder(inputString);
+
+                    foreach (var map in ReplaceStringMap
+                             .Where(v => !v.Key.StartsWith("regex:", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         builder.Replace(map.Key, map.Value);
                     }
