@@ -100,7 +100,7 @@ namespace FFImageLoading.Svg.Platform
                     var inputString = await reader.ReadToEndAsync();
 
                     foreach (var map in ReplaceStringMap
-                             .Where(v => v.Key.StartsWith("regex:", StringComparison.InvariantCultureIgnoreCase)))
+                             .Where(v => v.Key.StartsWith("regex:")))
                     {
                         inputString = Regex.Replace(inputString, map.Key.Substring(0, 6), map.Value);
                     }
