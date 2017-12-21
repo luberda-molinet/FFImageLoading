@@ -89,85 +89,100 @@ namespace FFImageLoading.Cache
 
         protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
         {
-            using (var cancelHeadersToken = new CancellationTokenSource())
+            using (var httpHeadersTimeoutTokenSource = new CancellationTokenSource())
+            using (var headersTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpHeadersTimeoutTokenSource.Token))
             {
-                cancelHeadersToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpHeadersTimeout));
+                httpHeadersTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpHeadersTimeout));
 
-                using (var linkedHeadersToken = CancellationTokenSource.CreateLinkedTokenSource(token, cancelHeadersToken.Token))
+                try
                 {
-                    try
+                    var headerTimeoutToken = headersTimeoutTokenSource.Token;
+
+                    using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, headerTimeoutToken).ConfigureAwait(false))
                     {
-                        using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, linkedHeadersToken.Token).ConfigureAwait(false))
+                        headerTimeoutToken.ThrowIfCancellationRequested();
+
+                        if (!response.IsSuccessStatusCode)
                         {
-                            if (!response.IsSuccessStatusCode)
-                                throw new HttpRequestException(response.StatusCode.ToString());
-
                             if (response.Content == null)
-                                throw new HttpRequestException("No Content");
-
-                            var mediaType = response.Content.Headers?.ContentType?.MediaType;
-                            if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                                throw new HttpRequestException(response.StatusCode.ToString());
+                            
+                            using (response.Content)
                             {
-                                if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
-                                    throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                                var content = await response.Content.ReadAsStringAsync();
+                                var hasContent = string.IsNullOrWhiteSpace(content);
+                                var message = hasContent ? $"{response.StatusCode}: {content}" : response.StatusCode.ToString();
+                                throw new HttpRequestException(message);
                             }
+                        }
 
-                            ModifyParametersAfterResponse(response, parameters);
+                        if (response.Content == null)
+                            throw new HttpRequestException("No Content");
 
-                            using (var cancelReadTimeoutToken = new CancellationTokenSource())
+                        var mediaType = response.Content.Headers?.ContentType?.MediaType;
+                        if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
+                                throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                        }
+
+                        ModifyParametersAfterResponse(response, parameters);
+
+                        using (var httpReadTimeoutTokenSource = new CancellationTokenSource())
+                        using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))                            
+                        {
+                            httpReadTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
+
+                            var readTimeoutToken = readTimeoutTokenSource.Token;
+                            int total = (int)(response.Content.Headers.ContentLength ?? -1);
+                            var canReportProgress = progressAction != null;
+
+                            try
                             {
-                                var readTimeoutToken = cancelReadTimeoutToken.Token;
-                                cancelReadTimeoutToken.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
-
-                                int total = (int)(response.Content.Headers.ContentLength ?? -1);
-                                var canReportProgress = progressAction != null;
-
-                                try
+                                using (var outputStream = new MemoryStream())
+                                using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                                 {
-                                    using (var outputStream = new MemoryStream())
-                                    using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                                    readTimeoutToken.Register(() => sourceStream.TryDispose());
+
+                                    int totalRead = 0;
+                                    var buffer = new byte[Configuration.HttpReadBufferSize];
+
+                                    int read = 0;
+                                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                                     {
-                                        int totalRead = 0;
-                                        var buffer = new byte[Configuration.HttpReadBufferSize];
+                                        readTimeoutToken.ThrowIfCancellationRequested();
+                                        outputStream.Write(buffer, 0, read);
+                                        totalRead += read;
 
-                                        int read = 0;
-                                        while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                                        {
-                                            token.ThrowIfCancellationRequested();
-                                            readTimeoutToken.ThrowIfCancellationRequested();
-                                            outputStream.Write(buffer, 0, read);
-                                            totalRead += read;
-
-                                            if (canReportProgress)
-                                                progressAction(new DownloadProgress() { Total = total, Current = totalRead });
-                                        }
-
-                                        if (outputStream.Length == 0)
-                                            throw new InvalidDataException("Zero length stream");
-
-                                        if (outputStream.Length < 32)
-                                            throw new InvalidDataException("Invalid stream");
-
-                                        return outputStream.ToArray();
+                                        if (canReportProgress)
+                                            progressAction(new DownloadProgress() { Total = total, Current = totalRead });
                                     }
+
+                                    if (outputStream.Length == 0)
+                                        throw new InvalidDataException("Zero length stream");
+
+                                    if (outputStream.Length < 32)
+                                        throw new InvalidDataException("Invalid stream");
+
+                                    return outputStream.ToArray();
                                 }
-                                catch (OperationCanceledException)
-                                {
-                                    if (cancelReadTimeoutToken.IsCancellationRequested)
-                                        throw new Exception("HttpReadTimeout");
-                                    else
-                                        throw;
-                                }
+                            }
+                            catch (Exception ex) when (ex is OperationCanceledException || ex is ObjectDisposedException)
+                            {
+                                if (httpReadTimeoutTokenSource.IsCancellationRequested)
+                                    throw new Exception("HttpReadTimeout");
+                                else
+                                    throw;
                             }
                         }
                     }
-                    catch (OperationCanceledException)
-                    {
-                        if (cancelHeadersToken.IsCancellationRequested)
-                            throw new Exception("HttpHeadersTimeout");
-                        else
-                            throw;
-                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    if (httpHeadersTimeoutTokenSource.IsCancellationRequested)
+                        throw new Exception("HttpHeadersTimeout");
+                    else
+                        throw;
                 }
             }
         }

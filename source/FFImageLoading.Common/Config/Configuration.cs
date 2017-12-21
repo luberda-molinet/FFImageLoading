@@ -22,8 +22,8 @@ namespace FFImageLoading.Config
             FadeAnimationDuration = 300;
             TransformPlaceholders = true;
             DownsampleInterpolationMode = InterpolationMode.Default;
-            HttpHeadersTimeout = 10;
-            HttpReadTimeout = 30;
+            HttpHeadersTimeout = 5;
+            HttpReadTimeout = 15;
             HttpReadBufferSize = 8192;
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
