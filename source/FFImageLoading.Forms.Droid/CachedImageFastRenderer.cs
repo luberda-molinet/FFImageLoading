@@ -18,7 +18,6 @@ using Android.Views;
 using System.Reflection;
 using Android.Content;
 using AView = Android.Views.View;
-using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 
 namespace FFImageLoading.Forms.Droid
 {
@@ -28,9 +27,9 @@ namespace FFImageLoading.Forms.Droid
     [Preserve(AllMembers = true)]
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
-        internal static Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
-        static MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
-        static MethodInfo _ElementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
+        internal static readonly Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
+        static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
+        static readonly MethodInfo _ElementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
 
         bool _isDisposed;
         CachedImage _element;
@@ -397,22 +396,19 @@ namespace FFImageLoading.Forms.Droid
 
         internal static class ElevationHelper
         {
+            static readonly MethodInfo _getEleveationMethod = typeof(Image).Assembly.GetType("Xamarin.Forms.PlatformConfiguration.AndroidSpecific.Elevation")?.GetRuntimeMethod("GetElevation", new Type[] { typeof(VisualElement) });
+
             internal static void SetElevation(global::Android.Views.View view, VisualElement element)
             {
-                if (view == null || element == null || !IsLollipopOrNewer)
+                if (_getEleveationMethod == null || view == null || element == null || !IsLollipopOrNewer)
                 {
                     return;
                 }
 
-                var iec = element as IElementConfiguration<VisualElement>;
-                var elevation = iec?.On<Xamarin.Forms.PlatformConfiguration.Android>().GetElevation();
+                var elevation = (float?)_getEleveationMethod.Invoke(null, new[] { element });
 
-                if (!elevation.HasValue)
-                {
-                    return;
-                }
-
-                view.Elevation = elevation.Value;
+                if (elevation.HasValue)
+                    view.Elevation = elevation.Value;
             }
         }
     }
