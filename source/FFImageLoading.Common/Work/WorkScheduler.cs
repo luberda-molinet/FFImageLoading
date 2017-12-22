@@ -240,7 +240,7 @@ namespace FFImageLoading.Work
                 {
                     Logger.Error("TakeFromPendingTasksAndRun exception", ex);
                 }
-            }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
