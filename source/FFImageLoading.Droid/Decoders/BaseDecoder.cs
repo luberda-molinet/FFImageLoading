@@ -35,6 +35,9 @@ namespace FFImageLoading.Decoders
             options.InPurgeable = true;
             options.InJustDecodeBounds = false;
             options.InDither = true;
+            options.InScaled = false;
+            options.InDensity = 0;
+            options.InTargetDensity = 0;
 
             imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
             imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
@@ -130,19 +133,19 @@ namespace FFImageLoading.Decoders
 
             if (reqHeight == 0)
                 reqHeight = (int)((reqWidth / width) * height);
-
-            double inSampleSize = 1D;
+            
+            double inSampleSize = 1d;
 
             if (height > reqHeight || width > reqWidth || allowUpscale)
             {
-                int halfHeight = (int)(height / 2);
-                int halfWidth = (int)(width / 2);
+                // Calculate ratios of height and width to requested height and width
+                int heightRatio = (int)Math.Round(height / reqHeight);
+                int widthRatio = (int)Math.Round(width / reqWidth);
 
-                // Calculate a inSampleSize that is a power of 2 - the decoder will use a value that is a power of two anyway.
-                while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth)
-                {
-                    inSampleSize *= 2;
-                }
+                // Choose the smallest ratio as inSampleSize value, this will guarantee
+                // a final image with both dimensions larger than or equal to the
+                // requested height and width.
+                inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
             }
 
             return (int)inSampleSize;
