@@ -57,7 +57,7 @@ namespace FFImageLoading
         public List<GifFrame> Frames { get { return frames; } }
 
         protected abstract int DipToPixels(int dips);
-        protected abstract Task<TNativeImageContainer> ToBitmapAsync(int[] data, int width, int height);
+        protected abstract Task<TNativeImageContainer> ToBitmapAsync(int[] data, int width, int height, int downsampleWidth, int downsampleHeight);
 
         async Task SetPixelsAsync()
         {
@@ -164,71 +164,67 @@ namespace FFImageLoading
             currentBitmap = result;
             TNativeImageContainer bitmap;
 
-            //TODO fix downsampling issue (part of image is cut)
-            _downsample = false;
-            if (_downsample)
+            int downsampleWidth = 0;
+            int downsampleHeight = 0;
+            int insample = 1;
+            bool downsampled = false;
+
+            if (_downsampleWidth.Value == 0 && _downsampleHeight.Value != 0)
             {
-                int downsampleWidth = width;
-                int downsampleHeight = height;
+                downsampleWidth = (int)(((float)_downsampleHeight.Value / height) * width);
+                downsampleHeight = _downsampleHeight.Value;
+                downsampled = true;
+            }
+            else if (_downsampleHeight.Value == 0 && _downsampleWidth.Value != 0)
+            {
+                downsampleWidth = _downsampleWidth.Value;
+                downsampleHeight = (int)(((float)_downsampleWidth.Value / width) * height);
+                downsampled = true;
+            }
 
-                if (_downsampleWidth.Value == 0 && _downsampleHeight.Value != 0)
-                {
-                    downsampleWidth = (int)(((float)_downsampleHeight.Value / height) * width);
-                    downsampleHeight = _downsampleHeight.Value;
-                }
-                else if (_downsampleHeight.Value == 0 && _downsampleWidth.Value != 0)
-                {
-                    downsampleWidth = _downsampleWidth.Value;
-                    downsampleHeight = (int)(((float)_downsampleWidth.Value / width) * height);
-                }
-
-
-                //double inSampleSize = 1D;
-
-                //if (height > downsampleHeight || width > downsampleWidth)
-                //{
-                //    int halfHeight = (int)(height / 2);
-                //    int halfWidth = (int)(width / 2);
-
-                //    // Calculate a inSampleSize that is a power of 2 - the decoder will use a value that is a power of two anyway.
-                //    while ((halfHeight / inSampleSize) > downsampleHeight && (halfWidth / inSampleSize) > downsampleWidth)
-                //    {
-                //        inSampleSize *= 2;
-                //    }
-                //}
-
-                //var insample = (int)inSampleSize;
-                //if (insample > 1)
-                //{
-                //    downsample = true;
-
-                //    int idh = 0;
-                //    int idw = 0;
-                //    result = new int[downsampleWidth * downsampleHeight];
-
-                //    for (int h = 0; h < downsampleHeight; h++)
-                //    {
-                //        idh = insample * h;
-
-                //        for (int w = 0; w < downsampleWidth; w++)
-                //        {
-                //            idw = insample * w;
-                //            var destIdx = idh * width + idw;
-
-                //            if (destIdx < dest.Length)
-                //                result[h * downsampleWidth + w] = dest[destIdx];
-                //        }
-                //    }
-                //}
-                //bitmap = await ToBitmapAsync(result, _downsample ? downsampleWidth : width, _downsample ? downsampleHeight : height);
-                bitmap = await ToBitmapAsync(result, downsampleWidth, downsampleHeight);
+            if (downsampled)
+            {
+                insample = CalculateInSampleSize(width, height, downsampleWidth, downsampleHeight, false);
+                bitmap = await ToBitmapAsync(result, width, height, downsampleWidth, downsampleHeight);
             }
             else
             {
-                bitmap = await ToBitmapAsync(result, width, height);
+                bitmap = await ToBitmapAsync(result, width, height, downsampleWidth, downsampleHeight);
             }
 
             image = bitmap;
+        }
+
+        public static int CalculateInSampleSize(float width, float height, int reqWidth, int reqHeight, bool allowUpscale)
+        {
+            if (reqWidth == 0)
+                reqWidth = (int)((reqHeight / height) * width);
+
+            if (reqHeight == 0)
+                reqHeight = (int)((reqWidth / width) * height);
+
+            double inSampleSize = 1d;
+
+            if (height > reqHeight || width > reqWidth || allowUpscale)
+            {
+                // Calculate ratios of height and width to requested height and width
+                int heightRatio = (int)Math.Round(height / reqHeight);
+                int widthRatio = (int)Math.Round(width / reqWidth);
+
+                // Choose the smallest ratio as inSampleSize value, this will guarantee
+                // a final image with both dimensions larger than or equal to the
+                // requested height and width.
+                inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+            }
+
+            int x = (int)inSampleSize;
+
+            x = x | (x >> 1);
+            x = x | (x >> 2);
+            x = x | (x >> 4);
+            x = x | (x >> 8);
+            x = x | (x >> 16);
+            return x - (x >> 1);
         }
 
         public async Task ReadGifAsync(Stream inputStream, string path, TaskParameter parameters)

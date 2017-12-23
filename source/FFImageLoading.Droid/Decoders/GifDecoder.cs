@@ -51,9 +51,21 @@ namespace FFImageLoading.Decoders
                 return dips.DpToPixels();
             }
 
-            protected override Task<Bitmap> ToBitmapAsync(int[] data, int width, int height)
+            protected override Task<Bitmap> ToBitmapAsync(int[] data, int width, int height, int downsampleWidth, int downsampleHeight)
             {
-                var bitmap = Bitmap.CreateBitmap(data, width, height, Bitmap.Config.Argb4444);
+                Bitmap bitmap;
+                bitmap = Bitmap.CreateBitmap(data, width, height, Bitmap.Config.Argb4444);
+
+                if (downsampleWidth != 0 && downsampleHeight != 0)
+                {
+                    var old = bitmap;
+
+                    bitmap = Bitmap.CreateScaledBitmap(old, downsampleWidth, downsampleHeight, false);
+
+                    old.Recycle();
+                    old.TryDispose();
+                }
+
                 return Task.FromResult(bitmap);
             }
         }
