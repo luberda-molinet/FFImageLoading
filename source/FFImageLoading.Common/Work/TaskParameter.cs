@@ -143,6 +143,8 @@ namespace FFImageLoading.Work
 
         public Action<DownloadInformation> OnDownloadStarted { get; private set; }
 
+        internal Action OnLoadingPlaceholderSet { get; private set; }
+
         public Action<FileWriteInfo> OnFileWriteFinished { get; private set; }
 
         public Action<DownloadProgress> OnDownloadProgress { get; private set; }
@@ -530,6 +532,20 @@ namespace FFImageLoading.Work
                 throw new ArgumentNullException(nameof(action));
 
             OnFileWriteFinished = action;
+            return this;
+        }
+
+        /// <summary>
+        /// Called after loading placeholder is set
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="action">Action.</param>
+        internal TaskParameter LoadingPlaceholderSet(Action action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            OnLoadingPlaceholderSet = action;
             return this;
         }
 

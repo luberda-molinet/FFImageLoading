@@ -63,6 +63,7 @@ namespace FFImageLoading.Forms.Droid
             registerMethod.Invoke(registrar, new[] { type, renderer });
         }
 
+        bool _isSizeSet;
         bool _isDisposed;
         IScheduledWork _currentTask;
         ImageSourceBinding _lastImageSource;
@@ -120,6 +121,7 @@ namespace FFImageLoading.Forms.Droid
 
             if (e.NewElement != null)
             {
+                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -207,7 +209,7 @@ namespace FFImageLoading.Forms.Droid
                     imageLoader.Finish((work) =>
                     {
                         finishAction?.Invoke(work);
-                        ImageLoadingFinished(image);
+                        ImageLoadingSizeChanged(image, false);
                     });
 
                     imageLoader.Success((imageInformation, loadingResult) =>
@@ -216,20 +218,28 @@ namespace FFImageLoading.Forms.Droid
                         _lastImageSource = ffSource;
                     });
 
+                    imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
+
                     if (!_isDisposed)
                         _currentTask = imageLoader.Into(imageView);
                 }
             }
         }
 
-        async void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
             await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {
-                    element.SetIsLoading(false);
-                    ((IVisualElementController)element).NativeSizeChanged();
+                    if (!isLoading || !_isSizeSet)
+                    {
+                        ((IVisualElementController)element).NativeSizeChanged();
+                        _isSizeSet = true;
+                    }
+
+                    if (!isLoading)
+                        element.SetIsLoading(isLoading);
                 }
             });
         }

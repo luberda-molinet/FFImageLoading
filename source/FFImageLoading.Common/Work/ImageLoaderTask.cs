@@ -480,6 +480,8 @@ namespace FFImageLoading.Work
             {
                 _isLoadingPlaceholderLoaded = true;
             }
+
+            Parameters.OnLoadingPlaceholderSet?.Invoke();
         }
 
         public async Task RunAsync()

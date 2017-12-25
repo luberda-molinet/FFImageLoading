@@ -45,6 +45,7 @@ namespace FFImageLoading.Forms.WinRT
     [Preserve(AllMembers = true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
     {
+        bool _isSizeSet;
         private bool _measured;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
@@ -101,6 +102,7 @@ namespace FFImageLoading.Forms.WinRT
 
             if (e.NewElement != null)
             {
+                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -187,7 +189,7 @@ namespace FFImageLoading.Forms.WinRT
                 imageLoader.Finish((work) =>
                 {
                     finishAction?.Invoke(work);
-                    ImageLoadingFinished(image);
+                    ImageLoadingSizeChanged(image, false);
                 });
 
                 imageLoader.Success((imageInformation, loadingResult) =>
@@ -195,6 +197,8 @@ namespace FFImageLoading.Forms.WinRT
                     sucessAction?.Invoke(imageInformation, loadingResult);
                     _lastImageSource = ffSource;
                 });
+
+                imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
 
                 if (!_isDisposed)
                     _currentTask = imageLoader.Into(imageView);
@@ -221,19 +225,20 @@ namespace FFImageLoading.Forms.WinRT
             }
         }
 
-        async void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
             await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {
-                    element.SetIsLoading(false);
-                    var elCtrl = element as IVisualElementController;
-
-                    if (elCtrl != null)
+                    if (!isLoading || !_isSizeSet)
                     {
-                        ((IVisualElementController)Element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
+                        ((IVisualElementController)element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
+                        _isSizeSet = true;
                     }
+
+                    if (!isLoading)
+                        element.SetIsLoading(isLoading);
                 }
             });
         }

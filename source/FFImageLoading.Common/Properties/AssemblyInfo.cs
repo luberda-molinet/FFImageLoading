@@ -28,3 +28,11 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("FFImageLoading.Tests")]
 [assembly: InternalsVisibleTo("FFImageLoading.Platform")]
 [assembly: InternalsVisibleTo("FFImageLoading.Svg.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Droid")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Mac")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Tizen")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Touch")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.WinRT")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.WinUWP")]
+

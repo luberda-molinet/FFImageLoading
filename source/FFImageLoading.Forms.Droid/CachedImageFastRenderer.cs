@@ -31,6 +31,7 @@ namespace FFImageLoading.Forms.Droid
         static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
         static readonly MethodInfo _ElementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
 
+        bool _isSizeSet;
         bool _isDisposed;
         CachedImage _element;
         int? _defaultLabelFor;
@@ -161,6 +162,8 @@ namespace FFImageLoading.Forms.Droid
             if (image == null)
                 throw new ArgumentException("Element is not of type " + typeof(CachedImage), nameof(element));
 
+            _isSizeSet = false;
+
             CachedImage oldElement = _element;
             _element = image;
 
@@ -280,7 +283,7 @@ namespace FFImageLoading.Forms.Droid
                     imageLoader.Finish((work) =>
                     {
                         finishAction?.Invoke(work);
-                        ImageLoadingFinished(image);
+                        ImageLoadingSizeChanged(image, false);
                     });
 
                     imageLoader.Success((imageInformation, loadingResult) =>
@@ -289,20 +292,28 @@ namespace FFImageLoading.Forms.Droid
                         _lastImageSource = ffSource;
                     });
 
+                    imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
+
                     if (!_isDisposed)
                         _currentTask = imageLoader.Into(imageView);
                 }
             }
         }
 
-        async void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
             await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {
-                    ((IVisualElementController)element).NativeSizeChanged();
-                    element.SetIsLoading(false);
+                    if (!isLoading || !_isSizeSet)
+                    {
+                        ((IVisualElementController)element).NativeSizeChanged();
+                        _isSizeSet = true;
+                    }
+
+                    if (!isLoading)
+                        element.SetIsLoading(isLoading);
                 }
             });
         }

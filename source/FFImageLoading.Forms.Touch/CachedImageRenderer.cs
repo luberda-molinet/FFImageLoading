@@ -40,6 +40,7 @@ namespace FFImageLoading.Forms.Mac
     [Preserve(AllMembers = true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, PImageView>
     {
+        bool _isSizeSet;
         private bool _isDisposed;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
@@ -96,6 +97,7 @@ namespace FFImageLoading.Forms.Mac
 
             if (e.NewElement != null)
             {
+                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -200,7 +202,7 @@ namespace FFImageLoading.Forms.Mac
                     imageLoader.Finish((work) =>
                     {
                         finishAction?.Invoke(work);
-                        ImageLoadingFinished(image);
+                        ImageLoadingSizeChanged(image, false);
                     });
 
                     imageLoader.Success((imageInformation, loadingResult) =>
@@ -209,20 +211,28 @@ namespace FFImageLoading.Forms.Mac
                         _lastImageSource = ffSource;
                     });
 
+                    imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
+
                     if (!_isDisposed)
                         _currentTask = imageLoader.Into(imageView);
                 }
             }
         }
 
-        async void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
             await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {
-                    element.SetIsLoading(false);
-                    ((IVisualElementController)element).NativeSizeChanged();
+                    if (!isLoading || !_isSizeSet)
+                    {
+                        ((IVisualElementController)element).NativeSizeChanged();
+                        _isSizeSet = true;
+                    }
+
+                    if (!isLoading)
+                        element.SetIsLoading(isLoading);
                 }
             });
         }
