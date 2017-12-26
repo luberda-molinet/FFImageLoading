@@ -436,7 +436,10 @@ namespace FFImageLoading.Work
                         if (await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
                         {
                             if (isLoadingPlaceholder)
+                            {
                                 _isLoadingPlaceholderLoaded = true;
+                                Parameters.OnLoadingPlaceholderSet?.Invoke();
+                            }
                             
                             return;
                         }
@@ -466,7 +469,10 @@ namespace FFImageLoading.Work
                         await SetTargetAsync(loadImage, false).ConfigureAwait(false);
 
                     if (isLoadingPlaceholder)
+                    {
                         _isLoadingPlaceholderLoaded = true;
+                        Parameters.OnLoadingPlaceholderSet?.Invoke();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -479,9 +485,8 @@ namespace FFImageLoading.Work
             else if (isLoadingPlaceholder)
             {
                 _isLoadingPlaceholderLoaded = true;
+                Parameters.OnLoadingPlaceholderSet?.Invoke();
             }
-
-            Parameters.OnLoadingPlaceholderSet?.Invoke();
         }
 
         public async Task RunAsync()
