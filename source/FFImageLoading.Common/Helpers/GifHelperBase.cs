@@ -50,8 +50,8 @@ namespace FFImageLoading
         byte[] pixels;
         List<GifFrame> frames = new List<GifFrame>(); // frames read from current file
         int frameCount;
-        int? _downsampleWidth;
-        int? _downsampleHeight;
+        int _downsampleWidth;
+        int _downsampleHeight;
         bool _downsample;
 
         public List<GifFrame> Frames { get { return frames; } }
@@ -169,16 +169,14 @@ namespace FFImageLoading
             int insample = 1;
             bool downsampled = false;
 
-            if (_downsampleWidth.Value == 0 && _downsampleHeight.Value != 0)
+            if (_downsampleWidth == 0 && _downsampleHeight != 0)
             {
-                downsampleWidth = (int)(((float)_downsampleHeight.Value / height) * width);
-                downsampleHeight = _downsampleHeight.Value;
+                downsampleWidth = (int)(((float)_downsampleHeight / height) * width);
                 downsampled = true;
             }
-            else if (_downsampleHeight.Value == 0 && _downsampleWidth.Value != 0)
+            else if (_downsampleHeight == 0 && _downsampleWidth != 0)
             {
-                downsampleWidth = _downsampleWidth.Value;
-                downsampleHeight = (int)(((float)_downsampleWidth.Value / width) * height);
+                downsampleHeight = (int)(((float)_downsampleWidth / width) * height);
                 downsampled = true;
             }
 
@@ -240,8 +238,8 @@ namespace FFImageLoading
 
                 if (dip)
                 {
-                    _downsampleWidth = DipToPixels(_downsampleWidth.Value);
-                    _downsampleHeight = DipToPixels(_downsampleHeight.Value);
+                    _downsampleWidth = DipToPixels(_downsampleWidth);
+                    _downsampleHeight = DipToPixels(_downsampleHeight);
                 }
             }
 
