@@ -993,12 +993,14 @@ namespace FFImageLoading.Svg.Platform
                                 {
                                     case "linearGradient":
                                         fillPaint.Color = SKColors.Transparent;
-                                        fills.TryAdd(fill, ReadLinearGradient(defE));
+                                        if (!fills.ContainsKey(fill))
+                                            fills.Add(fill, ReadLinearGradient(defE));
                                         read = true;
                                         break;
                                     case "radialGradient":
                                         fillPaint.Color = SKColors.Transparent;
-                                        fills.TryAdd(fill, ReadRadialGradient(defE));
+                                        if (!fills.ContainsKey(fill))
+                                            fills.Add(fill, ReadRadialGradient(defE));
                                         read = true;
                                         break;
                                 }
