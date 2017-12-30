@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="1.59.2" />
     <PackageReference Include="Tizen.NET" Version="4.0.0" />
+    <PackageReference Include="SkiaSharp" Version="1.59.3" />
   </ItemGroup>
 
   <ItemGroup>
