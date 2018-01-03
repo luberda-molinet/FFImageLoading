@@ -1,6 +1,5 @@
 ﻿using Android.Graphics;
 using Android.Graphics.Drawables;
-using Exception = System.Exception;
 using Math = System.Math;
 using FFImageLoading.Helpers;
 using Android.Content;
@@ -32,6 +31,12 @@ namespace FFImageLoading.Cache
 
     public class ImageCache<TValue> : IImageCache<TValue> where TValue: Java.Lang.Object, ISelfDisposingBitmapDrawable
     {
+        const int BYTES_PER_ARGB_8888_PIXEL = 4;
+        const int LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR = 2;
+        const int BITMAP_POOL_TARGET_SCREENS = 4;
+        const int MEMORY_CACHE_TARGET_SCREENS = 4;
+        const int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
+
         readonly ReuseBitmapDrawableCache<TValue> _cache;
         readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
         readonly IMiniLogger _logger;
@@ -40,15 +45,50 @@ namespace FFImageLoading.Cache
         public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
         {
             _logger = logger;
-            int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
+            int memoryCacheSize;
+            int bitmapPoolSize;
 
-            double sizeInMB = Math.Round(safeMaxCacheSize / 1024d / 1024d, 2);
-            logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
+            var context = new ContextWrapper(Application.Context);
+            var am = (ActivityManager)context.GetSystemService(Context.ActivityService);
 
-            // consider low treshold as a third of maxCacheSize
-            int lowTreshold = safeMaxCacheSize / 2;
+            bool isLowMemoryDevice = Utils.HasKitKat() && am.IsLowRamDevice;
+            bool isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
+            int memoryClass = isLargeHeapEnabled ? am.LargeMemoryClass : am.MemoryClass;
+            int maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
 
-            _cache = new ReuseBitmapDrawableCache<TValue>(logger, safeMaxCacheSize, lowTreshold, verboseLogging);
+            var metrics = context.Resources.DisplayMetrics;
+            int widthPixels = metrics.WidthPixels;
+            int heightPixels = metrics.HeightPixels;
+            int screenSize = widthPixels * heightPixels * BYTES_PER_ARGB_8888_PIXEL;
+
+            int targetBitmapPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS;
+            int targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;
+            int arrayPoolSize = isLowMemoryDevice ? ARRAY_POOL_SIZE_BYTES / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR : ARRAY_POOL_SIZE_BYTES;
+            int availableSize = maxSize - arrayPoolSize;
+
+            if (maxCacheSize >= (int)(1024 * 1024 * 16))
+            {
+                float part = maxCacheSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
+                bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
+            }
+            else if (targetMemoryCacheSize + targetBitmapPoolSize <= availableSize)
+            {
+                memoryCacheSize = targetMemoryCacheSize;
+                bitmapPoolSize = targetBitmapPoolSize;
+            }
+            else
+            {
+                float part = availableSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
+                bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
+            }
+
+            double sizeInMB = Math.Round(memoryCacheSize / 1024d / 1024d, 2);
+            double poolSizeInMB = Math.Round(bitmapPoolSize / 1024d / 1024d, 2);
+            logger.Debug(string.Format("Image memory cache size: {0} MB, reuse pool size:D {1} MB", sizeInMB, poolSizeInMB));
+
+            _cache = new ReuseBitmapDrawableCache<TValue>(logger, memoryCacheSize, bitmapPoolSize, verboseLogging);
             _imageInformations = new ConcurrentDictionary<string, ImageInformation>();
         }
 
@@ -74,13 +114,17 @@ namespace FFImageLoading.Cache
 
         public ImageInformation GetInfo(string key)
         {
-            ImageInformation imageInformation;
-            if (_imageInformations.TryGetValue(key, out imageInformation))
+            lock (_lock)
             {
-                return imageInformation;
-            }
+                ImageInformation imageInformation;
 
-            return null;
+                if (_imageInformations.TryGetValue(key, out imageInformation))
+                {
+                    return imageInformation;
+                }
+
+                return null;
+            }
         }
 
         public Tuple<TValue, ImageInformation> Get(string key)
@@ -90,16 +134,23 @@ namespace FFImageLoading.Cache
 
             TValue drawable = null;
 
-            if (_cache.TryGetValue(key, out drawable))
+            lock (_lock)
             {
-                if (!drawable.IsValidAndHasValidBitmap())
+                if (_cache.TryGetValue(key, out drawable))
+                {
+                    if (!drawable.IsValidAndHasValidBitmap())
+                    {
+                        Remove(key, false);
+                        return null;
+                    }
+
+                    var imageInformation = GetInfo(key);
+                    return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
+                }
+                else if (_imageInformations.ContainsKey(key))
                 {
                     Remove(key, false);
-                    return null;
                 }
-
-                var imageInformation = GetInfo(key);
-                return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
             }
 
             return null;
@@ -110,11 +161,12 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap())
                 return;
 
-            if (_imageInformations.ContainsKey(key) || _cache.ContainsKey(key))
-                Remove(key, false);
-
             lock (_lock)
             {
+
+                if (_imageInformations.ContainsKey(key) || _cache.ContainsKey(key))
+                    Remove(key, false);
+
                 _imageInformations.TryAdd(key, imageInformation);
                 _cache.Add(key, bitmap);
             }
@@ -172,39 +224,6 @@ namespace FFImageLoading.Cache
         public void AddToReusableSet(TValue value)
         {
             _cache.AddToReusePool(value);
-        }
-
-        private static int GetMaxCacheSize(int maxCacheSize)
-        {
-            if (maxCacheSize <= 0)
-                return GetCacheSizeInPercent(0.2f); // DEFAULT 20%
-
-            return Math.Max(GetCacheSizeInPercent(0.05f), maxCacheSize); // MIN SAFE LIMIT 5%
-        }
-
-        /// <summary>
-        /// Gets the memory cache size based on a percentage of the max available VM memory.
-        /// </summary>
-        /// <example>setting percent to 0.2 would set the memory cache to one fifth of the available memory</example>
-        /// <param name="percent">Percent of available app memory to use to size memory cache</param>
-        /// <returns></returns>
-        private static int GetCacheSizeInPercent(float percent)
-        {
-            if (percent < 0.01f || percent > 0.8f)
-                throw new Exception("GetCacheSizeInPercent - percent must be between 0.01 and 0.8 (inclusive)");
-
-            var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
-            var am = (ActivityManager) context.GetSystemService(Context.ActivityService);
-            bool largeHeap = (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
-            int memoryClass = am.MemoryClass;
-
-            if (largeHeap && Utils.HasHoneycomb())
-            {
-                memoryClass = am.LargeMemoryClass;
-            }
-
-            int availableMemory = 1024 * 1024 * memoryClass;
-            return (int)Math.Round(percent * availableMemory);
         }
     }
 }

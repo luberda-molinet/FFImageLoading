@@ -96,7 +96,17 @@ namespace FFImageLoading.Decoders
             if (imageData.Position != 0)
                 imageData.Position = 0;
 
-            bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+            try
+            {
+                bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+            }
+            catch (Java.Lang.IllegalArgumentException)
+            {
+                ISelfDisposingBitmapDrawable old = options.InBitmap as object as ISelfDisposingBitmapDrawable;
+                old?.SetIsRetained(true);
+                options.InBitmap = null;
+                bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
+            }
 
             // if image is rotated, swap width/height
             if (exifRotation != 0)

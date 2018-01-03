@@ -11,28 +11,13 @@ namespace FFImageLoading.Cache
         LRUCache _androidCache;
         HashSet<string> _keysCache = new HashSet<string>();
 
-        readonly int _high_watermark;
-        readonly int _low_watermark;
-        //bool _has_exceeded_high_watermark;
-
-        public ByteBoundStrongLruCache(int highWatermark, int lowWatermark)
+        public ByteBoundStrongLruCache(int maxSize)
         {
-            _androidCache = new LRUCache(highWatermark);
+            if (maxSize == 0)
+                throw new ArgumentException("maxSize must be > 0");
+
+            _androidCache = new LRUCache(maxSize);
             _androidCache.OnEntryRemoved += AndroidCache_OnEntryRemoved;
-            _high_watermark = Math.Max(0, highWatermark);
-            _low_watermark = Math.Max(0, lowWatermark);
-            if (_high_watermark == 0)
-            {
-                throw new ArgumentException("highWatermark must be > 0");
-            }
-            if (_low_watermark == 0)
-            {
-                throw new ArgumentException("lowWatermark must be > 0");
-            }
-            if (_high_watermark < _low_watermark)
-            {
-                _high_watermark = _low_watermark;
-            }
         }
 
         public event EventHandler<EntryRemovedEventArgs<TValue>> EntryRemoved;
