@@ -97,7 +97,7 @@ namespace FFImageLoading.Decoders
                 IAnimatedImage<PImage>[] images = null;
 
                 // GIF
-                if (sourceRef.ImageCount > 1 && config.AnimateGifs)
+                if (sourceRef.ImageCount > 1 && config.AnimateGifs && imageinformation.Type != ImageInformation.ImageType.ICO)
                 {
                     lock (_gifLock)
                     {

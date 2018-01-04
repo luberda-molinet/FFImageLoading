@@ -15,6 +15,7 @@ namespace FFImageLoading.Helpers
         static readonly byte[] _bmp = Encoding.UTF8.GetBytes("BM");
         static readonly byte[] _tiff = new byte[] { 73, 73, 42 };
         static readonly byte[] _tiff2 = new byte[] { 77, 77, 42 };
+        static readonly byte[] _ico = new byte[] { 00, 00, 01, 00 };
 
         public static ImageInformation.ImageType GetImageType(byte[] header)
         {
@@ -41,6 +42,9 @@ namespace FFImageLoading.Helpers
 
             if (_tiff2.SequenceEqual(header.Take(_tiff2.Length)))
                 return ImageInformation.ImageType.TIFF;
+
+            if (_ico.SequenceEqual(header.Take(_ico.Length)))
+                return ImageInformation.ImageType.ICO;
 
             return ImageInformation.ImageType.Unknown;
         }
