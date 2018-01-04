@@ -13,7 +13,7 @@ namespace FFImageLoading.DataResolvers
         readonly static Regex _regex1 = new Regex(@"data:(?<mime>[\w/]+);(?<encoding>\w+),(?<data>.*)");
         readonly static Regex _regex2 = new Regex(@"data:(?<mime>.+?),(?<data>.+)");
 
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var imageInformation = new ImageInformation();
             imageInformation.SetPath(identifier);
@@ -67,19 +67,19 @@ namespace FFImageLoading.DataResolvers
             return GetBase64Stream(data, imageInformation);
         }
 
-        Task<Tuple<Stream, LoadingResult, ImageInformation>> GetBase64Stream(string data, ImageInformation imageInformation)
+        Task<DataResolverResult> GetBase64Stream(string data, ImageInformation imageInformation)
         {
             var streamBase64 = new MemoryStream(Convert.FromBase64String(data));
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+            return Task.FromResult(new DataResolverResult(
                 streamBase64, LoadingResult.EmbeddedResource, imageInformation));
         }
 
-        Task<Tuple<Stream, LoadingResult, ImageInformation>> GetRAWStream(string data, ImageInformation imageInformation)
+        Task<DataResolverResult> GetRAWStream(string data, ImageInformation imageInformation)
         {
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+            return Task.FromResult(new DataResolverResult(
                 stream, LoadingResult.EmbeddedResource, imageInformation));
         }
     }

@@ -423,7 +423,7 @@ namespace FFImageLoading.Work
                     var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                     loadResolver = new WrappedDataResolver(loadResolver);
-                    Tuple<Stream, LoadingResult, ImageInformation> loadImageData;
+                    DataResolverResult loadImageData;
                     TImageContainer loadImage;
 
                     if (!await _placeholdersResolveLock.WaitAsync(TimeSpan.FromSeconds(10), CancellationTokenSource.Token).ConfigureAwait(false))
@@ -448,12 +448,20 @@ namespace FFImageLoading.Work
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                         ThrowIfCancellationRequested();
 
-                        using (loadImageData.Item1)
+                        if (loadImageData.Stream != null)
                         {
-                            loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
-                            if (loadImage != default(TImageContainer))
-                                MemoryCache.Add(key, loadImageData.Item3, loadImage);
+                            using (loadImageData.Stream)
+                            {
+                                loadImage = await GenerateImageAsync(path, source, loadImageData.Stream, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
+                            }
                         }
+                        else
+                        {
+                            loadImage = loadImageData.ImageContainer as TImageContainer;
+                        }
+
+                        if (loadImage != default(TImageContainer))
+                            MemoryCache.Add(key, loadImageData.ImageInformation, loadImage);
                     }
                     finally
                     {
@@ -512,50 +520,59 @@ namespace FFImageLoading.Work
                     var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
                     resolver = new WrappedDataResolver(resolver);
                     var imageData = await resolver.Resolve(Parameters.Path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
-                    loadingResult = imageData.Item2;
+                    loadingResult = imageData.LoadingResult;
 
-                    using (imageData.Item1)
+                    ImageInformation = imageData.ImageInformation;
+                    ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
+                    ImageInformation.SetPath(Parameters.Path);
+                    ThrowIfCancellationRequested();
+
+                    // Preload
+                    if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     {
-                        ImageInformation = imageData.Item3;
-                        ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
-                        ImageInformation.SetPath(Parameters.Path);
+                        if (loadingResult == LoadingResult.Internet)
+                            Logger?.Debug(string.Format("DownloadOnly success: {0}", Key));
+
+                        success = true;
+
+                        return;
+                    }
+
+                    ThrowIfCancellationRequested();
+
+                    TImageContainer image;
+
+                    if (imageData.Stream != null)
+                    {
+                        using (imageData.Stream)
+                        {
+                            image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Stream, imageData.ImageInformation, true, false).ConfigureAwait(false);
+                        }
+                    }
+                    else
+                    {
+                        image = imageData.ImageContainer as TImageContainer;
+                    }
+
+                    ThrowIfCancellationRequested();
+
+                    try
+                    {
+                        BeforeLoading(image, false);
+
+                        if (image != default(TImageContainer) && CanUseMemoryCache)
+                            MemoryCache.Add(Key, imageData.ImageInformation, image);
+
                         ThrowIfCancellationRequested();
 
-                        // Preload
-                        if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
-                        {
-                            if (loadingResult == LoadingResult.Internet)
-                                Logger?.Debug(string.Format("DownloadOnly success: {0}", Key));
+                        bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
 
-                            success = true;
-
-                            return;
-                        }
-
-                        ThrowIfCancellationRequested();
-
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
-
-                        ThrowIfCancellationRequested();
-
-                        try
-                        {
-                            BeforeLoading(image, false);
-
-                            if (image != default(TImageContainer) && CanUseMemoryCache)
-                                MemoryCache.Add(Key, imageData.Item3, image);
-
-                            ThrowIfCancellationRequested();
-
-                            bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
-
-                            if (Target != null)
-                                await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
-                        }
-                        finally
-                        {
-                            AfterLoading(image, false);
-                        }
+                        if (Target != null)
+                            await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        AfterLoading(image, false);
                     }
                 }
 

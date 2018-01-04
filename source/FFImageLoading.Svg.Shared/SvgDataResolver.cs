@@ -63,7 +63,7 @@ namespace FFImageLoading.Svg.Platform
 
         public Dictionary<string, string> ReplaceStringMap { get; set; }
 
-        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             ImageSource source = parameters.Source;
 
@@ -76,7 +76,7 @@ namespace FFImageLoading.Svg.Platform
                                             .GetResolver(identifier, source, parameters, Configuration)
                                             .Resolve(identifier, parameters, token).ConfigureAwait(false);
 
-            if (resolvedData?.Item1 == null)
+            if (resolvedData?.Stream == null)
                 throw new FileNotFoundException(identifier);
 
             var svg = new SKSvg()
@@ -87,14 +87,14 @@ namespace FFImageLoading.Svg.Platform
 
             if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
             {
-                using (var svgStream = resolvedData.Item1)
+                using (var svgStream = resolvedData.Stream)
                 {
                     picture = svg.Load(svgStream);
                 }
             }
             else
             {
-                using (var svgStream = resolvedData.Item1)
+                using (var svgStream = resolvedData.Stream)
                 using (var reader = new StreamReader(svgStream))
                 {
                     var inputString = await reader.ReadToEndAsync();
@@ -179,8 +179,8 @@ namespace FFImageLoading.Svg.Platform
                         var stream = new MemoryStream();
                         data.SaveTo(stream);
                         stream.Position = 0;
-                        resolvedData.Item3.SetType(ImageInformation.ImageType.SVG);
-                        return new Tuple<Stream, LoadingResult, ImageInformation>(stream, resolvedData.Item2, resolvedData.Item3);
+                        resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
+                        return new DataResolverResult(stream, resolvedData.LoadingResult, resolvedData.ImageInformation);
                     }
                 }
             }

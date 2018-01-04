@@ -53,7 +53,7 @@ namespace FFImageLoading.Svg.Platform
             }
         }
 
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             throw new NotImplementedException(DoNotReferenceMessage);
         }

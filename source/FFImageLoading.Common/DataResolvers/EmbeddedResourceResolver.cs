@@ -10,7 +10,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class EmbeddedResourceResolver : IDataResolver
     {
-        public Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             if (!identifier.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
                 throw new Exception("Only resource:// scheme is supported");
@@ -41,7 +41,7 @@ namespace FFImageLoading.DataResolvers
 
             var stream = assembly.GetManifestResourceStream(resourceName);
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+            return Task.FromResult(new DataResolverResult(
                 stream, LoadingResult.EmbeddedResource, imageInformation));
         }
     }

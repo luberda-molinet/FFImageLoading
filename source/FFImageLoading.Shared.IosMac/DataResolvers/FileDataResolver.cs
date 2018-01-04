@@ -8,9 +8,9 @@ using System.Threading;
 
 namespace FFImageLoading.DataResolvers
 {
-	public class FileDataResolver : IDataResolver
-	{
-        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+    public class FileDataResolver : IDataResolver
+    {
+        public virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             string file = null;
 
@@ -56,7 +56,7 @@ namespace FFImageLoading.DataResolvers
                 else if (parameters.ErrorPlaceholderPath == identifier)
                     result = (LoadingResult)(int)parameters.ErrorPlaceholderSource;
 
-                return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+                return Task.FromResult(new DataResolverResult(
                     stream, result, imageInformation));
             }
 

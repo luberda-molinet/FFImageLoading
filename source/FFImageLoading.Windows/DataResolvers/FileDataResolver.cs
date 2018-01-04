@@ -9,7 +9,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class FileDataResolver : IDataResolver
     {
-        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             StorageFile file = null;
 
@@ -34,7 +34,7 @@ namespace FFImageLoading.DataResolvers
                 token.ThrowIfCancellationRequested();
                 var stream = await file.OpenStreamForReadAsync();
 
-                return new Tuple<Stream, LoadingResult, ImageInformation>(stream, LoadingResult.Disk, imageInformation);
+                return new DataResolverResult(stream, LoadingResult.Disk, imageInformation);
             }
 
             throw new FileNotFoundException(identifier);

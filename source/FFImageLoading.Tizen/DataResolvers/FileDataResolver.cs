@@ -10,7 +10,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class FileDataResolver : IDataResolver
     {
-        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var filePath = GetPath(identifier);
             if (!FileStore.Exists(filePath))
@@ -26,7 +26,7 @@ namespace FFImageLoading.DataResolvers
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(filePath);
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+            return Task.FromResult(new DataResolverResult(
                 stream, LoadingResult.Disk, imageInformation));
         }
 

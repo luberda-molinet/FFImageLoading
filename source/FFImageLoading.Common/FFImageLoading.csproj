@@ -137,6 +137,7 @@
     <Compile Include="Helpers\GifHelperBase.cs" />
     <Compile Include="Decoders\IAnimatedImage.cs" />
     <Compile Include="Decoders\AnimatedImage.cs" />
+    <Compile Include="Work\DataResolverResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

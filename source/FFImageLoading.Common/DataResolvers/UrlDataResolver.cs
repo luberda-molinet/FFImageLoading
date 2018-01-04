@@ -18,7 +18,7 @@ namespace FFImageLoading.DataResolvers
         protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
         protected Configuration Configuration { get; private set; }
 
-        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
 
             var downloadedData = await DownloadCache.DownloadAndCacheIfNeededAsync(identifier, parameters, Configuration, token).ConfigureAwait(false);
@@ -33,7 +33,7 @@ namespace FFImageLoading.DataResolvers
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(downloadedData?.FilePath);
 
-            return new Tuple<Stream, LoadingResult, ImageInformation>(
+            return new DataResolverResult(
                 downloadedData?.ImageStream, downloadedData.RetrievedFromDiskCache ? LoadingResult.DiskCache : LoadingResult.Internet, imageInformation);
         }
     }

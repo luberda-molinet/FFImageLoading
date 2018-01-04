@@ -149,6 +149,8 @@
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json">
       <InProject>false</InProject>
     </ImageAsset>
+    <ImageAsset Include="Resources\Images.xcassets\testasset.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\testasset.imageset\loadingg.png" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.xib" />
@@ -202,6 +204,10 @@
       <Project>{A73A1EA8-E709-474D-9102-DCB2482950AB}</Project>
       <Name>FFImageLoading.Svg.Forms.Touch</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Images.xcassets\testasset.imageset\" />
+    <Folder Include="Resources\Images.xcassets\testasset.imageset\" />
   </ItemGroup>
   <Import Project="..\..\..\packages\Xamarin.Forms.2.5.0.121934\build\netstandard1.0\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.5.0.121934\build\netstandard1.0\Xamarin.Forms.targets')" />
 </Project>

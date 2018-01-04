@@ -13,7 +13,7 @@ namespace FFImageLoading.DataResolvers
         private static readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1, 1);
         private static Dictionary<string, StorageFile> _cache = new Dictionary<string, StorageFile>(128);
 
-        public async virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             StorageFile file = null;
             await _cacheLock.WaitAsync(token).ConfigureAwait(false);
@@ -74,7 +74,7 @@ namespace FFImageLoading.DataResolvers
                 token.ThrowIfCancellationRequested();
                 var stream = await file.OpenStreamForReadAsync();
 
-                return new Tuple<Stream, LoadingResult, ImageInformation>(stream, LoadingResult.CompiledResource, imageInformation);
+                return new DataResolverResult(stream, LoadingResult.CompiledResource, imageInformation);
             }
 
             throw new FileNotFoundException(identifier);
