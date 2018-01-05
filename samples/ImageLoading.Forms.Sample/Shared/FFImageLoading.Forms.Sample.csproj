@@ -175,6 +175,10 @@
     <Compile Include="Pages\ByteArrayListPageCell.xaml.cs">
       <DependentUpon>ByteArrayListPageCell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\CachedImageSizingTestPage.xaml.cs">
+      <DependentUpon>CachedImageSizingTestPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CachedImageSizingTestPageModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -294,6 +298,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Pages\ByteArrayListPageCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\CachedImageSizingTestPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

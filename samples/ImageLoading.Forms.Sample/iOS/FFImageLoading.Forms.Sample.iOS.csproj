@@ -170,6 +170,9 @@
     <BundleResource Include="Resources\error.png" />
     <BundleResource Include="Resources\loading.png" />
     <BundleResource Include="Resources\sample.svg" />
+    <BundleResource Include="Resources\ic_star_black_24dp.png" />
+    <BundleResource Include="Resources\ic_star_black_24dp%402x.png" />
+    <BundleResource Include="Resources\ic_star_black_24dp%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj">

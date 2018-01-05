@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms" xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations" x:Class="FFImageLoading.Forms.Sample.CachedImageSizingTestPage">
+    <ScrollView>
+        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="16,32,16,16">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Forms:Image" FontSize="14" HorizontalOptions="CenterAndExpand"/>
+                <Label Text="FFImageloading:CachedImage" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+            </StackLayout>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".5*" />
+                    <ColumnDefinition Width=".5*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="100" />
+                </Grid.RowDefinitions>
+
+                <StackLayout Grid.Column="0" Grid.Row="0" HorizontalOptions="FillAndExpand">
+                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" />
+                </StackLayout>
+
+                <StackLayout Grid.Column="1" Grid.Row="0" HorizontalOptions="FillAndExpand">
+                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" />
+                </StackLayout>
+
+                <StackLayout Grid.Column="0" Grid.Row="1" HorizontalOptions="FillAndExpand">
+                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="40"/>
+                </StackLayout>
+
+                <StackLayout Grid.Column="1" Grid.Row="1" HorizontalOptions="FillAndExpand">
+                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="40"/>
+                </StackLayout>
+
+                <StackLayout Grid.Column="0" Grid.Row="2" HorizontalOptions="FillAndExpand">
+                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="40"/>
+                </StackLayout>
+                
+                <StackLayout Grid.Column="1" Grid.Row="2" HorizontalOptions="FillAndExpand">
+                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="40" DownsampleWidth="24"/>
+                </StackLayout>
+
+                <StackLayout Grid.Column="0" Grid.Row="3" HorizontalOptions="FillAndExpand">
+                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="24" />
+                </StackLayout>
+                
+                <StackLayout Grid.Column="1" Grid.Row="3" HorizontalOptions="FillAndExpand">
+                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="24"/>
+                </StackLayout>
+                
+            </Grid>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
