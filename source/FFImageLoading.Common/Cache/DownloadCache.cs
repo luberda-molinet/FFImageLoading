@@ -89,6 +89,12 @@ namespace FFImageLoading.Cache
 
         protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
         {
+            if (!parameters.Preload)
+            {
+                await Task.Delay(25);
+                token.ThrowIfCancellationRequested();
+            }
+
             using (var httpHeadersTimeoutTokenSource = new CancellationTokenSource())
             using (var headersTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpHeadersTimeoutTokenSource.Token))
             {
@@ -118,7 +124,7 @@ namespace FFImageLoading.Cache
 
                         if (response.Content == null)
                             throw new HttpRequestException("No Content");
-
+                        
                         var mediaType = response.Content.Headers?.ContentType?.MediaType;
                         if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
@@ -131,18 +137,20 @@ namespace FFImageLoading.Cache
                         using (var httpReadTimeoutTokenSource = new CancellationTokenSource())
                         using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))                            
                         {
-                            httpReadTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
-
                             var readTimeoutToken = readTimeoutTokenSource.Token;
+                            var httpReadTimeoutToken = httpReadTimeoutTokenSource.Token;
                             int total = (int)(response.Content.Headers.ContentLength ?? -1);
                             var canReportProgress = progressAction != null;
+
+                            httpReadTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
+                            readTimeoutToken.ThrowIfCancellationRequested();
 
                             try
                             {
                                 using (var outputStream = new MemoryStream())
                                 using (var sourceStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                                 {
-                                    readTimeoutToken.Register(() => sourceStream.TryDispose());
+                                    httpReadTimeoutToken.Register(() => sourceStream.TryDispose());
 
                                     int totalRead = 0;
                                     var buffer = new byte[Configuration.HttpReadBufferSize];
