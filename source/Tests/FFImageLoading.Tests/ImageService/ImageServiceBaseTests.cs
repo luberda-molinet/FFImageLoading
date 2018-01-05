@@ -101,6 +101,10 @@ namespace FFImageLoading.Tests.ImageServiceTests
                           {
                               downloadsCount++;
                           })
+                          .Success((arg1, arg2) =>
+                          {
+                              successCount++;
+                          })                          
                           .PreloadAsync());
             }
 
