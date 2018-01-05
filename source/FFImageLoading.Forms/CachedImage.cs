@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
 using FFImageLoading.Cache;
-using FFImageLoading.Views;
 
 namespace FFImageLoading.Forms
 {
@@ -124,7 +123,7 @@ namespace FFImageLoading.Forms
                     return new DataUrlImageSource(uriImageSource.Uri.OriginalString);
             }
             
-            return newValue as ImageSource;;
+            return newValue as ImageSource;
         }
 
         /// <summary>
@@ -568,33 +567,13 @@ namespace FFImageLoading.Forms
             if (desiredWidth == 0 || desiredHeight == 0)
                 return new SizeRequest(new Size(0, 0));
 
-
-            if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
-            {
-                return new SizeRequest(new Size(desiredWidth, desiredHeight));
-            }
-
-            if (double.IsPositiveInfinity(widthConstraint))
-            {
-                double factor = heightConstraint / desiredHeight;
-                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-            }
-
-            if (double.IsPositiveInfinity(heightConstraint))
-            {
-                double factor = widthConstraint / desiredWidth;
-                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-            }
-
-            //TODO It's a breaking change, so change it in major version
             if (FixedOnMeasureBehavior)
             {
-
                 double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
                 double constraintAspect = widthConstraint / heightConstraint;
+
                 double width = desiredWidth;
                 double height = desiredHeight;
-
                 if (constraintAspect > desiredAspect)
                 {
                     // constraint area is proportionally wider than image
@@ -635,6 +614,23 @@ namespace FFImageLoading.Forms
                 }
 
                 return new SizeRequest(new Size(width, height));
+            }
+
+            if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
+            {
+                return new SizeRequest(new Size(desiredWidth, desiredHeight));
+            }
+
+            if (double.IsPositiveInfinity(widthConstraint))
+            {
+                double factor = heightConstraint / desiredHeight;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+            }
+
+            if (double.IsPositiveInfinity(heightConstraint))
+            {
+                double factor = widthConstraint / desiredWidth;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
             }
 
             double fitsWidthRatio = widthConstraint / desiredWidth;
