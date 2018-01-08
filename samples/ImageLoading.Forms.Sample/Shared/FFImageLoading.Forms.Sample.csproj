@@ -179,6 +179,10 @@
       <DependentUpon>CachedImageSizingTestPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\CachedImageSizingTestPageModel.cs" />
+    <Compile Include="Pages\SvgReplacePage.xaml.cs">
+      <DependentUpon>SvgReplacePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\SvgReplacePageModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -303,6 +307,10 @@
     <EmbeddedResource Include="Pages\CachedImageSizingTestPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Pages\SvgReplacePage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\replace.svg" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

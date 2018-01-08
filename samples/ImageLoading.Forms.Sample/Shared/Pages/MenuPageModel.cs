@@ -258,6 +258,15 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
+                new MenuItem() {
+                    Section = "File formats",
+                    Title = "SVG replace map example",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<SvgReplacePageModel>();
+                    })
+                },
+
                 new MenuItem()
                 {
                     Section = "File formats",
