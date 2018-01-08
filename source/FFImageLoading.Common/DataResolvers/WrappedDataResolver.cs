@@ -46,7 +46,7 @@ namespace FFImageLoading.DataResolvers
                 if (resolved.ImageInformation.Type == ImageInformation.ImageType.Unknown)
                 {
                     //READ HEADER
-                    const int headerLength = 8;
+                    const int headerLength = 4;
                     byte[] header = new byte[headerLength];
                     int offset = 0;
                     while (offset < headerLength)

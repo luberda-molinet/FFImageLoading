@@ -175,6 +175,10 @@
     <Compile Include="Pages\ByteArrayListPageCell.xaml.cs">
       <DependentUpon>ByteArrayListPageCell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\XmlSamplePageModel.cs" />
+    <Compile Include="Pages\XmlSamplePage.xaml.cs">
+      <DependentUpon>XmlSamplePage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -294,6 +298,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Pages\ByteArrayListPageCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pages\XmlSamplePage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

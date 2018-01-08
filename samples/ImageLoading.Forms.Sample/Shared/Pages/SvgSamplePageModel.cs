@@ -10,6 +10,6 @@ namespace FFImageLoading.Forms.Sample
         {
         }
 
-        public string Source { get; set; } = "sample.svg";
+        public string Source { get; set; } = "sample";
     }
 }

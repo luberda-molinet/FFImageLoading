@@ -16,7 +16,7 @@ namespace FFImageLoading.Helpers
         static readonly byte[] _tiff = new byte[] { 73, 73, 42 };
         static readonly byte[] _tiff2 = new byte[] { 77, 77, 42 };
         static readonly byte[] _ico = new byte[] { 00, 00, 01, 00 };
-        static readonly byte[] _xml = new byte[] { 3, 0, 8, 0, 16, 7, 0, 0 };
+        static readonly byte[] _xml = new byte[] { 3, 0, 8, 0 };
 
         public static ImageInformation.ImageType GetImageType(byte[] header)
         {
