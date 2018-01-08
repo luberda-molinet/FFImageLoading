@@ -121,6 +121,7 @@
     <Compile Include="Decoders\GifDecoder.cs" />
     <Compile Include="Decoders\BaseDecoder.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
+    <Compile Include="Decoders\XmlDecoder.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

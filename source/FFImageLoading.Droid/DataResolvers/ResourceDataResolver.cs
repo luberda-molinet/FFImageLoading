@@ -34,7 +34,10 @@ namespace FFImageLoading.DataResolvers
             if (stream == null)
                 throw new FileNotFoundException(identifier);
 
-            var imageInformation = new ImageInformation();
+            var imageInformation = new ImageInformation
+            {
+                AndroidResourceId = resourceId
+            };
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(identifier);
 

@@ -1171,6 +1171,7 @@ namespace FFImageLoading.Forms
                 imageLoader.Delay(LoadingDelay.Value);
             }
 
+            imageLoader.WithSizeRequest((int)WidthRequest, (int)HeightRequest);
             imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
             imageLoader.DownloadProgress((progress) => OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
             imageLoader.FileWriteFinished((fileWriteInfo) => OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));

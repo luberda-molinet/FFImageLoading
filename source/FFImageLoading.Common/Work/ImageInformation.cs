@@ -59,6 +59,8 @@ namespace FFImageLoading.Work
 
         public ImageType Type { get; private set; }
 
+        internal int AndroidResourceId { get; set; }
+
         internal string BaseKey
         {
             get
@@ -80,7 +82,8 @@ namespace FFImageLoading.Work
             PNG,
             WEBP,
             SVG,
-            ICO
+            ICO,
+            XML
         }
     }
 }

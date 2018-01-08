@@ -115,6 +115,9 @@ namespace FFImageLoading
                 case ImageInformation.ImageType.GIF:
                     return new GifDecoder();
 
+                case ImageInformation.ImageType.XML:
+                    return new XmlDecoder();
+
                 default:
                     return new BaseDecoder();
             }
