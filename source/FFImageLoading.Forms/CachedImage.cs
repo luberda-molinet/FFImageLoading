@@ -92,7 +92,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The source property.
         /// </summary>
-        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, coerceValue: CoerceImageSource, propertyChanged: OnSourcePropertyChanged);
+        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, coerceValue: CoerceImageSource, propertyChanged: OnSourcePropertyChanged);
 
         static object CoerceImageSource(BindableObject bindable, object newValue)
         {
@@ -122,7 +122,7 @@ namespace FFImageLoading.Forms
                 if (uriImageSource.Uri.OriginalString.IsDataUrl())
                     return new DataUrlImageSource(uriImageSource.Uri.OriginalString);
             }
-            
+
             return newValue as ImageSource;
         }
 
@@ -682,7 +682,8 @@ namespace FFImageLoading.Forms
             if (InternalGetImageAsJPG == null)
                 return null;
 
-            return InternalGetImageAsJPG(new GetImageAsJpgArgs() {
+            return InternalGetImageAsJPG(new GetImageAsJpgArgs()
+            {
                 Quality = quality,
                 DesiredWidth = desiredWidth,
                 DesiredHeight = desiredHeight,
@@ -700,7 +701,8 @@ namespace FFImageLoading.Forms
             if (InternalGetImageAsPNG == null)
                 return null;
 
-            return InternalGetImageAsPNG(new GetImageAsPngArgs() {
+            return InternalGetImageAsPNG(new GetImageAsPngArgs()
+            {
                 DesiredWidth = desiredWidth,
                 DesiredHeight = desiredHeight,
             });
@@ -725,7 +727,7 @@ namespace FFImageLoading.Forms
 
             var embResourceSource = source as EmbeddedResourceImageSource;
             if (embResourceSource != null)
-              await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
+                await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -1052,7 +1054,7 @@ namespace FFImageLoading.Forms
             // ErrorPlaceholder
             if (ErrorPlaceholder != null)
             {
-                
+
                 if (errorPlaceholderSource != null)
                     imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
             }
@@ -1167,7 +1169,7 @@ namespace FFImageLoading.Forms
                 imageLoader.Delay(LoadingDelay.Value);
             }
 
-            imageLoader.WithSizeRequest((int)WidthRequest, (int)HeightRequest);
+            imageLoader.WithSizeRequest(DesiredWidth, DesiredHeight);
             imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(new CachedImageEvents.DownloadStartedEventArgs(downloadInformation)));
             imageLoader.DownloadProgress((progress) => OnDownloadProgress(new CachedImageEvents.DownloadProgressEventArgs(progress)));
             imageLoader.FileWriteFinished((fileWriteInfo) => OnFileWriteFinished(new CachedImageEvents.FileWriteFinishedEventArgs(fileWriteInfo)));
@@ -1177,6 +1179,18 @@ namespace FFImageLoading.Forms
 
             SetupOnBeforeImageLoading(imageLoader);
         }
+
+        private int DesiredWidth => (int)(WidthRequest > 0
+        ? WidthRequest
+            : MinimumWidthRequest > 0
+        ? MinimumWidthRequest
+            : 0);
+
+        private int DesiredHeight => (int)(HeightRequest > 0
+        ? HeightRequest
+            : MinimumHeightRequest > 0
+        ? MinimumHeightRequest
+           : 0);
     }
 }
 
