@@ -19,6 +19,7 @@ namespace FFImageLoading.Svg.Forms
     {
         public static void Init()
         {
+            var ignore = typeof(SvgCachedImage);
         }
 
         /// <summary>

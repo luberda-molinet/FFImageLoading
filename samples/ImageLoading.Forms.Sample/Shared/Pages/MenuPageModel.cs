@@ -103,6 +103,15 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
+                new MenuItem() {
+                    Section = "Advanced",
+                    Title = "CachedImage sizing test",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<CachedImageSizingTestPageModel>();
+                    })
+                },
+
                 //new MenuItem() {
                 //	Section = "Advanced",
                 //	Title = "Stream with custom cache key example",
@@ -257,6 +266,15 @@ namespace FFImageLoading.Forms.Sample
                     Command = new BaseCommand(async (param) =>
                     {
                         await this.PushPageFromCacheAsync<SvgListHeavyPageModel>(pm => pm.Reload());
+                    })
+                },
+
+                new MenuItem() {
+                    Section = "File formats",
+                    Title = "SVG replace map example",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<SvgReplacePageModel>();
                     })
                 },
 

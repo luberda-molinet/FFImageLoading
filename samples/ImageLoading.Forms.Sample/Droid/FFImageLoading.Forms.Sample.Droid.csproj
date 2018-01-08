@@ -193,6 +193,9 @@
     <AndroidResource Include="Resources\layout\toolbar.axml" />
     <AndroidResource Include="Resources\drawable\testimage.xml" />
     <AndroidResource Include="Resources\drawable\testimage2.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_star_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_star_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_star_black_24dp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
