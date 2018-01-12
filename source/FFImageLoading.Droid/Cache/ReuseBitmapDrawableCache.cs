@@ -226,6 +226,9 @@ namespace FFImageLoading.Cache
             {
                 total_removed++;
 
+                if (value?.Bitmap == null || value.Bitmap.Handle == IntPtr.Zero)
+                    return;
+
                 // We only really care about evictions because we do direct Remove()als
                 // all the time when promoting to the displayed_cache. Only when the
                 // entry has been evicted is it truly not longer being held by us.
