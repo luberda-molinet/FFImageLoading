@@ -30,7 +30,7 @@ namespace FFImageLoading.Svg.Platform
 
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
         private readonly Dictionary<string, object> fills = new Dictionary<string, object>();
-        private Dictionary<string, string> styles;
+        private readonly Dictionary<string, string> styles = new Dictionary<string, string>();
         private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
         {
             DtdProcessing = DtdProcessing.Ignore,
@@ -127,6 +127,22 @@ namespace FFImageLoading.Svg.Platform
             return new XmlParserContext(null, manager, null, XmlSpace.None);
         }
 
+        private void ReadDefsStyles(XElement root)
+        {
+            var defs = root.Descendants().FirstOrDefault(x => x.Name.LocalName == "defs");
+            if (defs == null)
+                return;
+            foreach (var style in defs.Descendants().Where(x => x.Name.LocalName == "style"))
+            {
+                string stringStyle = style.Value.Trim();
+                if (stringStyle == "")
+                    continue;
+                int valueStart = stringStyle.IndexOf("{");
+                var styleName = stringStyle.Substring(0, valueStart);
+                styles[styleName] = stringStyle.Substring(valueStart + 1, stringStyle.Length - valueStart - 2).Trim();
+            }
+        }
+
         private SKPicture Load(XDocument xdoc)
         {
             var svg = xdoc.Root;
@@ -139,6 +155,8 @@ namespace FFImageLoading.Svg.Platform
                 if (!string.IsNullOrEmpty(id))
                     defs[id] = ReadDefinition(d);
             }
+
+            ReadDefsStyles(svg);
 
             Version = svg.Attribute("version")?.Value;
             Title = svg.Element(ns + "title")?.Value;
@@ -266,7 +284,8 @@ namespace FFImageLoading.Svg.Platform
             {
                 case "style":
                     {
-                        styles = CssHelpers.ParseSelectors(e.Value);
+                        foreach (var st in CssHelpers.ParseSelectors(e.Value))
+                            styles[st.Key] = st.Value;
                         break;
                     }
                 case "image":
