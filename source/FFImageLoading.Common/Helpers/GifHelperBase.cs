@@ -548,7 +548,7 @@ namespace FFImageLoading
                 dispose = 1; // elect to keep old image if discretionary
             }
             transparency = (packed & 1) != 0;
-            delay = Math.Max(100, ReadShort() * 10); // delay in milliseconds
+            delay = Math.Max(10, ReadShort() * 10); // delay in milliseconds, enforcing min 10ms framerate
 
             transIndex = Read(); // transparent color index
             Read(); // block terminator
