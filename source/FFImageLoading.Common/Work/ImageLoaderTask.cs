@@ -84,7 +84,7 @@ namespace FFImageLoading.Work
             }
 
             if (string.IsNullOrWhiteSpace(KeyRaw))
-                KeyRaw = Guid.NewGuid().ToString("N");
+                throw new Exception("Key cannot be null");
 
             var vect = Parameters.CustomDataResolver as IVectorDataResolver;
             if (vect != null)
