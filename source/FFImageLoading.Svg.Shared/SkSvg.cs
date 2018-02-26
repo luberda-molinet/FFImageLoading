@@ -134,12 +134,8 @@ namespace FFImageLoading.Svg.Platform
                 return;
             foreach (var style in defs.Descendants().Where(x => x.Name.LocalName == "style"))
             {
-                string stringStyle = style.Value.Trim();
-                if (stringStyle == "")
-                    continue;
-                int valueStart = stringStyle.IndexOf("{");
-                var styleName = stringStyle.Substring(0, valueStart);
-                styles[styleName] = stringStyle.Substring(valueStart + 1, stringStyle.Length - valueStart - 2).Trim();
+                foreach (var st in CssHelpers.ParseSelectors(style.Value))
+                    styles[st.Key] = st.Value;
             }
         }
 
@@ -286,6 +282,7 @@ namespace FFImageLoading.Svg.Platform
                     {
                         foreach (var st in CssHelpers.ParseSelectors(e.Value))
                             styles[st.Key] = st.Value;
+                        
                         break;
                     }
                 case "image":
@@ -298,7 +295,7 @@ namespace FFImageLoading.Svg.Platform
                             var width = ReadNumber(e.Attribute("width"));
                             var height = ReadNumber(e.Attribute("height"));
 
-                            if (uri.StartsWith("data:"))
+                            if (uri.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
                             {
                                 var bytes = ReadBytes(uri);
                                 using (var data = SKData.CreateCopy(bytes))

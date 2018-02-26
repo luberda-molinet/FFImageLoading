@@ -9,6 +9,9 @@ namespace FFImageLoading.Svg.Platform
     {
         public static Dictionary<string, string> ParseSelectors(string css)
         {
+            if (string.IsNullOrWhiteSpace(css))
+                return new Dictionary<string, string>();
+
             return
                 Regex
                     .Matches(css.Minify(), @"(?<selectors>[a-z0-9_\-\.,\s#]+)\s*{(?<declarations>.+?)}", RegexOptions.IgnoreCase)
@@ -23,6 +26,6 @@ namespace FFImageLoading.Svg.Platform
                     .ToDictionary(x => x.Key, x => x.Value);
         }
 
-        static string Minify(this string css) => Regex.Replace(css, @"(\r\n|\r|\n)", string.Empty);
+        static string Minify(this string css) => Regex.Replace(css, @"(\r\n|\r|\n)", string.Empty).Trim();
     }
 }
