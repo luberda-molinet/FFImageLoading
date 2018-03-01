@@ -28,6 +28,8 @@ SVG support for FFImageLoading library.
 
             <group targetFramework="uap">
                 <dependency id="NETStandard.Library" version="1.6.1" />
+                <dependency id="Xamarin.FFImageLoading" version="@version" />
+                <dependency id="SkiaSharp" version="1.59.1" />                
             </group>                       
 
         </dependencies>
