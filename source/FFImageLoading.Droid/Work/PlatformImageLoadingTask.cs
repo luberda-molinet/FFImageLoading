@@ -149,10 +149,10 @@ namespace FFImageLoading
                         if (old != null && old.Handle != IntPtr.Zero && !old.IsRecycled && old != bitmap && old.Handle != bitmap.Handle)
                         {
                             // Adding to pool gives us a better performance
-                            ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(old) { InCacheKey = Guid.NewGuid().ToString() });
-                            // Old and less efficient:
-                            //old?.Recycle();
-                            //old.TryDispose();
+                            // ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(old) { InCacheKey = Guid.NewGuid().ToString() });
+                            // Disabled as it caused OOM exceptions / extensive memory usage on older devices, in favor of this:
+                            old?.Recycle();
+                            old.TryDispose();
                         }
                     }
                 }
