@@ -77,6 +77,11 @@ namespace FFImageLoading.Cross
             int height = (int)this.Height;                
 #endif
 
+            if (width > height)
+                height = 0;
+            else
+                width = 0;
+
             if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.IsSvgFileUrl()) || ImageStream != null)
             {
                 imageLoader.WithCustomDataResolver(new SvgDataResolver(width, height, true, ReplaceStringMap));

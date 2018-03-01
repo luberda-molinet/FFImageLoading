@@ -123,7 +123,7 @@ namespace FFImageLoading.Svg.Platform
             double sizeX = 0;
             double sizeY = 0;
 
-            if (VectorWidth == 0 && VectorHeight == 0)
+            if (VectorWidth <= 0 && VectorHeight <= 0)
             {
                 if (picture.CullRect.Width > 0)
                     sizeX = picture.CullRect.Width;

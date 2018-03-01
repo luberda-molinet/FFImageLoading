@@ -1061,17 +1061,42 @@ namespace FFImageLoading.Forms
             var vect1 = Source as IVectorImageSource;
             var vect2 = LoadingPlaceholder as IVectorImageSource;
             var vect3 = ErrorPlaceholder as IVectorImageSource;
-            if (vect1 != null)
+
+            if (vect1 != null || vect2 != null || vect3 != null)
             {
-                imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
-            }
-            if (vect2 != null)
-            {
-                imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
-            }
-            if (vect3 != null)
-            {
-                imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+                int width = (int)((Width > 0 && !double.IsPositiveInfinity(Width)) ? Width 
+                                  : ((WidthRequest > 0 && !double.IsPositiveInfinity(WidthRequest)) ? WidthRequest : 0));
+                
+                int height = (int)((Height > 0 && !double.IsPositiveInfinity(Height)) ? Height 
+                                   : ((HeightRequest > 0 && !double.IsPositiveInfinity(HeightRequest)) ? HeightRequest : 0));
+
+                if (vect1 != null)
+                {
+                    if (vect1.VectorWidth > vect1.VectorHeight)
+                        vect1.VectorHeight = 0;
+                    else
+                        vect1.VectorWidth = 0;
+
+                    imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
+                }
+                if (vect2 != null)
+                {
+                    if (vect2.VectorWidth > vect2.VectorHeight)
+                        vect2.VectorHeight = 0;
+                    else
+                        vect2.VectorWidth = 0;
+
+                    imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
+                }
+                if (vect3 != null)
+                {
+                    if (vect3.VectorWidth > vect3.VectorHeight)
+                        vect3.VectorHeight = 0;
+                    else
+                        vect3.VectorWidth = 0;
+
+                    imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+                }
             }
             if (CustomDataResolver != null)
             {
