@@ -249,6 +249,17 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
+                (Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.Android 
+                 ? new MenuItem() {
+                    Section = "File formats",
+                    Title = "Simple XML example",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<XmlSamplePageModel>();
+                    })
+                } 
+                 : null),
+
                 new MenuItem() {
                     Section = "File formats",
                     Title = "Heavy SVG List example",
@@ -290,7 +301,7 @@ namespace FFImageLoading.Forms.Sample
                 },
             };
 
-            var sorted = menuItems
+            var sorted = menuItems.Where(i => i != null)
                 .GroupBy(item => item.Section)
                 .Select(itemGroup => new Grouping<string, MenuItem>(itemGroup.Key, itemGroup));
 

@@ -269,7 +269,10 @@ namespace FFImageLoading.Work
 
         protected abstract Task SetTargetAsync(TImageContainer image, bool animated);
 
-        protected virtual void BeforeLoading(TImageContainer image, bool fromMemoryCache) { }
+        protected virtual void BeforeLoading(TImageContainer image, bool fromMemoryCache) 
+        {
+            
+        }
 
         protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
 
@@ -380,13 +383,19 @@ namespace FFImageLoading.Work
             return false;
         }
 
-        async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated, bool isLoadingPlaceholder)
+        async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated, bool isLoadingPlaceholder, bool canGetInfoRecursively = true)
         {
             var found = MemoryCache.Get(key);
             if (found?.Item1 != null)
             {
                 try
                 {
+                    var info = found.Item2;
+                    if(info.Type == ImageInformation.ImageType.XML && canGetInfoRecursively)
+                    {
+                        return await TryLoadFromMemoryCacheAsync($"{key}_{Parameters.WidthRequest}_{Parameters.HeightRequest}", updateImageInformation, animated, isLoadingPlaceholder, false);
+                    }
+
                     BeforeLoading(found.Item1, true);
 
                     if (isLoadingPlaceholder)
@@ -415,7 +424,7 @@ namespace FFImageLoading.Work
         {
             if (Parameters.Preload)
                 return;
-
+            
             if (!await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
             {
                 try
@@ -461,7 +470,10 @@ namespace FFImageLoading.Work
                         }
 
                         if (loadImage != default(TImageContainer))
+                        {
                             MemoryCache.Add(key, loadImageData.ImageInformation, loadImage);
+                            MemoryCache.Add($"{key}_{Parameters.WidthRequest}_{Parameters.HeightRequest}", loadImageData.ImageInformation, loadImage);
+                        }
                     }
                     finally
                     {
@@ -561,7 +573,10 @@ namespace FFImageLoading.Work
                         BeforeLoading(image, false);
 
                         if (image != default(TImageContainer) && CanUseMemoryCache)
+                        {
                             MemoryCache.Add(Key, imageData.ImageInformation, image);
+                            MemoryCache.Add($"{Key}_{Parameters.WidthRequest}_{Parameters.HeightRequest}", imageData.ImageInformation, image);
+                        }
 
                         ThrowIfCancellationRequested();
 

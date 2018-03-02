@@ -9,12 +9,14 @@ using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using FFImageLoading.Config;
 using FFImageLoading.Extensions;
+using Android.Graphics.Drawables;
+using Android.Content;
 
 namespace FFImageLoading.Decoders
 {
     public class BaseDecoder : IDecoder<Bitmap>
     {
-        public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream imageData, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
+        public virtual async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream imageData, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
             BitmapFactory.Options options = null;
             Bitmap bitmap = null;
@@ -143,7 +145,7 @@ namespace FFImageLoading.Decoders
 
             if (reqHeight == 0)
                 reqHeight = (int)((reqWidth / width) * height);
-            
+
             double inSampleSize = 1d;
 
             if (height > reqHeight || width > reqWidth || allowUpscale)

@@ -177,6 +177,10 @@ namespace FFImageLoading.Work
 
         public int? DelayInMs { get; private set; }
 
+        internal int WidthRequest { get; private set; }
+
+        internal int HeightRequest { get; private set; }
+
         bool preload;
         public bool Preload
         {
@@ -532,6 +536,14 @@ namespace FFImageLoading.Work
                 throw new ArgumentNullException(nameof(action));
 
             OnFileWriteFinished = action;
+            return this;
+        }
+
+        // Use for customizing android's xml images size
+        public TaskParameter WithSizeRequest(int width = 0, int height = 0)
+        {
+            WidthRequest = width;
+            HeightRequest = height;
             return this;
         }
 
