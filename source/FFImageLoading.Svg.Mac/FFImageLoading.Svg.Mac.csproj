@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="SkiaSharp">
-      <HintPath>..\..\packages\SkiaSharp.1.59.3\lib\XamarinMac\SkiaSharp.dll</HintPath>
+      <HintPath>..\..\packages\SkiaSharp.1.60.0\lib\XamarinMac\SkiaSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

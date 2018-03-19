@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>tizen40</TargetFramework>
+    <TargetFramework>tizen4.0</TargetFramework>
     <TizenCreateTpkOnBuild>false</TizenCreateTpkOnBuild>
     <AssemblyName>FFImageLoading.Svg.Platform</AssemblyName>
     <RootNamespace>FFImageLoading.Svg.Platform</RootNamespace>
@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Tizen.NET" Version="4.0.0" />
-    <PackageReference Include="SkiaSharp" Version="1.59.3" />
+    <PackageReference Include="SkiaSharp" Version="1.60.0" />
   </ItemGroup>
 
   <ItemGroup>

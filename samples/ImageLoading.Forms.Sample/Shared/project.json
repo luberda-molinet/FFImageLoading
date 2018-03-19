@@ -2,9 +2,9 @@
   "dependencies": {
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
     "NETStandard.Library": "2.0.1",
-    "PropertyChanged.Fody": "2.2.4",
-    "SkiaSharp": "1.59.3",
-    "Xamarin.Forms": "2.5.0.121934",
+    "PropertyChanged.Fody": "2.2.9",
+    "SkiaSharp": "1.60.0",
+    "Xamarin.Forms": "2.5.0.280555",
     "Xamvvm.Forms": "1.0.4"
   },
   "frameworks": {

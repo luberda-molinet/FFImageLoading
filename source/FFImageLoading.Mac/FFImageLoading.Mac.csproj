@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Net.Http" />
     <Reference Include="WebP.Mac">
-      <HintPath>..\..\packages\WebP.Touch.1.0.7\lib\Xamarin.Mac20\WebP.Mac.dll</HintPath>
+      <HintPath>..\..\packages\WebP.Touch.1.0.8\lib\Xamarin.Mac20\WebP.Mac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
