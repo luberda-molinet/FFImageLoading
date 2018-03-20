@@ -19,9 +19,9 @@ namespace FFImageLoading.Forms.Tizen
 
         IVisualElementController ElementController => Element as IVisualElementController;
 
-        public static void Init(CoreApplication application)
+        public static void Init(FormsApplication application)
         {
-            ImageService.MainWindowProvider = () => application;
+            ImageService.MainWindowProvider = () => application.MainWindow;
         }
 
         SizeRequest IVisualElementRenderer.GetDesiredSize(double widthConstraint, double heightConstraint)
