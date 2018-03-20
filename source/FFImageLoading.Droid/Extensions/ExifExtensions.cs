@@ -1,6 +1,5 @@
 ﻿using System;
 using Android.Graphics;
-using Android.Support.Media;
 using System.IO;
 
 namespace FFImageLoading.Extensions
