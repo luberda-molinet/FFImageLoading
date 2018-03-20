@@ -7,30 +7,31 @@ namespace FFImageLoading.Extensions
 {
     public static class ExifExtensions
     {
-        public static int GetExifRotationDegrees(this Stream stream)
-        {
-            int rotation = 0;
-            var exifInt = new ExifInterface(stream);
-
-            int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, ExifInterface.OrientationNormal);
-
-            switch (exifRotation)
-            {
-                case ExifInterface.OrientationRotate270:
-                    rotation = 270;
-                    break;
-                case ExifInterface.OrientationRotate180:
-                    rotation = 180;
-                    break;
-                case ExifInterface.OrientationRotate90:
-                    rotation = 90;
-                    break;
-                default:
-                    return 0;
-            }
-
-            return rotation;
-        }
+        //public static int GetExifRotationDegrees(this Stream stream)
+        //{
+        //  int rotation = 0;
+        //
+        //	var exifInt = new ExifInterface(stream);
+        //
+        //	int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, ExifInterface.OrientationNormal);
+        //
+        //	switch (exifRotation)
+        //	{
+        //		case ExifInterface.OrientationRotate270:
+        //			rotation = 270;
+        //			break;
+        //		case ExifInterface.OrientationRotate180:
+        //			rotation = 180;
+        //			break;
+        //		case ExifInterface.OrientationRotate90:
+        //			rotation = 90;
+        //			break;
+        //		default:
+        //          rotation = 0;
+        //          break;
+        //	}
+        //	return rotation;
+        //}
 
         public static Bitmap ToRotatedBitmap(this Bitmap sourceBitmap, int rotationDegrees)
         {

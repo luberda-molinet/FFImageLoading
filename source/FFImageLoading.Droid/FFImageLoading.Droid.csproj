@@ -70,12 +70,6 @@
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.IO" />
     <Reference Include="System.Collections" />
-    <Reference Include="Xamarin.Android.Support.Annotations">
-      <HintPath>..\..\packages\Xamarin.Android.Support.Annotations.27.0.2\lib\MonoAndroid81\Xamarin.Android.Support.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Android.Support.Exif">
-      <HintPath>..\..\packages\Xamarin.Android.Support.Exif.27.0.2\lib\MonoAndroid81\Xamarin.Android.Support.Exif.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
@@ -143,9 +137,4 @@
   <ItemGroup>
     <Folder Include="Decoders\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="..\..\packages\Xamarin.Android.Support.Annotations.27.0.2\build\MonoAndroid81\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.Annotations.27.0.2\build\MonoAndroid81\Xamarin.Android.Support.Annotations.targets')" />
-  <Import Project="..\..\packages\Xamarin.Android.Support.Exif.27.0.2\build\MonoAndroid81\Xamarin.Android.Support.Exif.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.Exif.27.0.2\build\MonoAndroid81\Xamarin.Android.Support.Exif.targets')" />
 </Project>

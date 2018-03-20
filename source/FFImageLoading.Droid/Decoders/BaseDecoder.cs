@@ -9,6 +9,8 @@ using FFImageLoading.Cache;
 using FFImageLoading.Helpers;
 using FFImageLoading.Config;
 using FFImageLoading.Extensions;
+using System.Linq;
+using FFImageLoading.Helpers.Exif;
 
 namespace FFImageLoading.Decoders
 {
@@ -53,11 +55,32 @@ namespace FFImageLoading.Decoders
             int exifRotation = 0;
 
             if ((source == ImageSource.Filepath || source == ImageSource.Stream || source == ImageSource.Url)
-                && imageInformation.Type != ImageInformation.ImageType.SVG)
+                && imageInformation.Type != ImageInformation.ImageType.SVG && imageInformation.Exif != null)
             {
                 try
                 {
-                    exifRotation = imageData.GetExifRotationDegrees();
+                    var ifd0 = imageInformation.Exif.FirstOrDefault(v => v.HasTagName(ExifDirectoryBase.TagOrientation));
+                    var orientationTag = ifd0?.Tags?.FirstOrDefault(v => v.Type == ExifDirectoryBase.TagOrientation);
+                    int.TryParse(orientationTag?.Value, out var orientationValue);
+
+                    if (orientationValue > 0)
+                    {
+                        // 90 = 6, 180 = 3, and 270 = 8
+                        switch (orientationValue)
+                        {
+                            case 3:
+                                exifRotation = 180;
+                                break;
+
+                            case 6:
+                                exifRotation = 90;
+                                break;
+
+                            case 8:
+                                exifRotation = 270;
+                                break;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

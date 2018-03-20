@@ -58,6 +58,13 @@ namespace FFImageLoading.DataResolvers
                     resolved.Stream.Position = 0;
                     resolved.ImageInformation.SetType(FileHeader.GetImageType(header));
                 }
+
+                if (resolved.ImageInformation.Type == ImageInformation.ImageType.JPEG)
+                {
+                    var exif = ExifHelper.Read(resolved.Stream);
+                    resolved.Stream.Position = 0;
+                    resolved.ImageInformation.SetExif(exif);
+                }
             }
 
             return resolved;

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FFImageLoading.Helpers.Exif;
 
 namespace FFImageLoading.Work
 {
@@ -40,6 +42,13 @@ namespace FFImageLoading.Work
         {
             Type = type;
         }
+
+        internal void SetExif(IList<Directory> exif)
+        {
+            Exif = exif;
+        }
+
+        public IList<Directory> Exif { get; private set;  }
 
         public int CurrentWidth { get; private set; }
 

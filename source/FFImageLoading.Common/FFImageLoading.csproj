@@ -138,6 +138,29 @@
     <Compile Include="Decoders\IAnimatedImage.cs" />
     <Compile Include="Decoders\AnimatedImage.cs" />
     <Compile Include="Work\DataResolverResult.cs" />
+    <Compile Include="Helpers\ExifHelper.cs" />
+    <Compile Include="Helpers\Exif\IndexedReader.cs" />
+    <Compile Include="Helpers\Exif\TiffReader.cs" />
+    <Compile Include="Helpers\Exif\ITiffHandler.cs" />
+    <Compile Include="Helpers\Exif\TiffDataFormat.cs" />
+    <Compile Include="Helpers\Exif\StringValue.cs" />
+    <Compile Include="Helpers\Exif\Rational.cs" />
+    <Compile Include="Helpers\Exif\Directory.cs" />
+    <Compile Include="Helpers\Exif\Tag.cs" />
+    <Compile Include="Helpers\Exif\ITagDescriptor.cs" />
+    <Compile Include="Helpers\Exif\DirectoryTiffHandler.cs" />
+    <Compile Include="Helpers\Exif\ExifTiffHandler.cs" />
+    <Compile Include="Helpers\Exif\ExifIfd0Directory.cs" />
+    <Compile Include="Helpers\Exif\ExifIfd0Descriptor.cs" />
+    <Compile Include="Helpers\Exif\TagDescriptor.cs" />
+    <Compile Include="Helpers\Exif\DirectoryExtensions.cs" />
+    <Compile Include="Helpers\Exif\ExifSubIfdDescriptor.cs" />
+    <Compile Include="Helpers\Exif\ExifSubIfdDirectory.cs" />
+    <Compile Include="Helpers\Exif\ExifReader.cs" />
+    <Compile Include="Helpers\Exif\ByteArrayReader.cs" />
+    <Compile Include="Helpers\Exif\JpegSegmentReader.cs" />
+    <Compile Include="Helpers\Exif\SequentialReader.cs" />
+    <Compile Include="Helpers\Exif\SequentialStreamReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>
@@ -165,6 +188,7 @@
     <Folder Include="Args\" />
     <Folder Include="DataResolvers\" />
     <Folder Include="Decoders\" />
+    <Folder Include="Helpers\Exif\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
