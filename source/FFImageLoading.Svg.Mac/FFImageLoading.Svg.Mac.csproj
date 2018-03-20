@@ -76,4 +76,5 @@
   </ItemGroup>
   <Import Project="..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
+  <Target Name="_VerifyBuildSignature" />    
 </Project>
