@@ -7,6 +7,7 @@ using FFImageLoading.Extensions;
 using FFImageLoading.Forms.Args;
 using FFImageLoading.Work;
 using FFImageLoading.Views;
+using Tizen.Applications;
 
 [assembly: ExportRenderer(typeof(FFImageLoading.Forms.CachedImage), typeof(FFImageLoading.Forms.Tizen.CachedImageRenderer))]
 
@@ -18,9 +19,9 @@ namespace FFImageLoading.Forms.Tizen
 
         IVisualElementController ElementController => Element as IVisualElementController;
 
-        public static void Init()
+        public static void Init(CoreApplication application)
         {
-            ImageService.MainWindowProvider = () => Xamarin.Forms.Platform.Tizen.Forms.Context.MainWindow;
+            ImageService.MainWindowProvider = () => application;
         }
 
         SizeRequest IVisualElementRenderer.GetDesiredSize(double widthConstraint, double heightConstraint)
@@ -38,7 +39,7 @@ namespace FFImageLoading.Forms.Tizen
         {
             if (Control == null)
             {
-                SetNativeControl(new EvasImageContainer(Xamarin.Forms.Platform.Tizen.Forms.Context.MainWindow));
+                SetNativeControl(new EvasImageContainer(ImageService.MainWindowProvider()));
                 Control.SourceUpdated += OnSourceUpdated;
             }
 
