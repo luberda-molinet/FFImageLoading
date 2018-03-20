@@ -31,6 +31,7 @@ namespace FFImageLoading.Config
             VerboseLogging = false;
             SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 2d)));
             DiskCacheDuration = TimeSpan.FromDays(30d);
+            TryToReadDiskCacheDurationFromHttpHeaders = true;
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
             AnimateGifs = true;
@@ -219,6 +220,13 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The duration of the cache.</value>
         public TimeSpan DiskCacheDuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether try to read
+        /// disk cache duration from http headers .
+        /// </summary>
+        /// <value><c>true</c> if try to read disk cache duration from http headers; otherwise, <c>false</c>.</value>
+        public bool TryToReadDiskCacheDurationFromHttpHeaders { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether callbacs (OnFinish, OnSuccess, etc)

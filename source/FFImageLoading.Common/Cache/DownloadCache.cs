@@ -56,7 +56,7 @@ namespace FFImageLoading.Cache
             parameters.OnDownloadStarted?.Invoke(downloadInfo);
 
             var responseBytes = await Retry.DoAsync(
-                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters.OnDownloadProgress, parameters).ConfigureAwait(false),
+                async () => await DownloadAsync(url, token, configuration.HttpClient, parameters, downloadInfo).ConfigureAwait(false),
                 parameters.RetryDelayInMs > 0 ? TimeSpan.FromMilliseconds(parameters.RetryDelayInMs) : DelayBetweenRetry,
                 parameters.RetryCount,
                 () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace FFImageLoading.Cache
                     });
                 }
 
-                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, duration, finishedAction).ConfigureAwait(false);
+                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, downloadInfo.CacheValidity, finishedAction).ConfigureAwait(false);
             }
 
             token.ThrowIfCancellationRequested();
@@ -87,13 +87,21 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
+        [Obsolete("Use other override")]
+        protected virtual Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
+        {
+            return DownloadAsync(url, token, client, parameters, null);
+        }
+
+        protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, TaskParameter parameters, DownloadInformation downloadInformation)
         {
             if (!parameters.Preload)
             {
                 await Task.Delay(25);
                 token.ThrowIfCancellationRequested();
             }
+
+            var progressAction = parameters.OnDownloadProgress;
 
             using (var httpHeadersTimeoutTokenSource = new CancellationTokenSource())
             using (var headersTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpHeadersTimeoutTokenSource.Token))
@@ -130,6 +138,12 @@ namespace FFImageLoading.Cache
                         {
                             if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
                                 throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                        }
+
+                        if (!parameters.CacheDuration.HasValue && Configuration.TryToReadDiskCacheDurationFromHttpHeaders
+                            && response.Headers?.CacheControl?.MaxAge != null)
+                        {
+                            downloadInformation.CacheValidity = response.Headers.CacheControl.MaxAge.Value;
                         }
 
                         ModifyParametersAfterResponse(response, parameters);
