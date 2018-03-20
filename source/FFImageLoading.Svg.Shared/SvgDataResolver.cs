@@ -102,7 +102,7 @@ namespace FFImageLoading.Svg.Platform
                     foreach (var map in ReplaceStringMap
                              .Where(v => v.Key.StartsWith("regex:")))
                     {
-                        inputString = Regex.Replace(inputString, map.Key.Substring(0, 6), map.Value);
+                        inputString = Regex.Replace(inputString, map.Key.Substring(6), map.Value);
                     }
 
                     var builder = new StringBuilder(inputString);
