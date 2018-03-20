@@ -77,7 +77,7 @@ before_build:
     (Get-Content $nuspec5template).replace('@version', $version) | Set-Content $nuspec5
 
 test_script: 
- cmd: dotnet test source\Tests\FFImageLoading.Tests -c Release --no-build
+ cmd: dotnet test source\Tests\FFImageLoading.Tests -c Release --no-build --no-restore
 
 artifacts:
  - path: Xamarin.FFImageLoading.*.nupkg
