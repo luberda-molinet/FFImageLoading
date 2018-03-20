@@ -17,7 +17,7 @@ dotnet restore
 echo Building FFImageLoading...
 
 %msbuild% source/FFImageLoading.Common/FFImageLoading.csproj %buildargs%
-%msbuild% source/FFImageLoading.BaitAndSwitch/FFImageLoading.BaitAndSwitch.csproj %buildargs%
+%msbuild% source/FFImageLoading.Mock/FFImageLoading.Mock.csproj %buildargs%
 %msbuild% source/FFImageLoading.Windows/FFImageLoading.Windows.csproj %buildargs%
 %msbuild% source/FFImageLoading.Touch/FFImageLoading.Touch.csproj %buildargs%
 %msbuild% source/FFImageLoading.Mac/FFImageLoading.Mac.csproj %buildargsRelease%
