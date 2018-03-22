@@ -28,6 +28,8 @@ namespace FFImageLoading.Targets
                 control.Layer.Contents = null;
                 control.Image = image;
                 control.Animates = true;
+                control.NeedsLayout = true;
+                control.SetNeedsDisplay();
             }
             else
             {
@@ -35,10 +37,14 @@ namespace FFImageLoading.Targets
                 {
                     //TODO fade animation
                     control.Layer.Contents = image.CGImage;
+                    control.NeedsLayout = true;
+                    control.SetNeedsDisplay();
                 }
                 else
                 {
                     control.Layer.Contents = image.CGImage;
+                    control.NeedsLayout = true;
+                    control.SetNeedsDisplay();
                 }
             }
         }
