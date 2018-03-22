@@ -6,7 +6,7 @@ namespace FFImageLoading.Tests
     public class BaseTests
     {
         protected static Random _random = new Random();
-        protected const string RemoteImage = "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg";
+        protected const string RemoteImage = "https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg";
 
         protected static string[] Images = {
                 "https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg",
