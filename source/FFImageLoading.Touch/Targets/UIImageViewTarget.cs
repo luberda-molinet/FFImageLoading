@@ -20,6 +20,8 @@ namespace FFImageLoading.Targets
             if (control == null) return;
             if (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1))
                 return;
+
+            var isLayoutNeeded = IsLayoutNeeded(control.Image, image);
             
             var parameters = task.Parameters;
             if (animated)
@@ -37,8 +39,9 @@ namespace FFImageLoading.Targets
                             control.Image = null;
 
                         control.Image = image;
-                        control.SetNeedsLayout(); // It's needed for cells, etc
-                        // control.SetNeedsDisplay();
+
+                        if (isLayoutNeeded)
+                            control.SetNeedsLayout(); // It's needed for cells, etc
                     },
                     () => { });
             }
@@ -47,9 +50,29 @@ namespace FFImageLoading.Targets
                 if (control.Image?.Images != null && control.Image.Images.Length > 1)
                     control.Image = null;
                 control.Image = image;
-                control.SetNeedsLayout(); // It's needed for cells, etc
-                // control.SetNeedsDisplay();
+
+                if (isLayoutNeeded)
+                    control.SetNeedsLayout(); // It's needed for cells, etc
             }
+        }
+
+        bool IsLayoutNeeded(UIImage oldImage, UIImage newImage)
+        {
+            if (oldImage == null && newImage == null)
+                return false;
+
+            if (oldImage == null && newImage != null)
+                return true;
+
+            if (oldImage != null && newImage == null)
+                return true;
+
+            if (oldImage != null && newImage != null)
+            {
+                return !(oldImage.Size.Width == newImage.Size.Width && oldImage.Size.Height == newImage.Size.Height);
+            }
+
+            return false;
         }
 
         public override void SetAsEmpty(IImageLoaderTask task)
