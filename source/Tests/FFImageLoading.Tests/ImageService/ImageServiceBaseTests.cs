@@ -31,17 +31,17 @@ namespace FFImageLoading.Tests.ImageServiceTests
             Assert.NotNull(ImageService.Instance.Config);
         }
 
-        [Fact]
-        public async Task CanDownloadOnly()
-        {
-            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
-            await ImageService.Instance.LoadUrl(RemoteImage)
-                .DownloadOnlyAsync();
+        //[Fact]
+        //public async Task CanDownloadOnly()
+        //{
+  //          await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+        //	await ImageService.Instance.LoadUrl(RemoteImage)
+        //		.DownloadOnlyAsync();
 
-            var diskCacheKey = ImageService.Instance.Config.MD5Helper.MD5(RemoteImage);
-            var cachedDisk = await ImageService.Instance.Config.DiskCache.ExistsAsync(diskCacheKey);
-            Assert.True(cachedDisk);
-        }
+        //	var diskCacheKey = ImageService.Instance.Config.MD5Helper.MD5(RemoteImage);
+        //	var cachedDisk = await ImageService.Instance.Config.DiskCache.ExistsAsync(diskCacheKey);
+        //	Assert.True(cachedDisk);
+        //}
 
         [Fact]
         public async Task CanPreload()
