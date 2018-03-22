@@ -45,8 +45,32 @@ namespace FFImageLoading.Targets
             if (control == null || control.Drawable == image)
                 return;
 
+            var isLayoutNeeded = IsLayoutNeeded(control.Drawable, image);
+
             control.SetImageDrawable(image);
             control.Invalidate();
+
+            if (isLayoutNeeded)
+                control.RequestLayout();
+        }
+
+        bool IsLayoutNeeded(Drawable oldImage, Drawable newImage)
+        {
+            if (oldImage == null && newImage == null)
+                return false;
+
+            if (oldImage == null && newImage != null)
+                return true;
+
+            if (oldImage != null && newImage == null)
+                return true;
+
+            if (oldImage != null && newImage != null)
+            {
+                return !(oldImage.IntrinsicWidth == newImage.IntrinsicWidth && oldImage.IntrinsicHeight == newImage.IntrinsicHeight);
+            }
+
+            return false;
         }
 
         public override ImageViewAsync Control
