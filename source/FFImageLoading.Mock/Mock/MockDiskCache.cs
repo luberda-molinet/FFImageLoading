@@ -10,46 +10,65 @@ namespace FFImageLoading.Mock
     {
         readonly string _path = "/mock/ffimageloading";
         Dictionary<string, MockFile> _cache = new Dictionary<string, MockFile>();
+        readonly object _lock = new object();
 
         public Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
         {
-            _cache.Add(key, new MockFile(bytes, Path.Combine(_path, key)));
-            writeFinished?.Invoke();
-            return Task.FromResult(true);
+            lock (_lock)
+            {
+                _cache.Add(key, new MockFile(bytes, Path.Combine(_path, key)));
+                writeFinished?.Invoke();
+                return Task.FromResult(true);
+            }
         }
 
         public Task ClearAsync()
         {
-            _cache.Clear();
-            return Task.FromResult(true);
+            lock (_lock)
+            {
+                _cache.Clear();
+                return Task.FromResult(true);
+            }
         }
 
         public Task<bool> ExistsAsync(string key)
         {
-            return Task.FromResult(_cache.ContainsKey(key));
+            lock (_lock)
+            {
+                return Task.FromResult(_cache.ContainsKey(key));
+            }
         }
 
         public Task<string> GetFilePathAsync(string key)
         {
-            return Task.FromResult(_cache[key].Path);
+            lock (_lock)
+            {
+                return Task.FromResult(_cache[key].Path);
+            }
         }
 
         public Task RemoveAsync(string key)
         {
-            _cache.Remove(key);
-            return Task.FromResult(true);
+            lock (_lock)
+            {
+                _cache.Remove(key);
+                return Task.FromResult(true);
+            }
         }
 
         public Task<Stream> TryGetStreamAsync(string key)
         {
-            MockFile file;
-
-            if (_cache.TryGetValue(key, out file))
+            lock (_lock)
             {
-                return Task.FromResult<Stream>(new MemoryStream(file.Data));
-            }
+                MockFile file;
 
-            return Task.FromResult<Stream>(null);
+                if (_cache.TryGetValue(key, out file))
+                {
+                    return Task.FromResult<Stream>(new MemoryStream(file.Data));
+                }
+
+                return Task.FromResult<Stream>(null);
+            }
         }
     }
 }
