@@ -58,18 +58,25 @@ namespace FFImageLoading.Targets
 
         bool IsLayoutNeeded(UIImage oldImage, UIImage newImage)
         {
-            if (oldImage == null && newImage == null)
-                return false;
-
-            if (oldImage == null && newImage != null)
-                return true;
-
-            if (oldImage != null && newImage == null)
-                return true;
-
-            if (oldImage != null && newImage != null)
+            try
             {
-                return !(oldImage.Size.Width == newImage.Size.Width && oldImage.Size.Height == newImage.Size.Height);
+                if (oldImage == null && newImage == null)
+                    return false;
+
+                if (oldImage == null && newImage != null)
+                    return true;
+
+                if (oldImage != null && newImage == null)
+                    return true;
+
+                if (oldImage != null && newImage != null)
+                {
+                    return !(oldImage.Size.Width == newImage.Size.Width && oldImage.Size.Height == newImage.Size.Height);
+                }
+            }
+            catch (Exception)
+            {
+                return true;
             }
 
             return false;

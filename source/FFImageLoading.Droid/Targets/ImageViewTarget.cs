@@ -56,18 +56,25 @@ namespace FFImageLoading.Targets
 
         bool IsLayoutNeeded(Drawable oldImage, Drawable newImage)
         {
-            if (oldImage == null && newImage == null)
-                return false;
-
-            if (oldImage == null && newImage != null)
-                return true;
-
-            if (oldImage != null && newImage == null)
-                return true;
-
-            if (oldImage != null && newImage != null)
+            try
             {
-                return !(oldImage.IntrinsicWidth == newImage.IntrinsicWidth && oldImage.IntrinsicHeight == newImage.IntrinsicHeight);
+                if (oldImage == null && newImage == null)
+                    return false;
+
+                if (oldImage == null && newImage != null)
+                    return true;
+
+                if (oldImage != null && newImage == null)
+                    return true;
+
+                if (oldImage != null && newImage != null)
+                {
+                    return !(oldImage.IntrinsicWidth == newImage.IntrinsicWidth && oldImage.IntrinsicHeight == newImage.IntrinsicHeight);
+                }
+            }
+            catch (Exception)
+            {
+                return true;
             }
 
             return false;
