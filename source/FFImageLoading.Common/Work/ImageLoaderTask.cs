@@ -78,7 +78,7 @@ namespace FFImageLoading.Work
                 KeyRaw = Parameters.CustomCacheKey;
             }
 
-            if (Parameters.CacheType == CacheType.Disk)
+            if (Parameters.CacheType == CacheType.Disk || Parameters.CacheType == CacheType.None)
             {
                 CanUseMemoryCache = false;
             }
@@ -305,7 +305,8 @@ namespace FFImageLoading.Work
         {
             try
             {
-                if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
+                if (Parameters.Preload && Parameters.CacheType.HasValue && 
+                    (Parameters.CacheType.Value == CacheType.Disk || Parameters.CacheType.Value == CacheType.None))
                     return false;
 
                 ThrowIfCancellationRequested();
