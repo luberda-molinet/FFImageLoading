@@ -6,6 +6,7 @@ using Xunit;
 using FFImageLoading;
 using FFImageLoading.Work;
 using FFImageLoading.Cache;
+using System.Linq;
 
 namespace FFImageLoading.Tests.ImageServiceTests
 {
@@ -33,6 +34,7 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanDownloadOnly()
         {
+            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
             await ImageService.Instance.LoadUrl(RemoteImage)
                 .DownloadOnlyAsync();
 
@@ -44,6 +46,7 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanPreload()
         {
+            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
             await ImageService.Instance.LoadUrl(RemoteImage)
                 .PreloadAsync();
 
@@ -90,6 +93,8 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanPreloadMultipleUrlImageSources()
         {
+            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+
             IList<Task> tasks = new List<Task>();
             int downloadsCount = 0;
             int successCount = 0;
@@ -116,13 +121,15 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanWaitForSameUrlImageSources()
         {
+            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+
             IList<Task> tasks = new List<Task>();
             int downloadsCount = 0;
             int successCount = 0;
 
             for (int i = 0; i < 5; i++)
             {
-                tasks.Add(ImageService.Instance.LoadUrl(Images[0])
+                tasks.Add(ImageService.Instance.LoadUrl(Images.Last())
                           .DownloadStarted((obj) =>
                           {
                               downloadsCount++;

@@ -9,7 +9,6 @@ namespace FFImageLoading.Tests
         protected const string RemoteImage = "https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg";
 
         protected static string[] Images = {
-                "https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg",
                 "https://farm5.staticflickr.com/4011/4308181244_5ac3f8239b.jpg",
                 "https://farm8.staticflickr.com/7423/8729135907_79599de8d8.jpg",
                 "https://farm3.staticflickr.com/2475/4058009019_ecf305f546.jpg",
