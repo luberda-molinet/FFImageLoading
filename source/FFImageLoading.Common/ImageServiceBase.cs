@@ -37,11 +37,8 @@ namespace FFImageLoading
         {
             get
             {
-                lock (_initializeLock)
-                {
-                    InitializeIfNeeded(_config);
-                    return _config;
-                }
+                InitializeIfNeeded();
+                return _config;
             }
         }
 
