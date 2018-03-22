@@ -37,6 +37,8 @@ namespace FFImageLoading.Targets
                             control.Image = null;
 
                         control.Image = image;
+                        control.SetNeedsLayout(); // It's needed for cells, etc
+                        // control.SetNeedsDisplay();
                     },
                     () => { });
             }
@@ -45,6 +47,8 @@ namespace FFImageLoading.Targets
                 if (control.Image?.Images != null && control.Image.Images.Length > 1)
                     control.Image = null;
                 control.Image = image;
+                control.SetNeedsLayout(); // It's needed for cells, etc
+                // control.SetNeedsDisplay();
             }
         }
 
