@@ -226,7 +226,7 @@ namespace FFImageLoading.Cache
             {
                 total_removed++;
 
-                if (value?.Bitmap == null || value.Bitmap.Handle == IntPtr.Zero)
+                if (!value.IsValidAndHasValidBitmap())
                     return;
 
                 // We only really care about evictions because we do direct Remove()als
