@@ -21,7 +21,7 @@ namespace FFImageLoading.Targets
             if (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1))
                 return;
 
-            var isLayoutNeeded = IsLayoutNeeded(control.Image, image);
+            var isLayoutNeeded = IsLayoutNeeded(task, control.Image, image);
             
             var parameters = task.Parameters;
             if (animated)
