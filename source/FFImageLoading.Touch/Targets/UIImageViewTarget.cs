@@ -56,8 +56,18 @@ namespace FFImageLoading.Targets
             }
         }
 
-        bool IsLayoutNeeded(UIImage oldImage, UIImage newImage)
+        bool IsLayoutNeeded(IImageLoaderTask task, UIImage oldImage, UIImage newImage)
         {
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
+                return false;
+            }
+
             try
             {
                 if (oldImage == null && newImage == null)

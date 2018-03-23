@@ -115,6 +115,9 @@ namespace FFImageLoading.Views
         public bool? FadeAnimationForCachedImages { get { return (bool?)GetValue(FadeAnimationForCachedImagesProperty); } set { SetValue(FadeAnimationForCachedImagesProperty, value); } }
         public static readonly DependencyProperty FadeAnimationForCachedImagesProperty = DependencyProperty.Register(nameof(FadeAnimationForCachedImages), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
 
+        public bool? InvalidateLayoutAfterLoaded { get { return (bool?)GetValue(InvalidateLayoutAfterLoadedProperty); } set { SetValue(InvalidateLayoutAfterLoadedProperty, value); } }
+        public static readonly DependencyProperty InvalidateLayoutAfterLoadedProperty = DependencyProperty.Register(nameof(InvalidateLayoutAfterLoaded), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
+
         public int? FadeAnimationDuration { get { return (int?)GetValue(FadeAnimationDurationProperty); } set { SetValue(FadeAnimationDurationProperty, value); } }
         public static readonly DependencyProperty FadeAnimationDurationProperty = DependencyProperty.Register(nameof(FadeAnimationDuration), typeof(int?), typeof(MvxCachedImageView), new PropertyMetadata(default(int?)));
 
@@ -307,6 +310,9 @@ namespace FFImageLoading.Views
                 {
                     imageLoader.Transform(Transformations);
                 }
+
+                if (InvalidateLayoutAfterLoaded.HasValue)
+                    imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
 
                 imageLoader.WithPriority(LoadingPriority);
                 if (CacheType.HasValue)

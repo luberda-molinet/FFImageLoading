@@ -520,6 +520,22 @@ namespace FFImageLoading.Forms
             }
         }
 
+        /// <summary>
+        /// The invalidate layout after loaded property.
+        /// </summary>
+        public static readonly BindableProperty InvalidateLayoutAfterLoadedProperty = BindableProperty.Create(nameof(InvalidateLayoutAfterLoaded), typeof(bool?), typeof(CachedImage), default(bool?));
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded.
+        /// </summary>
+        /// <value>The invalidate layout after loaded.</value>
+        public bool? InvalidateLayoutAfterLoaded
+        {
+            get { return (bool?)GetValue(InvalidateLayoutAfterLoadedProperty); }
+            set { SetValue(InvalidateLayoutAfterLoadedProperty, value); }
+        }
+
+
         static void HandleTransformationsPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
             if (oldValue != newValue)
@@ -1180,6 +1196,9 @@ namespace FFImageLoading.Forms
             {
                 imageLoader.Transform(Transformations);
             }
+
+            if (InvalidateLayoutAfterLoaded.HasValue)
+                imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
 
             imageLoader.WithPriority(LoadingPriority);
             if (CacheType.HasValue)

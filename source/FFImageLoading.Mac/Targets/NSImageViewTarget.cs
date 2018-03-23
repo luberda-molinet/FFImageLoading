@@ -28,8 +28,9 @@ namespace FFImageLoading.Targets
                 control.Layer.Contents = null;
                 control.Image = image;
                 control.Animates = true;
-                control.NeedsLayout = true;
-                control.SetNeedsDisplay();
+                control.SetNeedsDisplay();   
+                if (IsLayoutNeeded(task))
+                    control.NeedsLayout = true;
             }
             else
             {
@@ -37,17 +38,35 @@ namespace FFImageLoading.Targets
                 {
                     //TODO fade animation
                     control.Layer.Contents = image.CGImage;
-                    control.NeedsLayout = true;
                     control.SetNeedsDisplay();
+                    if (IsLayoutNeeded(task))
+                        control.NeedsLayout = true;
                 }
                 else
                 {
                     control.Layer.Contents = image.CGImage;
-                    control.NeedsLayout = true;
                     control.SetNeedsDisplay();
+                    if (IsLayoutNeeded(task))
+                        control.NeedsLayout = true;
                 }
             }
         }
+
+        bool IsLayoutNeeded(IImageLoaderTask task)
+        {
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
         public override void SetAsEmpty(IImageLoaderTask task)
         {

@@ -37,6 +37,7 @@ namespace FFImageLoading.Config
             AnimateGifs = true;
             DelayInMs = 14; //Task.Delay resolution is around 15ms
             ClearMemoryCacheOnOutOfMemory = true;
+            InvalidateLayout = true;
         }
 
         /// <summary>
@@ -247,6 +248,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value><c>true</c> if clear memory cache on out of memory; otherwise, <c>false</c>.</value>
         public bool ClearMemoryCacheOnOutOfMemory { get; set; }
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded
+        /// </summary>
+        /// <value><c>true</c> if invalidate layout; otherwise, <c>false</c>.</value>
+        public bool InvalidateLayout { get; set;  }
     }
 }
 

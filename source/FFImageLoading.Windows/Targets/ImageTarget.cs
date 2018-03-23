@@ -60,11 +60,30 @@ namespace FFImageLoading.Targets
                 fadeInStoryboard.Children.Add(fade);
                 fadeInStoryboard.Begin();
                 control.Source = image;
+                if (IsLayoutNeeded(task))
+                    control.UpdateLayout();
             }
             else
             {
                 control.Source = image;
+                if (IsLayoutNeeded(task))
+                    control.UpdateLayout();
             }
+        }
+
+        bool IsLayoutNeeded(IImageLoaderTask task)
+        {
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public override Image Control

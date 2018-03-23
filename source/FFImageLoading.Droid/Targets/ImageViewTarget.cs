@@ -40,12 +40,12 @@ namespace FFImageLoading.Targets
         {
             if (task == null || task.IsCancelled)
                 return;
-
+            
             var control = Control;
             if (control == null || control.Drawable == image)
                 return;
 
-            var isLayoutNeeded = IsLayoutNeeded(control.Drawable, image);
+            var isLayoutNeeded = IsLayoutNeeded(task, control.Drawable, image);
 
             control.SetImageDrawable(image);
             control.Invalidate();
@@ -54,8 +54,18 @@ namespace FFImageLoading.Targets
                 control.RequestLayout();
         }
 
-        bool IsLayoutNeeded(Drawable oldImage, Drawable newImage)
+        bool IsLayoutNeeded(IImageLoaderTask task, Drawable oldImage, Drawable newImage)
         {
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
+                return false;
+            }
+
             try
             {
                 if (oldImage == null && newImage == null)

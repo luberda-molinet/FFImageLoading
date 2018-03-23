@@ -106,7 +106,6 @@ namespace FFImageLoading.Work
 
         internal string StreamChecksum { get; set; }
 
-
         public ImageSource Source { get; private set; }
 
         public string Path { get; private set; }
@@ -177,6 +176,8 @@ namespace FFImageLoading.Work
 
         public int? DelayInMs { get; private set; }
 
+        public bool? InvalidateLayoutEnabled { get; private set; }
+
         bool preload;
         public bool Preload
         {
@@ -195,6 +196,17 @@ namespace FFImageLoading.Work
                     FadeAnimationForCachedImagesEnabled = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded
+        /// </summary>
+        /// <returns>The layout.</returns>
+        /// <param name="enabled">If set to <c>true</c> enabled.</param>
+        public TaskParameter InvalidateLayout(bool enabled = true)
+        {
+            InvalidateLayoutEnabled = enabled;
+            return this;
         }
 
         /// <summary>
