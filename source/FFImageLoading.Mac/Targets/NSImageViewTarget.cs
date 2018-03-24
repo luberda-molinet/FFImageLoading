@@ -28,7 +28,8 @@ namespace FFImageLoading.Targets
                 control.Layer.Contents = null;
                 control.Image = image;
                 control.Animates = true;
-                control.SetNeedsDisplay();   
+                control.SetNeedsDisplay();
+                control.CanDrawSubviewsIntoLayer = true;
                 if (IsLayoutNeeded(task))
                     control.NeedsLayout = true;
             }
