@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:local="clr-namespace:FFImageLoading.Forms.Sample;assembly=Shared" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.ListTransformationsPage"
-		xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
-		xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
-		xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
-		Title="List with transformations">
-	<ContentPage.Content>
+        xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
+        xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+        xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+        Title="List with transformations">
+    <ContentPage.Content>
 
-		<ListView CachingStrategy="RecycleElement" HasUnevenRows="false"
-				RowHeight="180" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
+        <ListView CachingStrategy="RecycleElement" HasUnevenRows="false"
+                RowHeight="180" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
 
-			<ListView.Behaviors>
-				<xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
-			</ListView.Behaviors>
+            <ListView.Behaviors>
+                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
+            </ListView.Behaviors>
 
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<local:ListTransformationsPageCell/>
-				</DataTemplate>
-			</ListView.ItemTemplate>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <local:ListTransformationsPageCell/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
-		</ListView>
+        </ListView>
 
-	</ContentPage.Content>
+    </ContentPage.Content>
 </ContentPage>

@@ -1,26 +1,26 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.MenuPage"
-		xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
-		xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
-		xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
-		Title="FFImageLoading">
-	<ContentPage.Content>
+        xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms"
+        xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+        xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+        Title="FFImageLoading">
+    <ContentPage.Content>
 
-		<ListView HasUnevenRows="true" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="true"
-				SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
+        <ListView HasUnevenRows="true" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="true"
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
 
-			<ListView.Behaviors>
-				<xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
-			</ListView.Behaviors>
+            <ListView.Behaviors>
+                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
+            </ListView.Behaviors>
 
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<TextCell TextColor="Black" DetailColor="Gray"
-						Text="{Binding Title}" Detail="{Binding Details}" Command="{Binding Command}"/>
-				</DataTemplate>
-			</ListView.ItemTemplate>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell TextColor="Black" DetailColor="Gray"
+                        Text="{Binding Title}" Detail="{Binding Details}" Command="{Binding Command}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
-		</ListView>
+        </ListView>
 
-	</ContentPage.Content>
+    </ContentPage.Content>
 </ContentPage>

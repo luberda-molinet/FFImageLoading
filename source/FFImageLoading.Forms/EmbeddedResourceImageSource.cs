@@ -4,13 +4,13 @@ using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
-	/// <summary>
-	/// Embedded resource image source.
-	/// eg. resource://YourProject.Resource.Resource.png
-	/// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
-	/// </summary>
+    /// <summary>
+    /// Embedded resource image source.
+    /// eg. resource://YourProject.Resource.Resource.png
+    /// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
+    /// </summary>
     [Preserve(AllMembers = true)]
-	public class EmbeddedResourceImageSource : ImageSource
+    public class EmbeddedResourceImageSource : ImageSource
     {
         static string _cachedMainAssembly;
 
@@ -50,8 +50,8 @@ namespace FFImageLoading.Forms
         }
 
         public override string ToString()
-		{
-			return $"EmbeddedResource: {Uri}";
-		}
+        {
+            return $"EmbeddedResource: {Uri}";
+        }
     }
 }

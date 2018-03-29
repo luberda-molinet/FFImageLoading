@@ -5,9 +5,9 @@ namespace FFImageLoading.Transformations
 {
     public class CropTransformation : TransformationBase
     {
-		public CropTransformation() : this(1d, 0d, 0d)
-		{
-		}
+        public CropTransformation() : this(1d, 0d, 0d)
+        {
+        }
 
         public CropTransformation(double zoomFactor, double xOffset, double yOffset) : this(zoomFactor, xOffset, yOffset, 1f, 1f)
         {
@@ -15,30 +15,30 @@ namespace FFImageLoading.Transformations
 
         public CropTransformation(double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
         {
-			ZoomFactor = zoomFactor;
-			XOffset = xOffset;
-			YOffset = yOffset;
-			CropWidthRatio = cropWidthRatio;
-			CropHeightRatio = cropHeightRatio;
+            ZoomFactor = zoomFactor;
+            XOffset = xOffset;
+            YOffset = yOffset;
+            CropWidthRatio = cropWidthRatio;
+            CropHeightRatio = cropHeightRatio;
 
-			if (ZoomFactor < 1f)
-				ZoomFactor = 1f;
+            if (ZoomFactor < 1f)
+                ZoomFactor = 1f;
         }
 
-		public double ZoomFactor { get; set; }
-		public double XOffset { get; set; }
-		public double YOffset { get; set; }
-		public double CropWidthRatio { get; set; }
-		public double CropHeightRatio { get; set; }
+        public double ZoomFactor { get; set; }
+        public double XOffset { get; set; }
+        public double YOffset { get; set; }
+        public double CropWidthRatio { get; set; }
+        public double CropHeightRatio { get; set; }
 
-		public override string Key
-		{
-			get
-			{
-				return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}",
-				ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
-			}
-		}
+        public override string Key
+        {
+            get
+            {
+                return string.Format("CropTransformation,zoomFactor={0},xOffset={1},yOffset={2},cropWidthRatio={3},cropHeightRatio={4}",
+                ZoomFactor, XOffset, YOffset, CropWidthRatio, CropHeightRatio);
+            }
+        }
 
         protected override BitmapHolder Transform(BitmapHolder bitmapSource, string path, Work.ImageSource source, bool isPlaceholder, string key)
         {
