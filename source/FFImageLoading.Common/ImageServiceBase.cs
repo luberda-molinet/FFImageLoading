@@ -64,9 +64,6 @@ namespace FFImageLoading
 
         public void Initialize(Configuration configuration)
         {
-            if (_isInitializing)
-                return;
-            
             lock (_initializeLock)
             {
                 _initialized = false;
