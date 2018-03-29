@@ -52,28 +52,34 @@ namespace FFImageLoading.Transformations
         {
             if (context != null && !LegacyMode && (int)Android.OS.Build.VERSION.SdkInt >= 17)
             {
-                Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
+                Bitmap output = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
 
-                using (Canvas canvas = new Canvas(bitmap))
+                using (Android.Renderscripts.RenderScript rs = Android.Renderscripts.RenderScript.Create(context))
+                using (Android.Renderscripts.ScriptIntrinsicBlur script = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, Android.Renderscripts.Element.U8_4(rs)))
+                using (Android.Renderscripts.Allocation inAlloc = Android.Renderscripts.Allocation.CreateFromBitmap(rs, source, Android.Renderscripts.Allocation.MipmapControl.MipmapNone, Android.Renderscripts.AllocationUsage.Script))
+                using (Android.Renderscripts.Allocation outAlloc = Android.Renderscripts.Allocation.CreateFromBitmap(rs, output))
                 {
-                    canvas.DrawBitmap(source, 0, 0, null);
-                    using (Android.Renderscripts.RenderScript rs = Android.Renderscripts.RenderScript.Create(context))
-                    {
-                        using (Android.Renderscripts.Allocation overlayAlloc = Android.Renderscripts.Allocation.CreateFromBitmap(rs, bitmap))
-                        {
-                            using (Android.Renderscripts.ScriptIntrinsicBlur blur = Android.Renderscripts.ScriptIntrinsicBlur.Create(rs, overlayAlloc.Element))
-                            {
-                                blur.SetInput(overlayAlloc);
-                                blur.SetRadius(radius);
-                                blur.ForEach(overlayAlloc);
-                                overlayAlloc.CopyTo(bitmap);
+                    script.SetRadius(radius);
+                    script.SetInput(inAlloc);
+                    script.ForEach(outAlloc);
+                    outAlloc.CopyTo(output);
 
-                                rs.Destroy();
-                                return bitmap;
-                            }
-                        }
-                    }
+                    rs.Destroy();
+                    return output;
                 }
+
+                //Bitmap output = Bitmap.createBitmap(smallBitmap.getWidth(), smallBitmap.getHeight(), smallBitmap.getConfig());
+
+                //RenderScript rs = RenderScript.create(getContext());
+                //ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+                //Allocation inAlloc = Allocation.createFromBitmap(rs, smallBitmap, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_GRAPHICS_TEXTURE);
+                //Allocation outAlloc = Allocation.createFromBitmap(rs, output);
+                //script.setRadius(BLUR_RADIUS);
+                //script.setInput(inAlloc);
+                //script.forEach(outAlloc);
+                //outAlloc.copyTo(output);
+
+                //rs.destroy();
             }
 
             return ToLegacyBlurred(source, context, (int)radius);
