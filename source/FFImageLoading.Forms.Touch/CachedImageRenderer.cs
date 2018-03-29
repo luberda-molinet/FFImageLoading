@@ -51,6 +51,7 @@ namespace FFImageLoading.Forms.Mac
         /// </summary>
         public static new void Init()
         {
+            CachedImage.IsRendererInitialized = true;
             ScaleHelper.Init();
             // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 #pragma warning disable 0219

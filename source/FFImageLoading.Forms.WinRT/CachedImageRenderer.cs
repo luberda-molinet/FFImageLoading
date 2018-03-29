@@ -56,6 +56,7 @@ namespace FFImageLoading.Forms.WinRT
         /// </summary>
         public static void Init()
         {
+            CachedImage.IsRendererInitialized = true;
             ScaleHelper.Init();
         }
 

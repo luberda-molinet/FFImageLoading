@@ -14,6 +14,7 @@ namespace FFImageLoading.Forms
     /// </summary>
     public class CachedImage : View
     {
+        internal static bool IsRendererInitialized { get; set; } = false;
         public static bool FixedOnMeasureBehavior { get; set; } = true;
         public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
@@ -101,6 +102,9 @@ namespace FFImageLoading.Forms
 
         static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
+            if (!IsRendererInitialized)
+                throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
+
             if (newValue != null)
             {
                 SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);

@@ -21,6 +21,7 @@ namespace FFImageLoading.Forms.Tizen
 
         public static void Init(FormsApplication application)
         {
+            CachedImage.IsRendererInitialized = true;
             ImageService.MainWindowProvider = () => application.MainWindow;
         }
 
