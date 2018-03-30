@@ -35,6 +35,13 @@ namespace FFImageLoading.Work
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
+                // Loading placeholder if enabled
+                if (!_isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
+                {
+                    await ShowPlaceholder(Parameters.LoadingPlaceholderPath, KeyForLoadingPlaceholder,
+                                          Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
+                }
+
                 try
                 {
                     Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
