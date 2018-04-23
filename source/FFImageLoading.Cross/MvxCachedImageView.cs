@@ -470,7 +470,7 @@ namespace FFImageLoading.Cross
                 return null;
 
             if (imageStream != null)
-                return new ImageSourceBinding(ImageSource.Stream, "Stream");
+                return new ImageSourceBinding(imageStream);
 
             if (imagePath.StartsWith("res:", StringComparison.OrdinalIgnoreCase))
             {
