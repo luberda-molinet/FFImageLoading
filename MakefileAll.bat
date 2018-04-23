@@ -35,6 +35,7 @@ echo Building FFImageLoading.Transformations...
 
 echo Building FFImageLoading.Forms...
 
+%msbuild% source/FFImageLoading.Forms.Mock/FFImageLoading.Forms.Mock.csproj %buildargsRelease%
 %msbuild% source/FFImageLoading.Forms.WinRT/FFImageLoading.Forms.WinRT.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.WinUWP/FFImageLoading.Forms.WinUWP.csproj %buildargs%
 %msbuild% source/FFImageLoading.Forms.Touch/FFImageLoading.Forms.Touch.csproj %buildargs%
