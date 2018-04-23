@@ -40,7 +40,7 @@
     <DefineConstants>__MACOS__;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\FFImageLoading.Forms.Mac.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\FFImageLoading.Forms.Platform.xml</DocumentationFile>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
