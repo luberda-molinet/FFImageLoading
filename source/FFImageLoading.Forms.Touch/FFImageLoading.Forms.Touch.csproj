@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>FFImageLoading.Forms.Touch</AssemblyName>
+    <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
     <NoWarn>1591</NoWarn>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
