@@ -7,7 +7,7 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading.Forms.Touch</RootNamespace>
+    <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>FFImageLoading.Forms.Touch</AssemblyName>
     <NoWarn>1591</NoWarn>        
@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

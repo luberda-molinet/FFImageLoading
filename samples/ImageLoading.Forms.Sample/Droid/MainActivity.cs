@@ -8,7 +8,7 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Xamarin.Forms.Platform.Android;
-using FFImageLoading.Forms.Droid;
+using FFImageLoading.Forms.Platform;
 
 namespace FFImageLoading.Forms.Sample.Droid
 {

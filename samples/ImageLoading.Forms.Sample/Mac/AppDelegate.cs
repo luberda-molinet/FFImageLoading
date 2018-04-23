@@ -2,7 +2,7 @@
 using Foundation;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.MacOS;
-using FFImageLoading.Forms.Mac;
+using FFImageLoading.Forms.Platform;
 
 namespace FFImageLoading.Forms.Sample.Mac
 {

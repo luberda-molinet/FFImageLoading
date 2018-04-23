@@ -5,11 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 
-#if WINDOWS_UWP
-namespace FFImageLoading.Forms.WinUWP
-#else
-namespace FFImageLoading.Forms.WinRT
-#endif
+namespace FFImageLoading.Forms.Platform
 {
     public class ImageSourceBinding : IImageSourceBinding
     {

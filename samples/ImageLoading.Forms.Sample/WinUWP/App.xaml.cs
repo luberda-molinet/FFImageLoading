@@ -51,7 +51,7 @@ namespace WinUWP
                 rootFrame = new Frame();
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
-                FFImageLoading.Forms.WinUWP.CachedImageRenderer.Init();
+                FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
 
                 var config = new FFImageLoading.Config.Configuration()
                 {

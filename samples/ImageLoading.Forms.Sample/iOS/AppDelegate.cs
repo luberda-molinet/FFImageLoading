@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FFImageLoading.Forms.Touch;
+using FFImageLoading.Forms.Platform;
 using Foundation;
 using UIKit;
 

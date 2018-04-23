@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
-namespace FFImageLoading.Forms.Tizen
+namespace FFImageLoading.Forms.Platform
 {
     [Preserve(AllMembers = true)]
     internal class ImageSourceBinding : IImageSourceBinding

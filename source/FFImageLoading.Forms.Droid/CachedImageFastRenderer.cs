@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using FFImageLoading.Work;
-using FFImageLoading.Forms.Droid;
+using FFImageLoading.Forms.Platform;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using Android.Graphics.Drawables;
@@ -19,7 +19,7 @@ using System.Reflection;
 using Android.Content;
 using AView = Android.Views.View;
 
-namespace FFImageLoading.Forms.Droid
+namespace FFImageLoading.Forms.Platform
 {
     /// <summary>
     /// CachedImage Implementation
@@ -84,9 +84,9 @@ namespace FFImageLoading.Forms.Droid
                     {
                         _element.PropertyChanged -= OnElementPropertyChanged;
 
-                        if (Platform.GetRenderer(_element) == this)
+                        if (Xamarin.Forms.Platform.Android.Platform.GetRenderer(_element) == this)
                         {
-                            Platform.SetRenderer(_element, null);
+                            Xamarin.Forms.Platform.Android.Platform.SetRenderer(_element, null);
                         }
                     }
                 }

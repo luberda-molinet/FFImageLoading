@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using FFImageLoading.Work;
-using FFImageLoading.Forms.Droid;
+using FFImageLoading.Forms.Platform;
 using FFImageLoading.Forms;
 using Android.Runtime;
 using Android.Graphics.Drawables;
@@ -16,10 +16,54 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Views;
 using Android.Views;
 using System.Reflection;
+using Android.Content;
 
-//[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
-using System.Linq;
 namespace FFImageLoading.Forms.Droid
+{
+    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
+    public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
+    {
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        public CachedImageRenderer() : base(Xamarin.Forms.Forms.Context)
+        {
+        }
+
+        public CachedImageRenderer(IntPtr javaReference, JniHandleOwnership transfer) : this()
+        {
+        }
+
+        public CachedImageRenderer(Context context) : base(context)
+        {
+        }
+
+        public CachedImageRenderer(Context context, Android.Util.IAttributeSet attrs) : this(context)
+        {
+        }
+    }
+
+    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
+    public class CachedImageFastRenderer : FFImageLoading.Forms.Platform.CachedImageFastRenderer
+    {
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        public CachedImageFastRenderer() : base(Xamarin.Forms.Forms.Context)
+        {
+        }
+
+        public CachedImageFastRenderer(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
+
+        public CachedImageFastRenderer(Context context) : base(context)
+        {
+        }
+
+        public CachedImageFastRenderer(Context context, Android.Util.IAttributeSet attrs) : base(context, attrs)
+        {
+        }
+    }
+}
+
+namespace FFImageLoading.Forms.Platform
 {
     /// <summary>
     /// CachedImage Implementation
@@ -27,6 +71,11 @@ namespace FFImageLoading.Forms.Droid
     [Preserve(AllMembers=true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, CachedImageView>
     {
+        [RenderWith(typeof(CachedImageRenderer))]
+        internal class _CachedImageRenderer
+        {
+        }
+
         /// <summary>
         ///   Used for registration with dependency service
         /// </summary>
@@ -73,14 +122,21 @@ namespace FFImageLoading.Forms.Droid
         readonly static MethodInfo _platformDefaultRendererTypeNotifyFakeHandling = _platformDefaultRendererType?.GetMethod("NotifyFakeHandling", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         readonly object _updateBitmapLock = new object();
 
-        public CachedImageRenderer()
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        public CachedImageRenderer() : base(Xamarin.Forms.Forms.Context)
         {
-            AutoPackage = false;
         }
 
         public CachedImageRenderer(IntPtr javaReference, JniHandleOwnership transfer) : this()
         {
-            AutoPackage = false;
+        }
+
+        public CachedImageRenderer(Context context) : base(context)
+        {
+        }
+
+        public CachedImageRenderer(Context context, Android.Util.IAttributeSet attrs) : this(context)
+        {
         }
 
         public override bool OnTouchEvent(MotionEvent e)

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.Runtime;
 
-namespace FFImageLoading.Forms.Droid
+namespace FFImageLoading.Forms.Platform
 {
     [Preserve(AllMembers = true)]
     internal class ImageSourceBinding : IImageSourceBinding

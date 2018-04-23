@@ -7,8 +7,8 @@
     <ProjectGuid>{B8BE9FE7-2D07-40B5-8DAE-BA52F944C659}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FFImageLoading.Forms.WinUWP</RootNamespace>
-    <AssemblyName>FFImageLoading.Forms.WinUWP</AssemblyName>
+    <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
+    <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.15063.0</TargetPlatformVersion>

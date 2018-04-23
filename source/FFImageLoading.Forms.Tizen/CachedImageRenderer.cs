@@ -9,12 +9,15 @@ using FFImageLoading.Work;
 using FFImageLoading.Views;
 using Tizen.Applications;
 
-[assembly: ExportRenderer(typeof(FFImageLoading.Forms.CachedImage), typeof(FFImageLoading.Forms.Tizen.CachedImageRenderer))]
-
-namespace FFImageLoading.Forms.Tizen
+namespace FFImageLoading.Forms.Platform
 {
     public class CachedImageRenderer : ViewRenderer<CachedImage, EvasImageContainer>, IVisualElementRenderer
     {
+        [RenderWith(typeof(CachedImageRenderer))]
+        internal class _CachedImageRenderer
+        {
+        }
+
         IScheduledWork _currentTask;
 
         IVisualElementController ElementController => Element as IVisualElementController;

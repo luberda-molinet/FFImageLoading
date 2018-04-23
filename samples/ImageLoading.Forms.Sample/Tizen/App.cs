@@ -11,8 +11,8 @@
         static void Main(string[] args)
         {
             var app = new Program();
-            Forms.Tizen.CachedImageRenderer.Init();
             Xamarin.Forms.Platform.Tizen.Forms.Init(app);
+            FFImageLoading.Forms.Platform.CachedImageRenderer.Init(app);
             app.Run(args);
         }
     }

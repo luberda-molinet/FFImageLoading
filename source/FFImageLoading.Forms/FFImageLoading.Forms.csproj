@@ -82,6 +82,10 @@
       <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
       <Name>FFImageLoading.Mock</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj">
+      <Project>{957F1B47-0ADC-4BFE-AB87-8D0FBFB59BC4}</Project>
+      <Name>FFImageLoading.Forms.Mock</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

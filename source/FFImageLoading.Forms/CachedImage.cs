@@ -9,6 +9,7 @@ using FFImageLoading.Cache;
 namespace FFImageLoading.Forms
 {
     [Preserve(AllMembers = true)]
+    [RenderWith(typeof(Platform.CachedImageRenderer._CachedImageRenderer))]
     /// <summary>
     /// CachedImage by Daniel Luberda
     /// </summary>

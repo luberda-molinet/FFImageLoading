@@ -6,6 +6,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateDependencyFile>False</GenerateDependencyFile>
     <NoWarn>1591</NoWarn>        
+    <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
+    <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

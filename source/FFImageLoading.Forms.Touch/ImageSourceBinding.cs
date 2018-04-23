@@ -5,11 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 
-#if __IOS__
-namespace FFImageLoading.Forms.Touch
-#elif __MACOS__
-namespace FFImageLoading.Forms.Mac
-#endif
+namespace FFImageLoading.Forms.Platform
 {
     [Preserve(AllMembers= true)]
     internal class ImageSourceBinding : IImageSourceBinding

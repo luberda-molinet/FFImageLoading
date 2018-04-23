@@ -8,8 +8,8 @@
     <ProjectGuid>{0CD66811-BD69-4479-A4F1-C038AF475765}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FFImageLoading.Forms.WinRT</RootNamespace>
-    <AssemblyName>FFImageLoading.Forms.WinRT</AssemblyName>
+    <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
+    <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{76F1466A-8B6D-4E39-A767-685A06062A39};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
