@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers
 {
@@ -11,26 +12,27 @@ namespace FFImageLoading.Helpers
             {
                 if (!_scale.HasValue)
                 {
-                    Init();
+                    InitAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                 }
 
                 return _scale.Value;
             }
         }
 
-        public static void Init()
+        public static async Task InitAsync()
         {
             if (_scale.HasValue)
                 return;
 
-            new MainThreadDispatcher().PostAsync(() =>
+            var dispatcher = ImageService.Instance.Config.MainThreadDispatcher;
+            await dispatcher.PostAsync(() =>
             {
 #if __IOS__
                 _scale = UIKit.UIScreen.MainScreen.Scale;
 #elif __MACOS__
                 _scale = AppKit.NSScreen.MainScreen.BackingScaleFactor;
 #endif
-            }).ConfigureAwait(false).GetAwaiter().GetResult();;
+            }).ConfigureAwait(false);
         }
     }
 }

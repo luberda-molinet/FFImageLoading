@@ -30,8 +30,12 @@ namespace FFImageLoading.Work
 
         public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
-            // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
-            ScaleHelper.Init();
+        }
+
+        public async override Task Init()
+        {
+            await ScaleHelper.InitAsync();
+            await base.Init();
         }
 
         protected override Task SetTargetAsync(PImage image, bool animated)

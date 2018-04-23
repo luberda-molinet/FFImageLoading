@@ -31,7 +31,7 @@ namespace FFImageLoading.Work
             SetKeys();
         }
 
-        public async Task Init()
+        public virtual async Task Init()
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {

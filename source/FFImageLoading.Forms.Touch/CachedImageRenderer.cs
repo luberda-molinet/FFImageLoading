@@ -64,12 +64,15 @@ namespace FFImageLoading.Forms.Platform
         public static new void Init()
         {
             CachedImage.IsRendererInitialized = true;
-            ScaleHelper.Init();
+
             // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            ScaleHelper.InitAsync();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         protected override void Dispose(bool disposing)
