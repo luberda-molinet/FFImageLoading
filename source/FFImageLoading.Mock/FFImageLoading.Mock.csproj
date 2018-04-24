@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.1</TargetFramework>
     <AssemblyName>FFImageLoading.Platform</AssemblyName>
     <PackageId>FFImageLoading.Mock</PackageId>
-    <NetStandardImplicitPackageVersion>2.0.1</NetStandardImplicitPackageVersion>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
