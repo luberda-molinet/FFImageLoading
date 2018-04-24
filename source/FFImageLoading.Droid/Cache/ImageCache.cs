@@ -49,11 +49,22 @@ namespace FFImageLoading.Cache
             int bitmapPoolSize;
 
             var context = new ContextWrapper(Application.Context);
-            var am = (ActivityManager)context.GetSystemService(Context.ActivityService);
+            var am = (ActivityManager)context?.GetSystemService(Context.ActivityService);
 
-            bool isLowMemoryDevice = Utils.HasKitKat() && am.IsLowRamDevice;
+            bool amIsLowRamDevice = false;
+            int amLargeMemoryClass = 128;
+            int amMemoryClass = 48;
+
+            if (am != null)
+            {
+                amIsLowRamDevice = am.IsLowRamDevice;
+                amMemoryClass = am.MemoryClass;
+                amLargeMemoryClass = am.LargeMemoryClass;
+            }
+
+            bool isLowMemoryDevice = Utils.HasKitKat() && amIsLowRamDevice;
             bool isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
-            int memoryClass = isLargeHeapEnabled ? am.LargeMemoryClass : am.MemoryClass;
+            int memoryClass = isLargeHeapEnabled ? amLargeMemoryClass : amMemoryClass;
             int maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
 
             var metrics = context.Resources.DisplayMetrics;

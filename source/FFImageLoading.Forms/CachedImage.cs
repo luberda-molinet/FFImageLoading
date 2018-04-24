@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
 using FFImageLoading.Cache;
+using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
@@ -15,7 +16,32 @@ namespace FFImageLoading.Forms
     /// </summary>
     public class CachedImage : View
     {
-        internal static bool IsRendererInitialized { get; set; } = false;
+        static bool? _isDesignModeEnabled = null;
+        static bool IsDesignModeEnabled
+        {
+            get
+            {
+                // works only on Xamarin.Forms >= 3.0
+                if (!_isDesignModeEnabled.HasValue)
+                {
+                    var type = typeof(Image).GetTypeInfo().Assembly.GetType("Xamarin.Forms.DesignMode");
+
+                    if (type == null)
+                    {
+                        _isDesignModeEnabled = true;
+                    }
+                    else
+                    {
+                        var property = type.GetRuntimeProperty("IsDesignModeEnabled");
+                        _isDesignModeEnabled = (bool)property.GetValue(null);
+                    }
+                }
+
+                return _isDesignModeEnabled.Value;
+            }
+        }
+
+        internal static bool IsRendererInitialized { get; set; } = IsDesignModeEnabled;
         public static bool FixedOnMeasureBehavior { get; set; } = true;
         public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
