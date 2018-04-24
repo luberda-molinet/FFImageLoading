@@ -1,208 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading</RootNamespace>
+    <TargetFramework>netstandard1.1</TargetFramework>
     <AssemblyName>FFImageLoading</AssemblyName>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-    <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyTFMAttribute.cs</TargetFrameworkMonikerAssemblyAttributesPath>        
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
-    <NoWarn>1591</NoWarn>        
+    <PackageId>FFImageLoading.Common</PackageId>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;SILVERLIGHT;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
-    <Optimize>false</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <DefineConstants>DEBUG</DefineConstants>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <PlatformTarget>anycpu</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\IMainThreadDispatcher.cs" />
-    <Compile Include="Helpers\IMiniLogger.cs" />
-    <Compile Include="Work\IImageLoaderTask.cs" />
-    <Compile Include="Config\Configuration.cs" />
-    <Compile Include="Work\WorkScheduler.cs" />
-    <Compile Include="Work\IScheduledWork.cs" />
-    <Compile Include="Work\TaskParameter.cs" />
-    <Compile Include="Work\ITransformation.cs" />
-    <Compile Include="Work\IBitmap.cs" />
-    <Compile Include="Cache\CacheResult.cs" />
-    <Compile Include="Work\LoadingResult.cs" />
-    <Compile Include="Cache\CacheStream.cs" />
-    <Compile Include="Transformations\FFColorMatrix.cs" />
-    <Compile Include="Cache\CacheType.cs" />
-    <Compile Include="Work\ImageSource.cs" />
-    <Compile Include="Work\InterpolationMode.cs" />
-    <Compile Include="Work\ImageInformation.cs" />
-    <Compile Include="Work\LoadingPriority.cs" />
-    <Compile Include="Work\IImageService.cs" />
-    <Compile Include="Work\Target.cs" />
-    <Compile Include="Concurrency\ConcurrentDictionary.cs" />
-    <Compile Include="Concurrency\SR.cs" />
-    <Compile Include="Concurrency\ArrayHelper.cs" />
-    <Compile Include="Concurrency\PlatformHelper.cs" />
-    <Compile Include="Helpers\IPlatformPerformance.cs" />
-    <Compile Include="Helpers\MiniLoggerWrapper.cs" />
-    <Compile Include="Work\DownloadInformation.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Work\ImageLoaderTask.cs" />
-    <Compile Include="Work\IDataResolver.cs" />
-    <Compile Include="Work\IDataResolverFactory.cs" />
-    <Compile Include="Cache\IDiskCache.cs" />
-    <Compile Include="Cache\IDownloadCache.cs" />
-    <Compile Include="Cache\IMemoryCache.cs" />
-    <Compile Include="Work\ITarget.cs" />
-    <Compile Include="Work\IWorkScheduler.cs" />
-    <Compile Include="Helpers\Retry.cs" />
-    <Compile Include="Cache\DownloadCache.cs" />
-    <Compile Include="Helpers\IMD5Helper.cs" />
-    <Compile Include="Work\IVectorDataResolver.cs" />
-    <Compile Include="Work\DownloadProgress.cs" />
-    <Compile Include="Work\FileWriteInfo.cs" />
-    <Compile Include="Helpers\DownloadAggregateException.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\IFixedSizePriorityQueue.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\IPriorityQueue.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\SimplePriorityQueue.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueueNode.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\GenericPriorityQueue.cs" />
-    <Compile Include="Concurrency\PendingTasksQueue.cs" />
-    <Compile Include="Concurrency\ThreadSafeCollection.cs" />
-    <Compile Include="Views\ICachedImageView.cs" />
-    <Compile Include="Args\ErrorEventArgs.cs" />
-    <Compile Include="Args\SuccessEventArgs.cs" />
-    <Compile Include="Args\FinishEventArgs.cs" />
-    <Compile Include="Args\DownloadStartedEventArgs.cs" />
-    <Compile Include="Args\DownloadProgressEventArgs.cs" />
-    <Compile Include="Args\FileWriteFinishedEventArgs.cs" />
-    <Compile Include="DataResolvers\EmbeddedResourceResolver.cs" />
-    <Compile Include="Extensions\AssemblyExtensions.cs" />
-    <Compile Include="DataResolvers\DataUrlResolver.cs" />
-    <Compile Include="Helpers\PreserveAttribute.cs" />
-    <Compile Include="Work\DataEncodingType.cs" />
-    <Compile Include="DataResolvers\WrappedDataResolverFactory.cs" />
-    <Compile Include="DataResolvers\WrappedDataResolver.cs" />
-    <Compile Include="Helpers\FileHeader.cs" />
-    <Compile Include="Extensions\ObjectExtensions.cs" />
-    <Compile Include="Helpers\EmptyPlatformPerformance.cs" />
-    <Compile Include="ImageServiceBase.cs" />
-    <Compile Include="DataResolvers\UrlDataResolver.cs" />
-    <Compile Include="DataResolvers\StreamDataResolver.cs" />
-    <Compile Include="Concurrency\FastPriorityQueue\CustomComparer.cs" />
-    <Compile Include="Decoders\IDecoder.cs" />
-    <Compile Include="Decoders\IDecodedImage.cs" />
-    <Compile Include="Decoders\DecodedImage.cs" />
-    <Compile Include="Helpers\GifHelper.cs" />
-    <Compile Include="Helpers\GifHelperBase.cs" />
-    <Compile Include="Decoders\IAnimatedImage.cs" />
-    <Compile Include="Decoders\AnimatedImage.cs" />
-    <Compile Include="Work\DataResolverResult.cs" />
-    <Compile Include="Helpers\ExifHelper.cs" />
-    <Compile Include="Helpers\Exif\IndexedReader.cs" />
-    <Compile Include="Helpers\Exif\TiffReader.cs" />
-    <Compile Include="Helpers\Exif\ITiffHandler.cs" />
-    <Compile Include="Helpers\Exif\TiffDataFormat.cs" />
-    <Compile Include="Helpers\Exif\StringValue.cs" />
-    <Compile Include="Helpers\Exif\Rational.cs" />
-    <Compile Include="Helpers\Exif\Directory.cs" />
-    <Compile Include="Helpers\Exif\Tag.cs" />
-    <Compile Include="Helpers\Exif\ITagDescriptor.cs" />
-    <Compile Include="Helpers\Exif\DirectoryTiffHandler.cs" />
-    <Compile Include="Helpers\Exif\ExifTiffHandler.cs" />
-    <Compile Include="Helpers\Exif\ExifIfd0Directory.cs" />
-    <Compile Include="Helpers\Exif\ExifIfd0Descriptor.cs" />
-    <Compile Include="Helpers\Exif\TagDescriptor.cs" />
-    <Compile Include="Helpers\Exif\DirectoryExtensions.cs" />
-    <Compile Include="Helpers\Exif\ExifSubIfdDescriptor.cs" />
-    <Compile Include="Helpers\Exif\ExifSubIfdDirectory.cs" />
-    <Compile Include="Helpers\Exif\ExifReader.cs" />
-    <Compile Include="Helpers\Exif\ByteArrayReader.cs" />
-    <Compile Include="Helpers\Exif\JpegSegmentReader.cs" />
-    <Compile Include="Helpers\Exif\SequentialReader.cs" />
-    <Compile Include="Helpers\Exif\SequentialStreamReader.cs" />
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <TextStylePolicy TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="80" TabsToSpaces="True" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="True" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" scope="text/x-csharp" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
-  <ItemGroup />
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Collections" />
-    <Reference Include="System.Diagnostics.Debug" />
-    <Reference Include="System.Reflection" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Runtime.Extensions" />
-    <Reference Include="System.Threading" />
+    <None Remove="backup_1\project.json" />
+    <None Remove="backup_1\project.lock.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\" />
-    <Folder Include="Args\" />
-    <Folder Include="DataResolvers\" />
-    <Folder Include="Decoders\" />
-    <Folder Include="Helpers\Exif\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-    <Target Name="_SetTargetFrameworkMonikerAttribute" BeforeTargets="GenerateTargetFrameworkMonikerAttribute">
-        <PropertyGroup>
-          <RealTargetFrameworkMoniker>.NETStandard,Version=v1.0</RealTargetFrameworkMoniker>
-          <RealTargetFrameworkMonikerDisplayName>$(RealTargetFrameworkMoniker)</RealTargetFrameworkMonikerDisplayName>
-          <TargetFrameworkMonikerAssemblyAttributeText Condition="'$(RealTargetFrameworkMoniker)' != '' and '$(TargetingClr2Framework)' != 'true'">
-            // &lt;autogenerated /&gt;
-            using System%3b
-            using System.Reflection%3b
-            [assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute("$(RealTargetFrameworkMoniker)", FrameworkDisplayName = "$(RealTargetFrameworkMonikerDisplayName)")]
-          </TargetFrameworkMonikerAssemblyAttributeText>
-        </PropertyGroup>
-    </Target>  
 </Project>
