@@ -97,10 +97,10 @@ namespace FFImageLoading.Work
             if (vect != null)
             {
                 if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},type={4})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits, vect.GetType().Name);
                 else
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
-                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}),type={5})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
+                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)), vect.GetType().Name);
             }
 
             KeyDownsamplingOnly = string.Empty;
