@@ -34,4 +34,12 @@
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
     <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
+      <Link>CornerTransformType.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Transformations\FlipType.cs">
+      <Link>FlipType.cs</Link>
+    </Compile>
+  </ItemGroup>
 </Project>
