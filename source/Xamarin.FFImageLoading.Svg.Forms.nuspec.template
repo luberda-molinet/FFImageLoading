@@ -55,9 +55,9 @@
         <file src="FFImageLoading.Svg.Forms.Mac\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Forms.pdb" />
 
 		<!--Windows UWP-->
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.dll" target="lib\uap\FFImageLoading.Svg.Forms.dll" />
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.xml" target="lib\uap\FFImageLoading.Svg.Forms.xml" />
-		<file src="FFImageLoading.Svg.Forms.Windows\bin\Windows Release\FFImageLoading.Svg.Forms.pdb" target="lib\uap\FFImageLoading.Svg.Forms.pdb" />
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Release\FFImageLoading.Svg.Forms.dll" target="lib\uap\FFImageLoading.Svg.Forms.dll" />
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Release\FFImageLoading.Svg.Forms.xml" target="lib\uap\FFImageLoading.Svg.Forms.xml" />
+		<file src="FFImageLoading.Svg.Forms.Windows\bin\Release\FFImageLoading.Svg.Forms.pdb" target="lib\uap\FFImageLoading.Svg.Forms.pdb" />
 
       <!--Tizen-->
       <file src="FFImageLoading.Svg.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Svg.Forms.dll" target="lib\tizen40\FFImageLoading.Svg.Forms.dll" />

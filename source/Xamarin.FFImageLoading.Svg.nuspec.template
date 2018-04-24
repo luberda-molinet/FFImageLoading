@@ -66,9 +66,9 @@ SVG support for FFImageLoading library.
         <file src="FFImageLoading.Svg.Mac\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Svg.Platform.pdb" />
  
 		<!--Windows UWP-->
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.dll" target="lib\uap\FFImageLoading.Svg.Platform.dll" />
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.xml" target="lib\uap\FFImageLoading.Svg.Platform.xml" />
-		<file src="FFImageLoading.Svg.Windows\bin\Windows Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap\FFImageLoading.Svg.Platform.pdb" />	
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\uap\FFImageLoading.Svg.Platform.dll" />
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\uap\FFImageLoading.Svg.Platform.xml" />
+		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap\FFImageLoading.Svg.Platform.pdb" />	
 
         <!--Tizen-->
         <file src="FFImageLoading.Svg.Tizen\bin\Release\tizen40\FFImageLoading.Svg.Platform.dll" target="lib\tizen40\FFImageLoading.Svg.Platform.dll" />

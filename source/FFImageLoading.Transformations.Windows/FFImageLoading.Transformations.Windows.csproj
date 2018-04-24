@@ -17,13 +17,17 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WINDOWS;__WINDOWS__;</DefineConstants>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
+    <DefineConstants>TRACE;WINDOWS;__WINDOWS__;</DefineConstants>        
   </PropertyGroup>  
   
   <ItemGroup>

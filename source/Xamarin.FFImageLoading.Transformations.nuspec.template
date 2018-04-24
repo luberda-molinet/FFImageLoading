@@ -63,19 +63,19 @@ Don't forget to add the package in all platform specific projects. This way the 
         <file src="FFImageLoading.Transformations.Mac\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />
  
 		<!--Windows RT-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\win81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\win81\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\win81\FFImageLoading.Transformations.pdb" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\win81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\win81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\win81\FFImageLoading.Transformations.pdb" />
 
 		<!--Windows UWP-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\uap\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\uap\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\uap\FFImageLoading.Transformations.pdb" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\uap\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\uap\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\uap\FFImageLoading.Transformations.pdb" />
 
 		<!--Windows RT Phone-->
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.dll" target="lib\wpa81\FFImageLoading.Transformations.dll" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.xml" target="lib\wpa81\FFImageLoading.Transformations.xml" />
-		<file src="FFImageLoading.Transformations.Windows\bin\Windows Release\FFImageLoading.Transformations.pdb" target="lib\wpa81\FFImageLoading.Transformations.pdb" />        
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\wpa81\FFImageLoading.Transformations.pdb" />        
 
         <!--Tizen-->
         <file src="FFImageLoading.Transformations.Tizen\bin\Release\tizen40\FFImageLoading.Transformations.dll" target="lib\tizen40\FFImageLoading.Transformations.dll" />
