@@ -1,106 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>FFImageLoading.Forms</RootNamespace>
+    <TargetFramework>netstandard1.1</TargetFramework>
     <AssemblyName>FFImageLoading.Forms</AssemblyName>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-    <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyTFMAttribute.cs</TargetFrameworkMonikerAssemblyAttributesPath>                
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-    <NoWarn>1591</NoWarn>
+    <PackageId>FFImageLoading.Forms</PackageId>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
-    <Optimize>false</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <DefineConstants>DEBUG</DefineConstants>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <PlatformTarget>anycpu</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  </PropertyGroup>        
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CachedImage.cs" />
-    <Compile Include="ImageSourceConverter.cs" />
-    <Compile Include="ICacheKeyFactory.cs" />
-    <Compile Include="Args\GetImageAsJpgArgs.cs" />
-    <Compile Include="Args\GetImageAsPngArgs.cs" />
-    <Compile Include="Args\CachedImageEvents.cs" />
-    <Compile Include="Extensions\ColorExtensions.cs" />
-    <Compile Include="IVectorImageSource.cs" />
-    <Compile Include="EmbeddedResourceImageSource.cs" />
-    <Compile Include="DataUrlImageSource.cs" />
-    <Compile Include="IImageSourceBinding.cs" />
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj">
-      <Project>{32BFDBC6-F42B-4D67-BF53-E19BB7D3A799}</Project>
-      <Name>FFImageLoading.Mock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj">
-      <Project>{957F1B47-0ADC-4BFE-AB87-8D0FBFB59BC4}</Project>
-      <Name>FFImageLoading.Forms.Mock</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-    <Target Name="_SetTargetFrameworkMonikerAttribute" BeforeTargets="GenerateTargetFrameworkMonikerAttribute">
-        <PropertyGroup>
-          <RealTargetFrameworkMoniker>.NETStandard,Version=v1.0</RealTargetFrameworkMoniker>
-          <RealTargetFrameworkMonikerDisplayName>$(RealTargetFrameworkMoniker)</RealTargetFrameworkMonikerDisplayName>
-          <TargetFrameworkMonikerAssemblyAttributeText Condition="'$(RealTargetFrameworkMoniker)' != '' and '$(TargetingClr2Framework)' != 'true'">
-            // &lt;autogenerated /&gt;
-            using System%3b
-            using System.Reflection%3b
-            [assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute("$(RealTargetFrameworkMoniker)", FrameworkDisplayName = "$(RealTargetFrameworkMonikerDisplayName)")]
-          </TargetFrameworkMonikerAssemblyAttributeText>
-        </PropertyGroup>
-    </Target>       
 </Project>
