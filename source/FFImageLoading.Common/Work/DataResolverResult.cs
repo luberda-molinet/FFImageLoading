@@ -3,6 +3,16 @@ using System.IO;
 
 namespace FFImageLoading.Work
 {
+    public class DataResolverResult<TImageContainer> : DataResolverResult
+    {
+        public DataResolverResult(TImageContainer imageContainer, LoadingResult loadingResult, ImageInformation imageInformation)
+        {
+            ImageContainer = imageContainer;
+            LoadingResult = loadingResult;
+            ImageInformation = imageInformation;
+        }
+    }
+
     public class DataResolverResult
     {
         public DataResolverResult()

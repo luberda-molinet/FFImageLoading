@@ -16,10 +16,18 @@ using System.Text.RegularExpressions;
 using Foundation;
 using UIKit;
 using CoreGraphics;
+#elif __MACOS__
+using Foundation;
+using AppKit;
+using CoreGraphics;
 #elif __ANDROID__
 using Android.Util;
 using Android.Runtime;
 using Android.Content;
+using Android.Graphics;
+using FFImageLoading.Drawables;
+#elif __WINDOWS__
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 namespace FFImageLoading.Svg.Platform
@@ -157,21 +165,108 @@ namespace FFImageLoading.Svg.Platform
                 sizeY = sizeY.DpToPixels();
             }
 
-            lock (_encodingLock)
+            resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
+
+            using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
+            using (var canvas = new SKCanvas(bitmap))
+            using (var paint = new SKPaint())
             {
-                using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
-                //using (var bitmap = new SKBitmap((int)sizeX, (int)sizeY))
-                using (var canvas = new SKCanvas(bitmap))
-                using (var paint = new SKPaint())
+                canvas.Clear(SKColors.Transparent);
+                float scaleX = (float)sizeX / picture.CullRect.Width;
+                float scaleY = (float)sizeY / picture.CullRect.Height;
+                var matrix = SKMatrix.MakeScale(scaleX, scaleY);
+                canvas.DrawPicture(picture, ref matrix, paint);
+                canvas.Flush();
+#if __IOS__
+                var info = bitmap.Info;            
+                CGImage cgImage;
+                IntPtr size;
+                using (var provider = new CGDataProvider(bitmap.GetPixels(out size), size.ToInt32()))
+                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+                using (cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
+                        colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
+                        provider, null, false, CGColorRenderingIntent.Default))
                 {
-                    canvas.Clear(SKColors.Transparent);
-                    float scaleX = (float)sizeX / picture.CullRect.Width;
-                    float scaleY = (float)sizeY / picture.CullRect.Height;
-                    var matrix = SKMatrix.MakeScale(scaleX, scaleY);
+                    return new DataResolverResult<UIImage>(new UIImage(cgImage), resolvedData.LoadingResult, resolvedData.ImageInformation);	
+                }            
+#elif __MACOS__
+                var info = bitmap.Info;
+                CGImage cgImage;
+                IntPtr size;
+                using (var provider = new CGDataProvider(bitmap.GetPixels(out size), size.ToInt32()))
+                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+                using (cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
+                        colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
+                        provider, null, false, CGColorRenderingIntent.Default))
+                {
+                    return new DataResolverResult<NSImage>(new NSImage(cgImage, CGSize.Empty), resolvedData.LoadingResult, resolvedData.ImageInformation);
+                }
+#elif __ANDROID__
+                using (var skiaPixmap = bitmap.PeekPixels())
+                {
+                    var info = skiaPixmap.Info;
 
-                    canvas.DrawPicture(picture, ref matrix, paint);
-                    canvas.Flush();
+                    // destination values
+                    var config = Bitmap.Config.Argb8888;
+                    var dstInfo = new SKImageInfo(info.Width, info.Height);
 
+                    // try keep the pixel format if we can
+                    switch (info.ColorType)
+                    {
+                        case SKColorType.Alpha8:
+                            config = Bitmap.Config.Alpha8;
+                            dstInfo.ColorType = SKColorType.Alpha8;
+                            break;
+                        case SKColorType.Rgb565:
+                            config = Bitmap.Config.Rgb565;
+                            dstInfo.ColorType = SKColorType.Rgb565;
+                            dstInfo.AlphaType = SKAlphaType.Opaque;
+                            break;
+                        case SKColorType.Argb4444:
+                            config = Bitmap.Config.Argb4444;
+                            dstInfo.ColorType = SKColorType.Argb4444;
+                            break;
+                    }
+
+                    // destination bitmap
+                    var bmp = Bitmap.CreateBitmap(info.Width, info.Height, config);
+                    var ptr = bmp.LockPixels();
+
+                    // copy
+                    var success = skiaPixmap.ReadPixels(dstInfo, ptr, dstInfo.RowBytes);
+
+                    // confirm
+                    bmp.UnlockPixels();
+                    if (!success)
+                    {
+                        bmp.Recycle();
+                        bmp.Dispose();
+                        bmp = null;
+                    }
+
+                    return new DataResolverResult<SelfDisposingBitmapDrawable>(new SelfDisposingBitmapDrawable(bmp), resolvedData.LoadingResult, resolvedData.ImageInformation);
+                }
+#elif __WINDOWS__
+                WriteableBitmap writeableBitmap = null;
+
+                await Configuration.MainThreadDispatcher.PostAsync(async () =>
+                {
+                    using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
+                    {
+                        var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
+                        writeableBitmap = new WriteableBitmap(info.Width, info.Height);
+                        using (var pixmap = new SKPixmap(info, writeableBitmap.GetPixels()))
+                        {
+                            skiaImage.ReadPixels(pixmap, 0, 0);
+                        }
+                        writeableBitmap.Invalidate();                        
+                    }      
+                });
+
+                return new DataResolverResult<WriteableBitmap>(writeableBitmap, resolvedData.LoadingResult, resolvedData.ImageInformation);
+#else
+                lock (_encodingLock)
+                {
                     using (var image = SKImage.FromBitmap(bitmap))
                     //using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
                     using (var data = image.Encode())
@@ -179,10 +274,10 @@ namespace FFImageLoading.Svg.Platform
                         var stream = new MemoryStream();
                         data.SaveTo(stream);
                         stream.Position = 0;
-                        resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
                         return new DataResolverResult(stream, resolvedData.LoadingResult, resolvedData.ImageInformation);
                     }
                 }
+#endif
             }
         }
     }
