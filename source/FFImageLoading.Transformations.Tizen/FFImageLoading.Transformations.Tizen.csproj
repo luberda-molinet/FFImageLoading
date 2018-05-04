@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>tizen40</TargetFramework>
+    <TargetFramework>tizen4.0</TargetFramework>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
     <RootNamespace>FFImageLoading.Transformations</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>tizen40</TargetFramework>
+    <TargetFramework>tizen4.0</TargetFramework>
     <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateDependencyFile>False</GenerateDependencyFile>
