@@ -23,4 +23,7 @@
     <ProjectReference Include="..\FFImageLoading.Tizen\FFImageLoading.Tizen.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>

@@ -47,3 +47,6 @@ source/FFImageLoading.Transformations/AssemblyTFMAttribute.cs
 .vs/FFImageLoading/xs/UserPrefs.xml
 .mfractor/.ffimageloading.db
 source/FFImageLoading.Forms.Tizen/.vs/FFImageLoading.Forms.Tizen/xs/UserPrefs.xml
+.vs/FFImageLoading/xs/sqlite3/db.lock
+.vs/FFImageLoading/xs/sqlite3/storage.ide-shm
+.vs/FFImageLoading/xs/sqlite3/storage.ide-wal
