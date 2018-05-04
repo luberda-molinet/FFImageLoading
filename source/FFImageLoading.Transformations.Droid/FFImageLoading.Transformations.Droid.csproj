@@ -20,7 +20,7 @@
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;__ANDROID__;</DefineConstants>
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
@@ -32,7 +32,7 @@
     <DebugType>portable</DebugType>		
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>

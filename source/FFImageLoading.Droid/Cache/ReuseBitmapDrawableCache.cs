@@ -45,11 +45,11 @@ namespace FFImageLoading.Cache
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReuseBitmapDrawableCache"/> class.
+        /// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.ReuseBitmapDrawableCache`1"/> class.
         /// </summary>
-        /// <param name="logger">Logger for debug messages</param>
-        /// <param name="highWatermark">Maximum number of bytes the reuse pool will hold before starting evictions.</param>
-        /// <param name="lowWatermark">Number of bytes the reuse pool will be drained down to after the high watermark is exceeded.</param>
+        /// <param name="logger">Logger.</param>
+        /// <param name="memoryCacheSize">Memory cache size.</param>
+        /// <param name="bitmapPoolSize">Bitmap pool size.</param>
         /// <param name="verboseLogging">If set to <c>true</c> verbose logging.</param>
         public ReuseBitmapDrawableCache(IMiniLogger logger, int memoryCacheSize, int bitmapPoolSize, bool verboseLogging = false)
         {

@@ -55,8 +55,7 @@ namespace FFImageLoading.Extensions
                 // paint.AntiAlias = true;
                 // paint.Dither = true;
                 // paint.FilterBitmap = true;
-                canvas.Save(Android.Graphics.SaveFlags.Matrix);
-
+                canvas.Save();
                 if (rotationDegrees == 90)
                     canvas.Rotate(rotationDegrees, width / 2, width / 2);
                 else if (rotationDegrees == 270)
