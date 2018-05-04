@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>        
     <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
     <PackageId>FFImageLoading.Forms.Platform</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

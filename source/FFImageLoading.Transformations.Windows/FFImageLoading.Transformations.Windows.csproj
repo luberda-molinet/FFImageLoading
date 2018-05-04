@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>        
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
     <PackageId>FFImageLoading.Transformations</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

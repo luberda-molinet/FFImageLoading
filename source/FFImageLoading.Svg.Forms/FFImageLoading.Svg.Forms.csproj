@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
+    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>        
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
     <PackageId>FFImageLoading.Svg.Forms</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
