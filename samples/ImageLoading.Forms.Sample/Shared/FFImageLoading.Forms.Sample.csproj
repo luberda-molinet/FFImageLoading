@@ -1,44 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
-    <AssemblyName>Shared</AssemblyName>
-    <PackageId>Shared</PackageId>
-    <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
-    <PackageReference Include="PropertyChanged.Fody" Version="2.5.4" />
-    <PackageReference Include="SkiaSharp" Version="1.60.0" />
-    <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
-    <PackageReference Include="Xamvvm.Forms" Version="1.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg\FFImageLoading.Svg.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms\FFImageLoading.Svg.Forms.csproj" />
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations\FFImageLoading.Transformations.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Resources\replace.svg" />
-    <None Remove="Resources\sample.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\replace.svg" />
-    <EmbeddedResource Include="Resources\sample.svg" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AssemblyName>Shared</AssemblyName>
+        <PackageId>Shared</PackageId>
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+        <PackageReference Include="PropertyChanged.Fody" Version="2.5.4" />
+        <PackageReference Include="SkiaSharp" Version="1.60.0" />
+        <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
+        <PackageReference Include="Xamvvm.Forms" Version="1.0.4" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Svg\FFImageLoading.Svg.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms\FFImageLoading.Svg.Forms.csproj" />
+        <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations\FFImageLoading.Transformations.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Resources\replace.svg" />
+        <None Remove="Resources\sample.svg" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\replace.svg" />
+        <EmbeddedResource Include="Resources\sample.svg" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- https://bugzilla.xamarin.com/show_bug.cgi?id=55591 -->
+        <None Remove="**\*.xaml" />
+        <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
+        <EmbeddedResource Include="**\*.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" />        
+    </ItemGroup>
 </Project>
