@@ -20,7 +20,6 @@
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
     <ProjectReference Include="..\FFImageLoading.Forms.Tizen\FFImageLoading.Forms.Tizen.csproj" />
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
     <ProjectReference Include="..\FFImageLoading.Svg.Tizen\FFImageLoading.Svg.Tizen.csproj" />
   </ItemGroup>
 
