@@ -5,9 +5,19 @@
     <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
+    <PackageId>FFImageLoading.Svg.Forms.Tizen</PackageId>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateDependencyFile>False</GenerateDependencyFile>
     <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn> 
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Version>1.0.0</Version>
+    <Authors>Daniel Luberda</Authors>
+    <Company>Daniel Luberda</Company>
+    <Product>FFImageLoading</Product>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Copyright>Daniel Luberda</Copyright>          
   </PropertyGroup>
 
   <ItemGroup>
