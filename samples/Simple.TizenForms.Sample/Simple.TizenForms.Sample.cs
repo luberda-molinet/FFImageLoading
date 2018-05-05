@@ -30,7 +30,7 @@ namespace Simple.TizenForms.Sample
         static void Main(string[] args)
         {
             var app = new Program();
-            FFImageLoading.Forms.Tizen.CachedImageRenderer.Init();
+            FFImageLoading.Forms.Tizen.CachedImageRenderer.Init(app);
             Xamarin.Forms.Platform.Tizen.Forms.Init(app, true);
             app.Run(args);
         }
