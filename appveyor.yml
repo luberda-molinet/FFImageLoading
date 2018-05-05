@@ -8,19 +8,19 @@ environment:
   CAKE_SETTINGS_SKIPVERIFICATION: true
   ANDROID_HOME: 'C:\Program Files (x86)\Android\android-sdk\'  
   
-# assembly_info:
-#   patch: true
-#   file: '**\AssemblyInfo.*'
-#   assembly_version: $(appveyor_build_version)
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: $(appveyor_build_version)
 
-# dotnet_csproj:
-#   patch: true
-#   file: '**\*.csproj'
-#   version: $(appveyor_build_version)
-#   package_version: $(appveyor_build_version)
-#   assembly_version: $(appveyor_build_version)
-#   file_version: $(appveyor_build_version)
-#   informational_version: $(appveyor_build_version)
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: $(appveyor_build_version)
+  package_version: $(appveyor_build_version)
+  assembly_version: $(appveyor_build_version)
+  file_version: $(appveyor_build_version)
+  informational_version: $(appveyor_build_version)
 
 install:
 - ps: Invoke-WebRequest https://cakebuild.net/download/bootstrapper/windows -OutFile build.ps1    
