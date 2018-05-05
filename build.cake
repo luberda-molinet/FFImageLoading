@@ -15,7 +15,7 @@ Task("Libraries")
 {
 	NuGetRestore (SLN);
 
-	DotNetBuild(solutioSLNnFile, settings => settings
+	DotNetBuild(SLN, settings => settings
 		.SetConfiguration(CONFIG)
 		.WithProperty("NoWarn", "1701;1702;1705;1591;1587;NU1605")
 		.SetVerbosity(Verbosity.Minimal));
