@@ -44,10 +44,10 @@ Task ("NuGet")
     if(!DirectoryExists("./Build/nuget/"))
         CreateDirectory("./Build/nuget");
 
-    ReplaceTextInFiles("./nuget/*.nuspec", "@version", NUGET_VERSION)
     var nuspecFiles = GetFiles("./nuget/*.nuspec");
     foreach(var file in nuspecFiles)
     {
+        ReplaceTextInFiles(file.FullPath, "@version", NUGET_VERSION);
         NuGetPack (file.FullPath, new NuGetPackSettings { 
             Version = NUGET_VERSION,
             OutputDirectory = "./Build/nuget/",
