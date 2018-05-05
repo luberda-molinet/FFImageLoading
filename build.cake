@@ -31,7 +31,7 @@ Task("Libraries")
 			.SetMSBuildPlatform(Cake.Common.Tools.MSBuild.MSBuildPlatform.x86)
 			.SetVerbosity(Verbosity.Minimal)
 			.WithProperty("TreatWarningsAsErrors", false.ToString())
-			.WithProperty("NoWarn", "1701","1702","1705","1591","1587","NU1605")
+			.WithProperty("NoWarn", "1591") /* 1701","1702","1705","1591","1587","NU1605" */
 			);
 	});
 
@@ -70,7 +70,7 @@ Task ("NuGet")
 			NuGetPack (file.FullPath, new NuGetPackSettings { 
 				Version = NUGET_VERSION,
 				OutputDirectory = "./Build/nuget/",
-				BasePath = "./"
+				BasePath = "./source"
 			});
 		}
 	});
