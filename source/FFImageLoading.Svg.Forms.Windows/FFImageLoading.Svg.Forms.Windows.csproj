@@ -9,6 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
+    <PackageId>FFImageLoading.Svg.Forms.Windows</PackageId>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

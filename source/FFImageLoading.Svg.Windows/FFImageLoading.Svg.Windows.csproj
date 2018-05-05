@@ -9,6 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FFImageLoading.Svg.Platform</RootNamespace>
     <AssemblyName>FFImageLoading.Svg.Platform</AssemblyName>
+    <PackageId>FFImageLoading.Svg.Platform.Windows</PackageId>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>

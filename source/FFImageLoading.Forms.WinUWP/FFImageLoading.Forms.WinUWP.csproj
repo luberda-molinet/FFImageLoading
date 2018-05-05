@@ -10,6 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FFImageLoading.Forms.Platform</RootNamespace>
     <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
+    <PackageId>FFImageLoading.Forms.Platform.UWP</PackageId>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
