@@ -16,10 +16,10 @@ Task("RestoreNuGet")
 	{
 		var settings = new NuGetRestoreSettings()
 		{
-			Verbosity = NuGetVerbosity.Quiet,
+			Verbosity = NuGetVerbosity.Quiet
 		};
 		NuGetRestore(SLN, settings);		
-	})
+	});
 
 Task("Libraries")
 	.IsDependentOn("RestoreNuGet")
