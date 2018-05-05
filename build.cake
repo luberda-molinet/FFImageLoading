@@ -10,9 +10,10 @@ var SLN = "./FFImageLoading.sln";
 
 var ANDROID_HOME = EnvironmentVariable ("ANDROID_HOME") ?? Argument ("android_home", "");
 
-Task("Libraries").Does(()=>
+Task("Libraries")
+    .IsDependentOn("Clean")
+    .Does(()=>
 {
-    DotNetCoreRestore (SLN);
 	NuGetRestore (SLN);
 	MSBuild (SLN, c => {
 		c.Configuration = CONFIG;

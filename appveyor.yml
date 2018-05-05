@@ -27,8 +27,7 @@ install:
 # - cmd: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
 
 build_script:
-- cmd: >-
-    powershell .\build.ps1 -Target Default -Verbosity diagnostic
+- ps: .\build.ps1 -Target Default -Verbosity Diagnostic
 
 test_script: 
  cmd: dotnet test source\Tests\FFImageLoading.Tests -c Release --no-build --no-restore
