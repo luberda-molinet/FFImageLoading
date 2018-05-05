@@ -32,7 +32,7 @@ nuget.exe
 .vs/config/applicationhost.config
 *.DS_Store
 *.bak
-.vs/FFImageLoading.sqlite
+.vs/*
 *.ide
 *.lock.json
 *.droidres.db

@@ -27,6 +27,7 @@ using Android.Content;
 using Android.Graphics;
 using FFImageLoading.Drawables;
 #elif __WINDOWS__
+using Windows.Foundation;
 using Windows.UI.Xaml.Media.Imaging;
 #endif
 
@@ -255,7 +256,17 @@ namespace FFImageLoading.Svg.Platform
                     {
                         var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
                         writeableBitmap = new WriteableBitmap(info.Width, info.Height);
-                        using (var pixmap = new SKPixmap(info, writeableBitmap.GetPixels()))
+
+                        var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
+                        if (buffer == null)
+                            throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
+
+                        IntPtr ptr;
+                        var hr = buffer.Buffer(out ptr);
+                        if (hr < 0)
+                            throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
+
+                        using (var pixmap = new SKPixmap(info, ptr))
                         {
                             skiaImage.ReadPixels(pixmap, 0, 0);
                         }
@@ -280,5 +291,15 @@ namespace FFImageLoading.Svg.Platform
 #endif
             }
         }
+
+#if __WINDOWS__
+        [System.Runtime.InteropServices.ComImport]
+        [System.Runtime.InteropServices.Guid("905a0fef-bc53-11df-8c49-001e4fc686da")]
+        [System.Runtime.InteropServices.InterfaceType(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface IBufferByteAccess
+        {
+            long Buffer([System.Runtime.InteropServices.Out] out IntPtr value);
+        }
+#endif
     }
 }

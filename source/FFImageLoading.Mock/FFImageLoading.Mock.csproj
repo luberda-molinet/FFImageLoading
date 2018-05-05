@@ -14,7 +14,8 @@
     <FileVersion>1.0.0.0</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Copyright>Daniel Luberda</Copyright>    
-    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>    
+    <RootNamespace>FFImageLoading.Platform</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
