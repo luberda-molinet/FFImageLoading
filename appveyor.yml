@@ -24,7 +24,7 @@ environment:
 
 install:
 - ps: Invoke-WebRequest https://cakebuild.net/download/bootstrapper/windows -OutFile build.ps1    
-- cmd: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
+# - cmd: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
 
 build_script:
 - cmd: >-

@@ -12,10 +12,10 @@ var ANDROID_HOME = EnvironmentVariable ("ANDROID_HOME") ?? Argument ("android_ho
 
 Task("Libraries").Does(()=>
 {
+    DotNetCoreRestore (SLN);
 	NuGetRestore (SLN);
 	MSBuild (SLN, c => {
 		c.Configuration = CONFIG;
-		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
 	});
 });
 
