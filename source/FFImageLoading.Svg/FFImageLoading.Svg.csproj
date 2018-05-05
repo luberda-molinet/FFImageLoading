@@ -13,7 +13,8 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
-    <Copyright>Daniel Luberda</Copyright>    
+    <Copyright>Daniel Luberda</Copyright>   
+    <NoWarn>1701;1702;1705;1591;1587</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
