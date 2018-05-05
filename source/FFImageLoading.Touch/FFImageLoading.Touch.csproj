@@ -9,7 +9,7 @@
     <RootNamespace>FFImageLoading</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>FFImageLoading.Platform</AssemblyName>
-    <NoWarn>1701;1702;1705;1591;1587</NoWarn>        
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

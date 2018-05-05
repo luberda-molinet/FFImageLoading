@@ -17,7 +17,7 @@
     </NuGetPackageImportStamp>
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
-    <NoWarn>1701;1702;1705;1591;1587</NoWarn>        
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

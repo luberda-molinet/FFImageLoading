@@ -7,7 +7,7 @@
     <RootNamespace>FFImageLoading.Svg.Platform</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DefineConstants>$(DefineConstants);__TIZEN__</DefineConstants>
-    <NoWarn>1701;1702;1705;1591;1587</NoWarn>     
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>     
   </PropertyGroup>
 
   <ItemGroup>

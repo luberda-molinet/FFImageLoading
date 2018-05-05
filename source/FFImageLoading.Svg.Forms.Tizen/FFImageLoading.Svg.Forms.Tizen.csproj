@@ -7,7 +7,7 @@
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateDependencyFile>False</GenerateDependencyFile>
-    <NoWarn>1701;1702;1705;1591;1587</NoWarn> 
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn> 
   </PropertyGroup>
 
   <ItemGroup>

@@ -11,7 +11,6 @@ var SLN = "./FFImageLoading.sln";
 var ANDROID_HOME = EnvironmentVariable ("ANDROID_HOME") ?? Argument ("android_home", "");
 
 Task("Libraries")
-    .IsDependentOn("Clean")
     .Does(()=>
 {
 	NuGetRestore (SLN);
@@ -60,11 +59,13 @@ Task ("NuGet")
     }
 });
 
-Task ("Default").IsDependentOn("NuGet");
+Task ("Default")
+    .IsDependentOn("Clean")
+	.IsDependentOn("NuGet");
 
 Task ("Clean").Does (() => 
 {
-	CleanDirectory ("./component/tools/");
+	// CleanDirectory ("./component/tools/");
 	CleanDirectories ("./Build/");
 	CleanDirectories ("./**/bin");
 	CleanDirectories ("./**/obj");
