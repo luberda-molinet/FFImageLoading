@@ -25,10 +25,14 @@ Task("Libraries")
 	.IsDependentOn("RestoreNuGet")
     .Does(()=>
 	{
-		DotNetBuild(SLN, settings => settings
+		MSBuild(SLN, settings => settings
 			.SetConfiguration(CONFIG)
-			.WithProperty("NoWarn", "1701;1702;1705;1591;1587;NU1605")
-			.SetVerbosity(Verbosity.Minimal));
+			.UseToolVersion(MSBuildToolVersion.VS2017)
+			.SetMSBuildPlatform(Cake.Common.Tools.MSBuild.MSBuildPlatform.x86)
+			.SetVerbosity(Verbosity.Minimal)
+			.WithProperty("TreatWarningsAsErrors", false.ToString())
+			.WithProperty("NoWarn", "1701","1702","1705","1591","1587","NU1605")
+			);
 	});
 
 Task ("AndroidSDK")

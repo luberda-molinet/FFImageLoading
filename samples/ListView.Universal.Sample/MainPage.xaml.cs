@@ -37,7 +37,6 @@ namespace ListView.Universal.Sample
         public MainPage()
         {
             this.InitializeComponent();
-            FFImageLoading.ImageService.InvalidateDiskCache();
 
             for (int i = 0; i < 5; i++)
                 URLs.Add($"http://loremflickr.com/400/400?filename=simple.jpg?random={i}");
