@@ -29,7 +29,6 @@ Task("Libraries")
 			.SetConfiguration(CONFIG)
 			.UseToolVersion(MSBuildToolVersion.VS2017)
 			.SetMSBuildPlatform(Cake.Common.Tools.MSBuild.MSBuildPlatform.x86)
-			.SuppressVersionRecommendedFormatWarning()
 			.SetVerbosity(Verbosity.Minimal)
 			.WithProperty("TreatWarningsAsErrors", false.ToString())
 			.WithProperty("NoWarn", "1591") /* 1701","1702","1705","1591","1587","NU1605" */
