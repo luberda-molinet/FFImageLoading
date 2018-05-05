@@ -13,6 +13,7 @@
         <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+        <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />

@@ -20,8 +20,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>DEBUG</DefineConstants>        
     <OutputPath>bin\Debug</OutputPath>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>        
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>        
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
