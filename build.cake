@@ -14,12 +14,11 @@ Task("Libraries")
     .Does(()=>
 {
 	NuGetRestore (SLN);
-	MSBuild (SLN, c => {
-		c.Configuration = CONFIG;
-		// c.WithProperty("NoWarn", "1701;1702;1705;1591;1587;NU1605"); - not implemented yet?
-        c.WithProperty("TreatWarningsAsErrors", false);
-        c.SetVerbosity(Verbosity.Minimal);
-	});
+
+	DotNetBuild(solutioSLNnFile, settings => settings
+		.SetConfiguration(CONFIG)
+		.WithProperty("NoWarn", "1701;1702;1705;1591;1587;NU1605")
+		.SetVerbosity(Verbosity.Minimal));
 });
 
 Task ("AndroidSDK")
