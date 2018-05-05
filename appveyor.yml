@@ -1,83 +1,38 @@
 os: Visual Studio 2017
 configuration: Release
-# platform: Any CPU // https://github.com/appveyor/ci/issues/1915
 clone_depth: 1
 
 environment:
-  CLI_VERSION: 2.0.3
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  CAKE_SETTINGS_SKIPVERIFICATION: true
+  ANDROID_HOME: 'C:\Program Files (x86)\Android\android-sdk\'  
+  
+# assembly_info:
+#   patch: true
+#   file: '**\AssemblyInfo.*'
+#   assembly_version: $(appveyor_build_version)
 
-#environment:
-#  ANDROID_HOME: C:\android-sdk
-#  AndroidSdkDirectory: C:\android-sdk
-   
-# xamarin:
-#   email: EMAIL@ADDRESS.HE.RE
-#   password:
-#     secure: SECURE_PASSWORD_HERE
-#   android: true
-#   ios: true
+# dotnet_csproj:
+#   patch: true
+#   file: '**\*.csproj'
+#   version: $(appveyor_build_version)
+#   package_version: $(appveyor_build_version)
+#   assembly_version: $(appveyor_build_version)
+#   file_version: $(appveyor_build_version)
+#   informational_version: $(appveyor_build_version)
 
 install:
-- '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
+- ps: Invoke-WebRequest https://cakebuild.net/download/bootstrapper/windows -OutFile build.ps1    
+- cmd: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
 
 build_script:
-# - cmd: mklink /j %ANDROID_HOME% "C:\Program Files (x86)\Android\android-sdk"
-# - cmd: echo y | "%ANDROID_HOME%\tools\android.bat" update sdk --no-ui --all --filter platform-tools,tools,android-23,android-19
- - cmd: .\MakefileAll.bat
-  
-before_build:
-- cmd: dotnet --version
-- ps: >-
-    $nuspec1 = "source\Xamarin.FFImageLoading.nuspec"
-    
-    $nuspec2 = "source\Xamarin.FFImageLoading.Forms.nuspec"
-    
-    $nuspec3 = "source\Xamarin.FFImageLoading.Transformations.nuspec"
-    
-    $nuspec4 = "source\Xamarin.FFImageLoading.Svg.nuspec"
-    
-    $nuspec5 = "source\Xamarin.FFImageLoading.Svg.Forms.nuspec"
-    
-    $nuspec1template = "source\Xamarin.FFImageLoading.nuspec.template"
-    
-    $nuspec2template = "source\Xamarin.FFImageLoading.Forms.nuspec.template"
-    
-    $nuspec3template = "source\Xamarin.FFImageLoading.Transformations.nuspec.template" 
-    
-    $nuspec4template = "source\Xamarin.FFImageLoading.Svg.nuspec.template" 
-    
-    $nuspec5template = "source\Xamarin.FFImageLoading.Svg.Forms.nuspec.template" 
-
-    $version = $env:appveyor_build_version
-    
-    $branch = $env:appveyor_repo_branch
-    
-    $baseversion = $version.SubString(0, $version.LastIndexOf("."))
-
-    If ($env:appveyor_repo_tag -ine "true") {
-        
-        $version = ("{0}-pre-{1}" -f $baseversion, $env:appveyor_build_number)
-    }
-    Else {
-        $version = $baseversion    
-    }
-
-    If ($branch -ine "master") {
-        $version = ("{0}-{1}" -f $version, $branch.Replace("_", "-")).SubString(0, 20)
-    }
-          
-    (Get-Content $nuspec1template).replace('@version', $version) | Set-Content $nuspec1
-    
-    (Get-Content $nuspec2template).replace('@version', $version) | Set-Content $nuspec2    
-    
-    (Get-Content $nuspec3template).replace('@version', $version) | Set-Content $nuspec3
-    
-    (Get-Content $nuspec4template).replace('@version', $version) | Set-Content $nuspec4
-        
-    (Get-Content $nuspec5template).replace('@version', $version) | Set-Content $nuspec5
+- cmd: >-
+    powershell .\build.ps1 -Target Default -Verbosity diagnostic
 
 test_script: 
  cmd: dotnet test source\Tests\FFImageLoading.Tests -c Release --no-build --no-restore
 
 artifacts:
- - path: Xamarin.FFImageLoading.*.nupkg
+- path: ./Build/nuget/*.nupkg
+  name: NuGet
