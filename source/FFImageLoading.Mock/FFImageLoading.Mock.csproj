@@ -9,7 +9,7 @@
     <Authors>Daniel Luberda</Authors>
     <Company>Daniel Luberda</Company>
     <Product>FFImageLoading</Product>
-    <PackageId>FFImageLoading.Platform</PackageId>
+    <PackageId>FFImageLoading.Platform.Mock</PackageId>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>

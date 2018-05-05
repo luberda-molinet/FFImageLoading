@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.0</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.2</NetStandardImplicitPackageVersion>        
     <AssemblyName>FFImageLoading.Forms.Platform</AssemblyName>
-    <PackageId>FFImageLoading.Forms.Platform</PackageId>
+    <PackageId>FFImageLoading.Forms.Platform.Mock</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Version>1.0.0</Version>
     <Authors>Daniel Luberda</Authors>
