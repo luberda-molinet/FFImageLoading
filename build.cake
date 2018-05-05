@@ -47,7 +47,10 @@ Task ("NuGet")
     var nuspecFiles = GetFiles("./nuget/*.nuspec");
     foreach(var file in nuspecFiles)
     {
-        ReplaceTextInFiles(file.FullPath, "@version", NUGET_VERSION);
+        var updatedNuspec = System.IO.File.ReadAllText(file.FullPath)
+            .Replace("@version", NUGET_VERSION);
+        System.IO.File.WriteAllText(file.FullPath, updatedNuspec);        
+
         NuGetPack (file.FullPath, new NuGetPackSettings { 
             Version = NUGET_VERSION,
             OutputDirectory = "./Build/nuget/",
