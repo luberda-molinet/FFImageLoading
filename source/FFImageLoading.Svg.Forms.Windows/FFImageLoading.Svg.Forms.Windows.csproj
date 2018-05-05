@@ -10,6 +10,7 @@
     <RootNamespace>FFImageLoading.Svg.Forms</RootNamespace>
     <AssemblyName>FFImageLoading.Svg.Forms</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
@@ -109,10 +110,6 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\FFImageLoading.Svg.Forms.Windows.rd.xml" />
   </ItemGroup>
@@ -136,7 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.4.0</Version>
+      <Version>6.0.8</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
       <Version>1.60.0</Version>
