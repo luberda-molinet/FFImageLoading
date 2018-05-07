@@ -113,12 +113,12 @@ Features:
         <file src="FFImageLoading.Forms.WinRT\bin\Release\FFImageLoading.Forms.Platform.pdb" target="lib\wpa81\FFImageLoading.Forms.Platform.pdb" />
 
         <!--Tizen-->
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.dll" target="lib\tizen40\FFImageLoading.Forms.dll" />
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.xml" target="lib\tizen40\FFImageLoading.Forms.xml" />
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.pdb" target="lib\tizen40\FFImageLoading.Forms.pdb" />
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Platform.dll" target="lib\tizen40\FFImageLoading.Forms.Platform.dll" />
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Platform.xml" target="lib\tizen40\FFImageLoading.Forms.Platform.xml" />
-        <file src="FFImageLoading.Forms.Tizen\bin\Release\tizen40\FFImageLoading.Forms.Platform.pdb" target="lib\tizen40\FFImageLoading.Forms.Platform.pdb" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.dll" target="lib\tizen40\FFImageLoading.Forms.dll" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.xml" target="lib\tizen40\FFImageLoading.Forms.xml" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.pdb" target="lib\tizen40\FFImageLoading.Forms.pdb" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.Platform.dll" target="lib\tizen40\FFImageLoading.Forms.Platform.dll" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.Platform.xml" target="lib\tizen40\FFImageLoading.Forms.Platform.xml" />
+        <file src="FFImageLoading.Forms.Tizen\bin\Release\FFImageLoading.Forms.Platform.pdb" target="lib\tizen40\FFImageLoading.Forms.Platform.pdb" />
 
     </files>
     

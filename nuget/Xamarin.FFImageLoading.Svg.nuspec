@@ -71,9 +71,9 @@ SVG support for FFImageLoading library.
 		<file src="FFImageLoading.Svg.Windows\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\uap\FFImageLoading.Svg.Platform.pdb" />	
 
         <!--Tizen-->
-        <file src="FFImageLoading.Svg.Tizen\bin\Release\tizen40\FFImageLoading.Svg.Platform.dll" target="lib\tizen40\FFImageLoading.Svg.Platform.dll" />
-        <file src="FFImageLoading.Svg.Tizen\bin\Release\tizen40\FFImageLoading.Svg.Platform.xml" target="lib\tizen40\FFImageLoading.Svg.Platform.xml" />
-        <file src="FFImageLoading.Svg.Tizen\bin\Release\tizen40\FFImageLoading.Svg.Platform.pdb" target="lib\tizen40\FFImageLoading.Svg.Platform.pdb" />
+        <file src="FFImageLoading.Svg.Tizen\bin\Release\FFImageLoading.Svg.Platform.dll" target="lib\tizen40\FFImageLoading.Svg.Platform.dll" />
+        <file src="FFImageLoading.Svg.Tizen\bin\Release\FFImageLoading.Svg.Platform.xml" target="lib\tizen40\FFImageLoading.Svg.Platform.xml" />
+        <file src="FFImageLoading.Svg.Tizen\bin\Release\FFImageLoading.Svg.Platform.pdb" target="lib\tizen40\FFImageLoading.Svg.Platform.pdb" />
 
 	</files>
 	

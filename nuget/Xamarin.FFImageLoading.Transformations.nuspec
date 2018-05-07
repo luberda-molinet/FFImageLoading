@@ -78,9 +78,9 @@ Don't forget to add the package in all platform specific projects. This way the 
 		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\wpa81\FFImageLoading.Transformations.pdb" />        
 
         <!--Tizen-->
-        <file src="FFImageLoading.Transformations.Tizen\bin\Release\tizen40\FFImageLoading.Transformations.dll" target="lib\tizen40\FFImageLoading.Transformations.dll" />
-        <file src="FFImageLoading.Transformations.Tizen\bin\Release\tizen40\FFImageLoading.Transformations.xml" target="lib\tizen40\FFImageLoading.Transformations.xml" />
-        <file src="FFImageLoading.Transformations.Tizen\bin\Release\tizen40\FFImageLoading.Transformations.pdb" target="lib\tizen40\FFImageLoading.Transformations.pdb" />
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.dll" target="lib\tizen40\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.xml" target="lib\tizen40\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.pdb" target="lib\tizen40\FFImageLoading.Transformations.pdb" />
 
 	</files>
 	
