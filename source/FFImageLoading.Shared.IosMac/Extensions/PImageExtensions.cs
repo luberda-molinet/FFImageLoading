@@ -43,7 +43,7 @@ namespace FFImageLoading.Extensions
             resizedImage.UnlockFocus();
             return resizedImage;
 #elif __IOS__
-            UIGraphics.BeginImageContextWithOptions(newSize, false, (nfloat)1.0);
+            UIGraphics.BeginImageContextWithOptions(newSize, false, 0);
 
             try
             {
