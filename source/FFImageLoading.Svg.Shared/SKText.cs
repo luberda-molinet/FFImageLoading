@@ -8,30 +8,26 @@ namespace FFImageLoading.Svg.Platform
 {
     internal class SKText : IEnumerable<SKTextSpan>
     {
-        private readonly List<SKTextSpan> _spans = new List<SKTextSpan>();
+        private readonly List<SKTextSpan> spans = new List<SKTextSpan>();
 
-        public SKTextAlign TextAlign { get; }
-
-        public SKText(SKTextAlign textAlign)
+        public SKText(SKPoint location, SKTextAlign textAlign)
         {
+            Location = location;
             TextAlign = textAlign;
         }
 
         public void Append(SKTextSpan span)
         {
-            _spans.Add(span);
+            spans.Add(span);
         }
 
-        public float MeasureTextWidth()
-        {
-            return _spans.Sum(x => x.Fill.MeasureText(x.Text));
-        }
+        public SKPoint Location { get; }
 
-        //public SKRect GetBoundingRect()
-        //{
-        //}
+        public SKTextAlign TextAlign { get; }
 
-        public IEnumerator<SKTextSpan> GetEnumerator() => _spans.GetEnumerator();
+        public float MeasureTextWidth() => spans.Sum(x => x.MeasureTextWidth());
+
+        public IEnumerator<SKTextSpan> GetEnumerator() => spans.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
