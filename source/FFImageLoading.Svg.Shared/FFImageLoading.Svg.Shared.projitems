@@ -21,6 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\CssHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\ColorHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SKSvgImage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKLinearGradient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SKRadialGradient.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
