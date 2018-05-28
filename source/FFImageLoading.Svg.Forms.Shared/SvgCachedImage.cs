@@ -107,10 +107,7 @@ namespace FFImageLoading.Svg.Forms
         static void HandleReplaceStringMapPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
             var cachedImage = bindable as SvgCachedImage;
-            if (cachedImage?.Source != null)
-            {
-                cachedImage.ReloadImage();
-            }
+            cachedImage?.ReloadImage();
         }
 
         /// <summary>
