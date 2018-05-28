@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using FFImageLoading.Svg.Forms;
+using FFImageLoading.Transformations;
+using FFImageLoading.Work;
 using Xamarin.Forms;
 using Xamvvm;
 
@@ -40,9 +43,10 @@ namespace FFImageLoading.Forms.Sample.Pages
                     HeightRequest = 100,
                     DownsampleToViewSize = true,
                     Aspect = Aspect.AspectFill,
-                    TransformPlaceholders = false,
+                    TransformPlaceholders = true,
                     LoadingPlaceholder = "loading.png",
                     ErrorPlaceholder = "error.png",
+                    Transformations = new List<ITransformation>() { new CircleTransformation() { BorderSize = 4, BorderHexColor = "#000000"} }
                 };
 
                 image2 = new SvgCachedImage()

@@ -248,33 +248,36 @@ namespace FFImageLoading.Svg.Platform
                     return new DataResolverResult<SelfDisposingBitmapDrawable>(new SelfDisposingBitmapDrawable(bmp), resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
 #elif __WINDOWS__
-                WriteableBitmap writeableBitmap = null;
-
-                await Configuration.MainThreadDispatcher.PostAsync(async () =>
+                if (parameters.Transformations == null || parameters.Transformations.Count == 0)
                 {
-                    using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
+                    WriteableBitmap writeableBitmap = null;
+
+                    await Configuration.MainThreadDispatcher.PostAsync(async () =>
                     {
-                        var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
-                        writeableBitmap = new WriteableBitmap(info.Width, info.Height);
-
-                        var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
-                        if (buffer == null)
-                            throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
-
-                        IntPtr ptr;
-                        var hr = buffer.Buffer(out ptr);
-                        if (hr < 0)
-                            throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
-
-                        using (var pixmap = new SKPixmap(info, ptr))
+                        using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
                         {
-                            skiaImage.ReadPixels(pixmap, 0, 0);
-                        }
-                        writeableBitmap.Invalidate();                        
-                    }      
-                });
+                            var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
+                            writeableBitmap = new WriteableBitmap(info.Width, info.Height);
 
-                return new DataResolverResult<WriteableBitmap>(writeableBitmap, resolvedData.LoadingResult, resolvedData.ImageInformation);
+                            var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
+                            if (buffer == null)
+                                throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
+
+                            IntPtr ptr;
+                            var hr = buffer.Buffer(out ptr);
+                            if (hr < 0)
+                                throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
+
+                            using (var pixmap = new SKPixmap(info, ptr))
+                            {
+                                skiaImage.ReadPixels(pixmap, 0, 0);
+                            }
+                            writeableBitmap.Invalidate();                        
+                        }      
+                    });
+
+                    return new DataResolverResult<WriteableBitmap>(writeableBitmap, resolvedData.LoadingResult, resolvedData.ImageInformation);
+                }
 #else
                 lock (_encodingLock)
                 {

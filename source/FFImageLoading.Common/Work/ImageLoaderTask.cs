@@ -280,7 +280,7 @@ namespace FFImageLoading.Work
 
         protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
 
-        async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
             using (imageData)
             {
@@ -306,6 +306,27 @@ namespace FFImageLoading.Work
 
                 return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
             }
+        }
+
+        protected virtual Task<IDecodedImage<TDecoderContainer>> ImageContainerToDecoderImageAsync(TImageContainer container)
+        {
+            return Task.FromResult<IDecodedImage<TDecoderContainer>>(new DecodedImage<TDecoderContainer>() { Image = container as TDecoderContainer });
+        }
+
+        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, TImageContainer image, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            if (image == null)
+                throw new ArgumentNullException(nameof(image));
+
+            if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+            {        
+                var decoderContainer = await ImageContainerToDecoderImageAsync(image);
+                var transformations = Parameters.Transformations.ToList();            
+                decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+            }
+
+            return image;
         }
 
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
@@ -465,7 +486,7 @@ namespace FFImageLoading.Work
                         }
                         else
                         {
-                            loadImage = loadImageData.ImageContainer as TImageContainer;
+                            loadImage = await GenerateImageAsync(path, source, loadImageData.ImageContainer as TImageContainer, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
                         }
 
                         if (loadImage != default(TImageContainer))
@@ -559,7 +580,7 @@ namespace FFImageLoading.Work
                     }
                     else
                     {
-                        image = imageData.ImageContainer as TImageContainer;
+                        image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.ImageContainer as TImageContainer, imageData.ImageInformation, true, false).ConfigureAwait(false);
                     }
 
                     ThrowIfCancellationRequested();
