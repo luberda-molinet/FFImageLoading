@@ -20,7 +20,6 @@ namespace FFImageLoading.Targets
             var control = Control;
 
             if (control == null) return;
-            if (control.Layer.Contents == image.CGImage) return;
 
             bool isXamarinForms = control.Layer is FFCALayer;
             var parameters = task.Parameters;
@@ -42,9 +41,13 @@ namespace FFImageLoading.Targets
                 {
                     //TODO fade animation
                     if (isXamarinForms)
-                        control.Layer.Contents = image.CGImage;               
+                    {
+                        control.Layer.Contents = image.CGImage;
+                    }
                     else
+                    {
                         control.Image = image;
+                    }
 
                     control.SetNeedsDisplay();
                     if (IsLayoutNeeded(task))
@@ -52,11 +55,14 @@ namespace FFImageLoading.Targets
                 }
                 else
                 {
-                    //TODO fade animation
                     if (isXamarinForms)
+                    {
                         control.Layer.Contents = image.CGImage;
+                    }
                     else
+                    {
                         control.Image = image;
+                    }
 
                     control.SetNeedsDisplay();
                     if (IsLayoutNeeded(task))
