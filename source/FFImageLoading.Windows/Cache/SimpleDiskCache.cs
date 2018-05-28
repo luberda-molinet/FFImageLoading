@@ -55,7 +55,7 @@ namespace FFImageLoading.Cache
         public SimpleDiskCache(StorageFolder rootFolder, string cacheFolderName, Configuration configuration)
         {
             Configuration = configuration;
-            this.rootFolder = rootFolder;
+            this.rootFolder = rootFolder ?? ApplicationData.Current.TemporaryFolder;
             this.cacheFolderName = cacheFolderName;
             initTask = Init();
         }
@@ -78,8 +78,7 @@ namespace FFImageLoading.Cache
         {
             try
             {
-                StorageFolder root = rootFolder ?? ApplicationData.Current.TemporaryFolder;
-                cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                 await InitializeEntries().ConfigureAwait(false);
             }
             catch
@@ -205,7 +204,7 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                        cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                        cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                         string filename = key + "." + (long)duration.TotalSeconds;
 
                         var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
@@ -261,9 +260,9 @@ namespace FFImageLoading.Cache
                 {
                     file = await cacheFolder.GetFileAsync(entry.FileName);
                 }
-                catch (DirectoryNotFoundException)
+                catch (IOException)
                 {
-                    cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                    cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                 }
 
                 if (file == null)
@@ -329,9 +328,9 @@ namespace FFImageLoading.Cache
                     }
                 }
             }
-            catch (DirectoryNotFoundException) 
+            catch (IOException) 
             {
-                cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
             }
             finally
             {
