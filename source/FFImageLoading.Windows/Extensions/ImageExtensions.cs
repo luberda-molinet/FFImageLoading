@@ -101,7 +101,7 @@ namespace FFImageLoading.Extensions
                     {
                         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(downscaledImage);
                         PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync(
-                            BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight, new BitmapTransform(),
+                            BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, new BitmapTransform(),
                             ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
 
                         var bytes = pixelDataProvider.DetachPixelData();
@@ -113,7 +113,7 @@ namespace FFImageLoading.Extensions
                 {
                     BitmapDecoder decoder = await BitmapDecoder.CreateAsync(image);
                     PixelDataProvider pixelDataProvider = await decoder.GetPixelDataAsync(
-                        BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight, new BitmapTransform(), 
+                        BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, new BitmapTransform(), 
                         ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
 
                     if (imageInformation != null)
