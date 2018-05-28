@@ -221,6 +221,7 @@ namespace FFImageLoading.Cache
                 catch (DirectoryNotFoundException ex)
                 {
                     Directory.CreateDirectory(_cachePath);
+                    return null;
                 }
             }
             catch
