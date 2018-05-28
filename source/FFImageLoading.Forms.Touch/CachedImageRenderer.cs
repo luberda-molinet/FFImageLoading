@@ -331,7 +331,7 @@ namespace FFImageLoading.Forms.Platform
 
             public FormsNSImageView()
             {
-                Layer = new CALayer();
+                Layer = new FFCALayer();
                 WantsLayer = true;
             }
 

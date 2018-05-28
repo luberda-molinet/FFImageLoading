@@ -1,5 +1,7 @@
 ﻿using System;
 using AppKit;
+using CoreAnimation;
+using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Targets
@@ -20,6 +22,7 @@ namespace FFImageLoading.Targets
             if (control == null) return;
             if (control.Layer.Contents == image.CGImage) return;
 
+            bool isXamarinForms = control.Layer is FFCALayer;
             var parameters = task.Parameters;
             var representations = image.Representations();
 
@@ -38,14 +41,23 @@ namespace FFImageLoading.Targets
                 if (animated)
                 {
                     //TODO fade animation
-                    control.Layer.Contents = image.CGImage;
+                    if (isXamarinForms)
+                        control.Layer.Contents = image.CGImage;               
+                    else
+                        control.Image = image;
+
                     control.SetNeedsDisplay();
                     if (IsLayoutNeeded(task))
                         control.NeedsLayout = true;
                 }
                 else
                 {
-                    control.Layer.Contents = image.CGImage;
+                    //TODO fade animation
+                    if (isXamarinForms)
+                        control.Layer.Contents = image.CGImage;
+                    else
+                        control.Image = image;
+
                     control.SetNeedsDisplay();
                     if (IsLayoutNeeded(task))
                         control.NeedsLayout = true;
