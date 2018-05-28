@@ -21,7 +21,7 @@ namespace FFImageLoading.Extensions
 
             var raStream = new InMemoryRandomAccessStream();
             // Encode pixels into stream
-            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, raStream);
+            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, raStream);
             encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)bitmap.PixelWidth, (uint)bitmap.PixelHeight, 96, 96, pixels);
             await encoder.FlushAsync();
 

@@ -32,7 +32,7 @@ namespace FFImageLoading
         public static async Task<Stream> AsPngStreamAsync(this BitmapDrawable drawable)
         {
             var stream = new MemoryStream();
-            await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 90, stream);
+            await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
 
             if (stream.Position != 0)
                 stream.Position = 0;

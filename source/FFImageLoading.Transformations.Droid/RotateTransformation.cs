@@ -49,6 +49,7 @@ namespace FFImageLoading.Transformations
                 degrees = 360d - degrees;
 
             Bitmap bitmap = Bitmap.CreateBitmap(source.Width, source.Height, Bitmap.Config.Argb8888);
+            bitmap.HasAlpha = true;
             using (Canvas canvas = new Canvas(bitmap))
             using (Paint paint = new Paint())
             using (BitmapShader shader = new BitmapShader(source, Shader.TileMode.Clamp, Shader.TileMode.Clamp))

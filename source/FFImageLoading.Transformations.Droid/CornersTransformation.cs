@@ -89,6 +89,7 @@ namespace FFImageLoading.Transformations
             float cropY = (float)((sourceHeight - desiredHeight) / 2);
 
             Bitmap bitmap = Bitmap.CreateBitmap((int)desiredWidth, (int)desiredHeight, Bitmap.Config.Argb8888);
+            bitmap.HasAlpha = true;
 
             using (Canvas canvas = new Canvas(bitmap))
             using (Paint paint = new Paint())
