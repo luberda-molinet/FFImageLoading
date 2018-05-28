@@ -205,6 +205,7 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
+                        cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                         string filename = key + "." + (long)duration.TotalSeconds;
 
                         var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
@@ -254,7 +255,16 @@ namespace FFImageLoading.Cache
                 if (!entries.TryGetValue(key, out entry))
                     return null;
 
-                var file = await cacheFolder.GetFileAsync(entry.FileName);
+                StorageFile file = null;
+
+                try
+                {
+                    file = await cacheFolder.GetFileAsync(entry.FileName);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                }
 
                 if (file == null)
                     return null;
@@ -310,13 +320,22 @@ namespace FFImageLoading.Cache
                 var entriesToRemove = await cacheFolder.GetFilesAsync();
                 foreach (var item in entriesToRemove)
                 {
-                    await item.DeleteAsync();
+                    try
+                    {
+                        await item.DeleteAsync();
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
                 }
-
-                entries.Clear();
+            }
+            catch (DirectoryNotFoundException) 
+            {
+                cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
             }
             finally
             {
+                entries.Clear();
                 fileWriteLock.Release();
             }
         }

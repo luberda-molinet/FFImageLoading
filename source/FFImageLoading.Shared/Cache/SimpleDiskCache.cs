@@ -110,6 +110,9 @@ namespace FFImageLoading.Cache
 
                     try
                     {
+                        if (!Directory.Exists(_cachePath))
+                            Directory.CreateDirectory(_cachePath);
+
                         CacheEntry oldEntry;
                         if (_entries.TryGetValue(key, out oldEntry))
                         {
@@ -173,7 +176,14 @@ namespace FFImageLoading.Cache
                 await Task.Delay(20).ConfigureAwait(false);
             }
 
-            Directory.Delete(_cachePath, true);
+            try
+            {
+                Directory.Delete(_cachePath, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+
             Directory.CreateDirectory (_cachePath);
             _entries.Clear();
         }
@@ -204,7 +214,14 @@ namespace FFImageLoading.Cache
                     return null;
 
                 string filepath = Path.Combine(_cachePath, entry.FileName);
-                return FileStore.GetInputStream(filepath, false);
+                try
+                {
+                    return FileStore.GetInputStream(filepath, false);
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    Directory.CreateDirectory(_cachePath);
+                }
             }
             catch
             {
