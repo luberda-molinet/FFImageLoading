@@ -277,8 +277,8 @@ namespace FFImageLoading.Svg.Platform
                     });
 
                     return new DataResolverResult<WriteableBitmap>(writeableBitmap, resolvedData.LoadingResult, resolvedData.ImageInformation);
-                }
-#else
+                }            
+#endif
                 lock (_encodingLock)
                 {
                     using (var image = SKImage.FromBitmap(bitmap))
@@ -291,7 +291,6 @@ namespace FFImageLoading.Svg.Platform
                         return new DataResolverResult(stream, resolvedData.LoadingResult, resolvedData.ImageInformation);
                     }
                 }
-#endif
             }
         }
 
