@@ -423,7 +423,7 @@ namespace FFImageLoading.Svg.Platform
                         else
                         {
                             if (fill != null)
-                                canvas.DrawPath(elementPath, fill);
+                                canvas.DrawPath(elementPath, fill);                        
                             if (stroke != null)
                                 canvas.DrawPath(elementPath, stroke);
                         }
@@ -1028,6 +1028,10 @@ namespace FFImageLoading.Svg.Platform
                     if (strokePaint == null)
                         strokePaint = CreatePaint(true);
                     strokePaint.StrokeWidth = ReadNumber(strokeWidth);
+                }
+                else if (strokePaint != null)
+                {
+                    strokePaint.StrokeWidth = 1f;
                 }
 
                 var strokeOpacity = GetString(style, "stroke-opacity");
