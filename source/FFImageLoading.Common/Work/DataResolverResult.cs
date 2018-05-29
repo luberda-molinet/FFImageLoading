@@ -5,6 +5,10 @@ namespace FFImageLoading.Work
 {
     public class DataResolverResult
     {
+        public DataResolverResult()
+        {         
+        }
+
         public DataResolverResult(IDecodedImage<object> decoded, LoadingResult loadingResult, ImageInformation imageInformation)
         {
             Decoded = decoded;

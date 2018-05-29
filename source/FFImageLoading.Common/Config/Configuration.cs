@@ -35,7 +35,7 @@ namespace FFImageLoading.Config
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
             AnimateGifs = true;
-            DelayInMs = 14; //Task.Delay resolution is around 15ms
+            DelayInMs = 10; //Task.Delay resolution is around 15ms
             ClearMemoryCacheOnOutOfMemory = true;
             InvalidateLayout = true;
         }

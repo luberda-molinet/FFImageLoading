@@ -196,12 +196,12 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetPath(identifier);
                 imageInformation.SetFilePath(null);
 
-                var result = new DataResolverResult()
+                var container = new DecodedImage<object>()
                 {
-                    ImageContainer = image,
-                    LoadingResult = LoadingResult.CompiledResource,
-                    ImageInformation = imageInformation,
+                    Image = image
                 };
+
+                var result = new DataResolverResult(container, LoadingResult.CompiledResource, imageInformation);
 
                 return result;
             }
