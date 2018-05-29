@@ -1199,6 +1199,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 IsAntialias = true,
                 IsStroke = stroke,
+                Color = SKColors.Black
             };
 
             if (stroke)
@@ -1207,11 +1208,6 @@ namespace FFImageLoading.Svg.Platform
                 strokePaint.StrokeMiter = 4f;
                 strokePaint.StrokeJoin = SKStrokeJoin.Miter;
                 strokePaint.StrokeCap = SKStrokeCap.Butt;
-                strokePaint.Color = SKColors.Transparent;
-            }
-            else
-            {
-                strokePaint.Color = SKColors.Black;
             }
 
             return strokePaint;
