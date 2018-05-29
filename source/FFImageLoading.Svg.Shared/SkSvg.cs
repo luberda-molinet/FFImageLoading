@@ -331,9 +331,25 @@ namespace FFImageLoading.Svg.Platform
                         var elementPath = ReadElement(e);
                         if (elementPath == null)
                             break;
-
+                  
+                        if (mask != null)
+                        {
+                            canvas.SaveLayer(new SKPaint());
+                            foreach (var gElement in mask.Element.Elements())
+                            {
+                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+                            }
+                            using (var paint = fill.Clone())
+                            {
+                                paint.BlendMode = SKBlendMode.SrcIn;
+                                canvas.DrawPath(elementPath, paint);
+                            }
+                            canvas.Restore();
+                            return;
+                        }
+                  
                         string fillId = e.Attribute("fill")?.Value;
-                        object addFill = null;
+                        object addFill = null;                  
                         if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out addFill))
                         {
                             var x = ReadNumber(e.Attribute("x"));
@@ -405,28 +421,11 @@ namespace FFImageLoading.Svg.Platform
                                 gradientPaint.TryDispose();
                             }
                         }
+                        else if (fill != null)
+                            canvas.DrawPath(elementPath, fill);
+                        if (stroke != null)
+                            canvas.DrawPath(elementPath, stroke);
 
-                        if (mask != null)
-                        {
-                            canvas.SaveLayer(new SKPaint());
-                            foreach (var gElement in mask.Element.Elements())
-                            {
-                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
-                            }
-                            using (var paint = fill.Clone())
-                            {
-                                paint.BlendMode = SKBlendMode.SrcIn;
-                                canvas.DrawPath(elementPath, paint);
-                            }
-                            canvas.Restore();
-                        }
-                        else
-                        {
-                            if (fill != null)
-                                canvas.DrawPath(elementPath, fill);                        
-                            if (stroke != null)
-                                canvas.DrawPath(elementPath, stroke);
-                        }
                         break;
                     }
                 case "g":
@@ -478,18 +477,22 @@ namespace FFImageLoading.Svg.Platform
                         var href = ReadHref(e);
                         if (href != null)
                         {
-                            // TODO: copy/process other attributes
+                            // create a deep copy as we will copy attributes
+                            href = new XElement(href);
+                            var attributes = e.Attributes();
+                            foreach (var attribute in attributes)
+                            {
+                                var name = attribute.Name.LocalName;
 
-                            var x = ReadNumber(e.Attribute("x"));
-                            var y = ReadNumber(e.Attribute("y"));
-                            var useTransform = SKMatrix.MakeTranslation(x, y);
-
-                            canvas.Save();
-                            canvas.Concat(ref useTransform);
+                                if (!name.Contains("href", StringComparison.OrdinalIgnoreCase)
+                                    && !name.Equals("id", StringComparison.OrdinalIgnoreCase)
+                                    && !name.Equals("transform", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    href.SetAttributeValue(attribute.Name, attribute.Value);
+                                }
+                            }
 
                             ReadElement(href, canvas, stroke?.Clone(), fill?.Clone());
-
-                            canvas.Restore();
                         }
                     }
                     break;
@@ -1140,19 +1143,18 @@ namespace FFImageLoading.Svg.Platform
                         var urlM = urlRe.Match(fill);
                         if (urlM.Success)
                         {
-                            var id = urlM.Groups[1].Value.Trim();
-
+                            var id = urlM.Groups[1].Value.Trim();                     
                             if (defs.TryGetValue(id, out XElement defE))
                             {
-                                switch (defE.Name.LocalName)
+                                switch (defE.Name.LocalName.ToLower())
                                 {
-                                    case "linearGradient":
+                                    case "lineargradient":
                                         fillPaint.Color = SKColors.Transparent;
                                         if (!fills.ContainsKey(fill))
                                             fills.Add(fill, ReadLinearGradient(defE));
                                         read = true;
                                         break;
-                                    case "radialGradient":
+                                    case "radialgradient":
                                         fillPaint.Color = SKColors.Transparent;
                                         if (!fills.ContainsKey(fill))
                                             fills.Add(fill, ReadRadialGradient(defE));
@@ -1197,7 +1199,6 @@ namespace FFImageLoading.Svg.Platform
             {
                 IsAntialias = true,
                 IsStroke = stroke,
-                Color = SKColors.Black
             };
 
             if (stroke)
@@ -1206,6 +1207,11 @@ namespace FFImageLoading.Svg.Platform
                 strokePaint.StrokeMiter = 4f;
                 strokePaint.StrokeJoin = SKStrokeJoin.Miter;
                 strokePaint.StrokeCap = SKStrokeCap.Butt;
+                strokePaint.Color = SKColors.Transparent;
+            }
+            else
+            {
+                strokePaint.Color = SKColors.Black;
             }
 
             return strokePaint;
