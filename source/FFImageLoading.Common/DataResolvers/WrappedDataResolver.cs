@@ -21,8 +21,8 @@ namespace FFImageLoading.DataResolvers
         {
             var resolved = await _resolver.Resolve(identifier, parameters, token);
 
-            if (resolved.Stream == null && resolved.ImageContainer == null)
-                throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.ImageContainer)}");
+            if (resolved.Stream == null && resolved.Decoded == null)
+                throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.Decoded)}");
 
             if (resolved.Stream != null && !resolved.Stream.CanSeek)
             {

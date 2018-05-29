@@ -188,7 +188,11 @@ namespace FFImageLoading.Svg.Platform
                         colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
                         provider, null, false, CGColorRenderingIntent.Default))
                 {
-                    return new DataResolverResult<UIImage>(new UIImage(cgImage), resolvedData.LoadingResult, resolvedData.ImageInformation);	
+                    IDecodedImage<object> container = new DecodedImage<object>()
+                    {
+                        Image = new UIImage(cgImage),
+                    };
+                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);	
                 }            
 #elif __MACOS__
                 var info = bitmap.Info;
@@ -200,7 +204,11 @@ namespace FFImageLoading.Svg.Platform
                         colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
                         provider, null, false, CGColorRenderingIntent.Default))
                 {
-                    return new DataResolverResult<NSImage>(new NSImage(cgImage, CGSize.Empty), resolvedData.LoadingResult, resolvedData.ImageInformation);
+                    IDecodedImage<object> container = new DecodedImage<object>()
+                    {
+                        Image = new NSImage(cgImage, CGSize.Empty),
+                    };
+                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
 #elif __ANDROID__
                 using (var skiaPixmap = bitmap.PeekPixels())
@@ -245,7 +253,11 @@ namespace FFImageLoading.Svg.Platform
                         bmp = null;
                     }
 
-                    return new DataResolverResult<SelfDisposingBitmapDrawable>(new SelfDisposingBitmapDrawable(bmp), resolvedData.LoadingResult, resolvedData.ImageInformation);
+                    IDecodedImage<object> container = new DecodedImage<object>()
+                    {
+                        Image = bmp,
+                    };
+                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
 #elif __WINDOWS__
                 if (parameters.Transformations == null || parameters.Transformations.Count == 0)
@@ -276,7 +288,11 @@ namespace FFImageLoading.Svg.Platform
                         }      
                     });
 
-                    return new DataResolverResult<WriteableBitmap>(writeableBitmap, resolvedData.LoadingResult, resolvedData.ImageInformation);
+                    IDecodedImage<object> container = new DecodedImage<object>()
+                    {
+                        Image = writeableBitmap,
+                    };
+                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }            
 #endif
                 lock (_encodingLock)

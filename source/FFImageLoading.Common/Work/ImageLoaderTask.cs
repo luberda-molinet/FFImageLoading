@@ -308,25 +308,35 @@ namespace FFImageLoading.Work
             }
         }
 
-        protected virtual Task<IDecodedImage<TDecoderContainer>> ImageContainerToDecoderImageAsync(TImageContainer container)
+        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, IDecodedImage<object> decoded, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
         {
-            return Task.FromResult<IDecodedImage<TDecoderContainer>>(new DecodedImage<TDecoderContainer>() { Image = container as TDecoderContainer });
-        }
-
-        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, TImageContainer image, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
-        {
-            if (image == null)
-                throw new ArgumentNullException(nameof(image));
-
+            var decoderContainer = new DecodedImage<TDecoderContainer>()
+            {
+                IsAnimated = decoded.IsAnimated,
+                Image = decoded.Image as TDecoderContainer,
+                AnimatedImages = decoded.AnimatedImages?.Select(
+                    v => new AnimatedImage<TDecoderContainer>() { Delay = v.Delay, Image = v.Image as TDecoderContainer })
+                                        .ToArray()
+            };
+                     
             if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {        
-                var decoderContainer = await ImageContainerToDecoderImageAsync(image);
-                var transformations = Parameters.Transformations.ToList();            
-                decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
-                return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+                var transformations = Parameters.Transformations.ToList();      
+
+                if (decoderContainer.IsAnimated)
+                {
+                    for (int i = 0; i < decoderContainer.AnimatedImages.Length; i++)
+                    {
+                        decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
+                    }
+                }
+                else
+                {
+                    decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                }            
             }
 
-            return image;
+            return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
         }
 
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
@@ -486,7 +496,7 @@ namespace FFImageLoading.Work
                         }
                         else
                         {
-                            loadImage = await GenerateImageAsync(path, source, loadImageData.ImageContainer as TImageContainer, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
+                            loadImage = await GenerateImageAsync(path, source, loadImageData.Decoded, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
                         }
 
                         if (loadImage != default(TImageContainer))
@@ -580,7 +590,7 @@ namespace FFImageLoading.Work
                     }
                     else
                     {
-                        image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.ImageContainer as TImageContainer, imageData.ImageInformation, true, false).ConfigureAwait(false);
+                        image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Decoded, imageData.ImageInformation, true, false).ConfigureAwait(false);
                     }
 
                     ThrowIfCancellationRequested();
