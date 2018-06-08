@@ -51,18 +51,19 @@ namespace FFImageLoading.Cache
             var context = new ContextWrapper(Application.Context);
             var am = (ActivityManager)context?.GetSystemService(Context.ActivityService);
 
-            bool amIsLowRamDevice = false;
+            bool isLowMemoryDevice = true;
             int amLargeMemoryClass = 128;
             int amMemoryClass = 48;
 
             if (am != null)
             {
-                amIsLowRamDevice = am.IsLowRamDevice;
+                if (Utils.HasKitKat())
+                    isLowMemoryDevice = am.IsLowRamDevice;
+
                 amMemoryClass = am.MemoryClass;
                 amLargeMemoryClass = am.LargeMemoryClass;
             }
 
-            bool isLowMemoryDevice = Utils.HasKitKat() && amIsLowRamDevice;
             bool isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
             int memoryClass = isLargeHeapEnabled ? amLargeMemoryClass : amMemoryClass;
             int maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
