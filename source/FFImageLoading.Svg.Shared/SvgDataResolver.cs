@@ -259,42 +259,42 @@ namespace FFImageLoading.Svg.Platform
                     };
                     return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
-#elif __WINDOWS__
-                if (parameters.Transformations == null || parameters.Transformations.Count == 0)
-                {
-                    WriteableBitmap writeableBitmap = null;
+//#elif __WINDOWS__
+//				if (parameters.Transformations == null || parameters.Transformations.Count == 0)
+//				{
+//					WriteableBitmap writeableBitmap = null;
 
-                    await Configuration.MainThreadDispatcher.PostAsync(async () =>
-                    {
-                        using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
-                        {
-                            var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
-                            writeableBitmap = new WriteableBitmap(info.Width, info.Height);
+//					await Configuration.MainThreadDispatcher.PostAsync(async () =>
+//					{
+//						using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
+//						{
+//							var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
+//							writeableBitmap = new WriteableBitmap(info.Width, info.Height);
 
-                            var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
-                            if (buffer == null)
-                                throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
+//							var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
+//							if (buffer == null)
+//								throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
 
-                            IntPtr ptr;
-                            var hr = buffer.Buffer(out ptr);
-                            if (hr < 0)
-                                throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
+//							IntPtr ptr;
+//							var hr = buffer.Buffer(out ptr);
+//							if (hr < 0)
+//								throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
 
-                            using (var pixmap = new SKPixmap(info, ptr))
-                            {
-                                skiaImage.ReadPixels(pixmap, 0, 0);
-                            }
-                            writeableBitmap.Invalidate();                        
-                        }      
-                    });
+//							using (var pixmap = new SKPixmap(info, ptr))
+//							{
+//								skiaImage.ReadPixels(pixmap, 0, 0);
+//							}
+//							writeableBitmap.Invalidate();                        
+//						}      
+//					});
 
-                    IDecodedImage<object> container = new DecodedImage<object>()
-                    {
-                        Image = writeableBitmap,
-                    };
-                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
-                }            
-#endif
+//					IDecodedImage<object> container = new DecodedImage<object>()
+//					{
+//						Image = writeableBitmap,
+//					};
+//					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+//				}            
+//#endif
                 lock (_encodingLock)
                 {
                     using (var image = SKImage.FromBitmap(bitmap))
