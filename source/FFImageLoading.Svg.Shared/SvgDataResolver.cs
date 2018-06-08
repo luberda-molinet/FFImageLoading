@@ -294,7 +294,7 @@ namespace FFImageLoading.Svg.Platform
 //					};
 //					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
 //				}            
-//#endif
+#endif
                 lock (_encodingLock)
                 {
                     using (var image = SKImage.FromBitmap(bitmap))
