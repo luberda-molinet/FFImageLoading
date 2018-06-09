@@ -110,7 +110,6 @@
     <Content Include="Assets\error.png" />
     <Content Include="Assets\loading.png" />
     <Content Include="Assets\sample.svg" />
-    <Content Include="IMPORTANT.txt" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
