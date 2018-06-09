@@ -1,0 +1,6 @@
+﻿if you have compilation issues
+SET SYSTEM ENVIRONMENT VARIABLES by runnning
+
+SET_ENVIRONMENT_VARIABLES.bat
+
+then restart Visual Studio

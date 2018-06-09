@@ -1,5 +1,4 @@
-﻿using FFImageLoading;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -59,9 +58,8 @@ namespace WinUWP
                     VerbosePerformanceLogging = false,
                     VerboseMemoryCacheLogging = false,
                     VerboseLoadingCancelledLogging = false,
-                    Logger = new CustomLogger(),
                 };
-                ImageService.Instance.Initialize(config);
+                FFImageLoading.ImageService.Instance.Initialize(config);
 
                 List<Assembly> assembliesToInclude = new List<Assembly>();
                 assembliesToInclude.Add(typeof(FFImageLoading.Forms.WinUWP.CachedImageRenderer).GetTypeInfo().Assembly);
@@ -112,24 +110,6 @@ namespace WinUWP
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
-        }
-
-        public class CustomLogger : FFImageLoading.Helpers.IMiniLogger
-        {
-            public void Debug(string message)
-            {
-                System.Diagnostics.Debug.WriteLine(message);
-            }
-
-            public void Error(string errorMessage)
-            {
-                System.Diagnostics.Debug.WriteLine(errorMessage);
-            }
-
-            public void Error(string errorMessage, Exception ex)
-            {
-                Error(errorMessage + System.Environment.NewLine + ex.ToString());
-            }
         }
     }
 }
