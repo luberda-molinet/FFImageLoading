@@ -111,11 +111,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\FFImageLoading.Forms.WinRT\ImageSourceBinding.cs">
-      <Link>ImageSourceBinding.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CachedImageRenderer.cs" />
+    <Compile Include="ImageSourceBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
