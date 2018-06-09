@@ -29,6 +29,7 @@ using FFImageLoading.Drawables;
 #elif __WINDOWS__
 using Windows.Foundation;
 using Windows.UI.Xaml.Media.Imaging;
+using System.Runtime.InteropServices.WindowsRuntime;
 #endif
 
 namespace FFImageLoading.Svg.Platform
@@ -259,43 +260,30 @@ namespace FFImageLoading.Svg.Platform
                     };
                     return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
-//#elif __WINDOWS__
-//				if (parameters.Transformations == null || parameters.Transformations.Count == 0)
-//				{
-//					WriteableBitmap writeableBitmap = null;
+#elif __WINDOWS__
+				//var pixels = bitmap.Pixels;
+				//for (int i = 0; i < pixels.Length; i++)
+				//{
+				//	int bytePos = i * 4;
+				//	var color = pixels[i];
 
-//					await Configuration.MainThreadDispatcher.PostAsync(async () =>
-//					{
-//						using (var skiaImage = SKImage.FromPixels(bitmap.PeekPixels()))
-//						{
-//							var info = new SKImageInfo(skiaImage.Width, skiaImage.Height);
-//							writeableBitmap = new WriteableBitmap(info.Width, info.Height);
+				//	pixelData[bytePos] = color.Blue;
+				//	pixelData[bytePos + 1] = color.Green;
+				//	pixelData[bytePos + 2] = color.Red;
+				//	pixelData[bytePos + 3] = color.Alpha;
+				//}
 
-//							var buffer = writeableBitmap.PixelBuffer as IBufferByteAccess;
-//							if (buffer == null)
-//								throw new InvalidCastException("Unable to convert WriteableBitmap.PixelBuffer to IBufferByteAccess.");
+				byte[] pixelData = new byte[bitmap.Width * bitmap.Height * 4];
+				System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixelData, 0, bitmap.Width * bitmap.Height * 4);
 
-//							IntPtr ptr;
-//							var hr = buffer.Buffer(out ptr);
-//							if (hr < 0)
-//								throw new InvalidCastException("Unable to retrieve pixel address from WriteableBitmap.PixelBuffer.");
+				IDecodedImage<object> container = new DecodedImage<object>()
+				{
+					Image = new BitmapHolder(pixelData, bitmap.Width, bitmap.Height),
+				};
 
-//							using (var pixmap = new SKPixmap(info, ptr))
-//							{
-//								skiaImage.ReadPixels(pixmap, 0, 0);
-//							}
-//							writeableBitmap.Invalidate();                        
-//						}      
-//					});
-
-//					IDecodedImage<object> container = new DecodedImage<object>()
-//					{
-//						Image = writeableBitmap,
-//					};
-//					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
-//				}            
+				return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
 #endif
-                lock (_encodingLock)
+				lock (_encodingLock)
                 {
                     using (var image = SKImage.FromBitmap(bitmap))
                     //using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
@@ -309,15 +297,5 @@ namespace FFImageLoading.Svg.Platform
                 }
             }
         }
-
-#if __WINDOWS__
-        [System.Runtime.InteropServices.ComImport]
-        [System.Runtime.InteropServices.Guid("905a0fef-bc53-11df-8c49-001e4fc686da")]
-        [System.Runtime.InteropServices.InterfaceType(System.Runtime.InteropServices.ComInterfaceType.InterfaceIsIUnknown)]
-        internal interface IBufferByteAccess
-        {
-            long Buffer([System.Runtime.InteropServices.Out] out IntPtr value);
-        }
-#endif
-    }
+	}
 }
