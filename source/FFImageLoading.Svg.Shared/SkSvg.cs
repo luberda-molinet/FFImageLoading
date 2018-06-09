@@ -441,7 +441,7 @@ namespace FFImageLoading.Svg.Platform
 
                             foreach (var gElement in e.Elements())
                             {
-                                using (var paint = fill.Clone())
+                                using (var paint = fill?.Clone() ?? CreatePaint())
                                 {
                                     paint.BlendMode = SKBlendMode.SrcIn;
                                     ReadElement(gElement, canvas, paint, paint);
@@ -521,7 +521,7 @@ namespace FFImageLoading.Svg.Platform
                 case "mask":
                     if (e.HasElements)
                     {
-                        masks.Add(ReadId(e), new SKSvgMask(fill, e));
+                        masks.Add(ReadId(e), new SKSvgMask(fill ?? CreatePaint(), e));
                     }
                     break;
                 case "defs":
