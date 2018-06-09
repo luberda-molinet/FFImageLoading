@@ -349,8 +349,7 @@ namespace FFImageLoading.Svg.Platform
                         }
                   
                         string fillId = e.Attribute("fill")?.Value;
-                        object addFill = null;                  
-                        if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out addFill))
+                        if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out object addFill))
                         {
                             var x = ReadNumber(e.Attribute("x"));
                             var y = ReadNumber(e.Attribute("y"));
@@ -388,17 +387,17 @@ namespace FFImageLoading.Svg.Platform
                                 var startPoint = gradient.GetStartPoint(x, y, width, height);
                                 var endPoint = gradient.GetEndPoint(x, y, width, height);
 
-                                var gradientShader = SKShader.CreateLinearGradient(
-                                    startPoint,
-                                    endPoint,
-                                    gradient.Colors,
-                                    gradient.Positions,
-                                    gradient.TileMode);
-
-                                var gradientPaint = new SKPaint() { Color = SKColors.Black, Shader = gradientShader, IsAntialias = true, IsDither = true  };
-                                canvas.DrawPath(elementPath, gradientPaint);
-                                gradientShader.TryDispose();
-                                gradientPaint.TryDispose();
+                                using (var gradientShader = SKShader.CreateLinearGradient(
+                                    startPoint, endPoint, gradient.Colors, gradient.Positions, gradient.TileMode))
+                                {
+                                    var oldColor = fill.Color;
+                                    var oldShader = fill.Shader;
+                                    fill.Color = SKColors.Black;
+                                    fill.Shader = gradientShader;
+                                    canvas.DrawPath(elementPath, fill);
+                                    fill.Color = oldColor;
+                                    fill.Shader = oldShader;
+                                }
                             }
                             else if (addFillType == typeof(SKRadialGradient))
                             {
@@ -406,21 +405,24 @@ namespace FFImageLoading.Svg.Platform
                                 var centerPoint = gradient.GetCenterPoint(x, y, width, height);
                                 var radius = gradient.GetRadius(width, height);
 
-                                var gradientShader = SKShader.CreateRadialGradient(
-                                    centerPoint,
-                                    radius,
-                                    gradient.Colors,
-                                    gradient.Positions,
-                                    gradient.TileMode);
-
-                                var gradientPaint = new SKPaint() { Color = SKColors.Black, Shader = gradientShader, IsAntialias = true, IsDither = true };
-                                canvas.DrawPath(elementPath, gradientPaint);
-                                gradientShader.TryDispose();
-                                gradientPaint.TryDispose();
+                                using (var gradientShader = SKShader.CreateRadialGradient(
+                                    centerPoint, radius, gradient.Colors, gradient.Positions, gradient.TileMode))
+                                {
+                                    var oldColor = fill.Color;
+                                    var oldShader = fill.Shader;
+                                    fill.Color = SKColors.Black;
+                                    fill.Shader = gradientShader;
+                                    canvas.DrawPath(elementPath, fill);
+                                    fill.Color = oldColor;
+                                    fill.Shader = oldShader;
+                                }
                             }
                         }
                         else if (fill != null)
+                        {
                             canvas.DrawPath(elementPath, fill);
+                        }
+
                         if (stroke != null)
                             canvas.DrawPath(elementPath, stroke);
 
@@ -989,7 +991,7 @@ namespace FFImageLoading.Svg.Platform
                     if (ColorHelper.TryParse(stroke, out SKColor color))
                     {
                         // preserve alpha
-                        if (color.Alpha == 255)
+                        if (color.Alpha == 255 && fillPaint.Color.Alpha > 0)
                             strokePaint.Color = color.WithAlpha(strokePaint.Color.Alpha);
                         else
                             strokePaint.Color = color;
@@ -1130,7 +1132,7 @@ namespace FFImageLoading.Svg.Platform
                     if (ColorHelper.TryParse(fill, out SKColor color))
                     {
                         // preserve alpha
-                        if (color.Alpha == 255)
+                        if (color.Alpha == 255 && fillPaint.Color.Alpha > 0)
                             fillPaint.Color = color.WithAlpha(fillPaint.Color.Alpha);
                         else
                             fillPaint.Color = color;
