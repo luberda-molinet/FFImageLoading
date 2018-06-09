@@ -395,8 +395,7 @@ namespace FFImageLoading.Svg.Platform
                                     gradient.Positions,
                                     gradient.TileMode);
 
-                                var gradientPaint = new SKPaint() { Shader = gradientShader, IsAntialias = true, BlendMode = SKBlendMode.SrcOver };
-
+                                var gradientPaint = new SKPaint() { Color = SKColors.Black, Shader = gradientShader, IsAntialias = true, IsDither = true  };
                                 canvas.DrawPath(elementPath, gradientPaint);
                                 gradientShader.TryDispose();
                                 gradientPaint.TryDispose();
@@ -414,8 +413,7 @@ namespace FFImageLoading.Svg.Platform
                                     gradient.Positions,
                                     gradient.TileMode);
 
-                                var gradientPaint = new SKPaint() { Shader = gradientShader, IsAntialias = true };
-
+                                var gradientPaint = new SKPaint() { Color = SKColors.Black, Shader = gradientShader, IsAntialias = true, IsDither = true };
                                 canvas.DrawPath(elementPath, gradientPaint);
                                 gradientShader.TryDispose();
                                 gradientPaint.TryDispose();

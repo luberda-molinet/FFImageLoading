@@ -261,29 +261,29 @@ namespace FFImageLoading.Svg.Platform
                     return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
                 }
 #elif __WINDOWS__
-				//var pixels = bitmap.Pixels;
-				//for (int i = 0; i < pixels.Length; i++)
-				//{
-				//	int bytePos = i * 4;
-				//	var color = pixels[i];
+                //var pixels = bitmap.Pixels;
+                //for (int i = 0; i < pixels.Length; i++)
+                //{
+                //	int bytePos = i * 4;
+                //	var color = pixels[i];
 
-				//	pixelData[bytePos] = color.Blue;
-				//	pixelData[bytePos + 1] = color.Green;
-				//	pixelData[bytePos + 2] = color.Red;
-				//	pixelData[bytePos + 3] = color.Alpha;
-				//}
+                //	pixelData[bytePos] = color.Blue;
+                //	pixelData[bytePos + 1] = color.Green;
+                //	pixelData[bytePos + 2] = color.Red;
+                //	pixelData[bytePos + 3] = color.Alpha;
+                //}
 
-				byte[] pixelData = new byte[bitmap.Width * bitmap.Height * 4];
-				System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixelData, 0, bitmap.Width * bitmap.Height * 4);
+                byte[] pixelData = new byte[bitmap.Width * bitmap.Height * 4];
+                System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixelData, 0, bitmap.Width * bitmap.Height * 4);
 
-				IDecodedImage<object> container = new DecodedImage<object>()
-				{
-					Image = new BitmapHolder(pixelData, bitmap.Width, bitmap.Height),
-				};
+                IDecodedImage<object> container = new DecodedImage<object>()
+                {
+                    Image = new BitmapHolder(pixelData, bitmap.Width, bitmap.Height),
+                };
 
-				return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+                return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
 #endif
-				lock (_encodingLock)
+                lock (_encodingLock)
                 {
                     using (var image = SKImage.FromBitmap(bitmap))
                     //using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
@@ -297,5 +297,5 @@ namespace FFImageLoading.Svg.Platform
                 }
             }
         }
-	}
+    }
 }
