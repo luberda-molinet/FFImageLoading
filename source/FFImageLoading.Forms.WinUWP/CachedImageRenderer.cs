@@ -1,4 +1,4 @@
-using FFImageLoading.Forms;
+﻿using FFImageLoading.Forms;
 using FFImageLoading.Work;
 using FFImageLoading.Extensions;
 using FFImageLoading.Forms.Args;
