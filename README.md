@@ -1,5 +1,6 @@
 # FFImageLoading - Fast & Furious Image Loading 
-[![AppVeyor][ci-img]][ci-link] [![Donate][donate-img]][donate-link]
+
+[![AppVeyor][ci-img]][ci-link] <a href="https://www.buymeacoffee.com/AU3KQCy6N" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 25px !important;width: auto !important;" ></a>
 
 Library to load images quickly & easily on Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac / Xamarin.Tizen and Windows (UWP, WinRT).
 
@@ -46,8 +47,8 @@ https://github.com/luberda-molinet/FFImageLoading/wiki
 [ci-img]: https://img.shields.io/appveyor/ci/daniel-luberda/ffimageloading.svg
 [ci-link]: https://ci.appveyor.com/project/daniel-luberda/ffimageloading
 
-[donate-img]: http://img.shields.io/paypal/donate.png?color=green
-[donate-link]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CAQBVTDP2TPPU
+[donate-img]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+[donate-link]: https://www.buymeacoffee.com/AU3KQCy6N
 
 [ffil-img]: https://img.shields.io/nuget/v/Xamarin.FFImageLoading.svg
 [ffil-link]: https://www.nuget.org/packages/Xamarin.FFImageLoading
