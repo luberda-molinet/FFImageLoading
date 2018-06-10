@@ -991,7 +991,7 @@ namespace FFImageLoading.Svg.Platform
                     if (ColorHelper.TryParse(stroke, out SKColor color))
                     {
                         // preserve alpha
-                        if (color.Alpha == 255 && fillPaint.Color.Alpha > 0)
+                        if (color.Alpha == 255 && strokePaint.Color.Alpha > 0)
                             strokePaint.Color = color.WithAlpha(strokePaint.Color.Alpha);
                         else
                             strokePaint.Color = color;
