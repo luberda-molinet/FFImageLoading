@@ -158,14 +158,14 @@ namespace FFImageLoading.Views
             ((MvxCachedImageView)d)._internalImage.Stretch = (Windows.UI.Xaml.Media.Stretch)e.NewValue;
         }
 
-        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(FFImage), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
         public HorizontalAlignment HorizontalImageAlignment { get { return (HorizontalAlignment)GetValue(HorizontalImageAlignmentProperty); } set { SetValue(HorizontalImageAlignmentProperty, value); } }
         private static void HorizontalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((MvxCachedImageView)d)._internalImage.HorizontalAlignment = ((HorizontalAlignment)e.NewValue);
         }
 
-        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(FFImage), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
         public VerticalAlignment VerticalImageAlignment { get { return (VerticalAlignment)GetValue(VerticalImageAlignmentProperty); } set { SetValue(VerticalImageAlignmentProperty, value); } }
         private static void VerticalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
