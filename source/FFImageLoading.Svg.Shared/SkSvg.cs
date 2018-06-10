@@ -254,7 +254,7 @@ namespace FFImageLoading.Svg.Platform
         {
             foreach (var e in elements)
             {
-                ReadElement(e, canvas, stroke, fill);
+                ReadElement(e, canvas, stroke, fill?.Clone());
             }
         }
 
