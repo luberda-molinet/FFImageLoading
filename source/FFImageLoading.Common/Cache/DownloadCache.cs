@@ -87,12 +87,6 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        [Obsolete("Use other override")]
-        protected virtual Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
-        {
-            return DownloadAsync(url, token, client, parameters, null);
-        }
-
         protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, TaskParameter parameters, DownloadInformation downloadInformation)
         {
             if (!parameters.Preload)

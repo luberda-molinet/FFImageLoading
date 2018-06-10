@@ -60,17 +60,6 @@ namespace FFImageLoading.Cache
             initTask = Init();
         }
 
-        /// <summary>
-        /// Creates new cache default instance.
-        /// </summary>
-        /// <returns>The cache.</returns>
-        /// <param name="cacheName">Cache name.</param>
-        [Obsolete]
-        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
-        {
-            return new SimpleDiskCache(cacheName, configuration);
-        }
-
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 

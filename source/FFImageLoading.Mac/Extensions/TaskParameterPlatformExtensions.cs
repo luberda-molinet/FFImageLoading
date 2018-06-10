@@ -59,12 +59,6 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(imageView));
         }
 
-        [Obsolete("Use AsNSImageAsync")]
-        public static Task<NSImage> AsPImageAsync(this TaskParameter parameters)
-        {
-            return AsNSImageAsync(parameters);
-        }
-
         /// <summary>
         /// Loads and gets UImage using defined parameters.
         /// IMPORTANT: It throws image loading exceptions - you should handle them

@@ -13,18 +13,6 @@ namespace FFImageLoading.Extensions
         public static double PixelsToDp(this int px) => ImageService.Instance.PixelsToDp(px);
 
         public static double PixelsToDp(this double px) => ImageService.Instance.PixelsToDp(px);
-
-        [Obsolete("Use DpToPixels")]
-        public static int PointsToPixels(this double points) => ImageService.Instance.DpToPixels(points);
-
-        [Obsolete("Use PixelsToDp")]
-        public static int PixelsToPoints(this double px) => (int)ImageService.Instance.PixelsToDp(px);
-
-        [Obsolete("Use DpToPixels")]
-        public static int PointsToPixels(this int points) => ImageService.Instance.DpToPixels(points);
-
-        [Obsolete("Use PixelsToDp")]
-        public static int PixelsToPoints(this int px) => (int)ImageService.Instance.PixelsToDp(px);
     }
 }
 
