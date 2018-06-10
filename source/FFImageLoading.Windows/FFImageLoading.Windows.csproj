@@ -45,8 +45,6 @@
     <Compile Include="..\FFImageLoading.Shared\Cache\CacheEntry.cs">
       <Link>Cache\CacheEntry.cs</Link>
     </Compile>
-    <Compile Include="Args\GetImageAsJpgArgs.cs" />
-    <Compile Include="Args\GetImageAsPngArgs.cs" />
     <Compile Include="Cache\FFSourceBindingCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
@@ -69,7 +67,6 @@
     <Compile Include="Transformations\TransformationBase.cs" />
     <Compile Include="Views\MvxCachedImageView.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
-    <Compile Include="Cache\ICacheKeyFactory.cs" />
     <Compile Include="Targets\ImageTarget.cs" />
     <Compile Include="Helpers\PlatformPerformance.cs" />
     <Compile Include="Work\PlatformImageLoaderTask.cs" />
@@ -84,10 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <TargetPlatform Include="Windows, Version=8.1" />
-    <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
