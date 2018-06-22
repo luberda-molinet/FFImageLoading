@@ -76,6 +76,7 @@
       <Link>FlipType.cs</Link>
     </Compile>
     <Compile Include="Extensions\NSPathExtensions.cs" />
+    <Compile Include="ColorFillTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Mac\FFImageLoading.Mac.csproj">
