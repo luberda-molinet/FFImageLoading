@@ -42,7 +42,7 @@
     <ItemGroup>
         <!-- https://bugzilla.xamarin.com/show_bug.cgi?id=55591 -->
         <None Remove="**\*.xaml" />
-        <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
+        <Compile Update="**\*.xaml.cs" DependentUpon="ColorFillTransformationPage.xaml" />
         <EmbeddedResource Include="**\*.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" />        
     </ItemGroup>
     <ItemGroup>
