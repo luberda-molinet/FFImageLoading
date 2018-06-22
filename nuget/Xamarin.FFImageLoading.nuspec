@@ -41,7 +41,11 @@ Features:
 
 		<dependencies>
 
-			<group targetFramework="Xamarin.iOS10">
+            <group targetFramework="Xamarin.iOS10">
+              <dependency id="WebP.Touch" version="1.0.8" />
+            </group>
+
+			<group targetFramework="Xamarin.Mac20">
 				<dependency id="WebP.Touch" version="1.0.8" />
 			</group>
 
