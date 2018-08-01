@@ -24,9 +24,10 @@ namespace FFImageLoading.Cache
         ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FFImageLoading.Cache.SimpleDiskCache"/> class.
+        /// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.SimpleDiskCache"/> class.
         /// </summary>
         /// <param name="cachePath">Cache path.</param>
+        /// <param name="configuration">Configuration.</param>
         public SimpleDiskCache(string cachePath, Configuration configuration)
         {
             _cachePath = Path.GetFullPath(cachePath);
@@ -46,46 +47,12 @@ namespace FFImageLoading.Cache
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
         /// <summary>
-        /// Creates new cache default instance.
-        /// </summary>
-        /// <returns>The cache.</returns>
-        /// <param name="cacheName">Cache name.</param>
-        [Obsolete]
-        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
-        {
-#if __ANDROID__
-            var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
-            string tmpPath = context.CacheDir.AbsolutePath;
-            string cachePath = Path.Combine(tmpPath, cacheName);
-
-            Java.IO.File androidTempFolder = new Java.IO.File(cachePath);
-            if (!androidTempFolder.Exists())
-                androidTempFolder.Mkdir();
-
-            if (!androidTempFolder.CanRead())
-                androidTempFolder.SetReadable(true, false);
-
-            if (!androidTempFolder.CanWrite())
-                androidTempFolder.SetWritable(true, false);
-
-#elif __IOS__
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
-            string cachePath = Path.Combine(tmpPath, cacheName);
-#elif __MACOS__
-            string tmpPath = Path.GetTempPath();
-            string cachePath = Path.Combine(tmpPath, cacheName);
-#endif
-
-            return new SimpleDiskCache(cachePath, configuration);
-        }
-
-        /// <summary>
         /// Adds the file to cache and file saving queue if it does not exists.
         /// </summary>
         /// <param name="key">Key to store/retrieve the file.</param>
         /// <param name="bytes">File data in bytes.</param>
         /// <param name="duration">Specifies how long an item should remain in the cache.</param>
+        /// <param name="writeFinished">Write finished.</param>
         public virtual async Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
         {
             if (!_fileWritePendingTasks.TryAdd(key, 1))
@@ -103,6 +70,9 @@ namespace FFImageLoading.Cache
 
                     try
                     {
+                        if (!Directory.Exists(_cachePath))
+                            Directory.CreateDirectory(_cachePath);
+
                         CacheEntry oldEntry;
                         if (_entries.TryGetValue(key, out oldEntry))
                         {
@@ -166,7 +136,14 @@ namespace FFImageLoading.Cache
                 await Task.Delay(20).ConfigureAwait(false);
             }
 
-            Directory.Delete(_cachePath, true);
+            try
+            {
+                Directory.Delete(_cachePath, true);
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+
             Directory.CreateDirectory (_cachePath);
             _entries.Clear();
         }
@@ -197,7 +174,15 @@ namespace FFImageLoading.Cache
                     return null;
 
                 string filepath = Path.Combine(_cachePath, entry.FileName);
-                return FileStore.GetInputStream(filepath, false);
+                try
+                {
+                    return FileStore.GetInputStream(filepath, false);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    Directory.CreateDirectory(_cachePath);
+                    return null;
+                }
             }
             catch
             {

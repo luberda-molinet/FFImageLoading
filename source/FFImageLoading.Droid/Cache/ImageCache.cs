@@ -1,6 +1,5 @@
 ﻿using Android.Graphics;
 using Android.Graphics.Drawables;
-using Exception = System.Exception;
 using Math = System.Math;
 using FFImageLoading.Helpers;
 using Android.Content;
@@ -31,99 +30,164 @@ namespace FFImageLoading.Cache
     }
 
     public class ImageCache<TValue> : IImageCache<TValue> where TValue: Java.Lang.Object, ISelfDisposingBitmapDrawable
-	{
+    {
+        const int BYTES_PER_ARGB_8888_PIXEL = 4;
+        const int LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR = 2;
+        const int BITMAP_POOL_TARGET_SCREENS = 4;
+        const int MEMORY_CACHE_TARGET_SCREENS = 4;
+        const int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
+
         readonly ReuseBitmapDrawableCache<TValue> _cache;
-		readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-		readonly IMiniLogger _logger;
+        readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+        readonly IMiniLogger _logger;
         readonly object _lock = new object();
 
         public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
-		{
-			_logger = logger;
-			int safeMaxCacheSize = GetMaxCacheSize(maxCacheSize);
+        {
+            _logger = logger;
+            int memoryCacheSize;
+            int bitmapPoolSize;
 
-            double sizeInMB = Math.Round(safeMaxCacheSize / 1024d / 1024d, 2);
-            logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
+            var context = new ContextWrapper(Application.Context);
+            var am = (ActivityManager)context?.GetSystemService(Context.ActivityService);
 
-			// consider low treshold as a third of maxCacheSize
-			int lowTreshold = safeMaxCacheSize / 2;
+            bool isLowMemoryDevice = true;
+            int amLargeMemoryClass = 128;
+            int amMemoryClass = 48;
 
-            _cache = new ReuseBitmapDrawableCache<TValue>(logger, safeMaxCacheSize, lowTreshold, verboseLogging);
-			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
-		}
+            if (am != null)
+            {
+                if (Utils.HasKitKat())
+                    isLowMemoryDevice = am.IsLowRamDevice;
 
-		public static int GetBitmapSize(BitmapDrawable bmp)
-		{
-			if (Utils.HasKitKat())
-				return bmp.Bitmap.AllocationByteCount;
+                amMemoryClass = am.MemoryClass;
+                amLargeMemoryClass = am.LargeMemoryClass;
+            }
 
-			if (Utils.HasHoneycombMr1())
-				return bmp.Bitmap.ByteCount;
+            bool isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
+            int memoryClass = isLargeHeapEnabled ? amLargeMemoryClass : amMemoryClass;
+            int maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
 
-			return bmp.Bitmap.RowBytes*bmp.Bitmap.Height;
-		}
+            var metrics = context.Resources.DisplayMetrics;
+            int widthPixels = metrics.WidthPixels;
+            int heightPixels = metrics.HeightPixels;
+            int screenSize = widthPixels * heightPixels * BYTES_PER_ARGB_8888_PIXEL;
 
-		public void Clear()
-		{
+            int targetBitmapPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS;
+            int targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;
+            int arrayPoolSize = isLowMemoryDevice ? ARRAY_POOL_SIZE_BYTES / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR : ARRAY_POOL_SIZE_BYTES;
+            int availableSize = maxSize - arrayPoolSize;
+
+            if (maxCacheSize >= (int)(1024 * 1024 * 16))
+            {
+                float part = maxCacheSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
+                bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
+            }
+            else if (targetMemoryCacheSize + targetBitmapPoolSize <= availableSize)
+            {
+                memoryCacheSize = targetMemoryCacheSize;
+                bitmapPoolSize = targetBitmapPoolSize;
+            }
+            else
+            {
+                float part = availableSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
+                bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
+            }
+
+            double sizeInMB = Math.Round(memoryCacheSize / 1024d / 1024d, 2);
+            double poolSizeInMB = Math.Round(bitmapPoolSize / 1024d / 1024d, 2);
+            logger.Debug(string.Format("Image memory cache size: {0} MB, reuse pool size:D {1} MB", sizeInMB, poolSizeInMB));
+
+            _cache = new ReuseBitmapDrawableCache<TValue>(logger, memoryCacheSize, bitmapPoolSize, verboseLogging);
+            _imageInformations = new ConcurrentDictionary<string, ImageInformation>();
+        }
+
+        public static int GetBitmapSize(BitmapDrawable bmp)
+        {
+            if (Utils.HasKitKat())
+                return bmp.Bitmap.AllocationByteCount;
+
+            if (Utils.HasHoneycombMr1())
+                return bmp.Bitmap.ByteCount;
+
+            return bmp.Bitmap.RowBytes*bmp.Bitmap.Height;
+        }
+
+        public void Clear()
+        {
             lock (_lock)
             {
                 _cache.Clear();
                 _imageInformations.Clear();
             }
-		}
+        }
 
-		public ImageInformation GetInfo(string key)
-		{
-			ImageInformation imageInformation;
-			if (_imageInformations.TryGetValue(key, out imageInformation))
-			{
-				return imageInformation;
-			}
+        public ImageInformation GetInfo(string key)
+        {
+            lock (_lock)
+            {
+                ImageInformation imageInformation;
 
-			return null;
-		}
+                if (_imageInformations.TryGetValue(key, out imageInformation))
+                {
+                    return imageInformation;
+                }
+
+                return null;
+            }
+        }
 
         public Tuple<TValue, ImageInformation> Get(string key)
-		{
+        {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-			TValue drawable = null;
-
-            if (_cache.TryGetValue(key, out drawable))
-			{
-                if (!drawable.IsValidAndHasValidBitmap())
-                {
-                    Remove(key, false);
-                    return null;
-                }
-
-				var imageInformation = GetInfo(key);
-				return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
-			}
-
-			return null;
-		}
-
-		public void Add(string key, ImageInformation imageInformation, TValue bitmap)
-		{
-            if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap())
-				return;
-
-            if (_imageInformations.ContainsKey(key) || _cache.ContainsKey(key))
-                Remove(key, false);
+            TValue drawable = null;
 
             lock (_lock)
             {
+                if (_cache.TryGetValue(key, out drawable))
+                {
+                    if (!drawable.IsValidAndHasValidBitmap())
+                    {
+                        Remove(key, false);
+                        return null;
+                    }
+
+                    var imageInformation = GetInfo(key);
+                    return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
+                }
+                else if (_imageInformations.ContainsKey(key))
+                {
+                    Remove(key, false);
+                }
+            }
+
+            return null;
+        }
+
+        public void Add(string key, ImageInformation imageInformation, TValue bitmap)
+        {
+            if (string.IsNullOrWhiteSpace(key) || !bitmap.IsValidAndHasValidBitmap())
+                return;
+
+            lock (_lock)
+            {
+
+                if (_imageInformations.ContainsKey(key) || _cache.ContainsKey(key))
+                    Remove(key, false);
+
                 _imageInformations.TryAdd(key, imageInformation);
                 _cache.Add(key, bitmap);
             }
-		}
+        }
 
-		public void Remove(string key)
-		{
+        public void Remove(string key)
+        {
             Remove(key, true);
-		}
+        }
 
         void Remove(string key, bool log)
         {
@@ -141,8 +205,8 @@ namespace FFImageLoading.Cache
             }
         }
 
-		public void RemoveSimilar(string baseKey)
-		{
+        public void RemoveSimilar(string baseKey)
+        {
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
 
@@ -153,53 +217,25 @@ namespace FFImageLoading.Cache
             {
                 Remove(key);
             }
-		}
-
-		/// <summary>
-		/// Attempts to find a bitmap suitable for reuse based on the given dimensions.
-		/// Note that any returned instance will have SetIsRetained(true) called on it
-		/// to ensure that it does not release its resources prematurely as it is leaving
-		/// cache management. This means you must call SetIsRetained(false) when you no
-		/// longer need the instance.
-		/// </summary>
-		/// <returns>A ISelfDisposingBitmapDrawable.</returns>
-		/// <param name="options">Bitmap creation options.</param>
-		public TValue GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
-		{
-			return _cache.GetReusableBitmapDrawable(options);
-		}
-
-		private static int GetMaxCacheSize(int maxCacheSize)
-        {
-			if (maxCacheSize <= 0)
-                return GetCacheSizeInPercent(0.2f); // DEFAULT 20%
-
-            return Math.Max(GetCacheSizeInPercent(0.05f), maxCacheSize); // MIN SAFE LIMIT 5%
         }
 
-		/// <summary>
-		/// Gets the memory cache size based on a percentage of the max available VM memory.
-		/// </summary>
-		/// <example>setting percent to 0.2 would set the memory cache to one fifth of the available memory</example>
-		/// <param name="percent">Percent of available app memory to use to size memory cache</param>
-		/// <returns></returns>
-		private static int GetCacheSizeInPercent(float percent)
-		{
-			if (percent < 0.01f || percent > 0.8f)
-				throw new Exception("GetCacheSizeInPercent - percent must be between 0.01 and 0.8 (inclusive)");
+        /// <summary>
+        /// Attempts to find a bitmap suitable for reuse based on the given dimensions.
+        /// Note that any returned instance will have SetIsRetained(true) called on it
+        /// to ensure that it does not release its resources prematurely as it is leaving
+        /// cache management. This means you must call SetIsRetained(false) when you no
+        /// longer need the instance.
+        /// </summary>
+        /// <returns>A ISelfDisposingBitmapDrawable.</returns>
+        /// <param name="options">Bitmap creation options.</param>
+        public TValue GetBitmapDrawableFromReusableSet(BitmapFactory.Options options)
+        {
+            return _cache.GetReusableBitmapDrawable(options);
+        }
 
-			var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
-			var am = (ActivityManager) context.GetSystemService(Context.ActivityService);
-			bool largeHeap = (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
-			int memoryClass = am.MemoryClass;
-
-			if (largeHeap && Utils.HasHoneycomb())
-			{
-				memoryClass = am.LargeMemoryClass;
-			}
-
-			int availableMemory = 1024 * 1024 * memoryClass;
-			return (int)Math.Round(percent * availableMemory);
-		}
-	}
+        public void AddToReusableSet(TValue value)
+        {
+            _cache.AddToReusePool(value);
+        }
+    }
 }

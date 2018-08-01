@@ -7,10 +7,12 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Config;
 using System.Linq;
 using FFImageLoading.DataResolvers;
+using System.Collections.Generic;
+using FFImageLoading.Decoders;
 
 namespace FFImageLoading.Work
 {
-    public abstract class ImageLoaderTask<TImageContainer, TImageView> : IImageLoaderTask where TImageContainer : class where TImageView : class
+    public abstract class ImageLoaderTask<TDecoderContainer, TImageContainer, TImageView> : IImageLoaderTask where TDecoderContainer : class where TImageContainer : class where TImageView : class
     {
         bool _isLoadingPlaceholderLoaded;
         static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
@@ -27,18 +29,24 @@ namespace FFImageLoading.Work
             ImageInformation = new ImageInformation();
             CanUseMemoryCache = true;
             SetKeys();
-            Target?.SetImageLoadingTask(this);
         }
 
-        public async Task Init()
+        public virtual async Task Init()
         {
             if (Parameters.Source == ImageSource.Stream && Configuration.StreamChecksumsAsKeys && string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
             {
+                // Loading placeholder if enabled
+                if (!_isLoadingPlaceholderLoaded && !string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
+                {
+                    await ShowPlaceholder(Parameters.LoadingPlaceholderPath, KeyForLoadingPlaceholder,
+                                          Parameters.LoadingPlaceholderSource, true).ConfigureAwait(false);
+                }
+
                 try
                 {
-                    Parameters.StreamRead = await(Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
+                    Parameters.StreamRead = await (Parameters.Stream?.Invoke(CancellationTokenSource.Token)).ConfigureAwait(false);
                 }
-                catch(TaskCanceledException ex)
+                catch (TaskCanceledException ex)
                 {
                     Parameters.StreamRead = null;
                     Logger.Error(ex.Message, ex);
@@ -77,22 +85,22 @@ namespace FFImageLoading.Work
                 KeyRaw = Parameters.CustomCacheKey;
             }
 
-            if (Parameters.CacheType == CacheType.Disk)
+            if (Parameters.CacheType == CacheType.Disk || Parameters.CacheType == CacheType.None)
             {
                 CanUseMemoryCache = false;
             }
 
             if (string.IsNullOrWhiteSpace(KeyRaw))
-                KeyRaw = Guid.NewGuid().ToString("N");
+                throw new Exception("Key cannot be null");
 
             var vect = Parameters.CustomDataResolver as IVectorDataResolver;
             if (vect != null)
             {
                 if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits);
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},type={4})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits, vect.GetType().Name);
                 else
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
-                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
+                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}),type={5})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
+                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)), vect.GetType().Name);
             }
 
             KeyDownsamplingOnly = string.Empty;
@@ -181,6 +189,10 @@ namespace FFImageLoading.Work
 
         protected abstract int DpiToPixels(int size);
 
+        protected abstract IDecoder<TDecoderContainer> ResolveDecoder(ImageInformation.ImageType type);
+
+        protected abstract Task<TDecoderContainer> TransformAsync(TDecoderContainer bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder);
+
         public bool IsCancelled
         {
             get
@@ -232,24 +244,19 @@ namespace FFImageLoading.Work
             try
             {
                 CancellationTokenSource?.Token.ThrowIfCancellationRequested();
-                if (Target != null && !Target.IsTaskValid(this))
-                    throw new TaskCanceledException();
             }
             catch (ObjectDisposedException)
             {
             }
         }
 
-        public virtual bool UsesSameNativeControl(IImageLoaderTask anotherTask)
-        {
-            return Target != null && Target.UsesSameNativeControl(anotherTask);
-        }
-
         public void Cancel()
         {
             if (!_isDisposed)
             {
-                Target?.SetImageLoadingTask(null);
+                if (IsCancelled || IsCompleted)
+                    return;
+
                 ImageService.RemovePendingTask(this);
 
                 try
@@ -265,13 +272,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        public void CancelIfNeeded()
-        {
-            if (!IsCancelled && !IsCompleted)
-                Cancel();
-        }
-
-        protected abstract Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder);
+        protected abstract Task<TImageContainer> GenerateImageFromDecoderContainerAsync(IDecodedImage<TDecoderContainer> decoded, ImageInformation imageInformation, bool isPlaceholder);
 
         protected abstract Task SetTargetAsync(TImageContainer image, bool animated);
 
@@ -279,21 +280,72 @@ namespace FFImageLoading.Work
 
         protected virtual void AfterLoading(TImageContainer image, bool fromMemoryCache) { }
 
+        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            using (imageData)
+            {
+                var decoder = ResolveDecoder(imageInformation.Type);
+                var decoderContainer = await decoder.DecodeAsync(imageData, path, source, imageInformation, Parameters);
+
+                if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+                {
+                    var transformations = Parameters.Transformations.ToList();
+
+                    if (decoderContainer.IsAnimated)
+                    {
+                        for (int i = 0; i < decoderContainer.AnimatedImages.Length; i++)
+                        {
+                            decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
+                        }
+                    }
+                    else
+                    {
+                        decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                    }
+                }
+
+                return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+            }
+        }
+
+        protected virtual async Task<TImageContainer> GenerateImageAsync(string path, ImageSource source, IDecodedImage<object> decoded, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        {
+            var decoderContainer = new DecodedImage<TDecoderContainer>()
+            {
+                IsAnimated = decoded.IsAnimated,
+                Image = decoded.Image as TDecoderContainer,
+                AnimatedImages = decoded.AnimatedImages?.Select(
+                    v => new AnimatedImage<TDecoderContainer>() { Delay = v.Delay, Image = v.Image as TDecoderContainer })
+                                        .ToArray()
+            };
+                     
+            if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
+            {        
+                var transformations = Parameters.Transformations.ToList();      
+
+                if (decoderContainer.IsAnimated)
+                {
+                    for (int i = 0; i < decoderContainer.AnimatedImages.Length; i++)
+                    {
+                        decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
+                    }
+                }
+                else
+                {
+                    decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                }            
+            }
+
+            return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+        }
+
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()
         {
             try
             {
-                if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
+                if (Parameters.Preload && Parameters.CacheType.HasValue && 
+                    (Parameters.CacheType.Value == CacheType.Disk || Parameters.CacheType.Value == CacheType.None))
                     return false;
-
-                if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
-                {
-                    await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
-                }
-                else if (Configuration.DelayInMs > 0)
-                {
-                    await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false); ;
-                }
 
                 ThrowIfCancellationRequested();
 
@@ -410,7 +462,7 @@ namespace FFImageLoading.Work
                     var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
                     var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
                     loadResolver = new WrappedDataResolver(loadResolver);
-                    Tuple<Stream, LoadingResult, ImageInformation> loadImageData;
+                    DataResolverResult loadImageData;
                     TImageContainer loadImage;
 
                     if (!await _placeholdersResolveLock.WaitAsync(TimeSpan.FromSeconds(10), CancellationTokenSource.Token).ConfigureAwait(false))
@@ -423,7 +475,10 @@ namespace FFImageLoading.Work
                         if (await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
                         {
                             if (isLoadingPlaceholder)
+                            {
                                 _isLoadingPlaceholderLoaded = true;
+                                Parameters.OnLoadingPlaceholderSet?.Invoke();
+                            }
                             
                             return;
                         }
@@ -432,12 +487,20 @@ namespace FFImageLoading.Work
                         loadImageData = await loadResolver.Resolve(path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
                         ThrowIfCancellationRequested();
 
-                        using ( loadImageData.Item1)
+                        if (loadImageData.Stream != null)
                         {
-                            loadImage = await GenerateImageAsync(path, source, loadImageData.Item1, loadImageData.Item3, TransformPlaceholders, true).ConfigureAwait(false);
-                            if (loadImage != default(TImageContainer))
-                                MemoryCache.Add(key, loadImageData.Item3, loadImage);
+                            using (loadImageData.Stream)
+                            {
+                                loadImage = await GenerateImageAsync(path, source, loadImageData.Stream, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
+                            }
                         }
+                        else
+                        {
+                            loadImage = await GenerateImageAsync(path, source, loadImageData.Decoded, loadImageData.ImageInformation, TransformPlaceholders, true).ConfigureAwait(false);
+                        }
+
+                        if (loadImage != default(TImageContainer))
+                            MemoryCache.Add(key, loadImageData.ImageInformation, loadImage);
                     }
                     finally
                     {
@@ -453,16 +516,23 @@ namespace FFImageLoading.Work
                         await SetTargetAsync(loadImage, false).ConfigureAwait(false);
 
                     if (isLoadingPlaceholder)
+                    {
                         _isLoadingPlaceholderLoaded = true;
+                        Parameters.OnLoadingPlaceholderSet?.Invoke();
+                    }
                 }
                 catch (Exception ex)
                 {
+                    if (ex is OperationCanceledException)
+                        throw;
+
                     Logger.Error("Setting placeholder failed", ex);
                 }
             }
             else if (isLoadingPlaceholder)
             {
                 _isLoadingPlaceholderLoaded = true;
+                Parameters.OnLoadingPlaceholderSet?.Invoke();
             }
         }
 
@@ -476,54 +546,72 @@ namespace FFImageLoading.Work
                 // LOAD IMAGE
                 if (!(await TryLoadFromMemoryCacheAsync().ConfigureAwait(false)))
                 {
+                    if (Parameters.DelayInMs.HasValue && Parameters.DelayInMs.Value > 0)
+                    {
+                        await Task.Delay(Parameters.DelayInMs.Value).ConfigureAwait(false);
+                    }
+                    else if (!Parameters.Preload && Configuration.DelayInMs > 0)
+                    {
+                        await Task.Delay(Configuration.DelayInMs).ConfigureAwait(false);
+                    }
+
                     Logger.Debug(string.Format("Generating/retrieving image: {0}", Key));
                     var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
                     resolver = new WrappedDataResolver(resolver);
                     var imageData = await resolver.Resolve(Parameters.Path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
-                    loadingResult = imageData.Item2;
+                    loadingResult = imageData.LoadingResult;
 
-                    using (imageData.Item1)
+                    ImageInformation = imageData.ImageInformation;
+                    ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
+                    ImageInformation.SetPath(Parameters.Path);
+                    ThrowIfCancellationRequested();
+
+                    // Preload
+                    if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
                     {
-                        ImageInformation = imageData.Item3;
-                        ImageInformation.SetKey(Key, Parameters.CustomCacheKey);
-                        ImageInformation.SetPath(Parameters.Path);
+                        if (loadingResult == LoadingResult.Internet)
+                            Logger?.Debug(string.Format("DownloadOnly success: {0}", Key));
+
+                        success = true;
+
+                        return;
+                    }
+
+                    ThrowIfCancellationRequested();
+
+                    TImageContainer image;
+
+                    if (imageData.Stream != null)
+                    {
+                        using (imageData.Stream)
+                        {
+                            image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Stream, imageData.ImageInformation, true, false).ConfigureAwait(false);
+                        }
+                    }
+                    else
+                    {
+                        image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Decoded, imageData.ImageInformation, true, false).ConfigureAwait(false);
+                    }
+
+                    ThrowIfCancellationRequested();
+
+                    try
+                    {
+                        BeforeLoading(image, false);
+
+                        if (image != default(TImageContainer) && CanUseMemoryCache)
+                            MemoryCache.Add(Key, imageData.ImageInformation, image);
+
                         ThrowIfCancellationRequested();
 
-                        // Preload
-                        if (Parameters.Preload && Parameters.CacheType.HasValue && Parameters.CacheType.Value == CacheType.Disk)
-                        {
-                            if (loadingResult == LoadingResult.Internet)
-                                Logger?.Debug(string.Format("DownloadOnly success: {0}", Key));
+                        bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
 
-                            success = true;
-
-                            return;
-                        }
-
-                        ThrowIfCancellationRequested();
-
-                        var image = await GenerateImageAsync(Parameters.Path, Parameters.Source, imageData.Item1, imageData.Item3, true, false).ConfigureAwait(false);
-
-                        ThrowIfCancellationRequested();
-
-                        try
-                        {
-                            BeforeLoading(image, false);
-
-                            if (image != default(TImageContainer) && CanUseMemoryCache)
-                                MemoryCache.Add(Key, imageData.Item3, image);
-
-                            ThrowIfCancellationRequested();
-
-                            bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
-
-                            if (Target != null)
-                                await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
-                        }
-                        finally
-                        {
-                            AfterLoading(image, false);
-                        }
+                        if (Target != null)
+                            await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        AfterLoading(image, false);
                     }
                 }
 
@@ -618,7 +706,6 @@ namespace FFImageLoading.Work
         {
             if (!_isDisposed)
             {
-                Target?.SetImageLoadingTask(null);
                 Parameters.TryDispose();
                 CancellationTokenSource.TryDispose();
 

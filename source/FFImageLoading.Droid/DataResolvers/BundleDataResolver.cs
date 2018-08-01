@@ -10,7 +10,7 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
     {
-        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var stream = Context.Assets.Open(identifier, Access.Streaming);
@@ -22,8 +22,7 @@ namespace FFImageLoading.DataResolvers
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(null);
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
-                stream, LoadingResult.ApplicationBundle, imageInformation));
+            return Task.FromResult(new DataResolverResult(stream, LoadingResult.ApplicationBundle, imageInformation));
         }
 
         protected Context Context { get { return new ContextWrapper(Android.App.Application.Context); } }

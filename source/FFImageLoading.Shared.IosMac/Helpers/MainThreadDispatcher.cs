@@ -7,7 +7,7 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher : IMainThreadDispatcher
     {
-        public void Post(Action action)
+        public static void Post(Action action)
         {
             if (NSThread.Current.IsMainThread)
             {
@@ -17,6 +17,22 @@ namespace FFImageLoading.Helpers
             {
                 DispatchQueue.MainQueue.DispatchSync(action);
             }
+        }
+
+        public static T PostForResult<T>(Func<T> action)
+        {
+            T result = default(T);
+
+            if (NSThread.Current.IsMainThread)
+            {
+                result = action.Invoke();
+            }
+            else
+            {
+                DispatchQueue.MainQueue.DispatchSync(() => result = action.Invoke());
+            }
+
+            return result;
         }
 
         public Task PostAsync(Action action)

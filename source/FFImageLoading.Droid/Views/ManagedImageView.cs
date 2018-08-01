@@ -17,6 +17,9 @@ namespace FFImageLoading.Views
         WeakReference<Drawable> _drawableRef;
         CancellationTokenSource _tcs;
         readonly object _lock = new object();
+        HighResolutionTimer<Android.Graphics.Bitmap> _animationTimer;
+        bool _isDisposed;
+        volatile bool _animationFrameSetting;
 
         public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
@@ -36,6 +39,8 @@ namespace FFImageLoading.Views
 
         protected override void Dispose(bool disposing)
         {
+            _isDisposed = true;
+
             if (disposing)
             {
                 try
@@ -65,6 +70,7 @@ namespace FFImageLoading.Views
         {
             try
             {
+                _animationTimer?.Stop();
                 _tcs?.Cancel();
             }
             catch (ObjectDisposedException) { }
@@ -73,49 +79,48 @@ namespace FFImageLoading.Views
         void PlayGif(FFGifDrawable gifDrawable, CancellationTokenSource tokenSource)
         {
             var token = tokenSource.Token;
+            var animatedImages = gifDrawable.AnimatedImages;
 
-            Task.Run(async () =>
+            _animationTimer?.Stop();
+            _animationTimer = new HighResolutionTimer<Android.Graphics.Bitmap>(gifDrawable.AnimatedImages, async (image) =>
             {
+                if (_animationFrameSetting)
+                    return;
+
+                _animationFrameSetting = true;
+
                 try
                 {
-                    token.ThrowIfCancellationRequested();
-                    var gifDecoder = gifDrawable.GifHelper;
-                    int n = gifDecoder.GetFrameCount();
-                    //int ntimes = gifDecoder.GetLoopCount();
-                    //TODO DISABLED for endless loop
-                    int ntimes = 0;
-                    int repetitionCounter = 0;
+                    var bitmap = image.Image;
 
-                    do
+                    if (_isDisposed || !_animationTimer.Enabled)
+                        return;
+
+                    if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                     {
-                        for (int i = 0; i < n; i++)
-                        {
-                            token.ThrowIfCancellationRequested();
-                            var bitmap = gifDecoder.GetFrame(i);
-                            int t = gifDecoder.GetDelay(i);
+                        if (_isDisposed || !_animationTimer.Enabled)
+                            return;
 
-                            if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
-                            {
-                                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => base.SetImageBitmap(bitmap)).ConfigureAwait(false);
-                            }
-
-                            token.ThrowIfCancellationRequested();
-                            await Delay.DelayAsync(t - 2);
-                        }
-                        if (ntimes != 0)
+                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
                         {
-                            repetitionCounter++;
-                        }
-                    } while (repetitionCounter <= ntimes);
+                            if (_isDisposed || !_animationTimer.Enabled)
+                                return;
+                            
+                            base.SetImageBitmap(bitmap);;
+                        }).ConfigureAwait(false);
+                    }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    ImageService.Instance.Config.Logger.Error("GIF", ex);
                 }
                 finally
                 {
-                    tokenSource.TryDispose();
+                    _animationFrameSetting = false;
                 }
-            }, token);
+            });
+            _animationTimer.DelayOffset = -2;
+            _animationTimer.Start();
         }
 
         /* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
@@ -126,15 +131,9 @@ namespace FFImageLoading.Views
         }
         */
 
-        public IImageLoaderTask ImageLoaderTask { get; set; }
-
         public void CancelLoading()
         {
-            if (ImageLoaderTask != null)
-            {
-                ImageService.Instance.CancelWorkFor(ImageLoaderTask);
-                ImageLoaderTask = null;
-            }
+            ImageService.Instance.CancelWorkForView(this);
         }
 
         public override void SetImageDrawable(Drawable drawable)

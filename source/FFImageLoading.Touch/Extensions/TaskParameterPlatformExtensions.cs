@@ -5,6 +5,7 @@ using System.IO;
 using UIKit;
 using FFImageLoading.Targets;
 using FFImageLoading.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading
 {
@@ -29,6 +30,7 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
+        /// <param name="quality">Quality.</param>
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
             var result = await AsUIImageAsync(parameters);
@@ -42,7 +44,8 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView)
         {
-            var target = new PImageViewTarget(imageView);
+            var target = new UIImageViewTarget(imageView);
+
             return parameters.Into(target);
         }
 
@@ -104,12 +107,6 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(button));
         }
 
-        [Obsolete("Use AsUIImageAsync")] 
-        public static Task<UIImage> AsPImageAsync(this TaskParameter parameters)
-        {
-            return AsUIImageAsync(parameters);
-        }
-
         /// <summary>
         /// Loads and gets UImage using defined parameters.
         /// IMPORTANT: It throws image loading exceptions - you should handle them
@@ -118,7 +115,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters)
         {
-            var target = new PImageTarget();
+            var target = new UIImageTarget();
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
             var tcs = new TaskCompletionSource<UIImage>();
@@ -158,6 +155,7 @@ namespace FFImageLoading
             }
 
             var task = ImageService.CreateTask(parameters, target);
+
             ImageService.Instance.LoadImage(task);
             return task;
         }

@@ -6,10 +6,6 @@ namespace FFImageLoading.Svg.Platform
 {
     internal struct SKRoundedRect
     {
-        public SKRect Rect { get; }
-        public float RadiusX { get; }
-        public float RadiusY { get; }
-
         public SKRoundedRect(SKRect rect, float rx, float ry)
         {
             Rect = rect;
@@ -17,9 +13,12 @@ namespace FFImageLoading.Svg.Platform
             RadiusY = ry;
         }
 
-        public bool IsRounded()
-        {
-            return RadiusX > 0 || RadiusY > 0;
-        }
+        public SKRect Rect { get; }
+
+        public float RadiusX { get; }
+
+        public float RadiusY { get; }
+
+        public bool IsRounded => RadiusX > 0 || RadiusY > 0;
     }
 }

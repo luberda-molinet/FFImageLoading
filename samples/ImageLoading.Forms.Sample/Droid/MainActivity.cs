@@ -8,7 +8,7 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Xamarin.Forms.Platform.Android;
-using FFImageLoading.Forms.Droid;
+using FFImageLoading.Forms.Platform;
 
 namespace FFImageLoading.Forms.Sample.Droid
 {
@@ -23,7 +23,8 @@ namespace FFImageLoading.Forms.Sample.Droid
 
             base.OnCreate(bundle);
 
-            CachedImageRenderer.Init(enableFastRenderer: true);
+            Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
+            CachedImageRenderer.Init(true);
 
             var config = new FFImageLoading.Config.Configuration()
             {

@@ -1,34 +1,36 @@
 ﻿using System;
 using Android.Graphics;
-using Android.Media;
+using System.IO;
 
 namespace FFImageLoading.Extensions
 {
     public static class ExifExtensions
     {
-        public static int GetExifRotationDegrees(this string filePath)
-        {
-            int rotation = 0;
-            var exifInt = new ExifInterface(filePath);
-            int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, (int)Orientation.Normal);
-
-            switch (exifRotation)
-            {
-                case (int) Orientation.Rotate270:
-                    rotation = 270;
-                    break;
-                case (int) Orientation.Rotate180:
-                    rotation = 180;
-                    break;
-                case (int) Orientation.Rotate90:
-                    rotation = 90;
-                    break;
-                default:
-                    return 0;
-            }
-
-            return rotation;
-        }
+        //public static int GetExifRotationDegrees(this Stream stream)
+        //{
+        //  int rotation = 0;
+        //
+        //	var exifInt = new ExifInterface(stream);
+        //
+        //	int exifRotation = exifInt.GetAttributeInt(ExifInterface.TagOrientation, ExifInterface.OrientationNormal);
+        //
+        //	switch (exifRotation)
+        //	{
+        //		case ExifInterface.OrientationRotate270:
+        //			rotation = 270;
+        //			break;
+        //		case ExifInterface.OrientationRotate180:
+        //			rotation = 180;
+        //			break;
+        //		case ExifInterface.OrientationRotate90:
+        //			rotation = 90;
+        //			break;
+        //		default:
+        //          rotation = 0;
+        //          break;
+        //	}
+        //	return rotation;
+        //}
 
         public static Bitmap ToRotatedBitmap(this Bitmap sourceBitmap, int rotationDegrees)
         {
@@ -53,9 +55,7 @@ namespace FFImageLoading.Extensions
                 // paint.AntiAlias = true;
                 // paint.Dither = true;
                 // paint.FilterBitmap = true;
-
-                canvas.Save(Android.Graphics.SaveFlags.Matrix);
-
+                canvas.Save();
                 if (rotationDegrees == 90)
                     canvas.Rotate(rotationDegrees, width / 2, width / 2);
                 else if (rotationDegrees == 270)

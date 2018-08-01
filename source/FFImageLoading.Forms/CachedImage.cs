@@ -5,22 +5,49 @@ using System.Threading.Tasks;
 using FFImageLoading.Forms.Args;
 using System.Windows.Input;
 using FFImageLoading.Cache;
-using FFImageLoading.Views;
+using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
+    [Preserve(AllMembers = true)]
+    [RenderWith(typeof(Platform.CachedImageRenderer._CachedImageRenderer))]
     /// <summary>
     /// CachedImage by Daniel Luberda
     /// </summary>
-
-    [Preserve(AllMembers = true)]
     public class CachedImage : View
     {
-        //TODO It's a breaking change, so change it in major version
-        public static bool FixedOnMeasureBehavior { get; set; } = false;
+        static bool? _isDesignModeEnabled = null;
+        static bool IsDesignModeEnabled
+        {
+            get
+            {
+                // works only on Xamarin.Forms >= 3.0
+                if (!_isDesignModeEnabled.HasValue)
+                {
+                    var type = typeof(Image).GetTypeInfo().Assembly.GetType("Xamarin.Forms.DesignMode");
 
-        public static bool FixedAndroidMotionEventHandler { get; set; } = false;
+                    if (type == null)
+                    {
+                        _isDesignModeEnabled = true;
+                    }
+                    else
+                    {
+                        var property = type.GetRuntimeProperty("IsDesignModeEnabled");
+                        _isDesignModeEnabled = (bool)property.GetValue(null);
+                    }
+                }
 
+                return _isDesignModeEnabled.Value;
+            }
+        }
+
+        internal static bool IsRendererInitialized { get; set; } = IsDesignModeEnabled;
+        public static bool FixedOnMeasureBehavior { get; set; } = true;
+        public static bool FixedAndroidMotionEventHandler { get; set; } = true;
+
+        /// <summary>
+        /// CachedImage by Daniel Luberda
+        /// </summary>
         public CachedImage()
         {
             Transformations = new List<Work.ITransformation>();
@@ -102,6 +129,9 @@ namespace FFImageLoading.Forms
 
         static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
+            if (!IsRendererInitialized)
+                throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
+
             if (newValue != null)
             {
                 SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);
@@ -110,7 +140,21 @@ namespace FFImageLoading.Forms
 
         protected virtual ImageSource CoerceImageSource(object newValue)
         {
-            return newValue as ImageSource;;
+            var uriImageSource = newValue as UriImageSource;
+
+            if (uriImageSource?.Uri?.OriginalString != null)
+            {
+                if (uriImageSource.Uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+                    return ImageSource.FromFile(uriImageSource.Uri.LocalPath);
+
+                if (uriImageSource.Uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
+                    return new EmbeddedResourceImageSource(uriImageSource.Uri);
+
+                if (uriImageSource.Uri.OriginalString.IsDataUrl())
+                    return new DataUrlImageSource(uriImageSource.Uri.OriginalString);
+            }
+            
+            return newValue as ImageSource;
         }
 
         /// <summary>
@@ -283,16 +327,16 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The cache duration property.
         /// </summary>
-        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan), typeof(CachedImage), Config.Configuration.Default.DiskCacheDuration);
+        public static readonly BindableProperty CacheDurationProperty = BindableProperty.Create(nameof(CacheDuration), typeof(TimeSpan?), typeof(CachedImage));
 
         /// <summary>
         /// How long the file will be cached on disk.
         /// </summary>
-        public TimeSpan CacheDuration
+        public TimeSpan? CacheDuration
         {
             get
             {
-                return (TimeSpan)GetValue(CacheDurationProperty);
+                return (TimeSpan?)GetValue(CacheDurationProperty);
             }
             set
             {
@@ -317,28 +361,6 @@ namespace FFImageLoading.Forms
             set
             {
                 SetValue(LoadingPriorityProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// The transparency enabled property.
-        /// </summary>
-        [Obsolete("Use BitmapOptimizationsProperty")]
-        public static readonly BindableProperty TransparencyEnabledProperty = BindableProperty.Create(nameof(TransparencyEnabled), typeof(bool?), typeof(CachedImage), default(bool?));
-
-        /// <summary>
-        /// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.
-        /// </summary>
-        [Obsolete("Use BitmapOptimizations")]
-        public bool? TransparencyEnabled
-        {
-            get
-            {
-                return (bool?)GetValue(TransparencyEnabledProperty);
-            }
-            set
-            {
-                SetValue(TransparencyEnabledProperty, value);
             }
         }
 
@@ -489,7 +511,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// The transformations property.
         /// </summary>
-        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>(), propertyChanged: new BindableProperty.BindingPropertyChangedDelegate(HandleTransformationsPropertyChangedDelegate));
+        public static readonly BindableProperty TransformationsProperty = BindableProperty.Create(nameof(Transformations), typeof(List<Work.ITransformation>), typeof(CachedImage), new List<Work.ITransformation>(), propertyChanged: HandleTransformationsPropertyChangedDelegate);
 
         /// <summary>
         /// Gets or sets the transformations.
@@ -506,6 +528,22 @@ namespace FFImageLoading.Forms
                 SetValue(TransformationsProperty, value);
             }
         }
+
+        /// <summary>
+        /// The invalidate layout after loaded property.
+        /// </summary>
+        public static readonly BindableProperty InvalidateLayoutAfterLoadedProperty = BindableProperty.Create(nameof(InvalidateLayoutAfterLoaded), typeof(bool?), typeof(CachedImage), default(bool?));
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded.
+        /// </summary>
+        /// <value>The invalidate layout after loaded.</value>
+        public bool? InvalidateLayoutAfterLoaded
+        {
+            get { return (bool?)GetValue(InvalidateLayoutAfterLoadedProperty); }
+            set { SetValue(InvalidateLayoutAfterLoadedProperty, value); }
+        }
+
 
         static void HandleTransformationsPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
@@ -554,33 +592,13 @@ namespace FFImageLoading.Forms
             if (desiredWidth == 0 || desiredHeight == 0)
                 return new SizeRequest(new Size(0, 0));
 
-
-            if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
-            {
-                return new SizeRequest(new Size(desiredWidth, desiredHeight));
-            }
-
-            if (double.IsPositiveInfinity(widthConstraint))
-            {
-                double factor = heightConstraint / desiredHeight;
-                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-            }
-
-            if (double.IsPositiveInfinity(heightConstraint))
-            {
-                double factor = widthConstraint / desiredWidth;
-                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
-            }
-
-            //TODO It's a breaking change, so change it in major version
             if (FixedOnMeasureBehavior)
             {
-
                 double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
                 double constraintAspect = widthConstraint / heightConstraint;
+
                 double width = desiredWidth;
                 double height = desiredHeight;
-
                 if (constraintAspect > desiredAspect)
                 {
                     // constraint area is proportionally wider than image
@@ -621,6 +639,23 @@ namespace FFImageLoading.Forms
                 }
 
                 return new SizeRequest(new Size(width, height));
+            }
+
+            if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
+            {
+                return new SizeRequest(new Size(desiredWidth, desiredHeight));
+            }
+
+            if (double.IsPositiveInfinity(widthConstraint))
+            {
+                double factor = heightConstraint / desiredHeight;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
+            }
+
+            if (double.IsPositiveInfinity(heightConstraint))
+            {
+                double factor = widthConstraint / desiredWidth;
+                return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
             }
 
             double fitsWidthRatio = widthConstraint / desiredWidth;
@@ -721,7 +756,7 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// Invalidates cache for a specified key.
         /// </summary>
-        /// <param name="source">Image key.</param>
+        /// <param name="key">Image key.</param>
         /// <param name="cacheType">Cache type.</param>
         /// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
         /// (downsampling and transformations variants)</param>
@@ -990,6 +1025,9 @@ namespace FFImageLoading.Forms
         /// You can add additional logic here to configure image loader settings before loading
         /// </summary>
         /// <param name="imageLoader">Image loader.</param>
+        /// <param name="source">Source.</param>
+        /// <param name="loadingPlaceholderSource">Loading placeholder source.</param>
+        /// <param name="errorPlaceholderSource">Error placeholder source.</param>
         protected internal virtual void SetupOnBeforeImageLoading(out Work.TaskParameter imageLoader, IImageSourceBinding source, IImageSourceBinding loadingPlaceholderSource, IImageSourceBinding errorPlaceholderSource)
         {
             if (source.ImageSource == Work.ImageSource.Url)
@@ -1048,17 +1086,42 @@ namespace FFImageLoading.Forms
             var vect1 = Source as IVectorImageSource;
             var vect2 = LoadingPlaceholder as IVectorImageSource;
             var vect3 = ErrorPlaceholder as IVectorImageSource;
-            if (vect1 != null)
+
+            if (vect1 != null || vect2 != null || vect3 != null)
             {
-                imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
-            }
-            if (vect2 != null)
-            {
-                imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
-            }
-            if (vect3 != null)
-            {
-                imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+                int width = (int)((Width > 0 && !double.IsPositiveInfinity(Width)) ? Width 
+                                  : ((WidthRequest > 0 && !double.IsPositiveInfinity(WidthRequest)) ? WidthRequest : 0));
+                
+                int height = (int)((Height > 0 && !double.IsPositiveInfinity(Height)) ? Height 
+                                   : ((HeightRequest > 0 && !double.IsPositiveInfinity(HeightRequest)) ? HeightRequest : 0));
+
+                if (vect1 != null)
+                {
+                    if (vect1.VectorWidth > vect1.VectorHeight)
+                        vect1.VectorHeight = 0;
+                    else
+                        vect1.VectorWidth = 0;
+
+                    imageLoader.WithCustomDataResolver(vect1.GetVectorDataResolver());
+                }
+                if (vect2 != null)
+                {
+                    if (vect2.VectorWidth > vect2.VectorHeight)
+                        vect2.VectorHeight = 0;
+                    else
+                        vect2.VectorWidth = 0;
+
+                    imageLoader.WithCustomLoadingPlaceholderDataResolver(vect2.GetVectorDataResolver());
+                }
+                if (vect3 != null)
+                {
+                    if (vect3.VectorWidth > vect3.VectorHeight)
+                        vect3.VectorHeight = 0;
+                    else
+                        vect3.VectorWidth = 0;
+
+                    imageLoader.WithCustomErrorPlaceholderDataResolver(vect3.GetVectorDataResolver());
+                }
             }
             if (CustomDataResolver != null)
             {
@@ -1142,6 +1205,9 @@ namespace FFImageLoading.Forms
             {
                 imageLoader.Transform(Transformations);
             }
+
+            if (InvalidateLayoutAfterLoaded.HasValue)
+                imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
 
             imageLoader.WithPriority(LoadingPriority);
             if (CacheType.HasValue)

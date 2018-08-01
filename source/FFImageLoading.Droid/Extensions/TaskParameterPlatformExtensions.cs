@@ -32,6 +32,7 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
+        /// <param name="quality">Quality.</param>
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
             var result = await AsBitmapDrawableAsync(parameters);
@@ -48,8 +49,6 @@ namespace FFImageLoading
         /// <param name="imageView">Image view that should receive the image.</param>
         public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
         {
-            imageView.CancelLoading();
-
             var target = new ImageViewTarget(imageView);
 
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))

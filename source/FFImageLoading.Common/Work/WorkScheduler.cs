@@ -14,19 +14,16 @@ namespace FFImageLoading.Work
     {
         readonly object _lock = new object();
 
-        int _statsTotalPending;
-        int _statsTotalRunning;
-        int _statsTotalMemoryCacheHits;
-        int _statsTotalWaiting;
+        long _statsTotalPending;
+        long _statsTotalRunning;
+        long _statsTotalMemoryCacheHits;
+        long _statsTotalWaiting;
         long _loadCount;
 
         public WorkScheduler(Configuration configuration, IPlatformPerformance performance)
         {
             Configuration = configuration;
             Performance = performance;
-            PendingTasks = new PendingTasksQueue();
-            RunningTasks = new Dictionary<string, IImageLoaderTask>();
-            SimilarTasks = new ThreadSafeCollection<IImageLoaderTask>();
         }
 
         protected int MaxParallelTasks
@@ -41,9 +38,9 @@ namespace FFImageLoading.Work
         }
 
         protected IPlatformPerformance Performance { get; private set; }
-        protected PendingTasksQueue PendingTasks { get; private set; }
-        protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; }
-        protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; }
+        protected PendingTasksQueue PendingTasks { get; private set; } = new PendingTasksQueue();
+        protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; } = new Dictionary<string, IImageLoaderTask>();
+        protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; } = new ThreadSafeCollection<IImageLoaderTask>();
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
@@ -118,7 +115,7 @@ namespace FFImageLoading.Work
             {
                 lock (_lock)
                 {
-                    PendingTasks.Remove(task);
+                    PendingTasks.TryRemove(task);
                     SimilarTasks.Remove(task);
                 }
             }
@@ -145,14 +142,14 @@ namespace FFImageLoading.Work
                     LogSchedulerStats();
                 }
 
-                if (task?.Parameters?.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(task?.Parameters?.Path))
+                await task.Init();
+
+                if (string.IsNullOrWhiteSpace(task.KeyRaw))
                 {
-                    Logger.Error("ImageService: null path ignored");
+                    Logger.Error("ImageService: Key cannot be null");
                     task.TryDispose();
                     return;
                 }
-
-                await task.Init();
 
                 // If we have the image in memory then it's pointless to schedule the job: just display it straight away
                 if (task.CanUseMemoryCache && await task.TryLoadFromMemoryCacheAsync().ConfigureAwait(false))
@@ -186,10 +183,6 @@ namespace FFImageLoading.Work
             }
 
             IImageLoaderTask similarRunningTask = null;
-            if (!task.Parameters.Preload)
-            {
-                PendingTasks.CancelWhenUsesSameNativeControl(task);
-            }
 
             similarRunningTask = PendingTasks.FirstOrDefaultByRawKey(task.KeyRaw);
             if (similarRunningTask == null)
@@ -203,7 +196,7 @@ namespace FFImageLoading.Work
                     || task.Parameters.Priority.Value > similarRunningTask.Parameters.Priority.Value))
                 {
                     similarRunningTask.Parameters.WithPriority(task.Parameters.Priority.Value);
-                    PendingTasks.UpdatePriority(similarRunningTask, task.Parameters.Priority.Value);
+                    PendingTasks.TryUpdatePriority(similarRunningTask, task.Parameters.Priority.Value);
                 }
 
                 if (task.Parameters.OnDownloadProgress != null)
@@ -244,7 +237,7 @@ namespace FFImageLoading.Work
                 {
                     Logger.Error("TakeFromPendingTasksAndRun exception", ex);
                 }
-            }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)

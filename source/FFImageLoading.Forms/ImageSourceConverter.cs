@@ -10,6 +10,9 @@ namespace FFImageLoading.Forms
     {
         public override bool CanConvertFrom(Type sourceType)
         {
+            if (sourceType == null)
+                throw new ArgumentNullException(nameof(sourceType));
+
             return sourceType == typeof(string);
         }
 

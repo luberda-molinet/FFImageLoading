@@ -5,6 +5,7 @@ using FFImageLoading.Cache;
 using System.Reflection;
 using System.Linq;
 using FFImageLoading.Work;
+using FFImageLoading.Config;
 
 namespace FFImageLoading
 {
@@ -43,12 +44,12 @@ namespace FFImageLoading
         public static bool EnableMockImageService { get; set; }
 
         protected override IMemoryCache<MockBitmap> MemoryCache => MockImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance() => new MockMD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance() => new MockLogger();
-        protected override IDiskCache CreatePlatformDiskCacheInstance() => new MockDiskCache();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance() => new EmptyPlatformPerformance();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance() => new MockDataResolverFactory();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance() => new MockMainThreadDispatcher();
+        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MockMD5Helper();
+        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MockLogger();
+        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration) => new MockDiskCache();
+        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new EmptyPlatformPerformance();
+        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new MockDataResolverFactory();
+        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MockMainThreadDispatcher();
 
         internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<MockBitmap, TImageView> target) where TImageView : class
         {
@@ -58,6 +59,26 @@ namespace FFImageLoading
         internal static IImageLoaderTask CreateTask(TaskParameter parameters)
         {
             return new PlatformImageLoaderTask<object>(null, parameters, Instance);
+        }
+
+        protected override void SetTaskForTarget(IImageLoaderTask currentTask)
+        {
+            // throw new NotImplementedException();
+        }
+
+        public override void CancelWorkForView(object view)
+        {
+            // throw new NotImplementedException();
+        }
+
+        public override int DpToPixels(double dp)
+        {
+            return (int)dp;
+        }
+
+        public override double PixelsToDp(double px)
+        {
+            return px;
         }
     }
 }

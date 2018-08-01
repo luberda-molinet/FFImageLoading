@@ -10,29 +10,36 @@ using FFImageLoading.Extensions;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
+using FFImageLoading.Forms.Platform;
 
 #if __IOS__
 using UIKit;
 using PImage = UIKit.UIImage;
 using PImageView = UIKit.UIImageView;
 using Xamarin.Forms.Platform.iOS;
-using FFImageLoading.Forms.Touch;
+
 #elif __MACOS__
 using AppKit;
 using PImage = AppKit.NSImage;
-using PImageView = FFImageLoading.Forms.Mac.CachedImageRenderer.FormsNSImageView;
+using PImageView = FFImageLoading.Forms.Platform.CachedImageRenderer.FormsNSImageView;
 using Xamarin.Forms.Platform.MacOS;
-using FFImageLoading.Forms.Mac;
 using System.IO;
 #endif
 
 #if __IOS__
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Touch
 #elif __MACOS__
-[assembly: ExportRenderer(typeof(CachedImage), typeof(CachedImageRenderer))]
 namespace FFImageLoading.Forms.Mac
 #endif
+{
+    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
+    public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
+    {
+    }
+
+}
+
+namespace FFImageLoading.Forms.Platform
 {
     /// <summary>
     /// CachedImage Implementation
@@ -40,21 +47,32 @@ namespace FFImageLoading.Forms.Mac
     [Preserve(AllMembers = true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, PImageView>
     {
+        [RenderWith(typeof(CachedImageRenderer))]
+        internal class _CachedImageRenderer
+        {
+        }
+
+        bool _isSizeSet;
         private bool _isDisposed;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
+        readonly object _updateBitmapLock = new object();
 
         /// <summary>
         ///   Used for registration with dependency service
         /// </summary>
         public static new void Init()
         {
-            ScaleHelper.Init();
+            CachedImage.IsRendererInitialized = true;
+
             // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 #pragma warning disable 0219
             var ignore1 = typeof(CachedImageRenderer);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            ScaleHelper.InitAsync();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         protected override void Dispose(bool disposing)
@@ -95,6 +113,7 @@ namespace FFImageLoading.Forms.Mac
 
             if (e.NewElement != null)
             {
+                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -160,64 +179,76 @@ namespace FFImageLoading.Forms.Mac
 
         void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
         {
-            CancelIfNeeded();
-
-            if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
-                return;
-
-            var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
-            if (ffSource == null)
+            lock (_updateBitmapLock)
             {
-                if (_lastImageSource == null)
+                CancelIfNeeded();
+
+                if (image == null || imageView == null || imageView.Handle == IntPtr.Zero || _isDisposed)
                     return;
 
-                _lastImageSource = null;
-                imageView.Image = null;
-                return;
-            }
-
-            if (previousImage != null && !ffSource.Equals(_lastImageSource))
-            {
-                _lastImageSource = null;
-                imageView.Image = null;
-            }
-
-            image.SetIsLoading(true);
-
-            var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
-            var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-            TaskParameter imageLoader;
-            image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
-
-            if (imageLoader != null)
-            {
-                var finishAction = imageLoader.OnFinish;
-                var sucessAction = imageLoader.OnSuccess;
-
-                imageLoader.Finish((work) =>
+                var ffSource = ImageSourceBinding.GetImageSourceBinding(image.Source, image);
+                if (ffSource == null)
                 {
-                    finishAction?.Invoke(work);
-                    ImageLoadingFinished(image);
-                });
+                    if (_lastImageSource == null)
+                        return;
 
-                imageLoader.Success((imageInformation, loadingResult) =>
+                    _lastImageSource = null;
+                    imageView.Image = null;
+                    return;
+                }
+
+                if (previousImage != null && !ffSource.Equals(_lastImageSource))
                 {
-                    sucessAction?.Invoke(imageInformation, loadingResult);
-                    _lastImageSource = ffSource;
-                });
+                    _lastImageSource = null;
+                    imageView.Image = null;
+                }
 
-                _currentTask = imageLoader.Into(imageView);
+                image.SetIsLoading(true);
+
+                var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
+                var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
+                TaskParameter imageLoader;
+                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+
+                if (imageLoader != null)
+                {
+                    var finishAction = imageLoader.OnFinish;
+                    var sucessAction = imageLoader.OnSuccess;
+
+                    imageLoader.Finish((work) =>
+                    {
+                        finishAction?.Invoke(work);
+                        ImageLoadingSizeChanged(image, false);
+                    });
+
+                    imageLoader.Success((imageInformation, loadingResult) =>
+                    {
+                        sucessAction?.Invoke(imageInformation, loadingResult);
+                        _lastImageSource = ffSource;
+                    });
+
+                    imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
+
+                    if (!_isDisposed)
+                        _currentTask = imageLoader.Into(imageView);
+                }
             }
         }
 
-        async void ImageLoadingFinished(CachedImage element)
+        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
             await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
             {
                 if (element != null && !_isDisposed)
                 {
-                    ((IVisualElementController)element).NativeSizeChanged();
-                    element.SetIsLoading(false);
+                    if (!isLoading || !_isSizeSet)
+                    {
+                        ((IVisualElementController)element).NativeSizeChanged();
+                        _isSizeSet = true;
+                    }
+
+                    if (!isLoading)
+                        element.SetIsLoading(isLoading);
                 }
             });
         }
@@ -231,11 +262,7 @@ namespace FFImageLoading.Forms.Mac
         {
             try
             {
-                var taskToCancel = _currentTask;
-                if (taskToCancel != null && !taskToCancel.IsCancelled)
-                {
-                    taskToCancel.Cancel();
-                }
+                _currentTask?.Cancel();
             }
             catch (Exception) { }
         }
@@ -304,13 +331,20 @@ namespace FFImageLoading.Forms.Mac
 
             public FormsNSImageView()
             {
-                Layer = new CALayer();
+                Layer = new FFCALayer();
                 WantsLayer = true;
             }
 
             public void SetIsOpaque(bool isOpaque)
             {
                 _isOpaque = isOpaque;
+            }
+
+            public override void DrawRect(CGRect dirtyRect)
+            {
+                // TODO if it isn't disabled then this issue happens: 
+                // https://github.com/luberda-molinet/FFImageLoading/issues/922
+                // base.DrawRect(dirtyRect);
             }
 
             public override bool IsOpaque => _isOpaque;

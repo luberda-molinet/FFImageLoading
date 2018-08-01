@@ -42,6 +42,8 @@ namespace FFImageLoading.Views
 
         List<ITransformation> Transformations { get; set; }
 
+        bool? InvalidateLayoutAfterLoaded { get; set; }
+
         IDataResolver CustomDataResolver { get; set; }
 
         IDataResolver CustomLoadingPlaceholderDataResolver { get; set; }

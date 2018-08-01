@@ -92,7 +92,6 @@ namespace FFImageLoading.Transformations
             {
                 var color = bmp.GetPixel(i);
                 int currentAlpha = color.A;
-                var aNew = currentAlpha == 0 ? 0 : (int)(currentAlpha * (a / currentAlpha));
                 var curR = color.R;
                 var curG = color.G;
                 var curB = color.B;

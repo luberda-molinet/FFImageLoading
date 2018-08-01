@@ -10,6 +10,8 @@ using FFImageLoading.Config;
 using FFImageLoading.Cache;
 using ImageIO;
 using System.Collections.Generic;
+using FFImageLoading.Decoders;
+using CoreGraphics;
 
 #if __MACOS__
 using AppKit;
@@ -21,26 +23,26 @@ using PImage = UIKit.UIImage;
 
 namespace FFImageLoading.Work
 {
-    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, TImageView> where TImageView : class
+    public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, PImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
-        static readonly SemaphoreSlim _webpLock = new SemaphoreSlim(1, 1);
-
-#if __IOS__
-        static object _webpDecoder;
-#endif
+        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
+        static IDecoder<PImage> _webpDecoder = new WebPDecoder();
 
         public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
-            // do not remove! Kicks scale retrieval so it's available for all, without deadlocks due to accessing MainThread
-            ScaleHelper.Init();
+        }
+
+        public async override Task Init()
+        {
+            await ScaleHelper.InitAsync();
+            await base.Init();
         }
 
         protected override Task SetTargetAsync(PImage image, bool animated)
         {
             if (Target == null)
                 return Task.FromResult(true);
-            
+
             return MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
@@ -48,161 +50,111 @@ namespace FFImageLoading.Work
             });
         }
 
-        protected async override Task<PImage> GenerateImageAsync(string path, ImageSource source, Stream imageData, ImageInformation imageInformation, bool enableTransformations, bool isPlaceholder)
+        protected override int DpiToPixels(int size)
         {
-            PImage imageIn = null;
+            return size.DpToPixels();
+        }
 
-            if (imageData == null)
-                throw new ArgumentNullException(nameof(imageData));
+        protected override IDecoder<PImage> ResolveDecoder(ImageInformation.ImageType type)
+        {
+            switch (type)
+            {
+                case ImageInformation.ImageType.GIF:
+                    return new GifDecoder();
 
+                case ImageInformation.ImageType.WEBP:
+                    return _webpDecoder;
+
+                default:
+                    return new BaseDecoder();
+            }
+        }
+
+        protected override async Task<PImage> TransformAsync(PImage bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
+        {
+            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
             {
-                int downsampleWidth = Parameters.DownSampleSize?.Item1 ?? 0;
-                int downsampleHeight = Parameters.DownSampleSize?.Item2 ?? 0;
-                bool allowUpscale = Parameters.AllowUpscale ?? Configuration.AllowUpscale;
-
-                if (Parameters.DownSampleUseDipUnits)
+                foreach (var transformation in transformations)
                 {
-                    downsampleWidth = downsampleWidth.PointsToPixels();
-                    downsampleHeight = downsampleHeight.PointsToPixels();
-                }
-
-                // Special case to handle WebP decoding on iOS
-                if (source != ImageSource.Stream && imageInformation.Type == ImageInformation.ImageType.WEBP)
-                {
-#if __IOS__
-                    await _webpLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false);
                     ThrowIfCancellationRequested();
+
+                    var old = bitmap;
+
                     try
                     {
-                        var decoder = _webpDecoder as WebP.Touch.WebPCodec;
-                        if (decoder == null)
-                        {
-                            decoder = new WebP.Touch.WebPCodec();
-                            _webpDecoder = decoder;
-                        }
-                        var decodedWebP = decoder.Decode(imageData);
-                        //TODO Add WebP images downsampling!
-                        imageIn = decodedWebP;
+                        var bitmapHolder = transformation.Transform(new BitmapHolder(bitmap), path, source, isPlaceholder, Key);
+                        bitmap = bitmapHolder.ToNative();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                        throw;
                     }
                     finally
                     {
-                        _webpLock.Release();
+                        // Transformation succeeded, so garbage the source
+                        if (old != null && old.Handle != IntPtr.Zero && old != bitmap && old.Handle != bitmap.Handle)
+                        {
+                            old.TryDispose();
+                        }
                     }
-#else
-                    throw new NotImplementedException();
-#endif
-                }
-                else
-                {
-                    var nsdata = NSData.FromStream(imageData);
-                    imageIn = nsdata.ToImage(new CoreGraphics.CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale, Configuration, Parameters, NSDataExtensions.RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
                 }
             }
             finally
             {
-                imageData.TryDispose();
+                _decodingLock.Release();
             }
 
-            ThrowIfCancellationRequested();
-
-            if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-            {
-                var transformations = Parameters.Transformations.ToList();
-
-                await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
-                ThrowIfCancellationRequested();
-
-                try
-                {
-                    bool isAnimation = false;
-#if __IOS__
-                    if (imageIn.Images != null) isAnimation = true;
-#endif
-                    if (!isAnimation)
-                    {
-                        foreach (var transformation in transformations)
-                        {
-                            ThrowIfCancellationRequested();
-
-                            var old = imageIn;
-
-                            try
-                            {
-                                var bitmapHolder = transformation.Transform(new BitmapHolder(imageIn), path, source, isPlaceholder, Key);
-                                imageIn = bitmapHolder.ToNative();
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
-                                throw;
-                            }
-                            finally
-                            {
-                                if (old != null && old != imageIn && old.Handle != imageIn.Handle)
-                                    old.TryDispose();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // no animted image support for mac implemented
-#if __IOS__
-                        var animatedImages = imageIn.Images.ToArray();
-
-                        for (int i = 0; i < animatedImages.Length; i++)
-                        {
-                            var tempImage = animatedImages[i];
-
-                            if (tempImage.CGImage == null)
-                                continue;
-
-                            foreach (var transformation in transformations)
-                            {
-                                ThrowIfCancellationRequested();
-
-                                var old = tempImage;
-
-                                try
-                                {
-                                    var bitmapHolder = transformation.Transform(new BitmapHolder(tempImage), path, source, isPlaceholder, Key);
-                                    tempImage = bitmapHolder.ToNative();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
-                                    throw;
-                                }
-                                finally
-                                {
-                                    if (old != null && old != tempImage && old.Handle != tempImage.Handle)
-                                    old.TryDispose();
-                                }
-                            }
-
-                            animatedImages[i] = tempImage;
-                        }
-
-                        var oldImageIn = imageIn;
-                        imageIn = PImage.CreateAnimatedImage(animatedImages.Where(v => v.CGImage != null).ToArray(), imageIn.Duration);
-                        oldImageIn.TryDispose();
-#endif
-                    }
-                }
-                finally
-                {
-                    _decodingLock.Release();
-                }
-            }
-
-            return imageIn;
+            return bitmap;
         }
 
-        protected override int DpiToPixels(int size)
+        protected override Task<PImage> GenerateImageFromDecoderContainerAsync(IDecodedImage<PImage> decoded, ImageInformation imageInformation, bool isPlaceholder)
         {
-            return size.PointsToPixels();
+            PImage result;
+
+            if (decoded.IsAnimated)
+            {
+#if __IOS__
+                result = PImage.CreateAnimatedImage(decoded.AnimatedImages
+                                                    .Select(v => v.Image)
+                                                    .Where(v => v?.CGImage != null).ToArray(), decoded.AnimatedImages.Sum(v => v.Delay) / 100.0);
+#elif __MACOS__
+                using (var mutableData = NSMutableData.Create())
+                {
+                    var fileOptions = new CGImageDestinationOptions();
+                    fileOptions.GifDictionary = new NSMutableDictionary();
+                    fileOptions.GifDictionary[ImageIO.CGImageProperties.GIFLoopCount] = new NSString("0");
+                    //options.GifDictionary[ImageIO.CGImageProperties.GIFHasGlobalColorMap] = new NSString("true");
+
+                    using (var destintation = CGImageDestination.Create(mutableData, MobileCoreServices.UTType.GIF, decoded.AnimatedImages.Length, fileOptions))
+                    {
+                        for (int i = 0; i < decoded.AnimatedImages.Length; i++)
+                        {
+                            var options = new CGImageDestinationOptions();
+                            options.GifDictionary = new NSMutableDictionary();
+                            options.GifDictionary[ImageIO.CGImageProperties.GIFUnclampedDelayTime] = new NSString(decoded.AnimatedImages[i].Delay.ToString());
+                            destintation.AddImage(decoded.AnimatedImages[i].Image.CGImage, options);
+                        }
+
+                        destintation.Close();
+                    }
+
+                    result = new PImage(mutableData);
+
+                    // TODO I really don't know why representations count is 1, anyone?
+                    // var test = result.Representations();
+                }
+#endif                
+            }
+            else
+            {
+                result = decoded.Image;
+            }
+
+            return Task.FromResult(result);
         }
     }
 }

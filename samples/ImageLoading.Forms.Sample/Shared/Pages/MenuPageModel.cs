@@ -7,10 +7,11 @@ using FFImageLoading.Forms.Sample;
 using Xamarin.Forms;
 using Xamvvm;
 using FFImageLoading.Forms.Sample.Pages;
+using FFImageLoading.Forms.Sample.Pages.Transformations;
 
 namespace FFImageLoading.Forms.Sample
 {
-    
+
     public class MenuPageModel : BasePageModel
     {
         public MenuPageModel()
@@ -68,6 +69,15 @@ namespace FFImageLoading.Forms.Sample
                 },
 
                 new MenuItem() {
+                    Section = "Lists",
+                    Title = "ByteArray / custom cache key example",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<ByteArrayListPageModel>(pm => pm.Reload());
+                    })
+                },
+
+                new MenuItem() {
                     Section = "Advanced",
                     Title = "Custom CacheKey example",
                     Command = new BaseCommand(async (param) =>
@@ -94,6 +104,15 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
+                new MenuItem() {
+                    Section = "Advanced",
+                    Title = "CachedImage sizing test",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<CachedImageSizingTestPageModel>();
+                    })
+                },
+
                 //new MenuItem() {
                 //	Section = "Advanced",
                 //	Title = "Stream with custom cache key example",
@@ -102,6 +121,15 @@ namespace FFImageLoading.Forms.Sample
                 //		//TODO
                 //	})
                 //},
+
+                new MenuItem() {
+                    Section = "Transformations",
+                    Title = "ColorFillTransformation",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<ColorFillTransformationPageModel>(pm => pm.Reload());
+                    })
+                },
 
                 new MenuItem() {
                     Section = "Transformations",
@@ -240,6 +268,15 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
+                new MenuItem() {
+                    Section = "File formats",
+                    Title = "SVG replace map example",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<SvgReplacePageModel>();
+                    })
+                },
+
                 new MenuItem()
                 {
                     Section = "File formats",
@@ -288,7 +325,7 @@ namespace FFImageLoading.Forms.Sample
             }
         }
 
-        
+
         public class MenuItem : BaseModel
         {
             public string Section { get; set; }

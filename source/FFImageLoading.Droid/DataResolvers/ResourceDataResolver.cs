@@ -12,7 +12,7 @@ namespace FFImageLoading.DataResolvers
     {
         static ConcurrentDictionary<string, int> _resourceIdentifiersCache = new ConcurrentDictionary<string, int>();
 
-        public virtual Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             // Resource name is always without extension
             string resourceName = Path.GetFileNameWithoutExtension(identifier);
@@ -21,8 +21,8 @@ namespace FFImageLoading.DataResolvers
             if (!_resourceIdentifiersCache.TryGetValue(resourceName, out resourceId))
             {
                 token.ThrowIfCancellationRequested();
-                resourceId = Context.Resources.GetIdentifier(resourceName.ToLower(), "drawable", Context.PackageName);
-                _resourceIdentifiersCache.TryAdd(resourceName.ToLower(), resourceId);
+                resourceId = Context.Resources.GetIdentifier(resourceName.ToLowerInvariant(), "drawable", Context.PackageName);
+                _resourceIdentifiersCache.TryAdd(resourceName.ToLowerInvariant(), resourceId);
             }
 
             if (resourceId == 0)
@@ -38,7 +38,7 @@ namespace FFImageLoading.DataResolvers
             imageInformation.SetPath(identifier);
             imageInformation.SetFilePath(identifier);
 
-            return Task.FromResult(new Tuple<Stream, LoadingResult, ImageInformation>(
+            return Task.FromResult(new DataResolverResult(
                 stream, LoadingResult.CompiledResource, imageInformation));
         }
 

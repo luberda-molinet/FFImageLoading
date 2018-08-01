@@ -22,6 +22,9 @@ namespace FFImageLoading.Views
         protected ImageSourceBinding _lastImageSource;
         protected bool _isDisposed;
 
+        /// <summary>
+        /// MvxCachedImageView by Daniel Luberda
+        /// </summary>
         public MvxCachedImageView()
         {
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
@@ -112,6 +115,9 @@ namespace FFImageLoading.Views
         public bool? FadeAnimationForCachedImages { get { return (bool?)GetValue(FadeAnimationForCachedImagesProperty); } set { SetValue(FadeAnimationForCachedImagesProperty, value); } }
         public static readonly DependencyProperty FadeAnimationForCachedImagesProperty = DependencyProperty.Register(nameof(FadeAnimationForCachedImages), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
 
+        public bool? InvalidateLayoutAfterLoaded { get { return (bool?)GetValue(InvalidateLayoutAfterLoadedProperty); } set { SetValue(InvalidateLayoutAfterLoadedProperty, value); } }
+        public static readonly DependencyProperty InvalidateLayoutAfterLoadedProperty = DependencyProperty.Register(nameof(InvalidateLayoutAfterLoaded), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
+
         public int? FadeAnimationDuration { get { return (int?)GetValue(FadeAnimationDurationProperty); } set { SetValue(FadeAnimationDurationProperty, value); } }
         public static readonly DependencyProperty FadeAnimationDurationProperty = DependencyProperty.Register(nameof(FadeAnimationDuration), typeof(int?), typeof(MvxCachedImageView), new PropertyMetadata(default(int?)));
 
@@ -152,14 +158,14 @@ namespace FFImageLoading.Views
             ((MvxCachedImageView)d)._internalImage.Stretch = (Windows.UI.Xaml.Media.Stretch)e.NewValue;
         }
 
-        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(FFImage), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
         public HorizontalAlignment HorizontalImageAlignment { get { return (HorizontalAlignment)GetValue(HorizontalImageAlignmentProperty); } set { SetValue(HorizontalImageAlignmentProperty, value); } }
         private static void HorizontalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((MvxCachedImageView)d)._internalImage.HorizontalAlignment = ((HorizontalAlignment)e.NewValue);
         }
 
-        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(FFImage), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
         public VerticalAlignment VerticalImageAlignment { get { return (VerticalAlignment)GetValue(VerticalImageAlignmentProperty); } set { SetValue(VerticalImageAlignmentProperty, value); } }
         private static void VerticalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -304,6 +310,9 @@ namespace FFImageLoading.Views
                 {
                     imageLoader.Transform(Transformations);
                 }
+
+                if (InvalidateLayoutAfterLoaded.HasValue)
+                    imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
 
                 imageLoader.WithPriority(LoadingPriority);
                 if (CacheType.HasValue)

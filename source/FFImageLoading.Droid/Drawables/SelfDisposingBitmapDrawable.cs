@@ -35,10 +35,12 @@ namespace FFImageLoading.Drawables
         int retain_ref_count;
         bool is_bitmap_disposed;
 
+        [Obsolete]
         public SelfDisposingBitmapDrawable() : base()
         {
         }
 
+        [Obsolete]
         public SelfDisposingBitmapDrawable(Resources resources) : base(resources)
         {
         }
@@ -51,14 +53,17 @@ namespace FFImageLoading.Drawables
         {
         }
 
+        [Obsolete]
         public SelfDisposingBitmapDrawable(Bitmap bitmap) : base(bitmap)
         {
         }
 
+        [Obsolete]
         public SelfDisposingBitmapDrawable(Stream stream) : base(stream)
         {
         }
 
+        [Obsolete]
         public SelfDisposingBitmapDrawable(string filePath) : base(filePath)
         {
         }

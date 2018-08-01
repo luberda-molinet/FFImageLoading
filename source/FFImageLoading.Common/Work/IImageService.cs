@@ -97,7 +97,7 @@ namespace FFImageLoading
         /// Constructs a new TaskParameter to load an image from a Stream.
         /// </summary>
         /// <returns>The new TaskParameter.</returns>
-        /// <param name="resourceName">A function that allows a CancellationToken and returns the Stream to use. This function will be invoked by LoadStream().</param>
+        /// <param name="stream">Stream.</param>
         TaskParameter LoadStream(Func<CancellationToken, Task<Stream>> stream);
 
         /// <summary>
@@ -125,10 +125,16 @@ namespace FFImageLoading
         void SetPauseWork(bool pauseWork);
 
         /// <summary>
-        /// Cancel any loading work for the given ImageView
+        /// Cancel any loading work for the given task
         /// </summary>
         /// <param name="task">Image loading task to cancel.</param>
         void CancelWorkFor(IImageLoaderTask task);
+
+        /// <summary>
+        /// Cancel any loading work for the given view
+        /// </summary>
+        /// <param name="view">Image loading task to cancel.</param>
+        void CancelWorkForView(object view);
 
         /// <summary>
         /// Removes a pending image loading task from the work queue.
@@ -179,5 +185,19 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
         void Cancel(Func<TaskParameter, bool> predicate);
+
+        /// <summary>
+        /// Dps to pixels.
+        /// </summary>
+        /// <returns>The to pixels.</returns>
+        /// <param name="dp">Dp.</param>
+        int DpToPixels(double dp);
+
+        /// <summary>
+        /// Pixelses to dp.
+        /// </summary>
+        /// <returns>The to dp.</returns>
+        /// <param name="px">Px.</param>
+        double PixelsToDp(double px);
     }
 }

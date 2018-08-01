@@ -43,27 +43,27 @@ namespace ImageLoading.Sample
 
         void view_Click(object sender, EventArgs e)
         {
-			var position = (int)((View)sender).Tag;
+            var position = (int)((View)sender).Tag;
 
-			var view = (View)sender;
-			var pictureImage = view.FindViewById<ImageViewAsync>(Resource.Id.pictureImage);
-			var txtTitle = view.FindViewById<TextView>(Resource.Id.txtTitle);
+            var view = (View)sender;
+            var pictureImage = view.FindViewById<ImageViewAsync>(Resource.Id.pictureImage);
+            var txtTitle = view.FindViewById<TextView>(Resource.Id.txtTitle);
 
-			Intent intent = new Intent(context, typeof(DetailActivity));
-			intent.PutExtra(DetailActivity.POSITION, position);
+            Intent intent = new Intent(context, typeof(DetailActivity));
+            intent.PutExtra(DetailActivity.POSITION, position);
 
-			if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Lollipop)
-			{
-				var p1 = Pair.Create(pictureImage, pictureImage.TransitionName);
-				var p2 = Pair.Create(txtTitle, txtTitle.TransitionName);
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Lollipop)
+            {
+                var p1 = Pair.Create(pictureImage, pictureImage.TransitionName);
+                var p2 = Pair.Create(txtTitle, txtTitle.TransitionName);
 
-				var options = ActivityOptionsCompat.MakeSceneTransitionAnimation(context, p1, p2);
-				context.StartActivity(intent, options.ToBundle());
-			}
-			else
-			{
-				context.StartActivity(intent);
-			}
+                var options = ActivityOptionsCompat.MakeSceneTransitionAnimation(context, p1, p2);
+                context.StartActivity(intent, options.ToBundle());
+            }
+            else
+            {
+                context.StartActivity(intent);
+            }
         }
 
         // Replace the contents of a view (invoked by the layout manager)
@@ -74,7 +74,7 @@ namespace ImageLoading.Sample
             var vh = viewHolder as ViewHolder;
 
             vh.Title.Text = position.ToString();
-			vh.ItemView.Tag = position;
+            vh.ItemView.Tag = position;
 
             ImageService.Instance.LoadUrl(item)
                .Retry(3, 200)

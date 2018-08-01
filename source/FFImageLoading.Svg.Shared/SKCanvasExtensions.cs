@@ -26,10 +26,10 @@ namespace FFImageLoading.Svg.Platform
             canvas.DrawLine(line.P1.X, line.P1.Y, line.P2.X, line.P2.Y, paint);
         }
 
-        public static void DrawText(this SKCanvas canvas, float x, float y, SKText text)
+        public static void DrawText(this SKCanvas canvas, SKText text)
         {
-            var currentX = x;
-            var currentY = y;
+            var currentX = text.Location.X;
+            var currentY = text.Location.Y;
 
             var textWidth = text.MeasureTextWidth();
 

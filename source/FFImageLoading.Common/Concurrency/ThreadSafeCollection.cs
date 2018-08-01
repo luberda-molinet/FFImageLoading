@@ -78,14 +78,14 @@ namespace FFImageLoading
 
         public void RemoveAll(Func<T, bool> predicate)
         {
-        	lock (_lock)
-        	{
+            lock (_lock)
+            {
                 foreach (var item in _list.ToList())
                 {
                     if (predicate.Invoke(item))
                         _list.Remove(item);
                 }
-        	}
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

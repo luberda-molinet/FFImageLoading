@@ -23,11 +23,6 @@ namespace FFImageLoading.Targets
             }
         }
 
-        public override bool IsTaskValid(IImageLoaderTask task)
-        {
-            return IsValid;
-        }
-
         public override void SetAsEmpty(IImageLoaderTask task)
         {
             var control = Control;
@@ -65,25 +60,30 @@ namespace FFImageLoading.Targets
                 fadeInStoryboard.Children.Add(fade);
                 fadeInStoryboard.Begin();
                 control.Source = image;
+                if (IsLayoutNeeded(task))
+                    control.UpdateLayout();
             }
             else
             {
                 control.Source = image;
+                if (IsLayoutNeeded(task))
+                    control.UpdateLayout();
             }
         }
 
-        public override bool UsesSameNativeControl(IImageLoaderTask task)
+        bool IsLayoutNeeded(IImageLoaderTask task)
         {
-            var otherTarget = task.Target as ImageTarget;
-            if (otherTarget == null)
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
                 return false;
+            }
 
-            var control = Control;
-            var otherControl = otherTarget.Control;
-            if (control == null || otherControl == null)
-                return false;
-
-            return control == otherControl;
+            return true;
         }
 
         public override Image Control

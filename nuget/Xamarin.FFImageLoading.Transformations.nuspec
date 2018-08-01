@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="2.8.1">
+   
+       <id>Xamarin.FFImageLoading.Transformations</id>
+       <version>@version</version>
+       <title>FFImageLoading Transformations</title>
+       <authors>Daniel Luberda, Molinet Fabien</authors>
+       <owners></owners>
+       <licenseUrl>https://raw.githubusercontent.com/luberda-molinet\FFImageLoading/master/LICENSE.md</licenseUrl>
+       <projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
+       <iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
+       <requireLicenseAcceptance>false</requireLicenseAcceptance>
+       
+       <description>
+Transformations for FFImageLoading library.
+
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+- FlipTransformation, RotateTransformation
+- Supports custom transformations (native platform `ITransformation` implementations)
+
+These transformations can be consumed from FFImageLoading and FFImageLoading.Forms (Xamarin Forms).
+Don't forget to add the package in all platform specific projects. This way the correct native implementation is injected.
+       </description>
+       
+       <summary>Xamarin image transformations for FFImageLoading.</summary>
+       <tags>xamarin, android, ios, mac, windows, bitmap, image, webp, transformation, blur, round, circle, effects, corners</tags>
+       
+       <dependencies>
+       
+          <group>
+            <dependency id="Xamarin.FFImageLoading" version="@version" />
+          </group>
+              
+        </dependencies>
+        
+	</metadata>
+	
+	<files>
+		<!--Net Standard-->
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.dll" target="lib\netstandard1.0\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.xml" target="lib\netstandard1.0\FFImageLoading.Transformations.xml" />
+          
+		<!--Core PCL-->
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.dll" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations\bin\Release\FFImageLoading.Transformations.xml" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Transformations.xml" />
+            
+		<!--Xamarin.Android-->
+		<file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.dll" target="lib\MonoAndroid10\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.xml" target="lib\MonoAndroid10\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Droid\bin\Release\FFImageLoading.Transformations.pdb" target="lib\MonoAndroid10\FFImageLoading.Transformations.pdb" />
+            
+		<!--Xamarin.iOS-->
+		<file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.dll" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Touch\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Transformations.pdb" />
+
+		<!--Xamarin.Mac-->
+		<file src="FFImageLoading.Transformations.Mac\bin\Release\FFImageLoading.Transformations.dll" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Mac\bin\Release\FFImageLoading.Transformations.xml" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Mac\bin\Release\FFImageLoading.Transformations.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Transformations.pdb" />
+ 
+		<!--Windows RT-->
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\win81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\win81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\win81\FFImageLoading.Transformations.pdb" />
+
+		<!--Windows UWP-->
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\uap\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\uap\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\uap\FFImageLoading.Transformations.pdb" />
+
+		<!--Windows RT Phone-->
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.dll" target="lib\wpa81\FFImageLoading.Transformations.dll" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.xml" target="lib\wpa81\FFImageLoading.Transformations.xml" />
+		<file src="FFImageLoading.Transformations.Windows\bin\Release\FFImageLoading.Transformations.pdb" target="lib\wpa81\FFImageLoading.Transformations.pdb" />        
+
+        <!--Tizen-->
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.dll" target="lib\tizen40\FFImageLoading.Transformations.dll" />
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.xml" target="lib\tizen40\FFImageLoading.Transformations.xml" />
+        <file src="FFImageLoading.Transformations.Tizen\bin\Release\FFImageLoading.Transformations.pdb" target="lib\tizen40\FFImageLoading.Transformations.pdb" />
+
+	</files>
+	
+</package>

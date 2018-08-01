@@ -17,44 +17,54 @@ namespace FFImageLoading.DataResolvers
             _resolver = resolver;
         }
 
-        public async Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+        public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var resolved = await _resolver.Resolve(identifier, parameters, token);
 
-            if (resolved.Item1 == null)
-                throw new ArgumentNullException(nameof(parameters.Stream));
+            if (resolved.Stream == null && resolved.Decoded == null)
+                throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.Decoded)}");
 
-            if (!resolved.Item1.CanSeek)
+            if (resolved.Stream != null && !resolved.Stream.CanSeek)
             {
-                using (resolved.Item1)
+                using (resolved.Stream)
                 {
                     var memoryStream = new MemoryStream();
-                    await resolved.Item1.CopyToAsync(memoryStream);
+                    await resolved.Stream.CopyToAsync(memoryStream);
                     memoryStream.Position = 0;
-                    resolved = new Tuple<Stream, LoadingResult, ImageInformation>(memoryStream, resolved.Item2, resolved.Item3);
+                    resolved = new DataResolverResult(memoryStream, resolved.LoadingResult, resolved.ImageInformation);
                 }
             }
 
-            if (resolved.Item1.Length == 0)
-                throw new InvalidDataException("Zero length stream");
-
-            if (resolved.Item1.Length < 32)
-                throw new InvalidDataException("Invalid stream");
-            
-            if (resolved.Item3.Type == ImageInformation.ImageType.Unknown)
+            if (resolved.Stream != null)
             {
-                //READ HEADER
-                const int headerLength = 4;
-                byte[] header = new byte[headerLength];
-                int offset = 0;
-                while (offset < headerLength)
+                if (resolved.Stream.Length == 0)
+                    throw new InvalidDataException("Zero length stream");
+
+                if (resolved.Stream.Length < 32)
+                    throw new InvalidDataException("Invalid stream");
+
+                if (resolved.ImageInformation.Type == ImageInformation.ImageType.Unknown)
                 {
-                    int read = await resolved.Item1.ReadAsync(header, offset, headerLength - offset);
-                    offset += read;
+                    //READ HEADER
+                    const int headerLength = 4;
+                    byte[] header = new byte[headerLength];
+                    int offset = 0;
+                    while (offset < headerLength)
+                    {
+                        int read = await resolved.Stream.ReadAsync(header, offset, headerLength - offset);
+                        offset += read;
+                    }
+
+                    resolved.Stream.Position = 0;
+                    resolved.ImageInformation.SetType(FileHeader.GetImageType(header));
                 }
 
-                resolved.Item1.Position = 0;
-                resolved.Item3.SetType(FileHeader.GetImageType(header));
+                if (resolved.ImageInformation.Type == ImageInformation.ImageType.JPEG)
+                {
+                    var exif = ExifHelper.Read(resolved.Stream);
+                    resolved.Stream.Position = 0;
+                    resolved.ImageInformation.SetExif(exif);
+                }
             }
 
             return resolved;

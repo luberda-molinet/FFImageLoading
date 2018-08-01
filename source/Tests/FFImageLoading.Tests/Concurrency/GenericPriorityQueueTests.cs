@@ -279,5 +279,15 @@ namespace FFImageLoading.Tests.Concurrency
         {
             return new SimpleNode<IImageLoaderTask, int>(new Mock<IImageLoaderTask>().Object);
         }
+
+        class SimpleNode<TItem, TPriority> : GenericPriorityQueueNode<TPriority>
+        {
+            public TItem Data { get; private set; }
+
+            public SimpleNode(TItem data)
+            {
+                Data = data;
+            }
+        }
     }
 }

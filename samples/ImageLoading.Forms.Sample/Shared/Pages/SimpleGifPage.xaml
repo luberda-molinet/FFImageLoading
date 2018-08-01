@@ -8,9 +8,9 @@
         <ContentView HorizontalOptions="Center" VerticalOptions="Center">
             <ffimageloading:CachedImage HeightRequest="200" WidthRequest="200" DownsampleHeight="200"
              Source="{Binding ImageUrl}">
-            <ffimageloading:CachedImage.Transformations>
+<!--			<ffimageloading:CachedImage.Transformations>
                 <fftransformations:CircleTransformation/>
-            </ffimageloading:CachedImage.Transformations>
+            </ffimageloading:CachedImage.Transformations>-->
             </ffimageloading:CachedImage>
         </ContentView>
     </ContentPage.Content>

@@ -5,10 +5,10 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
 {
+    [Preserve(AllMembers = true)]
     /// <summary>
     /// SvgImageSourceConverter
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class SvgImageSourceConverter : FFImageLoading.Forms.ImageSourceConverter, IValueConverter
     {
         /// <summary>
@@ -19,7 +19,7 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public new object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var str = value as string;
             if (string.IsNullOrWhiteSpace(str))
@@ -36,7 +36,7 @@ namespace FFImageLoading.Svg.Forms
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public new object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

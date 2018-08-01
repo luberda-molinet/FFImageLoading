@@ -28,6 +28,9 @@ namespace FFImageLoading.Cross
     [Preserve(AllMembers = true)]
     [Register("ffimageloading.cross.MvxCachedImageView")]
 #endif
+    /// <summary>
+    /// MvxCachedImageView by Daniel Luberda
+    /// </summary>
     public class MvxCachedImageView
 #if __IOS__
         : UIImageView, ICachedImageView, INotifyPropertyChanged
@@ -36,13 +39,19 @@ namespace FFImageLoading.Cross
 #endif
     {
 #if __IOS__
+        /// <summary>
+        /// MvxCachedImageView by Daniel Luberda
+        /// </summary>
         public MvxCachedImageView() { Initialize(); }
         public MvxCachedImageView(IntPtr handle) : base(handle) { Initialize(); }
         public MvxCachedImageView(CGRect frame) : base(frame) { Initialize(); }
 #elif __ANDROID__
-        public MvxCachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { Initialize(); }
+        /// <summary>
+        /// MvxCachedImageView by Daniel Luberda
+        /// </summary>
         public MvxCachedImageView(Context context) : base(context) { Initialize(); }
         public MvxCachedImageView(Context context, IAttributeSet attrs) : base(context, attrs) { Initialize(); }
+        public MvxCachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { Initialize(); }
 #endif
 
         protected IScheduledWork _scheduledWork;
@@ -193,6 +202,13 @@ namespace FFImageLoading.Cross
             set { if (_transformations != value) { _transformations = value; OnPropertyChanged(nameof(Transformations)); } }
         }
 
+        bool? _invalidateLayoutAfterLoaded;
+        public bool? InvalidateLayoutAfterLoaded
+        {
+            get { return _invalidateLayoutAfterLoaded; }
+            set { if (_invalidateLayoutAfterLoaded != value) { _invalidateLayoutAfterLoaded = value; OnPropertyChanged(nameof(InvalidateLayoutAfterLoaded)); } }
+        }
+
         IDataResolver _customDataResolver;
         public IDataResolver CustomDataResolver
         {
@@ -265,11 +281,7 @@ namespace FFImageLoading.Cross
         {
             try
             {
-                var taskToCancel = _scheduledWork;
-                if (taskToCancel != null && !taskToCancel.IsCancelled)
-                {
-                    taskToCancel.Cancel();
-                }
+                _scheduledWork?.Cancel();
             }
             catch (Exception) { }
         }
@@ -395,6 +407,9 @@ namespace FFImageLoading.Cross
                     imageLoader.Transform(Transformations);
                 }
 
+                if (InvalidateLayoutAfterLoaded.HasValue)
+                    imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
+
                 imageLoader.WithPriority(LoadingPriority);
                 if (CacheType.HasValue)
                 {
@@ -455,7 +470,7 @@ namespace FFImageLoading.Cross
                 return null;
 
             if (imageStream != null)
-                return new ImageSourceBinding(ImageSource.Stream, "Stream");
+                return new ImageSourceBinding(imageStream);
 
             if (imagePath.StartsWith("res:", StringComparison.OrdinalIgnoreCase))
             {

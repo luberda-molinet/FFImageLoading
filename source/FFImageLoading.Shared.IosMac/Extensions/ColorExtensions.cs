@@ -31,7 +31,7 @@ namespace FFImageLoading
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 #if __MACOS__
-						color = PColor.FromRgba(r, g, b, a);
+                        color = PColor.FromRgba(r, g, b, a);
 #elif __IOS__
                         color = PColor.FromRGBA(r, g, b, a);
 #endif
@@ -44,7 +44,7 @@ namespace FFImageLoading
                         var g = (byte)((cuint >> 8) & 0xff);
                         var b = (byte)(cuint & 0xff);
 #if __MACOS__
-						color = PColor.FromRgba(r, g, b, (byte)255);
+                        color = PColor.FromRgba(r, g, b, (byte)255);
 #elif __IOS__
                         color = PColor.FromRGBA(r, g, b, (byte)255);
 #endif
@@ -62,11 +62,11 @@ namespace FFImageLoading
                         g = (byte)(g << 4 | g);
                         b = (byte)(b << 4 | b);
 #if __MACOS__
-						color = PColor.FromRgba(r, g, b, a);
+                        color = PColor.FromRgba(r, g, b, a);
 #elif __IOS__
                         color = PColor.FromRGBA(r, g, b, a);
 #endif
-						break;
+                        break;
                     }
                 case 4:
                     {
@@ -79,11 +79,11 @@ namespace FFImageLoading
                         b = (byte)(b << 4 | b);
 
 #if __MACOS__
-						color = PColor.FromRgba(r, g, b, (byte)255);
+                        color = PColor.FromRgba(r, g, b, (byte)255);
 #elif __IOS__
                         color = PColor.FromRGBA(r, g, b, (byte)255);
 #endif
-						break;
+                        break;
                     }
                 default:
                     throw new FormatException(string.Format("The {0} string passed in the c argument is not a recognized Color format.", hexColor));

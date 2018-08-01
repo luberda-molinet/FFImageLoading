@@ -9,7 +9,6 @@
     <Import_RootNamespace>FFImageLoading.Cross</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)MvxImageLoadingView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MvxCachedImageView.cs" />
   </ItemGroup>
 </Project>

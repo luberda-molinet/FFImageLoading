@@ -95,7 +95,7 @@ namespace FFImageLoading.Work
         /// </summary>
         /// <returns>The string.</returns>
         /// <param name="data">Data.</param>
-        /// <param name="dataEncoding">Data encoding.</param>
+        /// <param name="encoding">Data encoding.</param>
         public static TaskParameter FromString(string data, DataEncodingType encoding)
         {
             return new TaskParameter() { Source = ImageSource.Url, Path = data, DataEncoding = encoding };
@@ -105,7 +105,6 @@ namespace FFImageLoading.Work
         internal Stream StreamRead { get; set; }
 
         internal string StreamChecksum { get; set; }
-
 
         public ImageSource Source { get; private set; }
 
@@ -143,14 +142,13 @@ namespace FFImageLoading.Work
 
         public Action<DownloadInformation> OnDownloadStarted { get; private set; }
 
+        internal Action OnLoadingPlaceholderSet { get; private set; }
+
         public Action<FileWriteInfo> OnFileWriteFinished { get; private set; }
 
         public Action<DownloadProgress> OnDownloadProgress { get; private set; }
 
         public List<ITransformation> Transformations { get; private set; }
-
-        [Obsolete("Use BitmapOptimizations")]
-        public bool? LoadTransparencyChannel { get; private set; }
 
         public bool? BitmapOptimizationsEnabled { get; private set; }
 
@@ -178,6 +176,8 @@ namespace FFImageLoading.Work
 
         public int? DelayInMs { get; private set; }
 
+        public bool? InvalidateLayoutEnabled { get; private set; }
+
         bool preload;
         public bool Preload
         {
@@ -196,6 +196,17 @@ namespace FFImageLoading.Work
                     FadeAnimationForCachedImagesEnabled = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded
+        /// </summary>
+        /// <returns>The layout.</returns>
+        /// <param name="enabled">If set to <c>true</c> enabled.</param>
+        public TaskParameter InvalidateLayout(bool enabled = true)
+        {
+            InvalidateLayoutEnabled = enabled;
+            return this;
         }
 
         /// <summary>
@@ -366,18 +377,6 @@ namespace FFImageLoading.Work
         }
 
         /// <summary>
-        /// Indicates if the transparency channel should be loaded. By default this value comes from ImageService.Instance.Config.LoadWithTransparencyChannel.
-        /// </summary>
-        /// <returns>The TaskParameter instance for chaining the call.</returns>
-        /// <param name="loadTransparencyChannel">If set to <c>true</c> force loading alpha channel otherwise force not loading it.</param>
-        [Obsolete]
-        public TaskParameter TransparencyChannel(bool loadTransparencyChannel)
-        {
-            LoadTransparencyChannel = loadTransparencyChannel;
-            return this;
-        }
-
-        /// <summary>
         /// Enables / disables bitmap optimizations
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
@@ -482,7 +481,7 @@ namespace FFImageLoading.Work
         /// If image loading failed this callback is called
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
-        /// <param name="action">Action to invoke when loading failed
+        /// <param name="action">Action to invoke when loading failed</param>
         public TaskParameter Error(Action<Exception> action)
         {
             if (action == null)
@@ -496,7 +495,7 @@ namespace FFImageLoading.Work
         /// If image loading process finished, whatever the result, this callback is called
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
-        /// <param name="action">Action to invoke when process is done
+        /// <param name="action">Action to invoke when process is done</param>
         public TaskParameter Finish(Action<IScheduledWork> action)
         {
             if (action == null)
@@ -548,6 +547,28 @@ namespace FFImageLoading.Work
             return this;
         }
 
+        /// <summary>
+        /// Called after loading placeholder is set
+        /// </summary>
+        /// <returns>The TaskParameter instance for chaining the call.</returns>
+        /// <param name="action">Action.</param>
+        internal TaskParameter LoadingPlaceholderSet(Action action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            OnLoadingPlaceholderSet = action;
+            return this;
+        }
+
+        /// <summary>
+        /// Releases all resource used by the <see cref="T:FFImageLoading.Work.TaskParameter"/> object.
+        /// </summary>
+        /// <remarks>Call <see cref="Dispose"/> when you are finished using the
+        /// <see cref="T:FFImageLoading.Work.TaskParameter"/>. The <see cref="Dispose"/> method leaves the
+        /// <see cref="T:FFImageLoading.Work.TaskParameter"/> in an unusable state. After calling <see cref="Dispose"/>,
+        /// you must release all references to the <see cref="T:FFImageLoading.Work.TaskParameter"/> so the garbage
+        /// collector can reclaim the memory that the <see cref="T:FFImageLoading.Work.TaskParameter"/> was occupying.</remarks>
         public void Dispose()
         {
             if (!_disposed)

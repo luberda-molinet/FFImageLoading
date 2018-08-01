@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms" xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations" x:Class="FFImageLoading.Forms.Sample.ByteArrayListPage"
+    Title="ByteArray / custom cache key" xmlns:local="clr-namespace:FFImageLoading.Forms.Sample">
+    <ContentPage.Content>
+
+        <ListView CachingStrategy="RecycleElement" HasUnevenRows="false"
+                RowHeight="180" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
+
+            <ListView.Behaviors>
+                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
+            </ListView.Behaviors>
+
+            <ListView.ItemTemplate>
+                
+                <DataTemplate>
+                    <local:ByteArrayListPageCell/>
+                </DataTemplate>
+                
+            </ListView.ItemTemplate>
+
+        </ListView>
+        
+    </ContentPage.Content>
+</ContentPage>

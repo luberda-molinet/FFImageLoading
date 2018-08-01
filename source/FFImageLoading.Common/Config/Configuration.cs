@@ -22,8 +22,8 @@ namespace FFImageLoading.Config
             FadeAnimationDuration = 300;
             TransformPlaceholders = true;
             DownsampleInterpolationMode = InterpolationMode.Default;
-            HttpHeadersTimeout = 10;
-            HttpReadTimeout = 30;
+            HttpHeadersTimeout = 5;
+            HttpReadTimeout = 15;
             HttpReadBufferSize = 8192;
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
@@ -31,11 +31,13 @@ namespace FFImageLoading.Config
             VerboseLogging = false;
             SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 2d)));
             DiskCacheDuration = TimeSpan.FromDays(30d);
+            TryToReadDiskCacheDurationFromHttpHeaders = true;
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
             AnimateGifs = true;
-            DelayInMs = 14; //Task.Delay resolution is around 15ms
+            DelayInMs = 10; //Task.Delay resolution is around 15ms
             ClearMemoryCacheOnOutOfMemory = true;
+            InvalidateLayout = true;
         }
 
         /// <summary>
@@ -91,17 +93,6 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value>The main thread dispatcher.</value>
         public IMainThreadDispatcher MainThreadDispatcher { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="FFImageLoading.Config.Configuration"/> loads images with transparency channel. On Android we save 50% of the memory without transparency since we use 2 bytes per pixel instead of 4.
-        /// </summary>
-        /// <value><c>true</c> if FFIMageLoading loads images with transparency; otherwise, <c>false</c>.</value>
-        [Obsolete]
-        public bool LoadWithTransparencyChannel
-        {
-            get { return BitmapOptimizations; }
-            set { BitmapOptimizations = value; }
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="T:FFImageLoading.Config.Configuration"/> bitmap
@@ -232,6 +223,13 @@ namespace FFImageLoading.Config
         public TimeSpan DiskCacheDuration { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether try to read
+        /// disk cache duration from http headers .
+        /// </summary>
+        /// <value><c>true</c> if try to read disk cache duration from http headers; otherwise, <c>false</c>.</value>
+        public bool TryToReadDiskCacheDurationFromHttpHeaders { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether callbacs (OnFinish, OnSuccess, etc)
         /// should execute on UI thread
         /// </summary>
@@ -250,6 +248,12 @@ namespace FFImageLoading.Config
         /// </summary>
         /// <value><c>true</c> if clear memory cache on out of memory; otherwise, <c>false</c>.</value>
         public bool ClearMemoryCacheOnOutOfMemory { get; set; }
+
+        /// <summary>
+        /// Specifies if view layout should be invalidated after image is loaded
+        /// </summary>
+        /// <value><c>true</c> if invalidate layout; otherwise, <c>false</c>.</value>
+        public bool InvalidateLayout { get; set;  }
     }
 }
 

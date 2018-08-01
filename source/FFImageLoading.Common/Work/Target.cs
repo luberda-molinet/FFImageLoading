@@ -8,15 +8,11 @@ namespace FFImageLoading.Work
 
         public virtual bool IsValid { get; } = true;
 
-        public virtual bool IsTaskValid(IImageLoaderTask task) => IsValid;
-
-        public virtual bool UsesSameNativeControl(IImageLoaderTask task) => false;
+        public object TargetControl => Control;
 
         public virtual void SetAsEmpty(IImageLoaderTask task) {  }
 
         public virtual void Set(IImageLoaderTask task, TImageContainer image, bool animated) { }
-
-        public virtual void SetImageLoadingTask(IImageLoaderTask task) { }
     }
 }
 

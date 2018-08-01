@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.Runtime;
 
-namespace FFImageLoading.Forms.Droid
+namespace FFImageLoading.Forms.Platform
 {
     [Preserve(AllMembers = true)]
     internal class ImageSourceBinding : IImageSourceBinding
@@ -41,9 +41,6 @@ namespace FFImageLoading.Forms.Droid
                 var uri = uriImageSource.Uri?.OriginalString;
                 if (string.IsNullOrWhiteSpace(uri))
                     return null;
-
-                if (uriImageSource.Uri.Scheme == "file")
-                    return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Filepath, uriImageSource.Uri.LocalPath);
 
                 return new ImageSourceBinding(FFImageLoading.Work.ImageSource.Url, uri);
             }

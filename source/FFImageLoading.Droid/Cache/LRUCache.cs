@@ -15,7 +15,7 @@ namespace FFImageLoading.Cache
         {
             var drawable = value as ISelfDisposingBitmapDrawable;
 
-            if (drawable != null)
+            if (drawable != null && drawable.Handle != IntPtr.Zero)
                 return drawable.SizeInBytes;
 
             return 0;

@@ -79,12 +79,12 @@ namespace Simple.iOS.Sample
 
         partial void TapReloadAll (Foundation.NSObject sender)
         {
-			Task.Run(async () =>
-			{
-				ImageService.Instance.InvalidateMemoryCache();
-				await ImageService.Instance.InvalidateDiskCacheAsync();
-				CollectionView.ReloadData();
-			});
+            Task.Run(async () =>
+            {
+                ImageService.Instance.InvalidateMemoryCache();
+                await ImageService.Instance.InvalidateDiskCacheAsync();
+                CollectionView.ReloadData();
+            });
         }
     }
 }

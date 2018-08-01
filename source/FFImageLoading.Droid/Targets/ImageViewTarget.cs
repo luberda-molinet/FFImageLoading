@@ -24,12 +24,6 @@ namespace FFImageLoading.Targets
             }
         }
 
-        public override bool IsTaskValid(IImageLoaderTask task)
-        {
-            var controlTask = Control?.ImageLoaderTask;
-            return IsValid && (controlTask == null || controlTask == task);
-        }
-
         public override void SetAsEmpty(IImageLoaderTask task)
         {
             if (task == null || task.IsCancelled)
@@ -39,7 +33,6 @@ namespace FFImageLoading.Targets
             if (control == null)
                 return;
 
-            control.ImageLoaderTask = null;
             control.SetImageResource(global::Android.Resource.Color.Transparent);
         }
 
@@ -47,33 +40,54 @@ namespace FFImageLoading.Targets
         {
             if (task == null || task.IsCancelled)
                 return;
-
+            
             var control = Control;
             if (control == null || control.Drawable == image)
                 return;
 
+            var isLayoutNeeded = IsLayoutNeeded(task, control.Drawable, image);
+
             control.SetImageDrawable(image);
             control.Invalidate();
+
+            if (isLayoutNeeded)
+                control.RequestLayout();
         }
 
-        public override void SetImageLoadingTask(IImageLoaderTask task)
+        bool IsLayoutNeeded(IImageLoaderTask task, Drawable oldImage, Drawable newImage)
         {
-            if (IsValid)
-                Control.ImageLoaderTask = task;
-        }
-
-        public override bool UsesSameNativeControl(IImageLoaderTask task)
-        {
-            var otherTarget = task.Target as ImageViewTarget;
-            if (otherTarget == null)
+            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+            {
+                if (!task.Parameters.InvalidateLayoutEnabled.Value)
+                    return false;
+            }
+            else if (!task.Configuration.InvalidateLayout)
+            {
                 return false;
+            }
 
-            var control = Control;
-            var otherControl = otherTarget.Control;
-            if (control == null || otherControl == null)
-                return false;
+            try
+            {
+                if (oldImage == null && newImage == null)
+                    return false;
 
-            return control.Handle == otherControl.Handle;
+                if (oldImage == null && newImage != null)
+                    return true;
+
+                if (oldImage != null && newImage == null)
+                    return true;
+
+                if (oldImage != null && newImage != null)
+                {
+                    return !(oldImage.IntrinsicWidth == newImage.IntrinsicWidth && oldImage.IntrinsicHeight == newImage.IntrinsicHeight);
+                }
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public override ImageViewAsync Control

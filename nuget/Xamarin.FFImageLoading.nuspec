@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="2.8.1">
+
+		<id>Xamarin.FFImageLoading</id>
+		<version>@version</version>
+		<title>FFImageLoading Plugin for Xamarin.iOS / Xamarin.Android / Xamarin.Mac / Windows</title>
+		<authors>Daniel Luberda, Fabien Molinet</authors>
+		<owners/>
+		<licenseUrl>https://raw.githubusercontent.com/luberda-molinet\FFImageLoading/master/LICENSE.md</licenseUrl>
+		<projectUrl>https://github.com/luberda-molinet/FFImageLoading</projectUrl>
+		<iconUrl>https://cdn4.iconfinder.com/data/icons/flat-services-icons/128/startup.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+
+		<description>
+Xamarin Library to load images quickly and easily.
+
+Features:
+
+- Xamarin.iOS, Xamarin.Android, Xamarin.Forms, Xamarin.Mac and Windows (WinRT, UWP) support
+- Configurable disk and memory caching
+- Multiple image views using the same image source (url, path, resource) will use only one bitmap which is cached in memory (less memory usage)
+- Deduplication of similar download/load requests. *(If 100 similar requests arrive at same time then one real loading will be performed while 99 others will wait).*
+- Error and loading placeholders support
+- Images can be automatically downsampled to specified size (less memory usage)
+- Fluent API which is inspired by Picasso naming
+- SVG / WebP / GIF support
+- Image loading Fade-In animations support
+- Can retry image downloads (RetryCount, RetryDelay)
+- Android bitmap optimization. Saves 50% of memory by trying not to use transparency channel when possible.
+- Transformations support
+- BlurredTransformation
+- CircleTransformation, RoundedTransformation, CornersTransformation, CropTransformation
+- ColorSpaceTransformation, GrayscaleTransformation, SepiaTransformation, TintTransformation
+- FlipTransformation, RotateTransformation
+- Supports custom transformations (native platform `ITransformation` implementations)
+		</description>
+
+		<summary>Xamarin library to load images quickly and easily on Xamarin.iOS / Xamarin.Android / Xamarin.Mac / Windows</summary>
+		<tags>xamarin, android, ios, mac, windows, image, cache, caching, memory, bitmap, lru, load, loading, save, effects, photo</tags>
+
+		<dependencies>
+
+            <group targetFramework="Xamarin.iOS10">
+              <dependency id="WebP.Touch" version="1.0.8" />
+            </group>
+
+			<group targetFramework="Xamarin.Mac20">
+				<dependency id="WebP.Touch" version="1.0.8" />
+			</group>
+
+			<group targetFramework="MonoAndroid10">
+			</group>			
+
+		</dependencies>
+
+	</metadata>
+
+	<files>
+
+		<!--Net Standard-->
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.dll" target="lib\netstandard1.0\FFImageLoading.dll" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.xml" target="lib\netstandard1.0\FFImageLoading.xml" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.pdb" target="lib\netstandard1.0\FFImageLoading.pdb" />
+		<file src="FFImageLoading.Mock\bin\Release\FFImageLoading.Platform.dll" target="lib\netstandard1.0\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Mock\bin\Release\FFImageLoading.Platform.xml" target="lib\netstandard1.0\FFImageLoading.Platform.xml" />
+	
+		<!--Core PCL / Net Standard-->
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.dll" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.dll" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.xml" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.xml" />
+		<file src="FFImageLoading.Common\bin\Release\FFImageLoading.pdb" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.pdb" />
+		<file src="FFImageLoading.Mock\bin\Release\FFImageLoading.Platform.dll" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Mock\bin\Release\FFImageLoading.Platform.xml" target="lib\portable-win+net45+wp80+win81+wpa81\FFImageLoading.Platform.xml" />
+
+		<!--Xamarin.Android-->
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.Platform.dll" target="lib\MonoAndroid10\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.Platform.xml" target="lib\MonoAndroid10\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.Platform.pdb" target="lib\MonoAndroid10\FFImageLoading.Platform.pdb" />
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.dll" target="lib\MonoAndroid10\FFImageLoading.dll" />
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.xml" target="lib\MonoAndroid10\FFImageLoading.xml" />
+		<file src="FFImageLoading.Droid\bin\Release\FFImageLoading.pdb" target="lib\MonoAndroid10\FFImageLoading.pdb" />
+
+		<!--Xamarin.iOS-->
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.Platform.dll" target="lib\Xamarin.iOS10\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.Platform.xml" target="lib\Xamarin.iOS10\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.Platform.pdb" target="lib\Xamarin.iOS10\FFImageLoading.Platform.pdb" />
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.dll" target="lib\Xamarin.iOS10\FFImageLoading.dll" />
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.xml" target="lib\Xamarin.iOS10\FFImageLoading.xml" />
+		<file src="FFImageLoading.Touch\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.iOS10\FFImageLoading.pdb" />
+
+		<!--Xamarin.Mac-->
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.dll" target="lib\Xamarin.Mac20\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.xml" target="lib\Xamarin.Mac20\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.Platform.pdb" target="lib\Xamarin.Mac20\FFImageLoading.Platform.pdb" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.dll" target="lib\Xamarin.Mac20\FFImageLoading.dll" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.xml" target="lib\Xamarin.Mac20\FFImageLoading.xml" />
+		<file src="FFImageLoading.Mac\bin\Release\FFImageLoading.pdb" target="lib\Xamarin.Mac20\FFImageLoading.pdb" />		
+
+        <!--Windows UWP-->
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\uap\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\uap\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\uap\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\uap\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\uap\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\uap\FFImageLoading.pdb" />
+
+	    <!--Windows RT-->
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\win81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\win81\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\win81\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\win81\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\win81\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\win81\FFImageLoading.pdb" />	
+
+        <!--Windows RT Phone-->
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.dll" target="lib\wpa81\FFImageLoading.Platform.dll" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.xml" target="lib\wpa81\FFImageLoading.Platform.xml" />
+		<file src="FFImageLoading.Windows\bin\Release\FFImageLoading.Platform.pdb" target="lib\wpa81\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.dll" target="lib\wpa81\FFImageLoading.dll" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.xml" target="lib\wpa81\FFImageLoading.xml" />
+        <file src="FFImageLoading.Windows\bin\Release\FFImageLoading.pdb" target="lib\wpa81\FFImageLoading.pdb" />
+
+        <!--Tizen-->
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.Platform.dll" target="lib\tizen40\FFImageLoading.Platform.dll" />
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.Platform.xml" target="lib\tizen40\FFImageLoading.Platform.xml" />
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.Platform.pdb" target="lib\tizen40\FFImageLoading.Platform.pdb" />
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.dll" target="lib\tizen40\FFImageLoading.dll" />
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.xml" target="lib\tizen40\FFImageLoading.xml" />
+        <file src="FFImageLoading.Tizen\bin\Release\FFImageLoading.pdb" target="lib\tizen40\FFImageLoading.pdb" />
+
+	</files>
+
+</package>

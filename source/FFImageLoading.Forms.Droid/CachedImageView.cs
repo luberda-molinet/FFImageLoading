@@ -5,12 +5,12 @@ using Android.Runtime;
 using Android.Util;
 using Android.Graphics.Drawables;
 
-namespace FFImageLoading.Forms.Droid
+namespace FFImageLoading.Forms.Platform
 {
-	[Preserve(AllMembers = true)]
-	public class CachedImageView : ImageViewAsync
-	{
-		bool _skipInvalidate;
+    [Preserve(AllMembers = true)]
+    public class CachedImageView : ImageViewAsync
+    {
+        bool _skipInvalidate;
 
         public CachedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
@@ -25,21 +25,21 @@ namespace FFImageLoading.Forms.Droid
         }
 
 
-		public override void Invalidate()
-		{
-			if (_skipInvalidate)
-			{
-				_skipInvalidate = false;
-				return;
-			}
+        public override void Invalidate()
+        {
+            if (_skipInvalidate)
+            {
+                _skipInvalidate = false;
+                return;
+            }
 
-			base.Invalidate();
-		}
+            base.Invalidate();
+        }
 
-		public void SkipInvalidate()
-		{
-			_skipInvalidate = true;
-		}
-	}
+        public void SkipInvalidate()
+        {
+            _skipInvalidate = true;
+        }
+    }
 }
 

@@ -11,16 +11,20 @@ namespace FFImageLoading.Svg.Forms
             [Android.Runtime.Preserve(AllMembers = true)]
 #endif
 
+    [Preserve(AllMembers = true)]
     /// <summary>
     /// SvgCachedImage by Daniel Luberda
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class SvgCachedImage : CachedImage
     {
         public static void Init()
         {
+            var ignore = typeof(SvgCachedImage);
         }
 
+        /// <summary>
+        /// SvgCachedImage by Daniel Luberda
+        /// </summary>
         public SvgCachedImage() : base()
         {
             ReplaceStringMap = new Dictionary<string, string>();
@@ -28,7 +32,9 @@ namespace FFImageLoading.Svg.Forms
 
         protected override ImageSource CoerceImageSource(object newValue)
         {
-            var fileSource = newValue as FileImageSource;
+            var source = base.CoerceImageSource(newValue);;
+
+            var fileSource = source as FileImageSource;
             if (fileSource?.File != null)
             {
                 if (fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
@@ -41,7 +47,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var uriSource = newValue as UriImageSource;
+            var uriSource = source as UriImageSource;
             if (uriSource?.Uri?.OriginalString != null)
             {
                 if (uriSource.Uri.OriginalString.IsSvgDataUrl())
@@ -54,7 +60,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var dataUrlSource = newValue as DataUrlImageSource;
+            var dataUrlSource = source as DataUrlImageSource;
             if (dataUrlSource?.DataUrl != null)
             {
                 if (dataUrlSource.DataUrl.IsSvgDataUrl())
@@ -63,7 +69,7 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            var embeddedSource = newValue as EmbeddedResourceImageSource;
+            var embeddedSource = source as EmbeddedResourceImageSource;
             if (embeddedSource?.Uri?.OriginalString != null)
             {
                 if (embeddedSource.Uri.OriginalString.IsSvgFileUrl())
@@ -72,13 +78,13 @@ namespace FFImageLoading.Svg.Forms
                 }
             }
 
-            return base.CoerceImageSource(newValue);
+            return source;
         }
 
         /// <summary>
         /// The error placeholder property.
         /// </summary>
-        public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>), propertyChanged: new BindableProperty.BindingPropertyChangedDelegate(HandleReplaceStringMapPropertyChangedDelegate));
+        public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>), propertyChanged: HandleReplaceStringMapPropertyChangedDelegate);
 
         /// <summary>
         /// Used to define replacement map which will be used to
@@ -100,14 +106,8 @@ namespace FFImageLoading.Svg.Forms
 
         static void HandleReplaceStringMapPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
-            if (oldValue != newValue)
-            {
-                var cachedImage = bindable as SvgCachedImage;
-                if (cachedImage != null && cachedImage.Source != null)
-                {
-                    cachedImage.ReloadImage();
-                }
-            }
+            var cachedImage = bindable as SvgCachedImage;
+            cachedImage?.ReloadImage();
         }
 
         /// <summary>

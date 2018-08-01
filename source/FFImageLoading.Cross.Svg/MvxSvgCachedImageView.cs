@@ -28,7 +28,9 @@ namespace FFImageLoading.Cross
             [Preserve(AllMembers = true)]
             [Register("ffimageloading.cross.MvxSvgCachedImageView")]
     #endif
-
+    /// <summary>
+    /// MvxSvgCachedImageView by Daniel Luberda
+    /// </summary>
     public class MvxSvgCachedImageView : MvxCachedImageView
     {
 #if __IOS__
@@ -74,6 +76,11 @@ namespace FFImageLoading.Cross
             int width = (int)this.Width;
             int height = (int)this.Height;                
 #endif
+
+            if (width > height)
+                height = 0;
+            else
+                width = 0;
 
             if ((!string.IsNullOrWhiteSpace(ImagePath) && ImagePath.IsSvgFileUrl()) || ImageStream != null)
             {

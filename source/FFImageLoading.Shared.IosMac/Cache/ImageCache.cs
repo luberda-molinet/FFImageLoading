@@ -20,15 +20,15 @@ namespace FFImageLoading.Cache
     {
         readonly NSCache _cache;
         static IMemoryCache<PImage> _instance;
-		readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-		readonly IMiniLogger _logger;
+        readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+        readonly IMiniLogger _logger;
         readonly object _lock = new object();
 
         ImageCache(int maxCacheSize, IMiniLogger logger)
         {
-			_logger = logger;
+            _logger = logger;
             _cache = new NSCache();
-			_imageInformations = new ConcurrentDictionary<string, ImageInformation>();
+            _imageInformations = new ConcurrentDictionary<string, ImageInformation>();
 
             if (maxCacheSize <= 0)
                 _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory
@@ -50,52 +50,58 @@ namespace FFImageLoading.Cache
             }
         }
 
-		public ImageInformation GetInfo(string key)
-		{
-			ImageInformation imageInformation;
-			if (_imageInformations.TryGetValue(key, out imageInformation))
-			{
-				return imageInformation;
-			}
+        public ImageInformation GetInfo(string key)
+        {
+            lock (_lock)
+            {
+                ImageInformation imageInformation;
+                if (_imageInformations.TryGetValue(key, out imageInformation))
+                {
+                    return imageInformation;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public Tuple<PImage, ImageInformation> Get(string key)
+        public Tuple<PImage, ImageInformation> Get(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-			var image = (PImage)_cache.ObjectForKey(new NSString(key));
-            if (image == null || image.Handle == IntPtr.Zero)
+            lock (_lock)
             {
-                Remove(key, false);
-                return null;
-            }
+                var image = (PImage)_cache.ObjectForKey(new NSString(key));
+                if (image == null || image.Handle == IntPtr.Zero)
+                {
+                    Remove(key, false);
+                    return null;
+                }
 
-			var imageInformation = GetInfo(key);
-			return new Tuple<PImage, ImageInformation>(image, imageInformation);
+                var imageInformation = GetInfo(key);
+                return new Tuple<PImage, ImageInformation>(image, imageInformation);
+            }
         }
 
-		public void Add(string key, ImageInformation imageInformation, PImage value)
+        public void Add(string key, ImageInformation imageInformation, PImage value)
         {
             if (string.IsNullOrWhiteSpace(key) || value == null || value.Handle == IntPtr.Zero)
-				return;
-
-            if (_imageInformations.ContainsKey(key))
-                Remove(key, false);
+                return;
 
             lock (_lock)
             {
+                if (_imageInformations.ContainsKey(key))
+                    Remove(key, false);
+
                 _imageInformations.TryAdd(key, imageInformation);
                 _cache.SetCost(value, new NSString(key), value.GetMemorySize());
             }
         }
 
-		public void Remove(string key)
-		{
+        public void Remove(string key)
+        {
             Remove(key, true);
-		}
+        }
 
         void Remove(string key, bool log)
         {
@@ -113,33 +119,33 @@ namespace FFImageLoading.Cache
             }
         }
 
-		public void RemoveSimilar(string baseKey)
-		{
+        public void RemoveSimilar(string baseKey)
+        {
             if (string.IsNullOrWhiteSpace(baseKey))
                 return;
 
             var pattern = baseKey + ";";
 
             var keysToRemove = _imageInformations.Keys.Where(i => i.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase)).ToList();
-			foreach (var key in keysToRemove)
-			{
-				Remove(key);
-			}
-		}
+            foreach (var key in keysToRemove)
+            {
+                Remove(key);
+            }
+        }
 
-		public void Clear()
-		{
+        public void Clear()
+        {
             lock (_lock)
             {
                 _cache.RemoveAllObjects();
                 _imageInformations.Clear();
             }
-			// Force immediate Garbage collection. Please note that is resource intensive.
-			System.GC.Collect();
-			System.GC.WaitForPendingFinalizers ();
-			System.GC.WaitForPendingFinalizers (); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
-			System.GC.Collect ();
-		}
+            // Force immediate Garbage collection. Please note that is resource intensive.
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers ();
+            System.GC.WaitForPendingFinalizers (); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
+            System.GC.Collect ();
+        }
     }
 }
 

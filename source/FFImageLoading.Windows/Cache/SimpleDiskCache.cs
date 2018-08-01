@@ -55,20 +55,9 @@ namespace FFImageLoading.Cache
         public SimpleDiskCache(StorageFolder rootFolder, string cacheFolderName, Configuration configuration)
         {
             Configuration = configuration;
-            this.rootFolder = rootFolder;
+            this.rootFolder = rootFolder ?? ApplicationData.Current.TemporaryFolder;
             this.cacheFolderName = cacheFolderName;
             initTask = Init();
-        }
-
-        /// <summary>
-        /// Creates new cache default instance.
-        /// </summary>
-        /// <returns>The cache.</returns>
-        /// <param name="cacheName">Cache name.</param>
-        [Obsolete]
-        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
-        {
-            return new SimpleDiskCache(cacheName, configuration);
         }
 
         protected Configuration Configuration { get; private set; }
@@ -78,8 +67,7 @@ namespace FFImageLoading.Cache
         {
             try
             {
-                StorageFolder root = rootFolder ?? ApplicationData.Current.TemporaryFolder;
-                cacheFolder = await root.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                 await InitializeEntries().ConfigureAwait(false);
             }
             catch
@@ -205,6 +193,7 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
+                        cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
                         string filename = key + "." + (long)duration.TotalSeconds;
 
                         var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
@@ -254,7 +243,16 @@ namespace FFImageLoading.Cache
                 if (!entries.TryGetValue(key, out entry))
                     return null;
 
-                var file = await cacheFolder.GetFileAsync(entry.FileName);
+                StorageFile file = null;
+
+                try
+                {
+                    file = await cacheFolder.GetFileAsync(entry.FileName);
+                }
+                catch (IOException)
+                {
+                    cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                }
 
                 if (file == null)
                     return null;
@@ -310,13 +308,22 @@ namespace FFImageLoading.Cache
                 var entriesToRemove = await cacheFolder.GetFilesAsync();
                 foreach (var item in entriesToRemove)
                 {
-                    await item.DeleteAsync();
+                    try
+                    {
+                        await item.DeleteAsync();
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
                 }
-
-                entries.Clear();
+            }
+            catch (IOException) 
+            {
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
             }
             finally
             {
+                entries.Clear();
                 fileWriteLock.Release();
             }
         }

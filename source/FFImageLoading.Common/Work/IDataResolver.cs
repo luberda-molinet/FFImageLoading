@@ -7,6 +7,6 @@ namespace FFImageLoading.Work
 {
     public interface IDataResolver
     {
-        Task<Tuple<Stream, LoadingResult, ImageInformation>> Resolve(string identifier, TaskParameter parameters, CancellationToken token);
+        Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token);
     }
 }

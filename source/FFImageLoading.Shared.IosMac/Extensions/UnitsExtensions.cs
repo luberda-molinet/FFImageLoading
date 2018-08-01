@@ -4,30 +4,15 @@ using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Extensions
 {
-	public static class UnitsExtensions
-	{
-		public static int PointsToPixels(this double points)
-		{
-			return (int)Math.Floor(points * ScaleHelper.Scale);
-		}
+    public static class UnitsExtensions
+    {
+        public static int DpToPixels(this int dp) => ImageService.Instance.DpToPixels(dp);
 
-		public static int PixelsToPoints(this double px)
-		{
-			if (px == 0d)
-				return 0;
+        public static int DpToPixels(this double dp) => ImageService.Instance.DpToPixels(dp);
 
-			return (int)Math.Floor(px / ScaleHelper.Scale);
-		}
+        public static double PixelsToDp(this int px) => ImageService.Instance.PixelsToDp(px);
 
-		public static int PointsToPixels(this int points)
-		{
-			return PointsToPixels((double)points);
-		}
-
-		public static int PixelsToPoints(this int px)
-		{
-			return PixelsToPoints((double)px);
-		}
-	}
+        public static double PixelsToDp(this double px) => ImageService.Instance.PixelsToDp(px);
+    }
 }
 

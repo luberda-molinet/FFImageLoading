@@ -30,7 +30,7 @@ namespace FFImageLoading.Cache
         /// Contains all entries that are currently being displayed. These entries are not eligible for
         /// reuse or eviction. Entries will be added to the reuse pool when they are no longer displayed.
         /// </summary>
-        StrongCache<TValue> displayed_cache;
+        ByteBoundStrongLruCache<TValue> displayed_cache;
 
         /// <summary>
         /// Contains entries that potentially available for reuse and candidates for eviction.
@@ -43,22 +43,25 @@ namespace FFImageLoading.Cache
         readonly IMiniLogger log;
         readonly bool _verboseLogging;
 
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReuseBitmapDrawableCache"/> class.
+        /// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.ReuseBitmapDrawableCache`1"/> class.
         /// </summary>
-        /// <param name="logger">Logger for debug messages</param>
-        /// <param name="highWatermark">Maximum number of bytes the reuse pool will hold before starting evictions.
-        /// <param name="lowWatermark">Number of bytes the reuse pool will be drained down to after the high watermark is exceeded.</param>
-        public ReuseBitmapDrawableCache(IMiniLogger logger, int highWatermark, int lowWatermark, bool verboseLogging = false)
+        /// <param name="logger">Logger.</param>
+        /// <param name="memoryCacheSize">Memory cache size.</param>
+        /// <param name="bitmapPoolSize">Bitmap pool size.</param>
+        /// <param name="verboseLogging">If set to <c>true</c> verbose logging.</param>
+        public ReuseBitmapDrawableCache(IMiniLogger logger, int memoryCacheSize, int bitmapPoolSize, bool verboseLogging = false)
         {
             _verboseLogging = verboseLogging;
             log = logger;
-            low_watermark = lowWatermark;
-            high_watermark = highWatermark;
-            displayed_cache = new StrongCache<TValue>();
-            reuse_pool = new ByteBoundStrongLruCache<TValue>(high_watermark, low_watermark);
+            low_watermark = bitmapPoolSize / 2;
+            high_watermark = bitmapPoolSize;
+            displayed_cache = new ByteBoundStrongLruCache<TValue>(memoryCacheSize);
+            reuse_pool = new ByteBoundStrongLruCache<TValue>(bitmapPoolSize);
             reuse_pool.EntryRemoved += OnEntryRemovedFromReusePool;
         }
+
 
         /// <summary>
         /// Attempts to find a bitmap suitable for reuse based on the given dimensions.
@@ -69,14 +72,9 @@ namespace FFImageLoading.Cache
         /// </summary>
         /// <returns>A ISelfDisposingBitmapDrawable that has been retained. You must call SetIsRetained(false)
         /// when finished using it.</returns>
-        /// <param name="width">Width of the image to be written to the bitmap allocation.</param>
-        /// <param name="height">Height of the image to be written to the bitmap allocation.</param>
-        /// <param name="inSampleSize">DownSample factor.</param>
+        /// <param name="options">Options.</param>
         public TValue GetReusableBitmapDrawable(BitmapFactory.Options options)
         {
-            if (reuse_pool == null)
-                return null;
-
             // Only attempt to get a bitmap for reuse if the reuse cache is full.
             // This prevents us from prematurely depleting the pool and allows
             // more cache hits, as the most recently added entries will have a high
@@ -228,6 +226,9 @@ namespace FFImageLoading.Cache
             {
                 total_removed++;
 
+                if (!value.IsValidAndHasValidBitmap())
+                    return;
+
                 // We only really care about evictions because we do direct Remove()als
                 // all the time when promoting to the displayed_cache. Only when the
                 // entry has been evicted is it truly not longer being held by us.
@@ -249,8 +250,7 @@ namespace FFImageLoading.Cache
             {
                 lock (monitor)
                 {
-                    if (displayed_cache.ContainsKey(sdbd.InCacheKey))
-                        DemoteDisplayedEntryToReusePool(sdbd);
+                    DemoteDisplayedEntryToReusePool(sdbd);
                 }
 
                 if (_verboseLogging)
@@ -267,11 +267,10 @@ namespace FFImageLoading.Cache
                 // into the displayed_cache if found.
                 lock (monitor)
                 {
-                    if (reuse_pool.ContainsKey(sdbd.InCacheKey))
-                        PromoteReuseEntryToDisplayedCache(sdbd);
+                    PromoteReuseEntryToDisplayedCache(sdbd);
                 }
 
-                                if (_verboseLogging)
+                if (_verboseLogging)
                     log?.Debug("[MEMORY_CACHE] EntryDisplayed: " + sdbd.InCacheKey);
             }
         }
@@ -293,6 +292,7 @@ namespace FFImageLoading.Cache
                 value.NoLongerDisplayed += OnEntryNoLongerDisplayed;
                 value.SetIsRetained(false);
                 value.SetIsCached(true);
+
                 reuse_pool.Remove(value.InCacheKey);
                 displayed_cache.Add(value.InCacheKey, value);
             }
@@ -306,11 +306,24 @@ namespace FFImageLoading.Cache
                 value.Displayed += OnEntryDisplayed;
                 value.SetIsRetained(false);
                 value.SetIsCached(true);
+
                 displayed_cache.Remove(value.InCacheKey);
+                reuse_pool.Remove(value.InCacheKey);
+                reuse_pool.Add(value.InCacheKey, value);
+            }
+        }
 
-                if (reuse_pool.ContainsKey(value.InCacheKey))
-                    reuse_pool.Remove(value.InCacheKey);
+        public void AddToReusePool(TValue value)
+        {
+            lock (monitor)
+            {
+                value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
+                value.Displayed += OnEntryDisplayed;
+                value.SetIsRetained(false);
+                value.SetIsCached(true);
 
+                displayed_cache.Remove(value.InCacheKey);
+                reuse_pool.Remove(value.InCacheKey);
                 reuse_pool.Add(value.InCacheKey, value);
             }
         }
@@ -336,16 +349,9 @@ namespace FFImageLoading.Cache
 
             lock (monitor)
             {
-                if (!displayed_cache.ContainsKey(key))
-                {
-                    if (reuse_pool.ContainsKey(key))
-                    {
-                        reuse_pool.Remove(key);
-                    }
-
-                    reuse_pool.Add(key, value);
-                    OnEntryAdded(key, value);
-                }
+                Remove(key, true);
+                reuse_pool.Add(key, value);
+                OnEntryAdded(key, value);
             }
         }
 
@@ -360,7 +366,7 @@ namespace FFImageLoading.Cache
             }
         }
 
-        public bool Remove(string key)
+        bool Remove(string key, bool evicted)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
@@ -373,12 +379,21 @@ namespace FFImageLoading.Cache
                 {
                     TValue tmp = null;
                     tmp = displayed_cache.Remove(key) as TValue;
-                    ProcessRemoval(tmp, evicted: false);
+
+                    if (evicted)
+                        reuse_pool.Remove(key);
+
+                    ProcessRemoval(tmp, evicted: evicted);
                     result = true;
                 }
 
                 return result;
             }
+        }
+
+        public bool Remove(string key)
+        {
+            return Remove(key, false);
         }
 
         public bool TryGetValue(string key, out TValue value)
