@@ -22,6 +22,7 @@
     <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG</DefineConstants>        
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">        
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,7 @@
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />

@@ -22,12 +22,14 @@
     <OutputPath>bin\Debug</OutputPath>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>        
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Forms.xml</DocumentationFile>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>        
 
   <ItemGroup>
