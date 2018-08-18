@@ -8,7 +8,7 @@ namespace FFImageLoading.Cache
         public readonly TimeSpan TimeToLive;
         public readonly string FileName;
 
-        public CacheEntry (DateTime o, TimeSpan ttl, string fileName)
+        public CacheEntry(DateTime o, TimeSpan ttl, string fileName)
         {
             Origin = o;
             TimeToLive = ttl;
@@ -16,4 +16,3 @@ namespace FFImageLoading.Cache
         }
     }
 }
-

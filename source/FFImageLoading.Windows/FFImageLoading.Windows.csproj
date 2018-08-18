@@ -44,9 +44,6 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\FFImageLoading.Shared\Cache\CacheEntry.cs">
-      <Link>Cache\CacheEntry.cs</Link>
-    </Compile>
     <Compile Include="Cache\FFSourceBindingCache.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Cache\ImageCache.cs" />
