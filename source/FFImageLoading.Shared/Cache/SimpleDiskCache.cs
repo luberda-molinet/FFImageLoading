@@ -209,11 +209,11 @@ namespace FFImageLoading.Cache
 
         protected void InitializeEntries()
         {
-            foreach (FileInfo fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
+            foreach (var fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
             {
                 string key = Path.GetFileNameWithoutExtension(fileInfo.Name);
-                TimeSpan duration = GetDuration(fileInfo.Extension);
-                _entries.TryAdd(key, new CacheEntry() { Origin = fileInfo.CreationTimeUtc, TimeToLive = duration, FileName = fileInfo.Name });
+                var duration = GetDuration(fileInfo.Extension);
+                _entries.TryAdd(key, new CacheEntry(fileInfo.CreationTimeUtc, duration, fileInfo.Name));
             }
         }
 

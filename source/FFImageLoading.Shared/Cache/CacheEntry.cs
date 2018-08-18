@@ -2,18 +2,18 @@
 
 namespace FFImageLoading.Cache
 {
-	struct CacheEntry
-	{
-		public DateTime Origin;
-		public TimeSpan TimeToLive;
-		public string FileName;
+    readonly struct CacheEntry
+    {
+        public readonly DateTime Origin;
+        public readonly TimeSpan TimeToLive;
+        public readonly string FileName;
 
-		public CacheEntry (DateTime o, TimeSpan ttl, string fileName)
-		{
-			Origin = o;
-			TimeToLive = ttl;
-			FileName = fileName;
-		}
-	}
+        public CacheEntry (DateTime o, TimeSpan ttl, string fileName)
+        {
+            Origin = o;
+            TimeToLive = ttl;
+            FileName = fileName;
+        }
+    }
 }
 
