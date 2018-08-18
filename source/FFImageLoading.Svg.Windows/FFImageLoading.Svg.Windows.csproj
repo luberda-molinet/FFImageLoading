@@ -127,7 +127,7 @@
       <Version>6.1.5</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
-      <Version>1.60.1</Version>
+      <Version>1.60.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems" Label="Shared" />

@@ -134,13 +134,13 @@
       <Version>6.1.5</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
-      <Version>1.60.1</Version>
+      <Version>1.60.3</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms">
-      <Version>3.0.0.550146</Version>
+      <Version>3.1.0.697729</Version>
     </PackageReference>
     <PackageReference Include="Xamvvm.Forms">
-      <Version>1.0.4</Version>
+      <Version>1.0.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
