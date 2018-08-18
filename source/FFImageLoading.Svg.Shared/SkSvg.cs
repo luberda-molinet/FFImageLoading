@@ -37,8 +37,8 @@ namespace FFImageLoading.Svg.Platform
             IgnoreComments = true,
         };
 
-        #if PORTABLE
-                // basically use reflection to try and find a method that supports a 
+#if PORTABLE
+                // basically use reflection to try and find a method that supports a
         // file path AND a XmlParserContext...
         private static readonly MethodInfo createReaderMethod;
 
@@ -91,7 +91,7 @@ namespace FFImageLoading.Svg.Platform
 
         public SKPicture Load(string filename)
         {
-            #if PORTABLE
+#if PORTABLE
                         // PCL does not have the ability to read a file and use a context
             if (createReaderMethod == null)
             {
@@ -109,7 +109,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 return Load(stream);
             }
-            #endif
+#endif
         }
 
         public SKPicture Load(Stream stream)
@@ -263,6 +263,16 @@ namespace FFImageLoading.Svg.Platform
             if (e.Attribute("display")?.Value == "none")
                 return;
 
+            // SVG element
+            var elementName = e.Name.LocalName;
+            var isGroup = elementName == "g";
+
+            // read style
+            var style = ReadPaints(e, ref stroke, ref fill, isGroup);
+
+            if (style.TryGetValue("display", out var displayValue) && displayValue == "none")
+                return;
+
             // transform matrix
             var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
             canvas.Save();
@@ -274,13 +284,6 @@ namespace FFImageLoading.Svg.Platform
             {
                 canvas.ClipPath(clipPath);
             }
-
-            // SVG element
-            var elementName = e.Name.LocalName;
-            var isGroup = elementName == "g";
-
-            // read style
-            var style = ReadPaints(e, ref stroke, ref fill, isGroup);
 
             // read mask
             var mask = ReadMask(style);
@@ -327,11 +330,11 @@ namespace FFImageLoading.Svg.Platform
                 case "polygon":
                 case "polyline":
                 case "line":
-                    {                  
+                    {
                         var elementPath = ReadElement(e);
                         if (elementPath == null)
                             break;
-                  
+
                         if (mask != null)
                         {
                             canvas.SaveLayer(new SKPaint());
@@ -347,7 +350,7 @@ namespace FFImageLoading.Svg.Platform
                             canvas.Restore();
                             return;
                         }
-                  
+
                         string fillId = e.Attribute("fill")?.Value;
                         if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out object addFill))
                         {
@@ -1143,7 +1146,7 @@ namespace FFImageLoading.Svg.Platform
                         var urlM = urlRe.Match(fill);
                         if (urlM.Success)
                         {
-                            var id = urlM.Groups[1].Value.Trim();                     
+                            var id = urlM.Groups[1].Value.Trim();
                             if (defs.TryGetValue(id, out XElement defE))
                             {
                                 switch (defE.Name.LocalName.ToLower())
