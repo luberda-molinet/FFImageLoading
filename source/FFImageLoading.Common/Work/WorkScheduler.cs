@@ -26,23 +26,16 @@ namespace FFImageLoading.Work
             Performance = performance;
         }
 
-        protected int MaxParallelTasks
-        {
-            get
-            {
-                if (Configuration.SchedulerMaxParallelTasksFactory != null)
-                    return Configuration.SchedulerMaxParallelTasksFactory(Configuration);
-
-                return Configuration.SchedulerMaxParallelTasks;
-            }
-        }
+        protected int MaxParallelTasks => Configuration.SchedulerMaxParallelTasksFactory != null
+                    ? Configuration.SchedulerMaxParallelTasksFactory(Configuration)
+                    : Configuration.SchedulerMaxParallelTasks;
 
         protected IPlatformPerformance Performance { get; private set; }
         protected PendingTasksQueue PendingTasks { get; private set; } = new PendingTasksQueue();
         protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; } = new Dictionary<string, IImageLoaderTask>();
         protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; } = new ThreadSafeCollection<IImageLoaderTask>();
         protected Configuration Configuration { get; private set; }
-        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+        protected IMiniLogger Logger => Configuration.Logger;
 
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
@@ -270,15 +263,15 @@ namespace FFImageLoading.Work
 
             Dictionary<string, IImageLoaderTask> tasksToRun = null;
 
-            int preloadOrUrlTasksCount = 0;
-            int urlTasksCount = 0;
-            int preloadTasksCount = 0;
+            var preloadOrUrlTasksCount = 0;
+            var urlTasksCount = 0;
+            var preloadTasksCount = 0;
 
             lock (_lock)
             {
                 if (RunningTasks.Count >= MaxParallelTasks)
                 {
-                    urlTasksCount = RunningTasks.Count(v => v.Value != null && (!v.Value.Parameters.Preload && v.Value.Parameters.Source == ImageSource.Url));
+                    urlTasksCount = RunningTasks.Count(v => v.Value != null && !v.Value.Parameters.Preload && v.Value.Parameters.Source == ImageSource.Url);
                     preloadTasksCount = RunningTasks.Count(v => v.Value != null && v.Value.Parameters.Preload);
                     preloadOrUrlTasksCount = preloadTasksCount + urlTasksCount;
 
@@ -290,7 +283,7 @@ namespace FFImageLoading.Work
                         return;
                 }
 
-                int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
+                var numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, IImageLoaderTask>();
                 IImageLoaderTask task = null;
 
@@ -301,7 +294,7 @@ namespace FFImageLoading.Work
 
                     // We don't want to load, at the same time, images that have same key or same raw key at the same time
                     // This way we prevent concurrent downloads and benefit from caches
-                    string rawKey = task.KeyRaw;
+                    var rawKey = task.KeyRaw;
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
                     {
                         SimilarTasks.Add(task);
@@ -347,7 +340,7 @@ namespace FFImageLoading.Work
                 if (Configuration.VerbosePerformanceLogging)
                 {
                     LogSchedulerStats();
-                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var stopwatch = Stopwatch.StartNew();
 
                     await pendingTask.RunAsync().ConfigureAwait(false);
 
