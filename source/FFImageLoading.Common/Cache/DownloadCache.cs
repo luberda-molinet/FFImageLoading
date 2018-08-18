@@ -114,7 +114,7 @@ namespace FFImageLoading.Cache
                         {
                             if (response.Content == null)
                                 throw new HttpRequestException(response.StatusCode.ToString());
-                            
+
                             using (response.Content)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
@@ -126,7 +126,7 @@ namespace FFImageLoading.Cache
 
                         if (response.Content == null)
                             throw new HttpRequestException("No Content");
-                        
+
                         var mediaType = response.Content.Headers?.ContentType?.MediaType;
                         if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
@@ -135,7 +135,7 @@ namespace FFImageLoading.Cache
                         }
 
                         if (!parameters.CacheDuration.HasValue && Configuration.TryToReadDiskCacheDurationFromHttpHeaders
-                            && response.Headers?.CacheControl?.MaxAge != null)
+                            && response.Headers?.CacheControl?.MaxAge != null && response.Headers.CacheControl.MaxAge > TimeSpan.Zero)
                         {
                             downloadInformation.CacheValidity = response.Headers.CacheControl.MaxAge.Value;
                         }
@@ -143,7 +143,7 @@ namespace FFImageLoading.Cache
                         ModifyParametersAfterResponse(response, parameters);
 
                         using (var httpReadTimeoutTokenSource = new CancellationTokenSource())
-                        using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))                            
+                        using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))
                         {
                             var readTimeoutToken = readTimeoutTokenSource.Token;
                             var httpReadTimeoutToken = httpReadTimeoutTokenSource.Token;
@@ -171,7 +171,7 @@ namespace FFImageLoading.Cache
                                         totalRead += read;
 
                                         if (canReportProgress)
-                                            progressAction(new DownloadProgress() { Total = total, Current = totalRead });
+                                            progressAction(new DownloadProgress(totalRead, total));
                                     }
 
                                     if (outputStream.Length == 0)
