@@ -23,7 +23,7 @@ namespace FFImageLoading.Forms.Droid
     [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
     public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
     {
-        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use CachedImageRenderer(Context) instead.")]
         public CachedImageRenderer() : base(Xamarin.Forms.Forms.Context)
         {
         }
@@ -44,7 +44,7 @@ namespace FFImageLoading.Forms.Droid
     [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
     public class CachedImageFastRenderer : FFImageLoading.Forms.Platform.CachedImageFastRenderer
     {
-        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use CachedImageRenderer(Context) instead.")]
         public CachedImageFastRenderer() : base(Xamarin.Forms.Forms.Context)
         {
         }
@@ -122,7 +122,7 @@ namespace FFImageLoading.Forms.Platform
         readonly static MethodInfo _platformDefaultRendererTypeNotifyFakeHandling = _platformDefaultRendererType?.GetMethod("NotifyFakeHandling", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         readonly object _updateBitmapLock = new object();
 
-        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use CachedImageRenderer(Context) instead.")]
         public CachedImageRenderer() : base(Xamarin.Forms.Forms.Context)
         {
         }

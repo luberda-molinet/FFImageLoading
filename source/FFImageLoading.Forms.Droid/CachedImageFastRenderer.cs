@@ -42,7 +42,7 @@ namespace FFImageLoading.Forms.Platform
         readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
         readonly object _updateBitmapLock = new object();
 
-        [Obsolete("This constructor is obsolete as of version 2.5. Please use ImageRenderer(Context) instead.")]
+        [Obsolete("This constructor is obsolete as of version 2.5. Please use CachedImageRenderer(Context) instead.")]
         public CachedImageFastRenderer() : base(Xamarin.Forms.Forms.Context)
         {
         }
