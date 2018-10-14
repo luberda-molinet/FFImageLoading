@@ -274,7 +274,7 @@ namespace FFImageLoading.Svg.Platform
             // read style
             var style = ReadPaints(e, ref stroke, ref fill, isGroup);
 
-            if (style.TryGetValue("display", out var displayValue) && displayValue == "none")
+            if (GetString(style, "display") == "none")
                 return;
 
             // transform matrix
@@ -381,7 +381,7 @@ namespace FFImageLoading.Svg.Platform
 
                             if (!(width > 0f && height > 0f))
                             {
-                                var root = e?.Document?.Root;
+                                var root = e.Document?.Root;
                                 width = ReadNumber(root?.Attribute("width"));
                                 height = ReadNumber(root?.Attribute("height"));
                             }
