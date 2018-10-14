@@ -152,14 +152,18 @@ namespace FFImageLoading.Svg.Platform
             var ns = svg.Name.Namespace;
 
             // find the defs (gradients) - and follow all hrefs
-            foreach (var d in svg.Descendants())
-            {
-                var id = ReadId(d);
-                if (!string.IsNullOrEmpty(id))
-                    defs[id] = ReadDefinition(d);
-            }
+	        var defsE = svg.Descendants().FirstOrDefault(x => x.Name.LocalName == "defs");
+	        if (defsE != null)
+	        {
+		        foreach (var d in defsE.Descendants())
+		        {
+			        var id = ReadId(d);
+			        if (!string.IsNullOrEmpty(id))
+				        defs[id] = ReadDefinition(d);
+		        }
+	        }
 
-            ReadDefsStyles(svg);
+	        ReadDefsStyles(svg);
 
             Version = svg.Attribute("version")?.Value;
             Title = svg.Element(ns + "title")?.Value;
