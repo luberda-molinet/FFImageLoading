@@ -278,8 +278,8 @@ namespace FFImageLoading.Svg.Platform
             canvas.Save();
             canvas.Concat(ref transform);
 
-            // clip-path
-            var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
+	        // clip-path - can be an attribute or css
+            var clipPath = ReadClipPath(GetString(style, "clip-path"));
             if (clipPath != null)
             {
                 canvas.ClipPath(clipPath);
