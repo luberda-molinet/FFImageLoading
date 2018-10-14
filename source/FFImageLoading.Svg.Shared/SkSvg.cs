@@ -351,7 +351,7 @@ namespace FFImageLoading.Svg.Platform
                             return;
                         }
 
-                        string fillId = e.Attribute("fill")?.Value;
+	                    string fillId = GetString(style, "fill");
                         if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out object addFill))
                         {
                             var x = ReadNumber(e.Attribute("x"));
