@@ -277,10 +277,15 @@ namespace FFImageLoading.Svg.Platform
             if (GetString(style, "display") == "none")
                 return;
 
-            // transform matrix
-            var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
             canvas.Save();
-            canvas.Concat(ref transform);
+
+	        // transform matrix
+	        var transformValue = e.Attribute("transform")?.Value;
+	        if (String.IsNullOrEmpty(transformValue))
+	        {
+		        var transform = ReadTransform(transformValue);
+		        canvas.Concat(ref transform);
+	        }
 
 	        // clip-path - can be an attribute or css
             var clipPath = ReadClipPath(GetString(style, "clip-path"));
