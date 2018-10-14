@@ -391,7 +391,8 @@ namespace FFImageLoading.Svg.Platform
                                 var endPoint = gradient.GetEndPoint(x, y, width, height);
 
                                 using (var gradientShader = SKShader.CreateLinearGradient(
-                                    startPoint, endPoint, gradient.Colors, gradient.Positions, gradient.TileMode))
+                                    startPoint, endPoint, gradient.Colors, gradient.Positions, gradient.TileMode,
+	                                gradient.GradientTransform))
                                 {
                                     var oldColor = fill.Color;
                                     var oldShader = fill.Shader;
@@ -409,7 +410,8 @@ namespace FFImageLoading.Svg.Platform
                                 var radius = gradient.GetRadius(width, height);
 
                                 using (var gradientShader = SKShader.CreateRadialGradient(
-                                    centerPoint, radius, gradient.Colors, gradient.Positions, gradient.TileMode))
+                                    centerPoint, radius, gradient.Colors, gradient.Positions, gradient.TileMode,
+                                    gradient.GradientTransform))
                                 {
                                     var oldColor = fill.Color;
                                     var oldShader = fill.Shader;
@@ -1421,10 +1423,11 @@ namespace FFImageLoading.Svg.Platform
             var tileMode = ReadSpreadMethod(e);
             var stops = ReadStops(e);
 
-            // TODO: check gradientTransform attribute
+	        var transform = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
+
             // TODO: use absolute
 
-            return new SKRadialGradient(centerX, centerY, radius, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode);
+            return new SKRadialGradient(centerX, centerY, radius, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode, transform);
         }
 
         private SKLinearGradient ReadLinearGradient(XElement e)
@@ -1441,10 +1444,11 @@ namespace FFImageLoading.Svg.Platform
             var tileMode = ReadSpreadMethod(e);
             var stops = ReadStops(e);
 
-            // TODO: check gradientTransform attribute
-            // TODO: use absolute
+            var transform = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
 
-            return new SKLinearGradient(startX, startY, endX, endY, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode);
+	        // TODO: use absolute
+
+            return new SKLinearGradient(startX, startY, endX, endY, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode, transform);
         }
 
         private static SKShaderTileMode ReadSpreadMethod(XElement e)

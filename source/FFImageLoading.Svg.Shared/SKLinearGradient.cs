@@ -5,7 +5,7 @@ namespace FFImageLoading.Svg.Platform
 {
     internal struct SKLinearGradient
     {
-        public SKLinearGradient(float startX, float startY, float endX, float endY, float[] positions, SKColor[] colors, SKShaderTileMode tileMode)
+        public SKLinearGradient(float startX, float startY, float endX, float endY, float[] positions, SKColor[] colors, SKShaderTileMode tileMode, SKMatrix gradientTransform)
         {
             StartX = startX;
             StartY = startY;
@@ -14,6 +14,7 @@ namespace FFImageLoading.Svg.Platform
             Positions = positions;
             Colors = colors;
             TileMode = tileMode;
+	        GradientTransform = gradientTransform;
         }
 
         public float StartX { get; set; }
@@ -29,6 +30,8 @@ namespace FFImageLoading.Svg.Platform
         public SKColor[] Colors { get; set; }
 
         public SKShaderTileMode TileMode { get; set; }
+
+	    public SKMatrix GradientTransform { get; set; }
 
         public SKPoint GetStartPoint(float x, float y, float width, float height)
         {

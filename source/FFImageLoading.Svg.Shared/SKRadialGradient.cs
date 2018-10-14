@@ -5,7 +5,7 @@ namespace FFImageLoading.Svg.Platform
 {
     internal struct SKRadialGradient
     {
-        public SKRadialGradient(float centerX, float centerY, float radius, float[] positions, SKColor[] colors, SKShaderTileMode tileMode)
+        public SKRadialGradient(float centerX, float centerY, float radius, float[] positions, SKColor[] colors, SKShaderTileMode tileMode, SKMatrix gradientTransform)
         {
             CenterX = centerX;
             CenterY = centerY;
@@ -13,6 +13,7 @@ namespace FFImageLoading.Svg.Platform
             Positions = positions;
             Colors = colors;
             TileMode = tileMode;
+	        GradientTransform = gradientTransform;
         }
 
         public float CenterX { get; set; }
@@ -26,6 +27,8 @@ namespace FFImageLoading.Svg.Platform
         public SKColor[] Colors { get; set; }
 
         public SKShaderTileMode TileMode { get; set; }
+
+	    public SKMatrix GradientTransform { get; set; }
 
         public SKPoint GetCenterPoint(float x, float y, float width, float height)
         {
