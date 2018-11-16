@@ -152,18 +152,18 @@ namespace FFImageLoading.Svg.Platform
             var ns = svg.Name.Namespace;
 
             // find the defs (gradients) - and follow all hrefs
-	        var defsE = svg.Descendants().FirstOrDefault(x => x.Name.LocalName == "defs");
-	        if (defsE != null)
-	        {
-		        foreach (var d in defsE.Descendants())
-		        {
-			        var id = ReadId(d);
-			        if (!string.IsNullOrEmpty(id))
-				        defs[id] = ReadDefinition(d);
-		        }
-	        }
+            var defsE = svg.Descendants().FirstOrDefault(x => x.Name.LocalName == "defs");
+            if (defsE != null)
+            {
+                foreach (var d in defsE.Descendants())
+                {
+                    var id = ReadId(d);
+                    if (!string.IsNullOrEmpty(id))
+                        defs[id] = ReadDefinition(d);
+                }
+            }
 
-	        ReadDefsStyles(svg);
+            ReadDefsStyles(svg);
 
             Version = svg.Attribute("version")?.Value;
             Title = svg.Element(ns + "title")?.Value;
@@ -279,15 +279,15 @@ namespace FFImageLoading.Svg.Platform
 
             canvas.Save();
 
-	        // transform matrix
-	        var transformValue = e.Attribute("transform")?.Value;
-	        if (String.IsNullOrEmpty(transformValue))
-	        {
-		        var transform = ReadTransform(transformValue);
-		        canvas.Concat(ref transform);
-	        }
+            // transform matrix
+            var transformValue = e.Attribute("transform")?.Value;
+            if (String.IsNullOrEmpty(transformValue))
+            {
+                var transform = ReadTransform(transformValue);
+                canvas.Concat(ref transform);
+            }
 
-	        // clip-path - can be an attribute or css
+            // clip-path - can be an attribute or css
             var clipPath = ReadClipPath(GetString(style, "clip-path"));
             if (clipPath != null)
             {
@@ -360,7 +360,7 @@ namespace FFImageLoading.Svg.Platform
                             return;
                         }
 
-	                    string fillId = GetString(style, "fill");
+                        string fillId = GetString(style, "fill");
                         if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out object addFill))
                         {
                             var x = ReadNumber(e.Attribute("x"));
@@ -401,7 +401,7 @@ namespace FFImageLoading.Svg.Platform
 
                                 using (var gradientShader = SKShader.CreateLinearGradient(
                                     startPoint, endPoint, gradient.Colors, gradient.Positions, gradient.TileMode,
-	                                gradient.GradientTransform))
+                                    gradient.GradientTransform))
                                 {
                                     var oldColor = fill.Color;
                                     var oldShader = fill.Shader;
@@ -1432,7 +1432,7 @@ namespace FFImageLoading.Svg.Platform
             var tileMode = ReadSpreadMethod(e);
             var stops = ReadStops(e);
 
-	        var transform = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
+            var transform = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
 
             // TODO: use absolute
 
@@ -1455,7 +1455,7 @@ namespace FFImageLoading.Svg.Platform
 
             var transform = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
 
-	        // TODO: use absolute
+            // TODO: use absolute
 
             return new SKLinearGradient(startX, startY, endX, endY, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode, transform);
         }

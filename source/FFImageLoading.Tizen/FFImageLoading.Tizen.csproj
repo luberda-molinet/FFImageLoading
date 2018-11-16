@@ -26,7 +26,7 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Tizen.NET" Version="4.0.0" />
+    <PackageReference Include="Tizen.NET" Version="5.0.0.14562" />
   </ItemGroup>
 
   <ItemGroup>

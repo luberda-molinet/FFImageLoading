@@ -13,7 +13,7 @@ namespace FFImageLoading.Svg.Platform
             Positions = positions;
             Colors = colors;
             TileMode = tileMode;
-	        GradientTransform = gradientTransform;
+            GradientTransform = gradientTransform;
         }
 
         public float CenterX { get; set; }
@@ -28,7 +28,7 @@ namespace FFImageLoading.Svg.Platform
 
         public SKShaderTileMode TileMode { get; set; }
 
-	    public SKMatrix GradientTransform { get; set; }
+        public SKMatrix GradientTransform { get; set; }
 
         public SKPoint GetCenterPoint(float x, float y, float width, float height)
         {

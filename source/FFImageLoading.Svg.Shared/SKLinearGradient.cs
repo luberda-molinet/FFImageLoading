@@ -14,7 +14,7 @@ namespace FFImageLoading.Svg.Platform
             Positions = positions;
             Colors = colors;
             TileMode = tileMode;
-	        GradientTransform = gradientTransform;
+            GradientTransform = gradientTransform;
         }
 
         public float StartX { get; set; }
@@ -31,7 +31,7 @@ namespace FFImageLoading.Svg.Platform
 
         public SKShaderTileMode TileMode { get; set; }
 
-	    public SKMatrix GradientTransform { get; set; }
+        public SKMatrix GradientTransform { get; set; }
 
         public SKPoint GetStartPoint(float x, float y, float width, float height)
         {
