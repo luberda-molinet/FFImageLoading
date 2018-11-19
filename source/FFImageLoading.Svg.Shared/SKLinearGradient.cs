@@ -3,56 +3,61 @@ using SkiaSharp;
 
 namespace FFImageLoading.Svg.Platform
 {
-    internal struct SKLinearGradient
+    internal struct SKLinearGradient : ISKSvgFill
     {
-        public SKLinearGradient(float startX, float startY, float endX, float endY, float[] positions, SKColor[] colors, SKShaderTileMode tileMode, SKMatrix gradientTransform)
+        public SKLinearGradient(SKPoint start, SKPoint end, float[] positions, SKColor[] colors, SKShaderTileMode tileMode, SKMatrix matrix)
         {
-            StartX = startX;
-            StartY = startY;
-            EndX = endX;
-            EndY = endY;
+            Start = start;
+            End = end;
             Positions = positions;
             Colors = colors;
             TileMode = tileMode;
-            GradientTransform = gradientTransform;
+            Matrix = matrix;
         }
 
-        public float StartX { get; set; }
+        public SKPoint Start { get; set; }
 
-        public float StartY { get; set; }
-
-        public float EndX { get; set; }
-
-        public float EndY { get; set; }
+        public SKPoint End { get; set; }
 
         public float[] Positions { get; set; }
 
         public SKColor[] Colors { get; set; }
 
-        public SKShaderTileMode TileMode { get; set; }
+        public SKMatrix Matrix { get; set; }
 
-        public SKMatrix GradientTransform { get; set; }
+        public SKShaderTileMode TileMode { get; set; }
 
         public SKPoint GetStartPoint(float x, float y, float width, float height)
         {
-            if (Math.Max(StartX, StartY) > 1f)
-                return new SKPoint(StartX, StartY);
+            if (Math.Max(Start.X, Start.Y) > 1f)
+                return new SKPoint(Start.X, Start.Y);
 
-            var x0 = x + StartX * width;
-            var y0 = y + StartY * height;
+            var x0 = x + Start.X * width;
+            var y0 = y + Start.Y * height;
 
             return new SKPoint(x0, y0);
         }
 
         public SKPoint GetEndPoint(float x, float y, float width, float height)
         {
-            if (Math.Max(EndX, EndY) > 1f)
-                return new SKPoint(EndX, EndY);
+            if (Math.Max(End.X, End.Y) > 1f)
+                return new SKPoint(End.X, End.Y);
 
-            var x0 = x + EndX * width;
-            var y0 = y + EndY * height;
+            var x0 = x + End.X * width;
+            var y0 = y + End.Y * height;
 
             return new SKPoint(x0, y0);
+        }
+
+        public void ApplyFill(SKPaint fill, SKRect bounds)
+        {
+            var startPoint = GetStartPoint(bounds.Left, bounds.Top, bounds.Width, bounds.Height);
+            var endPoint = GetEndPoint(bounds.Left, bounds.Top, bounds.Width, bounds.Height);
+
+            var gradientShader = SKShader.CreateLinearGradient(startPoint, endPoint, Colors, Positions, TileMode, Matrix);
+
+            fill.Color = SKColors.Black;
+            fill.Shader = gradientShader;
         }
     }
 }
