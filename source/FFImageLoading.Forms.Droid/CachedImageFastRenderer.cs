@@ -226,6 +226,12 @@ namespace FFImageLoading.Forms.Platform
             ElementPropertyChanged?.Invoke(this, e);
         }   
 
+        protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
+        {
+            base.OnLayout(changed, left, top, right, bottom);
+            ClipBounds = GetScaleType() == ScaleType.CenterCrop ? new Rect(0, 0, right - left, bottom - top) : null;
+        }
+
         void UpdateAspect()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || TypedElement == null || _isDisposed)
