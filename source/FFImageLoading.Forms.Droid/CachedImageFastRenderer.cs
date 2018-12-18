@@ -17,6 +17,7 @@ using FFImageLoading.Views;
 using Android.Views;
 using System.Reflection;
 using Android.Content;
+using Android.OS;
 using AView = Android.Views.View;
 
 namespace FFImageLoading.Forms.Platform
@@ -229,7 +230,11 @@ namespace FFImageLoading.Forms.Platform
         protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
         {
             base.OnLayout(changed, left, top, right, bottom);
-            ClipBounds = GetScaleType() == ScaleType.CenterCrop ? new Rect(0, 0, right - left, bottom - top) : null;
+
+            if ((int)Build.VERSION.SdkInt >= 18)
+            {
+                ClipBounds = GetScaleType() == ScaleType.CenterCrop ? new Rect(0, 0, right - left, bottom - top) : null;
+            }                
         }
 
         void UpdateAspect()
