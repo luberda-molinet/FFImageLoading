@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SKLinearGradient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SKRadialGradient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SKSvgMask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ISKSvgFill.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />

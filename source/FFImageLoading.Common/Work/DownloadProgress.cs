@@ -1,10 +1,16 @@
 ﻿using System;
 namespace FFImageLoading
 {
-    public struct DownloadProgress
+    public readonly struct DownloadProgress
     {
-        public int Current;
+        public DownloadProgress(int current, int total)
+        {
+            Current = current;
+            Total = total;
+        }
 
-        public int Total;
+        public readonly int Current;
+
+        public readonly int Total;
     }
 }

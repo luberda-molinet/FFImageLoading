@@ -99,8 +99,8 @@ namespace FFImageLoading.Cache
             foreach (var file in await cacheFolder.GetFilesAsync())
             {
                 string key = Path.GetFileNameWithoutExtension(file.Name);
-                TimeSpan duration = GetDuration(file.FileType);
-                entries.TryAdd(key, new CacheEntry() { Origin = file.DateCreated.UtcDateTime, TimeToLive = duration, FileName = file.Name });
+                var duration = GetDuration(file.FileType);
+                entries.TryAdd(key, new CacheEntry(file.DateCreated.UtcDateTime, duration, file.Name));
             }
         }
 
@@ -317,7 +317,7 @@ namespace FFImageLoading.Cache
                     }
                 }
             }
-            catch (IOException) 
+            catch (IOException)
             {
                 cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
             }

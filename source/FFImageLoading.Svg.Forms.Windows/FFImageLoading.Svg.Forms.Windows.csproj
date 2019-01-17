@@ -137,10 +137,10 @@
       <Version>6.1.5</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
-      <Version>1.60.1</Version>
+      <Version>1.60.3</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms">
-      <Version>3.0.0.550146</Version>
+      <Version>3.4.0.1008975</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems" Label="Shared" />

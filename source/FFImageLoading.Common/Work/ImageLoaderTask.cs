@@ -17,7 +17,7 @@ namespace FFImageLoading.Work
         bool _isLoadingPlaceholderLoaded;
         static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
 
-        public ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
+        protected ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
         {
             MemoryCache = memoryCache;
             DataResolverFactory = imageService.Config.DataResolverFactory;
@@ -93,8 +93,7 @@ namespace FFImageLoading.Work
             if (string.IsNullOrWhiteSpace(KeyRaw))
                 throw new Exception("Key cannot be null");
 
-            var vect = Parameters.CustomDataResolver as IVectorDataResolver;
-            if (vect != null)
+            if (Parameters.CustomDataResolver is IVectorDataResolver vect)
             {
                 if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
                     KeyRaw = string.Format("{0};(size={1}x{2},dip={3},type={4})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits, vect.GetType().Name);
@@ -146,8 +145,7 @@ namespace FFImageLoading.Work
                 else
                     KeyForErrorPlaceholder = string.Concat(Parameters.ErrorPlaceholderPath, KeyDownsamplingOnly);
 
-                var vectEr = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
-                if (vectEr != null)
+                if (Parameters.CustomLoadingPlaceholderDataResolver is IVectorDataResolver vectEr)
                 {
                     if (vectEr.ReplaceStringMap == null || vectEr.ReplaceStringMap.Count == 0)
                         KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits);
@@ -177,15 +175,15 @@ namespace FFImageLoading.Work
 
         protected IDataResolverFactory DataResolverFactory { get; private set; }
 
-        protected IDiskCache DiskCache { get { return Configuration.DiskCache; } }
+        protected IDiskCache DiskCache => Configuration.DiskCache;
 
-        protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
+        protected IDownloadCache DownloadCache => Configuration.DownloadCache;
 
-        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+        protected IMiniLogger Logger => Configuration.Logger;
 
         protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
-        protected IMainThreadDispatcher MainThreadDispatcher { get { return Configuration.MainThreadDispatcher; } }
+        protected IMainThreadDispatcher MainThreadDispatcher => Configuration.MainThreadDispatcher;
 
         protected abstract int DpiToPixels(int size);
 
@@ -228,14 +226,8 @@ namespace FFImageLoading.Work
 
         protected WeakReference<TImageContainer> PlaceholderWeakReference { get; private set; }
 
-        protected bool TransformPlaceholders
-        {
-            get
-            {
-                return (Parameters.TransformPlaceholdersEnabled.HasValue && Parameters.TransformPlaceholdersEnabled.Value)
+        protected bool TransformPlaceholders => (Parameters.TransformPlaceholdersEnabled.HasValue && Parameters.TransformPlaceholdersEnabled.Value)
                     || (!Parameters.TransformPlaceholdersEnabled.HasValue && Configuration.TransformPlaceholders);
-            }
-        }
 
         public TaskParameter Parameters { get; private set; }
 
@@ -318,10 +310,10 @@ namespace FFImageLoading.Work
                     v => new AnimatedImage<TDecoderContainer>() { Delay = v.Delay, Image = v.Image as TDecoderContainer })
                                         .ToArray()
             };
-                     
+
             if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
-            {        
-                var transformations = Parameters.Transformations.ToList();      
+            {
+                var transformations = Parameters.Transformations.ToList();
 
                 if (decoderContainer.IsAnimated)
                 {
@@ -333,7 +325,7 @@ namespace FFImageLoading.Work
                 else
                 {
                     decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
-                }            
+                }
             }
 
             return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
@@ -343,13 +335,13 @@ namespace FFImageLoading.Work
         {
             try
             {
-                if (Parameters.Preload && Parameters.CacheType.HasValue && 
+                if (Parameters.Preload && Parameters.CacheType.HasValue &&
                     (Parameters.CacheType.Value == CacheType.Disk || Parameters.CacheType.Value == CacheType.None))
                     return false;
 
                 ThrowIfCancellationRequested();
 
-                bool isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImagesEnabled.HasValue ? Parameters.FadeAnimationForCachedImagesEnabled.Value : Configuration.FadeAnimationForCachedImages;
+                var isFadeAnimationEnabledForCached = Parameters.FadeAnimationForCachedImagesEnabled ?? Configuration.FadeAnimationForCachedImages;
                 var result = await TryLoadFromMemoryCacheAsync(Key, true, isFadeAnimationEnabledForCached, false).ConfigureAwait(false);
 
                 if (result)
@@ -469,7 +461,7 @@ namespace FFImageLoading.Work
                         return;
 
                     try
-                    {                        
+                    {
                         ThrowIfCancellationRequested();
 
                         if (await TryLoadFromMemoryCacheAsync(key, false, false, isLoadingPlaceholder).ConfigureAwait(false))
@@ -479,7 +471,7 @@ namespace FFImageLoading.Work
                                 _isLoadingPlaceholderLoaded = true;
                                 Parameters.OnLoadingPlaceholderSet?.Invoke();
                             }
-                            
+
                             return;
                         }
 
@@ -538,8 +530,8 @@ namespace FFImageLoading.Work
 
         public async Task RunAsync()
         {
-            LoadingResult loadingResult = LoadingResult.Failed;
-            bool success = false;
+            var loadingResult = LoadingResult.Failed;
+            var success = false;
 
             try
             {
@@ -604,7 +596,7 @@ namespace FFImageLoading.Work
 
                         ThrowIfCancellationRequested();
 
-                        bool isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
+                        var isFadeAnimationEnabled = Parameters.FadeAnimationEnabled ?? Configuration.FadeAnimationEnabled;
 
                         if (Target != null)
                             await SetTargetAsync(image, isFadeAnimationEnabled).ConfigureAwait(false);
@@ -672,9 +664,7 @@ namespace FFImageLoading.Work
                     if (CancellationTokenSource?.IsCancellationRequested == false)
                         CancellationTokenSource.Cancel();
                 }
-                catch (Exception)
-                {
-                }
+                catch {}
 
                 IsCompleted = true;
 
@@ -701,7 +691,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        bool _isDisposed = false;
+        bool _isDisposed;
         public void Dispose()
         {
             if (!_isDisposed)

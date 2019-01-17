@@ -28,17 +28,16 @@ namespace FFImageLoading.Svg.Platform
         private static readonly Regex WSRe = new Regex(@"\s{2,}");
 
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
-        private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
-        private readonly Dictionary<string, object> fills = new Dictionary<string, object>();
-        private readonly Dictionary<string, string> styles = new Dictionary<string, string>();
+        private readonly Dictionary<string, ISKSvgFill> fillDefs = new Dictionary<string, ISKSvgFill>();
+        private readonly Dictionary<XElement, string> elementFills = new Dictionary<XElement, string>();
         private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
         {
             DtdProcessing = DtdProcessing.Ignore,
             IgnoreComments = true,
         };
 
-        #if PORTABLE
-                // basically use reflection to try and find a method that supports a 
+#if PORTABLE
+        // basically use reflection to try and find a method that supports a
         // file path AND a XmlParserContext...
         private static readonly MethodInfo createReaderMethod;
 
@@ -91,8 +90,8 @@ namespace FFImageLoading.Svg.Platform
 
         public SKPicture Load(string filename)
         {
-            #if PORTABLE
-                        // PCL does not have the ability to read a file and use a context
+#if PORTABLE
+            // PCL does not have the ability to read a file and use a context
             if (createReaderMethod == null)
             {
                 return Load(XDocument.Load(filename));
@@ -109,7 +108,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 return Load(stream);
             }
-            #endif
+#endif
         }
 
         public SKPicture Load(Stream stream)
@@ -134,18 +133,6 @@ namespace FFImageLoading.Svg.Platform
             return new XmlParserContext(null, manager, null, XmlSpace.None);
         }
 
-        private void ReadDefsStyles(XElement root)
-        {
-            var defs = root.Descendants().FirstOrDefault(x => x.Name.LocalName == "defs");
-            if (defs == null)
-                return;
-            foreach (var style in defs.Descendants().Where(x => x.Name.LocalName == "style"))
-            {
-                foreach (var st in CssHelpers.ParseSelectors(style.Value))
-                    styles[st.Key] = st.Value;
-            }
-        }
-
         private SKPicture Load(XDocument xdoc)
         {
             var svg = xdoc.Root;
@@ -154,12 +141,10 @@ namespace FFImageLoading.Svg.Platform
             // find the defs (gradients) - and follow all hrefs
             foreach (var d in svg.Descendants())
             {
-                var id = ReadId(d);
+                var id = d.Attribute("id")?.Value?.Trim();
                 if (!string.IsNullOrEmpty(id))
                     defs[id] = ReadDefinition(d);
             }
-
-            ReadDefsStyles(svg);
 
             Version = svg.Attribute("version")?.Value;
             Title = svg.Element(ns + "title")?.Value;
@@ -171,9 +156,7 @@ namespace FFImageLoading.Svg.Platform
             // get the SVG dimensions
             var viewBoxA = svg.Attribute("viewBox") ?? svg.Attribute("viewPort");
             if (viewBoxA != null)
-            {
                 ViewBox = ReadRectangle(viewBoxA.Value);
-            }
 
             if (CanvasSize.IsEmpty)
             {
@@ -185,21 +168,14 @@ namespace FFImageLoading.Svg.Platform
                 var size = new SKSize(width, height);
 
                 if (widthA == null)
-                {
                     size.Width = ViewBox.Width;
-                }
                 else if (widthA.Value.Contains("%"))
-                {
                     size.Width *= ViewBox.Width;
-                }
+
                 if (heightA == null)
-                {
                     size.Height = ViewBox.Height;
-                }
                 else if (heightA != null && heightA.Value.Contains("%"))
-                {
                     size.Height *= ViewBox.Height;
-                }
 
                 // set the property
                 CanvasSize = size;
@@ -254,7 +230,7 @@ namespace FFImageLoading.Svg.Platform
         {
             foreach (var e in elements)
             {
-                ReadElement(e, canvas, stroke, fill?.Clone());
+                ReadElement(e, canvas, stroke?.Clone(), fill?.Clone());
             }
         }
 
@@ -271,9 +247,7 @@ namespace FFImageLoading.Svg.Platform
             // clip-path
             var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
             if (clipPath != null)
-            {
                 canvas.ClipPath(clipPath);
-            }
 
             // SVG element
             var elementName = e.Name.LocalName;
@@ -282,19 +256,9 @@ namespace FFImageLoading.Svg.Platform
             // read style
             var style = ReadPaints(e, ref stroke, ref fill, isGroup);
 
-            // read mask
-            var mask = ReadMask(style);
-
             // parse elements
             switch (elementName)
             {
-                case "style":
-                    {
-                        foreach (var st in CssHelpers.ParseSelectors(e.Value))
-                            styles[st.Key] = st.Value;
-
-                        break;
-                    }
                 case "image":
                     {
                         var image = ReadImage(e);
@@ -308,8 +272,8 @@ namespace FFImageLoading.Svg.Platform
                                 }
                             }
                         }
-                        break;
                     }
+                    break;
                 case "text":
                     if (stroke != null || fill != null)
                     {
@@ -327,148 +291,53 @@ namespace FFImageLoading.Svg.Platform
                 case "polygon":
                 case "polyline":
                 case "line":
-                    {                  
+                    if (stroke != null || fill != null)
+                    {
                         var elementPath = ReadElement(e);
                         if (elementPath == null)
                             break;
-                  
-                        if (mask != null)
-                        {
-                            canvas.SaveLayer(new SKPaint());
-                            foreach (var gElement in mask.Element.Elements())
-                            {
-                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
-                            }
-                            using (var paint = fill.Clone())
-                            {
-                                paint.BlendMode = SKBlendMode.SrcIn;
-                                canvas.DrawPath(elementPath, paint);
-                            }
-                            canvas.Restore();
-                            return;
-                        }
-                  
-                        string fillId = e.Attribute("fill")?.Value;
-                        if (!string.IsNullOrWhiteSpace(fillId) && fills.TryGetValue(fillId, out object addFill))
+
+                        if (elementFills.TryGetValue(e, out var fillId) && fillDefs.TryGetValue(fillId, out var addFill))
                         {
                             var x = ReadNumber(e.Attribute("x"));
                             var y = ReadNumber(e.Attribute("y"));
+                            var elementSize = ReadElementSize(e);
+                            var bounds = SKRect.Create(new SKPoint(x, y), elementSize);
 
-                            float width = 0f;
-                            float height = 0f;
-                            var element = e;
-
-                            while (element.Parent != null)
-                            {
-                                if (!(width > 0f))
-                                    width = ReadNumber(element.Attribute("width"));
-
-                                if (!(height > 0f))
-                                    height = ReadNumber(element.Attribute("height"));
-
-                                if (width > 0f && height > 0f)
-                                    break;
-
-                                element = element.Parent;
-                            }
-
-                            if (!(width > 0f && height > 0f))
-                            {
-                                var root = e?.Document?.Root;
-                                width = ReadNumber(root?.Attribute("width"));
-                                height = ReadNumber(root?.Attribute("height"));
-                            }
-
-                            var addFillType = addFill.GetType();
-
-                            if (addFillType == typeof(SKLinearGradient))
-                            {
-                                var gradient = (SKLinearGradient)addFill;
-                                var startPoint = gradient.GetStartPoint(x, y, width, height);
-                                var endPoint = gradient.GetEndPoint(x, y, width, height);
-
-                                using (var gradientShader = SKShader.CreateLinearGradient(
-                                    startPoint, endPoint, gradient.Colors, gradient.Positions, gradient.TileMode))
-                                {
-                                    var oldColor = fill.Color;
-                                    var oldShader = fill.Shader;
-                                    fill.Color = SKColors.Black;
-                                    fill.Shader = gradientShader;
-                                    canvas.DrawPath(elementPath, fill);
-                                    fill.Color = oldColor;
-                                    fill.Shader = oldShader;
-                                }
-                            }
-                            else if (addFillType == typeof(SKRadialGradient))
-                            {
-                                var gradient = (SKRadialGradient)addFill;
-                                var centerPoint = gradient.GetCenterPoint(x, y, width, height);
-                                var radius = gradient.GetRadius(width, height);
-
-                                using (var gradientShader = SKShader.CreateRadialGradient(
-                                    centerPoint, radius, gradient.Colors, gradient.Positions, gradient.TileMode))
-                                {
-                                    var oldColor = fill.Color;
-                                    var oldShader = fill.Shader;
-                                    fill.Color = SKColors.Black;
-                                    fill.Shader = gradientShader;
-                                    canvas.DrawPath(elementPath, fill);
-                                    fill.Color = oldColor;
-                                    fill.Shader = oldShader;
-                                }
-                            }
+                            addFill.ApplyFill(fill, bounds);
                         }
-                        else if (fill != null)
-                        {
+
+                        if (fill != null)
                             canvas.DrawPath(elementPath, fill);
-                        }
-
                         if (stroke != null)
                             canvas.DrawPath(elementPath, stroke);
-
-                        break;
                     }
+                    break;
                 case "g":
                     if (e.HasElements)
                     {
-                        if (mask != null)
+                        // get current group opacity
+                        float groupOpacity = ReadOpacity(style);
+                        if (groupOpacity != 1.0f)
                         {
-                            canvas.SaveLayer(new SKPaint());
-                            foreach (var gElement in mask.Element.Elements())
+                            var opacity = (byte)(255 * groupOpacity);
+                            var opacityPaint = new SKPaint
                             {
-                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
-                            }
+                                Color = SKColors.Black.WithAlpha(opacity)
+                            };
 
-                            foreach (var gElement in e.Elements())
-                            {
-                                using (var paint = fill?.Clone() ?? CreatePaint())
-                                {
-                                    paint.BlendMode = SKBlendMode.SrcIn;
-                                    ReadElement(gElement, canvas, paint, paint);
-                                }
-                            }
-                            canvas.Restore();
+                            // apply the opacity
+                            canvas.SaveLayer(opacityPaint);
                         }
-                        else
+
+                        foreach (var gElement in e.Elements())
                         {
-                            SKPaint opacityPaint = null;
-                            // get current group opacity
-                            float groupOpacity = ReadOpacity(style);
-                            if (groupOpacity != 1.0f)
-                            {
-                                var opacity = (byte)(255 * groupOpacity);
-                                opacityPaint = new SKPaint { Color = SKColors.Black.WithAlpha(opacity) };
-                                canvas.SaveLayer(opacityPaint);
-                            }
-                            foreach (var gElement in e.Elements())
-                            {
-                                ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone());
-                            }
-                            if (opacityPaint != null)
-                            {
-                                canvas.Restore();
-                            }
+                            ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone());
                         }
+
+                        // restore state
+                        if (groupOpacity != 1.0f)
+                            canvas.Restore();
                     }
                     break;
                 case "use":
@@ -483,10 +352,9 @@ namespace FFImageLoading.Svg.Platform
                             foreach (var attribute in attributes)
                             {
                                 var name = attribute.Name.LocalName;
-
-                                if (!name.Contains("href", StringComparison.OrdinalIgnoreCase)
-                                    && !name.Equals("id", StringComparison.OrdinalIgnoreCase)
-                                    && !name.Equals("transform", StringComparison.OrdinalIgnoreCase))
+                                if (!name.Equals("href", StringComparison.OrdinalIgnoreCase) &&
+                                    !name.Equals("id", StringComparison.OrdinalIgnoreCase) &&
+                                    !name.Equals("transform", StringComparison.OrdinalIgnoreCase))
                                 {
                                     href.SetAttributeValue(attribute.Name, attribute.Value);
                                 }
@@ -518,12 +386,6 @@ namespace FFImageLoading.Svg.Platform
                         }
                     }
                     break;
-                case "mask":
-                    if (e.HasElements)
-                    {
-                        masks.Add(ReadId(e), new SKSvgMask(fill ?? CreatePaint(), e));
-                    }
-                    break;
                 case "defs":
                 case "title":
                 case "desc":
@@ -553,13 +415,9 @@ namespace FFImageLoading.Svg.Platform
             if (uri != null)
             {
                 if (uri.StartsWith("data:"))
-                {
                     bytes = ReadUriBytes(uri);
-                }
                 else
-                {
                     LogOrThrow($"Remote images are not supported");
-                }
             }
 
             return new SKSvgImage(rect, uri, bytes);
@@ -754,7 +612,7 @@ namespace FFImageLoading.Svg.Platform
 
         private static SKFontStyleSlant ReadFontStyle(Dictionary<string, string> fontStyle, SKFontStyleSlant defaultStyle = SKFontStyleSlant.Upright)
         {
-            SKFontStyleSlant style = defaultStyle;
+            var style = defaultStyle;
 
             if (fontStyle.TryGetValue("font-style", out string fstyle) && !string.IsNullOrWhiteSpace(fstyle))
             {
@@ -827,27 +685,6 @@ namespace FFImageLoading.Svg.Platform
             return Math.Min(Math.Max((int)SKFontStyleWidth.UltraCondensed, width), (int)SKFontStyleWidth.UltraExpanded);
         }
 
-        private SKSvgMask ReadMask(Dictionary<string, string> style)
-        {
-            SKSvgMask mask = null;
-            var maskID = GetString(style, "mask").Trim();
-            if (!String.IsNullOrEmpty(maskID))
-            {
-                var urlM = urlRe.Match(maskID);
-                if (urlM.Success)
-                {
-                    var id = urlM.Groups[1].Value.Trim();
-                    masks.TryGetValue(id, out mask);
-                }
-            }
-            return mask;
-        }
-
-        private string ReadId(XElement d)
-        {
-            return d.Attribute("id")?.Value?.Trim();
-        }
-
         private int ReadFontWeight(Dictionary<string, string> fontStyle, int defaultWeight = (int)SKFontStyleWeight.Normal)
         {
             var weight = defaultWeight;
@@ -914,29 +751,6 @@ namespace FFImageLoading.Svg.Platform
             // get from local attributes
             var dic = e.Attributes().Where(a => HasSvgNamespace(a.Name)).ToDictionary(k => k.Name.LocalName, v => v.Value);
 
-            string className;
-            string glStyle;
-
-            if (styles != null && styles.TryGetValue(e.Name.LocalName, out glStyle))
-            {
-                // get from stlye attribute
-                var styleDic = ReadStyle(glStyle);
-
-                // overwrite
-                foreach (var pair in styleDic)
-                    dic[pair.Key] = pair.Value;
-            }
-            if (styles != null && dic.TryGetValue("class", out className)
-                && styles.TryGetValue("." + className, out glStyle))
-            {
-                // get from stlye attribute
-                var styleDic = ReadStyle(glStyle);
-
-                // overwrite
-                foreach (var pair in styleDic)
-                    dic[pair.Key] = pair.Value;
-            }
-
             var style = e.Attribute("style")?.Value;
             if (!string.IsNullOrWhiteSpace(style))
             {
@@ -955,19 +769,56 @@ namespace FFImageLoading.Svg.Platform
         {
             return
                 string.IsNullOrEmpty(name.Namespace?.NamespaceName) ||
-                      name.Namespace == svg ||
-                      name.Namespace == xlink;
+                name.Namespace == svg ||
+                name.Namespace == xlink;
+        }
+
+        private SKSize ReadElementSize(XElement e)
+        {
+            float width = 0f;
+            float height = 0f;
+            var element = e;
+
+            while (element.Parent != null)
+            {
+                if (width <= 0f)
+                    width = ReadNumber(element.Attribute("width"));
+
+                if (height <= 0f)
+                    height = ReadNumber(element.Attribute("height"));
+
+                if (width > 0f && height > 0f)
+                    break;
+
+                element = element.Parent;
+            }
+
+            if (!(width > 0f && height > 0f))
+            {
+                var root = e?.Document?.Root;
+                width = ReadNumber(root?.Attribute("width"));
+                height = ReadNumber(root?.Attribute("height"));
+            }
+
+            return new SKSize(width, height);
         }
 
         private Dictionary<string, string> ReadPaints(XElement e, ref SKPaint stroke, ref SKPaint fill, bool isGroup)
         {
             var style = ReadStyle(e);
-            ReadPaints(style, ref stroke, ref fill, isGroup);
+
+            ReadPaints(style, ref stroke, ref fill, isGroup, out var fillId);
+
+            if (fillId != null)
+                elementFills[e] = fillId;
+
             return style;
         }
 
-        private void ReadPaints(Dictionary<string, string> style, ref SKPaint strokePaint, ref SKPaint fillPaint, bool isGroup)
+        private void ReadPaints(Dictionary<string, string> style, ref SKPaint strokePaint, ref SKPaint fillPaint, bool isGroup, out string fillId)
         {
+            fillId = null;
+
             // get current element opacity, but ignore for groups (special case)
             float elementOpacity = isGroup ? 1.0f : ReadOpacity(style);
 
@@ -1019,8 +870,11 @@ namespace FFImageLoading.Svg.Platform
 
                 if (strokePaint == null)
                 {
-                    if (hasStrokeDashArray || hasStrokeWidth || hasStrokeOpacity
-                        || hasStrokeLineCap || hasStrokeLineJoin)
+                    if (hasStrokeDashArray ||
+                        hasStrokeWidth ||
+                        hasStrokeOpacity ||
+                        hasStrokeLineCap ||
+                        hasStrokeLineJoin)
                     {
                         strokePaint = CreatePaint(true);
                     }
@@ -1036,80 +890,32 @@ namespace FFImageLoading.Svg.Platform
                     }
                     else
                     {
-                        if (strokePaint == null)
-                            strokePaint = CreatePaint(true);
-
                         // get the dash
                         var dashesStrings = strokeDashArray.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
                         var dashes = dashesStrings.Select(ReadNumber).ToArray();
                         if (dashesStrings.Length % 2 == 1)
                             dashes = dashes.Concat(dashes).ToArray();
+
                         // get the offset
                         var strokeDashOffset = ReadNumber(style, "stroke-dashoffset", 0);
+
                         // set the effect
                         strokePaint.PathEffect = SKPathEffect.CreateDash(dashes.ToArray(), strokeDashOffset);
                     }
                 }
 
                 if (hasStrokeWidth)
-                {
-                    if (strokePaint == null)
-                        strokePaint = CreatePaint(true);
                     strokePaint.StrokeWidth = ReadNumber(strokeWidth);
-                }
-                else if (strokePaint != null)
-                {
-                    strokePaint.StrokeWidth = 1f;
-                }
-
                 if (hasStrokeOpacity)
-                {
-                    if (strokePaint == null)
-                        strokePaint = CreatePaint(true);
                     strokePaint.Color = strokePaint.Color.WithAlpha((byte)(ReadNumber(strokeOpacity) * 255));
-                }
-
                 if (hasStrokeLineCap)
-                {
-                    switch (strokeLineCap)
-                    {
-                        case "butt":
-                            strokePaint.StrokeCap = SKStrokeCap.Butt;
-                            break;
-                        case "round":
-                            strokePaint.StrokeCap = SKStrokeCap.Round;
-                            break;
-                        case "square":
-                            strokePaint.StrokeCap = SKStrokeCap.Square;
-                            break;
-                    }
-                }
-
+                    strokePaint.StrokeCap = ReadLineCap(strokeLineCap);
                 if (hasStrokeLineJoin)
-                {
-                    switch (strokeLineJoin)
-                    {
-                        case "miter":
-                            strokePaint.StrokeJoin = SKStrokeJoin.Miter;
-                            break;
-                        case "round":
-                            strokePaint.StrokeJoin = SKStrokeJoin.Round;
-                            break;
-                        case "bevel":
-                            strokePaint.StrokeJoin = SKStrokeJoin.Bevel;
-                            break;
-                    }
-                }
-
+                    strokePaint.StrokeJoin = ReadLineJoin(strokeLineJoin);
                 if (hasStrokeMiterLimit)
-                {
                     strokePaint.StrokeMiter = ReadNumber(strokeMiterLimit);
-                }
-
                 if (strokePaint != null)
-                {
                     strokePaint.Color = strokePaint.Color.WithAlpha((byte)(strokePaint.Color.Alpha * elementOpacity));
-                }
             }
 
             // fill
@@ -1129,7 +935,7 @@ namespace FFImageLoading.Svg.Platform
                     if (fillPaint == null)
                         fillPaint = CreatePaint();
 
-                    if (ColorHelper.TryParse(fill, out SKColor color))
+                    if (ColorHelper.TryParse(fill, out var color))
                     {
                         // preserve alpha
                         if (color.Alpha == 255 && fillPaint.Color.Alpha > 0)
@@ -1143,21 +949,19 @@ namespace FFImageLoading.Svg.Platform
                         var urlM = urlRe.Match(fill);
                         if (urlM.Success)
                         {
-                            var id = urlM.Groups[1].Value.Trim();                     
-                            if (defs.TryGetValue(id, out XElement defE))
+                            var id = urlM.Groups[1].Value.Trim();
+                            if (defs.TryGetValue(id, out var defE))
                             {
                                 switch (defE.Name.LocalName.ToLower())
                                 {
                                     case "lineargradient":
-                                        fillPaint.Color = SKColors.Transparent;
-                                        if (!fills.ContainsKey(fill))
-                                            fills.Add(fill, ReadLinearGradient(defE));
+                                        fillDefs[id] = ReadLinearGradient(defE);
+                                        fillId = id;
                                         read = true;
                                         break;
                                     case "radialgradient":
-                                        fillPaint.Color = SKColors.Transparent;
-                                        if (!fills.ContainsKey(fill))
-                                            fills.Add(fill, ReadRadialGradient(defE));
+                                        fillDefs[id] = ReadRadialGradient(defE);
+                                        fillId = id;
                                         read = true;
                                         break;
                                 }
@@ -1193,13 +997,43 @@ namespace FFImageLoading.Svg.Platform
             }
         }
 
+        private SKStrokeCap ReadLineCap(string strokeLineCap, SKStrokeCap def = SKStrokeCap.Butt)
+        {
+            switch (strokeLineCap)
+            {
+                case "butt":
+                    return SKStrokeCap.Butt;
+                case "round":
+                    return SKStrokeCap.Round;
+                case "square":
+                    return SKStrokeCap.Square;
+            }
+
+            return def;
+        }
+
+        private SKStrokeJoin ReadLineJoin(string strokeLineJoin, SKStrokeJoin def = SKStrokeJoin.Miter)
+        {
+            switch (strokeLineJoin)
+            {
+                case "miter":
+                    return SKStrokeJoin.Miter;
+                case "round":
+                    return SKStrokeJoin.Round;
+                case "bevel":
+                    return SKStrokeJoin.Bevel;
+            }
+
+            return def;
+        }
+
         private SKPaint CreatePaint(bool stroke = false)
         {
             var strokePaint = new SKPaint
             {
                 IsAntialias = true,
                 IsStroke = stroke,
-                Color = SKColors.Black
+                Color = stroke ? SKColors.Transparent : SKColors.Black
             };
 
             if (stroke)
@@ -1218,9 +1052,7 @@ namespace FFImageLoading.Svg.Platform
             var t = SKMatrix.MakeIdentity();
 
             if (string.IsNullOrWhiteSpace(raw))
-            {
                 return t;
-            }
 
             var calls = raw.Trim().Split(new[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var c in calls)
@@ -1295,9 +1127,7 @@ namespace FFImageLoading.Svg.Platform
         private SKPath ReadClipPath(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))
-            {
                 return null;
-            }
 
             SKPath result = null;
             var read = false;
@@ -1310,9 +1140,7 @@ namespace FFImageLoading.Svg.Platform
                 {
                     result = ReadClipPathDefinition(defE);
                     if (result != null)
-                    {
                         read = true;
-                    }
                 }
                 else
                 {
@@ -1331,9 +1159,7 @@ namespace FFImageLoading.Svg.Platform
         private SKPath ReadClipPathDefinition(XElement e)
         {
             if (e.Name.LocalName != "clipPath" || !e.HasElements)
-            {
                 return null;
-            }
 
             var result = new SKPath();
 
@@ -1344,7 +1170,6 @@ namespace FFImageLoading.Svg.Platform
                 {
                     result.AddPath(path);
                 }
-
                 else
                 {
                     LogOrThrow($"SVG element '{ce.Name.LocalName}' is not supported in clipPath.");
@@ -1406,42 +1231,39 @@ namespace FFImageLoading.Svg.Platform
 
         private SKRadialGradient ReadRadialGradient(XElement e)
         {
-            var cx = e.Attribute("cx");
-            var cy = e.Attribute("cy");
-            var centerX = cx == null ? 0.5f : ReadNumber(cx);
-            var centerY = cy == null ? 0.5f : ReadNumber(cy);
+            var center = new SKPoint(
+                ReadNumber(e.Attribute("cx"), 0.5f),
+                ReadNumber(e.Attribute("cy"), 0.5f));
+            var radius = ReadNumber(e.Attribute("r"), 0.5f);
+
             //var focusX = ReadOptionalNumber(e.Attribute("fx")) ?? centerX;
             //var focusY = ReadOptionalNumber(e.Attribute("fy")) ?? centerY;
-            var r = e.Attribute("r");
-            var radius = r == null ? 0.5f : ReadNumber(r);
             //var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
+
             var tileMode = ReadSpreadMethod(e);
             var stops = ReadStops(e);
+            var matrix = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
 
-            // TODO: check gradientTransform attribute
             // TODO: use absolute
-
-            return new SKRadialGradient(centerX, centerY, radius, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode);
+            return new SKRadialGradient(center, radius, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode, matrix);
         }
 
         private SKLinearGradient ReadLinearGradient(XElement e)
         {
-            var startX = ReadNumber(e.Attribute("x1"));
-            var startY = ReadNumber(e.Attribute("y1"));
-
-            var x2 = e.Attribute("x2");
-
-            float endX = x2 == null ? 1f : ReadNumber(x2);
-            float endY = ReadNumber(e.Attribute("y2"));
+            var start = new SKPoint(
+                ReadNumber(e.Attribute("x1"), 0f),
+                ReadNumber(e.Attribute("y1"), 0f));
+            var end = new SKPoint(
+                ReadNumber(e.Attribute("x2"), 1f),
+                ReadNumber(e.Attribute("y2"), 0f));
 
             //var absolute = e.Attribute("gradientUnits")?.Value == "userSpaceOnUse";
             var tileMode = ReadSpreadMethod(e);
             var stops = ReadStops(e);
+            var matrix = ReadTransform(e.Attribute("gradientTransform")?.Value ?? string.Empty);
 
-            // TODO: check gradientTransform attribute
             // TODO: use absolute
-
-            return new SKLinearGradient(startX, startY, endX, endY, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode);
+            return new SKLinearGradient(start, end, stops.Keys.ToArray(), stops.Values.ToArray(), tileMode, matrix);
         }
 
         private static SKShaderTileMode ReadSpreadMethod(XElement e)
@@ -1500,20 +1322,14 @@ namespace FFImageLoading.Svg.Platform
                 var style = ReadStyle(se);
 
                 var offset = ReadNumber(style["offset"]);
-                var color = SKColors.Transparent;
+                var color = SKColors.Black;
                 byte alpha = 255;
 
                 if (style.TryGetValue("stop-color", out string stopColor))
-                {
-                    // preserve alpha
-                    if (ColorHelper.TryParse(stopColor, out color))
-                        alpha = color.Alpha;
-                }
+                    ColorHelper.TryParse(stopColor, out color);
 
                 if (style.TryGetValue("stop-opacity", out string stopOpacity))
-                {
                     alpha = (byte)(ReadNumber(stopOpacity) * 255);
-                }
 
                 color = color.WithAlpha(alpha);
                 stops[offset] = color;
@@ -1563,25 +1379,15 @@ namespace FFImageLoading.Svg.Platform
             if (unitRe.IsMatch(s))
             {
                 if (s.EndsWith("in", StringComparison.Ordinal))
-                {
                     m = PixelsPerInch;
-                }
                 else if (s.EndsWith("cm", StringComparison.Ordinal))
-                {
                     m = PixelsPerInch / 2.54f;
-                }
                 else if (s.EndsWith("mm", StringComparison.Ordinal))
-                {
                     m = PixelsPerInch / 25.4f;
-                }
                 else if (s.EndsWith("pt", StringComparison.Ordinal))
-                {
                     m = PixelsPerInch / 72.0f;
-                }
                 else if (s.EndsWith("pc", StringComparison.Ordinal))
-                {
                     m = PixelsPerInch / 6.0f;
-                }
                 s = s.Substring(0, s.Length - 2);
             }
             else if (percRe.IsMatch(s))
@@ -1591,16 +1397,19 @@ namespace FFImageLoading.Svg.Platform
             }
 
             if (!float.TryParse(s, NumberStyles.Float, icult, out float v))
-            {
                 v = 0;
-            }
 
             return m * v;
         }
 
-        private float ReadNumber(XAttribute a) => ReadNumber(a?.Value);
+        private float ReadNumber(XAttribute a, float defaultValue) =>
+            a == null ? defaultValue : ReadNumber(a.Value);
 
-        private float? ReadOptionalNumber(XAttribute a) => a == null ? (float?)null : ReadNumber(a.Value);
+        private float ReadNumber(XAttribute a) =>
+            ReadNumber(a?.Value);
+
+        private float? ReadOptionalNumber(XAttribute a) =>
+            a == null ? (float?)null : ReadNumber(a.Value);
 
         private SKRect ReadRectangle(string s)
         {
