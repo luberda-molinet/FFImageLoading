@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Tizen.NET" Version="5.0.0.14562" />
     <PackageReference Include="Xamarin.Forms.Platform.Tizen" Version="2.5.1.444934" />
-    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
+    <PackageReference Include="Xamarin.Forms" Version="3.6.0.220655" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,4 +35,5 @@
 
   <Import Project="..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems" Label="Shared" />
 
+  <Import Project="..\..\packages\Xamarin.Forms.3.6.0.220655\build\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.3.6.0.220655\build\Xamarin.Forms.targets')" />
 </Project>
