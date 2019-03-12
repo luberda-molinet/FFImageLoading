@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System;
 using Android.OS;
 using Android.Graphics;
@@ -375,7 +375,7 @@ namespace FFImageLoading.Cache
 
             lock (monitor)
             {
-                if (displayed_cache.ContainsKey(key))
+                if (evicted || displayed_cache.ContainsKey(key))
                 {
                     TValue tmp = null;
                     tmp = displayed_cache.Remove(key) as TValue;
@@ -393,7 +393,7 @@ namespace FFImageLoading.Cache
 
         public bool Remove(string key)
         {
-            return Remove(key, false);
+            return Remove(key, true);
         }
 
         public bool TryGetValue(string key, out TValue value)
