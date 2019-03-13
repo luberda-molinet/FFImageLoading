@@ -15,8 +15,6 @@ namespace FFImageLoading.Decoders
         {
             var result = new DecodedImage<Bitmap>();
             var helper = new PlatformGifHelper();
-			BitmapFactory.Options options = null;
-
 
 			await helper.ReadGifAsync(stream, path, parameters);
             result.IsAnimated = helper.Frames.Count > 1;
