@@ -28,6 +28,7 @@ namespace FFImageLoading.Svg.Platform
         private static readonly Regex WSRe = new Regex(@"\s{2,}");
 
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
+        private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
         private readonly Dictionary<string, ISKSvgFill> fillDefs = new Dictionary<string, ISKSvgFill>();
         private readonly Dictionary<XElement, string> elementFills = new Dictionary<XElement, string>();
         private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
@@ -112,7 +113,7 @@ namespace FFImageLoading.Svg.Platform
             // find the defs (gradients) - and follow all hrefs
             foreach (var d in svg.Descendants())
             {
-                var id = d.Attribute("id")?.Value?.Trim();
+                var id = ReadId(d);
                 if (!string.IsNullOrEmpty(id))
                     defs[id] = ReadDefinition(d);
             }
@@ -237,6 +238,7 @@ namespace FFImageLoading.Svg.Platform
 
             // read style
             var style = ReadPaints(e, ref stroke, ref fill, isGroup);
+            var mask = ReadMask(style);
 
             // parse elements
             switch (elementName)
@@ -289,37 +291,76 @@ namespace FFImageLoading.Svg.Platform
                             addFill.ApplyFill(fill, bounds);
                         }
 
-                        if (fill != null)
-                            canvas.DrawPath(elementPath, fill);
-                        if (stroke != null)
-                            canvas.DrawPath(elementPath, stroke);
+                            if (mask != null)
+                            {
+                                canvas.SaveLayer(new SKPaint());
+                                foreach (var gElement in mask.Element.Elements())
+                                {
+                                    ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+                                }
+                                using (var paint = fill?.Clone() ?? CreatePaint())
+                                {
+                                    paint.BlendMode = SKBlendMode.SrcIn;
+                                    canvas.DrawPath(elementPath, paint);
+                                }
+                                canvas.Restore();
+                            }
+                            else if (fill != null)
+                            {
+                                canvas.DrawPath(elementPath, fill);
+                            }
+                            else if (stroke != null)
+                            {
+                                canvas.DrawPath(elementPath, stroke);
+                            }
                     }
                     break;
                 case "g":
                     if (e.HasElements)
                     {
-                        // get current group opacity
-                        float groupOpacity = ReadOpacity(style);
-                        if (groupOpacity != 1.0f)
+                        if (mask != null)
                         {
-                            var opacity = (byte)(255 * groupOpacity);
-                            var opacityPaint = new SKPaint
+                            canvas.SaveLayer(new SKPaint());
+                            foreach (var gElement in mask.Element.Elements())
                             {
-                                Color = SKColors.Black.WithAlpha(opacity)
-                            };
+                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+                            }
 
-                            // apply the opacity
-                            canvas.SaveLayer(opacityPaint);
-                        }
-
-                        foreach (var gElement in e.Elements())
-                        {
-                            ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone());
-                        }
-
-                        // restore state
-                        if (groupOpacity != 1.0f)
+                            foreach (var gElement in e.Elements())
+                            {
+                                using (var paint = fill?.Clone() ?? CreatePaint())
+                                {
+                                    paint.BlendMode = SKBlendMode.SrcIn;
+                                    ReadElement(gElement, canvas, paint, paint);
+                                }
+                            }
                             canvas.Restore();
+                        }
+                        else
+                        {
+                            // get current group opacity
+                            var groupOpacity = ReadOpacity(style);
+                            if (groupOpacity != 1.0f)
+                            {
+                                var opacity = (byte)(255 * groupOpacity);
+                                var opacityPaint = new SKPaint
+                                {
+                                    Color = SKColors.Black.WithAlpha(opacity)
+                                };
+
+                                // apply the opacity
+                                canvas.SaveLayer(opacityPaint);
+                            }
+
+                            foreach (var gElement in e.Elements())
+                            {
+                                ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone());
+                            }
+
+                            // restore state
+                            if (groupOpacity != 1.0f)
+                                canvas.Restore();
+                        }
                     }
                     break;
                 case "use":
@@ -366,6 +407,12 @@ namespace FFImageLoading.Svg.Platform
                                 ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone());
                             }
                         }
+                    }
+                    break;
+                case "mask":
+                    if (e.HasElements)
+                    {
+                        masks.Add(ReadId(e), new SKSvgMask(fill, e));
                     }
                     break;
                 case "defs":
@@ -736,6 +783,27 @@ namespace FFImageLoading.Svg.Platform
             if (style != null && style.TryGetValue(name, out string v))
                 return v;
             return defaultValue;
+        }
+
+        private SKSvgMask ReadMask(Dictionary<string, string> style)
+        {
+            SKSvgMask mask = null;
+            var maskID = GetString(style, "mask").Trim();
+            if (!string.IsNullOrEmpty(maskID))
+            {
+                var urlM = urlRe.Match(maskID);
+                if (urlM.Success)
+                {
+                    var id = urlM.Groups[1].Value.Trim();
+                    masks.TryGetValue(id, out mask);
+                }
+            }
+            return mask;
+        }
+
+        private string ReadId(XElement d)
+        {
+            return d.Attribute("id")?.Value?.Trim();
         }
 
         private Dictionary<string, string> ReadStyle(string style)
