@@ -36,20 +36,6 @@ namespace FFImageLoading.Svg.Platform
             IgnoreComments = true,
         };
 
-#if PORTABLE
-        // basically use reflection to try and find a method that supports a
-        // file path AND a XmlParserContext...
-        private static readonly MethodInfo createReaderMethod;
-
-        static SKSvg()
-        {
-            // try and find `Create(string, XmlReaderSettings, XmlParserContext)`
-            createReaderMethod = typeof(XmlReader).GetRuntimeMethod(
-                nameof(XmlReader.Create),
-                new[] { typeof(string), typeof(XmlReaderSettings), typeof(XmlParserContext) });
-        }
-#endif
-
         public SKSvg()
             : this(DefaultPPI, SKSize.Empty)
         {
@@ -90,25 +76,10 @@ namespace FFImageLoading.Svg.Platform
 
         public SKPicture Load(string filename)
         {
-#if PORTABLE
-            // PCL does not have the ability to read a file and use a context
-            if (createReaderMethod == null)
-            {
-                return Load(XDocument.Load(filename));
-            }
-
-            // we know that there we can access the method via reflection
-            var args = new object[] { filename, xmlReaderSettings, CreateSvgXmlContext() };
-            using (var reader = (XmlReader)createReaderMethod.Invoke(null, args))
-            {
-                return Load(reader);
-            }
-#else
             using (var stream = File.OpenRead(filename))
             {
                 return Load(stream);
             }
-#endif
         }
 
         public SKPicture Load(Stream stream)
@@ -156,7 +127,9 @@ namespace FFImageLoading.Svg.Platform
             // get the SVG dimensions
             var viewBoxA = svg.Attribute("viewBox") ?? svg.Attribute("viewPort");
             if (viewBoxA != null)
+            {
                 ViewBox = ReadRectangle(viewBoxA.Value);
+            }
 
             if (CanvasSize.IsEmpty)
             {
@@ -168,14 +141,21 @@ namespace FFImageLoading.Svg.Platform
                 var size = new SKSize(width, height);
 
                 if (widthA == null)
+                {
                     size.Width = ViewBox.Width;
+                }
                 else if (widthA.Value.Contains("%"))
+                {
                     size.Width *= ViewBox.Width;
-
+                }
                 if (heightA == null)
+                {
                     size.Height = ViewBox.Height;
+                }
                 else if (heightA != null && heightA.Value.Contains("%"))
+                {
                     size.Height *= ViewBox.Height;
+                }
 
                 // set the property
                 CanvasSize = size;
@@ -247,7 +227,9 @@ namespace FFImageLoading.Svg.Platform
             // clip-path
             var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
             if (clipPath != null)
+            {
                 canvas.ClipPath(clipPath);
+            }
 
             // SVG element
             var elementName = e.Name.LocalName;
@@ -293,7 +275,7 @@ namespace FFImageLoading.Svg.Platform
                 case "line":
                     if (stroke != null || fill != null)
                     {
-                        var elementPath = ReadElement(e);
+                        var elementPath = ReadElement(e, style);
                         if (elementPath == null)
                             break;
 
@@ -415,15 +397,19 @@ namespace FFImageLoading.Svg.Platform
             if (uri != null)
             {
                 if (uri.StartsWith("data:"))
+                {
                     bytes = ReadUriBytes(uri);
+                }
                 else
+                {
                     LogOrThrow($"Remote images are not supported");
+                }
             }
 
             return new SKSvgImage(rect, uri, bytes);
         }
 
-        private SKPath ReadElement(XElement e)
+        private SKPath ReadElement(XElement e, Dictionary<string, string> style = null)
         {
             var path = new SKPath();
 
@@ -433,7 +419,7 @@ namespace FFImageLoading.Svg.Platform
                 case "rect":
                     var rect = ReadRoundedRect(e);
                     if (rect.IsRounded)
-                        path.AddRoundedRect(rect.Rect, rect.RadiusX, rect.RadiusY);
+                        path.AddRoundRect(rect.Rect, rect.RadiusX, rect.RadiusY);
                     else
                         path.AddRect(rect.Rect);
                     break;
@@ -446,25 +432,25 @@ namespace FFImageLoading.Svg.Platform
                     path.AddCircle(circle.Center.X, circle.Center.Y, circle.Radius);
                     break;
                 case "path":
-                    var d = e.Attribute("d")?.Value;
-                    if (!string.IsNullOrWhiteSpace(d))
-                    {
-                        path.Dispose();
-                        path = SKPath.ParseSvgPathData(d);
-                    }
-                    break;
                 case "polygon":
                 case "polyline":
-                    var close = elementName == "polygon";
-                    var p = e.Attribute("points")?.Value;
-                    if (!string.IsNullOrWhiteSpace(p))
+                    string data = null;
+                    if (elementName == "path")
                     {
-                        p = "M" + p;
-                        if (close)
-                            p += " Z";
-                        path.Dispose();
-                        path = SKPath.ParseSvgPathData(p);
+                        data = e.Attribute("d")?.Value;
                     }
+                    else
+                    {
+                        data = "M" + e.Attribute("points")?.Value;
+                        if (elementName == "polygon")
+                            data += " Z";
+                    }
+                    if (!string.IsNullOrWhiteSpace(data))
+                    {
+                        path.Dispose();
+                        path = SKPath.ParseSvgPathData(data);
+                    }
+                    path.FillType = ReadFillRule(style);
                     break;
                 case "line":
                     var line = ReadLine(e);
@@ -598,7 +584,7 @@ namespace FFImageLoading.Svg.Platform
         {
             var fontStyle = ReadStyle(e);
 
-            if (!fontStyle.TryGetValue("font-family", out string ffamily) || string.IsNullOrWhiteSpace(ffamily))
+            if (fontStyle == null || !fontStyle.TryGetValue("font-family", out string ffamily) || string.IsNullOrWhiteSpace(ffamily))
                 ffamily = paint.Typeface?.FamilyName;
             var fweight = ReadFontWeight(fontStyle, paint.Typeface?.FontWeight ?? (int)SKFontStyleWeight.Normal);
             var fwidth = ReadFontWidth(fontStyle, paint.Typeface?.FontWidth ?? (int)SKFontStyleWidth.Normal);
@@ -606,15 +592,38 @@ namespace FFImageLoading.Svg.Platform
 
             paint.Typeface = SKTypeface.FromFamilyName(ffamily, fweight, fwidth, fstyle);
 
-            if (fontStyle.TryGetValue("font-size", out string fsize) && !string.IsNullOrWhiteSpace(fsize))
+            if (fontStyle != null && fontStyle.TryGetValue("font-size", out string fsize) && !string.IsNullOrWhiteSpace(fsize))
                 paint.TextSize = ReadNumber(fsize);
+        }
+
+        private static SKPathFillType ReadFillRule(Dictionary<string, string> style, SKPathFillType defaultFillRule = SKPathFillType.Winding)
+        {
+            var fillRule = defaultFillRule;
+
+            if (style != null && style.TryGetValue("fill-rule", out string rule) && !string.IsNullOrWhiteSpace(rule))
+            {
+                switch (rule)
+                {
+                    case "evenodd":
+                        fillRule = SKPathFillType.EvenOdd;
+                        break;
+                    case "nonzero":
+                        fillRule = SKPathFillType.Winding;
+                        break;
+                    default:
+                        fillRule = defaultFillRule;
+                        break;
+                }
+            }
+
+            return fillRule;
         }
 
         private static SKFontStyleSlant ReadFontStyle(Dictionary<string, string> fontStyle, SKFontStyleSlant defaultStyle = SKFontStyleSlant.Upright)
         {
             var style = defaultStyle;
 
-            if (fontStyle.TryGetValue("font-style", out string fstyle) && !string.IsNullOrWhiteSpace(fstyle))
+            if (fontStyle != null && fontStyle.TryGetValue("font-style", out string fstyle) && !string.IsNullOrWhiteSpace(fstyle))
             {
                 switch (fstyle)
                 {
@@ -639,7 +648,7 @@ namespace FFImageLoading.Svg.Platform
         private int ReadFontWidth(Dictionary<string, string> fontStyle, int defaultWidth = (int)SKFontStyleWidth.Normal)
         {
             var width = defaultWidth;
-            if (fontStyle.TryGetValue("font-stretch", out string fwidth) && !string.IsNullOrWhiteSpace(fwidth) && !int.TryParse(fwidth, out width))
+            if (fontStyle != null && fontStyle.TryGetValue("font-stretch", out string fwidth) && !string.IsNullOrWhiteSpace(fwidth) && !int.TryParse(fwidth, out width))
             {
                 switch (fwidth)
                 {
@@ -689,7 +698,7 @@ namespace FFImageLoading.Svg.Platform
         {
             var weight = defaultWeight;
 
-            if (fontStyle.TryGetValue("font-weight", out string fweight) && !string.IsNullOrWhiteSpace(fweight) && !int.TryParse(fweight, out weight))
+            if (fontStyle != null && fontStyle.TryGetValue("font-weight", out string fweight) && !string.IsNullOrWhiteSpace(fweight) && !int.TryParse(fweight, out weight))
             {
                 switch (fweight)
                 {
@@ -724,7 +733,7 @@ namespace FFImageLoading.Svg.Platform
 
         private string GetString(Dictionary<string, string> style, string name, string defaultValue = "")
         {
-            if (style.TryGetValue(name, out string v))
+            if (style != null && style.TryGetValue(name, out string v))
                 return v;
             return defaultValue;
         }
@@ -932,8 +941,7 @@ namespace FFImageLoading.Svg.Platform
                 }
                 else
                 {
-                    if (fillPaint == null)
-                        fillPaint = CreatePaint();
+                    fillPaint = CreatePaint();
 
                     if (ColorHelper.TryParse(fill, out var color))
                     {
@@ -1052,7 +1060,9 @@ namespace FFImageLoading.Svg.Platform
             var t = SKMatrix.MakeIdentity();
 
             if (string.IsNullOrWhiteSpace(raw))
+            {
                 return t;
+            }
 
             var calls = raw.Trim().Split(new[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var c in calls)
@@ -1127,7 +1137,9 @@ namespace FFImageLoading.Svg.Platform
         private SKPath ReadClipPath(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))
+            {
                 return null;
+            }
 
             SKPath result = null;
             var read = false;
@@ -1140,7 +1152,9 @@ namespace FFImageLoading.Svg.Platform
                 {
                     result = ReadClipPathDefinition(defE);
                     if (result != null)
+                    {
                         read = true;
+                    }
                 }
                 else
                 {
@@ -1159,7 +1173,9 @@ namespace FFImageLoading.Svg.Platform
         private SKPath ReadClipPathDefinition(XElement e)
         {
             if (e.Name.LocalName != "clipPath" || !e.HasElements)
+            {
                 return null;
+            }
 
             var result = new SKPath();
 
@@ -1326,10 +1342,14 @@ namespace FFImageLoading.Svg.Platform
                 byte alpha = 255;
 
                 if (style.TryGetValue("stop-color", out string stopColor))
+                {
                     ColorHelper.TryParse(stopColor, out color);
+                }
 
                 if (style.TryGetValue("stop-opacity", out string stopOpacity))
+                {
                     alpha = (byte)(ReadNumber(stopOpacity) * 255);
+                }
 
                 color = color.WithAlpha(alpha);
                 stops[offset] = color;
@@ -1346,7 +1366,7 @@ namespace FFImageLoading.Svg.Platform
         private float ReadNumber(Dictionary<string, string> style, string key, float defaultValue)
         {
             float value = defaultValue;
-            if (style.TryGetValue(key, out string strValue))
+            if (style != null && style.TryGetValue(key, out string strValue))
             {
                 value = ReadNumber(strValue);
             }
@@ -1379,15 +1399,25 @@ namespace FFImageLoading.Svg.Platform
             if (unitRe.IsMatch(s))
             {
                 if (s.EndsWith("in", StringComparison.Ordinal))
+                {
                     m = PixelsPerInch;
+                }
                 else if (s.EndsWith("cm", StringComparison.Ordinal))
+                {
                     m = PixelsPerInch / 2.54f;
+                }
                 else if (s.EndsWith("mm", StringComparison.Ordinal))
+                {
                     m = PixelsPerInch / 25.4f;
+                }
                 else if (s.EndsWith("pt", StringComparison.Ordinal))
+                {
                     m = PixelsPerInch / 72.0f;
+                }
                 else if (s.EndsWith("pc", StringComparison.Ordinal))
+                {
                     m = PixelsPerInch / 6.0f;
+                }
                 s = s.Substring(0, s.Length - 2);
             }
             else if (percRe.IsMatch(s))
@@ -1397,7 +1427,9 @@ namespace FFImageLoading.Svg.Platform
             }
 
             if (!float.TryParse(s, NumberStyles.Float, icult, out float v))
+            {
                 v = 0;
+            }
 
             return m * v;
         }
