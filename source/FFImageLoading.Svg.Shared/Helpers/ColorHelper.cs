@@ -10,6 +10,12 @@ namespace FFImageLoading.Svg.Platform
 
         public static bool TryParse(string str, out SKColor color)
         {
+            if (str == "transparent")
+            {
+                color = SKColor.Empty;
+                return true;
+            }
+
             if (str.StartsWith("rgb(", StringComparison.Ordinal))
             {
                 str = str.Substring(4, str.Length - 4).TrimEnd(')');
@@ -22,8 +28,7 @@ namespace FFImageLoading.Svg.Platform
 
             if (!SKColor.TryParse(str, out color))
             {
-                string hexString = null;
-                if (HexValues.TryGetValue(str, out hexString))
+                if (HexValues.TryGetValue(str, out var hexString))
                 {
                     return SKColor.TryParse(hexString, out color);
                 }
