@@ -283,10 +283,9 @@ namespace FFImageLoading.Svg.Platform
 
                         if (elementFills.TryGetValue(e, out var fillId) && fillDefs.TryGetValue(fillId, out var addFill))
                         {
-                            var x = ReadNumber(e.Attribute("x"));
-                            var y = ReadNumber(e.Attribute("y"));
+                            var points = ReadElementXY(e);
                             var elementSize = ReadElementSize(e);
-                            var bounds = SKRect.Create(new SKPoint(x, y), elementSize);
+                            var bounds = SKRect.Create(new SKPoint(points.X, points.Y), elementSize);
 
                             addFill.ApplyFill(fill, bounds);
                         }
@@ -371,19 +370,17 @@ namespace FFImageLoading.Svg.Platform
                         {
                             // create a deep copy as we will copy attributes
                             href = new XElement(href);
-                            var attributes = e.Attributes();
-                            foreach (var attribute in attributes)
-                            {
-                                var name = attribute.Name.LocalName;
-                                if (!name.Equals("href", StringComparison.OrdinalIgnoreCase) &&
-                                    !name.Equals("id", StringComparison.OrdinalIgnoreCase) &&
-                                    !name.Equals("transform", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    href.SetAttributeValue(attribute.Name, attribute.Value);
-                                }
-                            }
+                            var attributes = e.Attributes().ToArray();
 
-                            ReadElement(href, canvas, stroke?.Clone(), fill?.Clone());
+                            if (string.Equals(href.Name.LocalName, "symbol", StringComparison.OrdinalIgnoreCase))
+                            {
+                                RenderSymbol(href, e, canvas, stroke, fill, attributes);
+                            }
+                            else
+                            {
+                                ApplyAttributesToElement(attributes, href, new string[] { "href", "id", "transform" });
+                                ReadElement(href, canvas, stroke?.Clone(), fill?.Clone());
+                            }
                         }
                     }
                     break;
@@ -511,6 +508,99 @@ namespace FFImageLoading.Svg.Platform
             }
 
             return path;
+        }
+
+        private void RenderSymbol(XElement symbol, XElement use, SKCanvas canvas, SKPaint stroke, SKPaint fill, XAttribute[] attributes)
+        {
+            if (symbol == null || use == null)
+                return;
+
+            canvas.Save();
+            try
+            {
+                var point = ReadElementXY(use);
+                // adjust the canvas for use's location
+                canvas.Translate(point.X, point.Y);
+
+                var symbolViewBox = ReadElementViewBox(symbol);
+                var useSize = ReadElementSize(use);
+                var aspectRatio = symbol.Attribute("preserveAspectRatio")?.Value;
+
+                ScaleViewBoxToSize(canvas, symbolViewBox, useSize, aspectRatio);
+
+                // adjust the canvas for viewBox's origin
+                if (!symbolViewBox.IsEmpty)
+                    canvas.Translate(-symbolViewBox.Left, -symbolViewBox.Top);
+
+                foreach (var ee in symbol.Elements())
+                {
+                    // apply all attributes to each contained element
+                    ApplyAttributesToElement(attributes, ee, new string[] { "href", "id", "transform" });
+                    ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone());
+                }
+            }
+            finally
+            {
+                canvas.Restore();
+            }
+
+        }
+
+        private static void ApplyAttributesToElement(XAttribute[] attributes, XElement e, string[] ignoreAttributes)
+        {
+            if (e == null || attributes == null)
+                return;
+
+            foreach (var attribute in attributes)
+            {
+                bool skipAttribute = false;
+                var name = attribute.Name.LocalName;
+                foreach (var ignoreStr in ignoreAttributes)
+                {
+                    if (name.Equals(ignoreStr, StringComparison.OrdinalIgnoreCase))
+                    {
+                        skipAttribute = true;
+                        break;
+                    }
+                }
+
+                if (skipAttribute)
+                    continue;
+
+                e.SetAttributeValue(attribute.Name, attribute.Value);
+            }
+        }
+
+        private void ScaleViewBoxToSize(SKCanvas canvas, SKRect viewBox, SKSize size, string aspectRatio)
+        {
+            // if the viewbox is empty, no scaling is required
+            if (viewBox.IsEmpty || Math.Abs(viewBox.Width) == 0f || Math.Abs(viewBox.Height) == 0f)
+                return;
+            // we only want to exit if width and height are both empty because if one is missing, the
+            // other will be derived using the aspec ratio
+            if (size.IsEmpty)
+                return;
+
+            // scale the viewbox to fit into the requested size
+            var scaleX = size.Width / viewBox.Width;
+            var scaleY = size.Height / viewBox.Height;
+
+            // if either height or width is zero, set the missing scale to the other dimension
+            if (Math.Abs(size.Width) == 0f)
+                scaleX = scaleY;
+            if (Math.Abs(size.Height) == 0f)
+                scaleY = scaleX;
+                
+            if (!string.Equals(aspectRatio, "none", StringComparison.OrdinalIgnoreCase))
+            {
+                // if aspectRation is anything except "none", scale proportionally to the smallest dimension value
+                if (scaleX < scaleY)
+                    scaleY = scaleX;
+                if (scaleY < scaleX)
+                    scaleX = scaleY;
+            }
+
+            canvas.Scale(scaleX, scaleY);
         }
 
         private SKOval ReadOval(XElement e)
@@ -850,27 +940,80 @@ namespace FFImageLoading.Svg.Platform
                 name.Namespace == xlink;
         }
 
+        private SKPoint ReadElementXY(XElement e)
+        {
+            if (e == null)
+                return SKPoint.Empty;
+
+            var xAttr = e.Attribute("x");
+            var yAttr = e.Attribute("y");
+            var x = ReadNumber(xAttr);
+            var y = ReadNumber(yAttr);
+            return new SKPoint(x, y);
+        }
+
+        private SKRect ReadElementViewBox(XElement e)
+        {
+            if (e == null)
+                return SKRect.Empty;
+
+            var viewBox = new SKRect();
+            var tmpViewBoxAttr = e.Attribute("viewBox") ?? e.Attribute("viewPort");
+            if (tmpViewBoxAttr != null)
+            {
+                viewBox = ReadRectangle(tmpViewBoxAttr.Value);
+            }
+
+            return viewBox;
+        }
+
         private SKSize ReadElementSize(XElement e)
         {
+            if (e == null)
+                return SKSize.Empty;
+                
             float width = 0f;
             float height = 0f;
             var element = e;
 
             while (element.Parent != null)
             {
+                var widthAttr = element.Attribute("width");
                 if (width <= 0f)
-                    width = ReadNumber(element.Attribute("width"));
+                    width = ReadNumber(widthAttr);
 
+                var heightAttr = element.Attribute("height");
                 if (height <= 0f)
-                    height = ReadNumber(element.Attribute("height"));
+                    height = ReadNumber(heightAttr);
 
-                if (width > 0f && height > 0f)
+                if (width > 0f || height > 0f)
+                {
+                    var widthIsPercent = widthAttr?.Value?.Contains("%") ?? false;
+                    var heightIsPercent = heightAttr?.Value?.Contains("%") ?? false;
+                    if (element.Parent != null && (widthIsPercent || heightIsPercent))
+                    {
+                        // if either of the attributes is a %, then find the parent size
+                        var parentSize = ReadElementSize(element.Parent);
+                        var viewBox = ReadElementViewBox(element.Parent);
+                        SKSize viewSize;
+                        if (viewBox.IsEmpty)
+                            viewSize = new SKSize(parentSize.Width, parentSize.Height);
+                        else
+                            viewSize = new SKSize(viewBox.Width, viewBox.Height);
+
+                        if (widthIsPercent)
+                            width *= parentSize.Width * (viewSize.Width / parentSize.Width);
+                        if (heightIsPercent)
+                            height *= parentSize.Height * (viewSize.Height / parentSize.Height);
+                    }
+
                     break;
+                }
 
                 element = element.Parent;
             }
 
-            if (!(width > 0f && height > 0f))
+            if (!(width > 0f || height > 0f))
             {
                 var root = e?.Document?.Root;
                 width = ReadNumber(root?.Attribute("width"));
