@@ -16,7 +16,7 @@ namespace FFImageLoading.Decoders
             var result = new DecodedImage<Bitmap>();
             var helper = new PlatformGifHelper();
 
-			await helper.ReadGifAsync(stream, path, parameters);
+            await helper.ReadGifAsync(stream, path, parameters);
             result.IsAnimated = helper.Frames.Count > 1;
 
             if (result.IsAnimated && Configuration.AnimateGifs)
@@ -37,24 +37,24 @@ namespace FFImageLoading.Decoders
                 result.Image = helper.Frames[0].Image;
             }
 
-			if (result.Image != null)
-			{
-				imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
-				imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
-			}
-			else if (result.AnimatedImages != null)
-			{
-				if (result.AnimatedImages.Length > 0)
-				{
-					if (result.AnimatedImages[0].Image != null)
-					{
-						imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
-						imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
-					}
-				}
-			}
+            if (result.Image != null)
+            {
+                imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
+                imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
+            }
+            else if (result.AnimatedImages != null)
+            {
+                if (result.AnimatedImages.Length > 0)
+                {
+                    if (result.AnimatedImages[0].Image != null)
+                    {
+                        imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+                        imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+                    }
+                }
+            }
 
-			return result;
+            return result;
         }
 
         public Configuration Configuration => ImageService.Instance.Config;

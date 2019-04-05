@@ -48,3 +48,4 @@ source/FFImageLoading.Forms.Tizen/.vs/FFImageLoading.Forms.Tizen/xs/UserPrefs.xm
 .vs/
 .mfractor/
 
+samples/ImageLoading.Forms.Sample/Shared/FodyWeavers.xsd
