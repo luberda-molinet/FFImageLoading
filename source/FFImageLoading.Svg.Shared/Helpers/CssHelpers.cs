@@ -7,12 +7,12 @@ namespace FFImageLoading.Svg.Platform
 {
     internal static class CssHelpers
     {
-        public static Dictionary<string, string> ParseSelectors(string css)
+        public static void ParseSelectors(string css, Dictionary<string,string> destination)
         {
             if (string.IsNullOrWhiteSpace(css))
-                return new Dictionary<string, string>();
+                return;
 
-            return
+            var items =
                 Regex
                     .Matches(css.Minify(), @"(?<selectors>[a-z0-9_\-\.,\s#]+)\s*{(?<declarations>.+?)}", RegexOptions.IgnoreCase)
                     .Cast<Match>()
@@ -22,8 +22,12 @@ namespace FFImageLoading.Svg.Platform
                         .Select(selector => new KeyValuePair<string, string>(
                             key: selector.Trim().ToLowerInvariant(),
                             value: m.Groups["declarations"].Value.Trim())))
-                    .SelectMany(x => x)
-                    .ToDictionary(x => x.Key, x => x.Value);
+                    .SelectMany(x => x);
+
+            foreach (var item in items)
+            {
+                destination.Add(item.Key, item.Value);
+            }
         }
 
         static string Minify(this string css) => Regex.Replace(css, @"(\r\n|\r|\n)", string.Empty).Trim();

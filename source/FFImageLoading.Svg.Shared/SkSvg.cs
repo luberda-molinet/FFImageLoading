@@ -26,7 +26,7 @@ namespace FFImageLoading.Svg.Platform
         private static readonly Regex urlRe = new Regex(@"url\s*\(\s*#([^\)]+)\)");
         private static readonly Regex keyValueRe = new Regex(@"\s*([\w-]+)\s*:\s*(.*)");
         private static readonly Regex WSRe = new Regex(@"\s{2,}");
-
+        private readonly Dictionary<string, string> styles = new Dictionary<string, string>();
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
         private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
         private readonly Dictionary<string, ISKSvgFill> fillDefs = new Dictionary<string, ISKSvgFill>();
@@ -412,8 +412,23 @@ namespace FFImageLoading.Svg.Platform
                         masks.Add(ReadId(e), new SKSvgMask(fill, e));
                     }
                     break;
-                case "clipPath":
+                case "style":
+                    CssHelpers.ParseSelectors(e.Value, styles);
+                    break;
                 case "defs":
+                    var styleNodes = e.Descendants();
+                    if (styleNodes != null)
+                    {
+                        foreach (var item in styleNodes)
+                        {
+                            if (item.Name.LocalName == "style")
+                            {
+                                CssHelpers.ParseSelectors(item.Value, styles);
+                            }
+                        }
+                    }
+                    break;
+                case "clipPath":
                 case "title":
                 case "desc":
                 case "description":
@@ -918,6 +933,29 @@ namespace FFImageLoading.Svg.Platform
         {
             // get from local attributes
             var dic = e.Attributes().Where(a => HasSvgNamespace(a.Name)).ToDictionary(k => k.Name.LocalName, v => v.Value);
+
+            string className;
+            string glStyle;
+
+            if (styles != null && styles.TryGetValue(e.Name.LocalName, out glStyle))
+            {
+                // get from stlye attribute
+                var styleDic = ReadStyle(glStyle);
+
+                // overwrite
+                foreach (var pair in styleDic)
+                    dic[pair.Key] = pair.Value;
+            }
+            if (styles != null && dic.TryGetValue("class", out className)
+                && styles.TryGetValue("." + className, out glStyle))
+            {
+                // get from stlye attribute
+                var styleDic = ReadStyle(glStyle);
+
+                // overwrite
+                foreach (var pair in styleDic)
+                    dic[pair.Key] = pair.Value;
+            }
 
             var style = e.Attribute("style")?.Value;
             if (!string.IsNullOrWhiteSpace(style))
