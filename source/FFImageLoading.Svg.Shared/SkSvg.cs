@@ -412,6 +412,7 @@ namespace FFImageLoading.Svg.Platform
                         masks.Add(ReadId(e), new SKSvgMask(fill, e));
                     }
                     break;
+                case "clipPath":
                 case "defs":
                 case "title":
                 case "desc":
@@ -1392,7 +1393,14 @@ namespace FFImageLoading.Svg.Platform
 
             foreach (var ce in e.Elements())
             {
-                var path = ReadElement(ce);
+                var el = ce;
+
+                if (ce.Name.LocalName == "use")
+                {
+                    el = ReadHref(ce);
+                }
+
+                var path = ReadElement(el);
                 if (path != null)
                 {
                     result.AddPath(path);
