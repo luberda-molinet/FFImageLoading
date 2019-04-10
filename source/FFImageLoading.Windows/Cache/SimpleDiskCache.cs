@@ -127,7 +127,7 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
+                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
                         var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
                         await file.DeleteAsync();
                     }

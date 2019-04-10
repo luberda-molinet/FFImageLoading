@@ -240,8 +240,8 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
-                        File.Delete(Path.Combine(_cachePath, kvp.Key));
+                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
+                        File.Delete(Path.Combine(_cachePath, oldCacheEntry.FileName));
                     }
                     // Analysis disable once EmptyGeneralCatchClause
                     catch
