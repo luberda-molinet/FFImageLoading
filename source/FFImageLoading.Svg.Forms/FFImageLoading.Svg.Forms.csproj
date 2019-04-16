@@ -43,14 +43,14 @@
     <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgCachedImage.cs">
       <Link>SvgCachedImage.cs</Link>
     </Compile>
     <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgImageSourceConverter.cs">
       <Link>SvgImageSourceConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgImageSource.cs">
+      <Link>SvgImageSource.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>
