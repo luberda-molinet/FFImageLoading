@@ -88,7 +88,7 @@ namespace FFImageLoading
         public static IScheduledWork Into(this TaskParameter parameters, Image imageView)
         {
             var target = new ImageTarget(imageView);
-            return parameters.Into< ImageTarget>(target);
+            return parameters.Into<Image>(target);
         }
 
         /// <summary>
