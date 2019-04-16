@@ -97,7 +97,14 @@ namespace FFImageLoading
             return tcs.Task;
         }
 
-        static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<NSImage, TImageView> target) where TImageView : class
+        /// <summary>
+        /// Loads the image into given target using defined parameters.
+        /// </summary>
+        /// <returns>The into.</returns>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="target">Target.</param>
+        /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
+        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<NSImage, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -111,7 +118,20 @@ namespace FFImageLoading
             return task;
         }
 
-        static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)
+        /// <summary>
+        /// Loads the image into given target using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="target">Target.</param>
+        /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
+        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<NSImage, TImageView> target) where TImageView : class
+        {
+            return parameters.IntoAsync(param => param.Into(target));
+        }
+
+        private static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)
         {
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
