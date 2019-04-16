@@ -19,20 +19,14 @@ namespace FFImageLoading
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<Bitmap, SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
-        GifDecoder _gifDecoder = new GifDecoder();
+        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
+        private static readonly Color _placeholderHelperColor = Color.Argb(1, 255, 255, 255);
 
         public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
         }
 
-        protected Context Context
-        {
-            get
-            {
-                return new ContextWrapper(Android.App.Application.Context);
-            }
-        }
+        protected Context Context => new ContextWrapper(Android.App.Application.Context);
 
         protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
@@ -41,8 +35,7 @@ namespace FFImageLoading
 
             ThrowIfCancellationRequested();
 
-            var ffDrawable = image as FFBitmapDrawable;
-            if (ffDrawable != null)
+            if (image is FFBitmapDrawable ffDrawable)
             {
                 if (ffDrawable.IsAnimationRunning)
                 {
@@ -66,14 +59,27 @@ namespace FFImageLoading
                         placeholderDrawable = imageView?.Drawable as SelfDisposingBitmapDrawable;
                     }
 
+                    var fadeDuration = Parameters.FadeAnimationDuration ?? Configuration.FadeAnimationDuration;
+
                     if (placeholderDrawable.IsValidAndHasValidBitmap())
                     {
-                        int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
-                            Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
-
                         placeholderDrawable?.SetIsRetained(true);
                         ffDrawable?.SetPlaceholder(placeholderDrawable, fadeDuration);
                         placeholderDrawable?.SetIsRetained(false);
+                    }
+                    else if (ffDrawable.IsValidAndHasValidBitmap())
+                    {
+                        var width = ffDrawable.Bitmap.Width;
+                        var height = ffDrawable.Bitmap.Height;
+                        var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+
+                        using (var canvas = new Canvas(bitmap))
+                        using (var paint = new Paint() { Color = _placeholderHelperColor })
+                        {
+                            canvas.DrawRect(0, 0, width, height, paint);
+                        }
+
+                        ffDrawable?.SetPlaceholder(new SelfDisposingBitmapDrawable(Context.Resources, bitmap), fadeDuration);
                     }
                 }
                 else
@@ -159,8 +165,7 @@ namespace FFImageLoading
             }
             catch (Exception ex)
             {
-                var javaException = ex as Java.Lang.Throwable;
-                if (javaException != null && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+                if (ex is Java.Lang.Throwable javaException && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
                 {
                     throw new OutOfMemoryException();
                 }
@@ -206,8 +211,7 @@ namespace FFImageLoading
             }
             catch (Exception ex)
             {
-                var javaException = ex as Java.Lang.Throwable;
-                if (javaException != null && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+                if (ex is Java.Lang.Throwable javaException && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
                 {
                     throw new OutOfMemoryException();
                 }

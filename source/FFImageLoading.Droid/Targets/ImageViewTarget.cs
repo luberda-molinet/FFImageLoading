@@ -94,8 +94,7 @@ namespace FFImageLoading.Targets
         {
             get
             {
-                ImageViewAsync control;
-                if (!_controlWeakReference.TryGetTarget(out control))
+                if (!_controlWeakReference.TryGetTarget(out var control))
                     return null;
 
                 if (control == null || control.Handle == IntPtr.Zero)

@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using FFImageLoading.Targets;
 using FFImageLoading.Extensions;
+using ImageSource = FFImageLoading.Work.ImageSource;
 
 namespace FFImageLoading
 {
@@ -87,7 +88,7 @@ namespace FFImageLoading
         public static IScheduledWork Into(this TaskParameter parameters, Image imageView)
         {
             var target = new ImageTarget(imageView);
-            return parameters.Into(target);
+            return parameters.Into<Image>(target);
         }
 
         /// <summary>
@@ -109,7 +110,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
+        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -131,7 +132,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<WriteableBitmap, TImageView> target) where TImageView : class
+        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
         {
             return parameters.IntoAsync(param => param.Into(target));
         }
