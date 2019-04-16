@@ -40,9 +40,6 @@
     <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">
       <Link>CornerTransformType.cs</Link>
     </Compile>
