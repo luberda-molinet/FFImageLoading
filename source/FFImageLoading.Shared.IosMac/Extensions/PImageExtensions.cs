@@ -89,7 +89,7 @@ namespace FFImageLoading.Extensions
         public static System.IO.Stream AsJpegStream(this PImage image, int quality = 80)
         {
 #if __IOS__
-            return image.AsJPEG((nfloat)quality).AsStream();
+            return image.AsJPEG(quality / 100f).AsStream();
 #elif __MACOS__
             // todo: jpeg quality?
             var imageRep = new NSBitmapImageRep(image.AsTiff());
