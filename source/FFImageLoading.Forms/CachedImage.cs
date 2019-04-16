@@ -16,8 +16,8 @@ namespace FFImageLoading.Forms
     /// </summary>
     public class CachedImage : View
     {
-        static bool? _isDesignModeEnabled = null;
-        static bool IsDesignModeEnabled
+        private static bool? _isDesignModeEnabled = null;
+        protected static bool IsDesignModeEnabled
         {
             get
             {
@@ -25,7 +25,6 @@ namespace FFImageLoading.Forms
                 if (!_isDesignModeEnabled.HasValue)
                 {
                     var type = typeof(Image).GetTypeInfo().Assembly.GetType("Xamarin.Forms.DesignMode");
-
                     if (type == null)
                     {
                         _isDesignModeEnabled = true;
@@ -675,26 +674,13 @@ namespace FFImageLoading.Forms
         /// <summary>
         /// Reloads the image.
         /// </summary>
-        public void ReloadImage()
-        {
-            if (InternalReloadImage != null && Source != null)
-            {
-                InternalReloadImage();
-            }
-        }
+        public void ReloadImage() => InternalReloadImage?.Invoke();
 
         internal Action InternalCancel;
-
         /// <summary>
         /// Cancels image loading tasks
         /// </summary>
-        public void Cancel()
-        {
-            if (InternalCancel != null)
-            {
-                InternalCancel();
-            }
-        }
+        public void Cancel() => InternalCancel?.Invoke();
 
         internal Func<GetImageAsJpgArgs, Task<byte[]>> InternalGetImageAsJPG;
 
