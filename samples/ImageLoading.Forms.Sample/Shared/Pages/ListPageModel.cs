@@ -28,9 +28,11 @@ namespace FFImageLoading.Forms.Sample
         {
             var list = new List<ListItem>();
 
-            for (int i = 0; i < 20; i++)
+            var images = new string[20];
+
+            for (int i = 0; i < images.Length; i++)
             {
-                list.Add(Helpers.GetRandomImageUrlAlt(320, 240));
+                images[i] = Helpers.GetRandomImageUrlAlt(320, 240);
             }
 
             for (int j = 0; j < 5; j++)
