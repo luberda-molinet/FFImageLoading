@@ -673,27 +673,27 @@ namespace FFImageLoading.Svg.Platform
 
             ReadFontAttributes(e, fill);
 
-            return ReadTextSpans(e, xy, textAlign, baselineShift, stroke, fill);
-        }
-
-        private SKText ReadTextSpans(XElement e, SKPoint xy, SKTextAlign textAlign, float baselineShift, SKPaint stroke, SKPaint fill)
-        {
             var spans = new SKText(xy, textAlign);
 
             // textAlign is used for all spans within the <text> element. If different textAligns would be needed, it is necessary to use
             // several <text> elements instead of <tspan> elements
-            var currentBaselineShift = baselineShift;
-            fill.TextAlign = SKTextAlign.Left;  // fixed alignment for all spans
+            fill.TextAlign = SKTextAlign.Center;  // fixed alignment for all spans
 
+            ReadTextElement(e, spans, textAlign, baselineShift, stroke, fill);
+
+            return spans;
+        }
+
+        private void ReadTextElement(XElement e, SKText spans, SKTextAlign textAlign, float baselineShift, SKPaint stroke, SKPaint fill)
+        {
             var nodes = e.Nodes().ToArray();
             for (int i = 0; i < nodes.Length; i++)
             {
                 var c = nodes[i];
-                bool isFirst = i == 0;
-                bool isLast = i == nodes.Length - 1;
-
                 if (c.NodeType == XmlNodeType.Text)
                 {
+                    var isFirst = i == 0;
+                    var isLast = i == nodes.Length - 1;
                     // TODO: check for preserve whitespace
 
                     var textSegments = ((XText)c).Value.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -706,31 +706,32 @@ namespace FFImageLoading.Svg.Platform
                             textSegments[count - 1] = textSegments[count - 1].TrimEnd();
                         var text = WSRe.Replace(string.Concat(textSegments), " ");
 
-                        spans.Append(new SKTextSpan(text, fill.Clone(), baselineShift: currentBaselineShift));
+                        spans.Append(new SKTextSpan(text, fill.Clone(), baselineShift: baselineShift));
                     }
                 }
-                else if (c.NodeType == XmlNodeType.Element)
+                else if (c is XElement ce && ce.Name.LocalName == "tspan")
                 {
-                    var ce = (XElement)c;
-                    if (ce.Name.LocalName == "tspan")
+                    var spanFill = fill.Clone();
+                    ReadFontAttributes(ce, spanFill);
+
+                    if (ce.HasElements)
+                    {
+                        ReadTextElement(ce, spans, textAlign, baselineShift, stroke, fill);
+                    }
+                    else 
                     {
                         // the current span may want to change the cursor position
                         var x = ReadOptionalNumber(ce.Attribute("x"));
                         var y = ReadOptionalNumber(ce.Attribute("y"));
                         var text = ce.Value; //.Trim();
 
-                        var spanFill = fill.Clone();
-                        ReadFontAttributes(ce, spanFill);
-
                         // Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element!
-                        currentBaselineShift = ReadBaselineShift(ce);
+                        baselineShift = ReadBaselineShift(ce);
 
-                        spans.Append(new SKTextSpan(text, spanFill, x, y, currentBaselineShift));
+                        spans.Append(new SKTextSpan(text, spanFill, x, y, baselineShift));
                     }
                 }
             }
-
-            return spans;
         }
 
         private void ReadFontAttributes(XElement e, SKPaint paint)
