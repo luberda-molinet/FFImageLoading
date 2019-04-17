@@ -15,11 +15,11 @@ namespace FFImageLoading.Cache
 {
     public class ImageCache : ImageCache<SelfDisposingBitmapDrawable>
     {
-        private ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging) : base(maxCacheSize, logger, verboseLogging)
+        public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging) : base(maxCacheSize, logger, verboseLogging)
         {
         }
 
-        static IImageCache<SelfDisposingBitmapDrawable> _instance;
+        private static IImageCache<SelfDisposingBitmapDrawable> _instance;
         public static IImageCache<SelfDisposingBitmapDrawable> Instance
         {
             get
@@ -31,16 +31,15 @@ namespace FFImageLoading.Cache
 
     public class ImageCache<TValue> : IImageCache<TValue> where TValue: Java.Lang.Object, ISelfDisposingBitmapDrawable
     {
-        const int BYTES_PER_ARGB_8888_PIXEL = 4;
-        const int LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR = 2;
-        const int BITMAP_POOL_TARGET_SCREENS = 4;
-        const int MEMORY_CACHE_TARGET_SCREENS = 4;
-        const int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
-
-        readonly ReuseBitmapDrawableCache<TValue> _cache;
-        readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-        readonly IMiniLogger _logger;
-        readonly object _lock = new object();
+        private const int BYTES_PER_ARGB_8888_PIXEL = 4;
+        private const int LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR = 2;
+        private const int BITMAP_POOL_TARGET_SCREENS = 4;
+        private const int MEMORY_CACHE_TARGET_SCREENS = 4;
+        private const int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
+        private readonly ReuseBitmapDrawableCache<TValue> _cache;
+        private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+        private readonly IMiniLogger _logger;
+        private readonly object _lock = new object();
 
         public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
         {
@@ -51,9 +50,9 @@ namespace FFImageLoading.Cache
             var context = new ContextWrapper(Application.Context);
             var am = (ActivityManager)context?.GetSystemService(Context.ActivityService);
 
-            bool isLowMemoryDevice = true;
-            int amLargeMemoryClass = 128;
-            int amMemoryClass = 48;
+            var isLowMemoryDevice = true;
+            var amLargeMemoryClass = 128;
+            var amMemoryClass = 48;
 
             if (am != null)
             {
@@ -64,23 +63,23 @@ namespace FFImageLoading.Cache
                 amLargeMemoryClass = am.LargeMemoryClass;
             }
 
-            bool isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
-            int memoryClass = isLargeHeapEnabled ? amLargeMemoryClass : amMemoryClass;
-            int maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
+            var isLargeHeapEnabled = Utils.HasHoneycomb() && (context.ApplicationInfo.Flags & ApplicationInfoFlags.LargeHeap) != 0;
+            var memoryClass = isLargeHeapEnabled ? amLargeMemoryClass : amMemoryClass;
+            var maxSize = (int)(1024 * 1024 * (isLowMemoryDevice ? 0.33f * memoryClass : 0.4f * memoryClass));
 
             var metrics = context.Resources.DisplayMetrics;
-            int widthPixels = metrics.WidthPixels;
-            int heightPixels = metrics.HeightPixels;
-            int screenSize = widthPixels * heightPixels * BYTES_PER_ARGB_8888_PIXEL;
+            var widthPixels = metrics.WidthPixels;
+            var heightPixels = metrics.HeightPixels;
+            var screenSize = widthPixels * heightPixels * BYTES_PER_ARGB_8888_PIXEL;
 
-            int targetBitmapPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS;
-            int targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;
-            int arrayPoolSize = isLowMemoryDevice ? ARRAY_POOL_SIZE_BYTES / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR : ARRAY_POOL_SIZE_BYTES;
-            int availableSize = maxSize - arrayPoolSize;
+            var targetBitmapPoolSize = screenSize * BITMAP_POOL_TARGET_SCREENS;
+            var targetMemoryCacheSize = screenSize * MEMORY_CACHE_TARGET_SCREENS;
+            var arrayPoolSize = isLowMemoryDevice ? ARRAY_POOL_SIZE_BYTES / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR : ARRAY_POOL_SIZE_BYTES;
+            var availableSize = maxSize - arrayPoolSize;
 
-            if (maxCacheSize >= (int)(1024 * 1024 * 16))
+            if (maxCacheSize >= 1024 * 1024 * 16)
             {
-                float part = maxCacheSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                var part = (float)maxCacheSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
                 memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
                 bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
             }
@@ -91,13 +90,13 @@ namespace FFImageLoading.Cache
             }
             else
             {
-                float part = availableSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
+                var part = (float)availableSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
                 memoryCacheSize = (int)Math.Round(part * MEMORY_CACHE_TARGET_SCREENS);
                 bitmapPoolSize = (int)Math.Round(part * BITMAP_POOL_TARGET_SCREENS);
             }
 
-            double sizeInMB = Math.Round(memoryCacheSize / 1024d / 1024d, 2);
-            double poolSizeInMB = Math.Round(bitmapPoolSize / 1024d / 1024d, 2);
+            var sizeInMB = Math.Round((float)memoryCacheSize / 1024 / 1024, 2);
+            var poolSizeInMB = Math.Round((float)bitmapPoolSize / 1024 / 1024, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB, reuse pool size:D {1} MB", sizeInMB, poolSizeInMB));
 
             _cache = new ReuseBitmapDrawableCache<TValue>(logger, memoryCacheSize, bitmapPoolSize, verboseLogging);
@@ -128,9 +127,7 @@ namespace FFImageLoading.Cache
         {
             lock (_lock)
             {
-                ImageInformation imageInformation;
-
-                if (_imageInformations.TryGetValue(key, out imageInformation))
+                if (_imageInformations.TryGetValue(key, out var imageInformation))
                 {
                     return imageInformation;
                 }
@@ -144,11 +141,9 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            TValue drawable = null;
-
             lock (_lock)
             {
-                if (_cache.TryGetValue(key, out drawable))
+                if (_cache.TryGetValue(key, out var drawable))
                 {
                     if (!drawable.IsValidAndHasValidBitmap())
                     {
@@ -159,7 +154,8 @@ namespace FFImageLoading.Cache
                     var imageInformation = GetInfo(key);
                     return new Tuple<TValue, ImageInformation>(drawable, imageInformation);
                 }
-                else if (_imageInformations.ContainsKey(key))
+
+                if (_imageInformations.ContainsKey(key))
                 {
                     Remove(key, false);
                 }
@@ -189,7 +185,7 @@ namespace FFImageLoading.Cache
             Remove(key, true);
         }
 
-        void Remove(string key, bool log)
+        private void Remove(string key, bool log)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return;
@@ -200,8 +196,7 @@ namespace FFImageLoading.Cache
             lock (_lock)
             {
                 _cache.Remove(key);
-                ImageInformation imageInformation;
-                _imageInformations.TryRemove(key, out imageInformation);
+                _imageInformations.TryRemove(key, out var imageInformation);
             }
         }
 
