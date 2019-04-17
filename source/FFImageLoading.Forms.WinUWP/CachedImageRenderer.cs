@@ -242,9 +242,9 @@ namespace FFImageLoading.Forms.Platform
 
         async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            if (element != null && !_isDisposed)
             {
-                if (element != null && !_isDisposed)
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
                 {
                     if (!isLoading || !_isSizeSet)
                     {
@@ -254,8 +254,8 @@ namespace FFImageLoading.Forms.Platform
 
                     if (!isLoading)
                         element.SetIsLoading(isLoading);
-                }
-            });
+                });
+            }
         }
 
         void ReloadImage()

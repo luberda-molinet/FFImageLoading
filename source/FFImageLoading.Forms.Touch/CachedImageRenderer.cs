@@ -52,11 +52,11 @@ namespace FFImageLoading.Forms.Platform
         {
         }
 
-        bool _isSizeSet;
+        private bool _isSizeSet;
         private bool _isDisposed;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
-        readonly object _updateBitmapLock = new object();
+        private readonly object _updateBitmapLock = new object();
 
         /// <summary>
         ///   Used for registration with dependency service
@@ -143,7 +143,7 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        void SetAspect()
+        private void SetAspect()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
                 return;
@@ -166,7 +166,7 @@ namespace FFImageLoading.Forms.Platform
 #endif
         }
 
-        void SetOpacity()
+        private void SetOpacity()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
                 return;
@@ -177,7 +177,7 @@ namespace FFImageLoading.Forms.Platform
 #endif
         }
 
-        void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
+        private void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
         {
             lock (_updateBitmapLock)
             {
@@ -207,8 +207,7 @@ namespace FFImageLoading.Forms.Platform
 
                 var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
                 var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-                TaskParameter imageLoader;
-                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+                image.SetupOnBeforeImageLoading(out var imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
                 if (imageLoader != null)
                 {
@@ -235,11 +234,11 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            if (element != null && !_isDisposed)
             {
-                if (element != null && !_isDisposed)
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
                 {
                     if (!isLoading || !_isSizeSet)
                     {
@@ -249,35 +248,35 @@ namespace FFImageLoading.Forms.Platform
 
                     if (!isLoading)
                         element.SetIsLoading(isLoading);
-                }
-            });
+                });
+            }
         }
 
-        void ReloadImage()
+        private void ReloadImage()
         {
             UpdateImage(Control, Element, null);
         }
 
-        void CancelIfNeeded()
+        private void CancelIfNeeded()
         {
             try
             {
                 _currentTask?.Cancel();
             }
-            catch (Exception) { }
+            catch { }
         }
 
-        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
             return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
             return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
-        async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+        private async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
         {
             PImage image = null;
 
@@ -292,12 +291,12 @@ namespace FFImageLoading.Forms.Platform
 
             if (desiredWidth != 0 || desiredHeight != 0)
             {
-                image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
+                image = image.ResizeUIImage(desiredWidth, desiredHeight, InterpolationMode.Default);
             }
 
 #if __IOS__
 
-            NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+            var imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
 
             if (imageData == null || imageData.Length == 0)
                 return null;

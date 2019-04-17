@@ -22,6 +22,9 @@ using AView = Android.Views.View;
 
 namespace FFImageLoading.Forms.Platform
 {
+
+
+
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
@@ -29,19 +32,17 @@ namespace FFImageLoading.Forms.Platform
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
         internal static readonly Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
-        static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
-        static readonly MethodInfo _ElementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
-
-        bool _isSizeSet;
-        bool _isDisposed;
-        CachedImage _element;
-        int? _defaultLabelFor;
-        VisualElementTracker _visualElementTracker;
-        IDisposable _visualElementRenderer;
-        IScheduledWork _currentTask;
-        ImageSourceBinding _lastImageSource;
-        readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
-        readonly object _updateBitmapLock = new object();
+        private static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
+        private static readonly MethodInfo _elementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
+        private bool _isSizeSet;
+        private bool _isDisposed;
+        private int? _defaultLabelFor;
+        private VisualElementTracker _visualElementTracker;
+        private IDisposable _visualElementRenderer;
+        private IScheduledWork _currentTask;
+        private ImageSourceBinding _lastImageSource;
+        private readonly CachedImageRenderer.MotionEventHelper _motionEventHelper = new CachedImageRenderer.MotionEventHelper();
+        private readonly object _updateBitmapLock = new object();
 
         [Obsolete("This constructor is obsolete as of version 2.5. Please use CachedImageFastRenderer(Context) instead.")]
         public CachedImageFastRenderer() : base(Xamarin.Forms.Forms.Context)
@@ -81,13 +82,13 @@ namespace FFImageLoading.Forms.Platform
                         _visualElementRenderer = null;
                     }
 
-                    if (_element != null)
+                    if (TypedElement != null)
                     {
-                        _element.PropertyChanged -= OnElementPropertyChanged;
+                        TypedElement.PropertyChanged -= OnElementPropertyChanged;
 
-                        if (Xamarin.Forms.Platform.Android.Platform.GetRenderer(_element) == this)
+                        if (Xamarin.Forms.Platform.Android.Platform.GetRenderer(TypedElement) == this)
                         {
-                            Xamarin.Forms.Platform.Android.Platform.SetRenderer(_element, null);
+                            Xamarin.Forms.Platform.Android.Platform.SetRenderer(TypedElement, null);
                         }
                     }
                 }
@@ -96,7 +97,7 @@ namespace FFImageLoading.Forms.Platform
             base.Dispose(disposing);
         }
 
-        void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
+        private void OnElementChanged(ElementChangedEventArgs<CachedImage> e)
         {
             _viewExtensionsMethod.Invoke(null, new[] { this });
 
@@ -126,19 +127,19 @@ namespace FFImageLoading.Forms.Platform
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-            if (_ElementRendererTypeOnTouchEvent != null && (bool)_ElementRendererTypeOnTouchEvent.Invoke(_visualElementRenderer, new[] { e }))
+            if (_elementRendererTypeOnTouchEvent != null && (bool)_elementRendererTypeOnTouchEvent.Invoke(_visualElementRenderer, new[] { e }))
             {
                 return true;
             }
-            else if (base.OnTouchEvent(e))
+            if (base.OnTouchEvent(e))
             {
                 return true;
             }
 
-            return CachedImage.FixedAndroidMotionEventHandler ? _motionEventHelper.HandleMotionEvent(Parent, e) : false;
+            return CachedImage.FixedAndroidMotionEventHandler && _motionEventHelper.HandleMotionEvent(Parent, e);
         }
 
-        Size MinimumSize()
+        private Size MinimumSize()
         {
             return new Size();
         }
@@ -159,14 +160,13 @@ namespace FFImageLoading.Forms.Platform
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
 
-            var image = element as CachedImage;
-            if (image == null)
+            if (!(element is CachedImage image))
                 throw new ArgumentException("Element is not of type " + typeof(CachedImage), nameof(element));
 
             _isSizeSet = false;
 
-            CachedImage oldElement = _element;
-            _element = image;
+            var oldElement = TypedElement;
+            TypedElement = image;
 
             if (oldElement != null)
                 oldElement.PropertyChanged -= OnElementPropertyChanged;
@@ -182,10 +182,10 @@ namespace FFImageLoading.Forms.Platform
             }
 
             _motionEventHelper.UpdateElement(element);
-            OnElementChanged(new ElementChangedEventArgs<CachedImage>(oldElement, _element));
+            OnElementChanged(new ElementChangedEventArgs<CachedImage>(oldElement, TypedElement));
 
             // TODO Xamarin-Internal class - Is it necessary? 
-            // _element?.SendViewInitialized(Control);
+            //_element?.SendViewInitialized(Control);
         }
 
         void IVisualElementRenderer.SetLabelFor(int? id)
@@ -198,9 +198,9 @@ namespace FFImageLoading.Forms.Platform
 
         void IVisualElementRenderer.UpdateLayout() => _visualElementTracker?.UpdateLayout();
 
-        VisualElement IVisualElementRenderer.Element => _element;
+        VisualElement IVisualElementRenderer.Element => TypedElement;
 
-        CachedImage TypedElement => _element;
+        CachedImage TypedElement { get; set; }
 
         VisualElementTracker IVisualElementRenderer.Tracker => _visualElementTracker;
 
@@ -237,7 +237,7 @@ namespace FFImageLoading.Forms.Platform
             }                
         }
 
-        void UpdateAspect()
+        private void UpdateAspect()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || TypedElement == null || _isDisposed)
                 return;
@@ -252,7 +252,7 @@ namespace FFImageLoading.Forms.Platform
                 Control.SetScaleType(ScaleType.FitCenter);
         }
 
-        void UpdateBitmap(CachedImageView imageView, CachedImage image, CachedImage previousImage)
+        private void UpdateBitmap(CachedImageView imageView, CachedImage image, CachedImage previousImage)
         {
             lock (_updateBitmapLock)
             {
@@ -268,7 +268,7 @@ namespace FFImageLoading.Forms.Platform
                         return;
 
                     _lastImageSource = null;
-                    imageView.SetImageResource(global::Android.Resource.Color.Transparent);
+                    imageView.SetImageResource(Android.Resource.Color.Transparent);
                     return;
                 }
 
@@ -276,15 +276,14 @@ namespace FFImageLoading.Forms.Platform
                 {
                     _lastImageSource = null;
                     imageView.SkipInvalidate();
-                    Control.SetImageResource(global::Android.Resource.Color.Transparent);
+                    Control.SetImageResource(Android.Resource.Color.Transparent);
                 }
 
                 image.SetIsLoading(true);
 
                 var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
                 var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-                TaskParameter imageLoader;
-                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+                image.SetupOnBeforeImageLoading(out var imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
                 if (imageLoader != null)
                 {
@@ -311,11 +310,11 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            if (element != null && !_isDisposed)
             {
-                if (element != null && !_isDisposed)
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
                 {
                     if (!isLoading || !_isSizeSet)
                     {
@@ -325,16 +324,16 @@ namespace FFImageLoading.Forms.Platform
 
                     if (!isLoading)
                         element.SetIsLoading(isLoading);
-                }
-            });
+                });
+            }
         }
 
-        void ReloadImage()
+        private void ReloadImage()
         {
             UpdateBitmap(Control, TypedElement, null);
         }
 
-        void CancelIfNeeded()
+        private void CancelIfNeeded()
         {
             try
             {
@@ -346,37 +345,34 @@ namespace FFImageLoading.Forms.Platform
 
                 _currentTask = null;
             }
-            catch (Exception) { }
+            catch { }
         }
 
-        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
             return GetImageAsByteAsync(Bitmap.CompressFormat.Jpeg, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
             return GetImageAsByteAsync(Bitmap.CompressFormat.Png, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
-        async Task<byte[]> GetImageAsByteAsync(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
+        private async Task<byte[]> GetImageAsByteAsync(Bitmap.CompressFormat format, int quality, int desiredWidth, int desiredHeight)
         {
             if (Control == null)
                 return null;
-
-            var drawable = Control.Drawable as BitmapDrawable;
-
-            if (drawable == null || drawable.Bitmap == null)
+                
+            if (!(Control.Drawable is BitmapDrawable drawable) || drawable.Bitmap == null)
                 return null;
 
-            Bitmap bitmap = drawable.Bitmap;
+            var bitmap = drawable.Bitmap;
 
             if (desiredWidth != 0 || desiredHeight != 0)
             {
-                double widthRatio = (double)desiredWidth / (double)bitmap.Width;
-                double heightRatio = (double)desiredHeight / (double)bitmap.Height;
-
-                double scaleRatio = Math.Min(widthRatio, heightRatio);
+                var widthRatio = (double)desiredWidth / bitmap.Width;
+                var heightRatio = (double)desiredHeight / bitmap.Height;
+                var scaleRatio = Math.Min(widthRatio, heightRatio);
 
                 if (desiredWidth == 0)
                     scaleRatio = heightRatio;
@@ -384,8 +380,8 @@ namespace FFImageLoading.Forms.Platform
                 if (desiredHeight == 0)
                     scaleRatio = widthRatio;
 
-                int aspectWidth = (int)((double)bitmap.Width * scaleRatio);
-                int aspectHeight = (int)((double)bitmap.Height * scaleRatio);
+                var aspectWidth = (int)(bitmap.Width * scaleRatio);
+                var aspectHeight = (int)(bitmap.Height * scaleRatio);
 
                 bitmap = Bitmap.CreateScaledBitmap(bitmap, aspectWidth, aspectHeight, true);
             }
@@ -405,22 +401,22 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        static bool? s_isLollipopOrNewer;
+        private static bool? _isLollipopOrNewer;
         internal static bool IsLollipopOrNewer
         {
             get
             {
-                if (!s_isLollipopOrNewer.HasValue)
-                    s_isLollipopOrNewer = (int)Android.OS.Build.VERSION.SdkInt >= 21;
-                return s_isLollipopOrNewer.Value;
+                if (!_isLollipopOrNewer.HasValue)
+                    _isLollipopOrNewer = (int)Build.VERSION.SdkInt >= 21;
+                return _isLollipopOrNewer.Value;
             }
         }
 
         internal static class ElevationHelper
         {
-            static readonly MethodInfo _getEleveationMethod = typeof(Image).Assembly.GetType("Xamarin.Forms.PlatformConfiguration.AndroidSpecific.Elevation")?.GetRuntimeMethod("GetElevation", new Type[] { typeof(VisualElement) });
+            private static readonly MethodInfo _getEleveationMethod = typeof(Image).Assembly.GetType("Xamarin.Forms.PlatformConfiguration.AndroidSpecific.Elevation")?.GetRuntimeMethod("GetElevation", new Type[] { typeof(VisualElement) });
 
-            internal static void SetElevation(global::Android.Views.View view, VisualElement element)
+            internal static void SetElevation(AView view, VisualElement element)
             {
                 if (_getEleveationMethod == null || view == null || element == null || !IsLollipopOrNewer)
                 {
