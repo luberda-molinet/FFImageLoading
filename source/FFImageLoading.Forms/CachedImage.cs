@@ -40,6 +40,9 @@ namespace FFImageLoading.Forms
             }
         }
 
+        private static readonly PropertyInfo _visualMarkerProperty = typeof(VisualElement).GetTypeInfo().Assembly.GetType("Xamarin.Forms.VisualMarker")?.GetRuntimeProperty("Default");
+        private static readonly PropertyInfo _visualProperty = typeof(VisualElement).GetRuntimeProperty("Visual");
+
         internal static bool IsRendererInitialized { get; set; } = IsDesignModeEnabled;
         public static bool FixedOnMeasureBehavior { get; set; } = true;
         public static bool FixedAndroidMotionEventHandler { get; set; } = true;
@@ -50,6 +53,12 @@ namespace FFImageLoading.Forms
         public CachedImage()
         {
             Transformations = new List<Work.ITransformation>();
+
+            // Fix for issues with non-default visual style
+            if (_visualProperty != null && _visualMarkerProperty != null)
+            {
+                _visualProperty.SetValue(this, _visualMarkerProperty.GetValue(null));
+            }
         }
 
         /// <summary>
