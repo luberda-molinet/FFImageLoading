@@ -7,6 +7,8 @@ using System.Threading;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
 using System.Linq;
+using FFImageLoading.Exceptions;
+using System.Net;
 
 namespace FFImageLoading.Cache
 {
@@ -113,25 +115,23 @@ namespace FFImageLoading.Cache
                         if (!response.IsSuccessStatusCode)
                         {
                             if (response.Content == null)
-                                throw new HttpRequestException(response.StatusCode.ToString());
+                                throw new DownloadHttpStatusCodeException(response.StatusCode);
 
                             using (response.Content)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
-                                var hasContent = string.IsNullOrWhiteSpace(content);
-                                var message = hasContent ? $"{response.StatusCode}: {content}" : response.StatusCode.ToString();
-                                throw new HttpRequestException(message);
+                                throw new DownloadHttpStatusCodeException(response.StatusCode, content);
                             }
                         }
 
                         if (response.Content == null)
-                            throw new HttpRequestException("No Content");
+                            throw new DownloadException("No content");
 
                         var mediaType = response.Content.Headers?.ContentType?.MediaType;
                         if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
                             if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
-                                throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                                throw new DownloadException($"Invalid response content type ({mediaType})");
                         }
 
                         if (!parameters.CacheDuration.HasValue && Configuration.TryToReadDiskCacheDurationFromHttpHeaders
@@ -175,10 +175,10 @@ namespace FFImageLoading.Cache
                                     }
 
                                     if (outputStream.Length == 0)
-                                        throw new InvalidDataException("Zero length stream");
+                                        throw new DownloadException("Zero length stream");
 
                                     if (outputStream.Length < 32)
-                                        throw new InvalidDataException("Invalid stream");
+                                        throw new DownloadException("Invalid stream");
 
                                     return outputStream.ToArray();
                                 }
@@ -186,7 +186,7 @@ namespace FFImageLoading.Cache
                             catch (Exception ex) when (ex is OperationCanceledException || ex is ObjectDisposedException)
                             {
                                 if (httpReadTimeoutTokenSource.IsCancellationRequested)
-                                    throw new Exception("HttpReadTimeout");
+                                    throw new DownloadReadTimeoutException();
                                 else
                                     throw;
                             }
@@ -196,7 +196,7 @@ namespace FFImageLoading.Cache
                 catch (OperationCanceledException)
                 {
                     if (httpHeadersTimeoutTokenSource.IsCancellationRequested)
-                        throw new Exception("HttpHeadersTimeout");
+                        throw new DownloadHeadersTimeoutException();
                     else
                         throw;
                 }
