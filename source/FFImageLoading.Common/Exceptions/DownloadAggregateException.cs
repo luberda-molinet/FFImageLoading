@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FFImageLoading
+namespace FFImageLoading.Exceptions
 {
     [Preserve(AllMembers = true)]
     public class DownloadAggregateException : AggregateException

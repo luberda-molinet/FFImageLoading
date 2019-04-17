@@ -41,4 +41,7 @@
   <ItemGroup>
     <Compile Remove="AssemblyTFMAttribute.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
 </Project>
