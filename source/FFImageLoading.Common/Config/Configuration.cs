@@ -22,14 +22,14 @@ namespace FFImageLoading.Config
             FadeAnimationDuration = 300;
             TransformPlaceholders = true;
             DownsampleInterpolationMode = InterpolationMode.Default;
-            HttpHeadersTimeout = 5;
+            HttpHeadersTimeout = 3;
             HttpReadTimeout = 15;
             HttpReadBufferSize = 8192;
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
-            SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 2d)));
+            SchedulerMaxParallelTasks = Math.Max(4, Environment.ProcessorCount);
             DiskCacheDuration = TimeSpan.FromDays(30d);
             TryToReadDiskCacheDurationFromHttpHeaders = true;
             ExecuteCallbacksOnUIThread = false;
