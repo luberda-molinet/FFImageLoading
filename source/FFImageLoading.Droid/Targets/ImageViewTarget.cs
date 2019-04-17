@@ -15,7 +15,20 @@ namespace FFImageLoading.Targets
             _controlWeakReference = new WeakReference<ImageViewAsync>(control);
         }
 
-        public override bool IsValid => Control != null && Control.Handle != IntPtr.Zero;
+        public override bool IsValid
+        {
+            get
+            {
+                try
+                {
+                    return Control != null && Control.Handle != IntPtr.Zero;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
+            }
+        }
 
         public override void SetAsEmpty(IImageLoaderTask task)
         {

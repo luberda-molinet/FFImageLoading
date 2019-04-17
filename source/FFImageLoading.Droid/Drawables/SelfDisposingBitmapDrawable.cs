@@ -204,10 +204,10 @@ namespace FFImageLoading.Drawables
         {
             lock (_monitor)
             {
+                _isBitmapDisposed = true;
+
                 if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
                     Bitmap.TryDispose();
-
-                _isBitmapDisposed = true;
             }
         }
 
@@ -240,9 +240,19 @@ namespace FFImageLoading.Drawables
         {
             get
             {
+                if (_isBitmapDisposed)
+                    return false;
+
                 lock (_monitor)
                 {
-                    return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !_isBitmapDisposed && !Bitmap.IsRecycled;
+                    try
+                    {
+                        return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !Bitmap.IsRecycled;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return false;
+                    }
                 }
             }
         }

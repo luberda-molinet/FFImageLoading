@@ -10,44 +10,86 @@ namespace FFImageLoading
     {
         public static bool IsValidAndHasValidBitmap(this BitmapDrawable drawable)
         {
-            if (drawable is ISelfDisposingBitmapDrawable sdDrawable)
+            try
             {
-                return drawable != null && drawable.Handle != IntPtr.Zero && sdDrawable.HasValidBitmap;
-            }
+                if (drawable is ISelfDisposingBitmapDrawable sdDrawable)
+                {
+                    return drawable != null && drawable.Handle != IntPtr.Zero && sdDrawable.HasValidBitmap;
+                }
 
-            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled;
+                return drawable != null && drawable.Handle != IntPtr.Zero && drawable.Bitmap != null && drawable.Bitmap.Handle != IntPtr.Zero && !drawable.Bitmap.IsRecycled;
+            }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
         }
 
         public static bool IsValidAndHasValidBitmap(this ISelfDisposingBitmapDrawable drawable)
         {
-            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
+            try
+            {
+                return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
+            }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
         }
 
         public static bool IsValidAndHasValidBitmap(this SelfDisposingBitmapDrawable drawable)
         {
-            return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
+            try
+            {
+                return drawable != null && drawable.Handle != IntPtr.Zero && drawable.HasValidBitmap;
+            }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
         }
 
         public static async Task<Stream> AsPngStreamAsync(this BitmapDrawable drawable)
         {
-            var stream = new MemoryStream();
-            await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+            var sdbd = drawable as ISelfDisposingBitmapDrawable;
+            sdbd?.SetIsRetained(true);
 
-            if (stream.Position != 0)
-                stream.Position = 0;
+            try
+            {
+                var stream = new MemoryStream();
+                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
 
-            return stream;
+                if (stream.Position != 0)
+                    stream.Position = 0;
+
+
+                return stream;
+            }
+            finally
+            {
+                sdbd?.SetIsRetained(false);
+            }
         }
 
         public static async Task<Stream> AsJpegStreamAsync(this BitmapDrawable drawable, int quality = 90)
         {
-            var stream = new MemoryStream();
-            await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Jpeg, quality, stream);
+            var sdbd = drawable as ISelfDisposingBitmapDrawable;
+            sdbd?.SetIsRetained(true);
 
-            if (stream.Position != 0)
-                stream.Position = 0;
+            try
+            {
+                var stream = new MemoryStream();
+                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Jpeg, quality, stream);
 
-            return stream;
+                if (stream.Position != 0)
+                    stream.Position = 0;
+
+                return stream;
+            }
+            finally
+            {
+                sdbd?.SetIsRetained(false);
+            }
         }
     }
 }
