@@ -16,11 +16,11 @@ namespace FFImageLoading.DataResolvers
                 throw new Exception("Only resource:// scheme is supported");
 
 
-            Uri uri = new Uri(identifier);
+            var uri = new Uri(identifier);
             Assembly assembly = null;
 
             var parts = uri.OriginalString.Substring(11).Split('?');
-            string resourceName = parts.First();
+            var resourceName = parts.First();
 
             if (parts.Count() > 1)
             {
@@ -31,7 +31,7 @@ namespace FFImageLoading.DataResolvers
 
             if (assembly == null)
             {
-                MethodInfo callingAssemblyMethod = typeof(Assembly).GetTypeInfo().GetDeclaredMethod("GetCallingAssembly");
+                var callingAssemblyMethod = typeof(Assembly).GetTypeInfo().GetDeclaredMethod("GetCallingAssembly");
                 assembly = (Assembly)callingAssemblyMethod.Invoke(null, new object[0]);
             }
 

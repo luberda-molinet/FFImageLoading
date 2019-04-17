@@ -3,7 +3,7 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Forms
 {
-	[Preserve(AllMembers = true)]
+    [Preserve(AllMembers = true)]
     public class DataUrlImageSource : ImageSource
     {
         public DataUrlImageSource(string dataUrl)
@@ -15,13 +15,13 @@ namespace FFImageLoading.Forms
 
         public string DataUrl
         {
-            get { return (string)GetValue(DataUrlProperty); }
-            set { SetValue(DataUrlProperty, value); }
+            get => (string)GetValue(DataUrlProperty);
+            set => SetValue(DataUrlProperty, value);
         }
 
         public override string ToString()
-		{
-			return $"DataUrlImageSource: {DataUrl}";
-		}
+        {
+            return $"DataUrlImageSource: {DataUrl}";
+        }
     }
 }

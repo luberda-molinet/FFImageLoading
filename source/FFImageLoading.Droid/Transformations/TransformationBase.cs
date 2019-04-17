@@ -1,5 +1,4 @@
-﻿using System;
-using Android.Graphics;
+﻿using Android.Graphics;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations

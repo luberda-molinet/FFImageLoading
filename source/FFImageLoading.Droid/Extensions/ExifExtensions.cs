@@ -37,8 +37,8 @@ namespace FFImageLoading.Extensions
             if (rotationDegrees == 0)
                 return sourceBitmap;
 
-            int width = sourceBitmap.Width;
-            int height = sourceBitmap.Height;
+            var width = sourceBitmap.Width;
+            var height = sourceBitmap.Height;
 
             if (rotationDegrees == 90 || rotationDegrees == 270)
             {
@@ -46,11 +46,11 @@ namespace FFImageLoading.Extensions
                 height = sourceBitmap.Width;
             }
 
-            Bitmap bitmap = Bitmap.CreateBitmap(width, height, sourceBitmap.GetConfig());
-            using (Canvas canvas = new Canvas(bitmap))
-            using (Paint paint = new Paint())
-            using (BitmapShader shader = new BitmapShader(sourceBitmap, Shader.TileMode.Clamp, Shader.TileMode.Clamp))
-            using (Matrix matrix = new Matrix())
+            var bitmap = Bitmap.CreateBitmap(width, height, sourceBitmap.GetConfig());
+            using (var canvas = new Canvas(bitmap))
+            using (var paint = new Paint())
+            using (var shader = new BitmapShader(sourceBitmap, Shader.TileMode.Clamp, Shader.TileMode.Clamp))
+            using (var matrix = new Matrix())
             {
                 // paint.AntiAlias = true;
                 // paint.Dither = true;

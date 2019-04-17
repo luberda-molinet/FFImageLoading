@@ -8,7 +8,6 @@ using FFImageLoading.Work;
 using FFImageLoading.Config;
 using System.Linq;
 using FFImageLoading.Exceptions;
-using System.Net;
 
 namespace FFImageLoading.Cache
 {
@@ -20,13 +19,11 @@ namespace FFImageLoading.Cache
             Configuration = configuration;
         }
 
-        const int BufferSize = 4096;
-
         public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/json", "audio/", "video/", "message" };
 
         protected Configuration Configuration { get; private set; }
 
-        protected virtual IMD5Helper MD5Helper { get { return Configuration.MD5Helper; } }
+        protected virtual IMD5Helper MD5Helper => Configuration.MD5Helper;
 
         public virtual TimeSpan DelayBetweenRetry { get; set; } = TimeSpan.FromSeconds(1);
 
@@ -36,9 +33,9 @@ namespace FFImageLoading.Cache
                                        && (string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) || parameters.LoadingPlaceholderPath != url)
                                        && (string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) || parameters.ErrorPlaceholderPath != url);
 
-            string filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url));
+            var filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url));
             var allowDiskCaching = AllowDiskCaching(parameters.CacheType);
-            var duration = parameters.CacheDuration.HasValue ? parameters.CacheDuration.Value : configuration.DiskCacheDuration;
+            var duration = parameters.CacheDuration ?? configuration.DiskCacheDuration;
             string filePath = null;
 
             if (allowDiskCaching)
@@ -69,13 +66,12 @@ namespace FFImageLoading.Cache
             if (allowDiskCaching)
             {
                 Action finishedAction = null;
-                Action<FileWriteInfo> onFileWriteFinished = parameters?.OnFileWriteFinished;
+                var onFileWriteFinished = parameters?.OnFileWriteFinished;
                 if (onFileWriteFinished != null)
                 {
                     finishedAction = new Action(() =>
                     {
-                        if (onFileWriteFinished != null)
-                            onFileWriteFinished(new FileWriteInfo(filePath, url));
+                        onFileWriteFinished?.Invoke(new FileWriteInfo(filePath, url));
                     });
                 }
 
@@ -147,7 +143,7 @@ namespace FFImageLoading.Cache
                         {
                             var readTimeoutToken = readTimeoutTokenSource.Token;
                             var httpReadTimeoutToken = httpReadTimeoutTokenSource.Token;
-                            int total = (int)(response.Content.Headers.ContentLength ?? -1);
+                            var total = (int)(response.Content.Headers.ContentLength ?? -1);
                             var canReportProgress = progressAction != null;
 
                             httpReadTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
@@ -160,10 +156,10 @@ namespace FFImageLoading.Cache
                                 {
                                     httpReadTimeoutToken.Register(() => sourceStream.TryDispose());
 
-                                    int totalRead = 0;
+                                    var totalRead = 0;
                                     var buffer = new byte[Configuration.HttpReadBufferSize];
+                                    var read = 0;
 
-                                    int read = 0;
                                     while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                                     {
                                         readTimeoutToken.ThrowIfCancellationRequested();
@@ -187,8 +183,8 @@ namespace FFImageLoading.Cache
                             {
                                 if (httpReadTimeoutTokenSource.IsCancellationRequested)
                                     throw new DownloadReadTimeoutException();
-                                else
-                                    throw;
+
+                                throw;
                             }
                         }
                     }

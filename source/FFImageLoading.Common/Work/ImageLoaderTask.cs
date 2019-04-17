@@ -14,8 +14,11 @@ namespace FFImageLoading.Work
 {
     public abstract class ImageLoaderTask<TDecoderContainer, TImageContainer, TImageView> : IImageLoaderTask where TDecoderContainer : class where TImageContainer : class where TImageView : class
     {
-        bool _isLoadingPlaceholderLoaded;
-        static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
+        private bool _isLoadingPlaceholderLoaded;
+
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+        private static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
         protected ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
         {
@@ -62,7 +65,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        void SetKeys()
+        private void SetKeys()
         {
             KeyRaw = Parameters.Path;
             if (Parameters.Source == ImageSource.Stream)
@@ -127,8 +130,7 @@ namespace FFImageLoading.Work
                 else
                     KeyForLoadingPlaceholder = string.Concat(Parameters.LoadingPlaceholderPath, KeyDownsamplingOnly);
 
-                var vectLo = Parameters.CustomLoadingPlaceholderDataResolver as IVectorDataResolver;
-                if (vectLo != null)
+                if (Parameters.CustomLoadingPlaceholderDataResolver is IVectorDataResolver vectLo)
                 {
                     if (vectLo.ReplaceStringMap == null || vectLo.ReplaceStringMap.Count == 0)
                         KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits);
@@ -167,7 +169,7 @@ namespace FFImageLoading.Work
 
         public ITarget<TImageContainer, TImageView> PlatformTarget { get; private set; }
 
-        public ITarget Target { get { return PlatformTarget as ITarget; } }
+        public ITarget Target => PlatformTarget as ITarget;
 
         protected IImageService ImageService { get; private set; }
 
@@ -285,7 +287,7 @@ namespace FFImageLoading.Work
 
                     if (decoderContainer.IsAnimated)
                     {
-                        for (int i = 0; i < decoderContainer.AnimatedImages.Length; i++)
+                        for (var i = 0; i < decoderContainer.AnimatedImages.Length; i++)
                         {
                             decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
                         }
@@ -307,7 +309,7 @@ namespace FFImageLoading.Work
                 IsAnimated = decoded.IsAnimated,
                 Image = decoded.Image as TDecoderContainer,
                 AnimatedImages = decoded.AnimatedImages?.Select(
-                    v => new AnimatedImage<TDecoderContainer>() { Delay = v.Delay, Image = v.Image as TDecoderContainer })
+                    v => new AnimatedImage<TDecoderContainer> { Delay = v.Delay, Image = v.Image as TDecoderContainer })
                                         .ToArray()
             };
 
@@ -317,7 +319,7 @@ namespace FFImageLoading.Work
 
                 if (decoderContainer.IsAnimated)
                 {
-                    for (int i = 0; i < decoderContainer.AnimatedImages.Length; i++)
+                    for (var i = 0; i < decoderContainer.AnimatedImages.Length; i++)
                     {
                         decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
                     }
@@ -411,7 +413,7 @@ namespace FFImageLoading.Work
             return false;
         }
 
-        async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated, bool isLoadingPlaceholder)
+        private async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated, bool isLoadingPlaceholder)
         {
             var found = MemoryCache.Get(key);
             if (found?.Item1 != null)
@@ -691,15 +693,15 @@ namespace FFImageLoading.Work
             }
         }
 
-        bool _isDisposed;
+        private bool _isDisposed;
         public void Dispose()
         {
             if (!_isDisposed)
             {
+                _isDisposed = true;
+
                 Parameters.TryDispose();
                 CancellationTokenSource.TryDispose();
-
-                _isDisposed = true;
             }
         }
     }

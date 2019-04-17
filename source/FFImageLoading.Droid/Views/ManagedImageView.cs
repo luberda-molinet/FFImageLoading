@@ -5,21 +5,18 @@ using Android.Widget;
 using System;
 using Android.Runtime;
 using FFImageLoading.Drawables;
-using FFImageLoading.Work;
-using System.Threading.Tasks;
-using FFImageLoading.Helpers;
 using System.Threading;
 
 namespace FFImageLoading.Views
 {
     public class ManagedImageView : ImageView
     {
-        WeakReference<Drawable> _drawableRef;
-        CancellationTokenSource _tcs;
-        readonly object _lock = new object();
-        HighResolutionTimer<Android.Graphics.Bitmap> _animationTimer;
-        bool _isDisposed;
-        volatile bool _animationFrameSetting;
+        private WeakReference<Drawable> _drawableRef;
+        private CancellationTokenSource _tcs;
+        private readonly object _lock = new object();
+        private HighResolutionTimer<Android.Graphics.Bitmap> _animationTimer;
+        private bool _isDisposed;
+        private bool _animationFrameSetting;
 
         public ManagedImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
@@ -48,13 +45,11 @@ namespace FFImageLoading.Views
                     CancelGifPlay();
                     _tcs?.TryDispose();
                 }
-                catch (Exception) { }
+                catch { }
 
                 if (_drawableRef != null)
                 {
-                    Drawable drawable = null;
-
-                    if (_drawableRef.TryGetTarget(out drawable))
+                    if (_drawableRef.TryGetTarget(out var drawable))
                     {
                         UpdateDrawableDisplayedState(drawable, false);
                     }
@@ -66,7 +61,7 @@ namespace FFImageLoading.Views
             base.Dispose(disposing);
         }
 
-        void CancelGifPlay()
+        private void CancelGifPlay()
         {
             try
             {
@@ -76,7 +71,7 @@ namespace FFImageLoading.Views
             catch (ObjectDisposedException) { }
         }
 
-        void PlayGif(FFGifDrawable gifDrawable, CancellationTokenSource tokenSource)
+        private void PlayGif(FFGifDrawable gifDrawable, CancellationTokenSource tokenSource)
         {
             var token = tokenSource.Token;
             var animatedImages = gifDrawable.AnimatedImages;
@@ -105,8 +100,9 @@ namespace FFImageLoading.Views
                         {
                             if (_isDisposed || !_animationTimer.Enabled)
                                 return;
-                            
-                            base.SetImageBitmap(bitmap);;
+
+                            base.SetImageBitmap(bitmap);
+                            ;
                         }).ConfigureAwait(false);
                     }
                 }
@@ -118,18 +114,12 @@ namespace FFImageLoading.Views
                 {
                     _animationFrameSetting = false;
                 }
-            });
-            _animationTimer.DelayOffset = -2;
+            })
+            {
+                DelayOffset = -2
+            };
             _animationTimer.Start();
         }
-
-        /* FMT: this is not fine when working with RecyclerView... It can detach and cache the view, then reattach it
-        protected override void OnDetachedFromWindow()
-        {
-            SetImageDrawable(null);
-            base.OnDetachedFromWindow();
-        }
-        */
 
         public void CancelLoading()
         {
@@ -142,8 +132,7 @@ namespace FFImageLoading.Views
             {
                 var previous = Drawable;
 
-                var gifDrawable = drawable as FFGifDrawable;
-                if (gifDrawable != null)
+                if (drawable is FFGifDrawable gifDrawable)
                 {
                     CancelGifPlay();
                     var oldTcs = _tcs;
@@ -193,21 +182,19 @@ namespace FFImageLoading.Views
             UpdateDrawableDisplayedState(previous, false);
         }
 
-        void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
+        private void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
         {
             if (drawable == null || drawable.Handle == IntPtr.Zero)
                 return;
 
-            var selfDisposingBitmapDrawable = drawable as ISelfDisposingBitmapDrawable;
-            if (selfDisposingBitmapDrawable != null)
+            if (drawable is ISelfDisposingBitmapDrawable selfDisposingBitmapDrawable)
             {
                 if (selfDisposingBitmapDrawable.HasValidBitmap)
                     selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
             }
             else
             {
-                var layerDrawable = drawable as LayerDrawable;
-                if (layerDrawable != null)
+                if (drawable is LayerDrawable layerDrawable)
                 {
                     for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
                     {

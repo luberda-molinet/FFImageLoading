@@ -25,8 +25,10 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, PImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
-        static IDecoder<PImage> _webpDecoder = new WebPDecoder();
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
+        private static readonly IDecoder<PImage> _webpDecoder = new WebPDecoder();
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
         public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
@@ -124,17 +126,21 @@ namespace FFImageLoading.Work
 #elif __MACOS__
                 using (var mutableData = NSMutableData.Create())
                 {
-                    var fileOptions = new CGImageDestinationOptions();
-                    fileOptions.GifDictionary = new NSMutableDictionary();
+                    var fileOptions = new CGImageDestinationOptions
+                    {
+                        GifDictionary = new NSMutableDictionary()
+                    };
                     fileOptions.GifDictionary[ImageIO.CGImageProperties.GIFLoopCount] = new NSString("0");
                     //options.GifDictionary[ImageIO.CGImageProperties.GIFHasGlobalColorMap] = new NSString("true");
 
                     using (var destintation = CGImageDestination.Create(mutableData, MobileCoreServices.UTType.GIF, decoded.AnimatedImages.Length, fileOptions))
                     {
-                        for (int i = 0; i < decoded.AnimatedImages.Length; i++)
+                        for (var i = 0; i < decoded.AnimatedImages.Length; i++)
                         {
-                            var options = new CGImageDestinationOptions();
-                            options.GifDictionary = new NSMutableDictionary();
+                            var options = new CGImageDestinationOptions
+                            {
+                                GifDictionary = new NSMutableDictionary()
+                            };
                             options.GifDictionary[ImageIO.CGImageProperties.GIFUnclampedDelayTime] = new NSString(decoded.AnimatedImages[i].Delay.ToString());
                             destintation.AddImage(decoded.AnimatedImages[i].Image.CGImage, options);
                         }

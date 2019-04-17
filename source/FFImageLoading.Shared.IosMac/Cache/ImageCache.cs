@@ -35,27 +35,20 @@ namespace FFImageLoading.Cache
             else
                 _cache.TotalCostLimit = (nuint)Math.Min((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
 
-            double sizeInMB = Math.Round(_cache.TotalCostLimit /1024d / 1024d, 2);
+            double sizeInMB = Math.Round(_cache.TotalCostLimit / 1024d / 1024d, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());
         }
 
-        public static IMemoryCache<PImage> Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger));
-            }
-        }
+        public static IMemoryCache<PImage> Instance => _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger));
 
         public ImageInformation GetInfo(string key)
         {
             lock (_lock)
             {
-                ImageInformation imageInformation;
-                if (_imageInformations.TryGetValue(key, out imageInformation))
+                if (_imageInformations.TryGetValue(key, out var imageInformation))
                 {
                     return imageInformation;
                 }
@@ -103,7 +96,7 @@ namespace FFImageLoading.Cache
             Remove(key, true);
         }
 
-        void Remove(string key, bool log)
+        private void Remove(string key, bool log)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return;
@@ -114,8 +107,7 @@ namespace FFImageLoading.Cache
             lock (_lock)
             {
                 _cache.RemoveObjectForKey(new NSString(key));
-                ImageInformation imageInformation;
-                _imageInformations.TryRemove(key, out imageInformation);
+                _imageInformations.TryRemove(key, out var imageInformation);
             }
         }
 
@@ -140,11 +132,8 @@ namespace FFImageLoading.Cache
                 _cache.RemoveAllObjects();
                 _imageInformations.Clear();
             }
-            // Force immediate Garbage collection. Please note that is resource intensive.
-            System.GC.Collect();
-            System.GC.WaitForPendingFinalizers ();
-            System.GC.WaitForPendingFinalizers (); // Double call since GC doesn't always find resources to be collected: https://bugzilla.xamarin.com/show_bug.cgi?id=20503
-            System.GC.Collect ();
+
+            GC.Collect();
         }
     }
 }

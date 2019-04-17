@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Extensions;
 using FFImageLoading.Drawables;
 using FFImageLoading.Views;
 using FFImageLoading.Work;
@@ -9,20 +8,14 @@ namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageViewAsync>
     {
-        readonly WeakReference<ImageViewAsync> _controlWeakReference;
+        private readonly WeakReference<ImageViewAsync> _controlWeakReference;
 
         public ImageViewTarget(ImageViewAsync control)
         {
             _controlWeakReference = new WeakReference<ImageViewAsync>(control);
         }
 
-        public override bool IsValid
-        {
-            get
-            {
-                return Control != null && Control.Handle != IntPtr.Zero;
-            }
-        }
+        public override bool IsValid => Control != null && Control.Handle != IntPtr.Zero;
 
         public override void SetAsEmpty(IImageLoaderTask task)
         {
@@ -33,7 +26,7 @@ namespace FFImageLoading.Targets
             if (control == null)
                 return;
 
-            control.SetImageResource(global::Android.Resource.Color.Transparent);
+            control.SetImageResource(Android.Resource.Color.Transparent);
         }
 
         public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
@@ -54,7 +47,7 @@ namespace FFImageLoading.Targets
                 control.RequestLayout();
         }
 
-        bool IsLayoutNeeded(IImageLoaderTask task, Drawable oldImage, Drawable newImage)
+        private bool IsLayoutNeeded(IImageLoaderTask task, Drawable oldImage, Drawable newImage)
         {
             if (task.Parameters.InvalidateLayoutEnabled.HasValue)
             {

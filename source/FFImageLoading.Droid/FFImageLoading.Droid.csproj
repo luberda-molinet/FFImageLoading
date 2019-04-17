@@ -57,7 +57,6 @@
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
-    <Compile Include="Extensions\ImageViewExtensions.cs" />
     <Compile Include="Cache\IImageCache.cs" />
     <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />

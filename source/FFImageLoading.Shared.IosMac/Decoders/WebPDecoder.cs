@@ -30,9 +30,10 @@ namespace FFImageLoading.Decoders
             var result = new DecodedImage<PImage>();
             result.Image = _decoder.Decode(stream);
 
-            int downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
-            int downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
-            bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
+            var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
+            var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
+            // TODO allowUpscale
+            // bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
 
             if (parameters.DownSampleUseDipUnits)
             {

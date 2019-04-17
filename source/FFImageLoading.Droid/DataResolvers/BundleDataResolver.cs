@@ -25,7 +25,7 @@ namespace FFImageLoading.DataResolvers
             return Task.FromResult(new DataResolverResult(stream, LoadingResult.ApplicationBundle, imageInformation));
         }
 
-        protected Context Context { get { return new ContextWrapper(Android.App.Application.Context); } }
+        protected Context Context => new ContextWrapper(Android.App.Application.Context);
     }
 }
 

@@ -8,8 +8,8 @@ namespace FFImageLoading.Cache
     public class ByteBoundStrongLruCache<TValue> where TValue : Java.Lang.Object, ISelfDisposingBitmapDrawable
     {
         protected object _monitor = new object();
-        LRUCache _androidCache;
-        HashSet<string> _keysCache = new HashSet<string>();
+        private readonly LRUCache _androidCache;
+        private readonly HashSet<string> _keysCache = new HashSet<string>();
 
         public ByteBoundStrongLruCache(int maxSize)
         {
@@ -23,7 +23,7 @@ namespace FFImageLoading.Cache
         public event EventHandler<EntryRemovedEventArgs<TValue>> EntryRemoved;
         public event EventHandler<EntryAddedEventArgs<TValue>> EntryAdded;
 
-        void AndroidCache_OnEntryRemoved (object sender, EntryRemovedEventArgs<Java.Lang.Object> e)
+        private void AndroidCache_OnEntryRemoved (object sender, EntryRemovedEventArgs<Java.Lang.Object> e)
         {
             lock (_monitor)
             {
@@ -37,8 +37,7 @@ namespace FFImageLoading.Cache
         {
             lock (_monitor)
             {
-                var outValue = default(TValue);
-                TryGetValue(key, out outValue);
+                TryGetValue(key, out var outValue);
                 return outValue;
             }
         }
@@ -137,7 +136,7 @@ namespace FFImageLoading.Cache
 
         protected virtual int SizeOf(TValue value)
         {
-            return (int)value.SizeInBytes;
+            return value.SizeInBytes;
         }
     }
 }

@@ -22,14 +22,13 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
     {
-        readonly string[] _fileTypes = { null, "png", "jpg", "jpeg", "webp", "gif" };
+        private readonly string[] _fileTypes = { null, "png", "jpg", "jpeg", "webp", "gif" };
 
         public virtual async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var fileName = Path.GetFileNameWithoutExtension(identifier);
-            DataResolverResult result = null;
 
-            result = await ResolveFromBundlesAsync(fileName, identifier, parameters, token).ConfigureAwait(false);
+            var result = await ResolveFromBundlesAsync(fileName, identifier, parameters, token).ConfigureAwait(false);
             if (result != null)
                 return result;
 
@@ -48,7 +47,7 @@ namespace FFImageLoading.DataResolvers
             throw new FileNotFoundException(identifier);
         }
 
-        Task<DataResolverResult> ResolveFromBundlesAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private Task<DataResolverResult> ResolveFromBundlesAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
             NSBundle bundle = null;
             var ext = Path.GetExtension(identifier)?.TrimStart(new char[] { '.' });
@@ -65,7 +64,7 @@ namespace FFImageLoading.DataResolvers
 
                 token.ThrowIfCancellationRequested();
 
-                int scale = (int)ScaleHelper.Scale;
+                var scale = (int)ScaleHelper.Scale;
                 if (scale > 1)
                 {
                     while (scale > 1)
@@ -123,7 +122,7 @@ namespace FFImageLoading.DataResolvers
             return Task.FromResult<DataResolverResult>(null);
         }
 
-        async Task<DataResolverResult> ResolveFromAssetCatalogAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private async Task<DataResolverResult> ResolveFromAssetCatalogAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
 #if __IOS__
             if (!UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
@@ -136,7 +135,7 @@ namespace FFImageLoading.DataResolvers
             {
                 await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => asset = new NSDataAsset(identifier, NSBundle.MainBundle)).ConfigureAwait(false);
             }
-            catch (Exception) { }
+            catch { }
 
             if (asset == null && fileName != identifier)
             {
@@ -144,7 +143,7 @@ namespace FFImageLoading.DataResolvers
                 {
                     await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => asset = new NSDataAsset(fileName, NSBundle.MainBundle)).ConfigureAwait(false);
                 }
-                catch (Exception) { }
+                catch { }
             }
 
             if (asset != null)
@@ -161,7 +160,7 @@ namespace FFImageLoading.DataResolvers
             return null;
         }
 
-        async Task<DataResolverResult> ResolveFromNamedResourceAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private async Task<DataResolverResult> ResolveFromNamedResourceAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
             PImage image = null;
 
@@ -173,7 +172,7 @@ namespace FFImageLoading.DataResolvers
                 await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(identifier));
 #endif
             }
-            catch (Exception) { }
+            catch { }
 
             if (image == null && fileName != identifier)
             {
@@ -185,7 +184,7 @@ namespace FFImageLoading.DataResolvers
                     await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(fileName));
 #endif
                 }
-                catch (Exception) { }
+                catch { }
             }
 
             if (image != null)

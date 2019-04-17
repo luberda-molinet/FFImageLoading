@@ -9,7 +9,7 @@ namespace FFImageLoading.Views
     [Register("ffimageloading.views.ImageViewAsync")]
     public class ImageViewAsync : ManagedImageView
     {
-        bool _customFit = false;
+        private bool _customFit;
 
         public ImageViewAsync(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
@@ -34,10 +34,7 @@ namespace FFImageLoading.Views
         /// </summary>
         public bool ScaleToFit
         {
-            get
-            {
-                return _scaleToFit;
-            }
+            get => _scaleToFit;
             set
             {
                 _customFit = true;
@@ -54,10 +51,7 @@ namespace FFImageLoading.Views
         /// </summary>
         public AlignMode AlignMode
         {
-            get
-            {
-                return _bottomAlign;
-            }
+            get => _bottomAlign;
             set
             {
                 _customFit = true;
@@ -90,16 +84,16 @@ namespace FFImageLoading.Views
         {
             if (_customFit && Drawable != null && Drawable.IntrinsicWidth != 0)
             {
-                bool bottomAlignmentDefined = AlignMode != AlignMode.None;
+                var bottomAlignmentDefined = AlignMode != AlignMode.None;
                 if (ScaleToFit || bottomAlignmentDefined)
                 {
-                    var matrix = this.ImageMatrix;
-                    float scaleFactor = 1f;
+                    var matrix = ImageMatrix;
+                    var scaleFactor = 1f;
 
                     if (ScaleToFit)
                     {
-                        float scaleFactorWidth = (float)Width / (float)Drawable.IntrinsicWidth;
-                        float scaleFactorHeight = (float)Height / (float)Drawable.IntrinsicHeight;
+                        var scaleFactorWidth = (float)Width / Drawable.IntrinsicWidth;
+                        var scaleFactorHeight = (float)Height / Drawable.IntrinsicHeight;
 
                         if (scaleFactorHeight < scaleFactorWidth)
                         {
@@ -110,7 +104,7 @@ namespace FFImageLoading.Views
                             scaleFactor = scaleFactorWidth;
                         }
 
-                        if (scaleFactor != 1f)
+                        if (Math.Abs(scaleFactor - 1f) > float.Epsilon)
                         {
                             matrix.SetScale(scaleFactor, scaleFactor, 0, 0);
                         }

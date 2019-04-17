@@ -13,9 +13,8 @@ namespace FFImageLoading.Cache
 
         protected override int SizeOf(Java.Lang.Object key, Java.Lang.Object value)
         {
-            var drawable = value as ISelfDisposingBitmapDrawable;
 
-            if (drawable != null && drawable.Handle != IntPtr.Zero)
+            if (value is ISelfDisposingBitmapDrawable drawable && drawable.Handle != IntPtr.Zero)
                 return drawable.SizeInBytes;
 
             return 0;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FFImageLoading.Drawables;
 using Java.Util;
 using System.Linq;
@@ -9,14 +8,13 @@ namespace FFImageLoading.Cache
     public class StrongCache<TValue> where TValue : Java.Lang.Object, ISelfDisposingBitmapDrawable
     {
         protected object _monitor = new object();
-        Hashtable _androidCache = new Hashtable();
+        private readonly Hashtable _androidCache = new Hashtable();
 
         public TValue Get(string key)
         {
             lock (_monitor)
             {
-                var outValue = default(TValue);
-                TryGetValue(key, out outValue);
+                TryGetValue(key, out var outValue);
                 return outValue;
             }
         }

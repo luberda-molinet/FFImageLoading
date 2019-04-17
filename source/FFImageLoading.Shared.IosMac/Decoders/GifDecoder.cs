@@ -28,9 +28,9 @@ namespace FFImageLoading.Decoders
 
         public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
-            int downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
-            int downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
-            bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
+            var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
+            var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
+            var allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
 
             if (parameters.DownSampleUseDipUnits)
             {
@@ -77,9 +77,9 @@ namespace FFImageLoading.Decoders
                 }
 
                 // Calculate target size
-                CGSize targetSize = RCTTargetSize(sourceSize, 1, destSize, destScale, resizeMode, allowUpscale);
-                CGSize targetPixelSize = RCTSizeInPixels(targetSize, destScale);
-                int maxPixelSize = (int)Math.Max(
+                var targetSize = RCTTargetSize(sourceSize, 1, destSize, destScale, resizeMode, allowUpscale);
+                var targetPixelSize = RCTSizeInPixels(targetSize, destScale);
+                var maxPixelSize = (int)Math.Max(
                     allowUpscale ? targetPixelSize.Width : Math.Min(sourceSize.Width, targetPixelSize.Width),
                     allowUpscale ? targetPixelSize.Height : Math.Min(sourceSize.Height, targetPixelSize.Height)
                 );
@@ -140,7 +140,7 @@ namespace FFImageLoading.Decoders
                         images = new AnimatedImage<PImage>[frameCount];
                         var delays = GetDelays(sourceRef);
 
-                        for (int i = 0; i < images.Length; i++)
+                        for (var i = 0; i < images.Length; i++)
                         {
                             var nsImage = new PImage(sourceRef.CreateThumbnail(i, options), CGSize.Empty);
                             images[i] = new AnimatedImage<PImage>() { Image = nsImage, Delay = delays[i] };
@@ -165,7 +165,7 @@ namespace FFImageLoading.Decoders
                     }
                 }
 
-                DecodedImage<PImage> result = new DecodedImage<PImage>(); ;
+                var result = new DecodedImage<PImage>();
 
                 if (images != null && images.Length > 1)
                 {
@@ -174,8 +174,8 @@ namespace FFImageLoading.Decoders
 
                     if (imageinformation != null)
                     {
-                        int width = (int)images[0].Image.Size.Width;
-                        int height = (int)images[0].Image.Size.Height;
+                        var width = (int)images[0].Image.Size.Width;
+                        var height = (int)images[0].Image.Size.Height;
                         imageinformation.SetCurrentSize(width.DpToPixels(), height.DpToPixels());
                     }
                 }
@@ -185,8 +185,8 @@ namespace FFImageLoading.Decoders
 
                     if (imageinformation != null)
                     {
-                        int width = (int)image.Size.Width;
-                        int height = (int)image.Size.Height;
+                        var width = (int)image.Size.Width;
+                        var height = (int)image.Size.Height;
                         imageinformation.SetCurrentSize(width.DpToPixels(), height.DpToPixels());
                     }
                 }
@@ -212,7 +212,7 @@ namespace FFImageLoading.Decoders
 #endif
         }
 
-        static List<int> GetDelays(CGImageSource source)
+        private static List<int> GetDelays(CGImageSource source)
         {
             var retval = new List<int>();
 
@@ -226,7 +226,7 @@ namespace FFImageLoading.Decoders
                     {
                         using (var unclampedDelay = gifProperties.ValueForKey(ImageIO.CGImageProperties.GIFUnclampedDelayTime))
                         {
-                            double delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString(), CultureInfo.InvariantCulture) : 0;
+                            var delayAsDouble = unclampedDelay != null ? double.Parse(unclampedDelay.ToString(), CultureInfo.InvariantCulture) : 0;
 
                             if (Math.Abs(delayAsDouble) < double.Epsilon)
                             {
@@ -246,7 +246,7 @@ namespace FFImageLoading.Decoders
             return retval;
         }
 
-        static CGSize RCTTargetSize(CGSize sourceSize, nfloat sourceScale, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode, bool allowUpscaling)
+        private static CGSize RCTTargetSize(CGSize sourceSize, nfloat sourceScale, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode, bool allowUpscaling)
         {
             switch (resizeMode)
             {
@@ -254,7 +254,7 @@ namespace FFImageLoading.Decoders
 
                     if (!allowUpscaling)
                     {
-                        nfloat scale = sourceScale / destScale;
+                        var scale = sourceScale / destScale;
                         destSize.Width = (nfloat)Math.Min(sourceSize.Width * scale, destSize.Width);
                         destSize.Height = (nfloat)Math.Min(sourceSize.Height * scale, destSize.Height);
                     }
@@ -262,7 +262,7 @@ namespace FFImageLoading.Decoders
 
                 default:
                     {
-                        CGSize size = RCTTargetRect(sourceSize, destSize, destScale, resizeMode).Size;
+                        var size = RCTTargetRect(sourceSize, destSize, destScale, resizeMode).Size;
                         if (!allowUpscaling)
                         {
                             // return sourceSize if target size is larger
@@ -276,12 +276,12 @@ namespace FFImageLoading.Decoders
             }
         }
 
-        static CGSize RCTSizeInPixels(CGSize pointSize, nfloat scale) => new CGSize(Math.Ceiling(pointSize.Width * scale), Math.Ceiling(pointSize.Height * scale));
-        static CGSize RCTCeilSize(CGSize size, nfloat scale) => new CGSize(RCTCeilValue(size.Width, scale), RCTCeilValue(size.Height, scale));
-        static nfloat RCTCeilValue(nfloat value, nfloat scale) => (nfloat)Math.Ceiling(value * scale) / scale;
-        static nfloat RCTFloorValue(nfloat value, nfloat scale) => (nfloat)Math.Floor(value * scale) / scale;
+        private static CGSize RCTSizeInPixels(CGSize pointSize, nfloat scale) => new CGSize(Math.Ceiling(pointSize.Width * scale), Math.Ceiling(pointSize.Height * scale));
+        private static CGSize RCTCeilSize(CGSize size, nfloat scale) => new CGSize(RCTCeilValue(size.Width, scale), RCTCeilValue(size.Height, scale));
+        private static nfloat RCTCeilValue(nfloat value, nfloat scale) => (nfloat)Math.Ceiling(value * scale) / scale;
+        private static nfloat RCTFloorValue(nfloat value, nfloat scale) => (nfloat)Math.Floor(value * scale) / scale;
 
-        static CGRect RCTTargetRect(CGSize sourceSize, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode)
+        private static CGRect RCTTargetRect(CGSize sourceSize, CGSize destSize, nfloat destScale, RCTResizeMode resizeMode)
         {
             if (destSize.IsEmpty)
             {
@@ -289,7 +289,7 @@ namespace FFImageLoading.Decoders
                 return new CGRect(CGPoint.Empty, sourceSize);
             }
 
-            nfloat aspect = sourceSize.Width / sourceSize.Height;
+            var aspect = sourceSize.Width / sourceSize.Height;
             // If only one dimension in destSize is non-zero (for example, an Image
             // with `flex: 1` whose height is indeterminate), calculate the unknown
             // dimension based on the aspect ratio of sourceSize

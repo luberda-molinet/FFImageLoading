@@ -12,7 +12,7 @@ namespace FFImageLoading
         {
             var exceptions = new List<Exception>();
 
-            for (int retry = -1; retry < retryCount; retry++)
+            for (var retry = -1; retry < retryCount; retry++)
             {
                 try
                 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace FFImageLoading
 {
@@ -9,8 +8,8 @@ namespace FFImageLoading
         {
             try
             {
-                int headerCount = 0;
-                bool sequenceStartCand = false;
+                var headerCount = 0;
+                var sequenceStartCand = false;
                 int readByte;
                 while ((readByte = st.ReadByte()) >= 0)
                 {

@@ -10,8 +10,7 @@ namespace FFImageLoading
     {
         public static bool IsValidAndHasValidBitmap(this BitmapDrawable drawable)
         {
-            var sdDrawable = drawable as ISelfDisposingBitmapDrawable;
-            if (sdDrawable != null)
+            if (drawable is ISelfDisposingBitmapDrawable sdDrawable)
             {
                 return drawable != null && drawable.Handle != IntPtr.Zero && sdDrawable.HasValidBitmap;
             }

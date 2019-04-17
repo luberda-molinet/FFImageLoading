@@ -1,5 +1,4 @@
-﻿using System;
-using FFImageLoading.Work;
+﻿using FFImageLoading.Work;
 using System.Threading.Tasks;
 using Android.Content;
 using System.IO;
@@ -17,8 +16,7 @@ namespace FFImageLoading.DataResolvers
             // Resource name is always without extension
             string resourceName = Path.GetFileNameWithoutExtension(identifier);
 
-            int resourceId = 0;
-            if (!_resourceIdentifiersCache.TryGetValue(resourceName, out resourceId))
+            if (!_resourceIdentifiersCache.TryGetValue(resourceName, out var resourceId))
             {
                 token.ThrowIfCancellationRequested();
                 resourceId = Context.Resources.GetIdentifier(resourceName.ToLowerInvariant(), "drawable", Context.PackageName);
@@ -42,7 +40,7 @@ namespace FFImageLoading.DataResolvers
                 stream, LoadingResult.CompiledResource, imageInformation));
         }
 
-        protected Context Context { get { return new ContextWrapper(Android.App.Application.Context); } }
+        protected Context Context => new ContextWrapper(Android.App.Application.Context);
     }
 }
 

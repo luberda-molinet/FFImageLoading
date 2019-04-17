@@ -63,7 +63,7 @@ namespace FFImageLoading.Svg.Platform
             ReplaceStringMap = replaceStringMap;
         }
 
-        public Configuration Configuration { get { return ImageService.Instance.Config; } }
+        public Configuration Configuration => ImageService.Instance.Config;
 
         public bool UseDipUnits { get; private set; }
 
@@ -75,7 +75,7 @@ namespace FFImageLoading.Svg.Platform
 
         public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
-            ImageSource source = parameters.Source;
+            var source = parameters.Source;
 
             if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
                 source = parameters.LoadingPlaceholderSource;
@@ -110,7 +110,7 @@ namespace FFImageLoading.Svg.Platform
                     var inputString = await reader.ReadToEndAsync();
 
                     foreach (var map in ReplaceStringMap
-                             .Where(v => v.Key.StartsWith("regex:")))
+                             .Where(v => v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
                     {
                         inputString = Regex.Replace(inputString, map.Key.Substring(6), map.Value);
                     }

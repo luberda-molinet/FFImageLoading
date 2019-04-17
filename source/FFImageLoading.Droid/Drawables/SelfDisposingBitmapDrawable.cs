@@ -11,10 +11,8 @@ using Android.Content.Res;
 using Android.Graphics;
 using System;
 using Android.Graphics.Drawables;
-using Android.Util;
 using Android.Runtime;
 using System.IO;
-using FFImageLoading.Work;
 
 namespace FFImageLoading.Drawables
 {
@@ -27,13 +25,11 @@ namespace FFImageLoading.Drawables
     /// </summary>
     public class SelfDisposingBitmapDrawable : BitmapDrawable, ISelfDisposingBitmapDrawable
     {
-        const string TAG = "SelfDisposingBitmapDrawable";
-        protected readonly object monitor = new object();
-
-        int cache_ref_count;
-        int display_ref_count;
-        int retain_ref_count;
-        bool is_bitmap_disposed;
+        protected readonly object _monitor = new object();
+        private int _cacheRefCount;
+        private int _displayRefCount;
+        private int _retainRefCount;
+        private bool _isBitmapDisposed;
 
         [Obsolete]
         public SelfDisposingBitmapDrawable() : base()
@@ -55,16 +51,6 @@ namespace FFImageLoading.Drawables
 
         [Obsolete]
         public SelfDisposingBitmapDrawable(Bitmap bitmap) : base(bitmap)
-        {
-        }
-
-        [Obsolete]
-        public SelfDisposingBitmapDrawable(Stream stream) : base(stream)
-        {
-        }
-
-        [Obsolete]
-        public SelfDisposingBitmapDrawable(string filePath) : base(filePath)
         {
         }
 
@@ -107,9 +93,9 @@ namespace FFImageLoading.Drawables
 
         public void SetNoLongerDisplayed()
         {
-            lock (monitor)
+            lock (_monitor)
             {
-                display_ref_count = 0;
+                _displayRefCount = 0;
                 SetIsDisplayed(false);
             }
         }
@@ -126,7 +112,7 @@ namespace FFImageLoading.Drawables
         public virtual void SetIsDisplayed(bool isDisplayed)
         {
             EventHandler handler = null;
-            lock (monitor)
+            lock (_monitor)
             {
                 if (isDisplayed && !HasValidBitmap)
                 {
@@ -134,27 +120,24 @@ namespace FFImageLoading.Drawables
                 }
                 else if (isDisplayed)
                 {
-                    display_ref_count++;
-                    if (display_ref_count == 1)
+                    _displayRefCount++;
+                    if (_displayRefCount == 1)
                     {
                         handler = Displayed;
                     }
                 }
                 else
                 {
-                    display_ref_count--;
+                    _displayRefCount--;
                 }
 
-                if (display_ref_count <= 0)
+                if (_displayRefCount <= 0)
                 {
-                    display_ref_count = 0;
+                    _displayRefCount = 0;
                     handler = NoLongerDisplayed;
                 }
             }
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            handler?.Invoke(this, EventArgs.Empty);
             CheckState();
         }
 
@@ -168,14 +151,14 @@ namespace FFImageLoading.Drawables
         /// <param name="isCached">If set to <c>true</c> is cached.</param>
         public void SetIsCached(bool isCached)
         {
-            lock (monitor)
+            lock (_monitor)
             {
                 if (isCached)
                 {
-                    cache_ref_count++;
+                    _cacheRefCount++;
                 }
                 else {
-                    cache_ref_count--;
+                    _cacheRefCount--;
                 }
             }
             CheckState();
@@ -193,14 +176,14 @@ namespace FFImageLoading.Drawables
         /// <param name="isRetained">If set to <c>true</c> is retained.</param>
         public void SetIsRetained(bool isRetained)
         {
-            lock (monitor)
+            lock (_monitor)
             {
                 if (isRetained)
                 {
-                    retain_ref_count++;
+                    _retainRefCount++;
                 }
                 else {
-                    retain_ref_count--;
+                    _retainRefCount--;
                 }
             }
             CheckState();
@@ -210,27 +193,27 @@ namespace FFImageLoading.Drawables
         {
             get
             {
-                lock (monitor)
+                lock (_monitor)
                 {
-                    return retain_ref_count > 0;
+                    return _retainRefCount > 0;
                 }
             }
         }
 
         protected virtual void OnFreeResources()
         {
-            lock (monitor)
+            lock (_monitor)
             {
                 if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
                     Bitmap.TryDispose();
 
-                is_bitmap_disposed = true;
+                _isBitmapDisposed = true;
             }
         }
 
-        void CheckState()
+        private void CheckState()
         {
-            lock (monitor)
+            lock (_monitor)
             {
                 if (ShouldFreeResources)
                 {
@@ -239,15 +222,15 @@ namespace FFImageLoading.Drawables
             }
         }
 
-        bool ShouldFreeResources
+        private bool ShouldFreeResources
         {
             get
             {
-                lock (monitor)
+                lock (_monitor)
                 {
-                    return cache_ref_count <= 0 &&
-                    display_ref_count <= 0 &&
-                    retain_ref_count <= 0 &&
+                    return _cacheRefCount <= 0 &&
+                    _displayRefCount <= 0 &&
+                    _retainRefCount <= 0 &&
                     HasValidBitmap;
                 }
             }
@@ -257,9 +240,9 @@ namespace FFImageLoading.Drawables
         {
             get
             {
-                lock (monitor)
+                lock (_monitor)
                 {
-                    return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !is_bitmap_disposed && !Bitmap.IsRecycled;
+                    return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !_isBitmapDisposed && !Bitmap.IsRecycled;
                 }
             }
         }

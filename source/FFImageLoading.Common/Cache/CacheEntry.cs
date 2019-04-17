@@ -2,7 +2,7 @@
 
 namespace FFImageLoading.Cache
 {
-    readonly struct CacheEntry
+    internal readonly struct CacheEntry
     {
         public readonly DateTime Origin;
         public readonly TimeSpan TimeToLive;

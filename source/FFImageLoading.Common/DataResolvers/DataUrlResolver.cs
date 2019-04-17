@@ -10,8 +10,8 @@ namespace FFImageLoading.DataResolvers
 {
     public class DataUrlResolver : IDataResolver
     {
-        readonly static Regex _regex1 = new Regex(@"data:(?<mime>[\w/]+);(?<encoding>\w+),(?<data>.*)");
-        readonly static Regex _regex2 = new Regex(@"data:(?<mime>.+?),(?<data>.+)");
+        private static readonly Regex _regex1 = new Regex(@"data:(?<mime>[\w/]+);(?<encoding>\w+),(?<data>.*)");
+        private static readonly Regex _regex2 = new Regex(@"data:(?<mime>.+?),(?<data>.+)");
 
         public Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
@@ -67,7 +67,7 @@ namespace FFImageLoading.DataResolvers
             return GetBase64Stream(data, imageInformation);
         }
 
-        Task<DataResolverResult> GetBase64Stream(string data, ImageInformation imageInformation)
+        private Task<DataResolverResult> GetBase64Stream(string data, ImageInformation imageInformation)
         {
             var streamBase64 = new MemoryStream(Convert.FromBase64String(data));
 
@@ -75,7 +75,7 @@ namespace FFImageLoading.DataResolvers
                 streamBase64, LoadingResult.EmbeddedResource, imageInformation));
         }
 
-        Task<DataResolverResult> GetRAWStream(string data, ImageInformation imageInformation)
+        private Task<DataResolverResult> GetRAWStream(string data, ImageInformation imageInformation)
         {
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
 

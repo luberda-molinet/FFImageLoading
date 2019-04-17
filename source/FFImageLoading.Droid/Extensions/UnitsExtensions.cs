@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FFImageLoading.Extensions
+﻿namespace FFImageLoading.Extensions
 {
     public static class UnitsExtensions
     {

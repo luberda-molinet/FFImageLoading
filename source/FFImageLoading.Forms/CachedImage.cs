@@ -72,14 +72,8 @@ namespace FFImageLoading.Forms
         /// <value>The aspect.</value>
         public Aspect Aspect
         {
-            get
-            {
-                return (Aspect)GetValue(AspectProperty);
-            }
-            set
-            {
-                SetValue(AspectProperty, value);
-            }
+            get => (Aspect)GetValue(AspectProperty);
+            set => SetValue(AspectProperty, value);
         }
 
         /// <summary>
@@ -96,13 +90,7 @@ namespace FFImageLoading.Forms
         /// Gets a value indicating whether this instance is loading.
         /// </summary>
         /// <value><c>true</c> if this instance is loading; otherwise, <c>false</c>.</value>
-        public bool IsLoading
-        {
-            get
-            {
-                return (bool)GetValue(IsLoadingProperty);
-            }
-        }
+        public bool IsLoading => (bool)GetValue(IsLoadingProperty);
 
         /// <summary>
         /// The is opaque property.
@@ -115,14 +103,8 @@ namespace FFImageLoading.Forms
         /// <value><c>true</c> if this instance is opaque; otherwise, <c>false</c>.</value>
         public bool IsOpaque
         {
-            get
-            {
-                return (bool)GetValue(IsOpaqueProperty);
-            }
-            set
-            {
-                SetValue(IsOpaqueProperty, value);
-            }
+            get => (bool)GetValue(IsOpaqueProperty);
+            set => SetValue(IsOpaqueProperty, value);
         }
 
         /// <summary>
@@ -130,12 +112,12 @@ namespace FFImageLoading.Forms
         /// </summary>
         public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof (Source), typeof(ImageSource), typeof(CachedImage), default(ImageSource), BindingMode.OneWay, coerceValue: CoerceImageSource, propertyChanged: OnSourcePropertyChanged);
 
-        static object CoerceImageSource(BindableObject bindable, object newValue)
+        private static object CoerceImageSource(BindableObject bindable, object newValue)
         {
             return ((CachedImage)bindable).CoerceImageSource(newValue);
         }
 
-        static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        private static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (!IsRendererInitialized)
                 throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
@@ -172,14 +154,8 @@ namespace FFImageLoading.Forms
         [TypeConverter(typeof(ImageSourceConverter))]
         public ImageSource Source
         {
-            get
-            {
-                return (ImageSource)GetValue(SourceProperty);
-            }
-            set
-            {
-                SetValue(SourceProperty, value);
-            }
+            get => (ImageSource)GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
 
         /// <summary>
@@ -192,14 +168,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public int RetryCount
         {
-            get
-            {
-                return (int)GetValue(RetryCountProperty);
-            }
-            set
-            {
-                SetValue(RetryCountProperty, value);
-            }
+            get => (int)GetValue(RetryCountProperty);
+            set => SetValue(RetryCountProperty, value);
         }
 
         /// <summary>
@@ -212,14 +182,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public int RetryDelay
         {
-            get
-            {
-                return (int)GetValue(RetryDelayProperty);
-            }
-            set
-            {
-                SetValue(RetryDelayProperty, value);
-            }
+            get => (int)GetValue(RetryDelayProperty);
+            set => SetValue(RetryDelayProperty, value);
         }
 
         /// <summary>
@@ -232,14 +196,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public int? LoadingDelay
         {
-            get
-            {
-                return (int?)GetValue(LoadingDelayProperty);
-            }
-            set
-            {
-                SetValue(LoadingDelayProperty, value);
-            }
+            get => (int?)GetValue(LoadingDelayProperty);
+            set => SetValue(LoadingDelayProperty, value);
         }
 
         /// <summary>
@@ -253,14 +211,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public double DownsampleWidth
         {
-            get
-            {
-                return (double)GetValue(DownsampleWidthProperty);
-            }
-            set
-            {
-                SetValue(DownsampleWidthProperty, value);
-            }
+            get => (double)GetValue(DownsampleWidthProperty);
+            set => SetValue(DownsampleWidthProperty, value);
         }
 
         /// <summary>
@@ -274,14 +226,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public double DownsampleHeight
         {
-            get
-            {
-                return (double)GetValue(DownsampleHeightProperty);
-            }
-            set
-            {
-                SetValue(DownsampleHeightProperty, value);
-            }
+            get => (double)GetValue(DownsampleHeightProperty);
+            set => SetValue(DownsampleHeightProperty, value);
         }
 
         /// <summary>
@@ -300,14 +246,8 @@ namespace FFImageLoading.Forms
         /// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
         public bool DownsampleToViewSize
         {
-            get
-            {
-                return (bool)GetValue(DownsampleToViewSizeProperty);
-            }
-            set
-            {
-                SetValue(DownsampleToViewSizeProperty, value);
-            }
+            get => (bool)GetValue(DownsampleToViewSizeProperty);
+            set => SetValue(DownsampleToViewSizeProperty, value);
         }
 
         /// <summary>
@@ -322,14 +262,8 @@ namespace FFImageLoading.Forms
         /// <value><c>true</c> if downsample use dip units; otherwise, <c>false</c>.</value>
         public bool DownsampleUseDipUnits
         {
-            get
-            {
-                return (bool)GetValue(DownsampleUseDipUnitsProperty);
-            }
-            set
-            {
-                SetValue(DownsampleUseDipUnitsProperty, value);
-            }
+            get => (bool)GetValue(DownsampleUseDipUnitsProperty);
+            set => SetValue(DownsampleUseDipUnitsProperty, value);
         }
 
         /// <summary>
@@ -342,14 +276,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public TimeSpan? CacheDuration
         {
-            get
-            {
-                return (TimeSpan?)GetValue(CacheDurationProperty);
-            }
-            set
-            {
-                SetValue(CacheDurationProperty, value);
-            }
+            get => (TimeSpan?)GetValue(CacheDurationProperty);
+            set => SetValue(CacheDurationProperty, value);
         }
 
         /// <summary>
@@ -362,14 +290,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public Work.LoadingPriority LoadingPriority
         {
-            get
-            {
-                return (Work.LoadingPriority)GetValue(LoadingPriorityProperty);
-            }
-            set
-            {
-                SetValue(LoadingPriorityProperty, value);
-            }
+            get => (Work.LoadingPriority)GetValue(LoadingPriorityProperty);
+            set => SetValue(LoadingPriorityProperty, value);
         }
 
         /// <summary>
@@ -383,14 +305,8 @@ namespace FFImageLoading.Forms
         /// <value>The bitmap optimizations.</value>
         public bool? BitmapOptimizations
         {
-            get
-            {
-                return (bool?)GetValue(BitmapOptimizationsProperty);
-            }
-            set
-            {
-                SetValue(BitmapOptimizationsProperty, value);
-            }
+            get => (bool?)GetValue(BitmapOptimizationsProperty);
+            set => SetValue(BitmapOptimizationsProperty, value);
         }
 
         /// <summary>
@@ -403,14 +319,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public bool? FadeAnimationForCachedImages
         {
-            get
-            {
-                return (bool?)GetValue(FadeAnimationForCachedImagesProperty);
-            }
-            set
-            {
-                SetValue(FadeAnimationForCachedImagesProperty, value);
-            }
+            get => (bool?)GetValue(FadeAnimationForCachedImagesProperty);
+            set => SetValue(FadeAnimationForCachedImagesProperty, value);
         }
 
         /// <summary>
@@ -423,14 +333,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public bool? FadeAnimationEnabled
         {
-            get
-            {
-                return (bool?)GetValue(FadeAnimationEnabledProperty);
-            }
-            set
-            {
-                SetValue(FadeAnimationEnabledProperty, value);
-            }
+            get => (bool?)GetValue(FadeAnimationEnabledProperty);
+            set => SetValue(FadeAnimationEnabledProperty, value);
         }
 
         /// <summary>
@@ -443,14 +347,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public int? FadeAnimationDuration
         {
-            get
-            {
-                return (int?)GetValue(FadeAnimationDurationProperty);
-            }
-            set
-            {
-                SetValue(FadeAnimationDurationProperty, value);
-            }
+            get => (int?)GetValue(FadeAnimationDurationProperty);
+            set => SetValue(FadeAnimationDurationProperty, value);
         }
 
         /// <summary>
@@ -464,14 +362,8 @@ namespace FFImageLoading.Forms
         [TypeConverter(typeof(ImageSourceConverter))]
         public ImageSource LoadingPlaceholder
         {
-            get
-            {
-                return (ImageSource)GetValue(LoadingPlaceholderProperty);
-            }
-            set
-            {
-                SetValue(LoadingPlaceholderProperty, value);
-            }
+            get => (ImageSource)GetValue(LoadingPlaceholderProperty);
+            set => SetValue(LoadingPlaceholderProperty, value);
         }
 
         /// <summary>
@@ -485,14 +377,8 @@ namespace FFImageLoading.Forms
         [TypeConverter(typeof(ImageSourceConverter))]
         public ImageSource ErrorPlaceholder
         {
-            get
-            {
-                return (ImageSource)GetValue(ErrorPlaceholderProperty);
-            }
-            set
-            {
-                SetValue(ErrorPlaceholderProperty, value);
-            }
+            get => (ImageSource)GetValue(ErrorPlaceholderProperty);
+            set => SetValue(ErrorPlaceholderProperty, value);
         }
 
         /// <summary>
@@ -506,14 +392,8 @@ namespace FFImageLoading.Forms
         /// <value>The transform placeholders.</value>
         public bool? TransformPlaceholders
         {
-            get
-            {
-                return (bool?)GetValue(TransformPlaceholdersProperty);
-            }
-            set
-            {
-                SetValue(TransformPlaceholdersProperty, value);
-            }
+            get => (bool?)GetValue(TransformPlaceholdersProperty);
+            set => SetValue(TransformPlaceholdersProperty, value);
         }
 
         /// <summary>
@@ -527,14 +407,8 @@ namespace FFImageLoading.Forms
         /// <value>The transformations.</value>
         public List<Work.ITransformation> Transformations
         {
-            get
-            {
-                return (List<Work.ITransformation>)GetValue(TransformationsProperty);
-            }
-            set
-            {
-                SetValue(TransformationsProperty, value);
-            }
+            get => (List<Work.ITransformation>)GetValue(TransformationsProperty);
+            set => SetValue(TransformationsProperty, value);
         }
 
         /// <summary>
@@ -548,17 +422,15 @@ namespace FFImageLoading.Forms
         /// <value>The invalidate layout after loaded.</value>
         public bool? InvalidateLayoutAfterLoaded
         {
-            get { return (bool?)GetValue(InvalidateLayoutAfterLoadedProperty); }
-            set { SetValue(InvalidateLayoutAfterLoadedProperty, value); }
+            get => (bool?)GetValue(InvalidateLayoutAfterLoadedProperty);
+            set => SetValue(InvalidateLayoutAfterLoadedProperty, value);
         }
 
-
-        static void HandleTransformationsPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
+        private static void HandleTransformationsPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
             if (oldValue != newValue)
             {
-                var cachedImage = bindable as CachedImage;
-                if (cachedImage != null && cachedImage.Source != null)
+                if (bindable is CachedImage cachedImage && cachedImage?.Source != null)
                 {
                     cachedImage.ReloadImage();
                 }
@@ -592,21 +464,21 @@ namespace FFImageLoading.Forms
 
         protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
         {
-            SizeRequest desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
+            var desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
 
-            double desiredWidth = desiredSize.Request.Width;
-            double desiredHeight = desiredSize.Request.Height;
+            var desiredWidth = desiredSize.Request.Width;
+            var desiredHeight = desiredSize.Request.Height;
 
-            if (desiredWidth == 0 || desiredHeight == 0)
+            if (Math.Abs(desiredWidth) < double.Epsilon || Math.Abs(desiredHeight) < double.Epsilon)
                 return new SizeRequest(new Size(0, 0));
 
             if (FixedOnMeasureBehavior)
             {
-                double desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
-                double constraintAspect = widthConstraint / heightConstraint;
+                var desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
+                var constraintAspect = widthConstraint / heightConstraint;
+                var width = desiredWidth;
+                var height = desiredHeight;
 
-                double width = desiredWidth;
-                double height = desiredHeight;
                 if (constraintAspect > desiredAspect)
                 {
                     // constraint area is proportionally wider than image
@@ -656,19 +528,19 @@ namespace FFImageLoading.Forms
 
             if (double.IsPositiveInfinity(widthConstraint))
             {
-                double factor = heightConstraint / desiredHeight;
+                var factor = heightConstraint / desiredHeight;
                 return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
             }
 
             if (double.IsPositiveInfinity(heightConstraint))
             {
-                double factor = widthConstraint / desiredWidth;
+                var factor = widthConstraint / desiredWidth;
                 return new SizeRequest(new Size(desiredWidth * factor, desiredHeight * factor));
             }
 
-            double fitsWidthRatio = widthConstraint / desiredWidth;
-            double fitsHeightRatio = heightConstraint / desiredHeight;
-            double ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
+            var fitsWidthRatio = widthConstraint / desiredWidth;
+            var fitsHeightRatio = heightConstraint / desiredHeight;
+            var ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
 
             return new SizeRequest(new Size(desiredWidth * ratioFactor, desiredHeight * ratioFactor));
         }
@@ -735,17 +607,14 @@ namespace FFImageLoading.Forms
         /// (downsampling and transformations variants)</param>
         public static async Task InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar = false)
         {
-            var fileImageSource = source as FileImageSource;
-            if (fileImageSource != null)
+            if (source is FileImageSource fileImageSource)
                 await ImageService.Instance.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar).ConfigureAwait(false);
 
-            var uriImageSource = source as UriImageSource;
-            if (uriImageSource != null)
+            if (source is UriImageSource uriImageSource)
                 await ImageService.Instance.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
 
-            var embResourceSource = source as EmbeddedResourceImageSource;
-            if (embResourceSource != null)
-              await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
+            if (source is EmbeddedResourceImageSource embResourceSource)
+                await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -755,7 +624,7 @@ namespace FFImageLoading.Forms
         /// <param name="cacheType">Cache type.</param>
         /// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
         /// (downsampling and transformations variants)</param>
-        public static Task InvalidateCache(string key, Cache.CacheType cacheType, bool removeSimilar = false)
+        public static Task InvalidateCache(string key, CacheType cacheType, bool removeSimilar = false)
         {
             return ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
         }
@@ -778,20 +647,13 @@ namespace FFImageLoading.Forms
         /// <value>The success command.</value>
         public ICommand SuccessCommand
         {
-            get
-            {
-                return (ICommand)GetValue(SuccessCommandProperty);
-            }
-            set
-            {
-                SetValue(SuccessCommandProperty, value);
-            }
+            get => (ICommand)GetValue(SuccessCommandProperty);
+            set => SetValue(SuccessCommandProperty, value);
         }
 
         internal void OnSuccess(CachedImageEvents.SuccessEventArgs e)
         {
-            var handler = Success;
-            if (handler != null) handler(this, e);
+            Success?.Invoke(this, e);
 
             var successCommand = SuccessCommand;
             if (successCommand != null && successCommand.CanExecute(e))
@@ -816,20 +678,13 @@ namespace FFImageLoading.Forms
         /// <value>The error command.</value>
         public ICommand ErrorCommand
         {
-            get
-            {
-                return (ICommand)GetValue(ErrorCommandProperty);
-            }
-            set
-            {
-                SetValue(ErrorCommandProperty, value);
-            }
+            get => (ICommand)GetValue(ErrorCommandProperty);
+            set => SetValue(ErrorCommandProperty, value);
         }
 
         internal void OnError(CachedImageEvents.ErrorEventArgs e)
         {
-            var handler = Error;
-            if (handler != null) handler(this, e);
+            Error?.Invoke(this, e);
 
             var errorCommand = ErrorCommand;
             if (errorCommand != null && errorCommand.CanExecute(e))
@@ -854,20 +709,13 @@ namespace FFImageLoading.Forms
         /// <value>The finish command.</value>
         public ICommand FinishCommand
         {
-            get
-            {
-                return (ICommand)GetValue(FinishCommandProperty);
-            }
-            set
-            {
-                SetValue(FinishCommandProperty, value);
-            }
+            get => (ICommand)GetValue(FinishCommandProperty);
+            set => SetValue(FinishCommandProperty, value);
         }
 
         internal void OnFinish(CachedImageEvents.FinishEventArgs e)
         {
-            var handler = Finish;
-            if (handler != null) handler(this, e);
+            Finish?.Invoke(this, e);
 
             var finishCommand = FinishCommand;
             if (finishCommand != null && finishCommand.CanExecute(e))
@@ -893,14 +741,8 @@ namespace FFImageLoading.Forms
         /// <value>The download started command.</value>
         public ICommand DownloadStartedCommand
         {
-            get
-            {
-                return (ICommand)GetValue(DownloadStartedCommandProperty);
-            }
-            set
-            {
-                SetValue(DownloadStartedCommandProperty, value);
-            }
+            get => (ICommand)GetValue(DownloadStartedCommandProperty);
+            set => SetValue(DownloadStartedCommandProperty, value);
         }
 
         internal void OnDownloadStarted(CachedImageEvents.DownloadStartedEventArgs e)
@@ -930,14 +772,8 @@ namespace FFImageLoading.Forms
         /// <value>The download started command.</value>
         public ICommand DownloadProgressCommand
         {
-            get
-            {
-                return (ICommand)GetValue(DownloadProgressCommandProperty);
-            }
-            set
-            {
-                SetValue(DownloadProgressCommandProperty, value);
-            }
+            get => (ICommand)GetValue(DownloadProgressCommandProperty);
+            set => SetValue(DownloadProgressCommandProperty, value);
         }
 
         internal void OnDownloadProgress(CachedImageEvents.DownloadProgressEventArgs e)
@@ -967,14 +803,8 @@ namespace FFImageLoading.Forms
         /// <value>The download started command.</value>
         public ICommand FileWriteFinishedCommand
         {
-            get
-            {
-                return (ICommand)GetValue(FileWriteFinishedCommandProperty);
-            }
-            set
-            {
-                SetValue(FileWriteFinishedCommandProperty, value);
-            }
+            get => (ICommand)GetValue(FileWriteFinishedCommandProperty);
+            set => SetValue(FileWriteFinishedCommandProperty, value);
         }
 
         internal void OnFileWriteFinished(CachedImageEvents.FileWriteFinishedEventArgs e)
@@ -996,14 +826,8 @@ namespace FFImageLoading.Forms
         /// </summary>
         public CacheType? CacheType
         {
-            get
-            {
-                return (CacheType?)GetValue(CacheTypeProperty);
-            }
-            set
-            {
-                SetValue(CacheTypeProperty, value);
-            }
+            get => (CacheType?)GetValue(CacheTypeProperty);
+            set => SetValue(CacheTypeProperty, value);
         }
 
         /// <summary>
@@ -1084,10 +908,10 @@ namespace FFImageLoading.Forms
 
             if (vect1 != null || vect2 != null || vect3 != null)
             {
-                int width = (int)((Width > 0 && !double.IsPositiveInfinity(Width)) ? Width 
+                var width = (int)((Width > 0 && !double.IsPositiveInfinity(Width)) ? Width 
                                   : ((WidthRequest > 0 && !double.IsPositiveInfinity(WidthRequest)) ? WidthRequest : 0));
                 
-                int height = (int)((Height > 0 && !double.IsPositiveInfinity(Height)) ? Height 
+                var height = (int)((Height > 0 && !double.IsPositiveInfinity(Height)) ? Height 
                                    : ((HeightRequest > 0 && !double.IsPositiveInfinity(HeightRequest)) ? HeightRequest : 0));
 
                 if (vect1 != null)

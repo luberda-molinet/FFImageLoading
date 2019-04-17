@@ -45,8 +45,8 @@ namespace FFImageLoading.Forms
 
         public Uri Uri
         {
-            get { return (Uri)GetValue(UriProperty); }
-            set { SetValue(UriProperty, value); }
+            get => (Uri)GetValue(UriProperty);
+            set => SetValue(UriProperty, value);
         }
 
         public override string ToString()

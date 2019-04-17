@@ -25,9 +25,11 @@ namespace FFImageLoading.Decoders
 
                 for (int i = 0; i < helper.Frames.Count; i++)
                 {
-                    var animatedImage = new AnimatedImage<Bitmap>();
-                    animatedImage.Delay = helper.Frames[i].Delay;
-                    animatedImage.Image = helper.Frames[i].Image;
+                    var animatedImage = new AnimatedImage<Bitmap>
+                    {
+                        Delay = helper.Frames[i].Delay,
+                        Image = helper.Frames[i].Image
+                    };
                     result.AnimatedImages[i] = animatedImage;
                 }
             }

@@ -178,17 +178,14 @@ namespace FFImageLoading.Work
 
         public bool? InvalidateLayoutEnabled { get; private set; }
 
-        bool preload;
+        private bool _preload;
         public bool Preload
         {
-            get
-            {
-                return preload;
-            }
+            get => _preload;
 
             internal set
             {
-                preload = value;
+                _preload = value;
 
                 if (value)
                 {
@@ -470,10 +467,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when loading succeded. Argument is the size of the image loaded.</param>
         public TaskParameter Success(Action<ImageInformation, LoadingResult> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnSuccess = action;
+            OnSuccess = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -484,10 +478,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when loading failed</param>
         public TaskParameter Error(Action<Exception> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnError = action;
+            OnError = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -498,10 +489,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when process is done</param>
         public TaskParameter Finish(Action<IScheduledWork> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnFinish = action;
+            OnFinish = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -512,10 +500,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter DownloadStarted(Action<DownloadInformation> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnDownloadStarted = action;
+            OnDownloadStarted = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -526,10 +511,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter DownloadProgress(Action<DownloadProgress> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnDownloadProgress = action;
+            OnDownloadProgress = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -540,10 +522,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter FileWriteFinished(Action<FileWriteInfo> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnFileWriteFinished = action;
+            OnFileWriteFinished = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -554,10 +533,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         internal TaskParameter LoadingPlaceholderSet(Action action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnLoadingPlaceholderSet = action;
+            OnLoadingPlaceholderSet = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -573,6 +549,8 @@ namespace FFImageLoading.Work
         {
             if (!_disposed)
             {
+                _disposed = true;
+
                 OnSuccess = null;
                 OnError = null;
                 OnFinish = null;
@@ -583,8 +561,6 @@ namespace FFImageLoading.Work
                 Stream = null;
                 StreamRead.TryDispose();
                 StreamRead = null;
-
-                _disposed = true;
             }
         }
     }

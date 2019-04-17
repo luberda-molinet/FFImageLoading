@@ -21,9 +21,9 @@ namespace FFImageLoading.Extensions
 {
     public static class NSDataExtensions
     {
-        public static PImage ToImage(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, BaseDecoder.RCTResizeMode resizeMode = BaseDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static PImage ToImage(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
-            var decoded = BaseDecoder.SourceRegfToDecodedImage(data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale);
+            var decoded = GifDecoder.SourceRegfToDecodedImage(data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale);
 
             PImage result;
 

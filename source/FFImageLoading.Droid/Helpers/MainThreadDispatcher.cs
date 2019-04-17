@@ -6,11 +6,11 @@ namespace FFImageLoading.Helpers
 {
     public class MainThreadDispatcher : IMainThreadDispatcher
     {
-        static Handler _handler = new Handler(Looper.MainLooper);
+        private static readonly Handler _handler = new Handler(Looper.MainLooper);
 
         public void Post(Action action)
         {
-            Looper currentLooper = Looper.MyLooper();
+            var currentLooper = Looper.MyLooper();
 
             if (currentLooper != null && currentLooper.Thread == Looper.MainLooper.Thread)
             {

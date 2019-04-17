@@ -16,9 +16,11 @@ namespace FFImageLoading
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<Bitmap, SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
+#pragma warning disable RECS0108 // Warns about static fields in generic types
         private static readonly int _maxDecodeOperations = Environment.ProcessorCount <= 2 ? 1 : 2;
         private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(_maxDecodeOperations, _maxDecodeOperations);
         private static readonly Color _placeholderHelperColor = Color.Argb(1, 255, 255, 255);
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
         public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {

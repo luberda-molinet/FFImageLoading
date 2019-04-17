@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace FFImageLoading
 {
     public class ThreadSafeCollection<T> : ICollection<T>
     {
-        readonly List<T> _list = new List<T>();
-        readonly object _lock = new object();
+        private readonly List<T> _list = new List<T>();
+        private readonly object _lock = new object();
 
         public int Count
         {
@@ -20,13 +21,7 @@ namespace FFImageLoading
             }
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return ((IList<T>)_list).IsReadOnly;
-            }
-        }
+        public bool IsReadOnly => ((IList<T>)_list).IsReadOnly;
 
         public void Add(T item)
         {

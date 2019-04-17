@@ -21,7 +21,7 @@ namespace FFImageLoading.Helpers
 
         public static T PostForResult<T>(Func<T> action)
         {
-            T result = default(T);
+            T result = default;
 
             if (NSThread.Current.IsMainThread)
             {
