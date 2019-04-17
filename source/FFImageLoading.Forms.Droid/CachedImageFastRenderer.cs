@@ -22,9 +22,6 @@ using AView = Android.Views.View;
 
 namespace FFImageLoading.Forms.Platform
 {
-
-
-
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
@@ -120,6 +117,7 @@ namespace FFImageLoading.Forms.Platform
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
                 _motionEventHelper?.UpdateElement(e.NewElement);
+                SetBackgroundColor(e.NewElement.BackgroundColor);
                 UpdateBitmap(Control, TypedElement, e.OldElement);
                 UpdateAspect();
             }
@@ -223,9 +221,18 @@ namespace FFImageLoading.Forms.Platform
             {
                 UpdateAspect();
             }
+            if (e.PropertyName == VisualElement.BackgroundColorProperty.PropertyName)
+            {
+                SetBackgroundColor(TypedElement.BackgroundColor);
+            }
 
             ElementPropertyChanged?.Invoke(this, e);
-        }   
+        }
+
+        private void SetBackgroundColor(Xamarin.Forms.Color color)
+        {
+            Control?.SetBackgroundColor(color.ToAndroid());
+        }
 
         protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
         {
