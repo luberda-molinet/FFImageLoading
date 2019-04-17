@@ -57,7 +57,7 @@ namespace FFImageLoading.Forms
             // Fix for issues with non-default visual style
             if (_visualProperty != null && _visualMarkerProperty != null)
             {
-                _visualProperty?.SetValue(this, _visualMarkerProperty.GetValue(null));
+                _visualProperty.SetValue(this, _visualMarkerProperty.GetValue(null));
             }
         }
 
