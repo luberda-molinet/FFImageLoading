@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -9,7 +7,6 @@ using FFImageLoading.Cache;
 using FFImageLoading.Config;
 using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
-using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 using FFImageLoading.Views;
 using FFImageLoading.Decoders;
@@ -19,7 +16,8 @@ namespace FFImageLoading
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<Bitmap, SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
-        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
+        private static readonly int _maxDecodeOperations = Environment.ProcessorCount <= 2 ? 1 : 2;
+        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(_maxDecodeOperations, _maxDecodeOperations);
         private static readonly Color _placeholderHelperColor = Color.Argb(1, 255, 255, 255);
 
         public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
