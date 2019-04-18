@@ -8,11 +8,7 @@ using System.Collections.Generic;
 
 namespace FFImageLoading.Svg.Forms
 {
-#if __IOS__
-            [Foundation.Preserve(AllMembers = true)]
-#elif __ANDROID__
-    [Android.Runtime.Preserve(AllMembers = true)]
-#endif
+    [Preserve(AllMembers = true)]
     /// <summary>
     /// SVG image source.
     /// </summary>

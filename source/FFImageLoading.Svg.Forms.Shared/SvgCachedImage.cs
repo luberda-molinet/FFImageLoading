@@ -5,12 +5,6 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
 {
-#if __IOS__
-            [Foundation.Preserve(AllMembers = true)]
-#elif __ANDROID__
-            [Android.Runtime.Preserve(AllMembers = true)]
-#endif
-
     [Preserve(AllMembers = true)]
     /// <summary>
     /// SvgCachedImage by Daniel Luberda

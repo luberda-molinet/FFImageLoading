@@ -12,6 +12,7 @@ using SkiaSharp;
 
 namespace FFImageLoading.Svg.Platform
 {
+    [Preserve(AllMembers = true)]
     public class SKSvg
     {
         private const float DefaultPPI = 160f;

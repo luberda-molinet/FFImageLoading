@@ -37,11 +37,7 @@ namespace FFImageLoading.Svg.Platform
     /// <summary>
     /// Svg data resolver.
     /// </summary>
-#if __IOS__
     [Preserve(AllMembers = true)]
-#elif __ANDROID__
-    [Preserve(AllMembers = true)]
-#endif
     public class SvgDataResolver : IVectorDataResolver
     {
         static readonly object _encodingLock = new object();
