@@ -690,6 +690,9 @@ namespace FFImageLoading.Svg.Platform
             var nodes = e.Nodes().ToArray();
             for (int i = 0; i < nodes.Length; i++)
             {
+                var clonedFill = fill.Clone();
+                ReadFontAttributes(e, clonedFill);
+
                 var c = nodes[i];
                 if (c.NodeType == XmlNodeType.Text)
                 {
@@ -707,17 +710,14 @@ namespace FFImageLoading.Svg.Platform
                             textSegments[count - 1] = textSegments[count - 1].TrimEnd();
                         var text = WSRe.Replace(string.Concat(textSegments), " ");
 
-                        spans.Append(new SKTextSpan(text, fill.Clone(), baselineShift: baselineShift));
+                        spans.Append(new SKTextSpan(text, clonedFill, baselineShift: baselineShift));
                     }
                 }
                 else if (c is XElement ce && ce.Name.LocalName == "tspan")
                 {
-                    var spanFill = fill.Clone();
-                    ReadFontAttributes(ce, spanFill);
-
                     if (ce.HasElements)
                     {
-                        ReadTextElement(ce, spans, textAlign, baselineShift, stroke, fill);
+                        ReadTextElement(ce, spans, textAlign, baselineShift, stroke, clonedFill);
                     }
                     else 
                     {
@@ -729,7 +729,7 @@ namespace FFImageLoading.Svg.Platform
                         // Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element!
                         baselineShift = ReadBaselineShift(ce);
 
-                        spans.Append(new SKTextSpan(text, spanFill, x, y, baselineShift));
+                        spans.Append(new SKTextSpan(text, clonedFill, x, y, baselineShift));
                     }
                 }
             }
