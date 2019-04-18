@@ -120,7 +120,12 @@ namespace FFImageLoading.Forms
         private static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (!IsRendererInitialized)
+            {
+                if (ImageService.EnableMockImageService)
+                    return;
+
                 throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
+            }
 
             if (newValue != null)
             {
