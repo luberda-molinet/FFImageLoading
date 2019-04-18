@@ -34,32 +34,39 @@ namespace FFImageLoading.Drawables
         [Obsolete]
         public SelfDisposingBitmapDrawable() : base()
         {
+            UpdateSizeInBytes();
         }
 
         [Obsolete]
         public SelfDisposingBitmapDrawable(Resources resources) : base(resources)
         {
+            UpdateSizeInBytes();
         }
 
         public SelfDisposingBitmapDrawable(Resources resources, Stream stream) : base(resources, stream)
         {
+            UpdateSizeInBytes();
         }
 
         public SelfDisposingBitmapDrawable(Resources resources, string filePath) : base(resources, filePath)
         {
+            UpdateSizeInBytes();
         }
 
         [Obsolete]
         public SelfDisposingBitmapDrawable(Bitmap bitmap) : base(bitmap)
         {
+            UpdateSizeInBytes();
         }
 
         public SelfDisposingBitmapDrawable(Resources resources, Bitmap bitmap) : base(resources, bitmap)
         {
+            UpdateSizeInBytes();
         }
 
         public SelfDisposingBitmapDrawable(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
         {
+            UpdateSizeInBytes();
         }
 
         public string InCacheKey { get; set; }
@@ -78,18 +85,12 @@ namespace FFImageLoading.Drawables
         /// </summary>
         public event EventHandler Displayed;
 
-        public int SizeInBytes
+        private void UpdateSizeInBytes()
         {
-            get
-            {
-                if (HasValidBitmap)
-                {
-                    return Bitmap.Height * Bitmap.RowBytes;
-                }
-
-                return 0;
-            }
+            SizeInBytes = HasValidBitmap ? Bitmap.Height * Bitmap.RowBytes : 0;
         }
+
+        public int SizeInBytes { get; private set; }
 
         public void SetNoLongerDisplayed()
         {
