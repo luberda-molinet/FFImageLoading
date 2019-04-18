@@ -34,6 +34,12 @@ namespace FFImageLoading
             }
         }
 
+        /// <summary>
+        /// Set this to use FFImageLoading in a unit test environment. 
+        /// Instead throwing DoNotReference exception - use Mock implementation
+        /// </summary>
+        public static bool EnableMockImageService { get; set; }
+
         protected override IMemoryCache<NSImage> MemoryCache => ImageCache.Instance;
         protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
         protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
