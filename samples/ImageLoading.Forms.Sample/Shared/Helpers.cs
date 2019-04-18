@@ -13,5 +13,10 @@ namespace FFImageLoading.Forms.Sample
         {
             return $"https://loremflickr.com/{width}/{height}/nature?random={Guid.NewGuid()}";
         }
+
+        public static string GetImageUrlAlt(int key, int width = 600, int height = 600)
+        {
+            return $"https://loremflickr.com/{width}/{height}/nature?random={key}";
+        }
     }
 }
