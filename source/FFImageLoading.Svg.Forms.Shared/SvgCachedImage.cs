@@ -26,7 +26,7 @@ namespace FFImageLoading.Svg.Forms
 
         protected override ImageSource CoerceImageSource(object newValue)
         {
-            var source = base.CoerceImageSource(newValue);;
+            var source = base.CoerceImageSource(newValue); ;
 
             var fileSource = source as FileImageSource;
             if (fileSource?.File != null)
@@ -75,6 +75,8 @@ namespace FFImageLoading.Svg.Forms
             return source;
         }
 
+        internal bool ReplaceStringMapHasChanged { get; set;}
+
         /// <summary>
         /// The error placeholder property.
         /// </summary>
@@ -87,20 +89,14 @@ namespace FFImageLoading.Svg.Forms
         /// <value>The replace string map.</value>
         public Dictionary<string, string> ReplaceStringMap
         {
-            get
-            {
-                return (Dictionary<string, string>)GetValue(ReplaceStringMapProperty);
-            }
-            set
-            {
-
-                SetValue(ReplaceStringMapProperty, value);
-            }
+            get => (Dictionary<string, string>)GetValue(ReplaceStringMapProperty);
+            set => SetValue(ReplaceStringMapProperty, value);
         }
 
         static void HandleReplaceStringMapPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
             var cachedImage = bindable as SvgCachedImage;
+            cachedImage.ReplaceStringMapHasChanged = true;
             cachedImage?.ReloadImage();
         }
 
@@ -113,18 +109,21 @@ namespace FFImageLoading.Svg.Forms
         {
             base.SetupOnBeforeImageLoading(imageLoader);
 
-            if (ReplaceStringMap != null)
+            if (ReplaceStringMapHasChanged)
             {
+                ReplaceStringMapHasChanged = false;
+
+                //TODO need to improve that
                 var source = imageLoader.CustomDataResolver as Work.IVectorDataResolver;
-                if (source != null && source.ReplaceStringMap == null)
+                if (source != null)
                     source.ReplaceStringMap = ReplaceStringMap;
 
                 var loadingSource = imageLoader.CustomLoadingPlaceholderDataResolver as Work.IVectorDataResolver;
-                if (loadingSource != null && loadingSource.ReplaceStringMap == null)
+                if (loadingSource != null)
                     loadingSource.ReplaceStringMap = ReplaceStringMap;
 
                 var errorSource = imageLoader.CustomErrorPlaceholderDataResolver as Work.IVectorDataResolver;
-                if (errorSource != null && errorSource.ReplaceStringMap == null)
+                if (errorSource != null)
                     errorSource.ReplaceStringMap = ReplaceStringMap;
             }
         }
