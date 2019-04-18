@@ -26,19 +26,6 @@ using Xamarin.Forms.Platform.MacOS;
 using System.IO;
 #endif
 
-#if __IOS__
-namespace FFImageLoading.Forms.Touch
-#elif __MACOS__
-namespace FFImageLoading.Forms.Mac
-#endif
-{
-    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
-    public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
-    {
-    }
-
-}
-
 namespace FFImageLoading.Forms.Platform
 {
     /// <summary>

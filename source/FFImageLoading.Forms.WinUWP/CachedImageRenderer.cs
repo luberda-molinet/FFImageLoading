@@ -31,19 +31,6 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls;
 #endif
 
-#if WINDOWS_UWP
-namespace FFImageLoading.Forms.WinUWP
-#else
-namespace FFImageLoading.Forms.WinRT
-#endif
-{
-    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
-    public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
-    {
-    }
-
-}
-
 namespace FFImageLoading.Forms.Platform
 {
     /// <summary>
