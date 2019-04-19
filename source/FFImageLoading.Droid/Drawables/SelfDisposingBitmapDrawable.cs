@@ -96,7 +96,12 @@ namespace FFImageLoading.Drawables
         {
             lock (_monitor)
             {
-                _displayRefCount = 0;
+                if (_displayRefCount <= 0)
+                    return;
+
+                _displayRefCount = 1;
+                _retainRefCount = 0;
+                _cacheRefCount = 0;
                 SetIsDisplayed(false);
             }
         }
@@ -113,11 +118,15 @@ namespace FFImageLoading.Drawables
         public virtual void SetIsDisplayed(bool isDisplayed)
         {
             EventHandler handler = null;
+
             lock (_monitor)
             {
+                if (!isDisplayed && _displayRefCount <= 0)
+                    return;
+
                 if (isDisplayed && !HasValidBitmap)
                 {
-                    System.Diagnostics.Debug.WriteLine("Cannot redisplay this drawable, its resources have been disposed.");
+                    ImageService.Instance.Config.Logger.Error("Cannot display drawable, its resources have been disposed.");
                 }
                 else if (isDisplayed)
                 {
@@ -130,14 +139,14 @@ namespace FFImageLoading.Drawables
                 else
                 {
                     _displayRefCount--;
-                }
 
-                if (_displayRefCount <= 0)
-                {
-                    _displayRefCount = 0;
-                    handler = NoLongerDisplayed;
+                    if (_displayRefCount <= 0)
+                    {
+                        handler = NoLongerDisplayed;
+                    }
                 }
             }
+
             handler?.Invoke(this, EventArgs.Empty);
             CheckState();
         }
@@ -186,8 +195,9 @@ namespace FFImageLoading.Drawables
                 else {
                     _retainRefCount--;
                 }
+
+                CheckState();
             }
-            CheckState();
         }
 
         public bool IsRetained
@@ -207,8 +217,10 @@ namespace FFImageLoading.Drawables
             {
                 _isBitmapDisposed = true;
 
-                if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
-                    Bitmap.TryDispose();
+                // TODO
+                // removed for scenarios when Bitmap from Drawable is used somewhere else independently
+                // if (Bitmap != null && Bitmap.Handle != IntPtr.Zero)
+                // Bitmap.TryDispose();
             }
         }
 
@@ -216,23 +228,12 @@ namespace FFImageLoading.Drawables
         {
             lock (_monitor)
             {
-                if (ShouldFreeResources)
-                {
-                    OnFreeResources();
-                }
-            }
-        }
-
-        private bool ShouldFreeResources
-        {
-            get
-            {
-                lock (_monitor)
-                {
-                    return _cacheRefCount <= 0 &&
+                if (_cacheRefCount <= 0 &&
                     _displayRefCount <= 0 &&
                     _retainRefCount <= 0 &&
-                    HasValidBitmap;
+                    HasValidBitmap)
+                {
+                    OnFreeResources();
                 }
             }
         }
@@ -241,11 +242,11 @@ namespace FFImageLoading.Drawables
         {
             get
             {
-                if (_isBitmapDisposed)
-                    return false;
-
                 lock (_monitor)
                 {
+                    if (_isBitmapDisposed)
+                        return false;
+
                     try
                     {
                         return Bitmap != null && Bitmap.Handle != IntPtr.Zero && !Bitmap.IsRecycled;
@@ -257,6 +258,24 @@ namespace FFImageLoading.Drawables
                 }
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            SetNoLongerDisplayed();
+        }
+
+        protected override void JavaFinalize()
+        {
+            base.JavaFinalize();
+            SetNoLongerDisplayed();
+        }
+
+        // TODO Measure if it's necessary
+        //~SelfDisposingBitmapDrawable()
+        //{
+        //	SetNoLongerDisplayed();
+        //}
     }
 }
 
