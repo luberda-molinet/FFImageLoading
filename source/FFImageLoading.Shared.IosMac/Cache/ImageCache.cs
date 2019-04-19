@@ -16,15 +16,15 @@ using PImage = UIKit.UIImage;
 
 namespace FFImageLoading.Cache
 {
-    internal class ImageCache : IMemoryCache<PImage>
+    public class ImageCache : IMemoryCache<PImage>
     {
-        readonly NSCache _cache;
-        static IMemoryCache<PImage> _instance;
-        readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
-        readonly IMiniLogger _logger;
-        readonly object _lock = new object();
+        private readonly NSCache _cache;
+        private static IMemoryCache<PImage> _instance;
+        private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
+        private readonly IMiniLogger _logger;
+        private readonly object _lock = new object();
 
-        ImageCache(int maxCacheSize, IMiniLogger logger)
+        public ImageCache(int maxCacheSize, IMiniLogger logger)
         {
             _logger = logger;
             _cache = new NSCache();
@@ -35,7 +35,7 @@ namespace FFImageLoading.Cache
             else
                 _cache.TotalCostLimit = (nuint)Math.Min((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
 
-            double sizeInMB = Math.Round(_cache.TotalCostLimit / 1024d / 1024d, 2);
+            var sizeInMB = Math.Round(_cache.TotalCostLimit / 1024d / 1024d, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
