@@ -196,6 +196,7 @@ namespace FFImageLoading.Cache
                         _log.Debug("[MEMORY_CACHE] Invoking GC.Collect");
 
                     GC.Collect();
+                    Java.Lang.JavaSystem.Gc();
                 }
             }
         }

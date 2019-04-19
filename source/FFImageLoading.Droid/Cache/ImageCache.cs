@@ -121,6 +121,9 @@ namespace FFImageLoading.Cache
                 _cache.Clear();
                 _imageInformations.Clear();
             }
+
+            GC.Collect();
+            Java.Lang.JavaSystem.Gc();
         }
 
         public ImageInformation GetInfo(string key)

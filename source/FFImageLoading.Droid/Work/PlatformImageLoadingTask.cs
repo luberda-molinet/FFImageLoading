@@ -213,6 +213,9 @@ namespace FFImageLoading
             {
                 if (ex is Java.Lang.Throwable javaException && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
                 {
+                    if (Configuration.ClearMemoryCacheOnOutOfMemory)
+                        Java.Lang.JavaSystem.Gc();
+
                     throw new OutOfMemoryException();
                 }
 
