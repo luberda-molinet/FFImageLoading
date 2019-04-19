@@ -34,9 +34,15 @@ namespace FFImageLoading
 
                 return _instance;
             }
-        }
+		}
 
-        protected override void PlatformSpecificConfiguration(Config.Configuration configuration)
+	    /// <summary>
+	    /// Set this to use FFImageLoading in a unit test environment. 
+	    /// Instead throwing DoNotReference exception - use Mock implementation
+	    /// </summary>
+	    public static bool EnableMockImageService { get; set; }
+
+		protected override void PlatformSpecificConfiguration(Config.Configuration configuration)
         {
             base.PlatformSpecificConfiguration(configuration);
 

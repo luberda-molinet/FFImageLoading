@@ -19,7 +19,7 @@ namespace FFImageLoading.Forms.Platform
 	/// <summary>
 	/// CachedImage Implementation
 	/// </summary>
-	//[Preserve(AllMembers = true)]
+	[Preserve(AllMembers = true)]
 	public class CachedImageRenderer : ViewRenderer<CachedImage, Image>
     {
         [RenderWith(typeof(CachedImageRenderer))]
@@ -212,11 +212,11 @@ namespace FFImageLoading.Forms.Platform
 
         async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-            {
-                if (element != null && !_isDisposed)
-                {
-                    if (!isLoading || !_isSizeSet)
+            if (element != null && !_isDisposed)
+			{
+				await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+				{
+					if (!isLoading || !_isSizeSet)
                     {
                         ((IVisualElementController)element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
                         _isSizeSet = true;
@@ -224,8 +224,8 @@ namespace FFImageLoading.Forms.Platform
 
                     if (!isLoading)
                         element.SetIsLoading(isLoading);
-                }
-            });
+				});
+			}
         }
 
         void ReloadImage()
