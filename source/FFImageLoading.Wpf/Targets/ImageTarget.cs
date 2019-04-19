@@ -56,7 +56,6 @@ namespace FFImageLoading.Targets
                 fade.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut };
 
                 Storyboard fadeInStoryboard = new Storyboard();
-                //todo
                 Storyboard.SetTargetProperty(fade, new PropertyPath("Opacity"));
                 Storyboard.SetTarget(fade, control);
                 fadeInStoryboard.Children.Add(fade);
