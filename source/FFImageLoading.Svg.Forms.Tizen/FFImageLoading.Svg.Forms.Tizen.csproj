@@ -34,5 +34,4 @@
 
   <Import Project="..\FFImageLoading.Svg.Forms.Shared\FFImageLoading.Svg.Forms.Shared.projitems" Label="Shared" />
  
-  <Import Project="..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets')" />
 </Project>
