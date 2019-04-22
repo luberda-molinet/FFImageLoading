@@ -23,7 +23,7 @@
        
           <group>
             <dependency id="Xamarin.FFImageLoading.Forms" version="@version" />
-            <dependency id="Xamarin.FFImageLoading.Svg" version="@version" />            
+            <dependency id="Xamarin.FFImageLoading.Svg" version="@version" />         
           </group>
               
         </dependencies>
