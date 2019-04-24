@@ -678,7 +678,7 @@ namespace FFImageLoading.Svg.Platform
 
             // textAlign is used for all spans within the <text> element. If different textAligns would be needed, it is necessary to use
             // several <text> elements instead of <tspan> elements
-            fill.TextAlign = SKTextAlign.Center;  // fixed alignment for all spans
+            fill.TextAlign = SKTextAlign.Left;  // fixed alignment for all spans
 
             ReadTextElement(e, spans, textAlign, baselineShift, stroke, fill);
 
