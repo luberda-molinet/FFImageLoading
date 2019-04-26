@@ -44,7 +44,6 @@ namespace FFImageLoading.Forms.Platform
         {
         }
 
-        bool _isSizeSet;
         private bool _measured;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
@@ -104,7 +103,6 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -227,22 +225,19 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            if (element != null && !_isDisposed)
-            {
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-                {
-                    if (!isLoading || !_isSizeSet)
-                    {
-                        ((IVisualElementController)element)?.InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
-                        _isSizeSet = true;
-                    }
+			if (element == null || _isDisposed || isLoading)
+				return;
 
-                    if (!isLoading)
-                        element.SetIsLoading(isLoading);
-                });
-            }
+			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			{
+				if (element == null || _isDisposed)
+					return;
+
+				((IVisualElementController)element).InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
+				element.SetIsLoading(isLoading);
+			});
         }
 
         void ReloadImage()

@@ -31,7 +31,6 @@ namespace FFImageLoading.Forms.Platform
         internal static readonly Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");
         private static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
         private static readonly MethodInfo _elementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
-        private bool _isSizeSet;
         private bool _isDisposed;
         private int? _defaultLabelFor;
         private VisualElementTracker _visualElementTracker;
@@ -160,8 +159,6 @@ namespace FFImageLoading.Forms.Platform
 
             if (!(element is CachedImage image))
                 throw new ArgumentException("Element is not of type " + typeof(CachedImage), nameof(element));
-
-            _isSizeSet = false;
 
             var oldElement = TypedElement;
             TypedElement = image;
@@ -317,25 +314,22 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
-        {
-            if (element != null && !_isDisposed)
-            {
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-                {
-                    if (!isLoading || !_isSizeSet)
-                    {
-                        ((IVisualElementController)element).NativeSizeChanged();
-                        _isSizeSet = true;
-                    }
+		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+		{
+			if (element == null || _isDisposed || isLoading)
+				return;
 
-                    if (!isLoading)
-                        element.SetIsLoading(isLoading);
-                });
-            }
-        }
+			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			{
+				if (element == null || _isDisposed)
+					return;
 
-        private void ReloadImage()
+				((IVisualElementController)element).NativeSizeChanged();
+				element.SetIsLoading(isLoading);
+			});
+		}
+
+		private void ReloadImage()
         {
             UpdateBitmap(Control, TypedElement, null);
         }

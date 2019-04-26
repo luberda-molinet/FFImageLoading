@@ -102,7 +102,6 @@ namespace FFImageLoading.Views
                                 return;
 
                             base.SetImageBitmap(bitmap);
-                            ;
                         }).ConfigureAwait(false);
                     }
                 }

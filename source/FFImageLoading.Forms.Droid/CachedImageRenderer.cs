@@ -66,8 +66,7 @@ namespace FFImageLoading.Forms.Platform
             var registerMethod = registrar.GetType().GetRuntimeMethod("Register", new[] { typeof(Type), typeof(Type) });
             registerMethod.Invoke(registrar, new[] { type, renderer });
         }
-
-        private bool _isSizeSet;
+        
         private bool _isDisposed;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
@@ -132,7 +131,6 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                _isSizeSet = false;
                 e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
@@ -238,20 +236,17 @@ namespace FFImageLoading.Forms.Platform
 
         private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
         {
-            if (element != null && !_isDisposed)
-            {
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-                {
-                    if (!isLoading || !_isSizeSet)
-                    {
-                        ((IVisualElementController)element).NativeSizeChanged();
-                        _isSizeSet = true;
-                    }
+			if (element == null || _isDisposed || isLoading)
+				return;
 
-                    if (!isLoading)
-                        element.SetIsLoading(isLoading);
-                });
-            }
+			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			{
+				if (element == null || _isDisposed)
+					return;
+
+				((IVisualElementController)element).NativeSizeChanged();
+				element.SetIsLoading(isLoading);
+			});
         }
 
         private void ReloadImage()
