@@ -225,20 +225,22 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
-        {
-			if (element == null || _isDisposed || isLoading)
+		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+		{
+			if (element == null || _isDisposed)
 				return;
-
+				
 			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;
 
 				((IVisualElementController)element).InvalidateMeasure(Xamarin.Forms.Internals.InvalidationTrigger.RendererReady);
-				element.SetIsLoading(isLoading);
+
+				if (!isLoading)
+					element.SetIsLoading(isLoading);
 			});
-        }
+		}
 
         void ReloadImage()
         {

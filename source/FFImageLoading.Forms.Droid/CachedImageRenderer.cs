@@ -68,7 +68,7 @@ namespace FFImageLoading.Forms.Platform
         }
         
         private bool _isDisposed;
-        private IScheduledWork _currentTask;
+		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
         private readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;
         private readonly static Type _platformDefaultRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.Platform+DefaultRenderer");
@@ -131,7 +131,7 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -234,9 +234,9 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
-        {
-			if (element == null || _isDisposed || isLoading)
+		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+		{
+			if (element == null || _isDisposed)
 				return;
 
 			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
@@ -245,11 +245,13 @@ namespace FFImageLoading.Forms.Platform
 					return;
 
 				((IVisualElementController)element).NativeSizeChanged();
-				element.SetIsLoading(isLoading);
-			});
-        }
 
-        private void ReloadImage()
+				if (!isLoading)
+					element.SetIsLoading(isLoading);
+			});
+		}
+
+		private void ReloadImage()
         {
             UpdateBitmap(Control, Element, null);
         }

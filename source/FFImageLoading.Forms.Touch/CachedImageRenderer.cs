@@ -40,7 +40,7 @@ namespace FFImageLoading.Forms.Platform
         }
         
         private bool _isDisposed;
-        private IScheduledWork _currentTask;
+		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
         private readonly object _updateBitmapLock = new object();
 
@@ -99,7 +99,7 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -221,7 +221,7 @@ namespace FFImageLoading.Forms.Platform
 
 		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
 		{
-			if (element == null || _isDisposed || isLoading)
+			if (element == null || _isDisposed)
 				return;
 
 			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
@@ -230,7 +230,9 @@ namespace FFImageLoading.Forms.Platform
 					return;
 
 				((IVisualElementController)element).NativeSizeChanged();
-				element.SetIsLoading(isLoading);
+
+				if (!isLoading)
+					element.SetIsLoading(isLoading);
 			});
 		}
 

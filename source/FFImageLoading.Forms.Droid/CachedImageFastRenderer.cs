@@ -32,7 +32,7 @@ namespace FFImageLoading.Forms.Platform
         private static readonly MethodInfo _viewExtensionsMethod = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.ViewExtensions")?.GetRuntimeMethod("EnsureId", new[] { typeof(Android.Views.View) });
         private static readonly MethodInfo _elementRendererTypeOnTouchEvent = ElementRendererType?.GetRuntimeMethod("OnTouchEvent", new[] { typeof(MotionEvent) });
         private bool _isDisposed;
-        private int? _defaultLabelFor;
+		private int? _defaultLabelFor;
         private VisualElementTracker _visualElementTracker;
         private IDisposable _visualElementRenderer;
         private IScheduledWork _currentTask;
@@ -110,7 +110,7 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
@@ -316,16 +316,18 @@ namespace FFImageLoading.Forms.Platform
 
 		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
 		{
-			if (element == null || _isDisposed || isLoading)
+			if (element == null || _isDisposed)
 				return;
-
+				
 			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;
 
 				((IVisualElementController)element).NativeSizeChanged();
-				element.SetIsLoading(isLoading);
+
+				if (!isLoading)
+					element.SetIsLoading(isLoading);
 			});
 		}
 
