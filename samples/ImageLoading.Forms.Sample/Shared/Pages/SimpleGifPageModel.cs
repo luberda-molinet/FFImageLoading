@@ -7,7 +7,7 @@ namespace FFImageLoading.Forms.Sample
     {
         public void Reload()
         {
-            ImageUrl = "https://media.giphy.com/media/l0Hlyi4ZMJI9MpFUQ/giphy.gif";
+            ImageUrl = "resource://tenor.gif";
         }
 
         public string ImageUrl { get; set; }

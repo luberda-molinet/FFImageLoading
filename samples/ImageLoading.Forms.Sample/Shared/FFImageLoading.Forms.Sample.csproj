@@ -34,10 +34,14 @@
     <ItemGroup>
         <None Remove="Resources\replace.svg" />
         <None Remove="Resources\sample.svg" />
+        <None Remove="Resources\tenor.gif" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Resources\replace.svg" />
         <EmbeddedResource Include="Resources\sample.svg" />
+        <EmbeddedResource Include="Resources\tenor.gif">
+          <LogicalName>tenor.gif</LogicalName>
+        </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
         <!-- https://bugzilla.xamarin.com/show_bug.cgi?id=55591 -->
