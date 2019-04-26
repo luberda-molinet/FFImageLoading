@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Xamarin.Forms;
 using Xamvvm;
+using FFImageLoading.Svg.Forms;
 
 namespace FFImageLoading.Forms.Sample
 {
@@ -22,7 +24,10 @@ namespace FFImageLoading.Forms.Sample
                     { "#TEXT", Guid.NewGuid().ToString() },
                     { "#FILLCOLOR", $"#{r:X2}{g:X2}{b:X2}" }
                 };
-            });
+
+				ImageSource = SvgImageSource.FromResource("FFImageLoading.Forms.Sample.Resources.replace.svg",
+					replaceStringMap: ReplaceMap);
+			});
 
             ReplaceCommand.Execute(null);
         }
@@ -30,5 +35,7 @@ namespace FFImageLoading.Forms.Sample
         public Dictionary<string, string> ReplaceMap { get; set; }
 
         public IBaseCommand ReplaceCommand { get; set; }
+
+		public ImageSource ImageSource { get; set; }
     }
 }

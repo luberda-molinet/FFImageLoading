@@ -24,7 +24,16 @@ namespace FFImageLoading.Svg.Forms
             ReplaceStringMap = new Dictionary<string, string>();
         }
 
-        protected override ImageSource CoerceImageSource(object newValue)
+		private class AutoSvgImageSource : SvgImageSource
+		{
+			public AutoSvgImageSource(ImageSource imageSource, int vectorWidth, int vectorHeight, bool useDipUnits, Dictionary<string, string> replaceStringMap = null)
+				: base (imageSource, vectorWidth, vectorHeight, useDipUnits, replaceStringMap)
+			{
+
+			}
+		}
+
+		protected override ImageSource CoerceImageSource(object newValue)
         {
             var source = base.CoerceImageSource(newValue); ;
 
@@ -33,11 +42,11 @@ namespace FFImageLoading.Svg.Forms
             {
                 if (fileSource.File.StartsWith("<", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new SvgImageSource(new DataUrlImageSource(fileSource.File), 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(new DataUrlImageSource(fileSource.File), 0, 0, true, ReplaceStringMap);
                 }
                 else if (fileSource.File.IsSvgFileUrl())
                 {
-                    return new SvgImageSource(fileSource, 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(fileSource, 0, 0, true, ReplaceStringMap);
                 }
             }
 
@@ -46,11 +55,11 @@ namespace FFImageLoading.Svg.Forms
             {
                 if (uriSource.Uri.OriginalString.IsSvgDataUrl())
                 {
-                    return new SvgImageSource(uriSource, 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(uriSource, 0, 0, true, ReplaceStringMap);
                 }
                 else if (uriSource.Uri.OriginalString.IsSvgFileUrl())
                 {
-                    return new SvgImageSource(uriSource, 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(uriSource, 0, 0, true, ReplaceStringMap);
                 }
             }
 
@@ -59,7 +68,7 @@ namespace FFImageLoading.Svg.Forms
             {
                 if (dataUrlSource.DataUrl.IsSvgDataUrl())
                 {
-                    return new SvgImageSource(dataUrlSource, 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(dataUrlSource, 0, 0, true, ReplaceStringMap);
                 }
             }
 
@@ -68,7 +77,7 @@ namespace FFImageLoading.Svg.Forms
             {
                 if (embeddedSource.Uri.OriginalString.IsSvgFileUrl())
                 {
-                    return new SvgImageSource(embeddedSource, 0, 0, true, ReplaceStringMap);
+                    return new AutoSvgImageSource(embeddedSource, 0, 0, true, ReplaceStringMap);
                 }
             }
 
@@ -77,10 +86,10 @@ namespace FFImageLoading.Svg.Forms
 
         internal bool ReplaceStringMapHasChanged { get; set;}
 
-        /// <summary>
-        /// The error placeholder property.
-        /// </summary>
-        public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>), propertyChanged: HandleReplaceStringMapPropertyChangedDelegate);
+		/// <summary>
+		/// The error placeholder property.
+		/// </summary>
+		public static readonly BindableProperty ReplaceStringMapProperty = BindableProperty.Create(nameof(ReplaceStringMap), typeof(Dictionary<string, string>), typeof(SvgCachedImage), default(Dictionary<string, string>), propertyChanged: HandleReplaceStringMapPropertyChangedDelegate);
 
         /// <summary>
         /// Used to define replacement map which will be used to
@@ -95,9 +104,9 @@ namespace FFImageLoading.Svg.Forms
 
         static void HandleReplaceStringMapPropertyChangedDelegate(BindableObject bindable, object oldValue, object newValue)
         {
-            var cachedImage = bindable as SvgCachedImage;
-            cachedImage.ReplaceStringMapHasChanged = true;
-            cachedImage?.ReloadImage();
+            var cachedImage = (SvgCachedImage)bindable;
+			cachedImage.ReplaceStringMapHasChanged = true;
+			cachedImage?.ReloadImage();
         }
 
         /// <summary>
@@ -112,18 +121,17 @@ namespace FFImageLoading.Svg.Forms
             if (ReplaceStringMapHasChanged)
             {
                 ReplaceStringMapHasChanged = false;
-
-                //TODO need to improve that
+                
                 var source = imageLoader.CustomDataResolver as Work.IVectorDataResolver;
-                if (source != null)
+                if (source != null && (Source is AutoSvgImageSource || source.ReplaceStringMap == null))
                     source.ReplaceStringMap = ReplaceStringMap;
 
                 var loadingSource = imageLoader.CustomLoadingPlaceholderDataResolver as Work.IVectorDataResolver;
-                if (loadingSource != null)
+                if (loadingSource != null && (LoadingPlaceholder is AutoSvgImageSource || loadingSource.ReplaceStringMap == null))
                     loadingSource.ReplaceStringMap = ReplaceStringMap;
 
                 var errorSource = imageLoader.CustomErrorPlaceholderDataResolver as Work.IVectorDataResolver;
-                if (errorSource != null)
+                if (errorSource != null && (ErrorPlaceholder is AutoSvgImageSource || errorSource.ReplaceStringMap == null))
                     errorSource.ReplaceStringMap = ReplaceStringMap;
             }
         }
