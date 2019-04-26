@@ -15,6 +15,12 @@ namespace FFImageLoading.Tests.ImageServiceTests
         public ImageServiceBaseTests()
         {
             ImageService.EnableMockImageService = true;
+			ImageService.Instance.Initialize(new Config.Configuration()
+			{
+
+				HttpHeadersTimeout = 10,
+				HttpReadTimeout = 30
+			});
         }
 
         [Fact]
