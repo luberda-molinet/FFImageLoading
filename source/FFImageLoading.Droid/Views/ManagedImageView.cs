@@ -6,6 +6,7 @@ using System;
 using Android.Runtime;
 using FFImageLoading.Drawables;
 using System.Threading;
+using System.Linq;
 
 namespace FFImageLoading.Views
 {
@@ -141,6 +142,7 @@ namespace FFImageLoading.Views
                     _drawableRef = new WeakReference<Drawable>(drawable);
                     UpdateDrawableDisplayedState(drawable, true);
                     UpdateDrawableDisplayedState(previous, false);
+					base.SetImageBitmap(gifDrawable.AnimatedImages.First().Image);
 
                     PlayGif(gifDrawable, _tcs);
                 }
