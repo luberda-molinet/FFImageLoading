@@ -126,10 +126,16 @@ namespace FFImageLoading.Svg.Platform
                 }
             }
 
-            double sizeX = 0;
-            double sizeY = 0;
+            double sizeX = VectorWidth;
+            double sizeY = VectorHeight;
 
-            if (VectorWidth <= 0 && VectorHeight <= 0)
+			if (UseDipUnits)
+			{
+				sizeX = VectorWidth.DpToPixels();
+				sizeY = VectorHeight.DpToPixels();
+			}
+
+			if (sizeX <= 0 && sizeY <= 0)
             {
                 if (picture.CullRect.Width > 0)
                     sizeX = picture.CullRect.Width;
@@ -141,26 +147,13 @@ namespace FFImageLoading.Svg.Platform
                 else
                     sizeY = 300;
             }
-            else if (VectorWidth > 0 && VectorHeight > 0)
+            else if (sizeX > 0 && sizeY <= 0)
             {
-                sizeX = VectorWidth;
-                sizeY = VectorHeight;
+                sizeY = (int)(sizeX / picture.CullRect.Width * picture.CullRect.Height);
             }
-            else if (VectorWidth > 0)
-            {
-                sizeX = VectorWidth;
-                sizeY = (VectorWidth / picture.CullRect.Width) * picture.CullRect.Height;
-            }
-            else
-            {
-                sizeX = (VectorHeight / picture.CullRect.Height) * picture.CullRect.Width;
-                sizeY = VectorHeight;
-            }
-
-            if (UseDipUnits)
-            {
-                sizeX = sizeX.DpToPixels();
-                sizeY = sizeY.DpToPixels();
+            else if (sizeX <= 0 && sizeY > 0)
+			{
+                sizeX = (int)(sizeY / picture.CullRect.Height * picture.CullRect.Width);
             }
 
             resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
