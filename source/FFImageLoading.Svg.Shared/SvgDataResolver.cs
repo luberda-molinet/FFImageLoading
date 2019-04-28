@@ -81,7 +81,7 @@ namespace FFImageLoading.Svg.Platform
 
 		private async Task<DataResolverResult> Decode(SKPicture picture, SKBitmap bitmap, DataResolverResult resolvedData)
 		{
-			await _decodingLock.WaitAsync();
+			await _decodingLock.WaitAsync().ConfigureAwait(false);
 
 			try
 			{
@@ -304,7 +304,7 @@ namespace FFImageLoading.Svg.Platform
                 canvas.DrawPicture(picture, ref matrix, paint);
                 canvas.Flush();
 
-				return await Decode(picture, bitmap, resolvedData);
+				return await Decode(picture, bitmap, resolvedData).ConfigureAwait(false);
 			}
         }
     }
