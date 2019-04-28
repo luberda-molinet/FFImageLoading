@@ -32,7 +32,7 @@ namespace FFImageLoading.Forms.Sample
 
             for (int i = 0; i < images.Length; i++)
             {
-                images[i] = Helpers.GetRandomImageUrlAlt(320, 240);
+                images[i] = Helpers.GetImageUrl(i, 320, 240);
             }
 
             for (int j = 0; j < 5; j++)
