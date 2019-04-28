@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FFImageLoading.Helpers;
 
 #if __IOS__
 using Foundation;
@@ -40,18 +41,27 @@ namespace FFImageLoading.Svg.Platform
     [Preserve(AllMembers = true)]
     public class SvgDataResolver : IVectorDataResolver
     {
-        static readonly object _encodingLock = new object();
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+		private static readonly object _encodingLock = new object();
+		private static readonly SemaphoreSlim _decodingLock = StaticLocks.DecodingLock;
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
-        /// Default SVG size is read from SVG file width / height attributes
-        /// You can override it by specyfing vectorWidth / vectorHeight params
-        /// </summary>
-        /// <param name="vectorWidth">Vector width.</param>
-        /// <param name="vectorHeight">Vector height.</param>
-        /// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
-        /// <param name="replaceStringMap">Replace string map.</param>
-        public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
+#if __IOS__
+		private static readonly CGColorSpace _colorSpace = CGColorSpace.CreateDeviceRGB();
+#elif __MACOS__
+		private static readonly CGColorSpace _colorSpace = CGColorSpace.CreateDeviceRGB();
+#endif
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:FFImageLoading.Svg.Platform.SvgDataResolver"/> class.
+		/// Default SVG size is read from SVG file width / height attributes
+		/// You can override it by specyfing vectorWidth / vectorHeight params
+		/// </summary>
+		/// <param name="vectorWidth">Vector width.</param>
+		/// <param name="vectorHeight">Vector height.</param>
+		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
+		/// <param name="replaceStringMap">Replace string map.</param>
+		public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
         {
             VectorWidth = vectorWidth;
             VectorHeight = vectorHeight;
@@ -69,7 +79,132 @@ namespace FFImageLoading.Svg.Platform
 
         public Dictionary<string, string> ReplaceStringMap { get; set; }
 
-        public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
+		private async Task<DataResolverResult> Decode(SKPicture picture, SKBitmap bitmap, DataResolverResult resolvedData)
+		{
+			await _decodingLock.WaitAsync();
+
+			try
+			{
+#if __IOS__
+                var info = bitmap.Info;            
+				using (var provider = new CGDataProvider(bitmap.GetPixels(out var size), size.ToInt32()))
+				using (var cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
+						_colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
+						provider, null, false, CGColorRenderingIntent.Default))
+				{
+					IDecodedImage<object> container = new DecodedImage<object>()
+					{
+						Image = new UIImage(cgImage),
+					};
+
+					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+				}
+#elif __MACOS__
+                var info = bitmap.Info;
+				using (var provider = new CGDataProvider(bitmap.GetPixels(out var size), size.ToInt32()))
+				using (var cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
+						_colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
+						provider, null, false, CGColorRenderingIntent.Default))
+				{
+					IDecodedImage<object> container = new DecodedImage<object>()
+					{
+						Image = new NSImage(cgImage, CGSize.Empty),
+					};
+					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+				}
+#elif __ANDROID__
+				using (var skiaPixmap = bitmap.PeekPixels())
+				{
+					var info = skiaPixmap.Info;
+
+					// destination values
+					var config = Bitmap.Config.Argb8888;
+					var dstInfo = new SKImageInfo(info.Width, info.Height);
+
+					// try keep the pixel format if we can
+					switch (info.ColorType)
+					{
+						case SKColorType.Alpha8:
+							config = Bitmap.Config.Alpha8;
+							dstInfo.ColorType = SKColorType.Alpha8;
+							break;
+						case SKColorType.Rgb565:
+							config = Bitmap.Config.Rgb565;
+							dstInfo.ColorType = SKColorType.Rgb565;
+							dstInfo.AlphaType = SKAlphaType.Opaque;
+							break;
+						case SKColorType.Argb4444:
+							config = Bitmap.Config.Argb4444;
+							dstInfo.ColorType = SKColorType.Argb4444;
+							break;
+					}
+
+					// destination bitmap
+					var bmp = Bitmap.CreateBitmap(info.Width, info.Height, config);
+					var ptr = bmp.LockPixels();
+
+					// copy
+					var success = skiaPixmap.ReadPixels(dstInfo, ptr, dstInfo.RowBytes);
+
+					// confirm
+					bmp.UnlockPixels();
+					if (!success)
+					{
+						bmp.Recycle();
+						bmp.Dispose();
+						bmp = null;
+					}
+
+					IDecodedImage<object> container = new DecodedImage<object>()
+					{
+						Image = bmp,
+					};
+					return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+				}
+#elif __WINDOWS__
+                //var pixels = bitmap.Pixels;
+                //for (int i = 0; i < pixels.Length; i++)
+                //{
+                //	int bytePos = i * 4;
+                //	var color = pixels[i];
+
+                //	pixelData[bytePos] = color.Blue;
+                //	pixelData[bytePos + 1] = color.Green;
+                //	pixelData[bytePos + 2] = color.Red;
+                //	pixelData[bytePos + 3] = color.Alpha;
+                //}
+
+                byte[] pixelData = new byte[bitmap.Width * bitmap.Height * 4];
+                System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixelData, 0, bitmap.Width * bitmap.Height * 4);
+
+                IDecodedImage<object> container = new DecodedImage<object>()
+                {
+                    Image = new BitmapHolder(pixelData, bitmap.Width, bitmap.Height),
+                };
+
+                return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
+#else
+				lock (_encodingLock)
+				{
+					using (var image = SKImage.FromBitmap(bitmap))
+					//using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
+					using (var data = image.Encode())
+					{
+						var stream = new MemoryStream();
+						data.SaveTo(stream);
+						stream.Position = 0;
+						return new DataResolverResult(stream, resolvedData.LoadingResult, resolvedData.ImageInformation);
+					}
+				}
+#endif
+			}
+			finally
+			{
+				_decodingLock.Release();
+			}
+		}
+
+		public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var source = parameters.Source;
 
@@ -163,128 +298,14 @@ namespace FFImageLoading.Svg.Platform
             using (var paint = new SKPaint())
             {
                 canvas.Clear(SKColors.Transparent);
-                float scaleX = (float)sizeX / picture.CullRect.Width;
-                float scaleY = (float)sizeY / picture.CullRect.Height;
+                var scaleX = (float)sizeX / picture.CullRect.Width;
+                var scaleY = (float)sizeY / picture.CullRect.Height;
                 var matrix = SKMatrix.MakeScale(scaleX, scaleY);
                 canvas.DrawPicture(picture, ref matrix, paint);
                 canvas.Flush();
-#if __IOS__
-                var info = bitmap.Info;            
-                CGImage cgImage;
-                IntPtr size;
-                using (var provider = new CGDataProvider(bitmap.GetPixels(out size), size.ToInt32()))
-                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-                using (cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
-                        colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
-                        provider, null, false, CGColorRenderingIntent.Default))
-                {
-                    IDecodedImage<object> container = new DecodedImage<object>()
-                    {
-                        Image = new UIImage(cgImage),
-                    };
-                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);	
-                }            
-#elif __MACOS__
-                var info = bitmap.Info;
-                CGImage cgImage;
-                IntPtr size;
-                using (var provider = new CGDataProvider(bitmap.GetPixels(out size), size.ToInt32()))
-                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-                using (cgImage = new CGImage(info.Width, info.Height, 8, info.BitsPerPixel, info.RowBytes,
-                        colorSpace, CGBitmapFlags.PremultipliedLast | CGBitmapFlags.ByteOrder32Big,
-                        provider, null, false, CGColorRenderingIntent.Default))
-                {
-                    IDecodedImage<object> container = new DecodedImage<object>()
-                    {
-                        Image = new NSImage(cgImage, CGSize.Empty),
-                    };
-                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
-                }
-#elif __ANDROID__
-                using (var skiaPixmap = bitmap.PeekPixels())
-                {
-                    var info = skiaPixmap.Info;
 
-                    // destination values
-                    var config = Bitmap.Config.Argb8888;
-                    var dstInfo = new SKImageInfo(info.Width, info.Height);
-
-                    // try keep the pixel format if we can
-                    switch (info.ColorType)
-                    {
-                        case SKColorType.Alpha8:
-                            config = Bitmap.Config.Alpha8;
-                            dstInfo.ColorType = SKColorType.Alpha8;
-                            break;
-                        case SKColorType.Rgb565:
-                            config = Bitmap.Config.Rgb565;
-                            dstInfo.ColorType = SKColorType.Rgb565;
-                            dstInfo.AlphaType = SKAlphaType.Opaque;
-                            break;
-                        case SKColorType.Argb4444:
-                            config = Bitmap.Config.Argb4444;
-                            dstInfo.ColorType = SKColorType.Argb4444;
-                            break;
-                    }
-
-                    // destination bitmap
-                    var bmp = Bitmap.CreateBitmap(info.Width, info.Height, config);
-                    var ptr = bmp.LockPixels();
-
-                    // copy
-                    var success = skiaPixmap.ReadPixels(dstInfo, ptr, dstInfo.RowBytes);
-
-                    // confirm
-                    bmp.UnlockPixels();
-                    if (!success)
-                    {
-                        bmp.Recycle();
-                        bmp.Dispose();
-                        bmp = null;
-                    }
-
-                    IDecodedImage<object> container = new DecodedImage<object>()
-                    {
-                        Image = bmp,
-                    };
-                    return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
-                }
-#elif __WINDOWS__
-                //var pixels = bitmap.Pixels;
-                //for (int i = 0; i < pixels.Length; i++)
-                //{
-                //	int bytePos = i * 4;
-                //	var color = pixels[i];
-
-                //	pixelData[bytePos] = color.Blue;
-                //	pixelData[bytePos + 1] = color.Green;
-                //	pixelData[bytePos + 2] = color.Red;
-                //	pixelData[bytePos + 3] = color.Alpha;
-                //}
-
-                byte[] pixelData = new byte[bitmap.Width * bitmap.Height * 4];
-                System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixelData, 0, bitmap.Width * bitmap.Height * 4);
-
-                IDecodedImage<object> container = new DecodedImage<object>()
-                {
-                    Image = new BitmapHolder(pixelData, bitmap.Width, bitmap.Height),
-                };
-
-                return new DataResolverResult(container, resolvedData.LoadingResult, resolvedData.ImageInformation);
-#endif
-                lock (_encodingLock)
-                {
-                    using (var image = SKImage.FromBitmap(bitmap))
-                    //using (var data = image.Encode(SKImageEncodeFormat.Png, 100))  //TODO disabled because of https://github.com/mono/SkiaSharp/issues/285
-                    using (var data = image.Encode())
-                    {
-                        var stream = new MemoryStream();
-                        data.SaveTo(stream);
-                        stream.Position = 0;
-                        return new DataResolverResult(stream, resolvedData.LoadingResult, resolvedData.ImageInformation);
-                    }
-                }
-            }
+				return await Decode(picture, bitmap, resolvedData);
+			}
         }
     }
 }
