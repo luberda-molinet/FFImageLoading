@@ -29,7 +29,8 @@ namespace FFImageLoading.Config
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
-            SchedulerMaxParallelTasks = Math.Max(16, 4 + Environment.ProcessorCount);
+			DecodingMaxParallelTasks = Environment.ProcessorCount <= 2 ? 1 : 2;
+			SchedulerMaxParallelTasks = Math.Max(16, 4 + Environment.ProcessorCount);
             DiskCacheDuration = TimeSpan.FromDays(30d);
             TryToReadDiskCacheDurationFromHttpHeaders = true;
             ExecuteCallbacksOnUIThread = false;
@@ -202,12 +203,19 @@ namespace FFImageLoading.Config
         /// <value>The verbose logging.</value>
         public bool VerboseLogging { get; set; }
 
-        /// <summary>
-        /// Gets or sets the scheduler max parallel tasks.
-        /// Default is: Math.Max(2, (int)(Environment.ProcessorCount / 2d))
-        /// </summary>
-        /// <value>The scheduler max parallel tasks.</value>
-        public int SchedulerMaxParallelTasks { get; set; }
+		/// <summary>
+		/// Gets or sets the scheduler max parallel tasks.
+		/// Default: Environment.ProcessorCount <= 2 ? 1 : 2;
+		/// </summary>
+		/// <value>The decoding max parallel tasks.</value>
+		public int DecodingMaxParallelTasks { get; set; }
+
+		/// <summary>
+		/// Gets or sets the scheduler max parallel tasks.
+		/// Default: Math.Max(16, 4 + Environment.ProcessorCount);
+		/// </summary>
+		/// <value>The scheduler max parallel tasks.</value>
+		public int SchedulerMaxParallelTasks { get; set; }
 
         /// <summary>
         /// Gets or sets the scheduler max parallel tasks factory.

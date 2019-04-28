@@ -14,8 +14,6 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<SharedEvasImage, SharedEvasImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
-
         public PlatformImageLoaderTask(ITarget<SharedEvasImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(EvasImageCache.Instance, target, parameters, imageService)
         {
         }

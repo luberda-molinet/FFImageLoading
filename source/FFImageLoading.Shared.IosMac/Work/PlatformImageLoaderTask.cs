@@ -26,7 +26,6 @@ namespace FFImageLoading.Work
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, PImage, TImageView> where TImageView : class
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
-        private static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
         private static readonly IDecoder<PImage> _webpDecoder = new WebPDecoder();
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 

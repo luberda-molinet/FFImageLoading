@@ -128,8 +128,11 @@ namespace FFImageLoading
                     {
                     }
                 }
+                
+				if (StaticLocks.DecodingLock == null)
+					StaticLocks.DecodingLock = new SemaphoreSlim(userDefinedConfig.DecodingMaxParallelTasks, userDefinedConfig.DecodingMaxParallelTasks);
 
-                if (userDefinedConfig.Logger == null || !(userDefinedConfig.Logger is MiniLoggerWrapper))
+				if (userDefinedConfig.Logger == null || !(userDefinedConfig.Logger is MiniLoggerWrapper))
                     userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(userDefinedConfig), userDefinedConfig.VerboseLogging);
 
                 userDefinedConfig.MD5Helper = userDefinedConfig.MD5Helper ?? CreatePlatformMD5HelperInstance(userDefinedConfig);

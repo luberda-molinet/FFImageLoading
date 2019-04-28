@@ -17,10 +17,11 @@ namespace FFImageLoading.Work
         private bool _isLoadingPlaceholderLoaded;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
-        private static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
+		protected static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
+		protected static readonly SemaphoreSlim _decodingLock = StaticLocks.DecodingLock;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        protected ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
+		protected ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
         {
             MemoryCache = memoryCache;
             DataResolverFactory = imageService.Config.DataResolverFactory;
