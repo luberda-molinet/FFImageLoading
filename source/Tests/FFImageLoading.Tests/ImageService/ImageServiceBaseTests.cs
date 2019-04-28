@@ -18,8 +18,8 @@ namespace FFImageLoading.Tests.ImageServiceTests
 			ImageService.Instance.Initialize(new Config.Configuration()
 			{
 
-				HttpHeadersTimeout = 10,
-				HttpReadTimeout = 30
+				HttpHeadersTimeout = 15,
+				HttpReadTimeout = 40
 			});
         }
 
