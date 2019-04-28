@@ -169,7 +169,8 @@ namespace FFImageLoading.Svg.Platform
             {
                 // if there is no viewbox, then we don't do anything, otherwise
                 // scale the SVG dimensions to fit inside the user dimensions
-                if (!ViewBox.IsEmpty && (ViewBox.Width != CanvasSize.Width || ViewBox.Height != CanvasSize.Height))
+                if (!ViewBox.IsEmpty && (Math.Abs(ViewBox.Width - CanvasSize.Width) > float.Epsilon 
+					|| Math.Abs(ViewBox.Height - CanvasSize.Height) > float.Epsilon))
                 {
                     if (preserveAspectRatio == "none")
                     {
