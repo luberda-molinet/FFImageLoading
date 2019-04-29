@@ -1130,16 +1130,16 @@ namespace FFImageLoading.Svg.Platform
             }
             else
             {
-                if (string.IsNullOrEmpty(stroke))
+                if (string.IsNullOrEmpty(stroke) || stroke == "inherit")
                 {
                     // no change
                 }
                 else
                 {
-                    if (strokePaint == null)
+                    if (strokePaint == null || stroke == "initial")
                         strokePaint = CreatePaint(true);
 
-                    if (ColorHelper.TryParse(stroke, out SKColor color))
+					if (ColorHelper.TryParse(stroke, out SKColor color))
                     {
                         // preserve alpha
                         if (color.Alpha == 255 && strokePaint.Color.Alpha > 0)
@@ -1226,14 +1226,18 @@ namespace FFImageLoading.Svg.Platform
             }
             else
             {
-                if (string.IsNullOrEmpty(fill))
+                if (string.IsNullOrEmpty(fill) || fill == "inherit")
                 {
                     // no change
                 }
+				else if (fill == "initial")
+				{
+					fillPaint = CreatePaint();
+				}
                 else
                 {
                     fillPaint = CreatePaint();
-
+                    
                     if (ColorHelper.TryParse(fill, out var color))
                     {
                         // preserve alpha
