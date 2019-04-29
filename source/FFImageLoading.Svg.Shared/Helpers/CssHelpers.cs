@@ -14,13 +14,13 @@ namespace FFImageLoading.Svg.Platform
 
             var items =
                 Regex
-                    .Matches(css.Minify(), @"(?<selectors>[a-z0-9_\-\.,\s#]+)\s*{(?<declarations>.+?)}", RegexOptions.IgnoreCase)
+                    .Matches(css.Minify(), @"(?<selectors>[A-Za-z0-9_\-\.,\s#]+)\s*{(?<declarations>.+?)}", RegexOptions.IgnoreCase)
                     .Cast<Match>()
                     .Select(m => Regex
                         .Split(m.Groups["selectors"].Value, @",")
                         .Where(s => !string.IsNullOrEmpty(s))
                         .Select(selector => new KeyValuePair<string, string>(
-                            key: selector.Trim().ToLowerInvariant(),
+                            key: selector.Trim(),
                             value: m.Groups["declarations"].Value.Trim())))
                     .SelectMany(x => x);
 
