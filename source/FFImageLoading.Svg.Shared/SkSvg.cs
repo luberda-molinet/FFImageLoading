@@ -31,8 +31,10 @@ namespace FFImageLoading.Svg.Platform
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
         private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
         private readonly Dictionary<string, ISKSvgFill> fillDefs = new Dictionary<string, ISKSvgFill>();
-        private readonly Dictionary<XElement, string> elementFills = new Dictionary<XElement, string>();
-        private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
+		private readonly Dictionary<string, ISKSvgFill> strokeFillDefs = new Dictionary<string, ISKSvgFill>();
+		private readonly Dictionary<XElement, string> elementFills = new Dictionary<XElement, string>();
+		private readonly Dictionary<XElement, string> strokeElementFills = new Dictionary<XElement, string>();
+		private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
         {
             DtdProcessing = DtdProcessing.Ignore,
             IgnoreComments = true,
@@ -287,7 +289,8 @@ namespace FFImageLoading.Svg.Platform
                         if (elementPath == null)
                             break;
 
-                        if (elementFills.TryGetValue(e, out var fillId) && fillDefs.TryGetValue(fillId, out var addFill))
+                        if (fill != null && elementFills.TryGetValue(e, out var fillId) 
+							&& fillDefs.TryGetValue(fillId, out var addFill))
                         {
                             var points = ReadElementXY(e);
                             var elementSize = ReadElementSize(e);
@@ -296,28 +299,38 @@ namespace FFImageLoading.Svg.Platform
                             addFill.ApplyFill(fill, bounds);
                         }
 
-                            if (mask != null)
+						if (stroke != null && strokeElementFills.TryGetValue(e, 
+							out var strokeFillId) && strokeFillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
+						{
+							var points = ReadElementXY(e);
+							var elementSize = ReadElementSize(e);
+							var bounds = SKRect.Create(new SKPoint(points.X, points.Y), elementSize);
+
+							addStrokeFill.ApplyFill(stroke, bounds);
+						}
+
+						if (mask != null)
+                        {
+                            canvas.SaveLayer(new SKPaint());
+                            foreach (var gElement in mask.Element.Elements())
                             {
-                                canvas.SaveLayer(new SKPaint());
-                                foreach (var gElement in mask.Element.Elements())
-                                {
-                                    ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
-                                }
-                                using (var paint = fill?.Clone() ?? CreatePaint())
-                                {
-                                    paint.BlendMode = SKBlendMode.SrcIn;
-                                    canvas.DrawPath(elementPath, paint);
-                                }
-                                canvas.Restore();
+                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
                             }
-                            else if (fill != null)
+                            using (var paint = fill?.Clone() ?? CreatePaint())
                             {
-                                canvas.DrawPath(elementPath, fill);
+                                paint.BlendMode = SKBlendMode.SrcIn;
+                                canvas.DrawPath(elementPath, paint);
                             }
-                            else if (stroke != null)
-                            {
-                                canvas.DrawPath(elementPath, stroke);
-                            }
+                            canvas.Restore();
+                        }
+                        else if (fill != null)
+                        {
+                            canvas.DrawPath(elementPath, fill);
+                        }
+                        else if (stroke != null)
+                        {
+                            canvas.DrawPath(elementPath, stroke);
+                        }
                     }
                     break;
                 case "g":
@@ -1107,17 +1120,21 @@ namespace FFImageLoading.Svg.Platform
         {
             var style = ReadStyle(e);
 
-            ReadPaints(style, ref stroke, ref fill, isGroup, out var fillId);
+            ReadPaints(style, ref stroke, ref fill, isGroup, out var fillId, out var strokeFillId);
 
             if (fillId != null)
                 elementFills[e] = fillId;
 
-            return style;
+			if (strokeFillId != null)
+				strokeElementFills[e] = strokeFillId;
+
+			return style;
         }
 
-        private void ReadPaints(Dictionary<string, string> style, ref SKPaint strokePaint, ref SKPaint fillPaint, bool isGroup, out string fillId)
+        private void ReadPaints(Dictionary<string, string> style, ref SKPaint strokePaint, ref SKPaint fillPaint, bool isGroup, out string fillId, out string strokeFillId)
         {
             fillId = null;
+			strokeFillId = null;
 
             // get current element opacity, but ignore for groups (special case)
             float elementOpacity = isGroup ? 1.0f : ReadOpacity(style);
@@ -1147,6 +1164,39 @@ namespace FFImageLoading.Svg.Platform
                         else
                             strokePaint.Color = color;
                     }
+					else
+					{
+						var urlM = urlRe.Match(stroke);
+						if (urlM.Success)
+						{
+							var id = urlM.Groups[1].Value.Trim();
+							if (defs.TryGetValue(id, out var defE))
+							{
+								switch (defE.Name.LocalName.ToLower())
+								{
+									case "lineargradient":
+										strokeFillDefs[id] = ReadLinearGradient(defE);
+										strokeFillId = id;
+										break;
+									case "radialgradient":
+										strokeFillDefs[id] = ReadRadialGradient(defE);
+										strokeFillId = id;
+										break;
+									default:
+										LogOrThrow($"Unsupported stroke fill: {stroke}");
+										break;
+								}
+							}
+							else
+							{
+								LogOrThrow($"Invalid fill url reference: {id}");
+							}
+						}
+						else
+						{
+							LogOrThrow($"Unsupported stroke fill: {stroke}");
+						}
+					}
                 }
 
                 // stroke attributes
@@ -1248,7 +1298,6 @@ namespace FFImageLoading.Svg.Platform
                     }
                     else
                     {
-                        var read = false;
                         var urlM = urlRe.Match(fill);
                         if (urlM.Success)
                         {
@@ -1260,26 +1309,25 @@ namespace FFImageLoading.Svg.Platform
                                     case "lineargradient":
                                         fillDefs[id] = ReadLinearGradient(defE);
                                         fillId = id;
-                                        read = true;
                                         break;
                                     case "radialgradient":
                                         fillDefs[id] = ReadRadialGradient(defE);
                                         fillId = id;
-                                        read = true;
                                         break;
-                                }
-                                // else try another type (eg: image)
+									default:
+										LogOrThrow($"Unsupported fill: {fill}");
+										break;
+								}
                             }
                             else
                             {
                                 LogOrThrow($"Invalid fill url reference: {id}");
                             }
                         }
-
-                        if (!read)
-                        {
-                            LogOrThrow($"Unsupported fill: {fill}");
-                        }
+						else
+						{
+							LogOrThrow($"Unsupported fill: {fill}");
+						}
                     }
                 }
 
