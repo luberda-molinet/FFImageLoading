@@ -447,6 +447,12 @@ namespace FFImageLoading.Svg.Platform
                         }
                     }
                     break;
+				case "a":
+					foreach (var child in e.Descendants())
+					{
+						ReadElement(child, canvas, stroke?.Clone(), fill?.Clone());
+					}
+					break;
                 case "clipPath":
                 case "title":
                 case "desc":
