@@ -194,14 +194,17 @@ namespace FFImageLoading
             return TaskParameter.FromStream(stream);
         }
 
-        public void SetExitTasksEarly(bool exitTasksEarly)
+		[Obsolete("Use SetPauseWork(bool pauseWork, bool cancelExistingTasks = false)")]
+		public void SetExitTasksEarly(bool exitTasksEarly)
         {
             Scheduler.SetExitTasksEarly(exitTasksEarly);
         }
 
-        public void SetPauseWork(bool pauseWork)
+		public void SetPauseWorkAndCancelExisting(bool pauseWork) => SetPauseWork(pauseWork, true);
+
+		public void SetPauseWork(bool pauseWork, bool cancelExisting = false)
         {
-            Scheduler.SetPauseWork(pauseWork);
+            Scheduler.SetPauseWork(pauseWork, cancelExisting);
         }
 
         public void CancelWorkFor(IImageLoaderTask task)

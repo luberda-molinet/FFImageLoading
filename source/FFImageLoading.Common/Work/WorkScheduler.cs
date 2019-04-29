@@ -84,14 +84,30 @@ namespace FFImageLoading.Work
 
         public bool PauseWork { get; private set; }
 
-        public void SetPauseWork(bool pauseWork)
+        public void SetPauseWork(bool pauseWork, bool cancelExisting = false)
         {
             if (PauseWork == pauseWork)
                 return;
 
-            PauseWork = pauseWork;
+			if (cancelExisting)
+			{
+				lock (_lock)
+				{
+					foreach (var task in PendingTasks)
+						task?.Cancel();
 
-            if (pauseWork)
+					PendingTasks.Clear();
+
+					foreach (var task in SimilarTasks)
+						task?.Cancel();
+
+					SimilarTasks.Clear();
+				}
+			}
+
+			PauseWork = pauseWork;
+
+			if (pauseWork)
             {
                 Logger.Debug("SetPauseWork enabled.");
             }

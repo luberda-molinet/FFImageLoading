@@ -118,17 +118,24 @@ namespace FFImageLoading
         /// <value><c>true</c> if pause work; otherwise, <c>false</c>.</value>
         bool PauseWork { get; }
 
-        /// <summary>
-        /// Sets a value indicating if all loading work should be paused (silently canceled).
-        /// </summary>
-        /// <param name="pauseWork">If set to <c>true</c> pause/cancel work.</param>
-        void SetPauseWork(bool pauseWork);
+		/// <summary>
+		/// Sets a value indicating if all loading work should be paused.
+		/// </summary>
+		/// <param name="pauseWork">If set to <c>true</c> pause work.</param>
+		/// <param name="cancelExisting">If set to <c>true</c> cancels existing tasks.</param>
+		void SetPauseWork(bool pauseWork, bool cancelExisting = false);
 
-        /// <summary>
-        /// Cancel any loading work for the given task
-        /// </summary>
-        /// <param name="task">Image loading task to cancel.</param>
-        void CancelWorkFor(IImageLoaderTask task);
+		/// <summary>
+		/// Sets a value indicating if all loading work should be paused. Also cancels existing tasks.
+		/// </summary>
+		/// <param name="pauseWork">If set to <c>true</c> pause work.</param>
+		void SetPauseWorkAndCancelExisting(bool pauseWork);
+
+		/// <summary>
+		/// Cancel any loading work for the given task
+		/// </summary>
+		/// <param name="task">Image loading task to cancel.</param>
+		void CancelWorkFor(IImageLoaderTask task);
 
         /// <summary>
         /// Cancel any loading work for the given view
