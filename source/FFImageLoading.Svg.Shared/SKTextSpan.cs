@@ -27,18 +27,6 @@ namespace FFImageLoading.Svg.Platform
 
         public float? BaselineShift { get; }
 
-        public float MeasureTextWidth()
-        {
-            //TODO - need to debug exceptions here
-            try
-            {
-                return Fill.MeasureText(Text);
-            }
-            catch (Exception ex)
-            {
-                ImageService.Instance.Config.Logger?.Error("SVG", ex);
-                return 0f;
-            }
-        }
-    }
+		public float MeasureTextWidth() => Fill.MeasureText(Text);
+	}
 }

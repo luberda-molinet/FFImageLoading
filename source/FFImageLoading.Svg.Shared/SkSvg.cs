@@ -715,7 +715,10 @@ namespace FFImageLoading.Svg.Platform
                             textSegments[count - 1] = textSegments[count - 1].TrimEnd();
                         var text = WSRe.Replace(string.Concat(textSegments), " ");
 
-                        spans.Append(new SKTextSpan(text, clonedFill, baselineShift: baselineShift));
+						if (string.IsNullOrEmpty(text))
+							continue;
+
+						spans.Append(new SKTextSpan(text, clonedFill, baselineShift: baselineShift));
                     }
                 }
                 else if (c is XElement ce && ce.Name.LocalName == "tspan")
@@ -726,13 +729,17 @@ namespace FFImageLoading.Svg.Platform
                     }
                     else 
                     {
-                        // the current span may want to change the cursor position
-                        var x = ReadOptionalNumber(ce.Attribute("x"));
-                        var y = ReadOptionalNumber(ce.Attribute("y"));
                         var text = ce.Value; //.Trim();
 
-                        // Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element!
-                        baselineShift = ReadBaselineShift(ce);
+						if (string.IsNullOrEmpty(text))
+							continue;
+
+						// the current span may want to change the cursor position
+						var x = ReadOptionalNumber(ce.Attribute("x"));
+						var y = ReadOptionalNumber(ce.Attribute("y"));
+
+						// Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element!
+						baselineShift = ReadBaselineShift(ce);
 
                         spans.Append(new SKTextSpan(text, clonedFill, x, y, baselineShift));
                     }
