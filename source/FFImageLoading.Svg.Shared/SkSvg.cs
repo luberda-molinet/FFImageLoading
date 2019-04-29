@@ -669,23 +669,25 @@ namespace FFImageLoading.Svg.Platform
 
         private SKText ReadText(XElement e, SKPaint stroke, SKPaint fill)
         {
-            // TODO: stroke
-
             var x = ReadNumber(e.Attribute("x"));
             var y = ReadNumber(e.Attribute("y"));
             var xy = new SKPoint(x, y);
             var textAlign = ReadTextAlignment(e);
             var baselineShift = ReadBaselineShift(e);
 
-            ReadFontAttributes(e, fill);
+			var style = ReadPaints(e, ref stroke, ref fill, false);
+			ReadFontAttributes(style, ref stroke, ref fill);
 
-            var spans = new SKText(xy, textAlign);
+			var spans = new SKText(xy, textAlign);
 
             // textAlign is used for all spans within the <text> element. If different textAligns would be needed, it is necessary to use
             // several <text> elements instead of <tspan> elements
             fill.TextAlign = SKTextAlign.Left;  // fixed alignment for all spans
 
-            ReadTextElement(e, spans, textAlign, baselineShift, stroke, fill);
+			if (stroke != null)
+				stroke.TextAlign = SKTextAlign.Left;  // fixed alignment for all spans
+
+			ReadTextElement(e, spans, textAlign, baselineShift, stroke, fill);
 
             return spans;
         }
@@ -696,7 +698,10 @@ namespace FFImageLoading.Svg.Platform
             for (int i = 0; i < nodes.Length; i++)
             {
                 var clonedFill = fill.Clone();
-                ReadFontAttributes(e, clonedFill);
+				var clonedStroke = stroke?.Clone();
+
+				var style = ReadPaints(e, ref clonedStroke, ref clonedFill, false);
+				ReadFontAttributes(style, ref clonedStroke, ref clonedFill);
 
                 var c = nodes[i];
                 if (c.NodeType == XmlNodeType.Text)
@@ -718,7 +723,7 @@ namespace FFImageLoading.Svg.Platform
 						if (string.IsNullOrEmpty(text))
 							continue;
 
-						spans.Append(new SKTextSpan(text, clonedFill, baselineShift: baselineShift));
+						spans.Append(new SKTextSpan(text, clonedStroke, clonedFill, baselineShift: baselineShift));
                     }
                 }
                 else if (c is XElement ce && ce.Name.LocalName == "tspan")
@@ -729,7 +734,7 @@ namespace FFImageLoading.Svg.Platform
                     }
                     else 
                     {
-                        var text = ce.Value; //.Trim();
+                        var text = ce.Value;
 
 						if (string.IsNullOrEmpty(text))
 							continue;
@@ -741,26 +746,37 @@ namespace FFImageLoading.Svg.Platform
 						// Don't read text-anchor from tspans!, Only use enclosing text-anchor from text element!
 						baselineShift = ReadBaselineShift(ce);
 
-                        spans.Append(new SKTextSpan(text, clonedFill, x, y, baselineShift));
+                        spans.Append(new SKTextSpan(text, clonedStroke, clonedFill, x, y, baselineShift));
                     }
                 }
             }
         }
 
-        private void ReadFontAttributes(XElement e, SKPaint paint)
+        private void ReadFontAttributes(Dictionary<string, string> style, ref SKPaint stroke, ref SKPaint fill)
         {
-            var fontStyle = ReadStyle(e);
+			if (style == null || !style.TryGetValue("font-family", out var ffamily) || string.IsNullOrWhiteSpace(ffamily))
+			{
+				ffamily = fill.Typeface?.FamilyName;
+			}
 
-            if (fontStyle == null || !fontStyle.TryGetValue("font-family", out string ffamily) || string.IsNullOrWhiteSpace(ffamily))
-                ffamily = paint.Typeface?.FamilyName;
-            var fweight = ReadFontWeight(fontStyle, paint.Typeface?.FontWeight ?? (int)SKFontStyleWeight.Normal);
-            var fwidth = ReadFontWidth(fontStyle, paint.Typeface?.FontWidth ?? (int)SKFontStyleWidth.Normal);
-            var fstyle = ReadFontStyle(fontStyle, paint.Typeface?.FontSlant ?? SKFontStyleSlant.Upright);
+            var fweight = ReadFontWeight(style, fill.Typeface?.FontWeight ?? (int)SKFontStyleWeight.Normal);
+            var fwidth = ReadFontWidth(style, fill.Typeface?.FontWidth ?? (int)SKFontStyleWidth.Normal);
+            var fstyle = ReadFontStyle(style, fill.Typeface?.FontSlant ?? SKFontStyleSlant.Upright);
 
-            paint.Typeface = SKTypeface.FromFamilyName(ffamily, fweight, fwidth, fstyle);
+			var typeface = SKTypeface.FromFamilyName(ffamily, fweight, fwidth, fstyle);
 
-            if (fontStyle != null && fontStyle.TryGetValue("font-size", out string fsize) && !string.IsNullOrWhiteSpace(fsize))
-                paint.TextSize = ReadNumber(fsize);
+			if (stroke != null)
+				stroke.Typeface = typeface;
+			fill.Typeface = typeface;
+
+			if (style != null && style.TryGetValue("font-size", out var fsize) && !string.IsNullOrWhiteSpace(fsize))
+			{
+				var size = ReadNumber(fsize);
+
+				if (stroke != null)
+					stroke.TextSize = size;
+				fill.TextSize = size;
+			}
         }
 
         private static SKPathFillType ReadFillRule(Dictionary<string, string> style, SKPathFillType defaultFillRule = SKPathFillType.Winding)
