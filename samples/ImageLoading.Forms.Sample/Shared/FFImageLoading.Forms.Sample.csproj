@@ -49,9 +49,4 @@
         <Compile Update="**\*.xaml.cs" DependentUpon="ColorFillTransformationPage.xaml" />
         <EmbeddedResource Include="**\*.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" />        
     </ItemGroup>
-    <ItemGroup>
-      <None Update="Resources\sample.svg">
-        <LogicalName>FFImageLoading.Forms.Sample.Resources.sample.svg</LogicalName>
-      </None>
-    </ItemGroup>
 </Project>
