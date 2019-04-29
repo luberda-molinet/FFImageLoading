@@ -31,7 +31,6 @@ namespace FFImageLoading.Svg.Platform
         private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
         private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
         private readonly Dictionary<string, ISKSvgFill> fillDefs = new Dictionary<string, ISKSvgFill>();
-		private readonly Dictionary<string, ISKSvgFill> strokeFillDefs = new Dictionary<string, ISKSvgFill>();
 		private readonly Dictionary<XElement, string> elementFills = new Dictionary<XElement, string>();
 		private readonly Dictionary<XElement, string> strokeElementFills = new Dictionary<XElement, string>();
 		private readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings()
@@ -300,7 +299,7 @@ namespace FFImageLoading.Svg.Platform
                         }
 
 						if (stroke != null && strokeElementFills.TryGetValue(e, 
-							out var strokeFillId) && strokeFillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
+							out var strokeFillId) && fillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
 						{
 							var points = ReadElementXY(e);
 							var elementSize = ReadElementSize(e);
@@ -1181,11 +1180,11 @@ namespace FFImageLoading.Svg.Platform
 								switch (defE.Name.LocalName.ToLower())
 								{
 									case "lineargradient":
-										strokeFillDefs[id] = ReadLinearGradient(defE);
+										fillDefs[id] = ReadLinearGradient(defE);
 										strokeFillId = id;
 										break;
 									case "radialgradient":
-										strokeFillDefs[id] = ReadRadialGradient(defE);
+										fillDefs[id] = ReadRadialGradient(defE);
 										strokeFillId = id;
 										break;
 									default:
