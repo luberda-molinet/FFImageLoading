@@ -754,22 +754,30 @@ namespace FFImageLoading.Svg.Platform
 
         private void ReadFontAttributes(Dictionary<string, string> style, ref SKPaint stroke, ref SKPaint fill)
         {
-			if (style == null || !style.TryGetValue("font-family", out var ffamily) || string.IsNullOrWhiteSpace(ffamily))
-			{
-				ffamily = fill.Typeface?.FamilyName;
-			}
+			var fontFamily = fill.Typeface?.FamilyName ?? SKTypeface.Default.FamilyName;
+			var fontStyle = fill.Typeface?.FontSlant ?? SKFontStyleSlant.Upright;
+			var fontWeight = (SKFontStyleWeight?)fill.Typeface?.FontWeight ?? SKFontStyleWeight.Normal;
+			var fontWidth = (SKFontStyleWidth?)fill.Typeface?.FontWidth ?? SKFontStyleWidth.Normal;
 
-            var fweight = ReadFontWeight(style, fill.Typeface?.FontWeight ?? (int)SKFontStyleWeight.Normal);
-            var fwidth = ReadFontWidth(style, fill.Typeface?.FontWidth ?? (int)SKFontStyleWidth.Normal);
-            var fstyle = ReadFontStyle(style, fill.Typeface?.FontSlant ?? SKFontStyleSlant.Upright);
+			if (style.TryGetValue("font-style", out var cssFontStyle))
+				TryParseFontStyle(cssFontStyle, out fontStyle, fontStyle);
 
-			var typeface = SKTypeface.FromFamilyName(ffamily, fweight, fwidth, fstyle);
+			if (style.TryGetValue("font-weight", out var cssFontWeight))
+				TryParseFontWeight(cssFontWeight, out fontWeight, fontWeight);
+
+			if (style.TryGetValue("font-stretch", out var cssFontStretch))
+				TryParseFontWidth(cssFontStretch, out fontWidth, fontWidth);
+
+			if (style.TryGetValue("font-family", out var ffamily))
+				fontFamily = ffamily;
+
+			var typeface = SKTypeface.FromFamilyName(fontFamily, fontWeight, fontWidth, fontStyle);
 
 			if (stroke != null)
 				stroke.Typeface = typeface;
 			fill.Typeface = typeface;
 
-			if (style != null && style.TryGetValue("font-size", out var fsize) && !string.IsNullOrWhiteSpace(fsize))
+			if (style.TryGetValue("font-size", out var fsize))
 			{
 				var size = ReadNumber(fsize);
 
@@ -783,7 +791,7 @@ namespace FFImageLoading.Svg.Platform
         {
             var fillRule = defaultFillRule;
 
-            if (style != null && style.TryGetValue("fill-rule", out string rule) && !string.IsNullOrWhiteSpace(rule))
+            if (style != null && style.TryGetValue("fill-rule", out var rule) && !string.IsNullOrWhiteSpace(rule))
             {
                 switch (rule)
                 {
@@ -802,108 +810,107 @@ namespace FFImageLoading.Svg.Platform
             return fillRule;
         }
 
-        private static SKFontStyleSlant ReadFontStyle(Dictionary<string, string> fontStyle, SKFontStyleSlant defaultStyle = SKFontStyleSlant.Upright)
+		private static bool TryParseFontStyle(string value, out SKFontStyleSlant fontStyle, SKFontStyleSlant defaultFontStyle = SKFontStyleSlant.Upright)
         {
-            var style = defaultStyle;
-
-            if (fontStyle != null && fontStyle.TryGetValue("font-style", out string fstyle) && !string.IsNullOrWhiteSpace(fstyle))
-            {
-                switch (fstyle)
-                {
-                    case "italic":
-                        style = SKFontStyleSlant.Italic;
-                        break;
-                    case "oblique":
-                        style = SKFontStyleSlant.Oblique;
-                        break;
-                    case "normal":
-                        style = SKFontStyleSlant.Upright;
-                        break;
-                    default:
-                        style = defaultStyle;
-                        break;
-                }
-            }
-
-            return style;
+			switch (value)
+			{
+				case "italic":
+					fontStyle = SKFontStyleSlant.Italic;
+					return true;
+				case "oblique":
+					fontStyle = SKFontStyleSlant.Oblique;
+					return true;
+				case "normal":
+					fontStyle = SKFontStyleSlant.Upright;
+					return true;
+				default:
+					fontStyle = defaultFontStyle;
+					return false;
+			}
         }
 
-        private int ReadFontWidth(Dictionary<string, string> fontStyle, int defaultWidth = (int)SKFontStyleWidth.Normal)
+        private bool TryParseFontWidth(string value, out SKFontStyleWidth fontStretch, SKFontStyleWidth defaultFontStretch = SKFontStyleWidth.Normal)
         {
-            var width = defaultWidth;
-            if (fontStyle != null && fontStyle.TryGetValue("font-stretch", out string fwidth) && !string.IsNullOrWhiteSpace(fwidth) && !int.TryParse(fwidth, out width))
-            {
-                switch (fwidth)
-                {
-                    case "ultra-condensed":
-                        width = (int)SKFontStyleWidth.UltraCondensed;
-                        break;
-                    case "extra-condensed":
-                        width = (int)SKFontStyleWidth.ExtraCondensed;
-                        break;
-                    case "condensed":
-                        width = (int)SKFontStyleWidth.Condensed;
-                        break;
-                    case "semi-condensed":
-                        width = (int)SKFontStyleWidth.SemiCondensed;
-                        break;
-                    case "normal":
-                        width = (int)SKFontStyleWidth.Normal;
-                        break;
-                    case "semi-expanded":
-                        width = (int)SKFontStyleWidth.SemiExpanded;
-                        break;
-                    case "expanded":
-                        width = (int)SKFontStyleWidth.Expanded;
-                        break;
-                    case "extra-expanded":
-                        width = (int)SKFontStyleWidth.ExtraExpanded;
-                        break;
-                    case "ultra-expanded":
-                        width = (int)SKFontStyleWidth.UltraExpanded;
-                        break;
-                    case "wider":
-                        width = width + 1;
-                        break;
-                    case "narrower":
-                        width = width - 1;
-                        break;
-                    default:
-                        width = defaultWidth;
-                        break;
-                }
-            }
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				fontStretch = defaultFontStretch;
+				return false;
+			}
 
-            return Math.Min(Math.Max((int)SKFontStyleWidth.UltraCondensed, width), (int)SKFontStyleWidth.UltraExpanded);
+			switch (value)
+			{
+				case "ultra-condensed":
+					fontStretch = SKFontStyleWidth.UltraCondensed;
+					return true;
+				case "extra-condensed":
+					fontStretch = SKFontStyleWidth.ExtraCondensed;
+					return true;
+				case "condensed":
+					fontStretch = SKFontStyleWidth.Condensed;
+					return true;
+				case "semi-condensed":
+					fontStretch = SKFontStyleWidth.SemiCondensed;
+					return true;
+				case "normal":
+					fontStretch = SKFontStyleWidth.Normal;
+					return true;
+				case "semi-expanded":
+					fontStretch = SKFontStyleWidth.SemiExpanded;
+					return true;
+				case "expanded":
+					fontStretch = SKFontStyleWidth.Expanded;
+					return true;
+				case "extra-expanded":
+					fontStretch = SKFontStyleWidth.ExtraExpanded;
+					return true;
+				case "ultra-expanded":
+					fontStretch = SKFontStyleWidth.UltraExpanded;
+					return true;
+				case "wider":
+					fontStretch = (SKFontStyleWidth)(Math.Min(9, (int)defaultFontStretch + 1));
+					return true;
+				case "narrower":
+					fontStretch = (SKFontStyleWidth)(Math.Max(1, (int)defaultFontStretch - 1));
+					return true;
+
+				default:
+					fontStretch = defaultFontStretch;
+					return false;
+			}
         }
 
-        private int ReadFontWeight(Dictionary<string, string> fontStyle, int defaultWeight = (int)SKFontStyleWeight.Normal)
+        private bool TryParseFontWeight(string value, out SKFontStyleWeight fontWeight, SKFontStyleWeight defaultFontWeight = SKFontStyleWeight.Normal)
         {
-            var weight = defaultWeight;
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				fontWeight = defaultFontWeight;
+				return false;
+			}
 
-            if (fontStyle != null && fontStyle.TryGetValue("font-weight", out string fweight) && !string.IsNullOrWhiteSpace(fweight) && !int.TryParse(fweight, out weight))
-            {
-                switch (fweight)
-                {
-                    case "normal":
-                        weight = (int)SKFontStyleWeight.Normal;
-                        break;
-                    case "bold":
-                        weight = (int)SKFontStyleWeight.Bold;
-                        break;
-                    case "bolder":
-                        weight = weight + 100;
-                        break;
-                    case "lighter":
-                        weight = weight - 100;
-                        break;
-                    default:
-                        weight = defaultWeight;
-                        break;
-                }
-            }
+			if (int.TryParse(value, out var number) && number >= 100 && number <= 1000)
+			{
+				fontWeight = (SKFontStyleWeight)(number / 100 * 100);
+				return true;
+			}
 
-            return Math.Min(Math.Max((int)SKFontStyleWeight.Thin, weight), (int)SKFontStyleWeight.ExtraBlack);
+			switch (value)
+			{
+				case "normal":
+					fontWeight = SKFontStyleWeight.Normal;
+					return true;
+				case "bold":
+					fontWeight = SKFontStyleWeight.Bold;
+					return true;
+				case "bolder":
+					fontWeight = (SKFontStyleWeight)Math.Min(1000, (int)defaultFontWeight + 100);
+					return true;
+				case "lighter":
+					fontWeight = (SKFontStyleWeight)Math.Max(100, (int)defaultFontWeight - 100);
+					return true;
+				default:
+					fontWeight = defaultFontWeight;
+					return false;
+			}
         }
 
         private void LogOrThrow(string message)
@@ -953,7 +960,15 @@ namespace FFImageLoading.Svg.Platform
                 {
                     var k = m.Groups[1].Value;
                     var v = m.Groups[2].Value;
-                    d[k] = v;
+
+					if (k == "font")
+					{
+						CssHelpers.AddFontShorthand(d, v);
+					}
+					else
+					{
+						d[k] = v;
+					}
                 }
             }
             return d;
@@ -964,20 +979,16 @@ namespace FFImageLoading.Svg.Platform
             // get from local attributes
             var dic = e.Attributes().Where(a => HasSvgNamespace(a.Name)).ToDictionary(k => k.Name.LocalName, v => v.Value);
 
-            string className;
-            string glStyle;
+			if (styles.TryGetValue(e.Name.LocalName, out var glStyle))
+			{
+				// get from stlye attribute
+				var styleDic = ReadStyle(glStyle);
 
-            if (styles != null && styles.TryGetValue(e.Name.LocalName, out glStyle))
-            {
-                // get from stlye attribute
-                var styleDic = ReadStyle(glStyle);
-
-                // overwrite
-                foreach (var pair in styleDic)
-                    dic[pair.Key] = pair.Value;
-            }
-            if (styles != null && dic.TryGetValue("class", out className)
-                && styles.TryGetValue("." + className, out glStyle))
+				// overwrite
+				foreach (var pair in styleDic)
+					dic[pair.Key] = pair.Value;
+			}
+			if (dic.TryGetValue("class", out var className) && styles.TryGetValue("." + className, out glStyle))
             {
                 // get from stlye attribute
                 var styleDic = ReadStyle(glStyle);
