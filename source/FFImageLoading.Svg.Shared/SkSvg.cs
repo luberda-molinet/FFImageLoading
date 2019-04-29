@@ -222,8 +222,18 @@ namespace FFImageLoading.Svg.Platform
             if (e.Attribute("display")?.Value == "none")
                 return;
 
-            // transform matrix
-            var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
+			// SVG element
+			var elementName = e.Name.LocalName;
+			var isGroup = elementName == "g";
+
+			// read style
+			var style = ReadPaints(e, ref stroke, ref fill, isGroup);
+
+			if (style.TryGetValue("display", out var displayStyle) && displayStyle == "none")
+				return;
+
+			// transform matrix
+			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
             canvas.Save();
             canvas.Concat(ref transform);
 
@@ -233,13 +243,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 canvas.ClipPath(clipPath);
             }
-
-            // SVG element
-            var elementName = e.Name.LocalName;
-            var isGroup = elementName == "g";
-
-            // read style
-            var style = ReadPaints(e, ref stroke, ref fill, isGroup);
+            
             var mask = ReadMask(style);
 
             // parse elements
