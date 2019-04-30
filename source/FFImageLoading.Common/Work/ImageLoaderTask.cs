@@ -83,7 +83,9 @@ namespace FFImageLoading.Work
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Parameters.CustomCacheKey))
+			var isCustomCacheKeySet = !string.IsNullOrWhiteSpace(Parameters.CustomCacheKey);
+
+			if (isCustomCacheKeySet)
             {
                 CanUseMemoryCache = true;
                 KeyRaw = Parameters.CustomCacheKey;
@@ -96,7 +98,7 @@ namespace FFImageLoading.Work
 
             if (string.IsNullOrWhiteSpace(KeyRaw))
                 throw new Exception("Key cannot be null");
-
+                
             if (Parameters.CustomDataResolver is IVectorDataResolver vect)
             {
                 if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
@@ -106,8 +108,8 @@ namespace FFImageLoading.Work
                                            string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)), vect.GetType().Name);
             }
 
-            KeyDownsamplingOnly = string.Empty;
-            if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
+			KeyDownsamplingOnly = string.Empty;
+			if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
             {
                 if (Parameters.DownSampleUseDipUnits)
                     KeyDownsamplingOnly = string.Concat(";", DpiToPixels(Parameters.DownSampleSize.Item1), "x", DpiToPixels(Parameters.DownSampleSize.Item2));
@@ -121,8 +123,16 @@ namespace FFImageLoading.Work
                 KeyTransformationsOnly = string.Concat(";", string.Join(";", Parameters.Transformations.Select(t => t.Key)));
             }
 
-            Key = string.Concat(KeyRaw, KeyDownsamplingOnly, KeyTransformationsOnly);
-            KeyWithoutTransformations = string.Concat(KeyRaw, KeyDownsamplingOnly);
+			if (isCustomCacheKeySet)
+			{
+				Key = Parameters.CustomCacheKey;
+				KeyWithoutTransformations = Parameters.CustomCacheKey;
+			}
+			else
+			{
+				Key = string.Concat(KeyRaw, KeyDownsamplingOnly, KeyTransformationsOnly);
+				KeyWithoutTransformations = string.Concat(KeyRaw, KeyDownsamplingOnly);
+			}
 
             if (!string.IsNullOrWhiteSpace(Parameters.LoadingPlaceholderPath))
             {
