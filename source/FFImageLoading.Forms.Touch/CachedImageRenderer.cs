@@ -314,8 +314,8 @@ namespace FFImageLoading.Forms.Platform
 
             public FormsNSImageView()
             {
-                Layer = new FFCALayer();
-                WantsLayer = true;
+                //Layer = new FFCALayer();
+                //WantsLayer = true;
             }
 
             public void SetIsOpaque(bool isOpaque)
@@ -323,12 +323,12 @@ namespace FFImageLoading.Forms.Platform
                 _isOpaque = isOpaque;
             }
 
-            public override void DrawRect(CGRect dirtyRect)
-            {
-                // TODO if it isn't disabled then this issue happens: 
-                // https://github.com/luberda-molinet/FFImageLoading/issues/922
-                // base.DrawRect(dirtyRect);
-            }
+            //public override void DrawRect(CGRect dirtyRect)
+            //{
+            //    // TODO if it isn't disabled then this issue happens: 
+            //    // https://github.com/luberda-molinet/FFImageLoading/issues/922
+            //    // base.DrawRect(dirtyRect);
+            //}
 
             public override bool IsOpaque => _isOpaque;
         }
