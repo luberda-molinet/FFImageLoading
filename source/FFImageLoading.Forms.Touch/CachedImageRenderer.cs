@@ -104,9 +104,9 @@ namespace FFImageLoading.Forms.Platform
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-                SetAspect();
+				SetOpacity();
+				SetAspect();
                 UpdateImage(Control, Element, e.OldElement);
-                SetOpacity();
             }
         }
 
