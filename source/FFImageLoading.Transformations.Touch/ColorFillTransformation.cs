@@ -31,7 +31,11 @@ namespace FFImageLoading.Transformations
             {
                 using (var context = UIGraphics.GetCurrentContext())
                 {
-                    CGRect drawRect = new CGRect(0.0, 0.0, sourceBitmap.Size.Width, sourceBitmap.Size.Height);
+
+					var drawRect = new CGRect(0.0, 0.0, sourceBitmap.Size.Width, sourceBitmap.Size.Height);
+
+					context.TranslateCTM(0, sourceBitmap.Size.Height);
+					context.ScaleCTM(1.0f, -1.0f);
                     context.SetFillColor(HexColor.ToUIColor().CGColor);
                     context.FillRect(drawRect);
                     context.DrawImage(drawRect, sourceBitmap.CGImage);
