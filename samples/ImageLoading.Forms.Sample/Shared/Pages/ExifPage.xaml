@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FFImageLoading.Forms.Sample.Pages.ExifPage"
+             xmlns:xamvvm="clr-namespace:Xamvvm;assembly=Xamvvm.Forms" xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations" xmlns:ffimageloadingsvg="clr-namespace:FFImageLoading.Svg.Forms;assembly=FFImageLoading.Svg.Forms">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_1.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_2.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_3.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_4.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_5.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_6.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_7.jpg"/>
+                <ffimageloading:CachedImage Source="https://github.com/recurser/exif-orientation-examples/raw/master/Landscape_8.jpg"/> 
+
+            </StackLayout>
+        </ScrollView>        
+    </ContentPage.Content>
+</ContentPage>

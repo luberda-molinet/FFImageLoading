@@ -77,7 +77,16 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
-                new MenuItem() {
+				new MenuItem() {
+					Section = "Advanced",
+					Title = "Exif tests",
+					Command = new BaseCommand(async (param) =>
+					{
+						await this.PushPageFromCacheAsync<ExifPageModel>();
+					})
+				},
+
+				new MenuItem() {
                     Section = "Advanced",
                     Title = "Custom CacheKey example",
                     Command = new BaseCommand(async (param) =>
