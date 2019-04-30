@@ -69,6 +69,7 @@ namespace FFImageLoading.Work
         private void SetKeys()
         {
             KeyRaw = Parameters.Path;
+
             if (Parameters.Source == ImageSource.Stream)
             {
                 if (!string.IsNullOrWhiteSpace(Parameters.StreamChecksum))
@@ -101,27 +102,48 @@ namespace FFImageLoading.Work
                 
             if (Parameters.CustomDataResolver is IVectorDataResolver vect)
             {
-                if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},type={4})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits, vect.GetType().Name);
-                else
-                    KeyRaw = string.Format("{0};(size={1}x{2},dip={3},replace=({4}),type={5})", KeyRaw, vect.VectorWidth, vect.VectorHeight, vect.UseDipUnits,
-                                           string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)), vect.GetType().Name);
+				if (vect.ReplaceStringMap == null || vect.ReplaceStringMap.Count == 0)
+				{
+					KeyRaw = string.Format(
+						"{0};(size={1}x{2},type={3})",
+						KeyRaw,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth) : vect.VectorWidth,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight) : vect.VectorHeight,
+						vect.GetType().Name);
+				}
+				else
+				{
+					KeyRaw = string.Format(
+						"{0};(size={1}x{2},replace=({3}),type={4})",
+						KeyRaw,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth) : vect.VectorWidth,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight) : vect.VectorHeight,
+						string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)),
+						vect.GetType().Name);
+				}
             }
 
-			KeyDownsamplingOnly = string.Empty;
 			if (Parameters.DownSampleSize != null && (Parameters.DownSampleSize.Item1 > 0 || Parameters.DownSampleSize.Item2 > 0))
             {
-                if (Parameters.DownSampleUseDipUnits)
-                    KeyDownsamplingOnly = string.Concat(";", DpiToPixels(Parameters.DownSampleSize.Item1), "x", DpiToPixels(Parameters.DownSampleSize.Item2));
-                else
-                    KeyDownsamplingOnly = string.Concat(";", Parameters.DownSampleSize.Item1, "x", Parameters.DownSampleSize.Item2);
+				KeyDownsamplingOnly = string.Concat(
+					";",
+					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item1) : Parameters.DownSampleSize.Item1, 
+					"x",
+					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item2) : Parameters.DownSampleSize.Item2);
             }
+			else
+			{
+				KeyDownsamplingOnly = string.Empty;
+			}
 
-            KeyTransformationsOnly = string.Empty;
             if (Parameters.Transformations != null && Parameters.Transformations.Count > 0)
             {
                 KeyTransformationsOnly = string.Concat(";", string.Join(";", Parameters.Transformations.Select(t => t.Key)));
             }
+			else
+			{
+				KeyTransformationsOnly = string.Empty;
+			}
 
 			if (isCustomCacheKeySet)
 			{
@@ -144,10 +166,18 @@ namespace FFImageLoading.Work
                 if (Parameters.CustomLoadingPlaceholderDataResolver is IVectorDataResolver vectLo)
                 {
                     if (vectLo.ReplaceStringMap == null || vectLo.ReplaceStringMap.Count == 0)
-                        KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits);
+                        KeyForLoadingPlaceholder = string.Format(
+							"{0};(size={1}x{2})", 
+							KeyForLoadingPlaceholder,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth) : vectLo.VectorWidth,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight) : vectLo.VectorHeight);
                     else
-                        KeyForLoadingPlaceholder = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyForLoadingPlaceholder, vectLo.VectorWidth, vectLo.VectorHeight, vectLo.UseDipUnits,
-                                               string.Join(",", vectLo.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
+                        KeyForLoadingPlaceholder = string.Format(
+							"{0};(size={1}x{2},replace=({3}))", 
+							KeyForLoadingPlaceholder,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth) : vectLo.VectorWidth,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight) : vectLo.VectorHeight,
+							string.Join(",", vectLo.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
                 }
             }
 
@@ -161,10 +191,18 @@ namespace FFImageLoading.Work
                 if (Parameters.CustomLoadingPlaceholderDataResolver is IVectorDataResolver vectEr)
                 {
                     if (vectEr.ReplaceStringMap == null || vectEr.ReplaceStringMap.Count == 0)
-                        KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3})", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits);
+                        KeyForErrorPlaceholder = string.Format(
+							"{0};(size={1}x{2})", 
+							KeyForErrorPlaceholder,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth) : vectEr.VectorWidth,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight) : vectEr.VectorHeight);
                     else
-                        KeyForErrorPlaceholder = string.Format("{0};(size={1}x{2},dip={3},replace=({4}))", KeyForErrorPlaceholder, vectEr.VectorWidth, vectEr.VectorHeight, vectEr.UseDipUnits,
-                                               string.Join(",", vectEr.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
+                        KeyForErrorPlaceholder = string.Format(
+							"{0};(size={1}x{2},replace=({3}))", 
+							KeyForErrorPlaceholder,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth) : vectEr.VectorWidth,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight) : vectEr.VectorHeight,
+							string.Join(",", vectEr.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
                 }
             }
 
