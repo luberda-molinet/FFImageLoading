@@ -51,8 +51,8 @@ namespace FFImageLoading.Decoders
                 options.InPreferQualityOverSpeed = false;
             }
 
-            // CHECK IF BITMAP IS EXIF ROTATED
-            var exifRotation = 0;
+			// CHECK IF BITMAP IS EXIF ROTATED
+			var exifOrientation = ExifOrientation.ORIENTATION_UNDEFINED;
 
             if ((source == ImageSource.Filepath || source == ImageSource.Stream || source == ImageSource.Url)
                 && imageInformation.Type != ImageInformation.ImageType.SVG && imageInformation.Exif != null)
@@ -61,27 +61,11 @@ namespace FFImageLoading.Decoders
                 {
                     var ifd0 = imageInformation.Exif.FirstOrDefault(v => v.HasTagName(ExifDirectoryBase.TagOrientation));
                     var orientationTag = ifd0?.Tags?.FirstOrDefault(v => v.Type == ExifDirectoryBase.TagOrientation);
-                    int.TryParse(orientationTag?.Value, out var orientationValue);
 
-                    if (orientationValue > 0)
-                    {
-                        // 90 = 6, 180 = 3, and 270 = 8
-                        switch (orientationValue)
-                        {
-                            case 3:
-                                exifRotation = 180;
-                                break;
+					if (int.TryParse(orientationTag?.Value, out var orientation) && orientation >= 0 && orientation <= 8)
+						exifOrientation = (ExifOrientation)orientation;
 
-                            case 6:
-                                exifRotation = 90;
-                                break;
-
-                            case 8:
-                                exifRotation = 270;
-                                break;
-                        }
-                    }
-                }
+				}
                 catch (Exception ex)
                 {
                     Logger.Error("Reading EXIF orientation failed", ex);
@@ -132,11 +116,10 @@ namespace FFImageLoading.Decoders
             }
 
             // if image is rotated, swap width/height
-            if (exifRotation != 0)
+            if (exifOrientation != ExifOrientation.ORIENTATION_UNDEFINED && exifOrientation != ExifOrientation.ORIENTATION_NORMAL)
             {
-                var oldBitmap = bitmap;
-                bitmap = bitmap.ToRotatedBitmap(exifRotation);
-                ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(Context.Resources, oldBitmap) { InCacheKey = Guid.NewGuid().ToString() });
+                bitmap = bitmap.ToRotatedBitmap(exifOrientation);
+                //ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(Context.Resources, oldBitmap) { InCacheKey = Guid.NewGuid().ToString() });
             }
 
             return new DecodedImage<Bitmap>() { Image = bitmap };
