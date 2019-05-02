@@ -18,5 +18,7 @@ namespace FFImageLoading.Forms
 		bool UseDipUnits { get; set; }
 
         Dictionary<string, string> ReplaceStringMap { get; set; }
+
+		IVectorImageSource Clone();
 	}
 }

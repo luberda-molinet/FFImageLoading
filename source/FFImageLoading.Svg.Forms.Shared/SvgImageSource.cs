@@ -142,5 +142,10 @@ namespace FFImageLoading.Svg.Forms
         {
             return new SvgImageSource(new DataUrlImageSource(svg), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
         }
-    }
+
+		public IVectorImageSource Clone()
+		{
+			return new SvgImageSource(ImageSource, VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
+		}
+	}
 }
