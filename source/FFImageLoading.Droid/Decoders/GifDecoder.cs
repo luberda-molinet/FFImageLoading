@@ -73,8 +73,7 @@ namespace FFImageLoading.Decoders
             protected override Task<Bitmap> ToBitmapAsync(int[] data, int width, int height, int downsampleWidth, int downsampleHeight)
             {
                 Bitmap bitmap;
-                bitmap = Bitmap.CreateBitmap(data, width, height, Bitmap.Config.Argb8888);
-				bitmap.HasAlpha = false;
+                bitmap = Bitmap.CreateBitmap(data, width, height, Bitmap.Config.Argb4444);
 
                 if (downsampleWidth != 0 && downsampleHeight != 0)
                 {
