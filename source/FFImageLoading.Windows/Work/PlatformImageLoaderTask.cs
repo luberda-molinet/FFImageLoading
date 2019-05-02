@@ -56,7 +56,7 @@ namespace FFImageLoading.Work
 
         protected override async Task<BitmapHolder> TransformAsync(BitmapHolder bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            await StaticLocks.DecodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
@@ -89,7 +89,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                _decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
             }
 
             return bitmap;

@@ -43,7 +43,6 @@ namespace FFImageLoading.Svg.Platform
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 		private static readonly object _encodingLock = new object();
-		private static readonly SemaphoreSlim _decodingLock = StaticLocks.DecodingLock;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
 #if __IOS__
@@ -81,7 +80,7 @@ namespace FFImageLoading.Svg.Platform
 
 		private async Task<DataResolverResult> Decode(SKPicture picture, SKBitmap bitmap, DataResolverResult resolvedData)
 		{
-			await _decodingLock.WaitAsync().ConfigureAwait(false);
+			await StaticLocks.DecodingLock.WaitAsync().ConfigureAwait(false);
 
 			try
 			{
@@ -200,7 +199,7 @@ namespace FFImageLoading.Svg.Platform
 			}
 			finally
 			{
-				_decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
 			}
 		}
 
