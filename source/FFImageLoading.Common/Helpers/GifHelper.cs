@@ -8,10 +8,11 @@ namespace FFImageLoading
 		public static int GetValidFrameDelay(int ms)
 		{
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=139677
-			if (ms <= 0)
+			// https://nullsleep.tumblr.com/post/16524517190/animated-gif-minimum-frame-delay-browser
+			if (ms < 20)
 				return 100;
 				
-			return Math.Max(15, ms);
+			return ms;
 		}
 
         public static bool CheckIfAnimated(Stream st)
