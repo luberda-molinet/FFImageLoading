@@ -979,20 +979,10 @@ namespace FFImageLoading.Forms
             }
             else if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
             {
-                if (DownsampleHeight > DownsampleWidth)
-                {
-                    if (DownsampleUseDipUnits)
-                        imageLoader.DownSampleInDip(height: (int)DownsampleHeight);
-                    else
-                        imageLoader.DownSample(height: (int)DownsampleHeight);
-                }
-                else
-                {
-                    if (DownsampleUseDipUnits)
-                        imageLoader.DownSampleInDip(width: (int)DownsampleWidth);
-                    else
-                        imageLoader.DownSample(width: (int)DownsampleWidth);
-                }
+				if (DownsampleUseDipUnits)
+					imageLoader.DownSampleInDip((int)DownsampleWidth, (int)DownsampleHeight);
+				else
+					imageLoader.DownSample((int)DownsampleWidth, (int)DownsampleHeight);
             }
             else if (DownsampleToViewSize)
             {
