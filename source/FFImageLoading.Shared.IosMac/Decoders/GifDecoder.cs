@@ -240,7 +240,7 @@ namespace FFImageLoading.Decoders
                     }
                 }
 
-                retval.Add(delayCentiseconds);
+                retval.Add(GifHelper.GetValidFrameDelay(delayCentiseconds));
             }
 
             return retval;

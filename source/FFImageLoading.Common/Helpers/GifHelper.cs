@@ -1,9 +1,19 @@
 ﻿using System.IO;
+using System;
 
 namespace FFImageLoading
 {
     internal static class GifHelper
     {
+		public static int GetValidFrameDelay(int ms)
+		{
+			// https://bugzilla.mozilla.org/show_bug.cgi?id=139677
+			if (ms <= 0)
+				return 100;
+				
+			return Math.Max(15, ms);
+		}
+
         public static bool CheckIfAnimated(Stream st)
         {
             try
