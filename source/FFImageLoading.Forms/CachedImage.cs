@@ -245,10 +245,6 @@ namespace FFImageLoading.Forms
 		/// <summary>
 		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
 		/// DownsampleWidth and DownsampleHeight properties will be automatically set to view size
-		/// If the view height or width will not return > 0 - it'll fall back
-		/// to using DownsampleWidth / DownsampleHeight properties values
-		/// IMPORTANT: That property is tricky when using some auto-layouts as view doesn't have its size defined,
-		/// so it's always safe to have DownsampleWidth / DownsampleHeight set as a fallback
 		/// </summary>
 		/// <value><c>true</c> if downsample to view size; otherwise, <c>false</c>.</value>
 		public bool DownsampleToViewSize
