@@ -518,8 +518,8 @@ namespace FFImageLoading.Svg.Platform
                 case "path":
                 case "polygon":
                 case "polyline":
-                    string data = null;
-                    if (elementName == "path")
+					string data;
+					if (elementName == "path")
                     {
                         data = e.Attribute("d")?.Value;
                     }
@@ -614,7 +614,7 @@ namespace FFImageLoading.Svg.Platform
         private void ScaleViewBoxToSize(SKCanvas canvas, SKRect viewBox, SKSize size, string aspectRatio)
         {
             // if the viewbox is empty, no scaling is required
-            if (viewBox.IsEmpty || Math.Abs(viewBox.Width) == 0f || Math.Abs(viewBox.Height) == 0f)
+            if (viewBox.IsEmpty || Math.Abs(viewBox.Width) < float.Epsilon || Math.Abs(viewBox.Height) < float.Epsilon)
                 return;
             // we only want to exit if width and height are both empty because if one is missing, the
             // other will be derived using the aspec ratio
@@ -626,9 +626,9 @@ namespace FFImageLoading.Svg.Platform
             var scaleY = size.Height / viewBox.Height;
 
             // if either height or width is zero, set the missing scale to the other dimension
-            if (Math.Abs(size.Width) == 0f)
+            if (Math.Abs(size.Width) < float.Epsilon)
                 scaleX = scaleY;
-            if (Math.Abs(size.Height) == 0f)
+            if (Math.Abs(size.Height) < float.Epsilon)
                 scaleY = scaleX;
                 
             if (!string.Equals(aspectRatio, "none", StringComparison.OrdinalIgnoreCase))
@@ -935,8 +935,8 @@ namespace FFImageLoading.Svg.Platform
         {
             if (ThrowOnUnsupportedElement)
                 throw new NotSupportedException(message);
-            else
-                Debug.WriteLine(message);
+            
+            Debug.WriteLine(message);
         }
 
         private string GetString(Dictionary<string, string> style, string name, string defaultValue = "")
