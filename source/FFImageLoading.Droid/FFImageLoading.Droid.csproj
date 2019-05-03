@@ -58,7 +58,6 @@
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Cache\IImageCache.cs" />
-    <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
@@ -85,7 +84,7 @@
     <Compile Include="Cache\LRUCache.cs" />
     <Compile Include="Cache\IByteSizeAware.cs" />
     <Compile Include="Cache\StrongCache.cs" />
-    <Compile Include="Drawables\FFGifDrawable.cs" />
+    <Compile Include="Drawables\FFAnimatedDrawable.cs" />
     <Compile Include="ImageService.cs" />
     <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
       <Link>Extensions\TaskParameterExtensions.cs</Link>
@@ -94,6 +93,7 @@
     <Compile Include="Decoders\GifDecoder.cs" />
     <Compile Include="Decoders\BaseDecoder.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
+    <Compile Include="Drawables\ISelfDisposingAnimatedBitmapDrawable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

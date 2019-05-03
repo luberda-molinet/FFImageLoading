@@ -187,7 +187,7 @@ namespace FFImageLoading
 
                 if (decoded.IsAnimated)
                 {
-                    result = new FFGifDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
+                    result = new FFAnimatedDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
                 }
                 else
                 {

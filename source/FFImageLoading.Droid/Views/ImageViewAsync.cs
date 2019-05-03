@@ -2,12 +2,14 @@ using System;
 using Android.Content;
 using Android.Util;
 using Android.Runtime;
+using Android.Widget;
 
 namespace FFImageLoading.Views
 {
     [Preserve(AllMembers = true)]
     [Register("ffimageloading.views.ImageViewAsync")]
-    public class ImageViewAsync : ManagedImageView
+	[Obsolete("You can now use Android's ImageView")]
+    public class ImageViewAsync : ImageView
     {
         private bool _customFit;
 
@@ -27,7 +29,12 @@ namespace FFImageLoading.Views
         {
         }
 
-        private bool _scaleToFit;
+		public void CancelLoading()
+		{
+			ImageService.Instance.CancelWorkForView(this);
+		}
+
+		private bool _scaleToFit;
         /// <summary>
         /// Gets or sets a value if the image should be scale to fit in the available space keeping aspect ratio.
         /// <remarks>AdjustViewToBounds should be false and ScaleType should be matrix.</remarks>
