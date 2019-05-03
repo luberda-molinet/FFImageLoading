@@ -272,7 +272,8 @@ namespace FFImageLoading.Work
         public TaskParameter DownSample(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = false;
-
+			width = Math.Max(0, width);
+			height = Math.Max(0, height);
 			DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
@@ -291,7 +292,9 @@ namespace FFImageLoading.Work
 		public TaskParameter DownSampleInDip(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = true;
-            DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
+			width = Math.Max(0, width);
+			height = Math.Max(0, height);
+			DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
             return this;
