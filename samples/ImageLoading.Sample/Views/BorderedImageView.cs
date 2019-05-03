@@ -14,7 +14,7 @@ using FFImageLoading.Views;
 
 namespace ImageLoading.Sample.Views
 {
-    public class BorderedImageView : ImageViewAsync
+    public class BorderedImageView : ImageView
     {
         private const int STROKE_WIDTH_DP = 4;
 

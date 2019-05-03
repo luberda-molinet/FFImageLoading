@@ -1,14 +1,14 @@
 ﻿using System;
-using FFImageLoading.Views;
 using Android.Content;
 using Android.Runtime;
 using Android.Util;
 using Android.Graphics.Drawables;
+using Android.Widget;
 
 namespace FFImageLoading.Forms.Platform
 {
     [Preserve(AllMembers = true)]
-    public class CachedImageView : ImageViewAsync
+    public class CachedImageView : ImageView
     {
         bool _skipInvalidate;
 

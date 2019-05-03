@@ -35,7 +35,7 @@ namespace FFImageLoading.Cross
 #if __IOS__
         : UIImageView, ICachedImageView, INotifyPropertyChanged
 #elif __ANDROID__
-        : ImageViewAsync, ICachedImageView, INotifyPropertyChanged
+        : Android.Widget.ImageView, ICachedImageView, INotifyPropertyChanged
 #endif
     {
 #if __IOS__
