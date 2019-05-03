@@ -4,12 +4,14 @@ using FFImageLoading.Work;
 using Android.Graphics.Drawables;
 using Android.Widget;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageView>
     {
         private readonly WeakReference<ImageView> _controlWeakReference;
+		private static readonly Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>> _runningAnimations = new Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>>();
 
         public ImageViewTarget(ImageView control)
         {
@@ -18,72 +20,59 @@ namespace FFImageLoading.Targets
 
 		private static void PlayAnimation(ImageView control, ISelfDisposingAnimatedBitmapDrawable drawable)
 		{
+			lock (_runningAnimations)
+			{
+				StopAnimation(control);
 
+				var timer = new HighResolutionTimer<Android.Graphics.Bitmap>(drawable, async (t, bitmap) =>
+				{
+					try
+					{
+						if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
+							|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled)
+						{
+							t.Stop();
+							return;
+						}
+
+						await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+						{
+							if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
+								|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled)
+							{
+								t.Stop();
+								return;
+							}
+
+							control.SetImageBitmap(bitmap);
+						}).ConfigureAwait(false);
+					}
+					catch (Exception ex)
+					{
+						ImageService.Instance.Config.Logger.Error("GIF", ex);
+					}
+				})
+				{
+					DelayOffset = -2
+				};
+
+				_runningAnimations.Add(control, timer);
+
+				timer.Start();
+			}
 		}
 
 		private static void StopAnimation(ImageView control)
 		{
-
+			lock (_runningAnimations)
+			{
+				if (_runningAnimations.TryGetValue(control, out var timer))
+				{
+					timer?.Stop();
+					_runningAnimations.Remove(control);
+				}
+			}
 		}
-
-		//private void StopAnimation()
-		//{
-		//	try
-		//	{
-		//		_animationTimer?.Stop();
-		//		_tcs?.Cancel();
-		//	}
-		//	catch (ObjectDisposedException) { }
-		//}
-
-		//private void PlayAnimation(FFGifDrawable gifDrawable, CancellationTokenSource tokenSource)
-		//{
-		//	var token = tokenSource.Token;
-		//	var animatedImages = gifDrawable.AnimatedImages;
-
-		//	_animationTimer?.Stop();
-		//	_animationTimer = new HighResolutionTimer<Android.Graphics.Bitmap>(gifDrawable.AnimatedImages, async (image) =>
-		//	{
-		//		if (_animationFrameSetting)
-		//			return;
-
-		//		_animationFrameSetting = true;
-
-		//		try
-		//		{
-		//			var bitmap = image.Image;
-
-		//			if (_isDisposed || !_animationTimer.Enabled)
-		//				return;
-
-		//			if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
-		//			{
-		//				if (_isDisposed || !_animationTimer.Enabled)
-		//					return;
-
-		//				await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-		//				{
-		//					if (_isDisposed || !_animationTimer.Enabled)
-		//						return;
-
-		//					base.SetImageBitmap(bitmap);
-		//				}).ConfigureAwait(false);
-		//			}
-		//		}
-		//		catch (Exception ex)
-		//		{
-		//			ImageService.Instance.Config.Logger.Error("GIF", ex);
-		//		}
-		//		finally
-		//		{
-		//			_animationFrameSetting = false;
-		//		}
-		//	})
-		//	{
-		//		DelayOffset = -2
-		//	};
-		//	_animationTimer.Start();
-		//}
 
 		private static void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
 		{
