@@ -47,6 +47,8 @@ namespace FFImageLoading.Forms
 		public static bool FixedOnMeasureBehavior { get; set; } = true;
 		public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
+		private bool _reloadBecauseOfMissingSize;
+
 		/// <summary>
 		/// CachedImage by Daniel Luberda
 		/// </summary>
@@ -919,6 +921,13 @@ namespace FFImageLoading.Forms
 
 			if (vect1 != null || vect2 != null || vect3 != null)
 			{
+				if (widthRequest == 0 && heightRequest == 0 && width == 0 && height == 0)
+				{
+					_reloadBecauseOfMissingSize = true;
+					imageLoader = null;
+					return;
+				}
+
 				var isWidthHeightRequestSet = widthRequest > 0 || heightRequest > 0; 
 
 				if (vect1 != null)
@@ -986,11 +995,10 @@ namespace FFImageLoading.Forms
 			}
 			else if (DownsampleToViewSize)
 			{
-				// Fallback to a constant value due to a lot people misusing DownsampleToViewSize property
-				// More here: https://github.com/luberda-molinet/FFImageLoading/wiki/Xamarin.Forms-API#downsampletoviewsize-bool-default-false
-				imageLoader.DownSample(height: 100);
+				_reloadBecauseOfMissingSize = true;
+				imageLoader = null;
 
-				ImageService.Instance.Config.Logger?.Error("DownsampleToViewSize failed - view is expandable in both dimensions, so it doesn't have a size. Please use DownsampleWidth or DownsampleHeight property.");
+				return;
 			}
 
 			// RetryCount
@@ -1042,6 +1050,23 @@ namespace FFImageLoading.Forms
 			imageLoader.Success((imageInformation, loadingResult) => OnSuccess(new CachedImageEvents.SuccessEventArgs(imageInformation, loadingResult)));
 
 			SetupOnBeforeImageLoading(imageLoader);
+		}
+
+		protected override void OnSizeAllocated(double width, double height)
+		{
+			base.OnSizeAllocated(width, height);
+
+			if(_reloadBecauseOfMissingSize)
+			{
+				_reloadBecauseOfMissingSize = false;
+
+				if (width <= 0 && height <= 0)
+				{
+					ImageService.Instance.Config.Logger?.Error("Couldn't read view size for auto sizing");
+				}
+
+				ReloadImage();
+			}
 		}
 	}
 }
