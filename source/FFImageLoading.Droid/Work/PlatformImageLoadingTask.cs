@@ -36,7 +36,7 @@ namespace FFImageLoading
 
             if (image is FFBitmapDrawable ffDrawable)
             {
-                if (ffDrawable.IsAnimationRunning)
+                if (ffDrawable.IsFadeAnimationRunning)
                 {
                     var mut = new FFBitmapDrawable(Context.Resources, ffDrawable.Bitmap, ffDrawable);
                     ffDrawable = mut as FFBitmapDrawable;

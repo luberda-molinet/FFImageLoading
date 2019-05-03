@@ -53,13 +53,13 @@ namespace FFImageLoading.Drawables
 
         public void SetPlaceholder(SelfDisposingBitmapDrawable drawable, int animationDuration)
         {
-            if (!IsAnimationRunning)
+            if (!IsFadeAnimationRunning)
             {
                 _alpha = 255;
                 _fadeDuration = animationDuration;
                 _startTimeMillis = SystemClock.UptimeMillis();
                 _placeholder = drawable?.GetConstantState().NewDrawable() as BitmapDrawable;
-                IsAnimationRunning = true;
+				IsFadeAnimationRunning = true;
             }
         }
 
@@ -76,7 +76,7 @@ namespace FFImageLoading.Drawables
             }
         }
 
-        public bool IsAnimationRunning { get; private set; }
+        public bool IsFadeAnimationRunning { get; private set; }
         public int FadeDuration => (int)_fadeDuration;
 
         protected override void OnBoundsChange(Rect bounds)
@@ -90,7 +90,7 @@ namespace FFImageLoading.Drawables
         {
             try
             {
-                if (!IsAnimationRunning)
+                if (!IsFadeAnimationRunning)
                 {
                     base.Draw(canvas);
                 }
@@ -99,7 +99,7 @@ namespace FFImageLoading.Drawables
                     var normalized = (SystemClock.UptimeMillis() - _startTimeMillis) / _fadeDuration;
                     if (normalized >= 1f)
                     {
-                        IsAnimationRunning = false;
+						IsFadeAnimationRunning = false;
                         _placeholder = null;
                         normalized = 1f;
                         base.Draw(canvas);
