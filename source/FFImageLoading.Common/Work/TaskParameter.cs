@@ -261,8 +261,9 @@ namespace FFImageLoading.Work
         }
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept.
         /// Uses pixels units for width/height
+		/// If both width / height is set, then height is ignored
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
@@ -271,24 +272,26 @@ namespace FFImageLoading.Work
         public TaskParameter DownSample(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = false;
-            DownSampleSize = Tuple.Create(width, height);
+
+			DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
             return this;
         }
 
-        /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
-        /// Uses device independent points units for width/height
-        /// </summary>
-        /// <returns>The TaskParameter instance for chaining the call.</returns>
-        /// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
-        /// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
-        /// <param name="allowUpscale">Whether to upscale the image if it is smaller than passed dimensions or not; if <c>null</c> the value is taken from Configuration (<c>false</c> by default)</param>
-        public TaskParameter DownSampleInDip(int width = 0, int height = 0, bool? allowUpscale = null)
+		/// <summary>
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept.
+		/// Uses device independent points units for width/height
+		/// If both width / height is set, then height is ignored
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
+		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
+		/// <param name="allowUpscale">Whether to upscale the image if it is smaller than passed dimensions or not; if <c>null</c> the value is taken from Configuration (<c>false</c> by default)</param>
+		public TaskParameter DownSampleInDip(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = true;
-            DownSampleSize = Tuple.Create(width, height);
+            DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
             return this;
