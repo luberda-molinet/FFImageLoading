@@ -132,6 +132,7 @@
     <Compile Include="ImageSourceBinding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CachedImageFastRenderer.cs" />
+    <Compile Include="FFImageLoadingImageViewHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

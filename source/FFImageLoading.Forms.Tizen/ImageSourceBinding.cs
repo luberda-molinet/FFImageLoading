@@ -27,7 +27,7 @@ namespace FFImageLoading.Forms.Platform
 
         public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-        internal static ImageSourceBinding GetImageSourceBinding(ImageSource source, CachedImage element)
+        internal static ImageSourceBinding GetImageSourceBinding(ImageSource source, CachedImage element = null)
         {
             if (source == null)
             {
@@ -78,8 +78,8 @@ namespace FFImageLoading.Forms.Platform
             }
 
             var vectorSource = source as IVectorImageSource;
-            if (vectorSource != null)
-            {
+			if (element != null && vectorSource != null)
+			{
                 if (vectorSource.VectorHeight == 0 && vectorSource.VectorHeight == 0)
                 {
                     if (element.Height > 0d && !double.IsInfinity(element.Height))
