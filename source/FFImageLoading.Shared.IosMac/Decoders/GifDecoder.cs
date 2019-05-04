@@ -122,17 +122,10 @@ namespace FFImageLoading.Decoders
 
 #if __IOS__
 						var frames = GetFrames(sourceRef, options);
-						var delays = await GetDelaysAsync(sourceRef).ConfigureAwait(false);
+						var delays = GetDelays(sourceRef);
 						var totalDuration = delays.Sum();
 						var adjustedFrames = AdjustFramesToSpoofDurations(frames, destScale, delays, totalDuration);
 						var avgDuration = (double)totalDuration / adjustedFrames.Length;
-
-						if (avgDuration < 10)
-						{
-							var nth = (int)(10 / avgDuration);
-							avgDuration = avgDuration * nth;
-							adjustedFrames = adjustedFrames.Where((value, index) => index % nth == 0).ToArray();
-						}
 
 						images = new AnimatedImage<PImage>[adjustedFrames.Length];
 
@@ -142,9 +135,9 @@ namespace FFImageLoading.Decoders
 						}
 #elif __MACOS__
                         images = new AnimatedImage<PImage>[frameCount];
-                        var delays = await GetDelaysAsync(sourceRef).ConfigureAwait(false);
+						var delays = GetDelays(sourceRef);
 
-                        for (var i = 0; i < images.Length; i++)
+						for (var i = 0; i < images.Length; i++)
                         {
                             var nsImage = new PImage(sourceRef.CreateThumbnail(i, options), CGSize.Empty);
                             images[i] = new AnimatedImage<PImage>() { Image = nsImage, Delay = delays[i] };
@@ -220,13 +213,13 @@ namespace FFImageLoading.Decoders
 #endif
         }
 
-        private static async Task<List<int>> GetDelaysAsync(CGImageSource source)
+        private static List<int> GetDelays(CGImageSource source)
         {
             var retval = new List<int>();
 
             for (int i = 0; i < source?.ImageCount; i++)
             {
-                var delayCentiseconds = 1;
+                var delayMs = 0;
                 var properties = source.GetProperties(i, null);
                 using (var gifProperties = properties.Dictionary[ImageIO.CGImageProperties.GIFDictionary])
                 {
@@ -243,12 +236,12 @@ namespace FFImageLoading.Decoders
                             }
 
                             if (delayAsDouble > 0)
-                                delayCentiseconds = (int)(delayAsDouble * 100);
+								delayMs = (int)(delayAsDouble * 1000);
                         }
                     }
                 }
 
-                retval.Add(GifHelper.GetValidFrameDelay(delayCentiseconds));
+                retval.Add(GifHelper.GetValidFrameDelay(delayMs));
             }
 
             return retval;
@@ -402,14 +395,14 @@ namespace FFImageLoading.Decoders
         {
             var count = images.Length;
             var gcd = GetGCD(delays);
-            var frameCount = totalDuration / gcd;
+            var frameCount = totalDuration / 10 / gcd;
             var frames = new PImage[frameCount];
             var f = 0;
 
             for (var i = 0; i < count; i++)
             {
                 var frame = PImage.FromImage(images[i], scale, UIImageOrientation.Up);
-                for (var j = delays[i] / gcd; j > 0; --j)
+                for (var j = delays[i] / 10 / gcd; j > 0; --j)
                     frames[f++] = frame;
             }
 
@@ -418,10 +411,10 @@ namespace FFImageLoading.Decoders
 
         static int GetGCD(List<int> delays)
         {
-            var gcd = delays[0];
+            var gcd = delays[0] / 10;
 
             for (var i = 1; i < delays.Count; ++i)
-                gcd = PairGCD(delays[i], gcd);
+                gcd = PairGCD(delays[i] / 10, gcd);
 
             return gcd;
         }
