@@ -40,8 +40,10 @@
  
   <ItemGroup>
     <Compile Remove="AssemblyTFMAttribute.cs" />
+    <Compile Remove="Helpers\GifHelperBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Exceptions\" />
+    <Folder Include="Helpers\Gif\" />
   </ItemGroup>
 </Project>

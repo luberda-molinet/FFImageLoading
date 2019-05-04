@@ -6,7 +6,7 @@ using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using FFImageLoading.Extensions;
 using FFImageLoading.Config;
-using BumpTech.GlideLib.GifDecoderLib;
+using FFImageLoading.Helpers.Gif;
 
 namespace FFImageLoading.Decoders
 {
@@ -18,95 +18,88 @@ namespace FFImageLoading.Decoders
 
 			var result = new DecodedImage<Bitmap>();
 
-			var bitMapProvider = new BitmapProvider();
-			var gifDecoder = new StandardGifDecoder(bitMapProvider);
-
-			var bytes = stream.ToBytes();
-			gifDecoder.Read(bytes);
-			gifDecoder.Advance();
-
-			result.IsAnimated = gifDecoder.FrameCount > 1;
-
-			if (result.IsAnimated && Configuration.AnimateGifs)
+			using (var gifDecoder = new GifHelper())
 			{
-				result.AnimatedImages = new AnimatedImage<Bitmap>[gifDecoder.FrameCount];
+				gifDecoder.Read(stream, 1);
+				gifDecoder.Advance();
 
-				for (var i = 0; i < gifDecoder.FrameCount; i++)
+				result.IsAnimated = gifDecoder.FrameCount > 1;
+
+				if (result.IsAnimated && Configuration.AnimateGifs)
 				{
-					var animatedImage = new AnimatedImage<Bitmap>();
-					animatedImage.Delay = gifDecoder.GetDelay(i);
-					animatedImage.Image = gifDecoder.NextFrame;
-					result.AnimatedImages[i] = animatedImage;
+					result.AnimatedImages = new AnimatedImage<Bitmap>[gifDecoder.FrameCount];
 
-					gifDecoder.Advance();
-				}
-			}
-			else
-			{
-				result.IsAnimated = false;
-				result.Image = gifDecoder.NextFrame;
-			}
-
-
-
-			if (result.Image != null)
-			{
-				imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
-				imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
-			}
-			else if (result.AnimatedImages != null)
-			{
-				if (result.AnimatedImages.Length > 0)
-				{
-					if (result.AnimatedImages[0].Image != null)
+					for (var i = 0; i < gifDecoder.FrameCount; i++)
 					{
-						imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
-						imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+						var animatedImage = new AnimatedImage<Bitmap>
+						{
+							Delay = gifDecoder.GetDelay(i),
+							Image = gifDecoder.GetNextFrame()
+						};
+						result.AnimatedImages[i] = animatedImage;
+
+						gifDecoder.Advance();
 					}
 				}
-			}
+				else
+				{
+					result.IsAnimated = false;
+					result.Image = gifDecoder.GetNextFrame();
+				}
 
-			return result;
+
+
+				if (result.Image != null)
+				{
+					imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
+					imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
+				}
+				else if (result.AnimatedImages != null)
+				{
+					if (result.AnimatedImages.Length > 0)
+					{
+						if (result.AnimatedImages[0].Image != null)
+						{
+							imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+							imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+						}
+					}
+				}
+
+				return result;
+			}
 		}
 
+		public class GifHelper : GifHelperBase<Bitmap>
+		{
+			protected override Bitmap GetNextBitmap()
+			{
+				var config = IsFirstFrameTransparent == null || IsFirstFrameTransparent.Value
+					? Bitmap.Config.Argb8888 : Bitmap.Config.Rgb565;
+				var result = Bitmap.CreateBitmap(DownsampledWidth, DownsampledHeight, config);
+				result.HasAlpha = config == Bitmap.Config.Argb8888;
+				return result;
+			}
 
+			protected override void GetPixels(Bitmap bitmap, int[] pixels, int width, int height)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override void Release(Bitmap bitmap)
+			{
+				bitmap?.Recycle();
+			}
+
+			protected override void SetPixels(Bitmap bitmap, int[] pixels, int width, int height)
+			{
+				throw new NotImplementedException();
+			}
+		}
 
 
 		public Configuration Configuration => ImageService.Instance.Config;
 
 		public IMiniLogger Logger => ImageService.Instance.Config.Logger;
-
-		private class BitmapProvider : Java.Lang.Object, IGifDecoderBitmapProvider
-		{
-			public Bitmap Obtain(int width, int height, Bitmap.Config config)
-			{
-				return Bitmap.CreateBitmap(width, height, config);
-			}
-
-			public byte[] ObtainByteArray(int size)
-			{
-				return new byte[size];
-			}
-
-			public int[] ObtainIntArray(int size)
-			{
-				return new int[size];
-			}
-
-			public void Release(Bitmap bitmap)
-			{
-				bitmap.Recycle();
-			}
-
-			public void Release(byte[] bytes)
-			{
-				//nothing to do 
-			}
-
-			public void Release(int[] array)
-			{
-				//nothing to do 
-			}
-		}
 	}
 }

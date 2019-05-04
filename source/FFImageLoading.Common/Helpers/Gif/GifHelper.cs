@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System;
 
-namespace FFImageLoading
+namespace FFImageLoading.Helpers.Gif
 {
     internal static class GifHelper
     {

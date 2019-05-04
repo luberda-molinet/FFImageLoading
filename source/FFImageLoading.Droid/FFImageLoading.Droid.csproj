@@ -50,9 +50,6 @@
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.IO" />
     <Reference Include="System.Collections" />
-    <Reference Include="GlideGifDecoder">
-      <HintPath>..\..\packages\Karamunting.Android.BumpTech.GlideGifDecoder.4.9.0\lib\monoandroid81\GlideGifDecoder.dll</HintPath>
-    </Reference>
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
@@ -120,8 +117,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Decoders\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>
