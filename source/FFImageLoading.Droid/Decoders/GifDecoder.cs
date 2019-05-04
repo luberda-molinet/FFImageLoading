@@ -6,87 +6,107 @@ using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using FFImageLoading.Extensions;
 using FFImageLoading.Config;
+using BumpTech.GlideLib.GifDecoderLib;
 
 namespace FFImageLoading.Decoders
 {
-    public class GifDecoder : IDecoder<Bitmap>
-    {
-        public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
-        {
-            var result = new DecodedImage<Bitmap>();
-            var helper = new PlatformGifHelper();
+	public class GifDecoder : IDecoder<Bitmap>
+	{
+		public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
+		{
+			await Task.Yield();
 
-            await helper.ReadGifAsync(stream, path, parameters);
-            result.IsAnimated = helper.Frames.Count > 1;
+			var result = new DecodedImage<Bitmap>();
 
-            if (result.IsAnimated && Configuration.AnimateGifs)
-            {
-                result.AnimatedImages = new AnimatedImage<Bitmap>[helper.Frames.Count];
+			var bitMapProvider = new BitmapProvider();
+			var gifDecoder = new StandardGifDecoder(bitMapProvider);
 
-                for (int i = 0; i < helper.Frames.Count; i++)
-                {
-                    var animatedImage = new AnimatedImage<Bitmap>
-                    {
-                        Delay = helper.Frames[i].Delay,
-                        Image = helper.Frames[i].Image
-                    };
-                    result.AnimatedImages[i] = animatedImage;
-                }
-            }
-            else
-            {
-                result.IsAnimated = false;
-                result.Image = helper.Frames[0].Image;
-            }
+			var bytes = stream.ToBytes();
+			gifDecoder.Read(bytes);
+			gifDecoder.Advance();
 
-            if (result.Image != null)
-            {
-                imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
-                imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
-            }
-            else if (result.AnimatedImages != null)
-            {
-                if (result.AnimatedImages.Length > 0)
-                {
-                    if (result.AnimatedImages[0].Image != null)
-                    {
-                        imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
-                        imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
-                    }
-                }
-            }
+			result.IsAnimated = gifDecoder.FrameCount > 1;
 
-            return result;
-        }
+			if (result.IsAnimated && Configuration.AnimateGifs)
+			{
+				result.AnimatedImages = new AnimatedImage<Bitmap>[gifDecoder.FrameCount];
 
-        public Configuration Configuration => ImageService.Instance.Config;
+				for (var i = 0; i < gifDecoder.FrameCount; i++)
+				{
+					var animatedImage = new AnimatedImage<Bitmap>();
+					animatedImage.Delay = gifDecoder.GetDelay(i);
+					animatedImage.Image = gifDecoder.NextFrame;
+					result.AnimatedImages[i] = animatedImage;
 
-        public IMiniLogger Logger => ImageService.Instance.Config.Logger;
+					gifDecoder.Advance();
+				}
+			}
+			else
+			{
+				result.IsAnimated = false;
+				result.Image = gifDecoder.NextFrame;
+			}
 
-        public class PlatformGifHelper : GifHelperBase<Bitmap>
-        {
-            protected override int DipToPixels(int dips)
-            {
-                return dips.DpToPixels();
-            }
 
-            protected override Task<Bitmap> ToBitmapAsync(int[] data, int width, int height, int downsampleWidth, int downsampleHeight)
-            {
-                Bitmap bitmap;
-                bitmap = Bitmap.CreateBitmap(data, width, height, Bitmap.Config.Argb4444);
 
-                if (downsampleWidth != 0 && downsampleHeight != 0)
-                {
-                    var old = bitmap;
+			if (result.Image != null)
+			{
+				imageInformation.SetOriginalSize(result.Image.Width, result.Image.Height);
+				imageInformation.SetCurrentSize(result.Image.Width, result.Image.Height);
+			}
+			else if (result.AnimatedImages != null)
+			{
+				if (result.AnimatedImages.Length > 0)
+				{
+					if (result.AnimatedImages[0].Image != null)
+					{
+						imageInformation.SetOriginalSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+						imageInformation.SetCurrentSize(result.AnimatedImages[0].Image.Width, result.AnimatedImages[0].Image.Height);
+					}
+				}
+			}
 
-                    bitmap = Bitmap.CreateScaledBitmap(old, downsampleWidth, downsampleHeight, false);
+			return result;
+		}
 
-                    old.Recycle();
-                    old.TryDispose();
-                }
 
-                return Task.FromResult(bitmap);
-            }
-        }
-    }
+
+
+		public Configuration Configuration => ImageService.Instance.Config;
+
+		public IMiniLogger Logger => ImageService.Instance.Config.Logger;
+
+		private class BitmapProvider : Java.Lang.Object, IGifDecoderBitmapProvider
+		{
+			public Bitmap Obtain(int width, int height, Bitmap.Config config)
+			{
+				return Bitmap.CreateBitmap(width, height, config);
+			}
+
+			public byte[] ObtainByteArray(int size)
+			{
+				return new byte[size];
+			}
+
+			public int[] ObtainIntArray(int size)
+			{
+				return new int[size];
+			}
+
+			public void Release(Bitmap bitmap)
+			{
+				bitmap.Recycle();
+			}
+
+			public void Release(byte[] bytes)
+			{
+				//nothing to do 
+			}
+
+			public void Release(int[] array)
+			{
+				//nothing to do 
+			}
+		}
+	}
 }
