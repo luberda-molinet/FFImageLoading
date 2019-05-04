@@ -95,6 +95,7 @@
     <Compile Include="Decoders\BaseDecoder.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Drawables\ISelfDisposingAnimatedBitmapDrawable.cs" />
+    <Compile Include="Targets\ViewTarget.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

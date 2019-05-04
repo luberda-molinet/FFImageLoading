@@ -8,14 +8,12 @@ using System.Collections.Generic;
 
 namespace FFImageLoading.Targets
 {
-    public class ImageViewTarget : Target<SelfDisposingBitmapDrawable, ImageView>
+    public class ImageViewTarget : ViewTarget<ImageView>
     {
-        private readonly WeakReference<ImageView> _controlWeakReference;
 		private static readonly Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>> _runningAnimations = new Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>>();
 
-        public ImageViewTarget(ImageView control)
+        public ImageViewTarget(ImageView control) : base(control)
         {
-            _controlWeakReference = new WeakReference<ImageView>(control);
         }
 
 		private static void PlayAnimation(ImageView control, ISelfDisposingAnimatedBitmapDrawable drawable)
@@ -74,28 +72,6 @@ namespace FFImageLoading.Targets
 			}
 		}
 
-		private static void UpdateDrawableDisplayedState(Drawable drawable, bool isDisplayed)
-		{
-			if (drawable == null || drawable.Handle == IntPtr.Zero)
-				return;
-
-			if (drawable is ISelfDisposingBitmapDrawable selfDisposingBitmapDrawable)
-			{
-				if (selfDisposingBitmapDrawable.HasValidBitmap)
-					selfDisposingBitmapDrawable.SetIsDisplayed(isDisplayed);
-			}
-			else
-			{
-				if (drawable is LayerDrawable layerDrawable)
-				{
-					for (var i = 0; i < layerDrawable.NumberOfLayers; i++)
-					{
-						UpdateDrawableDisplayedState(layerDrawable.GetDrawable(i), isDisplayed);
-					}
-				}
-			}
-		}
-
 		private static void Set(ImageView control, SelfDisposingBitmapDrawable drawable)
 		{
 			lock (control)
@@ -129,21 +105,6 @@ namespace FFImageLoading.Targets
 			}
 		}
 
-		public override bool IsValid
-        {
-            get
-            {
-                try
-                {
-                    return Control != null && Control.Handle != IntPtr.Zero;
-                }
-                catch (ObjectDisposedException)
-                {
-                    return false;
-                }
-            }
-        }
-
         public override void SetAsEmpty(IImageLoaderTask task)
         {
             if (task == null || task.IsCancelled)
@@ -172,56 +133,6 @@ namespace FFImageLoading.Targets
 
             if (isLayoutNeeded)
                 control.RequestLayout();
-        }
-
-        private bool IsLayoutNeeded(IImageLoaderTask task, Drawable oldImage, Drawable newImage)
-        {
-            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
-            {
-                if (!task.Parameters.InvalidateLayoutEnabled.Value)
-                    return false;
-            }
-            else if (!task.Configuration.InvalidateLayout)
-            {
-                return false;
-            }
-
-            try
-            {
-                if (oldImage == null && newImage == null)
-                    return false;
-
-                if (oldImage == null && newImage != null)
-                    return true;
-
-                if (oldImage != null && newImage == null)
-                    return true;
-
-                if (oldImage != null && newImage != null)
-                {
-                    return !(oldImage.IntrinsicWidth == newImage.IntrinsicWidth && oldImage.IntrinsicHeight == newImage.IntrinsicHeight);
-                }
-            }
-            catch (Exception)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public override ImageView Control
-        {
-            get
-            {
-                if (!_controlWeakReference.TryGetTarget(out var control))
-                    return null;
-
-                if (control == null || control.Handle == IntPtr.Zero)
-                    return null;
-
-                return control;
-            }
         }
     }
 }
