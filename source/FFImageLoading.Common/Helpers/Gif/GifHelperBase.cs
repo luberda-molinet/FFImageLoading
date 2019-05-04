@@ -36,11 +36,18 @@ namespace FFImageLoading.Helpers.Gif
 
 		public int Width => _header.Width;
 		public int Height => _header.Height;
-        public Stream Data { get; private set; }
+        protected Stream Data { get; private set; }
         public GifDecodeStatus Status { get; private set; }
 		public int DownsampledHeight { get; private set; }
 		public int DownsampledWidth { get; private set; }
 		public bool? IsFirstFrameTransparent { get; private set; }
+
+		public async Task ReadHeaderAsync(Stream input)
+		{
+			input = await input.AsSeekableStreamAsync().ConfigureAwait(false);
+			var parser = new GifHeaderParser(input);
+			_header = await parser.ParseHeaderAsync().ConfigureAwait(false);
+		}
 
 		public async Task<GifDecodeStatus> ReadAsync(Stream input, int sampleSize)
 		{
@@ -50,9 +57,11 @@ namespace FFImageLoading.Helpers.Gif
 				return Status;
 			}
 
-			input = await input.AsSeekableStreamAsync();
-			var parser = new GifHeaderParser(input);
-			_header = parser.ParseHeader();
+			if (_header == null)
+			{
+				await ReadHeaderAsync(input).ConfigureAwait(false);
+			}
+
 			if (input != null)
 			{
 				SetData(_header, input, sampleSize);
@@ -169,7 +178,7 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			// Transfer pixel data to image.
-			return await SetPixelsAsync(currentFrame, previousFrame);
+			return await SetPixelsAsync(currentFrame, previousFrame).ConfigureAwait(false);
 		}
 
 		public void Clear()
@@ -290,7 +299,7 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			// Decode pixels for this frame into the global pixels[] scratch.
-			await DecodeBitmapDataAsync(currentFrame);
+			await DecodeBitmapDataAsync(currentFrame).ConfigureAwait(false);
 
 			if (currentFrame.Interlace || _sampleSize != 1)
 			{
@@ -596,7 +605,7 @@ namespace FFImageLoading.Helpers.Gif
 				// Read a new data block.
 				if (count == 0)
 				{
-					count = await ReadBlockAsync();
+					count = await ReadBlockAsync().ConfigureAwait(false);
 					if (count <= 0)
 					{
 						Status = GifDecodeStatus.STATUS_PARTIAL_DECODE;
@@ -701,7 +710,7 @@ namespace FFImageLoading.Helpers.Gif
 			{
 				return blockSize;
 			}
-			await Data.ReadAsync(_block, 0, Math.Min(blockSize, (int)Data.Length - (int)Data.Position));
+			await Data.ReadAsync(_block, 0, Math.Min(blockSize, (int)Data.Length - (int)Data.Position)).ConfigureAwait(false);
 			return blockSize;
 		}
 

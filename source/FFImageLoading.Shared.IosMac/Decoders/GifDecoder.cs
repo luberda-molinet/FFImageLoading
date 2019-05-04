@@ -11,6 +11,8 @@ using FFImageLoading.Config;
 using FFImageLoading.Helpers;
 using Foundation;
 using CoreGraphics;
+using FFImageLoading.Helpers.Gif;
+using System.Threading;
 
 #if __MACOS__
 using AppKit;
@@ -24,9 +26,9 @@ namespace FFImageLoading.Decoders
 {
     public class GifDecoder : IDecoder<PImage>
     {
-        static readonly object _gifLock = new object();
+		private static readonly SemaphoreSlim _gifLock = new SemaphoreSlim(1, 1);
 
-        public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
+        public async Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
             var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
             var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
@@ -40,13 +42,13 @@ namespace FFImageLoading.Decoders
 
             using (var nsdata = NSData.FromStream(stream))
             {
-                var result = SourceRegfToDecodedImage(nsdata, new CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale,
+                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale,
                                                       Configuration, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
-                return Task.FromResult(result);
+				return result;
             }
         }
 
-        public static IDecodedImage<PImage> SourceRegfToDecodedImage(NSData nsdata, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static async Task<IDecodedImage<PImage>> SourceRegfToDecodedImageAsync(NSData nsdata, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
             using (var sourceRef = CGImageSource.FromData(nsdata))
             {
@@ -99,46 +101,48 @@ namespace FFImageLoading.Decoders
                 // GIF
                 if (sourceRef.ImageCount > 1 && config.AnimateGifs && imageinformation.Type != ImageInformation.ImageType.ICO)
                 {
-                    lock (_gifLock)
-                    {
-                        var frameCount = sourceRef.ImageCount;
+					try
+					{
+						await _gifLock.WaitAsync().ConfigureAwait(false);
 
-                        // no need to animate, fail safe.
-                        if (frameCount <= 1)
-                        {
-                            using (var imageRef = sourceRef.CreateThumbnail(0, options))
-                            {
+						var frameCount = sourceRef.ImageCount;
+
+						// no need to animate, fail safe.
+						if (frameCount <= 1)
+						{
+							using (var imageRef = sourceRef.CreateThumbnail(0, options))
+							{
 #if __IOS__
-                            image = new PImage(imageRef, destScale, UIImageOrientation.Up);
+								image = new PImage(imageRef, destScale, UIImageOrientation.Up);
 #elif __MACOS__
                                 image = new PImage(imageRef, CGSize.Empty);
 #endif
-                            }
-                        }
+							}
+						}
 
 #if __IOS__
-                        var frames = GetFrames(sourceRef, options);
-                        var delays = GetDelays(sourceRef);
-                        var totalDuration = delays.Sum();
-                        var adjustedFrames = AdjustFramesToSpoofDurations(frames, destScale, delays, totalDuration);
-                        var avgDuration = (double)totalDuration / adjustedFrames.Length;
+						var frames = GetFrames(sourceRef, options);
+						var delays = await GetDelaysAsync(sourceRef).ConfigureAwait(false);
+						var totalDuration = delays.Sum();
+						var adjustedFrames = AdjustFramesToSpoofDurations(frames, destScale, delays, totalDuration);
+						var avgDuration = (double)totalDuration / adjustedFrames.Length;
 
-                        if (avgDuration < 10)
-                        {
-                            var nth = (int)(10 / avgDuration);
-                            avgDuration = avgDuration * nth;
-                            adjustedFrames = adjustedFrames.Where((value, index) => index % nth == 0).ToArray();
-                        }
+						if (avgDuration < 10)
+						{
+							var nth = (int)(10 / avgDuration);
+							avgDuration = avgDuration * nth;
+							adjustedFrames = adjustedFrames.Where((value, index) => index % nth == 0).ToArray();
+						}
 
-                        images = new AnimatedImage<PImage>[adjustedFrames.Length];
+						images = new AnimatedImage<PImage>[adjustedFrames.Length];
 
-                        for (int i = 0; i < images.Length; i++)
-                        {
-                            images[i] = new AnimatedImage<PImage>() { Image = adjustedFrames[i], Delay = (int)avgDuration };
-                        }
+						for (int i = 0; i < images.Length; i++)
+						{
+							images[i] = new AnimatedImage<PImage>() { Image = adjustedFrames[i], Delay = (int)avgDuration };
+						}
 #elif __MACOS__
                         images = new AnimatedImage<PImage>[frameCount];
-                        var delays = GetDelays(sourceRef);
+                        var delays = await GetDelaysAsync(sourceRef).ConfigureAwait(false);
 
                         for (var i = 0; i < images.Length; i++)
                         {
@@ -146,7 +150,11 @@ namespace FFImageLoading.Decoders
                             images[i] = new AnimatedImage<PImage>() { Image = nsImage, Delay = delays[i] };
                         }
 #endif
-                    }
+					}
+					finally
+					{
+						_gifLock.Release();
+					}
                 }
                 else
                 {
@@ -212,7 +220,7 @@ namespace FFImageLoading.Decoders
 #endif
         }
 
-        private static List<int> GetDelays(CGImageSource source)
+        private static async Task<List<int>> GetDelaysAsync(CGImageSource source)
         {
             var retval = new List<int>();
 

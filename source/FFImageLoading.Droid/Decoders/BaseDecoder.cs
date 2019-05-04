@@ -88,7 +88,7 @@ namespace FFImageLoading.Decoders
                     downsampleHeight = downsampleHeight.DpToPixels();
                 }
 
-                options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? Configuration.AllowUpscale);
+                options.InSampleSize = CalculateInSampleSize(options.OutWidth, options.OutHeight, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? Configuration.AllowUpscale);
 
                 if (options.InSampleSize > 1)
                     imageInformation.SetCurrentSize(
@@ -138,11 +138,11 @@ namespace FFImageLoading.Decoders
         /// <param name="reqHeight"></param>
         /// <param name="allowUpscale"></param>
         /// <returns></returns>
-        public static int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight, bool allowUpscale)
+        public static int CalculateInSampleSize(int sourceWidth, int sourceHeight, int reqWidth, int reqHeight, bool allowUpscale)
         {
-            // Raw height and width of image
-            float height = options.OutHeight;
-            float width = options.OutWidth;
+			// Raw height and width of image
+			float width = sourceWidth;
+			float height = sourceHeight;
 
             if (reqWidth == 0)
                 reqWidth = (int)((reqHeight / height) * width);

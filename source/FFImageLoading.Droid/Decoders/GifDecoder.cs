@@ -18,10 +18,35 @@ namespace FFImageLoading.Decoders
 
 			using (var gifDecoder = new GifHelper())
 			{
-				await gifDecoder.ReadAsync(stream, 1);
+				var insampleSize = 1;
+
+				// DOWNSAMPLE
+				if (parameters.DownSampleSize != null && (parameters.DownSampleSize.Item1 > 0 || parameters.DownSampleSize.Item2 > 0))
+				{
+					// Calculate inSampleSize
+					var downsampleWidth = parameters.DownSampleSize.Item1;
+					var downsampleHeight = parameters.DownSampleSize.Item2;
+
+					if (parameters.DownSampleUseDipUnits)
+					{
+						downsampleWidth = downsampleWidth.DpToPixels();
+						downsampleHeight = downsampleHeight.DpToPixels();
+					}
+					await gifDecoder.ReadHeaderAsync(stream).ConfigureAwait(false);
+					insampleSize = BaseDecoder.CalculateInSampleSize(gifDecoder.Width, gifDecoder.Height, downsampleWidth, downsampleHeight, false);
+				}
+
+				await gifDecoder.ReadAsync(stream, insampleSize).ConfigureAwait(false);
 				gifDecoder.Advance();
 
-				result.IsAnimated = gifDecoder.FrameCount > 1;
+				imageInformation.SetOriginalSize(gifDecoder.Width, gifDecoder.Height);
+
+				if (insampleSize > 1)
+					imageInformation.SetCurrentSize(gifDecoder.DownsampledWidth, gifDecoder.DownsampledHeight);
+				else
+					imageInformation.SetCurrentSize(gifDecoder.Width, gifDecoder.Height);
+
+				result.IsAnimated = gifDecoder.FrameCount > 1 && Configuration.AnimateGifs;
 
 				if (result.IsAnimated && Configuration.AnimateGifs)
 				{

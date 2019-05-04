@@ -95,7 +95,6 @@
     <Compile Include="Decoders\GifDecoder.cs" />
     <Compile Include="Decoders\BaseDecoder.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
-    <Compile Include="Extensions\StreamExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

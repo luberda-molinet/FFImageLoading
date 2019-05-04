@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers.Gif
 {
@@ -40,7 +41,7 @@ namespace FFImageLoading.Helpers.Gif
 			_rawData = data;
 		}
 
-		public GifHeader ParseHeader()
+		public async Task<GifHeader> ParseHeaderAsync()
 		{
 			if (_rawData == null)
 			{
@@ -55,7 +56,7 @@ namespace FFImageLoading.Helpers.Gif
 			ReadHeader();
 			if (!Error)
 			{
-				ReadContents();
+				await ReadContentsAsync().ConfigureAwait(false);
 				if (_header.FrameCount < 0)
 				{
 					_header.Status = GifDecodeStatus.STATUS_FORMAT_ERROR;
@@ -65,22 +66,22 @@ namespace FFImageLoading.Helpers.Gif
 			return _header;
 		}
 
-		public bool IsAnimated()
+		public async Task<bool> IsAnimatedAsync()
 		{
 			ReadHeader();
 			if (!Error)
 			{
-				ReadContents(2 /* maxFrames */);
+				await ReadContentsAsync(2 /* maxFrames */).ConfigureAwait(false);
 			}
 			return _header.FrameCount > 1;
 		}
 
-		private void ReadContents()
+		private async Task ReadContentsAsync()
 		{
-			ReadContents(int.MaxValue /* maxFrames */);
+			await ReadContentsAsync(int.MaxValue /* maxFrames */).ConfigureAwait(false);
 		}
 
-		private void ReadContents(int maxFrames)
+		private async Task ReadContentsAsync(int maxFrames)
 		{
 			// Read GIF file content blocks.
 			bool done = false;
@@ -110,7 +111,7 @@ namespace FFImageLoading.Helpers.Gif
 								ReadGraphicControlExt();
 								break;
 							case LABEL_APPLICATION_EXTENSION:
-								ReadBlock();
+								await ReadBlockAsync().ConfigureAwait(false);
 								var app = new StringBuilder();
 								for (int i = 0; i < 11; i++)
 								{
@@ -118,7 +119,7 @@ namespace FFImageLoading.Helpers.Gif
 								}
 								if (app.ToString().Equals("NETSCAPE2.0"))
 								{
-									ReadNetscapeExt();
+									await ReadNetscapeExtAsync().ConfigureAwait(false);
 								}
 								else
 								{
@@ -240,11 +241,11 @@ namespace FFImageLoading.Helpers.Gif
 			_header.Frames.Add(_header.CurrentFrame);
 		}
 
-		private void ReadNetscapeExt()
+		private async Task ReadNetscapeExtAsync()
 		{
 			do
 			{
-				ReadBlock();
+				await ReadBlockAsync().ConfigureAwait(false);
 				if (_block[0] == 1)
 				{
 					// Loop count sub-block.
@@ -350,7 +351,7 @@ namespace FFImageLoading.Helpers.Gif
 			} while (bSize > 0);
 		}
 
-		private void ReadBlock()
+		private async Task ReadBlockAsync()
 		{
 			_blockSize = Read();
 			int n = 0;
@@ -362,7 +363,7 @@ namespace FFImageLoading.Helpers.Gif
 					while (n < _blockSize)
 					{
 						count = _blockSize - n;
-						_rawData.Read(_block, n, count);
+						await _rawData.ReadAsync(_block, n, count).ConfigureAwait(false);
 
 						n += count;
 					}

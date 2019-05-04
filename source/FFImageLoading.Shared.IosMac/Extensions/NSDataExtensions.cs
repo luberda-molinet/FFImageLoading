@@ -8,6 +8,7 @@ using FFImageLoading.Config;
 using System.Threading;
 using FFImageLoading.Decoders;
 using System.Linq;
+using System.Threading.Tasks;
 
 #if __MACOS__
 using AppKit;
@@ -21,9 +22,9 @@ namespace FFImageLoading.Extensions
 {
     public static class NSDataExtensions
     {
-        public static PImage ToImage(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
-            var decoded = GifDecoder.SourceRegfToDecodedImage(data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale);
+            var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale);
 
             PImage result;
 
