@@ -18,7 +18,7 @@ namespace FFImageLoading.Helpers.Gif
 		private const int TOTAL_ITERATION_COUNT_FOREVER = 0;
 		private int[] act;
 		private int[] pct = new int[256];
-		private MemoryStream rawData;
+		private Stream rawData;
 		private byte[] block;
 
 		// LZW decoder working arrays.
@@ -44,8 +44,27 @@ namespace FFImageLoading.Helpers.Gif
 
 		public int Width => header.Width;
 		public int Height => header.Height;
-		public MemoryStream Data => rawData;
+		public Stream Data => rawData;
 		public GifDecodeStatus Status => status;
+
+		public async Task<GifDecodeStatus> ReadAsync(Stream input, int sampleSize)
+		{
+			if (input == null)
+			{
+				status = GifDecodeStatus.STATUS_OPEN_ERROR;
+				return status;
+			}
+
+			input = await input.AsSeekableStreamAsync();
+			var parser = new GifHeaderParser(input);
+			header = parser.ParseHeader();
+			if (input != null)
+			{
+				SetData(header, input, sampleSize);
+			}
+
+			return status;
+		}
 
 		public void Advance()
 		{
@@ -158,23 +177,6 @@ namespace FFImageLoading.Helpers.Gif
 			return SetPixels(currentFrame, previousFrame);
 		}
 
-		public GifDecodeStatus Read(MemoryStream input, int sampleSize)
-		{
-			if (input == null)
-			{
-				status = GifDecodeStatus.STATUS_OPEN_ERROR;
-				return status;
-			}
-
-			header = new GifHeaderParser(input).ParseHeader();
-			if (input != null)
-			{
-				SetData(header, input, sampleSize);
-			}
-
-			return status;
-		}
-
 		public void Clear()
 		{
 			if (previousImage != default)
@@ -191,7 +193,7 @@ namespace FFImageLoading.Helpers.Gif
 			IsFirstFrameTransparent = null;
 		}
 
-		private void SetData(GifHeader header, MemoryStream buffer, int sampleSize)
+		private void SetData(GifHeader header, Stream buffer, int sampleSize)
 		{
 			if (sampleSize <= 0)
 			{
@@ -219,12 +221,12 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			this.sampleSize = sampleSize;
-			downsampledWidth = header.Width / sampleSize;
-			downsampledHeight = header.Height / sampleSize;
+			DownsampledWidth = header.Width / sampleSize;
+			DownsampledHeight = header.Height / sampleSize;
 			// Now that we know the size, init scratch arrays.
 			// TODO Find a way to avoid this entirely or at least downsample it (either should be possible).
 			mainPixels = new byte[header.Width * header.Height];
-			mainScratch = new int[downsampledWidth * downsampledHeight];
+			mainScratch = new int[DownsampledWidth * DownsampledHeight];
 		}
 
 		private TNativeImageContainer SetPixels(GifFrame currentFrame, GifFrame previousFrame)
@@ -274,9 +276,9 @@ namespace FFImageLoading.Helpers.Gif
 					int downsampledIY = previousFrame.Y / sampleSize;
 					int downsampledIW = previousFrame.Width / sampleSize;
 					int downsampledIX = previousFrame.X / sampleSize;
-					int topLeft = downsampledIY * downsampledWidth + downsampledIX;
-					int bottomLeft = topLeft + downsampledIH * downsampledWidth;
-					for (int left = topLeft; left < bottomLeft; left += downsampledWidth)
+					int topLeft = downsampledIY * DownsampledWidth + downsampledIX;
+					int bottomLeft = topLeft + downsampledIH * DownsampledWidth;
+					for (int left = topLeft; left < bottomLeft; left += DownsampledWidth)
 					{
 						int right = left + downsampledIW;
 						for (int pointer = left; pointer < right; pointer++)
@@ -288,7 +290,7 @@ namespace FFImageLoading.Helpers.Gif
 				else if (previousFrame.Dispose == GifFrame.Disposal.PREVIOUS && previousImage != default)
 				{
 					// Start with the previous frame
-					GetPixels(previousImage, dest, downsampledWidth, downsampledHeight);
+					GetPixels(previousImage, dest, DownsampledWidth, DownsampledHeight);
 				}
 			}
 
@@ -312,12 +314,12 @@ namespace FFImageLoading.Helpers.Gif
 				{
 					previousImage = GetNextBitmap();
 				}
-				SetPixels(previousImage, dest, downsampledWidth, downsampledHeight);
+				SetPixels(previousImage, dest, DownsampledWidth, DownsampledHeight);
 			}
 
 			// Set pixels for current image.
 			var result = GetNextBitmap();
-			SetPixels(result, dest, downsampledWidth, downsampledHeight);
+			SetPixels(result, dest, DownsampledWidth, DownsampledHeight);
 			return result;
 		}
 
@@ -330,10 +332,10 @@ namespace FFImageLoading.Helpers.Gif
 			int downsampledIX = currentFrame.X;
 			// Copy each source line to the appropriate place in the destination.
 			bool isFirstFrame = framePointer == 0;
-			int width = this.downsampledWidth;
+			int width = DownsampledWidth;
 			byte[] mainPixels = this.mainPixels;
 			int[] act = this.act;
-			byte transparentColorIndex = Convert.ToByte(-1);
+			byte? transparentColorIndex = null;
 			for (int i = 0; i < downsampledIH; i++)
 			{
 				int line = i + downsampledIY;
@@ -372,7 +374,7 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			IsFirstFrameTransparent = IsFirstFrameTransparent.GetValueOrDefault()
-					|| (isFirstFrame && transparentColorIndex != Convert.ToByte(-1));
+					|| (isFirstFrame && transparentColorIndex != null);
 		}
 
 		private void CopyCopyIntoScratchRobust(GifFrame currentFrame)
@@ -389,8 +391,8 @@ namespace FFImageLoading.Helpers.Gif
 			int inc = 8;
 			int iline = 0;
 			var isFirstFrame = framePointer == 0;
-			int downsampledWidth = this.downsampledWidth;
-			int downsampledHeight = this.downsampledHeight;
+			int downsampledWidth = DownsampledWidth;
+			int downsampledHeight = DownsampledHeight;
 			byte[] mainPixels = this.mainPixels;
 			int[] act = this.act;
 

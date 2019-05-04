@@ -14,13 +14,11 @@ namespace FFImageLoading.Decoders
 	{
 		public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream stream, string path, ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
 		{
-			await Task.Yield();
-
 			var result = new DecodedImage<Bitmap>();
 
 			using (var gifDecoder = new GifHelper())
 			{
-				gifDecoder.Read(stream, 1);
+				await gifDecoder.ReadAsync(stream, 1);
 				gifDecoder.Advance();
 
 				result.IsAnimated = gifDecoder.FrameCount > 1;
@@ -83,7 +81,7 @@ namespace FFImageLoading.Decoders
 
 			protected override void GetPixels(Bitmap bitmap, int[] pixels, int width, int height)
 			{
-				throw new NotImplementedException();
+				bitmap.GetPixels(pixels, 0, width, 0, 0, width, height);
 			}
 
 			protected override void Release(Bitmap bitmap)
@@ -93,7 +91,7 @@ namespace FFImageLoading.Decoders
 
 			protected override void SetPixels(Bitmap bitmap, int[] pixels, int width, int height)
 			{
-				throw new NotImplementedException();
+				bitmap.SetPixels(pixels, 0, width, 0, 0, width, height);
 			}
 		}
 

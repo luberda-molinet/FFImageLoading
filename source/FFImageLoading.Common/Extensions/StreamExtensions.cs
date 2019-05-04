@@ -1,0 +1,64 @@
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace FFImageLoading
+{
+	public static class StreamExtensions
+	{
+		public static async Task<Stream> AsSeekableStreamAsync(this Stream stream, bool forceCopy = false)
+		{
+			var lengthSupported = true;
+
+			try
+			{
+				var length = stream.Length;
+			}
+			catch (NotSupportedException)
+			{
+				lengthSupported = false;
+			}
+
+			if (lengthSupported && !forceCopy && stream.CanSeek)
+			{
+				if (stream.Position != 0)
+					stream.Position = 0;
+
+				return stream;
+			}
+
+			if (stream.Position != 0)
+			{
+				if (!stream.CanSeek)
+					throw new NotSupportedException("Stream position is not 0 and it's not seekable, can't create a copy");
+
+				stream.Position = 0;
+			}
+
+			using (stream)
+			{
+				var ms = new MemoryStream();
+				await stream.CopyToAsync(ms);
+				ms.Position = 0;
+				return ms;
+			}
+		}
+
+		public static byte[] ToByteArray(this Stream stream)
+		{
+			if (stream == null)
+				return null;
+
+			if (stream is MemoryStream memoryStream)
+			{
+				return memoryStream.ToArray();
+			}
+
+			using (var ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
+		}
+	}
+}

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FFImageLoading.Helpers.Gif
 {
-	public class GifHeaderParser
+	public class GifHeaderParser : IDisposable
 	{
 		const int MASK_INT_LOWEST_BYTE = 0x000000FF;
 		const int MIN_FRAME_DELAY = 2;
@@ -23,50 +23,22 @@ namespace FFImageLoading.Helpers.Gif
 		const int DESCRIPTOR_MASK_LCT_FLAG = 0b10000000;
 		const int DESCRIPTOR_MASK_INTERLACE_FLAG = 0b01000000;
 		const int DESCRIPTOR_MASK_LCT_SIZE = 0b00000111;
-
 		const int DEFAULT_FRAME_DELAY = 10;
 		const int MAX_BLOCK_SIZE = 256;
+
 		byte[] block = new byte[MAX_BLOCK_SIZE];
-		int blockSize = 0;
-		private MemoryStream rawData;
-		private BinaryReader rawDataReader;
+		int blockSize;
+
+		private Stream rawData;
 		private GifHeader header;
 
-		public GifHeaderParser(MemoryStream data)
+		public GifHeaderParser(Stream data)
 		{
-			Reset();
-			data.Position = 0;
-			rawData = data;
-			rawDataReader = new BinaryReader(rawData);
-		}
-
-		public GifHeaderParser(byte[] data)
-		{
-			if (data != null)
-			{
-				Reset();
-				rawData = new MemoryStream(data);
-				rawDataReader = new BinaryReader(rawData);
-			}
-			else
-			{
-				rawData = null;
-				header.Status = GifDecodeStatus.STATUS_OPEN_ERROR;
-			}
-		}
-
-		public void Clear()
-		{
-			rawData = null;
-			header = null;
-		}
-
-		private void Reset()
-		{
-			rawData = null;
 			Array.Clear(block, 0, block.Length);
 			header = new GifHeader();
 			blockSize = 0;
+			data.Position = 0;
+			rawData = data;
 		}
 
 		public GifHeader ParseHeader()
@@ -75,13 +47,14 @@ namespace FFImageLoading.Helpers.Gif
 			{
 				throw new ArgumentNullException(nameof(rawData));
 			}
-			if (Err())
+
+			if (Error)
 			{
 				return header;
 			}
 
 			ReadHeader();
-			if (!Err())
+			if (!Error)
 			{
 				ReadContents();
 				if (header.FrameCount < 0)
@@ -96,7 +69,7 @@ namespace FFImageLoading.Helpers.Gif
 		public bool IsAnimated()
 		{
 			ReadHeader();
-			if (!Err())
+			if (!Error)
 			{
 				ReadContents(2 /* maxFrames */);
 			}
@@ -112,7 +85,7 @@ namespace FFImageLoading.Helpers.Gif
 		{
 			// Read GIF file content blocks.
 			bool done = false;
-			while (!(done || Err() || header.FrameCount > maxFrames))
+			while (!(done || Error || header.FrameCount > maxFrames))
 			{
 				int code = Read();
 				switch (code)
@@ -135,7 +108,7 @@ namespace FFImageLoading.Helpers.Gif
 							case LABEL_GRAPHIC_CONTROL_EXTENSION:
 								// Start a new frame.
 								header.CurrentFrame = new GifFrame();
-								readGraphicControlExt();
+								ReadGraphicControlExt();
 								break;
 							case LABEL_APPLICATION_EXTENSION:
 								ReadBlock();
@@ -146,7 +119,7 @@ namespace FFImageLoading.Helpers.Gif
 								}
 								if (app.ToString().Equals("NETSCAPE2.0"))
 								{
-									readNetscapeExt();
+									ReadNetscapeExt();
 								}
 								else
 								{
@@ -179,7 +152,7 @@ namespace FFImageLoading.Helpers.Gif
 			}
 		}
 
-		private void readGraphicControlExt()
+		private void ReadGraphicControlExt()
 		{
 			// Block size.
 			Read();
@@ -211,7 +184,7 @@ namespace FFImageLoading.Helpers.Gif
 			{
 				delayInHundredthsOfASecond = DEFAULT_FRAME_DELAY;
 			}
-			header.CurrentFrame.Delay = delayInHundredthsOfASecond * 10;
+			header.CurrentFrame.Delay = GifHelper.GetValidFrameDelay(delayInHundredthsOfASecond * 10);
 			// Transparent color index
 			header.CurrentFrame.TransparencyIndex = Read();
 			// Block terminator
@@ -256,9 +229,9 @@ namespace FFImageLoading.Helpers.Gif
 			header.CurrentFrame.BufferFrameStart = (int)rawData.Position;
 
 			// False decode pixel data to advance buffer.
-			skipImageData();
+			SkipImageData();
 
-			if (Err())
+			if (Error)
 			{
 				return;
 			}
@@ -268,7 +241,7 @@ namespace FFImageLoading.Helpers.Gif
 			header.Frames.Add(header.CurrentFrame);
 		}
 
-		private void readNetscapeExt()
+		private void ReadNetscapeExt()
 		{
 			do
 			{
@@ -280,7 +253,7 @@ namespace FFImageLoading.Helpers.Gif
 					int b2 = ((int)block[2]) & MASK_INT_LOWEST_BYTE;
 					header.LoopCount = (b2 << 8) | b1;
 				}
-			} while ((blockSize > 0) && !Err());
+			} while ((blockSize > 0) && !Error);
 		}
 
 		private void ReadHeader()
@@ -296,7 +269,7 @@ namespace FFImageLoading.Helpers.Gif
 				return;
 			}
 			ReadLSD();
-			if (header.GCTFlag && !Err())
+			if (header.GCTFlag && !Error)
 			{
 				header.GCT = ReadColorTable(header.GCTSize);
 				header.BackgroundColor = header.GCT[header.BackgroundIndex];
@@ -359,7 +332,7 @@ namespace FFImageLoading.Helpers.Gif
 			return tab;
 		}
 
-		private void skipImageData()
+		private void SkipImageData()
 		{
 			// lzwMinCodeSize
 			Read();
@@ -407,7 +380,7 @@ namespace FFImageLoading.Helpers.Gif
 			var currByte = 0;
 			try
 			{
-				currByte = rawDataReader.Read() & MASK_INT_LOWEST_BYTE;
+				currByte = rawData.ReadByte() & MASK_INT_LOWEST_BYTE;
 			}
 			catch (Exception)
 			{
@@ -416,15 +389,17 @@ namespace FFImageLoading.Helpers.Gif
 			return currByte;
 		}
 
-		private int ReadShort()
+		private short ReadShort()
 		{
 			// Read 16-bit value.
-			return rawDataReader.ReadInt16();
+			return (short)(rawData.ReadByte() | (rawData.ReadByte() << 8));
 		}
 
-		private bool Err()
+		private bool Error => header.Status != GifDecodeStatus.STATUS_OK;
+
+		public void Dispose()
 		{
-			return header.Status != GifDecodeStatus.STATUS_OK;
+			rawData = null;
 		}
 	}
 }
