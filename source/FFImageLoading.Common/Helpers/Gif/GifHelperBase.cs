@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using FFImageLoading.Helpers;
-using FFImageLoading.Work;
 
 namespace FFImageLoading.Helpers.Gif
 {
 	public abstract class GifHelperBase<TNativeImageContainer> : IDisposable
 	{
+#pragma warning disable IDE1006 // Naming Styles
 		private const int MAX_STACK_SIZE = 4 * 1024;
 		private const int NULL_CODE = -1;
 		private const int INITIAL_FRAME_POINTER = -1;
@@ -16,141 +14,138 @@ namespace FFImageLoading.Helpers.Gif
 		private const int MASK_INT_LOWEST_BYTE = 0x000000FF;
 		private const int COLOR_TRANSPARENT_BLACK = 0x00000000;
 		private const int TOTAL_ITERATION_COUNT_FOREVER = 0;
-		private int[] act;
-		private int[] pct = new int[256];
-		private Stream rawData;
-		private byte[] block;
+#pragma warning restore IDE1006 // Naming Styles
+		private int[] _act;
+		private readonly int[] _pct = new int[256];
+		private byte[] _block;
 
 		// LZW decoder working arrays.
-		private short[] prefix;
-		private byte[] suffix;
-		private byte[] pixelStack;
-		private byte[] mainPixels;
-		private int[] mainScratch;
-
-		private int framePointer;
-		private GifHeader header;
-		private TNativeImageContainer previousImage;
-		private bool savePrevious;
-		private GifDecodeStatus status;
-		private int sampleSize;
-		public int DownsampledHeight { get; private set; }
-		public int DownsampledWidth { get; private set; }
-		public bool? IsFirstFrameTransparent { get; private set; }
+		private short[] _prefix;
+		private byte[] _suffix;
+		private byte[] _pixelStack;
+		private byte[] _mainPixels;
+		private int[] _mainScratch;
+		private GifHeader _header;
+		private TNativeImageContainer _previousImage;
+		private bool _savePrevious;
+		private int _sampleSize;
 
 		protected abstract void Release(TNativeImageContainer bitmap);
 		protected abstract void SetPixels(TNativeImageContainer bitmap, int[] pixels, int width, int height);
 		protected abstract void GetPixels(TNativeImageContainer bitmap, int[] pixels, int width, int height);
 
-		public int Width => header.Width;
-		public int Height => header.Height;
-		public Stream Data => rawData;
-		public GifDecodeStatus Status => status;
+		public int Width => _header.Width;
+		public int Height => _header.Height;
+        public Stream Data { get; private set; }
+        public GifDecodeStatus Status { get; private set; }
+		public int DownsampledHeight { get; private set; }
+		public int DownsampledWidth { get; private set; }
+		public bool? IsFirstFrameTransparent { get; private set; }
 
 		public async Task<GifDecodeStatus> ReadAsync(Stream input, int sampleSize)
 		{
 			if (input == null)
 			{
-				status = GifDecodeStatus.STATUS_OPEN_ERROR;
-				return status;
+				Status = GifDecodeStatus.STATUS_OPEN_ERROR;
+				return Status;
 			}
 
 			input = await input.AsSeekableStreamAsync();
 			var parser = new GifHeaderParser(input);
-			header = parser.ParseHeader();
+			_header = parser.ParseHeader();
 			if (input != null)
 			{
-				SetData(header, input, sampleSize);
+				SetData(_header, input, sampleSize);
 			}
 
-			return status;
+			return Status;
 		}
 
 		public void Advance()
 		{
-			framePointer = (framePointer + 1) % header.FrameCount;
+			CurrentFrameIndex = (CurrentFrameIndex + 1) % _header.FrameCount;
 		}
 
 		public int GetDelay(int n)
 		{
 			int delay = -1;
-			if ((n >= 0) && (n < header.FrameCount))
+			if ((n >= 0) && (n < _header.FrameCount))
 			{
-				delay = header.Frames[n].Delay;
+				delay = _header.Frames[n].Delay;
 			}
 			return delay;
 		}
 
 		public int GetNextDelay()
 		{
-			if (header.FrameCount <= 0 || framePointer < 0)
+			if (_header.FrameCount <= 0 || CurrentFrameIndex < 0)
 			{
 				return 0;
 			}
 
-			return GetDelay(framePointer);
+			return GetDelay(CurrentFrameIndex);
 		}
 
-		public int FrameCount => header.FrameCount;
+		public int FrameCount => _header.FrameCount;
 
-		public int CurrentFrameIndex => framePointer;
+        public int CurrentFrameIndex { get; private set; }
 
-		public void ResetFrameIndex()
+        public void ResetFrameIndex()
 		{
-			framePointer = INITIAL_FRAME_POINTER;
+			CurrentFrameIndex = INITIAL_FRAME_POINTER;
 		}
 
-		public int NetscapeLoopCount => header.LoopCount;
+		public int NetscapeLoopCount => _header.LoopCount;
 
 		public int GetTotalIterationCount()
 		{
-			if (header.LoopCount == (int)GifHeader.LoopCountType.NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST)
+			if (_header.LoopCount == (int)GifHeader.LoopCountType.NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST)
 			{
 				return 1;
 			}
-			if (header.LoopCount == (int)GifHeader.LoopCountType.NETSCAPE_LOOP_COUNT_FOREVER)
+			if (_header.LoopCount == (int)GifHeader.LoopCountType.NETSCAPE_LOOP_COUNT_FOREVER)
 			{
 				return TOTAL_ITERATION_COUNT_FOREVER;
 			}
-			return header.LoopCount + 1;
+			return _header.LoopCount + 1;
 		}
 
 		public int GetByteSize()
 		{
-			return (int)rawData.Length + mainPixels.Length + (mainScratch.Length * BYTES_PER_INTEGER);
+			return (int)Data.Length + _mainPixels.Length + (_mainScratch.Length * BYTES_PER_INTEGER);
 		}
 
-		public TNativeImageContainer GetNextFrame()
+		public async Task<TNativeImageContainer> GetNextFrameAsync()
 		{
-			if (header.FrameCount <= 0 || framePointer < 0)
+			if (_header.FrameCount <= 0 || CurrentFrameIndex < 0)
 			{
-				status = GifDecodeStatus.STATUS_FORMAT_ERROR;
+				Status = GifDecodeStatus.STATUS_FORMAT_ERROR;
 			}
-			if (status == GifDecodeStatus.STATUS_FORMAT_ERROR || status == GifDecodeStatus.STATUS_OPEN_ERROR)
+			if (Status == GifDecodeStatus.STATUS_FORMAT_ERROR || Status == GifDecodeStatus.STATUS_OPEN_ERROR)
 			{
 				return default;
 			}
-			status = GifDecodeStatus.STATUS_OK;
+			Status = GifDecodeStatus.STATUS_OK;
 
-			if (block == null)
+			if (_block == null)
 			{
-				block = new byte[255];
+				_block = new byte[255];
 			}
 
-			GifFrame currentFrame = header.Frames[framePointer];
+			GifFrame currentFrame = _header.Frames[CurrentFrameIndex];
 			GifFrame previousFrame = null;
-			int previousIndex = framePointer - 1;
+			int previousIndex = CurrentFrameIndex - 1;
 			if (previousIndex >= 0)
 			{
-				previousFrame = header.Frames[previousIndex];
+				previousFrame = _header.Frames[previousIndex];
 			}
 
 			// Set the appropriate color table.
-			act = currentFrame.LCT ?? header.GCT;
-			if (act == null)
+			_act = currentFrame.LCT ?? _header.GCT;
+			if (_act == null)
 			{
 				// No color table defined.
-				status = GifDecodeStatus.STATUS_FORMAT_ERROR;
+				Status = GifDecodeStatus.STATUS_FORMAT_ERROR;
 				return default;
 			}
 
@@ -158,13 +153,13 @@ namespace FFImageLoading.Helpers.Gif
 			if (currentFrame.Transparency)
 			{
 				// Prepare local copy of color table ("pct = act"), see #1068
-				Array.Copy(act, 0, pct, 0, act.Length);
+				Array.Copy(_act, 0, _pct, 0, _act.Length);
 				// Forget about act reference from shared header object, use copied version
-				act = pct;
+				_act = _pct;
 				// Set transparent color if specified.
-				act[currentFrame.TransparencyIndex] = COLOR_TRANSPARENT_BLACK;
+				_act[currentFrame.TransparencyIndex] = COLOR_TRANSPARENT_BLACK;
 
-				if (currentFrame.Dispose == GifFrame.Disposal.BACKGROUND && framePointer == 0)
+				if (currentFrame.Dispose == GifFrame.Disposal.BACKGROUND && CurrentFrameIndex == 0)
 				{
 					// TODO: We should check and see if all individual pixels are replaced. If they are, the
 					// first frame isn't actually transparent. For now, it's simpler and safer to assume
@@ -174,22 +169,22 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			// Transfer pixel data to image.
-			return SetPixels(currentFrame, previousFrame);
+			return await SetPixelsAsync(currentFrame, previousFrame);
 		}
 
 		public void Clear()
 		{
-			if (previousImage != default)
+			if (_previousImage != default)
 			{
-				Release(previousImage);
+				Release(_previousImage);
 			}
 
-			header = null;
-			mainPixels = null;
-			mainScratch = null;
-			block = null;
-			previousImage = default;
-			rawData = null;
+			_header = null;
+			_mainPixels = null;
+			_mainScratch = null;
+			_block = null;
+			_previousImage = default;
+			Data = null;
 			IsFirstFrameTransparent = null;
 		}
 
@@ -201,47 +196,47 @@ namespace FFImageLoading.Helpers.Gif
 			}
 			// Make sure sample size is a power of 2.
 			sampleSize = sampleSize.HighestOneBit();
-			this.status = GifDecodeStatus.STATUS_OK;
-			this.header = header;
-			framePointer = INITIAL_FRAME_POINTER;
+			this.Status = GifDecodeStatus.STATUS_OK;
+			this._header = header;
+			CurrentFrameIndex = INITIAL_FRAME_POINTER;
 			// Initialize the raw data buffer.
-			rawData = buffer;
-			rawData.Position = 0;
+			Data = buffer;
+			Data.Position = 0;
 
 			// No point in specially saving an old frame if we're never going to use it.
-			savePrevious = false;
+			_savePrevious = false;
 
 			foreach (var frame in header.Frames)
 			{
 				if (frame.Dispose == GifFrame.Disposal.PREVIOUS)
 				{
-					savePrevious = true;
+					_savePrevious = true;
 					break;
 				}
 			}
 
-			this.sampleSize = sampleSize;
+			this._sampleSize = sampleSize;
 			DownsampledWidth = header.Width / sampleSize;
 			DownsampledHeight = header.Height / sampleSize;
 			// Now that we know the size, init scratch arrays.
 			// TODO Find a way to avoid this entirely or at least downsample it (either should be possible).
-			mainPixels = new byte[header.Width * header.Height];
-			mainScratch = new int[DownsampledWidth * DownsampledHeight];
+			_mainPixels = new byte[header.Width * header.Height];
+			_mainScratch = new int[DownsampledWidth * DownsampledHeight];
 		}
 
-		private TNativeImageContainer SetPixels(GifFrame currentFrame, GifFrame previousFrame)
+		private async Task<TNativeImageContainer> SetPixelsAsync(GifFrame currentFrame, GifFrame previousFrame)
 		{
 			// Final location of blended pixels.
-			int[] dest = mainScratch;
+			int[] dest = _mainScratch;
 
 			// clear all pixels when meet first frame and drop prev image from last loop
 			if (previousFrame == null)
 			{
-				if (previousImage != default)
+				if (_previousImage != default)
 				{
-					Release(previousImage);
+					Release(_previousImage);
 				}
-				previousImage = default;
+				_previousImage = default;
 				dest.Fill(COLOR_TRANSPARENT_BLACK);
 			}
 
@@ -249,7 +244,7 @@ namespace FFImageLoading.Helpers.Gif
 			// When DISPOSAL_PREVIOUS and previousImage didn't be set, new frame should draw on
 			// a empty image
 			if (previousFrame != null && previousFrame.Dispose == GifFrame.Disposal.PREVIOUS
-					&& previousImage == default)
+					&& _previousImage == default)
 			{
 				dest.Fill(COLOR_TRANSPARENT_BLACK);
 			}
@@ -265,17 +260,17 @@ namespace FFImageLoading.Helpers.Gif
 					int c = COLOR_TRANSPARENT_BLACK;
 					if (!currentFrame.Transparency)
 					{
-						c = header.BackgroundColor;
-						if (currentFrame.LCT != null && header.BackgroundIndex == currentFrame.TransparencyIndex)
+						c = _header.BackgroundColor;
+						if (currentFrame.LCT != null && _header.BackgroundIndex == currentFrame.TransparencyIndex)
 						{
 							c = COLOR_TRANSPARENT_BLACK;
 						}
 					}
 					// The area used by the graphic must be restored to the background color.
-					int downsampledIH = previousFrame.Height / sampleSize;
-					int downsampledIY = previousFrame.Y / sampleSize;
-					int downsampledIW = previousFrame.Width / sampleSize;
-					int downsampledIX = previousFrame.X / sampleSize;
+					int downsampledIH = previousFrame.Height / _sampleSize;
+					int downsampledIY = previousFrame.Y / _sampleSize;
+					int downsampledIW = previousFrame.Width / _sampleSize;
+					int downsampledIX = previousFrame.X / _sampleSize;
 					int topLeft = downsampledIY * DownsampledWidth + downsampledIX;
 					int bottomLeft = topLeft + downsampledIH * DownsampledWidth;
 					for (int left = topLeft; left < bottomLeft; left += DownsampledWidth)
@@ -287,17 +282,17 @@ namespace FFImageLoading.Helpers.Gif
 						}
 					}
 				}
-				else if (previousFrame.Dispose == GifFrame.Disposal.PREVIOUS && previousImage != default)
+				else if (previousFrame.Dispose == GifFrame.Disposal.PREVIOUS && _previousImage != default)
 				{
 					// Start with the previous frame
-					GetPixels(previousImage, dest, DownsampledWidth, DownsampledHeight);
+					GetPixels(_previousImage, dest, DownsampledWidth, DownsampledHeight);
 				}
 			}
 
 			// Decode pixels for this frame into the global pixels[] scratch.
-			DecodeBitmapData(currentFrame);
+			await DecodeBitmapDataAsync(currentFrame);
 
-			if (currentFrame.Interlace || sampleSize != 1)
+			if (currentFrame.Interlace || _sampleSize != 1)
 			{
 				CopyCopyIntoScratchRobust(currentFrame);
 			}
@@ -307,14 +302,14 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			// Copy pixels into previous image
-			if (savePrevious && (currentFrame.Dispose == GifFrame.Disposal.UNSPECIFIED
+			if (_savePrevious && (currentFrame.Dispose == GifFrame.Disposal.UNSPECIFIED
 				|| currentFrame.Dispose == GifFrame.Disposal.NONE))
 			{
-				if (previousImage == default)
+				if (_previousImage == default)
 				{
-					previousImage = GetNextBitmap();
+					_previousImage = GetNextBitmap();
 				}
-				SetPixels(previousImage, dest, DownsampledWidth, DownsampledHeight);
+				SetPixels(_previousImage, dest, DownsampledWidth, DownsampledHeight);
 			}
 
 			// Set pixels for current image.
@@ -325,16 +320,16 @@ namespace FFImageLoading.Helpers.Gif
 
 		private void CopyIntoScratchFast(GifFrame currentFrame)
 		{
-			int[] dest = mainScratch;
+			int[] dest = _mainScratch;
 			int downsampledIH = currentFrame.Height;
 			int downsampledIY = currentFrame.Y;
 			int downsampledIW = currentFrame.Width;
 			int downsampledIX = currentFrame.X;
 			// Copy each source line to the appropriate place in the destination.
-			bool isFirstFrame = framePointer == 0;
+			bool isFirstFrame = CurrentFrameIndex == 0;
 			int width = DownsampledWidth;
-			byte[] mainPixels = this.mainPixels;
-			int[] act = this.act;
+			byte[] mainPixels = this._mainPixels;
+			int[] act = this._act;
 			byte? transparentColorIndex = null;
 			for (int i = 0; i < downsampledIH; i++)
 			{
@@ -379,9 +374,9 @@ namespace FFImageLoading.Helpers.Gif
 
 		private void CopyCopyIntoScratchRobust(GifFrame currentFrame)
 		{
-			int sampleSize = this.sampleSize;
+			int sampleSize = this._sampleSize;
 			var isFirstFrameTransparent = IsFirstFrameTransparent;
-			int[] dest = mainScratch;
+			int[] dest = _mainScratch;
 			int downsampledIH = currentFrame.Height / sampleSize;
 			int downsampledIY = currentFrame.Y / sampleSize;
 			int downsampledIW = currentFrame.Width / sampleSize;
@@ -390,11 +385,11 @@ namespace FFImageLoading.Helpers.Gif
 			int pass = 1;
 			int inc = 8;
 			int iline = 0;
-			var isFirstFrame = framePointer == 0;
+			var isFirstFrame = CurrentFrameIndex == 0;
 			int downsampledWidth = DownsampledWidth;
 			int downsampledHeight = DownsampledHeight;
-			byte[] mainPixels = this.mainPixels;
-			int[] act = this.act;
+			byte[] mainPixels = this._mainPixels;
+			int[] act = this._act;
 
 
 			for (int i = 0; i < downsampledIH; i++)
@@ -502,11 +497,11 @@ namespace FFImageLoading.Helpers.Gif
 			int totalAdded = 0;
 			// Find the pixels in the current row.
 			for (int i = positionInMainPixels;
-				 i < positionInMainPixels + sampleSize && i < mainPixels.Length
+				 i < positionInMainPixels + _sampleSize && i < _mainPixels.Length
 					 && i < maxPositionInMainPixels; i++)
 			{
-				int currentColorIndex = ((int)mainPixels[i]) & MASK_INT_LOWEST_BYTE;
-				int currentColor = act[currentColorIndex];
+				int currentColorIndex = ((int)_mainPixels[i]) & MASK_INT_LOWEST_BYTE;
+				int currentColor = _act[currentColorIndex];
 				if (currentColor != 0)
 				{
 					alphaSum += currentColor >> 24 & MASK_INT_LOWEST_BYTE;
@@ -518,11 +513,11 @@ namespace FFImageLoading.Helpers.Gif
 			}
 			// Find the pixels in the next row.
 			for (int i = positionInMainPixels + currentFrameIw;
-				 i < positionInMainPixels + currentFrameIw + sampleSize && i < mainPixels.Length
+				 i < positionInMainPixels + currentFrameIw + _sampleSize && i < _mainPixels.Length
 					 && i < maxPositionInMainPixels; i++)
 			{
-				int currentColorIndex = ((int)mainPixels[i]) & MASK_INT_LOWEST_BYTE;
-				int currentColor = act[currentColorIndex];
+				int currentColorIndex = ((int)_mainPixels[i]) & MASK_INT_LOWEST_BYTE;
+				int currentColor = _act[currentColorIndex];
 				if (currentColor != 0)
 				{
 					alphaSum += currentColor >> 24 & MASK_INT_LOWEST_BYTE;
@@ -545,37 +540,37 @@ namespace FFImageLoading.Helpers.Gif
 			}
 		}
 
-		private void DecodeBitmapData(GifFrame frame)
+		private async Task DecodeBitmapDataAsync(GifFrame frame)
 		{
 			if (frame != null)
 			{
 				// Jump to the frame start position.
-				rawData.Position = frame.BufferFrameStart;
+				Data.Position = frame.BufferFrameStart;
 			}
 
-			int npix = (frame == null) ? header.Width * header.Height : frame.Width * frame.Height;
+			int npix = (frame == null) ? _header.Width * _header.Height : frame.Width * frame.Height;
 			int available, clear, codeMask, codeSize, endOfInformation, inCode, oldCode, bits, code, count,
 				i, datum, dataSize, first, top, bi, pi;
 
-			if (mainPixels == null || this.mainPixels.Length < npix)
+			if (_mainPixels == null || this._mainPixels.Length < npix)
 			{
 				// Allocate new pixel array.
-				mainPixels = new byte[npix];
+				_mainPixels = new byte[npix];
 			}
 
-			if (prefix == null)
+			if (_prefix == null)
 			{
-				prefix = new short[MAX_STACK_SIZE];
+				_prefix = new short[MAX_STACK_SIZE];
 			}
 
-			if (suffix == null)
+			if (_suffix == null)
 			{
-				suffix = new byte[MAX_STACK_SIZE];
+				_suffix = new byte[MAX_STACK_SIZE];
 			}
 
-			if (pixelStack == null)
+			if (_pixelStack == null)
 			{
-				pixelStack = new byte[MAX_STACK_SIZE + 1];
+				_pixelStack = new byte[MAX_STACK_SIZE + 1];
 			}
 
 			// Initialize GIF data stream decoder.
@@ -590,10 +585,10 @@ namespace FFImageLoading.Helpers.Gif
 			for (code = 0; code < clear; code++)
 			{
 				// XXX ArrayIndexOutOfBoundsException.
-				prefix[code] = 0;
-				suffix[code] = (byte)code;
+				_prefix[code] = 0;
+				_suffix[code] = (byte)code;
 			}
-			byte[] block = this.block;
+			byte[] block = this._block;
 			// Decode GIF pixel stream.
 			i = datum = bits = count = first = top = pi = bi = 0;
 			while (i < npix)
@@ -601,10 +596,10 @@ namespace FFImageLoading.Helpers.Gif
 				// Read a new data block.
 				if (count == 0)
 				{
-					count = ReadBlock();
+					count = await ReadBlockAsync();
 					if (count <= 0)
 					{
-						status = GifDecodeStatus.STATUS_PARTIAL_DECODE;
+						Status = GifDecodeStatus.STATUS_PARTIAL_DECODE;
 						break;
 					}
 					bi = 0;
@@ -638,7 +633,7 @@ namespace FFImageLoading.Helpers.Gif
 					}
 					else if (oldCode == NULL_CODE)
 					{
-						mainPixels[pi] = suffix[code];
+						_mainPixels[pi] = _suffix[code];
 						++pi;
 						++i;
 						oldCode = code;
@@ -649,27 +644,27 @@ namespace FFImageLoading.Helpers.Gif
 					inCode = code;
 					if (code >= available)
 					{
-						pixelStack[top] = (byte)first;
+						_pixelStack[top] = (byte)first;
 						++top;
 						code = oldCode;
 					}
 
 					while (code >= clear)
 					{
-						pixelStack[top] = suffix[code];
+						_pixelStack[top] = _suffix[code];
 						++top;
-						code = prefix[code];
+						code = _prefix[code];
 					}
-					first = ((int)suffix[code]) & MASK_INT_LOWEST_BYTE;
+					first = ((int)_suffix[code]) & MASK_INT_LOWEST_BYTE;
 
-					mainPixels[pi] = (byte)first;
+					_mainPixels[pi] = (byte)first;
 					++pi;
 					++i;
 
 					while (top > 0)
 					{
 						// Pop a pixel off the pixel stack.
-						mainPixels[pi] = pixelStack[--top];
+						_mainPixels[pi] = _pixelStack[--top];
 						++pi;
 						++i;
 					}
@@ -677,8 +672,8 @@ namespace FFImageLoading.Helpers.Gif
 					// Add a new string to the string table.
 					if (available < MAX_STACK_SIZE)
 					{
-						prefix[available] = (short)oldCode;
-						suffix[available] = (byte)first;
+						_prefix[available] = (short)oldCode;
+						_suffix[available] = (byte)first;
 						++available;
 						if (((available & codeMask) == 0) && (available < MAX_STACK_SIZE))
 						{
@@ -691,22 +686,22 @@ namespace FFImageLoading.Helpers.Gif
 			}
 
 			// Clear missing pixels.
-			mainPixels.Fill(pi, npix, (byte)COLOR_TRANSPARENT_BLACK);
+			_mainPixels.Fill(pi, npix, (byte)COLOR_TRANSPARENT_BLACK);
 		}
 
 		private int ReadByte()
 		{
-			return rawData.ReadByte() & MASK_INT_LOWEST_BYTE;
+			return Data.ReadByte() & MASK_INT_LOWEST_BYTE;
 		}
 
-		private int ReadBlock()
+		private async Task<int> ReadBlockAsync()
 		{
 			var blockSize = ReadByte();
 			if (blockSize <= 0)
 			{
 				return blockSize;
 			}
-			rawData.Read(block, 0, Math.Min(blockSize, (int)rawData.Length - (int)rawData.Position));
+			await Data.ReadAsync(_block, 0, Math.Min(blockSize, (int)Data.Length - (int)Data.Position));
 			return blockSize;
 		}
 
