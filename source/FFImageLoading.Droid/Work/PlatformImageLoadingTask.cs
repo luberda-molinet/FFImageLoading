@@ -8,10 +8,10 @@ using FFImageLoading.Config;
 using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
 using FFImageLoading.Work;
-using FFImageLoading.Views;
 using FFImageLoading.Decoders;
 using System.Collections.Generic;
 using FFImageLoading.Helpers;
+using Android.Widget;
 
 namespace FFImageLoading
 {
@@ -36,7 +36,7 @@ namespace FFImageLoading
 
             if (image is FFBitmapDrawable ffDrawable)
             {
-                if (ffDrawable.IsAnimationRunning)
+                if (ffDrawable.IsFadeAnimationRunning)
                 {
                     var mut = new FFBitmapDrawable(Context.Resources, ffDrawable.Bitmap, ffDrawable);
                     ffDrawable = mut as FFBitmapDrawable;
@@ -54,7 +54,7 @@ namespace FFImageLoading
                     if (placeholderDrawable == null)
                     {
                         // Enable fade animation when no placeholder is set and the previous image is not null
-                        var imageView = PlatformTarget.Control as ImageViewAsync;
+                        var imageView = PlatformTarget.Control as ImageView;
                         placeholderDrawable = imageView?.Drawable as SelfDisposingBitmapDrawable;
                     }
 
@@ -187,7 +187,7 @@ namespace FFImageLoading
 
                 if (decoded.IsAnimated)
                 {
-                    result = new FFGifDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
+                    result = new FFAnimatedDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
                 }
                 else
                 {

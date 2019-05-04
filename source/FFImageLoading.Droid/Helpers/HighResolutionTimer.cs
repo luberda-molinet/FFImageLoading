@@ -2,22 +2,23 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading
 {
-    internal class HighResolutionTimer<TImageContainer>
+    internal class HighResolutionTimer<TImageContainer> where TImageContainer: class
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
         // The number of ticks per one millisecond.
         private static readonly float _tickFrequency = 1000f / Stopwatch.Frequency;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        private readonly IAnimatedImage<TImageContainer>[] _animatedImage;
-        private readonly Action<IAnimatedImage<TImageContainer>> _action;
+        private readonly ISelfDisposingAnimatedBitmapDrawable _animatedDrawable;
+        private readonly Action<HighResolutionTimer<TImageContainer>, TImageContainer> _action;
 
-        public HighResolutionTimer(IAnimatedImage<TImageContainer>[] animatedImage, Action<IAnimatedImage<TImageContainer>> action)
+        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Action<HighResolutionTimer<TImageContainer>, TImageContainer> action)
         {
-            _animatedImage = animatedImage;
+            _animatedDrawable = animatedDrawable;
             _action = action;
         }
 
@@ -45,7 +46,7 @@ namespace FFImageLoading
         private void ExecuteTimer()
         {
             float elapsed;
-            var count = _animatedImage.Length;
+            var count = _animatedDrawable.AnimatedImages.Length;
             var nextTrigger = 0f;
 
             var stopwatch = new Stopwatch();
@@ -59,7 +60,7 @@ namespace FFImageLoading
                     {
                         if (!Enabled) return;
 
-                        var image = _animatedImage[i];
+                        var image = _animatedDrawable.AnimatedImages[i];
 
                         nextTrigger += (image.Delay + DelayOffset);
 
@@ -85,7 +86,7 @@ namespace FFImageLoading
                         if (!Enabled) return;
 
                         var delay = elapsed - nextTrigger;
-                        _action.Invoke(image);
+                        _action.Invoke(this, image.Image as TImageContainer);
                     }
                 }
             }

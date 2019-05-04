@@ -46,7 +46,7 @@ namespace ImageLoading.Sample
             var position = (int)((View)sender).Tag;
 
             var view = (View)sender;
-            var pictureImage = view.FindViewById<ImageViewAsync>(Resource.Id.pictureImage);
+            var pictureImage = view.FindViewById<ImageView>(Resource.Id.pictureImage);
             var txtTitle = view.FindViewById<TextView>(Resource.Id.txtTitle);
 
             Intent intent = new Intent(context, typeof(DetailActivity));
@@ -86,13 +86,13 @@ namespace ImageLoading.Sample
 
         public class ViewHolder : RecyclerView.ViewHolder
         {
-            public ImageViewAsync Image { get; set; }
+            public ImageView Image { get; set; }
             public TextView Title { get; set; }
 
             public ViewHolder(View rootView)
                 : base(rootView)
             {
-                Image = rootView.FindViewById<ImageViewAsync>(Resource.Id.pictureImage);
+                Image = rootView.FindViewById<ImageView>(Resource.Id.pictureImage);
                 Title = rootView.FindViewById<TextView>(Resource.Id.txtTitle);
             }
         }

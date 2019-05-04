@@ -19,7 +19,7 @@ namespace ImageLoading.Sample
     public class ImageFragment : Fragment
     {
         private int _position;
-        private ImageViewAsync _imgDisplay;
+        private ImageView _imgDisplay;
 
         public ImageFragment(int position = 0)
         {
@@ -35,7 +35,7 @@ namespace ImageLoading.Sample
                 textView.Text = _position.ToString();
             }
 
-            _imgDisplay = view.FindViewById<ImageViewAsync>(Resource.Id.imgDisplay);
+            _imgDisplay = view.FindViewById<ImageView>(Resource.Id.imgDisplay);
             var urlToImage = Config.Images[_position];
 
             ImageService.Instance.LoadUrl(urlToImage)

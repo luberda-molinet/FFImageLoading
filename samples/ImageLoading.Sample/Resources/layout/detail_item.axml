@@ -9,7 +9,7 @@
         android:layout_marginBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="250dp">
-        <FFImageLoading.Views.ImageViewAsync
+        <ImageView
             android:id="@+id/backgroundImage"
             android:scaleType="centerCrop"
             android:layout_width="match_parent"

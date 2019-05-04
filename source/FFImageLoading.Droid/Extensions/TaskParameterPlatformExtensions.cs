@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using FFImageLoading.Work;
 using System.IO;
-using FFImageLoading.Views;
 using FFImageLoading.Targets;
 using FFImageLoading.Drawables;
+using Android.Widget;
 
 namespace FFImageLoading
 {
@@ -85,24 +85,24 @@ namespace FFImageLoading
         }
 
         /// <summary>
-        /// Loads the image into given ImageViewAsync using defined parameters.
+        /// Loads the image into given ImageView using defined parameters.
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static IScheduledWork Into(this TaskParameter parameters, ImageViewAsync imageView)
+        public static IScheduledWork Into(this TaskParameter parameters, ImageView imageView)
         {
             var target = new ImageViewTarget(imageView);
             return parameters.Into(target);
         }
 
         /// <summary>
-        /// Loads the image into given imageView using defined parameters.
+        /// Loads the image into given ImageView using defined parameters.
         /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, ImageViewAsync imageView)
+        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, ImageView imageView)
         {
             return parameters.IntoAsync(param => param.Into(imageView));
         }
