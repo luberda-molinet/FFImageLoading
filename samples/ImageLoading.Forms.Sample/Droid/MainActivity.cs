@@ -24,7 +24,7 @@ namespace FFImageLoading.Forms.Sample.Droid
             base.OnCreate(bundle);
 
             Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
-            CachedImageRenderer.Init(true);
+            
 
             var config = new FFImageLoading.Config.Configuration()
             {
@@ -37,7 +37,11 @@ namespace FFImageLoading.Forms.Sample.Droid
             ImageService.Instance.Initialize(config);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
-            LoadApplication(new App());
+
+			CachedImageRenderer.Init(true);
+			CachedImageRenderer.InitImageViewHandler();
+
+			LoadApplication(new App());
         }
 
         public class CustomLogger : FFImageLoading.Helpers.IMiniLogger

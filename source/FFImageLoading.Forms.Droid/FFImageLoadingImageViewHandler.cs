@@ -8,12 +8,24 @@ using Xamarin.Forms.Platform.Android;
 using TNativeImageView = Android.Widget.ImageView;
 #endif
 
+//[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(Xamarin.Forms.FileImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
+//[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(Xamarin.Forms.StreamImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
+//[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(Xamarin.Forms.UriImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
+//[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(FFImageLoading.Forms.EmbeddedResourceImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
+//[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(FFImageLoading.Forms.DataUrlImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
+
 namespace FFImageLoading.Forms.Platform
 {
+	[Preserve(AllMembers = true)]
 	public class FFImageLoadingImageViewHandler : IImageViewHandler
 	{
 		public Task LoadImageAsync(Xamarin.Forms.ImageSource imagesource, TNativeImageView imageView, CancellationToken cancellationToken = default)
 		{
+#if __ANDROID__
+			if (!IsValid(imageView))
+				return Task.CompletedTask;
+#endif
+
 			var source = ImageSourceBinding.GetImageSourceBinding(imagesource, null);
 			if (source == null)
 			{
@@ -27,7 +39,13 @@ namespace FFImageLoading.Forms.Platform
 
 			if (source.ImageSource == ImageSource.Url)
 			{
-				imageLoader = ImageService.Instance.LoadUrl(source.Path);
+				var urlSource = (Xamarin.Forms.UriImageSource)imagesource;
+				imageLoader = ImageService.Instance.LoadUrl(source.Path, urlSource.CacheValidity);
+
+				if (!urlSource.CachingEnabled)
+				{
+					imageLoader.WithCache(Cache.CacheType.None);
+				}
 			}
 			else if (source.ImageSource == ImageSource.CompiledResource)
 			{
@@ -59,6 +77,7 @@ namespace FFImageLoading.Forms.Platform
 				var tcs = new TaskCompletionSource<IScheduledWork>();
 
 				imageLoader
+					.FadeAnimation(false, false)
 					.Error(ex => {
 						tcs.TrySetException(ex);
 					})
@@ -83,5 +102,28 @@ namespace FFImageLoading.Forms.Platform
 
 			return Task.CompletedTask;
 		}
+#if __ANDROID__
+		private static bool IsValid(TNativeImageView imageView)
+		{
+			if (imageView == null || imageView.Handle == IntPtr.Zero)
+				return false;
+
+			//NOTE: in some cases ContextThemeWrapper is Context
+			var activity = imageView.Context as Android.App.Activity ?? (Android.App.Activity)Xamarin.Forms.Forms.Context;
+			if (activity != null)
+			{
+				if (activity.IsFinishing)
+					return false;
+				if (activity.IsDestroyed)
+					return false;
+			}
+			else
+			{
+				return false;
+			}
+
+			return true;
+		}
+#endif
 	}
 }

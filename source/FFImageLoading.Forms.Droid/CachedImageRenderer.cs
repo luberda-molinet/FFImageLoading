@@ -53,19 +53,21 @@ namespace FFImageLoading.Forms.Platform
                 enabled = CachedImageFastRenderer.ElementRendererType != null;
             }
 
-            RegisterRenderer(typeof(CachedImage), enabled ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
-        }
+			Helpers.Dependency.Register(typeof(CachedImage), enabled ? typeof(CachedImageFastRenderer) : typeof(CachedImageRenderer));
+		}
 
-        private static void RegisterRenderer(Type type, Type renderer)
-        {
-            var assembly = typeof(Image).Assembly;
-            var registrarType = assembly.GetType("Xamarin.Forms.Internals.Registrar") ?? assembly.GetType("Xamarin.Forms.Registrar");
-            var registrarProperty = registrarType.GetProperty("Registered", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-
-            var registrar = registrarProperty.GetValue(registrarType, null);
-            var registerMethod = registrar.GetType().GetRuntimeMethod("Register", new[] { typeof(Type), typeof(Type) });
-            registerMethod.Invoke(registrar, new[] { type, renderer });
-        }
+		/// <summary>
+		/// Call this after Xamarin.Forms.Init to use FFImageLoading in all Xamarin.Forms views
+		/// Including Xamarin.Forms.Image
+		/// </summary>
+		public static void InitImageViewHandler()
+		{
+			Helpers.Dependency.Register(typeof(FileImageSource), typeof(FFImageLoadingImageViewHandler));
+			Helpers.Dependency.Register(typeof(StreamImageSource), typeof(FFImageLoadingImageViewHandler));
+			Helpers.Dependency.Register(typeof(UriImageSource), typeof(FFImageLoadingImageViewHandler));
+			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageViewHandler));
+			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageViewHandler));
+		}
         
         private bool _isDisposed;
 		private IScheduledWork _currentTask;
