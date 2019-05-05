@@ -275,7 +275,10 @@ namespace FFImageLoading.Cache
         {
             lock (_monitor)
             {
-                value.Displayed -= OnEntryDisplayed;
+				if (value == null || value.Handle == IntPtr.Zero)
+					return;
+
+				value.Displayed -= OnEntryDisplayed;
                 value.NoLongerDisplayed += OnEntryNoLongerDisplayed;
                 value.SetIsRetained(false);
                 value.SetIsCached(true);
@@ -289,14 +292,19 @@ namespace FFImageLoading.Cache
         {
             lock (_monitor)
             {
-                value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
+				if (value == null || value.Handle == IntPtr.Zero)
+					return;
+
+				value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
                 value.Displayed += OnEntryDisplayed;
                 value.SetIsRetained(false);
                 value.SetIsCached(true);
 
                 _displayed_cache.Remove(value.InCacheKey);
                 _reuse_pool.Remove(value.InCacheKey);
-                _reuse_pool.Add(value.InCacheKey, value);
+
+				if (!string.IsNullOrEmpty(value.InCacheKey))
+                	_reuse_pool.Add(value.InCacheKey, value);
             }
         }
 
@@ -304,7 +312,10 @@ namespace FFImageLoading.Cache
         {
             lock (_monitor)
             {
-                value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
+				if (value == null || value.Handle == IntPtr.Zero)
+					return;
+
+				value.NoLongerDisplayed -= OnEntryNoLongerDisplayed;
                 value.Displayed += OnEntryDisplayed;
                 value.SetIsRetained(false);
                 value.SetIsCached(true);
