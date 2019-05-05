@@ -96,33 +96,33 @@ namespace FFImageLoading.Tests.ImageServiceTests
             Assert.Null(cachedMemory);
         }
 
-        [Fact]
-        public async Task CanPreloadMultipleUrlImageSources()
-        {
-            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+        //[Fact]
+        //public async Task CanPreloadMultipleUrlImageSources()
+        //{
+        //    await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
 
-            IList<Task> tasks = new List<Task>();
-            int downloadsCount = 0;
-            int successCount = 0;
+        //    IList<Task> tasks = new List<Task>();
+        //    int downloadsCount = 0;
+        //    int successCount = 0;
 
-            for (int i = 0; i < 5; i++)
-            {
-                tasks.Add(ImageService.Instance.LoadUrl(GetRandomImageUrl())
-                          .DownloadStarted((obj) =>
-                          {
-                              downloadsCount++;
-                          })
-                          .Success((arg1, arg2) =>
-                          {
-                              successCount++;
-                          })                          
-                          .PreloadAsync());
-            }
+        //    for (int i = 0; i < 5; i++)
+        //    {
+        //        tasks.Add(ImageService.Instance.LoadUrl(GetRandomImageUrl())
+        //                  .DownloadStarted((obj) =>
+        //                  {
+        //                      downloadsCount++;
+        //                  })
+        //                  .Success((arg1, arg2) =>
+        //                  {
+        //                      successCount++;
+        //                  })                          
+        //                  .PreloadAsync());
+        //    }
 
-            await Task.WhenAll(tasks);
-            Assert.Equal(5, downloadsCount);
-            Assert.Equal(5, successCount);
-        }
+        //    await Task.WhenAll(tasks);
+        //    Assert.Equal(5, downloadsCount);
+        //    Assert.Equal(5, successCount);
+        //}
 
         [Fact]
         public async Task CanWaitForSameUrlImageSources()
