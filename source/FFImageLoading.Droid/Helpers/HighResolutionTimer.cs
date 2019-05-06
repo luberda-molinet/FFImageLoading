@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using FFImageLoading.Drawables;
+using Android.Graphics;
 
 namespace FFImageLoading
 {
@@ -13,16 +14,16 @@ namespace FFImageLoading
         private static readonly float _tickFrequency = 1000f / Stopwatch.Frequency;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        private readonly ISelfDisposingAnimatedBitmapDrawable _animatedDrawable;
-        private readonly Action<HighResolutionTimer<TImageContainer>, TImageContainer> _action;
+        private readonly Action<HighResolutionTimer<TImageContainer>, Bitmap> _action;
 
-        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Action<HighResolutionTimer<TImageContainer>, TImageContainer> action)
+        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Action<HighResolutionTimer<TImageContainer>, Bitmap> action)
         {
-            _animatedDrawable = animatedDrawable;
+			AnimatedDrawable = animatedDrawable;
             _action = action;
         }
 
-        public bool Enabled { get; private set; }
+		public ISelfDisposingAnimatedBitmapDrawable AnimatedDrawable { get; private set; }
+		public bool Enabled { get; private set; }
         public int DelayOffset { get; set; }
 
         public void Start()
@@ -46,7 +47,7 @@ namespace FFImageLoading
         private void ExecuteTimer()
         {
             float elapsed;
-            var count = _animatedDrawable.AnimatedImages.Length;
+            var count = AnimatedDrawable.AnimatedImages.Length;
             var nextTrigger = 0f;
 
             var stopwatch = new Stopwatch();
@@ -60,7 +61,7 @@ namespace FFImageLoading
                     {
                         if (!Enabled) return;
 
-                        var image = _animatedDrawable.AnimatedImages[i];
+                        var image = AnimatedDrawable.AnimatedImages[i];
 
                         nextTrigger += (image.Delay + DelayOffset);
 
@@ -86,7 +87,7 @@ namespace FFImageLoading
                         if (!Enabled) return;
 
                         var delay = elapsed - nextTrigger;
-                        _action.Invoke(this, image.Image as TImageContainer);
+                        _action.Invoke(this, image.Image);
                     }
                 }
             }

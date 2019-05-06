@@ -10,7 +10,7 @@ namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : ViewTarget<ImageView>
     {
-		private static readonly Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>> _runningAnimations = new Dictionary<ImageView, HighResolutionTimer<Android.Graphics.Bitmap>>();
+		private static readonly Dictionary<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new Dictionary<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
 
         public ImageViewTarget(ImageView control) : base(control)
         {
@@ -22,23 +22,25 @@ namespace FFImageLoading.Targets
 			{
 				StopAnimation(control);
 
-				var timer = new HighResolutionTimer<Android.Graphics.Bitmap>(drawable, async (t, bitmap) =>
+				var timer = new HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>(drawable, async (t, bitmap) =>
 				{
 					try
 					{
 						if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
-							|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled)
+							|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
+							|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
 						{
-							t.Stop();
+							StopAnimation(control);
 							return;
 						}
 
 						await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
 						{
 							if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
-								|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled)
+								|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
+								|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
 							{
-								t.Stop();
+								StopAnimation(control);
 								return;
 							}
 
@@ -64,9 +66,10 @@ namespace FFImageLoading.Targets
 		{
 			lock (_runningAnimations)
 			{
-				if (_runningAnimations.TryGetValue(control, out var timer))
+				if (_runningAnimations.TryGetValue(control, out var timer) && timer != null)
 				{
 					timer?.Stop();
+					UpdateDrawableDisplayedState(timer.AnimatedDrawable as Drawable, false);
 					_runningAnimations.Remove(control);
 				}
 			}
@@ -76,15 +79,7 @@ namespace FFImageLoading.Targets
 		{
 			lock (control)
 			{
-				if (control.Drawable is ISelfDisposingBitmapDrawable previous)
-				{
-					if (previous is ISelfDisposingAnimatedBitmapDrawable)
-					{
-						StopAnimation(control);
-					}
-
-					UpdateDrawableDisplayedState(previous as Drawable, false);
-				}
+				StopAnimation(control);
 
 				if (drawable == null)
 				{
@@ -94,7 +89,7 @@ namespace FFImageLoading.Targets
 				else if (drawable is ISelfDisposingAnimatedBitmapDrawable animatedBitmapDrawable)
 				{
 					UpdateDrawableDisplayedState(drawable, true);
-					control.SetImageBitmap(animatedBitmapDrawable.AnimatedImages.FirstOrDefault()?.Image);
+					control.SetImageDrawable(animatedBitmapDrawable as Drawable);
 					PlayAnimation(control, animatedBitmapDrawable);
 				}
 				else
