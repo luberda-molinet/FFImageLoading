@@ -83,9 +83,9 @@ namespace FFImageLoading.Forms.Platform
             }
 
             var vectorSource = source as IVectorImageSource;
-            if (element != null && vectorSource != null)
+            if (vectorSource != null)
             {
-                if (vectorSource.VectorHeight == 0 && vectorSource.VectorHeight == 0)
+                if (element != null && vectorSource.VectorHeight == 0 && vectorSource.VectorHeight == 0)
                 {
                     if (element.Height > 0d && !double.IsInfinity(element.Height))
                     {

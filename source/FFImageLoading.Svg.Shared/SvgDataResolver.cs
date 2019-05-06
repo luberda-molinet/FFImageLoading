@@ -274,12 +274,12 @@ namespace FFImageLoading.Svg.Platform
                 if (picture.CullRect.Width > 0)
                     sizeX = picture.CullRect.Width;
                 else
-                    sizeX = 300;
+                    sizeX = 400;
 
                 if (picture.CullRect.Height > 0)
                     sizeY = picture.CullRect.Height;
                 else
-                    sizeY = 300;
+                    sizeY = 400;
             }
             else if (sizeX > 0 && sizeY <= 0)
             {

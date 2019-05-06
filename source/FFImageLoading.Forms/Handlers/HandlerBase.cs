@@ -13,7 +13,7 @@ namespace FFImageLoading.Forms.Handlers
 
 			if (binding.ImageSource == ImageSource.Url)
 			{
-				var urlSource = (Xamarin.Forms.UriImageSource)imageSource;
+				var urlSource = (Xamarin.Forms.UriImageSource)((imageSource as IVectorImageSource)?.ImageSource ?? imageSource);
 				parameters = ImageService.Instance.LoadUrl(binding.Path, urlSource.CacheValidity);
 
 				if (!urlSource.CachingEnabled)
@@ -44,6 +44,12 @@ namespace FFImageLoading.Forms.Handlers
 
 			if (parameters != default)
 			{
+				// Enable vector image source
+				if (imageSource is IVectorImageSource vect)
+				{
+					parameters.WithCustomDataResolver(vect.GetVectorDataResolver());
+				}
+
 				var tcs = new TaskCompletionSource<IImageLoaderTask>();
 
 				parameters

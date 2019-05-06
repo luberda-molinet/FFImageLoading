@@ -67,6 +67,20 @@ namespace FFImageLoading.Forms.Platform
 			Helpers.Dependency.Register(typeof(UriImageSource), typeof(FFImageLoadingImageViewHandler));
 			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageViewHandler));
 			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageViewHandler));
+
+			try
+			{
+				var svgAssembly = Assembly.Load("FFImageLoading.Svg.Forms");
+				if (svgAssembly != null)
+				{
+					var svgImageSourceType = svgAssembly.GetType("FFImageLoading.Svg.Forms.SvgImageSource");
+					if (svgImageSourceType != null)
+					{
+						Helpers.Dependency.Register(svgImageSourceType, typeof(FFImageLoadingImageViewHandler));
+					}
+				}
+			}
+			catch { }
 		}
 
 		private bool _isDisposed;

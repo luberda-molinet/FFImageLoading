@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
 using FFImageLoading.Forms.Platform;
+using System.Reflection;
 
 #if __IOS__
 using UIKit;
@@ -72,6 +73,20 @@ namespace FFImageLoading.Forms.Platform
 			Helpers.Dependency.Register(typeof(UriImageSource), typeof(FFImageLoadingImageSourceHandler));
 			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageSourceHandler));
 			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageSourceHandler));
+
+			try
+			{
+				var svgAssembly = Assembly.Load("FFImageLoading.Svg.Forms");
+				if (svgAssembly != null)
+				{
+					var svgImageSourceType = svgAssembly.GetType("FFImageLoading.Svg.Forms.SvgImageSource");
+					if (svgImageSourceType != null)
+					{
+						Helpers.Dependency.Register(svgImageSourceType, typeof(FFImageLoadingImageSourceHandler));
+					}
+				}
+			}
+			catch { }
 		}
 
 		protected override void Dispose(bool disposing)
