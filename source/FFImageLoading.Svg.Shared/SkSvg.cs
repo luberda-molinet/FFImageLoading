@@ -326,7 +326,22 @@ namespace FFImageLoading.Svg.Platform
                         {
                             canvas.DrawPath(elementPath, fill);
                         }
-                        else if (stroke != null)
+
+						if (mask != null)
+						{
+							canvas.SaveLayer(new SKPaint());
+							foreach (var gElement in mask.Element.Elements())
+							{
+								ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+							}
+							using (var paint = stroke?.Clone() ?? CreatePaint())
+							{
+								paint.BlendMode = SKBlendMode.SrcIn;
+								canvas.DrawPath(elementPath, paint);
+							}
+							canvas.Restore();
+						}
+						else if (stroke != null)
                         {
                             canvas.DrawPath(elementPath, stroke);
                         }

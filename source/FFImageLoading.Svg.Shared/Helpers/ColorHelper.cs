@@ -12,7 +12,7 @@ namespace FFImageLoading.Svg.Platform
         {
             if (str == "transparent")
             {
-                color = SKColor.Empty;
+                color = SKColors.Transparent;
                 return true;
             }
 
