@@ -308,7 +308,7 @@ namespace FFImageLoading.Svg.Platform
 							addStrokeFill.ApplyFill(stroke, bounds);
 						}
 
-						if (mask != null)
+						if (fill != null && mask != null)
                         {
                             canvas.SaveLayer(new SKPaint());
                             foreach (var gElement in mask.Element.Elements())
@@ -327,7 +327,7 @@ namespace FFImageLoading.Svg.Platform
                             canvas.DrawPath(elementPath, fill);
                         }
 
-						if (mask != null)
+						if (stroke != null && mask != null)
 						{
 							canvas.SaveLayer(new SKPaint());
 							foreach (var gElement in mask.Element.Elements())
