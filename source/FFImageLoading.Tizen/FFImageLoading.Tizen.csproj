@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Folder Include="Decoders\" />
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
 

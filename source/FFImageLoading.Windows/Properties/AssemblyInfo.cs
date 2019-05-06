@@ -27,3 +27,9 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0")]
+
+[assembly: InternalsVisibleTo("FFImageLoading.Tests")]
+[assembly: InternalsVisibleTo("FFImageLoading.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Svg.Platform")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms")]
+[assembly: InternalsVisibleTo("FFImageLoading.Forms.Platform")]

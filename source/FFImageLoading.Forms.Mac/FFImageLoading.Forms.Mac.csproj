@@ -78,6 +78,9 @@
     <Compile Include="..\FFImageLoading.Forms.Touch\ImageSourceBinding.cs">
       <Link>ImageSourceBinding.cs</Link>
     </Compile>
+    <Compile Include="..\FFImageLoading.Forms.Touch\FFImageLoadingImageSourceHandler.cs">
+      <Link>FFImageLoadingImageSourceHandler.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">

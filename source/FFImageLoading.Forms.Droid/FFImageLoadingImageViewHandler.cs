@@ -2,11 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FFImageLoading.Work;
-
-#if __ANDROID__
+using Android.Widget;
+using FFImageLoading.Forms.Handlers;
 using Xamarin.Forms.Platform.Android;
-using TNativeImageView = Android.Widget.ImageView;
-#endif
 
 //[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(Xamarin.Forms.FileImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
 //[assembly: Xamarin.Forms.ExportImageSourceHandler(typeof(Xamarin.Forms.StreamImageSource), typeof(FFImageLoading.Forms.Platform.FFImageLoadingImageViewHandler))]
@@ -17,99 +15,38 @@ using TNativeImageView = Android.Widget.ImageView;
 namespace FFImageLoading.Forms.Platform
 {
 	[Preserve(AllMembers = true)]
-	public class FFImageLoadingImageViewHandler : IImageViewHandler
+	public class FFImageLoadingImageViewHandler : HandlerBase<ImageView>, IImageViewHandler
 	{
-		public Task LoadImageAsync(Xamarin.Forms.ImageSource imagesource, TNativeImageView imageView, CancellationToken cancellationToken = default)
+		public Task LoadImageAsync(Xamarin.Forms.ImageSource imageSource, ImageView imageView, CancellationToken cancellationToken = default)
 		{
-#if __ANDROID__
-			if (!IsValid(imageView))
-				return Task.CompletedTask;
-#endif
-
-			var source = ImageSourceBinding.GetImageSourceBinding(imagesource, null);
-			if (source == null)
+			try
 			{
-#if __ANDROID__
-				imageView.SetImageResource(Android.Resource.Color.Transparent);
-#endif
-				return Task.CompletedTask;
-			}
+				if (!IsValid(imageView))
+					return Task.CompletedTask;
 
-			TaskParameter imageLoader;
-
-			if (source.ImageSource == ImageSource.Url)
-			{
-				var urlSource = (Xamarin.Forms.UriImageSource)imagesource;
-				imageLoader = ImageService.Instance.LoadUrl(source.Path, urlSource.CacheValidity);
-
-				if (!urlSource.CachingEnabled)
+				var source = ImageSourceBinding.GetImageSourceBinding(imageSource, null);
+				if (source == null)
 				{
-					imageLoader.WithCache(Cache.CacheType.None);
+					imageView.SetImageResource(Android.Resource.Color.Transparent);
+					return Task.CompletedTask;
 				}
+
+				return LoadImageAsync(source, imageSource, imageView, cancellationToken);
 			}
-			else if (source.ImageSource == ImageSource.CompiledResource)
-			{
-				imageLoader = ImageService.Instance.LoadCompiledResource(source.Path);
-			}
-			else if (source.ImageSource == ImageSource.ApplicationBundle)
-			{
-				imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(source.Path);
-			}
-			else if (source.ImageSource == ImageSource.Filepath)
-			{
-				imageLoader = ImageService.Instance.LoadFile(source.Path);
-			}
-			else if (source.ImageSource == ImageSource.Stream)
-			{
-				imageLoader = ImageService.Instance.LoadStream(source.Stream);
-			}
-			else if (source.ImageSource == ImageSource.EmbeddedResource)
-			{
-				imageLoader = ImageService.Instance.LoadEmbeddedResource(source.Path);
-			}
-			else
+			catch (Exception)
 			{
 				return Task.CompletedTask;
 			}
-
-			if (imageLoader != null)
-			{
-				var tcs = new TaskCompletionSource<IScheduledWork>();
-
-				imageLoader
-					.FadeAnimation(false, false)
-					.Error(ex => {
-						tcs.TrySetException(ex);
-					})
-					.Finish(scheduledWork => {
-						tcs.TrySetResult(scheduledWork);
-					});
-
-				var task = imageLoader.Into(imageView);
-
-				if (cancellationToken != default)
-					cancellationToken.Register(() =>
-					{
-						try
-						{
-							task?.Cancel();
-						}
-						catch { }
-					});
-
-				return tcs.Task;
-			}
-
-			return Task.CompletedTask;
 		}
-#if __ANDROID__
-		private static bool IsValid(TNativeImageView imageView)
+
+		private static bool IsValid(ImageView imageView)
 		{
 			if (imageView == null || imageView.Handle == IntPtr.Zero)
 				return false;
-
-			//NOTE: in some cases ContextThemeWrapper is Context
+				
+#pragma warning disable CS0618 // Type or member is obsolete
 			var activity = imageView.Context as Android.App.Activity ?? (Android.App.Activity)Xamarin.Forms.Forms.Context;
+#pragma warning restore CS0618 // Type or member is obsolete
 			if (activity != null)
 			{
 				if (activity.IsFinishing)
@@ -124,6 +61,10 @@ namespace FFImageLoading.Forms.Platform
 
 			return true;
 		}
-#endif
+
+		protected override IImageLoaderTask GetImageLoaderTask(TaskParameter parameters, ImageView imageView)
+		{
+			return parameters.Into(imageView) as IImageLoaderTask;
+		}
 	}
 }

@@ -45,7 +45,7 @@ Features:
         
           <group>
             <dependency id="Xamarin.FFImageLoading" version="@version" />
-            <dependency id="Xamarin.Forms" version="2.4" />
+            <dependency id="Xamarin.Forms" version="3.3.0.912540" />
           </group>
 		  
         </dependencies>

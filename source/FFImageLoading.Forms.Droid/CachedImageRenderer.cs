@@ -57,8 +57,8 @@ namespace FFImageLoading.Forms.Platform
 		}
 
 		/// <summary>
-		/// Call this after Xamarin.Forms.Init to use FFImageLoading in all Xamarin.Forms views
-		/// Including Xamarin.Forms.Image
+		/// Call this after Xamarin.Forms.Init to use FFImageLoading in all Xamarin.Forms views,
+		/// including Xamarin.Forms.Image
 		/// </summary>
 		public static void InitImageViewHandler()
 		{
@@ -68,8 +68,8 @@ namespace FFImageLoading.Forms.Platform
 			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageViewHandler));
 			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageViewHandler));
 		}
-        
-        private bool _isDisposed;
+
+		private bool _isDisposed;
 		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
         private readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;

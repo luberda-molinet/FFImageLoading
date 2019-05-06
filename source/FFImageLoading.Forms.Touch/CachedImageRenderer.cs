@@ -61,7 +61,20 @@ namespace FFImageLoading.Forms.Platform
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
-        protected override void Dispose(bool disposing)
+		/// <summary>
+		/// Call this after Xamarin.Forms.Init to use FFImageLoading in all Xamarin.Forms views,
+		/// including Xamarin.Forms.Image
+		/// </summary>
+		public static void InitImageSourceHandler()
+		{
+			Helpers.Dependency.Register(typeof(FileImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(StreamImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(UriImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageSourceHandler));
+		}
+
+		protected override void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
