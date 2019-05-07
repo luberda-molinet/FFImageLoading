@@ -10,7 +10,7 @@ namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : ViewTarget<ImageView>
     {
-		private static readonly Dictionary<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new Dictionary<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
+		private static readonly Dictionary<int, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new Dictionary<int, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
 
         public ImageViewTarget(ImageView control) : base(control)
         {
@@ -20,32 +20,37 @@ namespace FFImageLoading.Targets
 		{
 			lock (_runningAnimations)
 			{
-				StopAnimation(control);
+				var hashCode = control.GetHashCode();
 
 				var timer = new HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>(drawable, async (t, bitmap) =>
 				{
 					try
 					{
-						if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
-							|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
-							|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
-						{
-							StopAnimation(control);
-							return;
-						}
-
-						await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+						try
 						{
 							if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
 								|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
 								|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
 							{
-								StopAnimation(control);
 								return;
 							}
 
-							control.SetImageBitmap(bitmap);
-						}).ConfigureAwait(false);
+							await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+							{
+								if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
+									|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
+									|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
+								{
+									return;
+								}
+
+								control.SetImageBitmap(bitmap);
+							}).ConfigureAwait(false);
+						}
+						catch (ObjectDisposedException)
+						{
+							StopAnimation(hashCode);
+						}
 					}
 					catch (Exception ex)
 					{
@@ -56,21 +61,21 @@ namespace FFImageLoading.Targets
 					DelayOffset = -2
 				};
 
-				_runningAnimations.Add(control, timer);
+				_runningAnimations.Add(hashCode, timer);
 
 				timer.Start();
 			}
 		}
 
-		private static void StopAnimation(ImageView control)
+		private static void StopAnimation(int hashCode)
 		{
 			lock (_runningAnimations)
 			{
-				if (_runningAnimations.TryGetValue(control, out var timer) && timer != null)
+				if (_runningAnimations.TryGetValue(hashCode, out var timer))
 				{
+					_runningAnimations.Remove(hashCode);
 					timer?.Stop();
 					UpdateDrawableDisplayedState(timer.AnimatedDrawable as Drawable, false);
-					_runningAnimations.Remove(control);
 				}
 			}
 		}
@@ -79,14 +84,15 @@ namespace FFImageLoading.Targets
 		{
 			lock (control)
 			{
-				StopAnimation(control);
+				StopAnimation(control.GetHashCode());
 
 				if (drawable == null)
 				{
 					control.SetImageResource(Android.Resource.Color.Transparent);
 					return;
 				}
-				else if (drawable is ISelfDisposingAnimatedBitmapDrawable animatedBitmapDrawable)
+
+				if (drawable is ISelfDisposingAnimatedBitmapDrawable animatedBitmapDrawable)
 				{
 					UpdateDrawableDisplayedState(drawable, true);
 					control.SetImageDrawable(animatedBitmapDrawable as Drawable);
