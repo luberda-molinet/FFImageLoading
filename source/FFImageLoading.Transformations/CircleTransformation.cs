@@ -8,29 +8,23 @@ namespace FFImageLoading.Transformations
 	{
 		public CircleTransformation()
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
 		public CircleTransformation(double borderSize, string borderHexColor)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			return Helpers.ThrowOrDefault<IBitmap>();
 		}
 
 		public double BorderSize { get; set; }
 		public string BorderHexColor { get; set; }
 
-		public string Key
-		{
-			get
-			{
-				throw new Exception(Common.DoNotReferenceMessage);
-			}
-		}
+		public string Key => Helpers.ThrowOrDefault<string>();
 	}
 }
 

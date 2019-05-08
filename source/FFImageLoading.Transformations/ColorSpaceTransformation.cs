@@ -8,28 +8,22 @@ namespace FFImageLoading.Transformations
 	{
 		public ColorSpaceTransformation()
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
 		public ColorSpaceTransformation(float[][] rgbawMatrix)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			return Helpers.ThrowOrDefault<IBitmap>();
 		}
 
 		public float[][] RGBAWMatrix { get; set; }
 
-		public string Key
-		{
-			get
-			{
-				throw new Exception(Common.DoNotReferenceMessage);
-			}
-		}
+		public string Key => Helpers.ThrowOrDefault<string>();
 	}
 }
 

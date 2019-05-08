@@ -8,40 +8,34 @@ namespace FFImageLoading.Transformations
     {
         public RotateTransformation()
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RotateTransformation(double degrees) : this(degrees, false, false)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RotateTransformation(double degrees, bool ccw) : this(degrees, ccw, false)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RotateTransformation(double degrees, bool ccw, bool resize)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public double Degrees { get; set; }
         public bool CCW { get; set; }
         public bool Resize { get; set; }
 
-        public string Key
+		public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            get
-            {
-                throw new Exception(Common.DoNotReferenceMessage);
-            }
-        }
+			return Helpers.ThrowOrDefault<IBitmap>();
+		}
 
-        public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
-        {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
-    }
+		public string Key => Helpers.ThrowOrDefault<string>();
+	}
 }
 

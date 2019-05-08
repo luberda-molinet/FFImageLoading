@@ -7,27 +7,21 @@ namespace FFImageLoading.Transformations
     {
         public ColorFillTransformation()
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public ColorFillTransformation(string hexColor)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			return Helpers.ThrowOrDefault<IBitmap>();
+		}
 
         public string HexColor { get; set; }
 
-        public string Key
-        {
-            get
-            {
-                throw new Exception(Common.DoNotReferenceMessage);
-            }
-        }
-    }
+		public string Key => Helpers.ThrowOrDefault<string>();
+	}
 }

@@ -21,6 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +29,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>    
 
   <ItemGroup>
@@ -36,5 +38,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
   </ItemGroup>
 </Project>

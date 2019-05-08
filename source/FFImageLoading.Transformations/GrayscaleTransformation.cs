@@ -8,16 +8,10 @@ namespace FFImageLoading.Transformations
 	{
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			return Helpers.ThrowOrDefault<IBitmap>();
 		}
 
-		public string Key
-		{
-			get
-			{
-				throw new Exception(Common.DoNotReferenceMessage);
-			}
-		}
+		public string Key => Helpers.ThrowOrDefault<string>();
 	}
 }
 

@@ -22,6 +22,7 @@
     <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS;__WINDOWS__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,6 +30,7 @@
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <DefineConstants>TRACE;WINDOWS;__WINDOWS__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>  
   
   <ItemGroup>
