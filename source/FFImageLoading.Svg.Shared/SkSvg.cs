@@ -308,43 +308,45 @@ namespace FFImageLoading.Svg.Platform
 							addStrokeFill.ApplyFill(stroke, bounds);
 						}
 
-						if (fill != null && mask != null)
-                        {
-                            canvas.SaveLayer(new SKPaint());
-                            foreach (var gElement in mask.Element.Elements())
-                            {
-                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
-                            }
-                            using (var paint = fill?.Clone() ?? CreatePaint())
-                            {
-                                paint.BlendMode = SKBlendMode.SrcIn;
-                                canvas.DrawPath(elementPath, paint);
-                            }
-                            canvas.Restore();
-                        }
-                        else if (fill != null)
-                        {
-                            canvas.DrawPath(elementPath, fill);
-                        }
-
-						if (stroke != null && mask != null)
+						if (mask != null)
 						{
 							canvas.SaveLayer(new SKPaint());
+
 							foreach (var gElement in mask.Element.Elements())
 							{
-								ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+								ReadElement(gElement, canvas, null, mask.Fill.Clone());
 							}
-							using (var paint = stroke?.Clone() ?? CreatePaint())
+
+							if (fill != null)
 							{
-								paint.BlendMode = SKBlendMode.SrcIn;
-								canvas.DrawPath(elementPath, paint);
+								using (var paint = fill.Clone())
+								{
+									paint.BlendMode = SKBlendMode.SrcIn;
+									canvas.DrawPath(elementPath, paint);
+								}
 							}
+							if (stroke != null)
+							{
+								using (var paint = stroke.Clone())
+								{
+									paint.BlendMode = SKBlendMode.SrcIn;
+									canvas.DrawPath(elementPath, paint);
+								}
+							}
+
 							canvas.Restore();
 						}
-						else if (stroke != null)
-                        {
-                            canvas.DrawPath(elementPath, stroke);
-                        }
+						else
+						{
+							if (fill != null)
+							{
+								canvas.DrawPath(elementPath, fill);
+							}
+							if (stroke != null)
+							{
+								canvas.DrawPath(elementPath, stroke);
+							}
+						}
                     }
                     break;
                 case "g":
@@ -353,19 +355,26 @@ namespace FFImageLoading.Svg.Platform
                         if (mask != null)
                         {
                             canvas.SaveLayer(new SKPaint());
+
                             foreach (var gElement in mask.Element.Elements())
                             {
-                                ReadElement(gElement, canvas, mask.Fill.Clone(), mask.Fill.Clone());
+                                ReadElement(gElement, canvas, null, mask.Fill.Clone());
                             }
 
                             foreach (var gElement in e.Elements())
                             {
-                                using (var paint = fill?.Clone() ?? CreatePaint())
-                                {
-                                    paint.BlendMode = SKBlendMode.SrcIn;
-                                    ReadElement(gElement, canvas, paint, paint);
-                                }
+								using (var fillPaint = fill?.Clone())
+								using (var strokePaint = stroke?.Clone())
+								{
+									if (fillPaint != null)
+										fillPaint.BlendMode = SKBlendMode.SrcIn;
+									if (strokePaint != null)
+										strokePaint.BlendMode = SKBlendMode.SrcIn;
+
+									ReadElement(gElement, canvas, strokePaint, fillPaint);
+								}
                             }
+
                             canvas.Restore();
                         }
                         else
