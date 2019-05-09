@@ -10,10 +10,10 @@ namespace FFImageLoading.DataResolvers
         {
             switch (source)
             {
-                case ImageSource.ApplicationBundle:
                 case ImageSource.Filepath:
                     return new FileDataResolver();
-                case ImageSource.CompiledResource:
+				case ImageSource.ApplicationBundle:
+				case ImageSource.CompiledResource:
                     return new BundleDataResolver();
                 case ImageSource.Url:
                     if (!string.IsNullOrWhiteSpace(identifier) && identifier.IsDataUrl())
