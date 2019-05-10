@@ -21,22 +21,20 @@ namespace FFImageLoading.Targets
 
             if (control == null) return;
             
-            var parameters = task.Parameters;
             var representations = image.Representations();
 
             if (representations.Length > 1)
             {
-                control.Layer.Contents = null;
                 control.Image = image;
                 control.Animates = true;
                 control.SetNeedsDisplay();
-                control.CanDrawSubviewsIntoLayer = true;
+
                 if (IsLayoutNeeded(task))
                     control.NeedsLayout = true;
             }
             else
             {
-                if (animated)
+				if (animated)
                 {
 					//TODO fade animation
 					control.Image = image;
