@@ -14,9 +14,9 @@ namespace FFImageLoading
         private static readonly float _tickFrequency = 1000f / Stopwatch.Frequency;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        private readonly Action<HighResolutionTimer<TImageContainer>, Bitmap> _action;
+        private readonly Func<HighResolutionTimer<TImageContainer>, Bitmap, Task> _action;
 
-        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Action<HighResolutionTimer<TImageContainer>, Bitmap> action)
+        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Func<HighResolutionTimer<TImageContainer>, Bitmap, Task> action)
         {
 			AnimatedDrawable = animatedDrawable;
             _action = action;
@@ -32,6 +32,7 @@ namespace FFImageLoading
                 return;
 
             Enabled = true;
+
             var thread = new Thread(ExecuteTimer)
             {
                 Priority = ThreadPriority.BelowNormal
@@ -44,7 +45,7 @@ namespace FFImageLoading
             Enabled = false;
         }
 
-        private void ExecuteTimer()
+        private async void ExecuteTimer()
         {
             float elapsed;
             var count = AnimatedDrawable.AnimatedImages.Length;
@@ -87,7 +88,7 @@ namespace FFImageLoading
                         if (!Enabled) return;
 
                         var delay = elapsed - nextTrigger;
-                        _action.Invoke(this, image.Image);
+                        await _action.Invoke(this, image.Image);
                     }
                 }
             }

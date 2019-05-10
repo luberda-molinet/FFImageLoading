@@ -5,12 +5,13 @@ using Android.Graphics.Drawables;
 using Android.Widget;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading.Targets
 {
     public class ImageViewTarget : ViewTarget<ImageView>
     {
-		private static readonly Dictionary<int, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new Dictionary<int, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
+		private static readonly ConditionalWeakTable<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new ConditionalWeakTable<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
 
         public ImageViewTarget(ImageView control) : base(control)
         {
@@ -28,28 +29,28 @@ namespace FFImageLoading.Targets
 					{
 						try
 						{
-							if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
-								|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
-								|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
+							if (control == null || control.Handle == IntPtr.Zero
+							|| !drawable.IsValidAndHasValidBitmap())
 							{
+								StopAnimation(control);
 								return;
 							}
 
 							await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
 							{
-								if (control == null || control.Handle == IntPtr.Zero || !t.Enabled
-									|| bitmap == null || bitmap.Handle == IntPtr.Zero || bitmap.IsRecycled
-									|| !t.AnimatedDrawable.IsValidAndHasValidBitmap())
+								if (control == null || control.Handle == IntPtr.Zero
+								|| !drawable.IsValidAndHasValidBitmap())
 								{
+									StopAnimation(control);
 									return;
 								}
 
 								control.SetImageBitmap(bitmap);
-							}).ConfigureAwait(false);
+							});
 						}
 						catch (ObjectDisposedException)
 						{
-							StopAnimation(hashCode);
+							StopAnimation(control);
 						}
 					}
 					catch (Exception ex)
@@ -61,21 +62,23 @@ namespace FFImageLoading.Targets
 					DelayOffset = -2
 				};
 
-				_runningAnimations.Add(hashCode, timer);
+				_runningAnimations.Add(control, timer);
 
 				timer.Start();
 			}
 		}
 
-		private static void StopAnimation(int hashCode)
+		private static void StopAnimation(ImageView imageView)
 		{
 			lock (_runningAnimations)
 			{
-				if (_runningAnimations.TryGetValue(hashCode, out var timer))
+				if (_runningAnimations.TryGetValue(imageView, out var timer))
 				{
-					_runningAnimations.Remove(hashCode);
 					timer?.Stop();
+					_runningAnimations.Remove(imageView);
 					UpdateDrawableDisplayedState(timer.AnimatedDrawable as Drawable, false);
+					imageView.SetImageResource(Android.Resource.Color.Transparent);
+					Java.Lang.JavaSystem.Gc();
 				}
 			}
 		}
@@ -84,7 +87,7 @@ namespace FFImageLoading.Targets
 		{
 			lock (control)
 			{
-				StopAnimation(control.GetHashCode());
+				StopAnimation(control);
 
 				if (drawable == null)
 				{
