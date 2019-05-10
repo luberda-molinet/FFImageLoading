@@ -88,6 +88,9 @@ namespace FFImageLoading.Cache
                 var reuse_values = _reuse_pool.Values;
                 foreach (var bd in reuse_values)
                 {
+					if (bd is ISelfDisposingAnimatedBitmapDrawable)
+						continue;
+
                     if (bd.IsValidAndHasValidBitmap() && bd.Bitmap.IsMutable && !bd.IsRetained && CanUseForInBitmap(bd.Bitmap, options))
                     {
                         reuseDrawable = bd;
@@ -205,7 +208,10 @@ namespace FFImageLoading.Cache
         {
             ProcessRemoval(e.Value, e.Evicted);
 
-            if (_verboseLogging && e.Evicted)
+			if (e.Value is ISelfDisposingAnimatedBitmapDrawable)
+				Java.Lang.JavaSystem.Gc();
+
+			if (_verboseLogging && e.Evicted)
                 _log?.Debug("[MEMORY_CACHE] Evicted image from reuse pool " + e.Key);
         }
 

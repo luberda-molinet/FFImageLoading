@@ -78,7 +78,6 @@ namespace FFImageLoading.Targets
 					_runningAnimations.Remove(imageView);
 					UpdateDrawableDisplayedState(timer.AnimatedDrawable as Drawable, false);
 					imageView.SetImageResource(Android.Resource.Color.Transparent);
-					Java.Lang.JavaSystem.Gc();
 				}
 			}
 		}
