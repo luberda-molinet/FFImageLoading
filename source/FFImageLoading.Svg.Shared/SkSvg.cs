@@ -247,6 +247,35 @@ namespace FFImageLoading.Svg.Platform
             
             var mask = ReadMask(style);
 
+			if (mask != null)
+			{
+				canvas.SaveLayer(new SKPaint());
+
+				foreach (var gElement in mask.Element.Elements())
+				{
+					ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
+				}
+
+				foreach (var gElement in e.Elements())
+				{
+					using (var strokePaint = stroke?.Clone())
+					using (var fillPaint = fill?.Clone())
+					{
+						if (strokePaint != null)
+							strokePaint.BlendMode = SKBlendMode.SrcIn;
+
+						if (fillPaint != null)
+							fillPaint.BlendMode = SKBlendMode.SrcIn;
+
+						ReadElement(gElement, canvas, strokePaint, fillPaint, true);
+					}
+				}
+
+				canvas.Restore();
+
+				return;
+			}
+
             // parse elements
             switch (elementName)
             {
@@ -308,102 +337,42 @@ namespace FFImageLoading.Svg.Platform
 							addStrokeFill.ApplyFill(stroke, bounds);
 						}
 
-						if (mask != null)
+						if (fill != null)
 						{
-							canvas.SaveLayer(new SKPaint());
-
-							foreach (var gElement in mask.Element.Elements())
-							{
-								ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
-							}
-
-							if (fill != null)
-							{
-								using (var paint = fill.Clone())
-								{
-									paint.BlendMode = SKBlendMode.SrcIn;
-									canvas.DrawPath(elementPath, paint);
-								}
-							}
-							if (stroke != null)
-							{
-								using (var paint = stroke.Clone())
-								{
-									paint.BlendMode = SKBlendMode.SrcIn;
-									canvas.DrawPath(elementPath, paint);
-								}
-							}
-
-							canvas.Restore();
+							canvas.DrawPath(elementPath, fill);
 						}
-						else
+						if (stroke != null)
 						{
-							if (fill != null)
-							{
-								canvas.DrawPath(elementPath, fill);
-							}
-							if (stroke != null)
-							{
-								canvas.DrawPath(elementPath, stroke);
-							}
+							canvas.DrawPath(elementPath, stroke);
 						}
-                    }
+					}
                     break;
                 case "g":
                     if (e.HasElements)
                     {
-                        if (mask != null)
-                        {
-                            canvas.SaveLayer(new SKPaint());
+						// get current group opacity
+						var groupOpacity = ReadOpacity(style);
+						if (groupOpacity != 1.0f)
+						{
+							var opacity = (byte)(255 * groupOpacity);
+							var opacityPaint = new SKPaint
+							{
+								Color = SKColors.Black.WithAlpha(opacity)
+							};
 
-							foreach (var gElement in mask.Element.Elements())
-                            {
-								ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
-							}
+							// apply the opacity
+							canvas.SaveLayer(opacityPaint);
+						}
 
-                            foreach (var gElement in e.Elements())
-                            {
-								using (var strokePaint = stroke?.Clone())
-								using (var fillPaint = fill?.Clone())
-								{
-									if (strokePaint != null)
-										strokePaint.BlendMode = SKBlendMode.SrcIn;
+						foreach (var gElement in e.Elements())
+						{
+							ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+						}
 
-									if (fillPaint != null)
-										fillPaint.BlendMode = SKBlendMode.SrcIn;
-
-									ReadElement(gElement, canvas, strokePaint, fillPaint, true);
-								}
-                            }
-
-                            canvas.Restore();
-                        }
-                        else
-                        {
-                            // get current group opacity
-                            var groupOpacity = ReadOpacity(style);
-                            if (groupOpacity != 1.0f)
-                            {
-                                var opacity = (byte)(255 * groupOpacity);
-                                var opacityPaint = new SKPaint
-                                {
-                                    Color = SKColors.Black.WithAlpha(opacity)
-                                };
-
-                                // apply the opacity
-                                canvas.SaveLayer(opacityPaint);
-                            }
-
-                            foreach (var gElement in e.Elements())
-                            {
-                                ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone(), isMask);
-                            }
-
-                            // restore state
-                            if (groupOpacity != 1.0f)
-                                canvas.Restore();
-                        }
-                    }
+						// restore state
+						if (groupOpacity != 1.0f)
+							canvas.Restore();
+					}
                     break;
                 case "use":
                     if (e.HasAttributes)
