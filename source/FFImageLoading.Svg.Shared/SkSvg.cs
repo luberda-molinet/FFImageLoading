@@ -218,7 +218,7 @@ namespace FFImageLoading.Svg.Platform
             }
         }
 
-        private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill)
+        private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill, bool isMask = false)
         {
             if (e.Attribute("display")?.Value == "none")
                 return;
@@ -228,7 +228,7 @@ namespace FFImageLoading.Svg.Platform
 			var isGroup = elementName == "g";
 
 			// read style
-			var style = ReadPaints(e, ref stroke, ref fill, isGroup);
+			var style = ReadPaints(e, ref stroke, ref fill, isGroup, isMask);
 
 			if (style.TryGetValue("display", out var displayStyle) && displayStyle == "none")
 				return;
@@ -314,7 +314,7 @@ namespace FFImageLoading.Svg.Platform
 
 							foreach (var gElement in mask.Element.Elements())
 							{
-								ReadElement(gElement, canvas, null, mask.Fill.Clone());
+								ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
 							}
 
 							if (fill != null)
@@ -356,22 +356,23 @@ namespace FFImageLoading.Svg.Platform
                         {
                             canvas.SaveLayer(new SKPaint());
 
-                            foreach (var gElement in mask.Element.Elements())
+							foreach (var gElement in mask.Element.Elements())
                             {
-                                ReadElement(gElement, canvas, null, mask.Fill.Clone());
-                            }
+								ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
+							}
 
                             foreach (var gElement in e.Elements())
                             {
-								using (var fillPaint = fill?.Clone())
 								using (var strokePaint = stroke?.Clone())
+								using (var fillPaint = fill?.Clone())
 								{
-									if (fillPaint != null)
-										fillPaint.BlendMode = SKBlendMode.SrcIn;
 									if (strokePaint != null)
 										strokePaint.BlendMode = SKBlendMode.SrcIn;
 
-									ReadElement(gElement, canvas, strokePaint, fillPaint);
+									if (fillPaint != null)
+										fillPaint.BlendMode = SKBlendMode.SrcIn;
+
+									ReadElement(gElement, canvas, strokePaint, fillPaint, true);
 								}
                             }
 
@@ -395,7 +396,7 @@ namespace FFImageLoading.Svg.Platform
 
                             foreach (var gElement in e.Elements())
                             {
-                                ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone());
+                                ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone(), isMask);
                             }
 
                             // restore state
@@ -421,7 +422,7 @@ namespace FFImageLoading.Svg.Platform
                             else
                             {
                                 ApplyAttributesToElement(attributes, href, new string[] { "href", "id", "transform" });
-                                ReadElement(href, canvas, stroke?.Clone(), fill?.Clone());
+                                ReadElement(href, canvas, stroke?.Clone(), fill?.Clone(), isMask);
                             }
                         }
                     }
@@ -443,7 +444,7 @@ namespace FFImageLoading.Svg.Platform
 
                             if (isVisible)
                             {
-                                ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone());
+                                ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone(), isMask);
                             }
                         }
                     }
@@ -451,7 +452,7 @@ namespace FFImageLoading.Svg.Platform
                 case "mask":
                     if (e.HasElements)
                     {
-                        masks.Add(ReadId(e), new SKSvgMask(fill, e));
+                        masks.Add(ReadId(e), new SKSvgMask(stroke, fill, e));
                     }
                     break;
                 case "style":
@@ -473,7 +474,7 @@ namespace FFImageLoading.Svg.Platform
 				case "a":
 					foreach (var child in e.Descendants())
 					{
-						ReadElement(child, canvas, stroke?.Clone(), fill?.Clone());
+						ReadElement(child, canvas, stroke?.Clone(), fill?.Clone(), isMask);
 					}
 					break;
                 case "clipPath":
@@ -549,7 +550,7 @@ namespace FFImageLoading.Svg.Platform
                     }
                     else
                     {
-                        data = "M" + e.Attribute("points")?.Value;
+						data = "M" + e.Attribute("points")?.Value;
                         if (elementName == "polygon")
                             data += " Z";
                     }
@@ -1145,11 +1146,20 @@ namespace FFImageLoading.Svg.Platform
             return new SKSize(width, height);
         }
 
-        private Dictionary<string, string> ReadPaints(XElement e, ref SKPaint stroke, ref SKPaint fill, bool isGroup)
+        private Dictionary<string, string> ReadPaints(XElement e, ref SKPaint stroke, ref SKPaint fill, bool isGroup, bool isMask = false)
         {
             var style = ReadStyle(e);
 
             ReadPaints(style, ref stroke, ref fill, isGroup, out var fillId, out var strokeFillId);
+
+			if (isMask)
+			{
+				if (stroke != null)
+					stroke.BlendMode = SKBlendMode.SrcIn;
+
+				if (fill != null)
+					fill.BlendMode = SKBlendMode.SrcIn;
+			}
 
             if (fillId != null)
                 elementFills[e] = fillId;
