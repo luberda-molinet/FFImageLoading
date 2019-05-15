@@ -322,9 +322,8 @@ namespace FFImageLoading.Svg.Platform
                         if (fill != null && elementFills.TryGetValue(e, out var fillId) 
 							&& fillDefs.TryGetValue(fillId, out var addFill))
                         {
-                            var points = ReadElementXY(e);
                             var elementSize = ReadElementSize(e);
-                            var bounds = SKRect.Create(new SKPoint(points.X, points.Y), elementSize);
+                            var bounds = SKRect.Create(xy, elementSize);
 
                             addFill.ApplyFill(fill, bounds);
                         }
@@ -332,9 +331,8 @@ namespace FFImageLoading.Svg.Platform
 						if (stroke != null && strokeElementFills.TryGetValue(e, 
 							out var strokeFillId) && fillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
 						{
-							var points = ReadElementXY(e);
 							var elementSize = ReadElementSize(e);
-							var bounds = SKRect.Create(new SKPoint(points.X, points.Y), elementSize);
+							var bounds = SKRect.Create(xy, elementSize);
 
 							addStrokeFill.ApplyFill(stroke, bounds);
 						}
@@ -382,17 +380,13 @@ namespace FFImageLoading.Svg.Platform
                         var href = ReadHref(e);
                         if (href != null)
                         {
-                            // create a deep copy as we will copy attributes
-                            href = new XElement(href);
-                            var attributes = e.Attributes().ToArray();
-
                             if (string.Equals(href.Name.LocalName, "symbol", StringComparison.OrdinalIgnoreCase))
                             {
-                                RenderSymbol(href, e, canvas, stroke, fill, attributes);
+                                RenderSymbol(href, e, canvas, stroke?.Clone(), fill?.Clone(), e.Attributes());
                             }
                             else
                             {
-                                ApplyAttributesToElement(attributes, href, new string[] { "href", "id", "transform" });
+                                ApplyAttributesToElement(e.Attributes(), href, new string[] { "href", "id"});
                                 ReadElement(href, canvas, stroke?.Clone(), fill?.Clone(), isMask);
                             }
                         }
@@ -546,7 +540,7 @@ namespace FFImageLoading.Svg.Platform
             return path;
         }
 
-        private void RenderSymbol(XElement symbol, XElement use, SKCanvas canvas, SKPaint stroke, SKPaint fill, XAttribute[] attributes)
+        private void RenderSymbol(XElement symbol, XElement use, SKCanvas canvas, SKPaint stroke, SKPaint fill, IEnumerable<XAttribute> attributes)
         {
             if (symbol == null || use == null)
                 return;
@@ -582,7 +576,7 @@ namespace FFImageLoading.Svg.Platform
 
         }
 
-        private static void ApplyAttributesToElement(XAttribute[] attributes, XElement e, string[] ignoreAttributes)
+        private static void ApplyAttributesToElement(IEnumerable<XAttribute> attributes, XElement e, string[] ignoreAttributes)
         {
             if (e == null || attributes == null)
                 return;
@@ -1252,9 +1246,9 @@ namespace FFImageLoading.Svg.Platform
                     {
                         // get the dash
                         var dashesStrings = strokeDashArray.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        var dashes = dashesStrings.Select(ReadNumber).ToArray();
+                        var dashes = dashesStrings.Select(ReadNumber);
                         if (dashesStrings.Length % 2 == 1)
-                            dashes = dashes.Concat(dashes).ToArray();
+                            dashes = dashes.Concat(dashes);
 
                         // get the offset
                         var strokeDashOffset = ReadNumber(style, "stroke-dashoffset", 0);
@@ -1682,11 +1676,13 @@ namespace FFImageLoading.Svg.Platform
         private XElement ReadHref(XElement e)
         {
             var href = ReadHrefString(e)?.Substring(1);
-            if (string.IsNullOrEmpty(href) || !defs.TryGetValue(href, out XElement child))
+
+            if (!string.IsNullOrEmpty(href) && defs.TryGetValue(href, out var child))
             {
-                child = null;
+				return new XElement(child);
             }
-            return child;
+
+            return null;
         }
 
         private static string ReadHrefString(XElement e)
