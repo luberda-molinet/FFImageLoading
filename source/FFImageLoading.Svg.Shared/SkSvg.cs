@@ -233,8 +233,10 @@ namespace FFImageLoading.Svg.Platform
 			if (style.TryGetValue("display", out var displayStyle) && displayStyle == "none")
 				return;
 
+			var xy = ReadElementXY(e);
+
 			// transform matrix
-			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty);
+			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty, isGroup ? xy : default);
             canvas.Save();
             canvas.Concat(ref transform);
 
@@ -1406,12 +1408,18 @@ namespace FFImageLoading.Svg.Platform
             return strokePaint;
         }
 
-        private SKMatrix ReadTransform(string raw)
+        private SKMatrix ReadTransform(string raw, SKPoint xy = default)
         {
             var t = SKMatrix.MakeIdentity();
 
             if (string.IsNullOrWhiteSpace(raw))
             {
+				if (xy != default)
+				{
+					var m = SKMatrix.MakeTranslation(xy.X, xy.Y);
+					SKMatrix.Concat(ref t, t, m);
+				}
+
                 return t;
             }
 
@@ -1440,11 +1448,11 @@ namespace FFImageLoading.Svg.Platform
                     case "translate":
                         if (args.Length >= 3)
                         {
-                            nt = SKMatrix.MakeTranslation(ReadNumber(args[1]), ReadNumber(args[2]));
+                            nt = SKMatrix.MakeTranslation(ReadNumber(args[1]) + xy.X, ReadNumber(args[2]) + xy.Y);
                         }
                         else if (args.Length >= 2)
                         {
-                            nt = SKMatrix.MakeTranslation(ReadNumber(args[1]), 0);
+                            nt = SKMatrix.MakeTranslation(ReadNumber(args[1]) + xy.X, xy.Y);
                         }
                         break;
                     case "scale":
