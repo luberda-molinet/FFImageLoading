@@ -238,9 +238,12 @@ namespace FFImageLoading.Svg.Platform
 
 			try
 			{
-				// transform matrix
-				var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty, isGroup ? xy : default);
-				canvas.Concat(ref transform);
+				if (elementName != "use")
+				{
+					// transform matrix
+					var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty, isGroup ? xy : default);
+					canvas.Concat(ref transform);
+				}
 
 				// clip-path
 				var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
@@ -1042,19 +1045,23 @@ namespace FFImageLoading.Svg.Platform
                 name.Namespace == xlink;
         }
 
-        private SKPoint ReadElementXY(XElement e)
-        {
-            if (e == null)
-                return SKPoint.Empty;
+		private SKPoint ReadElementXY(XElement e)
+		{
+			if (e == null)
+				return default;
 
-            var xAttr = e.Attribute("x");
-            var yAttr = e.Attribute("y");
-            var x = ReadNumber(xAttr);
-            var y = ReadNumber(yAttr);
-            return new SKPoint(x, y);
-        }
+			var xAttr = e.Attribute("x");
+			var yAttr = e.Attribute("y");
 
-        private SKRect ReadElementViewBox(XElement e)
+			if (xAttr == null && yAttr == null)
+				return default;
+
+			var x = ReadNumber(xAttr);
+			var y = ReadNumber(yAttr);
+			return new SKPoint(x, y);
+		}
+
+		private SKRect ReadElementViewBox(XElement e)
         {
             if (e == null)
                 return SKRect.Empty;
