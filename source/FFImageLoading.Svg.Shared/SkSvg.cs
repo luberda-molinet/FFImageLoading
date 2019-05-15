@@ -234,227 +234,241 @@ namespace FFImageLoading.Svg.Platform
 				return;
 
 			var xy = ReadElementXY(e);
+			canvas.Save();
 
-			// transform matrix
-			var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty, isGroup ? xy : default);
-            canvas.Save();
-            canvas.Concat(ref transform);
-
-            // clip-path
-            var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
-            if (clipPath != null)
-            {
-                canvas.ClipPath(clipPath);
-            }
-            
-            var mask = ReadMask(style);
-
-			if (mask != null)
+			try
 			{
-				canvas.SaveLayer(new SKPaint());
+				// transform matrix
+				var transform = ReadTransform(e.Attribute("transform")?.Value ?? string.Empty, isGroup ? xy : default);
+				canvas.Concat(ref transform);
 
-				foreach (var gElement in mask.Element.Elements())
+				// clip-path
+				var clipPath = ReadClipPath(e.Attribute("clip-path")?.Value ?? string.Empty);
+				if (clipPath != null)
 				{
-					ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
+					canvas.ClipPath(clipPath);
 				}
 
-				foreach (var gElement in e.Elements())
+				var mask = ReadMask(style);
+				if (mask != null)
 				{
-					using (var strokePaint = stroke?.Clone())
-					using (var fillPaint = fill?.Clone())
+					canvas.SaveLayer(new SKPaint());
+
+					try
 					{
-						if (strokePaint != null)
-							strokePaint.BlendMode = SKBlendMode.SrcIn;
-
-						if (fillPaint != null)
-							fillPaint.BlendMode = SKBlendMode.SrcIn;
-
-						ReadElement(gElement, canvas, strokePaint, fillPaint, true);
-					}
-				}
-
-				canvas.Restore();
-
-				return;
-			}
-
-            // parse elements
-            switch (elementName)
-            {
-                case "image":
-                    {
-                        var image = ReadImage(e);
-                        if (image.Bytes != null)
-                        {
-                            using (var bitmap = SKBitmap.Decode(image.Bytes))
-                            {
-                                if (bitmap != null)
-                                {
-                                    canvas.DrawBitmap(bitmap, image.Rect);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case "text":
-                    if (stroke != null || fill != null)
-                    {
-                        var spans = ReadText(e, stroke?.Clone(), fill?.Clone());
-                        if (spans.Any())
-                        {
-                            canvas.DrawText(spans);
-                        }
-                    }
-                    break;
-                case "rect":
-                case "ellipse":
-                case "circle":
-                case "path":
-                case "polygon":
-                case "polyline":
-                case "line":
-                    if (stroke != null || fill != null)
-                    {
-                        var elementPath = ReadElement(e, style);
-                        if (elementPath == null)
-                            break;
-
-                        if (fill != null && elementFills.TryGetValue(e, out var fillId) 
-							&& fillDefs.TryGetValue(fillId, out var addFill))
-                        {
-                            var elementSize = ReadElementSize(e);
-                            var bounds = SKRect.Create(xy, elementSize);
-
-                            addFill.ApplyFill(fill, bounds);
-                        }
-
-						if (stroke != null && strokeElementFills.TryGetValue(e, 
-							out var strokeFillId) && fillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
+						foreach (var gElement in mask.Element.Elements())
 						{
-							var elementSize = ReadElementSize(e);
-							var bounds = SKRect.Create(xy, elementSize);
-
-							addStrokeFill.ApplyFill(stroke, bounds);
-						}
-
-						if (fill != null)
-						{
-							canvas.DrawPath(elementPath, fill);
-						}
-						if (stroke != null)
-						{
-							canvas.DrawPath(elementPath, stroke);
-						}
-					}
-                    break;
-                case "g":
-                    if (e.HasElements)
-                    {
-						// get current group opacity
-						var groupOpacity = ReadOpacity(style);
-						if (groupOpacity != 1.0f)
-						{
-							var opacity = (byte)(255 * groupOpacity);
-							var opacityPaint = new SKPaint
-							{
-								Color = SKColors.Black.WithAlpha(opacity)
-							};
-
-							// apply the opacity
-							canvas.SaveLayer(opacityPaint);
+							ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
 						}
 
 						foreach (var gElement in e.Elements())
 						{
-							ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+							using (var strokePaint = stroke?.Clone())
+							using (var fillPaint = fill?.Clone())
+							{
+								if (strokePaint != null)
+									strokePaint.BlendMode = SKBlendMode.SrcIn;
+
+								if (fillPaint != null)
+									fillPaint.BlendMode = SKBlendMode.SrcIn;
+
+								ReadElement(gElement, canvas, strokePaint, fillPaint, true);
+							}
 						}
-
-						// restore state
-						if (groupOpacity != 1.0f)
-							canvas.Restore();
 					}
-                    break;
-                case "use":
-                    if (e.HasAttributes)
-                    {
-                        var href = ReadHref(e);
-                        if (href != null)
-                        {
-                            if (string.Equals(href.Name.LocalName, "symbol", StringComparison.OrdinalIgnoreCase))
-                            {
-                                RenderSymbol(href, e, canvas, stroke?.Clone(), fill?.Clone(), e.Attributes());
-                            }
-                            else
-                            {
-                                ApplyAttributesToElement(e.Attributes(), href, new string[] { "href", "id"});
-                                ReadElement(href, canvas, stroke?.Clone(), fill?.Clone(), isMask);
-                            }
-                        }
-                    }
-                    break;
-                case "switch":
-                    if (e.HasElements)
-                    {
-                        foreach (var ee in e.Elements())
-                        {
-                            var requiredFeatures = ee.Attribute("requiredFeatures");
-                            var requiredExtensions = ee.Attribute("requiredExtensions");
-                            var systemLanguage = ee.Attribute("systemLanguage");
-
-                            // TODO: evaluate requiredFeatures, requiredExtensions and systemLanguage
-                            var isVisible =
-                                requiredFeatures == null &&
-                                requiredExtensions == null &&
-                                systemLanguage == null;
-
-                            if (isVisible)
-                            {
-                                ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone(), isMask);
-                            }
-                        }
-                    }
-                    break;
-                case "mask":
-                    if (e.HasElements)
-                    {
-                        masks.Add(ReadId(e), new SKSvgMask(stroke, fill, e));
-                    }
-                    break;
-                case "style":
-                    CssHelpers.ParseSelectors(e.Value, styles);
-                    break;
-                case "defs":
-                    var styleNodes = e.Descendants();
-                    if (styleNodes != null)
-                    {
-                        foreach (var item in styleNodes)
-                        {
-                            if (item.Name.LocalName == "style")
-                            {
-                                CssHelpers.ParseSelectors(item.Value, styles);
-                            }
-                        }
-                    }
-                    break;
-				case "a":
-					foreach (var child in e.Descendants())
+					finally
 					{
-						ReadElement(child, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+						canvas.Restore();
 					}
-					break;
-                case "clipPath":
-                case "title":
-                case "desc":
-                case "description":
-                    // already read earlier
-                    break;
-                default:
-                    LogOrThrow($"SVG element '{elementName}' is not supported");
-                    break;
-            }
 
-            // restore matrix
-            canvas.Restore();
+					return;
+				}
+
+				// parse elements
+				switch (elementName)
+				{
+					case "image":
+						{
+							var image = ReadImage(e);
+							if (image.Bytes != null)
+							{
+								using (var bitmap = SKBitmap.Decode(image.Bytes))
+								{
+									if (bitmap != null)
+									{
+										canvas.DrawBitmap(bitmap, image.Rect);
+									}
+								}
+							}
+						}
+						break;
+					case "text":
+						if (stroke != null || fill != null)
+						{
+							var spans = ReadText(e, stroke?.Clone(), fill?.Clone());
+							if (spans.Any())
+							{
+								canvas.DrawText(spans);
+							}
+						}
+						break;
+					case "rect":
+					case "ellipse":
+					case "circle":
+					case "path":
+					case "polygon":
+					case "polyline":
+					case "line":
+						if (stroke != null || fill != null)
+						{
+							var elementPath = ReadElement(e, style);
+							if (elementPath == null)
+								break;
+
+							if (fill != null && elementFills.TryGetValue(e, out var fillId)
+								&& fillDefs.TryGetValue(fillId, out var addFill))
+							{
+								var elementSize = ReadElementSize(e);
+								var bounds = SKRect.Create(xy, elementSize);
+
+								addFill.ApplyFill(fill, bounds);
+							}
+
+							if (stroke != null && strokeElementFills.TryGetValue(e,
+								out var strokeFillId) && fillDefs.TryGetValue(strokeFillId, out var addStrokeFill))
+							{
+								var elementSize = ReadElementSize(e);
+								var bounds = SKRect.Create(xy, elementSize);
+
+								addStrokeFill.ApplyFill(stroke, bounds);
+							}
+
+							if (fill != null)
+							{
+								canvas.DrawPath(elementPath, fill);
+							}
+							if (stroke != null)
+							{
+								canvas.DrawPath(elementPath, stroke);
+							}
+						}
+						break;
+					case "g":
+						if (e.HasElements)
+						{
+							// get current group opacity
+							var groupOpacity = ReadOpacity(style);
+							try
+							{
+								if (groupOpacity != 1.0f)
+								{
+									var opacity = (byte)(255 * groupOpacity);
+									var opacityPaint = new SKPaint
+									{
+										Color = SKColors.Black.WithAlpha(opacity)
+									};
+
+									// apply the opacity
+									canvas.SaveLayer(opacityPaint);
+								}
+
+								foreach (var gElement in e.Elements())
+								{
+									ReadElement(gElement, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+								}
+							}
+							finally
+							{
+								// restore state
+								if (groupOpacity != 1.0f)
+									canvas.Restore();
+							}
+						}
+						break;
+					case "use":
+						if (e.HasAttributes)
+						{
+							var href = ReadHref(e);
+							if (href != null)
+							{
+								if (string.Equals(href.Name.LocalName, "symbol", StringComparison.OrdinalIgnoreCase))
+								{
+									RenderSymbol(href, e, canvas, stroke?.Clone(), fill?.Clone(), e.Attributes());
+								}
+								else
+								{
+									ApplyAttributesToElement(e.Attributes(), href, new string[] { "href", "id" });
+									ReadElement(href, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+								}
+							}
+						}
+						break;
+					case "switch":
+						if (e.HasElements)
+						{
+							foreach (var ee in e.Elements())
+							{
+								var requiredFeatures = ee.Attribute("requiredFeatures");
+								var requiredExtensions = ee.Attribute("requiredExtensions");
+								var systemLanguage = ee.Attribute("systemLanguage");
+
+								// TODO: evaluate requiredFeatures, requiredExtensions and systemLanguage
+								var isVisible =
+									requiredFeatures == null &&
+									requiredExtensions == null &&
+									systemLanguage == null;
+
+								if (isVisible)
+								{
+									ReadElement(ee, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+								}
+							}
+						}
+						break;
+					case "mask":
+						if (e.HasElements)
+						{
+							masks.Add(ReadId(e), new SKSvgMask(stroke, fill, e));
+						}
+						break;
+					case "style":
+						CssHelpers.ParseSelectors(e.Value, styles);
+						break;
+					case "defs":
+						var styleNodes = e.Descendants();
+						if (styleNodes != null)
+						{
+							foreach (var item in styleNodes)
+							{
+								if (item.Name.LocalName == "style")
+								{
+									CssHelpers.ParseSelectors(item.Value, styles);
+								}
+							}
+						}
+						break;
+					case "a":
+						foreach (var child in e.Descendants())
+						{
+							ReadElement(child, canvas, stroke?.Clone(), fill?.Clone(), isMask);
+						}
+						break;
+					case "clipPath":
+					case "title":
+					case "desc":
+					case "description":
+						// already read earlier
+						break;
+					default:
+						LogOrThrow($"SVG element '{elementName}' is not supported");
+						break;
+				}
+			}
+			finally
+			{
+				// restore matrix
+				canvas.Restore();
+			}
         }
 
         private SKSvgImage ReadImage(XElement e)
