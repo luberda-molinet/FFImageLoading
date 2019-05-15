@@ -21,12 +21,14 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Svg.Platform.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>      
 
   <ItemGroup>
