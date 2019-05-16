@@ -44,7 +44,10 @@ namespace FFImageLoading.Forms
 		private static readonly PropertyInfo _visualProperty = typeof(VisualElement).GetRuntimeProperty("Visual");
 
 		internal static bool IsRendererInitialized { get; set; } = IsDesignModeEnabled;
+
+		[Obsolete]
 		public static bool FixedOnMeasureBehavior { get; set; } = true;
+		[Obsolete]
 		public static bool FixedAndroidMotionEventHandler { get; set; } = true;
 
 		private bool _reloadBecauseOfMissingSize;
@@ -468,8 +471,13 @@ namespace FFImageLoading.Forms
 		protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
 		{
 			var desiredSize = base.OnMeasure(double.PositiveInfinity, double.PositiveInfinity);
-			var desiredWidth = desiredSize.Request.Width;
-			var desiredHeight = desiredSize.Request.Height;
+			var desiredWidth = double.IsNaN(desiredSize.Request.Width) ? 0 : desiredSize.Request.Width;
+			var desiredHeight = double.IsNaN(desiredSize.Request.Height) ? 0 : desiredSize.Request.Height;
+
+			if (double.IsNaN(widthConstraint))
+				widthConstraint = 0;
+			if (double.IsNaN(heightConstraint))
+				heightConstraint = 0;
 
 			if (Math.Abs(desiredWidth) < double.Epsilon || Math.Abs(desiredHeight) < double.Epsilon)
 				return new SizeRequest(new Size(0, 0));
