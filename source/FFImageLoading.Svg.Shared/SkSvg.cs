@@ -1420,14 +1420,14 @@ namespace FFImageLoading.Svg.Platform
 		{
 			var t = SKMatrix.MakeIdentity();
 
+			if (xy != default && (string.IsNullOrWhiteSpace(raw) || !raw.Contains("translate")))
+			{
+				var m = SKMatrix.MakeTranslation(xy.X, xy.Y);
+				SKMatrix.Concat(ref t, t, m);
+			}
+
 			if (string.IsNullOrWhiteSpace(raw))
 			{
-				if (xy != default)
-				{
-					var m = SKMatrix.MakeTranslation(xy.X, xy.Y);
-					SKMatrix.Concat(ref t, t, m);
-				}
-
 				return t;
 			}
 
