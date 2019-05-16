@@ -18,6 +18,7 @@ namespace FFImageLoading.Svg.Platform
 		private const float DefaultPPI = 160f;
 		private const bool DefaultThrowOnUnsupportedElement = false;
 
+		private static readonly Random random = new Random();
 		private static readonly IFormatProvider icult = CultureInfo.InvariantCulture;
 		private static readonly XNamespace xlink = "http://www.w3.org/1999/xlink";
 		private static readonly XNamespace svg = "http://www.w3.org/2000/svg";
@@ -238,6 +239,51 @@ namespace FFImageLoading.Svg.Platform
 
 			try
 			{
+				var mask = ReadMask(style);
+				if (!isMask && mask != null)
+				{
+					canvas.SaveLayer(new SKPaint());
+					canvas.Clear();
+
+					try
+					{
+						using (var strokePaint = mask.Stroke?.Clone())
+						using (var fillPaint = mask.Fill?.Clone())
+						{
+							// TODO Is it Skia bug? When the same color is used for fill and mask nothing is drawn
+							if (strokePaint != null && strokePaint.Color == stroke?.Color)
+								strokePaint.Color = new SKColor((byte)~strokePaint.Color.Red, (byte)~strokePaint.Color.Green, (byte)~strokePaint.Color.Blue);
+
+							// TODO Is it Skia bug? When the same color is used for fill and mask nothing is drawn
+							if (fillPaint != null && fillPaint.Color == fill?.Color)
+								fillPaint.Color = new SKColor((byte)~fillPaint.Color.Red, (byte)~fillPaint.Color.Green, (byte)~fillPaint.Color.Blue);
+
+							foreach (var gElement in mask.Element.Elements())
+							{
+								ReadElement(gElement, canvas, strokePaint, fillPaint);
+							}
+						}
+
+						using (var strokePaint = stroke?.Clone())
+						using (var fillPaint = fill?.Clone())
+						{
+							if (strokePaint != null)
+								strokePaint.BlendMode = SKBlendMode.SrcIn;
+
+							if (fillPaint != null)
+								fillPaint.BlendMode = SKBlendMode.SrcIn;
+
+							ReadElement(e, canvas, strokePaint, fillPaint, true);
+						}
+					}
+					finally
+					{
+						canvas.Restore();
+					}
+
+					return;
+				}
+
 				if (elementName != "use")
 				{
 					// transform matrix
@@ -250,41 +296,6 @@ namespace FFImageLoading.Svg.Platform
 				if (clipPath != null)
 				{
 					canvas.ClipPath(clipPath);
-				}
-
-				var mask = ReadMask(style);
-				if (mask != null)
-				{
-					canvas.SaveLayer(new SKPaint());
-
-					try
-					{
-						foreach (var gElement in mask.Element.Elements())
-						{
-							ReadElement(gElement, canvas, mask.Stroke?.Clone(), mask.Fill?.Clone());
-						}
-
-						foreach (var gElement in e.Elements())
-						{
-							using (var strokePaint = stroke?.Clone())
-							using (var fillPaint = fill?.Clone())
-							{
-								if (strokePaint != null)
-									strokePaint.BlendMode = SKBlendMode.SrcIn;
-
-								if (fillPaint != null)
-									fillPaint.BlendMode = SKBlendMode.SrcIn;
-
-								ReadElement(gElement, canvas, strokePaint, fillPaint, true);
-							}
-						}
-					}
-					finally
-					{
-						canvas.Restore();
-					}
-
-					return;
 				}
 
 				// parse elements
