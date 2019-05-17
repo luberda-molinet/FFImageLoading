@@ -167,9 +167,9 @@ namespace FFImageLoading.DataResolvers
             try
             {
 #if __IOS__
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(identifier));
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(identifier)).ConfigureAwait(false);
 #elif __MACOS__
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(identifier));
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(identifier)).ConfigureAwait(false);
 #endif
             }
             catch { }
@@ -179,9 +179,9 @@ namespace FFImageLoading.DataResolvers
                 try
                 {
 #if __IOS__
-                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(fileName));
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(fileName)).ConfigureAwait(false);
 #elif __MACOS__
-                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(fileName));
+					await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(fileName)).ConfigureAwait(false);
 #endif
                 }
                 catch { }

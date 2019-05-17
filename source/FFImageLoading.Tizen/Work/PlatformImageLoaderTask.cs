@@ -24,16 +24,16 @@ namespace FFImageLoading.Work
             return size.DpToPixels();
         }
 
-        protected override Task SetTargetAsync(SharedEvasImage image, bool animated)
+        protected override async Task SetTargetAsync(SharedEvasImage image, bool animated)
         {
-            if (Target == null)
-                return Task.FromResult(true);
+			if (Target == null)
+				return;
 
-            return MainThreadDispatcher.PostAsync(() =>
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override IDecoder<SharedEvasImage> ResolveDecoder(ImageInformation.ImageType type)

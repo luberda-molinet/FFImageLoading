@@ -328,7 +328,7 @@ namespace FFImageLoading.Forms.Platform
 
 				if (!isLoading)
 					element.SetIsLoading(isLoading);
-			});
+			}).ConfigureAwait(false);
 		}
 
 		private void ReloadImage()

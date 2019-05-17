@@ -39,16 +39,16 @@ namespace FFImageLoading.Work
             await base.Init();
         }
 
-        protected override Task SetTargetAsync(PImage image, bool animated)
+        protected override async Task SetTargetAsync(PImage image, bool animated)
         {
-            if (Target == null)
-                return Task.FromResult(true);
+			if (Target == null)
+				return;
 
-            return MainThreadDispatcher.PostAsync(() =>
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override int DpiToPixels(int size)

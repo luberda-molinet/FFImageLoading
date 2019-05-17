@@ -60,7 +60,7 @@ namespace FFImageLoading.Decoders
                 }
 
                 tcs.SetResult(new DecodedImage<SharedEvasImage>() { Image = img });
-            });
+            }).ConfigureAwait(false);
 
             return tcs.Task;
         }
