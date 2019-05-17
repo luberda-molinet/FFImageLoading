@@ -12,13 +12,12 @@ namespace FFImageLoading.Work
 {
     public class WorkScheduler : IWorkScheduler
     {
-        readonly object _lock = new object();
-
-        long _statsTotalPending;
-        long _statsTotalRunning;
-        long _statsTotalMemoryCacheHits;
-        long _statsTotalWaiting;
-        long _loadCount;
+		private readonly object _lock = new object();
+		private long _statsTotalPending;
+		private long _statsTotalRunning;
+		private long _statsTotalMemoryCacheHits;
+		private long _statsTotalWaiting;
+		private long _loadCount;
 
         public WorkScheduler(Configuration configuration, IPlatformPerformance performance)
         {
@@ -176,7 +175,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        void Enqueue(IImageLoaderTask task)
+		private void Enqueue(IImageLoaderTask task)
         {
             PendingTasks.Enqueue(task, task.Parameters.Priority ?? GetDefaultPriority(task.Parameters.Source));
         }
