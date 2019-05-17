@@ -89,7 +89,7 @@ namespace FFImageLoading.Cache
         {
             if (!parameters.Preload)
             {
-                await Task.Delay(25);
+                await Task.Delay(25).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
             }
 
@@ -115,7 +115,7 @@ namespace FFImageLoading.Cache
 
                             using (response.Content)
                             {
-                                var content = await response.Content.ReadAsStringAsync();
+                                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                                 throw new DownloadHttpStatusCodeException(response.StatusCode, content);
                             }
                         }
@@ -160,7 +160,7 @@ namespace FFImageLoading.Cache
                                     var buffer = new byte[Configuration.HttpReadBufferSize];
                                     var read = 0;
 
-                                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
                                     {
                                         readTimeoutToken.ThrowIfCancellationRequested();
                                         outputStream.Write(buffer, 0, read);

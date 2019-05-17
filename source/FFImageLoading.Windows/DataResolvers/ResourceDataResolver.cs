@@ -32,7 +32,7 @@ namespace FFImageLoading.DataResolvers
                 var key = imgUri.ToString();
                 if (!_cache.TryGetValue(key, out file))
                 {
-                    file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+                    file = await StorageFile.GetFileFromApplicationUriAsync(imgUri).ConfigureAwait(false);
 
                     if (_cache.Count >= 128)
                         _cache.Clear();
@@ -48,7 +48,7 @@ namespace FFImageLoading.DataResolvers
                     var key = imgUri.ToString();
                     if (!_cache.TryGetValue(key, out file))
                     {
-                        file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+                        file = await StorageFile.GetFileFromApplicationUriAsync(imgUri).ConfigureAwait(false);
 
                         if (_cache.Count >= 128)
                             _cache.Clear();
@@ -72,7 +72,7 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetFilePath(file.Path);
 
                 token.ThrowIfCancellationRequested();
-                var stream = await file.OpenStreamForReadAsync();
+                var stream = await file.OpenStreamForReadAsync().ConfigureAwait(false);
 
                 return new DataResolverResult(stream, LoadingResult.CompiledResource, imageInformation);
             }

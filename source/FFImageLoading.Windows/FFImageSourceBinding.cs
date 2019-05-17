@@ -27,7 +27,7 @@ namespace FFImageLoading
             Uri uri;
             if (!Uri.TryCreate(source, UriKind.Absolute, out uri) || uri.Scheme == "file")
             {
-                var isFile = await Cache.FFSourceBindingCache.IsFileAsync(source);
+                var isFile = await Cache.FFSourceBindingCache.IsFileAsync(source).ConfigureAwait(false);
                 if (isFile)
                 {
                     return new FFImageSourceBinding(Work.ImageSource.Filepath, source);

@@ -198,7 +198,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
         {
-            var result = await AsNSImageAsync(parameters);
+            var result = await AsNSImageAsync(parameters).ConfigureAwait(false);
             var imageRep = new NSBitmapImageRep(result.AsTiff());
             return imageRep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png)
                                                              .AsStream();
@@ -211,7 +211,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public async static Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
-            var result = await AsNSImageAsync(parameters);
+            var result = await AsNSImageAsync(parameters).ConfigureAwait(false);
             var imageRep = new NSBitmapImageRep(result.AsTiff());
 
             return imageRep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg)

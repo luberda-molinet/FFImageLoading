@@ -327,7 +327,8 @@ namespace FFImageLoading.Work
             using (imageData)
             {
                 var decoder = ResolveDecoder(imageInformation.Type);
-                var decoderContainer = await decoder.DecodeAsync(imageData, path, source, imageInformation, Parameters);
+                var decoderContainer = await decoder.DecodeAsync(
+					imageData, path, source, imageInformation, Parameters).ConfigureAwait(false);
 
                 if (enableTransformations && Parameters.Transformations != null && Parameters.Transformations.Count > 0)
                 {
@@ -337,16 +338,19 @@ namespace FFImageLoading.Work
                     {
                         for (var i = 0; i < decoderContainer.AnimatedImages.Length; i++)
                         {
-                            decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
+                            decoderContainer.AnimatedImages[i].Image = await TransformAsync(
+								decoderContainer.AnimatedImages[i].Image, 
+								transformations, path, source, isPlaceholder).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                        decoderContainer.Image = await TransformAsync(
+							decoderContainer.Image, transformations, path, source, isPlaceholder).ConfigureAwait(false);
                     }
                 }
 
-                return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+                return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder).ConfigureAwait(false);
             }
         }
 
@@ -369,16 +373,18 @@ namespace FFImageLoading.Work
                 {
                     for (var i = 0; i < decoderContainer.AnimatedImages.Length; i++)
                     {
-                        decoderContainer.AnimatedImages[i].Image = await TransformAsync(decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder);
+                        decoderContainer.AnimatedImages[i].Image = await TransformAsync(
+							decoderContainer.AnimatedImages[i].Image, transformations, path, source, isPlaceholder).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    decoderContainer.Image = await TransformAsync(decoderContainer.Image, transformations, path, source, isPlaceholder);
+                    decoderContainer.Image = await TransformAsync(
+						decoderContainer.Image, transformations, path, source, isPlaceholder).ConfigureAwait(false);
                 }
             }
 
-            return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder);
+            return await GenerateImageFromDecoderContainerAsync(decoderContainer, imageInformation, isPlaceholder).ConfigureAwait(false);
         }
 
         public async virtual Task<bool> TryLoadFromMemoryCacheAsync()

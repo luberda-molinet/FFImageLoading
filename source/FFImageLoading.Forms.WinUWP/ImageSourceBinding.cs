@@ -58,7 +58,7 @@ namespace FFImageLoading.Forms.Platform
 
                     if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                     {
-                        file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File);
+                        file = await Cache.FFSourceBindingCache.GetFileAsync(fileImageSource.File).ConfigureAwait(false);
                     }
                 }
                 catch (Exception)

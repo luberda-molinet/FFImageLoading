@@ -35,8 +35,8 @@ namespace FFImageLoading.Work
 
         public async override Task Init()
         {
-            await ScaleHelper.InitAsync();
-            await base.Init();
+            await ScaleHelper.InitAsync().ConfigureAwait(false);
+            await base.Init().ConfigureAwait(false);
         }
 
         protected override async Task SetTargetAsync(PImage image, bool animated)

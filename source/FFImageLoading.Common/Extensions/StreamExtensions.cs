@@ -38,7 +38,7 @@ namespace FFImageLoading
 			using (stream)
 			{
 				var ms = new MemoryStream();
-				await stream.CopyToAsync(ms);
+				await stream.CopyToAsync(ms).ConfigureAwait(false);
 				ms.Position = 0;
 				return ms;
 			}

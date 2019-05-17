@@ -57,7 +57,7 @@ namespace FFImageLoading.Decoders
 						var animatedImage = new AnimatedImage<Bitmap>
 						{
 							Delay = gifDecoder.GetDelay(i),
-							Image = await gifDecoder.GetNextFrameAsync()
+							Image = await gifDecoder.GetNextFrameAsync().ConfigureAwait(false)
 						};
 						result.AnimatedImages[i] = animatedImage;
 
@@ -67,7 +67,7 @@ namespace FFImageLoading.Decoders
 				else
 				{
 					result.IsAnimated = false;
-					result.Image = await gifDecoder.GetNextFrameAsync();
+					result.Image = await gifDecoder.GetNextFrameAsync().ConfigureAwait(false);
 				}
 
 

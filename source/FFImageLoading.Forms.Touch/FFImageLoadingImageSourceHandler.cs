@@ -28,7 +28,7 @@ namespace FFImageLoading.Forms.Platform
 					return null;
 				}
 
-				var result = await LoadImageAsync(source, imageSource, null, cancellationToken);
+				var result = await LoadImageAsync(source, imageSource, null, cancellationToken).ConfigureAwait(false);
 				var target = result?.Target as PImageTarget;
 				return target?.PImage;
 			}

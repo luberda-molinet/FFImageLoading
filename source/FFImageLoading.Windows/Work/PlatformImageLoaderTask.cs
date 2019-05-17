@@ -21,8 +21,8 @@ namespace FFImageLoading.Work
 
         public async override Task Init()
         {
-            await ScaleHelper.InitAsync();
-            await base.Init();
+            await ScaleHelper.InitAsync().ConfigureAwait(false);
+            await base.Init().ConfigureAwait(false);
         }
 
         protected override async Task SetTargetAsync(BitmapSource image, bool animated)
@@ -108,7 +108,7 @@ namespace FFImageLoading.Work
                     if (decoded.Image.HasWriteableBitmap)
                         return decoded.Image.WriteableBitmap;
 
-                    return await decoded.Image.ToBitmapImageAsync();
+                    return await decoded.Image.ToBitmapImageAsync().ConfigureAwait(false);
                 }
                 finally
                 {

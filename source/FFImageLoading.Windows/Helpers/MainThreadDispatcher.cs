@@ -27,7 +27,7 @@ namespace FFImageLoading.Helpers
             // not in UI thread, ensuring UI thread:
             else
             {
-                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
+                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action()).ConfigureAwait(false);
                 //await CoreApplication.GetCurrentView().Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => action());
             }
         }
@@ -58,7 +58,7 @@ namespace FFImageLoading.Helpers
             {
                 try
                 {
-                    await action?.Invoke();
+                    await (action?.Invoke()).ConfigureAwait(false);
                     tcs.SetResult(true);
                 }
                 catch (Exception ex)

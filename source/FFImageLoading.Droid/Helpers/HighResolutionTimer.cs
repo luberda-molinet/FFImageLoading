@@ -88,7 +88,7 @@ namespace FFImageLoading
                         if (!Enabled) return;
 
                         var delay = elapsed - nextTrigger;
-                        await _action.Invoke(this, image.Image);
+                        await (_action.Invoke(this, image.Image)).ConfigureAwait(false);
                     }
                 }
             }

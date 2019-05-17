@@ -57,7 +57,7 @@ namespace FFImageLoading
             try
             {
                 var stream = new MemoryStream();
-                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream).ConfigureAwait(false);
 
                 if (stream.Position != 0)
                     stream.Position = 0;
@@ -79,7 +79,7 @@ namespace FFImageLoading
             try
             {
                 var stream = new MemoryStream();
-                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Jpeg, quality, stream);
+                await drawable.Bitmap.CompressAsync(Android.Graphics.Bitmap.CompressFormat.Jpeg, quality, stream).ConfigureAwait(false);
 
                 if (stream.Position != 0)
                     stream.Position = 0;

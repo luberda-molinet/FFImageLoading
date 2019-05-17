@@ -46,7 +46,7 @@ namespace FFImageLoading.Targets
 								}
 
 								control.SetImageBitmap(bitmap);
-							});
+							}).ConfigureAwait(false);
 						}
 						catch (ObjectDisposedException)
 						{

@@ -43,7 +43,7 @@ namespace FFImageLoading.Decoders
             using (var nsdata = NSData.FromStream(stream))
             {
                 var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale,
-                                                      Configuration, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale);
+                                                      Configuration, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale).ConfigureAwait(false);
 				return result;
             }
         }

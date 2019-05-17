@@ -237,7 +237,7 @@ namespace FFImageLoading.Svg.Platform
                 using (var svgStream = resolvedData.Stream)
                 using (var reader = new StreamReader(svgStream))
                 {
-                    var inputString = await reader.ReadToEndAsync();
+                    var inputString = await reader.ReadToEndAsync().ConfigureAwait(false);
 
                     foreach (var map in ReplaceStringMap
                              .Where(v => v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))

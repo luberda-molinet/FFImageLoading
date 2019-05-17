@@ -23,8 +23,8 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
         {
-            var result = await AsWriteableBitmapAsync(parameters);
-            var stream = await result.AsPngStreamAsync();
+            var result = await AsWriteableBitmapAsync(parameters).ConfigureAwait(false);
+            var stream = await result.AsPngStreamAsync().ConfigureAwait(false);
 
             return stream;
         }
@@ -36,8 +36,8 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
-            var result = await AsWriteableBitmapAsync(parameters);
-            var stream = await result.AsJpegStreamAsync(quality);
+            var result = await AsWriteableBitmapAsync(parameters).ConfigureAwait(false);
+            var stream = await result.AsJpegStreamAsync(quality).ConfigureAwait(false);
 
             return stream;
         }

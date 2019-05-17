@@ -67,7 +67,7 @@ namespace FFImageLoading.Cache
         {
             try
             {
-                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
                 await InitializeEntries().ConfigureAwait(false);
             }
             catch
@@ -76,7 +76,7 @@ namespace FFImageLoading.Cache
 
                 try
                 {
-                    folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(cacheFolderName);
+                    folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(cacheFolderName).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -84,8 +84,8 @@ namespace FFImageLoading.Cache
 
                 if (folder != null)
                 {
-                    await folder.DeleteAsync();
-                    await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.ReplaceExisting);
+                    await folder.DeleteAsync().ConfigureAwait(false);
+                    await ApplicationData.Current.LocalFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
                 }
             }
             finally
@@ -96,7 +96,7 @@ namespace FFImageLoading.Cache
 
         protected virtual async Task InitializeEntries()
         {
-            foreach (var file in await cacheFolder.GetFilesAsync())
+            foreach (var file in await cacheFolder.GetFilesAsync().ConfigureAwait(false))
             {
                 string key = Path.GetFileNameWithoutExtension(file.Name);
                 var duration = GetDuration(file.FileType);
@@ -128,8 +128,8 @@ namespace FFImageLoading.Cache
                     try
                     {
                         Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
-                        var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
-                        await file.DeleteAsync();
+                        var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName).ConfigureAwait(false);
+                        await file.DeleteAsync().ConfigureAwait(false);
                     }
                     catch
                     {
@@ -193,10 +193,10 @@ namespace FFImageLoading.Cache
                     {
                         await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                        cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                        cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
                         string filename = key + "." + (long)duration.TotalSeconds;
 
-                        var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
+                        var file = await cacheFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
 
                         using (var fs = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
                         {
@@ -247,11 +247,11 @@ namespace FFImageLoading.Cache
 
                 try
                 {
-                    file = await cacheFolder.GetFileAsync(entry.FileName);
+                    file = await cacheFolder.GetFileAsync(entry.FileName).ConfigureAwait(false);
                 }
                 catch (IOException)
                 {
-                    cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                    cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
                 }
 
                 if (file == null)
@@ -280,8 +280,8 @@ namespace FFImageLoading.Cache
             {
                 try
                 {
-                    var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
-                    await file.DeleteAsync();
+                    var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName).ConfigureAwait(false);
+                    await file.DeleteAsync().ConfigureAwait(false);
                 }
                 catch
                 {
@@ -305,12 +305,12 @@ namespace FFImageLoading.Cache
             {
                 await fileWriteLock.WaitAsync().ConfigureAwait(false);
 
-                var entriesToRemove = await cacheFolder.GetFilesAsync();
+                var entriesToRemove = await cacheFolder.GetFilesAsync().ConfigureAwait(false);
                 foreach (var item in entriesToRemove)
                 {
                     try
                     {
-                        await item.DeleteAsync();
+                        await item.DeleteAsync().ConfigureAwait(false);
                     }
                     catch (FileNotFoundException)
                     {
@@ -319,7 +319,7 @@ namespace FFImageLoading.Cache
             }
             catch (IOException)
             {
-                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
+                cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
             }
             finally
             {

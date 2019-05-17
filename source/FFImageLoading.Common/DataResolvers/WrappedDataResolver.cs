@@ -18,7 +18,7 @@ namespace FFImageLoading.DataResolvers
 
         public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
-            var resolved = await _resolver.Resolve(identifier, parameters, token);
+            var resolved = await _resolver.Resolve(identifier, parameters, token).ConfigureAwait(false);
 
             if (resolved.Stream == null && resolved.Decoded == null)
                 throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.Decoded)}");
@@ -28,7 +28,7 @@ namespace FFImageLoading.DataResolvers
                 using (resolved.Stream)
                 {
                     var memoryStream = new MemoryStream();
-                    await resolved.Stream.CopyToAsync(memoryStream);
+                    await resolved.Stream.CopyToAsync(memoryStream).ConfigureAwait(false);
                     memoryStream.Position = 0;
                     resolved = new DataResolverResult(memoryStream, resolved.LoadingResult, resolved.ImageInformation);
                 }
@@ -50,7 +50,7 @@ namespace FFImageLoading.DataResolvers
                     var offset = 0;
                     while (offset < headerLength)
                     {
-                        offset += await resolved.Stream.ReadAsync(header, offset, headerLength - offset);
+                        offset += await resolved.Stream.ReadAsync(header, offset, headerLength - offset).ConfigureAwait(false);
                     }
 
                     resolved.Stream.Position = 0;

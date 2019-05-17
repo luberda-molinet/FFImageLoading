@@ -24,7 +24,8 @@ namespace FFImageLoading.Extensions
     {
         public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
-            var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale);
+            var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(
+				data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale).ConfigureAwait(false);
 
             PImage result;
 

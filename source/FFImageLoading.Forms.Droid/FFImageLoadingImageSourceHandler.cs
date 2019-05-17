@@ -26,7 +26,7 @@ namespace FFImageLoading.Forms.Platform
 					return null;
 				}
 
-				var result = await LoadImageAsync(source, imageSource, context, cancellationToken);
+				var result = await LoadImageAsync(source, imageSource, context, cancellationToken).ConfigureAwait(false);
 				var target = result.Target as BitmapTarget;
 				return target?.BitmapDrawable?.Bitmap;
 			}

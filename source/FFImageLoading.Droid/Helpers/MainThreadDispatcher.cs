@@ -48,7 +48,7 @@ namespace FFImageLoading.Helpers
             {
                 try
                 {
-                    await action?.Invoke();
+                    await (action?.Invoke()).ConfigureAwait(false);
                     tcs.SetResult(true);
                 }
                 catch (Exception ex)

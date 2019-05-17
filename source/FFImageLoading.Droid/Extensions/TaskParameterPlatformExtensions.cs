@@ -20,9 +20,9 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
         {
-            using (var result = await AsBitmapDrawableAsync(parameters))
+            using (var result = await AsBitmapDrawableAsync(parameters).ConfigureAwait(false))
             {
-                var stream = await result.AsPngStreamAsync();
+                var stream = await result.AsPngStreamAsync().ConfigureAwait(false);
 
                 return stream;
             }
@@ -36,9 +36,9 @@ namespace FFImageLoading
         /// <param name="quality">Quality.</param>
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
-            using (var result = await AsBitmapDrawableAsync(parameters))
+            using (var result = await AsBitmapDrawableAsync(parameters).ConfigureAwait(false))
             {
-                var stream = await result.AsJpegStreamAsync(quality);
+                var stream = await result.AsJpegStreamAsync(quality).ConfigureAwait(false);
                 result.SetIsDisplayed(false);
 
                 return stream;

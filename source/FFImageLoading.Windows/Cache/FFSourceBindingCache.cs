@@ -27,7 +27,7 @@ namespace FFImageLoading.Cache
                     _cache.Clear();
                 }
 
-                StorageFile file = await GetFileAsync(path);
+                StorageFile file = await GetFileAsync(path).ConfigureAwait(false);
                 _cache.Add(path, new Tuple<bool, StorageFile>(file != null, file));
                 return file != null;
             }
@@ -41,7 +41,7 @@ namespace FFImageLoading.Cache
                 var filePath = System.IO.Path.GetDirectoryName(path);
                 if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                 {
-                    file = await StorageFile.GetFileFromPathAsync(path);
+                    file = await StorageFile.GetFileFromPathAsync(path).ConfigureAwait(false);
                 }
             }
             catch (Exception)
