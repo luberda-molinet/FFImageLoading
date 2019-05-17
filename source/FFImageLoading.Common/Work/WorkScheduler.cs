@@ -151,7 +151,7 @@ namespace FFImageLoading.Work
                     LogSchedulerStats();
                 }
 
-                await task.Init();
+                await task.Init().ConfigureAwait(false);
 
                 if (string.IsNullOrWhiteSpace(task.KeyRaw))
                 {
@@ -234,19 +234,9 @@ namespace FFImageLoading.Work
             }
         }
 
-        protected void TakeFromPendingTasksAndRun()
+        protected async void TakeFromPendingTasksAndRun()
         {
-            Task.Factory.StartNew(async () =>
-            {
-                try
-                {
-                    await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("TakeFromPendingTasksAndRun exception", ex);
-                }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+			await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false);
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
@@ -342,7 +332,20 @@ namespace FFImageLoading.Work
 
             if (tasksToRun != null && tasksToRun.Count > 0)
             {
-                var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value));
+                var tasks = tasksToRun.Select(async p =>
+				{
+					await Task.Factory.StartNew(async () =>
+					{
+						try
+						{
+							await RunImageLoadingTaskAsync(p.Value).ConfigureAwait(false);
+						}
+						catch (Exception ex)
+						{
+							Logger.Error("TakeFromPendingTasksAndRun exception", ex);
+						}
+					}, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+				});
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
