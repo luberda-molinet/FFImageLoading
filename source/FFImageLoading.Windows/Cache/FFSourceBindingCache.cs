@@ -41,7 +41,7 @@ namespace FFImageLoading.Cache
                 var filePath = System.IO.Path.GetDirectoryName(path);
                 if (!string.IsNullOrWhiteSpace(filePath) && !(filePath.TrimStart('\\', '/')).StartsWith("Assets"))
                 {
-                    file = await StorageFile.GetFileFromPathAsync(path).ConfigureAwait(false);
+                    file = await StorageFile.GetFileFromPathAsync(path);
                 }
             }
             catch (Exception)

@@ -129,7 +129,7 @@ namespace FFImageLoading.Cache
                     {
                         Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
                         var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
-                        await file.DeleteAsync().ConfigureAwait(false);
+                        await file.DeleteAsync();
                     }
                     catch
                     {
@@ -281,7 +281,7 @@ namespace FFImageLoading.Cache
                 try
                 {
                     var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
-                    await file.DeleteAsync().ConfigureAwait(false);
+                    await file.DeleteAsync();
                 }
                 catch
                 {
@@ -310,7 +310,7 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        await item.DeleteAsync().ConfigureAwait(false);
+                        await item.DeleteAsync();
                     }
                     catch (FileNotFoundException)
                     {
