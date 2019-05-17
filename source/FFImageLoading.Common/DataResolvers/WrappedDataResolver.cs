@@ -23,16 +23,7 @@ namespace FFImageLoading.DataResolvers
             if (resolved.Stream == null && resolved.Decoded == null)
                 throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.Decoded)}");
 
-            if (resolved.Stream != null && !resolved.Stream.CanSeek)
-            {
-                using (resolved.Stream)
-                {
-                    var memoryStream = new MemoryStream();
-                    await resolved.Stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                    memoryStream.Position = 0;
-                    resolved = new DataResolverResult(memoryStream, resolved.LoadingResult, resolved.ImageInformation);
-                }
-            }
+			resolved.Stream = await resolved.Stream.AsSeekableStreamAsync().ConfigureAwait(false);
 
             if (resolved.Stream != null)
             {

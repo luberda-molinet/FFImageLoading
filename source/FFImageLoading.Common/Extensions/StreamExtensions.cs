@@ -8,6 +8,9 @@ namespace FFImageLoading
 	{
 		public static async Task<Stream> AsSeekableStreamAsync(this Stream stream, bool forceCopy = false)
 		{
+			if (stream == null)
+				return null;
+
 			var lengthSupported = true;
 
 			try
@@ -25,14 +28,6 @@ namespace FFImageLoading
 					stream.Position = 0;
 
 				return stream;
-			}
-
-			if (stream.Position != 0)
-			{
-				if (!stream.CanSeek)
-					throw new NotSupportedException("Stream position is not 0 and it's not seekable, can't create a copy");
-
-				stream.Position = 0;
 			}
 
 			using (stream)
