@@ -550,6 +550,21 @@ namespace FFImageLoading.Forms
 
 			var fitsWidthRatio = widthConstraint / desiredWidth;
 			var fitsHeightRatio = heightConstraint / desiredHeight;
+
+			if (double.IsNaN(fitsWidthRatio))
+				fitsWidthRatio = 0;
+			if (double.IsNaN(fitsHeightRatio))
+				fitsHeightRatio = 0;
+
+			if (Math.Abs(fitsWidthRatio) < double.Epsilon && Math.Abs(fitsHeightRatio) < double.Epsilon)
+				return new SizeRequest(new Size(0, 0));
+
+			if (Math.Abs(fitsWidthRatio) < double.Epsilon)
+				return new SizeRequest(new Size(desiredWidth * fitsHeightRatio, desiredHeight * fitsHeightRatio));
+
+			if (Math.Abs(fitsHeightRatio) < double.Epsilon)
+				return new SizeRequest(new Size(desiredWidth * fitsWidthRatio, desiredHeight * fitsWidthRatio));
+
 			var ratioFactor = Math.Min(fitsWidthRatio, fitsHeightRatio);
 
 			return new SizeRequest(new Size(desiredWidth * ratioFactor, desiredHeight * ratioFactor));
