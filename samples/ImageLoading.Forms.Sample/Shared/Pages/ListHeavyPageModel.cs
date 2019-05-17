@@ -7,7 +7,6 @@ using Xamvvm;
 
 namespace FFImageLoading.Forms.Sample
 {
-    
     public class ListHeavyPageModel : BasePageModel
     {
         public ListHeavyPageModel()
@@ -39,6 +38,7 @@ namespace FFImageLoading.Forms.Sample
             var howManyTimes = 10;
 
             for (int j = 0; j < howManyTimes; j++)
+			{
                 for (int i = 0; i < howMuch; i++)
                 {
                     var item = new ListHeavyItem()
