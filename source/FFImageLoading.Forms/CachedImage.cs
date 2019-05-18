@@ -528,7 +528,7 @@ namespace FFImageLoading.Forms
 					height = desiredHeight * (width / desiredWidth);
 				}
 
-				return new SizeRequest(new Size(width, height));
+				return new SizeRequest(new Size(double.IsNaN(width) ? 0 : width, double.IsNaN(height) ? 0 : height));
 			}
 
 			if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
