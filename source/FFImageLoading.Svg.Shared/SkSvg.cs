@@ -83,7 +83,7 @@ namespace FFImageLoading.Svg.Platform
 		{
 			using (var stream = File.OpenRead(filename))
 			{
-				return Load(stream);
+				return Load(stream, token);
 			}
 		}
 
