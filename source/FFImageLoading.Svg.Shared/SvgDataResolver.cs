@@ -229,7 +229,7 @@ namespace FFImageLoading.Svg.Platform
             {
                 using (var svgStream = resolvedData.Stream)
                 {
-                    picture = svg.Load(svgStream);
+                    picture = svg.Load(svgStream, token);
                 }
             }
             else
@@ -253,12 +253,16 @@ namespace FFImageLoading.Svg.Platform
                         builder.Replace(map.Key, map.Value);
                     }
 
-                    using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
+					token.ThrowIfCancellationRequested();
+
+					using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
                     {
                         picture = svg.Load(svgFinalStream);
                     }
                 }
             }
+
+			token.ThrowIfCancellationRequested();
 
             double sizeX = VectorWidth;
             double sizeY = VectorHeight;
@@ -302,6 +306,8 @@ namespace FFImageLoading.Svg.Platform
                 var matrix = SKMatrix.MakeScale(scaleX, scaleY);
                 canvas.DrawPicture(picture, ref matrix, paint);
                 canvas.Flush();
+
+				token.ThrowIfCancellationRequested();
 
 				return await Decode(picture, bitmap, resolvedData).ConfigureAwait(false);
 			}

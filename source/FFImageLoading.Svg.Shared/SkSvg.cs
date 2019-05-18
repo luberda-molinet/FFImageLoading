@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using SkiaSharp;
+using System.Threading;
 
 namespace FFImageLoading.Svg.Platform
 {
@@ -18,7 +19,6 @@ namespace FFImageLoading.Svg.Platform
 		private const float DefaultPPI = 160f;
 		private const bool DefaultThrowOnUnsupportedElement = false;
 
-		private static readonly Random random = new Random();
 		private static readonly IFormatProvider icult = CultureInfo.InvariantCulture;
 		private static readonly XNamespace xlink = "http://www.w3.org/1999/xlink";
 		private static readonly XNamespace svg = "http://www.w3.org/2000/svg";
@@ -28,6 +28,7 @@ namespace FFImageLoading.Svg.Platform
 		private static readonly Regex urlRe = new Regex(@"url\s*\(\s*#([^\)]+)\)");
 		private static readonly Regex keyValueRe = new Regex(@"\s*([\w-]+)\s*:\s*(.*)");
 		private static readonly Regex WSRe = new Regex(@"\s{2,}");
+
 		private readonly Dictionary<string, string> styles = new Dictionary<string, string>();
 		private readonly Dictionary<string, XElement> defs = new Dictionary<string, XElement>();
 		private readonly Dictionary<string, SKSvgMask> masks = new Dictionary<string, SKSvgMask>();
@@ -78,7 +79,7 @@ namespace FFImageLoading.Svg.Platform
 
 		public string Version { get; private set; }
 
-		public SKPicture Load(string filename)
+		public SKPicture Load(string filename, CancellationToken token = default)
 		{
 			using (var stream = File.OpenRead(filename))
 			{
@@ -86,17 +87,17 @@ namespace FFImageLoading.Svg.Platform
 			}
 		}
 
-		public SKPicture Load(Stream stream)
+		public SKPicture Load(Stream stream, CancellationToken token = default)
 		{
 			using (var reader = XmlReader.Create(stream, xmlReaderSettings, CreateSvgXmlContext()))
 			{
-				return Load(reader);
+				return Load(reader, token);
 			}
 		}
 
-		public SKPicture Load(XmlReader reader)
+		public SKPicture Load(XmlReader reader, CancellationToken token = default)
 		{
-			return Load(XDocument.Load(reader));
+			return Load(XDocument.Load(reader), token);
 		}
 
 		private static XmlParserContext CreateSvgXmlContext()
@@ -108,7 +109,7 @@ namespace FFImageLoading.Svg.Platform
 			return new XmlParserContext(null, manager, null, XmlSpace.None);
 		}
 
-		private SKPicture Load(XDocument xdoc)
+		private SKPicture Load(XDocument xdoc, CancellationToken token = default)
 		{
 			var svg = xdoc.Root;
 			var ns = svg.Name.Namespace;
@@ -165,6 +166,8 @@ namespace FFImageLoading.Svg.Platform
 				CanvasSize = size;
 			}
 
+			token.ThrowIfCancellationRequested();
+
 			// create the picture from the elements
 			using (var recorder = new SKPictureRecorder())
 			using (var canvas = recorder.BeginRecording(SKRect.Create(CanvasSize)))
@@ -203,7 +206,7 @@ namespace FFImageLoading.Svg.Platform
 				var style = ReadPaints(svg, ref stroke, ref fill, true);
 
 				// read elements
-				LoadElements(svg.Elements(), canvas, stroke, fill);
+				LoadElements(svg.Elements(), canvas, stroke, fill, token);
 
 				Picture = recorder.EndRecording();
 			}
@@ -211,7 +214,7 @@ namespace FFImageLoading.Svg.Platform
 			return Picture;
 		}
 
-		private void LoadElements(IEnumerable<XElement> elements, SKCanvas canvas, SKPaint stroke, SKPaint fill)
+		private void LoadElements(IEnumerable<XElement> elements, SKCanvas canvas, SKPaint stroke, SKPaint fill, CancellationToken token = default)
 		{
 			foreach (var e in elements)
 			{
@@ -219,8 +222,10 @@ namespace FFImageLoading.Svg.Platform
 			}
 		}
 
-		private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill, bool isMask = false)
+		private void ReadElement(XElement e, SKCanvas canvas, SKPaint stroke, SKPaint fill, bool isMask = false, CancellationToken token = default)
 		{
+			token.ThrowIfCancellationRequested();
+
 			if (e.Attribute("display")?.Value == "none")
 				return;
 
