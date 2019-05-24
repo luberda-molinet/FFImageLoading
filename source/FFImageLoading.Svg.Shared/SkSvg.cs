@@ -63,6 +63,8 @@ namespace FFImageLoading.Svg.Platform
 			ThrowOnUnsupportedElement = DefaultThrowOnUnsupportedElement;
 		}
 
+		public bool HasRasterImage { get; private set; }
+
 		public float PixelsPerInch { get; set; }
 
 		public bool ThrowOnUnsupportedElement { get; set; }
@@ -207,7 +209,6 @@ namespace FFImageLoading.Svg.Platform
 
 				// read elements
 				LoadElements(svg.Elements(), canvas, stroke, fill, token);
-
 				Picture = recorder.EndRecording();
 			}
 
@@ -315,6 +316,7 @@ namespace FFImageLoading.Svg.Platform
 								{
 									if (bitmap != null)
 									{
+										HasRasterImage = true;
 										canvas.DrawBitmap(bitmap, image.Rect);
 									}
 								}
