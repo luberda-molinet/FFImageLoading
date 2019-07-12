@@ -47,5 +47,6 @@ source/FFImageLoading.Transformations/AssemblyTFMAttribute.cs
 source/FFImageLoading.Forms.Tizen/.vs/FFImageLoading.Forms.Tizen/xs/UserPrefs.xml
 .vs/
 .mfractor/
+.idea/
 
 samples/ImageLoading.Forms.Sample/Shared/FodyWeavers.xsd
