@@ -293,156 +293,156 @@ namespace FFImageLoading.Cross
 
         protected virtual void UpdateImageLoadingTask()
         {
-            var ffSource = GetImageSourceBinding(ImagePath, ImageStream);
-            var placeholderSource = GetImageSourceBinding(LoadingPlaceholderImagePath, null);
+	        var ffSource = GetImageSourceBinding(ImagePath, ImageStream);
 
-            Cancel();
-            TaskParameter imageLoader = null;
+	        Cancel();
 
-            if (ffSource == null)
-            {
+	        if (ffSource == null)
+	        {
 #if __ANDROID__
-                this.SetImageResource(global::Android.Resource.Color.Transparent);
+				this.SetImageResource(global::Android.Resource.Color.Transparent);
 #elif __IOS__
                 Image = null;
 #endif
-                IsLoading = false;
-                return;
-            }
+		        IsLoading = false;
+		        return;
+	        }
 
-            IsLoading = true;
+	        IsLoading = true;
 
-            if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Url)
-            {
-                imageLoader = ImageService.Instance.LoadUrl(ffSource.Path, CacheDuration);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.CompiledResource)
-            {
-                imageLoader = ImageService.Instance.LoadCompiledResource(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.ApplicationBundle)
-            {
-                imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Filepath)
-            {
-                imageLoader = ImageService.Instance.LoadFile(ffSource.Path);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.Stream)
-            {
-                imageLoader = ImageService.Instance.LoadStream(ffSource.Stream);
-            }
-            else if (ffSource.ImageSource == FFImageLoading.Work.ImageSource.EmbeddedResource)
-            {
-                imageLoader = ImageService.Instance.LoadEmbeddedResource(ffSource.Path);
-            }
+	        var imageLoader = GetImageLoaderForSource(ffSource);
+	        if (imageLoader != null)
+	        {
+		        ConfigureImageLoader(imageLoader, ffSource);
+		        SetupOnBeforeImageLoading(imageLoader);
 
-            if (imageLoader != null)
-            {
-                // LoadingPlaceholder
-                if (placeholderSource != null)
-                {
-                    if (placeholderSource != null)
-                        imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
-                }
-
-                // ErrorPlaceholder
-                if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath))
-                {
-                    var errorPlaceholderSource = GetImageSourceBinding(ErrorPlaceholderImagePath, null);
-                    if (errorPlaceholderSource != null)
-                        imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
-                }
-
-                if (CustomDataResolver != null)
-                {
-                    imageLoader.WithCustomDataResolver(CustomDataResolver);
-                    imageLoader.WithCustomLoadingPlaceholderDataResolver(CustomLoadingPlaceholderDataResolver);
-                    imageLoader.WithCustomErrorPlaceholderDataResolver(CustomErrorPlaceholderDataResolver);
-                }
-
-                // Downsample
-                if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
-                {
-					if (DownsampleUseDipUnits)
-						imageLoader.DownSampleInDip((int)DownsampleWidth, (int)DownsampleHeight);
-					else
-						imageLoader.DownSample((int)DownsampleWidth, (int)DownsampleHeight);
-				}
-
-                // RetryCount
-                if (RetryCount > 0)
-                {
-                    imageLoader.Retry(RetryCount, RetryDelay);
-                }
-
-                if (BitmapOptimizations.HasValue)
-                    imageLoader.BitmapOptimizations(BitmapOptimizations.Value);
-
-                // FadeAnimation
-                if (FadeAnimationEnabled.HasValue)
-                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, duration: FadeAnimationDuration);
-
-                // FadeAnimationForCachedImages
-                if (FadeAnimationEnabled.HasValue && FadeAnimationForCachedImages.HasValue)
-                    imageLoader.FadeAnimation(FadeAnimationEnabled.Value, FadeAnimationForCachedImages.Value, FadeAnimationDuration);
-
-                // TransformPlaceholders
-                if (TransformPlaceholders.HasValue)
-                    imageLoader.TransformPlaceholders(TransformPlaceholders.Value);
-
-                // Transformations
-                if (Transformations != null && Transformations.Count > 0)
-                {
-                    imageLoader.Transform(Transformations);
-                }
-
-                if (InvalidateLayoutAfterLoaded.HasValue)
-                    imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
-
-                imageLoader.WithPriority(LoadingPriority);
-                if (CacheType.HasValue)
-                {
-                    imageLoader.WithCache(CacheType.Value);
-                }
-
-                if (LoadingDelay > 0)
-                {
-                    imageLoader.Delay(LoadingDelay);
-                }
-
-                imageLoader.Finish((work) =>
-                {
-                    IsLoading = false;
-                    OnFinish?.Invoke(this, new Args.FinishEventArgs(work));
-                });
-
-                imageLoader.Success((imageInformation, loadingResult) =>
-                {
-                    OnSuccess?.Invoke(this, new Args.SuccessEventArgs(imageInformation, loadingResult));
-                    _lastImageSource = ffSource;
-                });
-
-                if (OnError != null)
-                    imageLoader.Error((ex) => OnError?.Invoke(this, new Args.ErrorEventArgs(ex)));
-
-                if (OnDownloadStarted != null)
-                    imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(this, new Args.DownloadStartedEventArgs(downloadInformation)));
-
-                if (OnDownloadProgress != null)
-                    imageLoader.DownloadProgress((progress) => OnDownloadProgress(this, new Args.DownloadProgressEventArgs(progress)));
-
-                if (OnFileWriteFinished != null)
-                    imageLoader.FileWriteFinished((info) => OnFileWriteFinished(this, new Args.FileWriteFinishedEventArgs(info)));
-
-                if (!string.IsNullOrWhiteSpace(CustomCacheKey))
-                    imageLoader.CacheKey(CustomCacheKey);
-
-                SetupOnBeforeImageLoading(imageLoader);
-
-                _scheduledWork = imageLoader.Into(this);
-            }
+		        _scheduledWork = imageLoader.Into(this);
+	        }
         }
+
+        protected virtual TaskParameter GetImageLoaderForSource(ImageSourceBinding ffSource)
+        {
+	        switch (ffSource.ImageSource)
+	        {
+		        case FFImageLoading.Work.ImageSource.Url:
+			        return ImageService.Instance.LoadUrl(ffSource.Path, CacheDuration);
+		        case FFImageLoading.Work.ImageSource.CompiledResource:
+			        return ImageService.Instance.LoadCompiledResource(ffSource.Path);
+		        case FFImageLoading.Work.ImageSource.ApplicationBundle:
+			        return ImageService.Instance.LoadFileFromApplicationBundle(ffSource.Path);
+		        case FFImageLoading.Work.ImageSource.Filepath:
+			        return ImageService.Instance.LoadFile(ffSource.Path);
+		        case FFImageLoading.Work.ImageSource.Stream:
+			        return ImageService.Instance.LoadStream(ffSource.Stream);
+		        case FFImageLoading.Work.ImageSource.EmbeddedResource:
+			        return ImageService.Instance.LoadEmbeddedResource(ffSource.Path);
+		        default:
+			        return null;
+	        }
+        }
+
+        protected virtual void ConfigureImageLoader(TaskParameter imageLoader, ImageSourceBinding ffSource)
+		{
+			var placeholderSource = GetImageSourceBinding(LoadingPlaceholderImagePath, null);
+
+			// LoadingPlaceholder
+			if (placeholderSource != null)
+			{
+				imageLoader.LoadingPlaceholder(placeholderSource.Path, placeholderSource.ImageSource);
+			}
+
+			// ErrorPlaceholder
+			if (!string.IsNullOrWhiteSpace(ErrorPlaceholderImagePath))
+			{
+				var errorPlaceholderSource = GetImageSourceBinding(ErrorPlaceholderImagePath, null);
+				if (errorPlaceholderSource != null)
+					imageLoader.ErrorPlaceholder(errorPlaceholderSource.Path, errorPlaceholderSource.ImageSource);
+			}
+
+			if (CustomDataResolver != null)
+			{
+				imageLoader.WithCustomDataResolver(CustomDataResolver);
+				imageLoader.WithCustomLoadingPlaceholderDataResolver(CustomLoadingPlaceholderDataResolver);
+				imageLoader.WithCustomErrorPlaceholderDataResolver(CustomErrorPlaceholderDataResolver);
+			}
+
+			// Downsample
+			if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
+			{
+				if (DownsampleUseDipUnits)
+					imageLoader.DownSampleInDip((int)DownsampleWidth, (int)DownsampleHeight);
+				else
+					imageLoader.DownSample((int)DownsampleWidth, (int)DownsampleHeight);
+			}
+
+			// RetryCount
+			if (RetryCount > 0)
+			{
+				imageLoader.Retry(RetryCount, RetryDelay);
+			}
+
+			if (BitmapOptimizations.HasValue)
+				imageLoader.BitmapOptimizations(BitmapOptimizations.Value);
+
+			// FadeAnimation
+			if (FadeAnimationEnabled.HasValue)
+				imageLoader.FadeAnimation(FadeAnimationEnabled.Value, duration: FadeAnimationDuration);
+
+			// FadeAnimationForCachedImages
+			if (FadeAnimationEnabled.HasValue && FadeAnimationForCachedImages.HasValue)
+				imageLoader.FadeAnimation(FadeAnimationEnabled.Value, FadeAnimationForCachedImages.Value, FadeAnimationDuration);
+
+			// TransformPlaceholders
+			if (TransformPlaceholders.HasValue)
+				imageLoader.TransformPlaceholders(TransformPlaceholders.Value);
+
+			// Transformations
+			if (Transformations != null && Transformations.Count > 0)
+			{
+				imageLoader.Transform(Transformations);
+			}
+
+			if (InvalidateLayoutAfterLoaded.HasValue)
+				imageLoader.InvalidateLayout(InvalidateLayoutAfterLoaded.Value);
+
+			imageLoader.WithPriority(LoadingPriority);
+			if (CacheType.HasValue)
+			{
+				imageLoader.WithCache(CacheType.Value);
+			}
+
+			if (LoadingDelay > 0)
+			{
+				imageLoader.Delay(LoadingDelay);
+			}
+
+			imageLoader.Finish((work) =>
+			{
+				IsLoading = false;
+				OnFinish?.Invoke(this, new Args.FinishEventArgs(work));
+			});
+
+			imageLoader.Success((imageInformation, loadingResult) =>
+			{
+				OnSuccess?.Invoke(this, new Args.SuccessEventArgs(imageInformation, loadingResult));
+				_lastImageSource = ffSource;
+			});
+
+			if (OnError != null)
+				imageLoader.Error((ex) => OnError?.Invoke(this, new Args.ErrorEventArgs(ex)));
+
+			if (OnDownloadStarted != null)
+				imageLoader.DownloadStarted((downloadInformation) => OnDownloadStarted(this, new Args.DownloadStartedEventArgs(downloadInformation)));
+
+			if (OnDownloadProgress != null)
+				imageLoader.DownloadProgress((progress) => OnDownloadProgress(this, new Args.DownloadProgressEventArgs(progress)));
+
+			if (OnFileWriteFinished != null)
+				imageLoader.FileWriteFinished((info) => OnFileWriteFinished(this, new Args.FileWriteFinishedEventArgs(info)));
+
+			if (!string.IsNullOrWhiteSpace(CustomCacheKey))
+				imageLoader.CacheKey(CustomCacheKey);
+		}
 
         /// <summary>
         /// Setups the on before image loading.
