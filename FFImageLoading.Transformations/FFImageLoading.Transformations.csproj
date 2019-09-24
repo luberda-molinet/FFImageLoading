@@ -105,5 +105,9 @@
     <Compile Include="Platforms\Tizen\**\*.cs" />
     <Compile Include="Platforms\Xamarin\**\*.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FFImageLoading\FFImageLoading.csproj" />
+  </ItemGroup>
   
 </Project>

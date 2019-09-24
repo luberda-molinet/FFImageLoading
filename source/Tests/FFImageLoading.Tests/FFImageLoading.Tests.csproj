@@ -20,4 +20,8 @@
     <Folder Include="Properties\" />
     <Folder Include="Cache\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FFImageLoading\FFImageLoading.csproj" />
+  </ItemGroup>
 </Project>
