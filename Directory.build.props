@@ -21,6 +21,7 @@
     <NoWarn>$(NoWarn);1591;1701;1702;1705;VSX1000;NU1603</NoWarn>
     
     <IsTestProject>$(MSBuildProjectName.Contains('UnitTest'))</IsTestProject>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

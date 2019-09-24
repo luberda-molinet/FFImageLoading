@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup Condition=" '$(TargetsToBuild)' == 'All' ">
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard2.0;xamarin.ios10;xamarin.mac20;xamarin.tvos10;monoandroid90;tizen40;uap10.0.16299;net472</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;xamarin.ios10;xamarin.mac20;xamarin.tvos10;monoandroid90;tizen40</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;xamarin.tvos10;xamarin.watchos10;monoandroid90;tizen40;uap10.0.16299;net472</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetsToBuild)' != 'All' ">
@@ -12,9 +12,9 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <AssemblyName>FFImageLoading.Svg</AssemblyName>
-    <RootNamespace>FFImageLoading.Svg</RootNamespace>
-    <PackageId>Xamarin.FFImageLoading.Svg</PackageId>
+    <AssemblyName>FFImageLoading.MvvmCross</AssemblyName>
+    <RootNamespace>FFImageLoading.MvvmCross</RootNamespace>
+    <PackageId>Xamarin.FFImageLoading.MvvmCross</PackageId>
     <Description>Xamarin library to load images quickly and easily on Xamarin.iOS / Xamarin.Android / Xamarin.Mac / Windows</Description>
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
@@ -22,7 +22,7 @@
   <PropertyGroup Condition="$(TargetFramework.StartsWith('uap')) And '$(OS)' == 'Windows_NT'">
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Remove="Platforms\**\*.cs" />
     <None Include="Platforms\**\*.cs" />
@@ -41,15 +41,6 @@
     <None Remove="Platforms\Wpf\**\*.cs" />
     <Compile Include="Platforms\Net\**\*.cs" />
     <Compile Include="Platforms\Wpf\**\*.cs" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Xaml" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0'">
-    <None Remove="Platforms\Shared\**\*.cs" />
-    <Compile Include="Platforms\Shared\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
@@ -104,15 +95,11 @@
     <Compile Include="Platforms\Android\**\*.cs" />
     <Compile Include="Platforms\Xamarin\**\*.cs" />
     <AndroidResource Include="Resources\**\*.xml" SubType="Designer" Generator="MSBuild:UpdateAndroidResources" />
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer" Version="2.9.7" />
-    <!--<PackageReference Include="Xam.Plugins.Android.ExoPlayer.Cast" Version="2.9.7" />
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer.Leanback" Version="2.9.7" />-->
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer.MediaSession" Version="2.9.7" />
     <PackageReference Include="Xamarin.Build.Download" Version="0.4.11" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-    <PackageReference Include="Tizen.NET" Version="4.0.0" />
+    <PackageReference Include="Tizen.NET" Version="4.0.0" PrivateAssets="All" />
     <None Remove="Platforms\Tizen\**\*.cs" />
     <None Remove="Platforms\Xamarin\**\*.cs" />
     <Compile Include="Platforms\Tizen\**\*.cs" />
