@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
-    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>        
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +29,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -49,7 +50,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -83,23 +85,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
       <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Mac\FFImageLoading.Mac.csproj">
-      <Project>{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}</Project>
-      <Name>FFImageLoading.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
-  <Target Name="_VerifyBuildSignature" />    
+  <Target Name="_VerifyBuildSignature" />
   <Import Project="..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets')" />
 </Project>

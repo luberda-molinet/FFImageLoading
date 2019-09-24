@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,7 +11,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
-    <NoWarn>1591</NoWarn>        
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +28,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
@@ -37,7 +38,7 @@
     <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>__MACOS__</DefineConstants>        
+    <DefineConstants>__MACOS__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
@@ -48,9 +49,10 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
-    <DefineConstants>__MACOS__</DefineConstants>        
+    <DefineConstants>__MACOS__</DefineConstants>
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -76,16 +78,7 @@
     <Compile Include="Helpers\FFCALayer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Work\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Targets\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

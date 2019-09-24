@@ -103,26 +103,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51ca3be2-df00-4f49-8054-e5c776992b61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Wpf\FFImageLoading.Forms.Wpf.csproj">
-      <Project>{0aa5a427-adc8-4685-aa8c-fea26ebd31f5}</Project>
-      <Name>FFImageLoading.Forms.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
-      <Project>{3d6c1f12-68d7-44c2-a7de-8e7942627a01}</Project>
-      <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Wpf\FFImageLoading.Transformations.Wpf.csproj">
-      <Project>{a63b1175-5fb5-4a9c-bcc5-8ac091876d04}</Project>
-      <Name>FFImageLoading.Transformations.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Wpf\FFImageLoading.Wpf.csproj">
-      <Project>{dc06c582-6c7e-4018-a752-feb528c65f7e}</Project>
-      <Name>FFImageLoading.Wpf</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj">
       <Project>{3a682234-5918-4f58-b02b-598a59c6a7bd}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>

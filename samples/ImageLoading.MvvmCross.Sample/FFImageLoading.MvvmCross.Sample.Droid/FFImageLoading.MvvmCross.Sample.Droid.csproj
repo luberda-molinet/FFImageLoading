@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -176,26 +176,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
-    <Folder Include="Views\" />
-    <Folder Include="Resources\layout\" />
-    <Folder Include="Resources\drawable-nodpi\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.MvvmCross.Sample.Core\FFImageLoading.MvvmCross.Sample.Core.csproj">
       <Project>{087DE224-30F0-4FEF-A960-F93F04182BA6}</Project>
       <Name>FFImageLoading.MvvmCross.Sample.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
-      <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
-      <Name>FFImageLoading.Transformations.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Droid\FFImageLoading.Svg.Droid.csproj">
-      <Project>{0BF13419-BA9C-4004-812C-EB22E41927D9}</Project>
-      <Name>FFImageLoading.Svg.Droid</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

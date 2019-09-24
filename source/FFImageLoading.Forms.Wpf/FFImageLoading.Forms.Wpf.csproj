@@ -50,17 +50,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{0ad3a755-399a-4527-a001-6192724c67bb}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
       <Project>{0e77b5d3-dba5-46d3-af16-7c209c952bd0}</Project>
       <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Wpf\FFImageLoading.Wpf.csproj">
-      <Project>{dc06c582-6c7e-4018-a752-feb528c65f7e}</Project>
-      <Name>FFImageLoading.Wpf</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

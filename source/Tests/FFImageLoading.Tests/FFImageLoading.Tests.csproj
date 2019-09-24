@@ -21,8 +21,4 @@
     <Folder Include="Properties\" />
     <Folder Include="Cache\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\FFImageLoading.Common\FFImageLoading.csproj" />
-    <ProjectReference Include="..\..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
-  </ItemGroup>
 </Project>

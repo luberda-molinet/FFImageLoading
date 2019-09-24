@@ -20,9 +20,4 @@
     <PackageReference Include="Tizen.NET" Version="5.0.0.14629" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Tizen\FFImageLoading.Tizen.csproj" />
-  </ItemGroup>
-
 </Project>

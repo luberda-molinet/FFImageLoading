@@ -196,20 +196,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
-      <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
-      <Name>FFImageLoading.Transformations.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading.Droid</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="..\..\packages\Xamarin.Android.Support.Annotations.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.Annotations.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Annotations.targets')" />
   <Import Project="..\..\packages\Xamarin.Android.Arch.Core.Common.1.1.1.1\build\monoandroid90\Xamarin.Android.Arch.Core.Common.targets" Condition="Exists('..\..\packages\Xamarin.Android.Arch.Core.Common.1.1.1.1\build\monoandroid90\Xamarin.Android.Arch.Core.Common.targets')" />
   <Import Project="..\..\packages\Xamarin.Android.Arch.Core.Runtime.1.1.1.1\build\monoandroid90\Xamarin.Android.Arch.Core.Runtime.targets" Condition="Exists('..\..\packages\Xamarin.Android.Arch.Core.Runtime.1.1.1.1\build\monoandroid90\Xamarin.Android.Arch.Core.Runtime.targets')" />

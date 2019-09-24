@@ -139,38 +139,7 @@
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Touch\FFImageLoading.Forms.Touch.csproj">
-      <Project>{1E70A5AF-AAFA-4247-8AFE-39CDA73EBCEC}</Project>
-      <Name>FFImageLoading.Forms.Touch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
-      <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
-      <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Touch\FFImageLoading.Transformations.Touch.csproj">
-      <Project>{A19942AA-BE22-4CF5-9173-4A78D6B0EB06}</Project>
-      <Name>FFImageLoading.Transformations.Touch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Touch\FFImageLoading.Touch.csproj">
-      <Project>{1597F7D4-432C-4F26-B508-0F6FAF0B9711}</Project>
-      <Name>FFImageLoading.Touch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Touch\FFImageLoading.Svg.Touch.csproj">
-      <Project>{AA5B8D71-77C6-4341-BFBA-EBB7B8FAF5AC}</Project>
-      <Name>FFImageLoading.Svg.Touch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms.Touch\FFImageLoading.Svg.Forms.Touch.csproj">
-      <Project>{A73A1EA8-E709-474D-9102-DCB2482950AB}</Project>
-      <Name>FFImageLoading.Svg.Forms.Touch</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\Images.xcassets\testasset.imageset\" />
-    <Folder Include="Resources\Images.xcassets\testasset.imageset\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.3.6.0.344457\build\Xamarin.Forms.targets')" />
 </Project>

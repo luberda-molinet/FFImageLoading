@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,7 +11,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
-    <NoWarn>1591</NoWarn> 
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +30,8 @@
     <LinkMode>None</LinkMode>
     <AOTMode>None</AOTMode>
     <AOTMode>None</AOTMode>
-    <Commandlineparameters></Commandlineparameters>
+    <Commandlineparameters>
+    </Commandlineparameters>
     <NoStdLib>false</NoStdLib>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -51,7 +52,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
     <DefineConstants>__MACOS__</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -85,19 +87,7 @@
     <Compile Include="Extensions\NSPathExtensions.cs" />
     <Compile Include="ColorFillTransformation.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Mac\FFImageLoading.Mac.csproj">
-      <Project>{91825F9F-8F2D-4848-8375-68FCAA8C0DC6}</Project>
-      <Name>FFImageLoading.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
-  <Target Name="_VerifyBuildSignature" />    
+  <Target Name="_VerifyBuildSignature" />
 </Project>

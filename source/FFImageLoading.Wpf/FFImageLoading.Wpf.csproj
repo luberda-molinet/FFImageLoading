@@ -78,12 +78,6 @@
     <Compile Include="Work\PlatformImageLoaderTask.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{0ad3a755-399a-4527-a001-6192724c67bb}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +85,5 @@
       <Version>1.6.2</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -14,7 +14,7 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>        
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -186,22 +186,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
-      <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
-      <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Forms.Droid\FFImageLoading.Forms.Droid.csproj">
-      <Project>{7014FEB6-0338-4A47-B600-4A1B48127C5C}</Project>
-      <Name>FFImageLoading.Forms.Droid</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Svg.Droid\FFImageLoading.Svg.Droid.csproj">
       <Project>{0BF13419-BA9C-4004-812C-EB22E41927D9}</Project>
       <Name>FFImageLoading.Svg.Droid</Name>

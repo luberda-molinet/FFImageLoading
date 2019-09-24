@@ -17,7 +17,8 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
-    <AndroidTlsProvider></AndroidTlsProvider>
+    <AndroidTlsProvider>
+    </AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -213,11 +214,7 @@
     <None Include="Assets\AboutAssets.txt" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\layout\" />
-    <Folder Include="Resources\values\" />
-    <Folder Include="Resources\values-v21\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
     <AndroidResource Include="Resources\drawable-hdpi\icon.png" />
@@ -240,34 +237,6 @@
     <ProjectReference Include="..\Shared\FFImageLoading.Forms.Sample.csproj">
       <Project>{3A682234-5918-4F58-B02B-598A59C6A7BD}</Project>
       <Name>FFImageLoading.Forms.Sample</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms.Droid\FFImageLoading.Forms.Droid.csproj">
-      <Project>{7014FEB6-0338-4A47-B600-4A1B48127C5C}</Project>
-      <Name>FFImageLoading.Forms.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Forms\FFImageLoading.Forms.csproj">
-      <Project>{3D6C1F12-68D7-44C2-A7DE-8E7942627A01}</Project>
-      <Name>FFImageLoading.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Transformations.Droid\FFImageLoading.Transformations.Droid.csproj">
-      <Project>{BD3CEB96-93D6-47BD-9474-01DFCD320897}</Project>
-      <Name>FFImageLoading.Transformations.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Droid\FFImageLoading.Svg.Droid.csproj">
-      <Project>{0BF13419-BA9C-4004-812C-EB22E41927D9}</Project>
-      <Name>FFImageLoading.Svg.Droid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\FFImageLoading.Svg.Forms.Droid\FFImageLoading.Svg.Forms.Droid.csproj">
-      <Project>{CCA629E9-55E3-414A-91AF-79A0CB845CD5}</Project>
-      <Name>FFImageLoading.Svg.Forms.Droid</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\..\packages\Xamarin.Android.Support.Annotations.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\..\..\packages\Xamarin.Android.Support.Annotations.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Annotations.targets')" />
