@@ -107,7 +107,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MvvmCross" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FFImageLoading\FFImageLoading.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Svg\FFImageLoading.Svg.csproj" />
   </ItemGroup>
   
 </Project>
