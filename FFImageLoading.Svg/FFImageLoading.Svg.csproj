@@ -107,6 +107,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="1.68.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FFImageLoading\FFImageLoading.csproj" />
   </ItemGroup>
   
