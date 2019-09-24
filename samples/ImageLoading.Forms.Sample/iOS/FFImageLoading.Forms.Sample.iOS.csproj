@@ -26,6 +26,8 @@
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>full</DebugType>
@@ -47,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>i386</MtouchArch>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
@@ -68,6 +70,9 @@
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

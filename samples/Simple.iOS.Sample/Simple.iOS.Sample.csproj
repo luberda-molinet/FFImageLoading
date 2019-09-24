@@ -24,6 +24,9 @@
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchDebug>true</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>full</DebugType>
@@ -34,8 +37,9 @@
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <MtouchFloat32>true</MtouchFloat32>
+    <MtouchFloat32>false</MtouchFloat32>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>full</DebugType>

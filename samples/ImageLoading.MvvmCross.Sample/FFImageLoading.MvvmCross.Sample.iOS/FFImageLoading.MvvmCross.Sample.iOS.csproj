@@ -26,7 +26,8 @@
     <IOSDebuggerPort>32830</IOSDebuggerPort>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>i386, x86_64</MtouchArch>
-    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>pdbonly</DebugType>
@@ -37,12 +38,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <DeviceSpecificBuild>true</DeviceSpecificBuild>
-    <MtouchFloat32>true</MtouchFloat32>
+    <DeviceSpecificBuild>false</DeviceSpecificBuild>
+    <MtouchFloat32>false</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -117,12 +119,6 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\place.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.MvvmCross.Sample.Core\FFImageLoading.MvvmCross.Sample.Core.csproj">
-      <Project>{087DE224-30F0-4FEF-A960-F93F04182BA6}</Project>
-      <Name>FFImageLoading.MvvmCross.Sample.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

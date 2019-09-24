@@ -34,6 +34,13 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AotAssemblies>false</AotAssemblies>
+    <EnableLLVM>false</EnableLLVM>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <BundleAssemblies>false</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -47,6 +54,13 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AotAssemblies>false</AotAssemblies>
+    <EnableLLVM>false</EnableLLVM>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <BundleAssemblies>false</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
