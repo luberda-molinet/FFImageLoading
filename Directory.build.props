@@ -1,0 +1,69 @@
+﻿<Project>
+  <PropertyGroup>
+    <Copyright>Copyright (c) Daniel Luberda</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/luberda-molinet/FFImageLoading</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/luberda-molinet/FFImageLoading/master/icon.png</PackageIconUrl>
+    <Authors>Daniel Luberda, Fabien Molinet</Authors>
+    <Owners>Daniel Luberda, Fabien Molinet</Owners>
+    <PackageTags>xamarin, android, ios, mac, windows, image, cache, caching, memory, bitmap, lru, load, loading, save, effects, photo</PackageTags>
+    <PackageReleaseNotes>https://github.com/luberda-molinet/FFImageLoading/releases</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+    <RepositoryUrl>https://github.com/luberda-molinet/FFImageLoading</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Product>$(AssemblyName) ($(TargetFramework))</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Version>2.5.0</Version>
+    <Platform>AnyCPU</Platform>
+
+    <LangVersion>7.3</LangVersion>
+    <NoWarn>$(NoWarn);1591;1701;1702;1705;VSX1000;NU1603</NoWarn>
+    
+    <IsTestProject>$(MSBuildProjectName.Contains('UnitTest'))</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DesignTimeBuild>false</DesignTimeBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild Condition=" '$(IsTestProject)' != 'true'">true</GeneratePackageOnBuild>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT' ">
+    <!--<IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+    
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(SourceLinkEnabled)' != 'false' ">
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
+  </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <TargetsToBuild>All</TargetsToBuild>
+    <!--<TargetsToBuild>Android</TargetsToBuild>-->
+    <!--<TargetsToBuild>Uap</TargetsToBuild>-->
+    <!--<TargetsToBuild>iOS</TargetsToBuild>-->
+    <!--<TargetsToBuild>Apple</TargetsToBuild>-->
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' != 'Debug' ">
+    <TargetsToBuild>All</TargetsToBuild>
+  </PropertyGroup>
+  
+</Project>
