@@ -4,7 +4,6 @@ using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class CornersTransformation : TransformationBase
     {
         public CornersTransformation() : this(20d, CornerTransformType.TopRightRounded)

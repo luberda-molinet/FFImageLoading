@@ -2,7 +2,6 @@
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class RoundedTransformation : ITransformation
     {
         public RoundedTransformation() : this(30d)

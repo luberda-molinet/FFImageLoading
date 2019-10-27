@@ -3,7 +3,6 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Forms
 {
-    [Preserve(AllMembers = true)]
     public class DataUrlImageSource : ImageSource
     {
         public DataUrlImageSource(string dataUrl)

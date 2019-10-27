@@ -4,7 +4,6 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Forms
 {
-    [Preserve(AllMembers = true)]
 	public interface IVectorImageSource
 	{
 		IVectorDataResolver GetVectorDataResolver();

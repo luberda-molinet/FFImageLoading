@@ -2,7 +2,6 @@
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class TintTransformation : ITransformation
     {
         public TintTransformation() : this(0, 165, 0, 128)

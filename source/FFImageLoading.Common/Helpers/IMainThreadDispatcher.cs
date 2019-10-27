@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers
 {
-    [Preserve(AllMembers = true)]
     public interface IMainThreadDispatcher
     {
         // void Post(Action action);

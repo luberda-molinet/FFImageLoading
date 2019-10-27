@@ -3,7 +3,6 @@ using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
-	[Preserve(AllMembers = true)]
 	public class SepiaTransformation : TransformationBase
 	{
 		public SepiaTransformation()

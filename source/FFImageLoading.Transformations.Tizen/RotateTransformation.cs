@@ -2,7 +2,6 @@
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class RotateTransformation : ITransformation
     {
         public RotateTransformation() : this(30d)

@@ -25,7 +25,6 @@ namespace FFImageLoading.Forms.Platform
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class CachedImageFastRenderer : CachedImageView, IVisualElementRenderer
     {
         internal static readonly Type ElementRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.FastRenderers.VisualElementRenderer");

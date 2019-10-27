@@ -2,7 +2,6 @@
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class CropTransformation : ITransformation
     {
         public CropTransformation() : this(1d, 0d, 0d)

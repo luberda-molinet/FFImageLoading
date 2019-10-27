@@ -3,7 +3,6 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
 	public class TintTransformation : ITransformation
 	{
 		public TintTransformation()

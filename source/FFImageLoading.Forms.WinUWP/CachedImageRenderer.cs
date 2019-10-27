@@ -36,7 +36,6 @@ namespace FFImageLoading.Forms.Platform
     /// <summary>
     /// CachedImage Implementation
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class CachedImageRenderer : ViewRenderer<CachedImage, Windows.UI.Xaml.Controls.Image>
     {
         [RenderWith(typeof(CachedImageRenderer))]

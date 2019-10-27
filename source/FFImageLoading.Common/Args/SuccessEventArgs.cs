@@ -3,7 +3,6 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Args
 {
-    [Preserve(AllMembers = true)]
     public class SuccessEventArgs : EventArgs
     {
         public SuccessEventArgs(ImageInformation imageInformation, LoadingResult loadingResult)

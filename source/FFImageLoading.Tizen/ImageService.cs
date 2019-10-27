@@ -16,7 +16,6 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading for Tizen
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<SharedEvasImage>
     {
         static ConditionalWeakTable<object, IImageLoaderTask> s_viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();

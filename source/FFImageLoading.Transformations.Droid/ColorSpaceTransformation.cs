@@ -5,7 +5,6 @@ using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class ColorSpaceTransformation : TransformationBase
     {
         ColorMatrix _colorMatrix;

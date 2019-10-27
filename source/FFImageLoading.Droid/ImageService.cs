@@ -13,7 +13,6 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading by Daniel Luberda
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<SelfDisposingBitmapDrawable>
     {
         readonly Android.Util.DisplayMetrics _metrics = Android.Content.Res.Resources.System.DisplayMetrics;

@@ -4,7 +4,6 @@ using AppKit;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class FlipTransformation: TransformationBase
     {
         public FlipTransformation() : this(FlipType.Horizontal)
