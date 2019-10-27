@@ -4,7 +4,6 @@ using System.IO;
 
 namespace FFImageLoading.Cache
 {
-    [Preserve(AllMembers = true)]
     public interface IDiskCache
     {
         /// <summary>

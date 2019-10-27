@@ -5,7 +5,6 @@ using Xamarin.Forms;
 
 namespace FFImageLoading.Svg.Forms
 {
-    [Preserve(AllMembers = true)]
     /// <summary>
     /// SvgImageSourceConverter
     /// </summary>

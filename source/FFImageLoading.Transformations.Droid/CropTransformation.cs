@@ -3,7 +3,6 @@ using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class CropTransformation : TransformationBase
     {
         public CropTransformation() : this(1d, 0d, 0d)

@@ -3,7 +3,6 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class CropTransformation : ITransformation
     {
         public CropTransformation()

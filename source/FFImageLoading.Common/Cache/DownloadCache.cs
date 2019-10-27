@@ -11,7 +11,6 @@ using FFImageLoading.Exceptions;
 
 namespace FFImageLoading.Cache
 {
-    [Preserve(AllMembers = true)]
     public class DownloadCache : IDownloadCache
     {
         public DownloadCache(Configuration configuration)

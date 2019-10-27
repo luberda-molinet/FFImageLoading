@@ -3,7 +3,6 @@ using AppKit;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class CircleTransformation : TransformationBase
     {
         public CircleTransformation() : this(0d, null)

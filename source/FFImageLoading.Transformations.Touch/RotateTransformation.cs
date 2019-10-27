@@ -5,7 +5,6 @@ using Foundation;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class RotateTransformation : TransformationBase
     {
         public RotateTransformation() : this(30d)

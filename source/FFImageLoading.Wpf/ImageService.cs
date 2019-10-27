@@ -15,7 +15,6 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading by Daniel Luberda
     /// </summary>
-    //[Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<BitmapSource>
     {
         static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();

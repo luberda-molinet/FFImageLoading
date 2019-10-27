@@ -16,7 +16,6 @@ namespace FFImageLoading
     /// <summary>
     /// FFImageLoading by Daniel Luberda
     /// </summary>
-    [Preserve(AllMembers = true)]
     public interface IImageService
     {
         /// <summary>

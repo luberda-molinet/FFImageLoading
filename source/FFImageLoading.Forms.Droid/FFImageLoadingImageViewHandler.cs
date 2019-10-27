@@ -14,7 +14,6 @@ using Xamarin.Forms.Platform.Android;
 
 namespace FFImageLoading.Forms.Platform
 {
-	[Preserve(AllMembers = true)]
 	public class FFImageLoadingImageViewHandler : HandlerBase<ImageView>, IImageViewHandler
 	{
 		public Task LoadImageAsync(Xamarin.Forms.ImageSource imageSource, ImageView imageView, CancellationToken cancellationToken = default)

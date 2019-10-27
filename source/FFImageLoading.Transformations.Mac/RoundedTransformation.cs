@@ -6,7 +6,6 @@ using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class RoundedTransformation : TransformationBase
     {
         public RoundedTransformation() : this(30d)

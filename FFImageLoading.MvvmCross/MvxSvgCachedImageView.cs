@@ -22,10 +22,8 @@ using Android.Content;
 namespace FFImageLoading.Cross
 {
     #if __IOS__
-            [Preserve(AllMembers = true)]
             [Register("MvxSvgCachedImageView")]
     #elif __ANDROID__
-            [Preserve(AllMembers = true)]
             [Register("ffimageloading.cross.MvxSvgCachedImageView")]
     #endif
     /// <summary>

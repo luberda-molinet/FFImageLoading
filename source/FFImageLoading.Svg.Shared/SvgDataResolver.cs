@@ -38,7 +38,6 @@ namespace FFImageLoading.Svg.Platform
     /// <summary>
     /// Svg data resolver.
     /// </summary>
-    [Preserve(AllMembers = true)]
     public class SvgDataResolver : IVectorDataResolver
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types

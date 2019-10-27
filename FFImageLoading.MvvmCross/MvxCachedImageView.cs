@@ -22,10 +22,8 @@ namespace FFImageLoading.Cross
 {
 
 #if __IOS__
-    [Preserve(AllMembers = true)]
     [Register("MvxCachedImageView")]
 #elif __ANDROID__
-    [Preserve(AllMembers = true)]
     [Register("ffimageloading.cross.MvxCachedImageView")]
 #endif
     /// <summary>

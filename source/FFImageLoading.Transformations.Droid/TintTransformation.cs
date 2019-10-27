@@ -4,7 +4,6 @@ using Android.Runtime;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class TintTransformation : ColorSpaceTransformation
     {
         public TintTransformation() : this(0, 165, 0, 128)

@@ -3,7 +3,6 @@ using System.Diagnostics;
 
 namespace FFImageLoading.Helpers
 {
-    [Preserve(AllMembers = true)]
     public interface IMiniLogger
     {
         void Debug(string message);

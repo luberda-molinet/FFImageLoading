@@ -7,7 +7,6 @@ using Foundation;
 
 namespace FFImageLoading.Transformations
 {
-    [Preserve(AllMembers = true)]
     public class ColorSpaceTransformation: TransformationBase
     {
         CGColorSpace _colorSpace;

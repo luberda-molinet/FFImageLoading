@@ -6,7 +6,6 @@ using Android.Widget;
 
 namespace FFImageLoading.Views
 {
-    [Preserve(AllMembers = true)]
     [Register("ffimageloading.views.ImageViewAsync")]
 	[Obsolete("You can now use Android's ImageView")]
     public class ImageViewAsync : ImageView

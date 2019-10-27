@@ -3,7 +3,6 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading.Cache
 {
-    [Preserve(AllMembers = true)]
 	public interface IMemoryCache<TImageContainer>
 	{
 		ImageInformation GetInfo(string key);

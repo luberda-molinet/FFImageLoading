@@ -8,7 +8,6 @@ using System.Collections.Generic;
 
 namespace FFImageLoading.Svg.Forms
 {
-    [Preserve(AllMembers = true)]
     /// <summary>
     /// SVG image source.
     /// </summary>

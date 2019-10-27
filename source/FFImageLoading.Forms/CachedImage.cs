@@ -9,7 +9,6 @@ using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
-	[Preserve(AllMembers = true)]
 	[RenderWith(typeof(Platform.CachedImageRenderer._CachedImageRenderer))]
 	/// <summary>
 	/// CachedImage by Daniel Luberda

@@ -3,7 +3,6 @@ using System.Net;
 
 namespace FFImageLoading.Exceptions
 {
-    [Preserve(AllMembers = true)]
     public class DownloadHttpStatusCodeException : Exception
     {
         public DownloadHttpStatusCodeException(HttpStatusCode httpStatusCode, string content = null) 
