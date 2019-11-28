@@ -55,7 +55,7 @@ namespace FFImageLoading.Decoders
                         imageInformation.SetCurrentSize(
                             (int)((double)img.Size.Width / scaleDownFactor),
                             (int)((double)img.Size.Height / scaleDownFactor));
-                        EvasInterop.evas_object_image_load_scale_down_set(img.RealHandle, scaleDownFactor);
+                        img.SetScaleDown(scaleDownFactor);
                     }
                 }
 
