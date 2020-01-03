@@ -29,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Tizen.NET" Version="5.0.0.14629" />
     <PackageReference Include="Xamarin.Forms.Platform.Tizen" Version="2.5.1.444934" />
-    <PackageReference Include="Xamarin.Forms" Version="3.6.0.344457" />
+    <PackageReference Include="Xamarin.Forms" Version="4.4.0.991265" />
   </ItemGroup>
 
   <ItemGroup>
