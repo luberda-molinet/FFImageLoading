@@ -31,9 +31,18 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+<!--    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />-->
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Extensions\UnitExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".DS_Store" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Extensions\UnitExtensions.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
   </ItemGroup>
