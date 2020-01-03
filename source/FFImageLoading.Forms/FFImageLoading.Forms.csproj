@@ -33,14 +33,16 @@
   </PropertyGroup>        
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
-    <PackageReference Include="Xamarin.Forms" Version="3.6.0.344457" />
+<!--    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />-->
+    <PackageReference Include="Xamarin.Forms" Version="4.4.0.991265" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
+    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj">
+      <ReferenceSourceTarget></ReferenceSourceTarget>
+    </ProjectReference>
     <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers\" />
