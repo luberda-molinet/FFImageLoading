@@ -38,11 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Forms\FFImageLoading.Forms.csproj" />
     <ProjectReference Include="..\FFImageLoading.Svg\FFImageLoading.Svg.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\FFImageLoading.Svg.Forms.Shared\SvgCachedImage.cs">

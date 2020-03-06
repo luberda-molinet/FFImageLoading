@@ -31,11 +31,6 @@
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Tizen\FFImageLoading.Tizen.csproj" />
-  </ItemGroup>
-
   <Import Project="..\FFImageLoading.Svg.Shared\FFImageLoading.Svg.Shared.projitems" Label="Shared" />
 
 </Project>

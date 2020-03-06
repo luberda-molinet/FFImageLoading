@@ -38,9 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
     <ProjectReference Include="..\FFImageLoading.Forms.Mock\FFImageLoading.Forms.Mock.csproj" />
-    <ProjectReference Include="..\FFImageLoading.Mock\FFImageLoading.Mock.csproj" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers\" />

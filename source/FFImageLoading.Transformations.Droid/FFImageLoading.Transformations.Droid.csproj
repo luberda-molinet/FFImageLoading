@@ -12,33 +12,33 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
     <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
-    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn> 
+    <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
     <ConsolePause>false</ConsolePause>
-    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>		
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
-    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -66,16 +66,6 @@
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="TintTransformation.cs" />
     <Compile Include="ColorFillTransformation.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">
-      <Project>{51CA3BE2-DF00-4F49-8054-E5C776992B61}</Project>
-      <Name>FFImageLoading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFImageLoading.Droid\FFImageLoading.Droid.csproj">
-      <Project>{74BF9402-3E13-4003-8923-BC20A1294CE2}</Project>
-      <Name>FFImageLoading.Droid</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

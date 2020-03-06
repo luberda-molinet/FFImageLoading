@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Decoders\" />
     <Folder Include="Properties\" />
   </ItemGroup>
