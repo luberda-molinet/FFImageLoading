@@ -1723,7 +1723,6 @@ namespace FFImageLoading.Svg.Platform
 		private SortedDictionary<float, SKColor> ReadStops(XElement e)
 		{
 			var stops = new SortedDictionary<float, SKColor>();
-			
 			var ns = e.Name.Namespace;
 			foreach (var se in e.Elements(ns + "stop"))
 			{
