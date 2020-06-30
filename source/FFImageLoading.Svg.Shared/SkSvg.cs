@@ -1735,15 +1735,19 @@ namespace FFImageLoading.Svg.Platform
 		private SortedDictionary<float, SKColor> ReadStops(XElement e)
 		{
 			var stops = new SortedDictionary<float, SKColor>();
-
 			var ns = e.Name.Namespace;
 			foreach (var se in e.Elements(ns + "stop"))
 			{
 				var style = ReadStyle(se);
 
-				var offset = ReadNumber(style["offset"]);
+				float offset = 0;
 				var color = SKColors.Black;
 				byte alpha = 255;
+
+				if (style.TryGetValue("offset", out string offsetValue))
+				{
+					offset = ReadNumber(offsetValue);
+				}
 
 				if (style.TryGetValue("stop-color", out string stopColor))
 				{
