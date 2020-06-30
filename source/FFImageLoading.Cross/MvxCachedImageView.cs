@@ -362,7 +362,15 @@ namespace FFImageLoading.Cross
 			if (CustomDataResolver != null)
 			{
 				imageLoader.WithCustomDataResolver(CustomDataResolver);
+			}
+
+			if (CustomLoadingPlaceholderDataResolver != null)
+			{
 				imageLoader.WithCustomLoadingPlaceholderDataResolver(CustomLoadingPlaceholderDataResolver);
+			}
+
+			if (CustomErrorPlaceholderDataResolver != null)
+			{
 				imageLoader.WithCustomErrorPlaceholderDataResolver(CustomErrorPlaceholderDataResolver);
 			}
 
