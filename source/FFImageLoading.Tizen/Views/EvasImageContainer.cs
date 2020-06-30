@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ElmSharp;
 using AppFW = Tizen.Applications;
@@ -86,7 +85,7 @@ namespace FFImageLoading.Views
             var file = Path.Combine(absPath, filename);
 
             // Readme : I can't know, EFL "evas_object_image_save" was safty for multithread, So, i did't run on worker-thread
-            evas_object_image_save(Source.RealHandle, file, null, flags);
+            Source.Save(file, null, flags);
 
             TaskCompletionSource<byte[]> tcs = new TaskCompletionSource<byte[]>();
             Task.Run(() =>
@@ -180,8 +179,5 @@ namespace FFImageLoading.Views
             }
             _content.Geometry = contentBound;
         }
-
-        [DllImport("libevas.so.1")]
-        internal static extern void evas_object_image_save(IntPtr obj, string file, string key, string flags);
     }
 }
