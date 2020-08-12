@@ -131,7 +131,7 @@ namespace FFImageLoading.Views
         public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register(nameof(Transformations), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(new List<ITransformation>(), OnTransformationsChanged));
 
         public IDataResolver CustomDataResolver { get { return (IDataResolver)GetValue(CustomDataResolverProperty); } set { SetValue(CustomDataResolverProperty, value); } }
-        public static readonly DependencyProperty CustomDataResolverProperty = DependencyProperty.Register(nameof(CustomDataResolver), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
+        public static readonly DependencyProperty CustomDataResolverProperty = DependencyProperty.Register(nameof(CustomDataResolver), typeof(IDataResolver), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
 
         public IDataResolver CustomLoadingPlaceholderDataResolver { get { return (IDataResolver)GetValue(CustomLoadingPlaceholderDataResolverProperty); } set { SetValue(CustomLoadingPlaceholderDataResolverProperty, value); } }
         public static readonly DependencyProperty CustomLoadingPlaceholderDataResolverProperty = DependencyProperty.Register(nameof(CustomLoadingPlaceholderDataResolver), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
