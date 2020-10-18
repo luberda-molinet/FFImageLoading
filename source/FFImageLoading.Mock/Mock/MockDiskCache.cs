@@ -12,12 +12,14 @@ namespace FFImageLoading.Mock
         Dictionary<string, MockFile> _cache = new Dictionary<string, MockFile>();
         readonly object _lock = new object();
 
-        public Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration, Action writeFinished = null)
+        public Task AddToSavingQueueIfNotExistsAsync(string key, byte[] bytes, TimeSpan duration,
+	        string uri = null,
+	        Action<FileWriteInfo> writeFinishedAction = null)
         {
             lock (_lock)
             {
                 _cache.Add(key, new MockFile(bytes, Path.Combine(_path, key)));
-                writeFinished?.Invoke();
+                writeFinishedAction?.Invoke(new FileWriteInfo());
                 return Task.FromResult(true);
             }
         }
