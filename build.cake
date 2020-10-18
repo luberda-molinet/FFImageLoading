@@ -27,7 +27,7 @@ Task("Libraries")
 	{
 		MSBuild(SLN, settings => settings
 			.SetConfiguration(CONFIG)
-			.UseToolVersion(MSBuildToolVersion.VS2017)
+			.UseToolVersion(MSBuildToolVersion.VS2019)
 			.SetMSBuildPlatform(Cake.Common.Tools.MSBuild.MSBuildPlatform.x86)
 			.SetVerbosity(Verbosity.Minimal)
 			.WithProperty("TreatWarningsAsErrors", false.ToString())
