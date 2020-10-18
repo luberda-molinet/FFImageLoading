@@ -25,8 +25,9 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, PImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
-        static IDecoder<PImage> _webpDecoder = new WebPDecoder();
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+        private static readonly IDecoder<PImage> _webpDecoder = new WebPDecoder();
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
         public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
@@ -34,20 +35,20 @@ namespace FFImageLoading.Work
 
         public async override Task Init()
         {
-            await ScaleHelper.InitAsync();
-            await base.Init();
+            await ScaleHelper.InitAsync().ConfigureAwait(false);
+            await base.Init().ConfigureAwait(false);
         }
 
-        protected override Task SetTargetAsync(PImage image, bool animated)
+        protected override async Task SetTargetAsync(PImage image, bool animated)
         {
-            if (Target == null)
-                return Task.FromResult(true);
+			if (Target == null)
+				return;
 
-            return MainThreadDispatcher.PostAsync(() =>
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override int DpiToPixels(int size)
@@ -72,7 +73,7 @@ namespace FFImageLoading.Work
 
         protected override async Task<PImage> TransformAsync(PImage bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            await StaticLocks.DecodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
@@ -105,7 +106,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                _decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
             }
 
             return bitmap;
@@ -120,21 +121,25 @@ namespace FFImageLoading.Work
 #if __IOS__
                 result = PImage.CreateAnimatedImage(decoded.AnimatedImages
                                                     .Select(v => v.Image)
-                                                    .Where(v => v?.CGImage != null).ToArray(), decoded.AnimatedImages.Sum(v => v.Delay) / 100.0);
+                                                    .Where(v => v?.CGImage != null).ToArray(), decoded.AnimatedImages.Sum(v => v.Delay) / 1000f);
 #elif __MACOS__
                 using (var mutableData = NSMutableData.Create())
                 {
-                    var fileOptions = new CGImageDestinationOptions();
-                    fileOptions.GifDictionary = new NSMutableDictionary();
+                    var fileOptions = new CGImageDestinationOptions
+                    {
+                        GifDictionary = new NSMutableDictionary()
+                    };
                     fileOptions.GifDictionary[ImageIO.CGImageProperties.GIFLoopCount] = new NSString("0");
                     //options.GifDictionary[ImageIO.CGImageProperties.GIFHasGlobalColorMap] = new NSString("true");
 
                     using (var destintation = CGImageDestination.Create(mutableData, MobileCoreServices.UTType.GIF, decoded.AnimatedImages.Length, fileOptions))
                     {
-                        for (int i = 0; i < decoded.AnimatedImages.Length; i++)
+                        for (var i = 0; i < decoded.AnimatedImages.Length; i++)
                         {
-                            var options = new CGImageDestinationOptions();
-                            options.GifDictionary = new NSMutableDictionary();
+                            var options = new CGImageDestinationOptions
+                            {
+                                GifDictionary = new NSMutableDictionary()
+                            };
                             options.GifDictionary[ImageIO.CGImageProperties.GIFUnclampedDelayTime] = new NSString(decoded.AnimatedImages[i].Delay.ToString());
                             destintation.AddImage(decoded.AnimatedImages[i].Image.CGImage, options);
                         }

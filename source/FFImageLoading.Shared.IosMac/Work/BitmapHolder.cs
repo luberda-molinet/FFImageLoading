@@ -17,21 +17,9 @@ namespace FFImageLoading.Work
             NativeBitmap = bitmap;
         }
 
-        public int Width
-        {
-            get
-            {
-                return (int)NativeBitmap.Size.Width;
-            }
-        }
+        public int Width => (int)NativeBitmap.Size.Width;
 
-        public int Height
-        {
-            get
-            {
-                return (int)NativeBitmap.Size.Height;
-            }
-        }
+        public int Height => (int)NativeBitmap.Size.Height;
 
         internal PImage NativeBitmap
         {

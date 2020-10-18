@@ -21,7 +21,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
         {
-            var result = await AsUIImageAsync(parameters);
+            var result = await AsUIImageAsync(parameters).ConfigureAwait(false);
             return result.AsPngStream();
         }
 
@@ -33,7 +33,7 @@ namespace FFImageLoading
         /// <param name="quality">Quality.</param>
         public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
         {
-            var result = await AsUIImageAsync(parameters);
+            var result = await AsUIImageAsync(parameters).ConfigureAwait(false);
             return result.AsJpegStream(quality);
         }
 
@@ -107,12 +107,6 @@ namespace FFImageLoading
             return parameters.IntoAsync(param => param.Into(button));
         }
 
-        [Obsolete("Use AsUIImageAsync")] 
-        public static Task<UIImage> AsPImageAsync(this TaskParameter parameters)
-        {
-            return AsUIImageAsync(parameters);
-        }
-
         /// <summary>
         /// Loads and gets UImage using defined parameters.
         /// IMPORTANT: It throws image loading exceptions - you should handle them
@@ -150,8 +144,15 @@ namespace FFImageLoading
 
             return tcs.Task;
         }
-       
-        static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
+
+        /// <summary>
+        /// Loads the image into given target using defined parameters.
+        /// </summary>
+        /// <returns>The into.</returns>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="target">Target.</param>
+        /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
+        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -166,7 +167,20 @@ namespace FFImageLoading
             return task;
         }
 
-        static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)
+        /// <summary>
+        /// Loads the image into given target using defined parameters.
+        /// IMPORTANT: It throws image loading exceptions - you should handle them
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="target">Target.</param>
+        /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
+        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
+        {
+            return parameters.IntoAsync(param => param.Into(target));
+        }
+
+        private static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)
         {
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;

@@ -46,47 +46,7 @@ namespace FFImageLoading.Cache
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
-
         /// <summary>
-        /// Creates the cache.
-        /// </summary>
-        /// <returns>The cache.</returns>
-        /// <param name="cacheName">Cache name.</param>
-        /// <param name="configuration">Configuration.</param>
-        [Obsolete]
-        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
-        {
-#if __ANDROID__
-            var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
-            string tmpPath = context.CacheDir.AbsolutePath;
-            string cachePath = Path.Combine(tmpPath, cacheName);
-
-            Java.IO.File androidTempFolder = new Java.IO.File(cachePath);
-            if (!androidTempFolder.Exists())
-                androidTempFolder.Mkdir();
-
-            if (!androidTempFolder.CanRead())
-                androidTempFolder.SetReadable(true, false);
-
-            if (!androidTempFolder.CanWrite())
-                androidTempFolder.SetWritable(true, false);
-
-#elif __IOS__
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
-            string cachePath = Path.Combine(tmpPath, cacheName);
-#elif __MACOS__
-            string tmpPath = Path.GetTempPath();
-            string cachePath = Path.Combine(tmpPath, cacheName);
-#elif __TIZEN__
-            var appCachePath = Tizen.Applications.Application.Current.DirectoryInfo.Cache;
-            string cachePath = Path.Combine(appCachePath, "FFSimpleDiskCache");
-#endif
-
-            return new SimpleDiskCache(cachePath, configuration);
-        }
-
-            /// <summary>
         /// Adds the file to cache and file saving queue if it does not exists.
         /// </summary>
         /// <param name="key">Key to store/retrieve the file.</param>
@@ -218,7 +178,7 @@ namespace FFImageLoading.Cache
                 {
                     return FileStore.GetInputStream(filepath, false);
                 }
-                catch (DirectoryNotFoundException ex)
+                catch (DirectoryNotFoundException)
                 {
                     Directory.CreateDirectory(_cachePath);
                     return null;
@@ -249,11 +209,11 @@ namespace FFImageLoading.Cache
 
         protected void InitializeEntries()
         {
-            foreach (FileInfo fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
+            foreach (var fileInfo in new DirectoryInfo(_cachePath).EnumerateFiles())
             {
                 string key = Path.GetFileNameWithoutExtension(fileInfo.Name);
-                TimeSpan duration = GetDuration(fileInfo.Extension);
-                _entries.TryAdd(key, new CacheEntry() { Origin = fileInfo.CreationTimeUtc, TimeToLive = duration, FileName = fileInfo.Name });
+                var duration = GetDuration(fileInfo.Extension);
+                _entries.TryAdd(key, new CacheEntry(fileInfo.CreationTimeUtc, duration, fileInfo.Name));
             }
         }
 
@@ -280,8 +240,8 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
-                        File.Delete(Path.Combine(_cachePath, kvp.Key));
+                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
+                        File.Delete(Path.Combine(_cachePath, oldCacheEntry.FileName));
                     }
                     // Analysis disable once EmptyGeneralCatchClause
                     catch

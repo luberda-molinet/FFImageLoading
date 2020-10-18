@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Xamarin.Forms;
-using System.Reflection;
 
 namespace FFImageLoading.Forms
 {
@@ -28,9 +27,7 @@ namespace FFImageLoading.Forms
 
         public override object ConvertFromInvariantString(string value)
         {
-            var text = value as string;
-
-            if (text == null)
+            if (!(value is string text))
                 return null;
 
             if (text.IsDataUrl())
@@ -38,9 +35,7 @@ namespace FFImageLoading.Forms
                 return new DataUrlImageSource(text);
             }
 
-            Uri uri;
-
-            if (Uri.TryCreate(text, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
             {
                 if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
                     return ImageSource.FromFile(uri.LocalPath);

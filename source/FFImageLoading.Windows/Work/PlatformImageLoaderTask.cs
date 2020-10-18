@@ -15,28 +15,26 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<BitmapHolder, BitmapSource, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
-
         public PlatformImageLoaderTask(ITarget<BitmapSource, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
         }
 
         public async override Task Init()
         {
-            await ScaleHelper.InitAsync();
-            await base.Init();
+            await ScaleHelper.InitAsync().ConfigureAwait(false);
+            await base.Init().ConfigureAwait(false);
         }
 
-        protected override Task SetTargetAsync(BitmapSource image, bool animated)
+        protected override async Task SetTargetAsync(BitmapSource image, bool animated)
         {
-            if (Target == null)
-                return Task.FromResult(true);
+			if (Target == null)
+				return;
             
-            return MainThreadDispatcher.PostAsync(() =>
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override int DpiToPixels(int size)
@@ -58,7 +56,7 @@ namespace FFImageLoading.Work
 
         protected override async Task<BitmapHolder> TransformAsync(BitmapHolder bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            await StaticLocks.DecodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
@@ -91,7 +89,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                _decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
             }
 
             return bitmap;
@@ -110,7 +108,7 @@ namespace FFImageLoading.Work
                     if (decoded.Image.HasWriteableBitmap)
                         return decoded.Image.WriteableBitmap;
 
-                    return await decoded.Image.ToBitmapImageAsync();
+                    return await decoded.Image.ToBitmapImageAsync().ConfigureAwait(false);
                 }
                 finally
                 {

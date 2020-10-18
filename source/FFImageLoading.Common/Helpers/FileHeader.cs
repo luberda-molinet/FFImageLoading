@@ -7,15 +7,15 @@ namespace FFImageLoading.Helpers
 {
     public static class FileHeader
     {
-        static readonly byte[] _jpeg = new byte[] { 255, 216, 255 };
-        static readonly byte[] _png = new byte[] { 137, 80, 78, 71 };
-        static readonly byte[] _svg = Encoding.UTF8.GetBytes("<");
-        static readonly byte[] _webp = Encoding.UTF8.GetBytes("RIFF");
-        static readonly byte[] _gif = Encoding.UTF8.GetBytes("GIF");
-        static readonly byte[] _bmp = Encoding.UTF8.GetBytes("BM");
-        static readonly byte[] _tiff = new byte[] { 73, 73, 42 };
-        static readonly byte[] _tiff2 = new byte[] { 77, 77, 42 };
-        static readonly byte[] _ico = new byte[] { 00, 00, 01, 00 };
+        private static readonly byte[] _jpeg = { 255, 216, 255 };
+        private static readonly byte[] _png = { 137, 80, 78, 71 };
+        private static readonly byte[] _svg = Encoding.UTF8.GetBytes("<");
+        private static readonly byte[] _webp = Encoding.UTF8.GetBytes("RIFF");
+        private static readonly byte[] _gif = Encoding.UTF8.GetBytes("GIF");
+        private static readonly byte[] _bmp = Encoding.UTF8.GetBytes("BM");
+        private static readonly byte[] _tiff = { 73, 73, 42 };
+        private static readonly byte[] _tiff2 = { 77, 77, 42 };
+        private static readonly byte[] _ico = { 00, 00, 01, 00 };
 
         public static ImageInformation.ImageType GetImageType(byte[] header)
         {

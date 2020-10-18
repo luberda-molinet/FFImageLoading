@@ -101,10 +101,10 @@ namespace FFImageLoading.Views
         public static readonly DependencyProperty DownsampleUseDipUnitsProperty = DependencyProperty.Register(nameof(DownsampleUseDipUnits), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(bool)));
 
         public TimeSpan? CacheDuration { get { return (TimeSpan?)GetValue(CacheDurationProperty); } set { SetValue(CacheDurationProperty, value); } }
-        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(TimeSpan?)));
+        public static readonly DependencyProperty CacheDurationProperty = DependencyProperty.Register(nameof(CacheDuration), typeof(TimeSpan?), typeof(MvxCachedImageView), new PropertyMetadata(default(TimeSpan?)));
 
         public LoadingPriority LoadingPriority { get { return (LoadingPriority)GetValue(LoadingPriorityProperty); } set { SetValue(LoadingPriorityProperty, value); } }
-        public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(LoadingPriority)));
+        public static readonly DependencyProperty LoadingPriorityProperty = DependencyProperty.Register(nameof(LoadingPriority), typeof(LoadingPriority), typeof(MvxCachedImageView), new PropertyMetadata(default(LoadingPriority)));
 
         public bool? BitmapOptimizations { get { return (bool?)GetValue(BitmapOptimizationsProperty); } set { SetValue(BitmapOptimizationsProperty, value); } }
         public static readonly DependencyProperty BitmapOptimizationsProperty = DependencyProperty.Register(nameof(BitmapOptimizations), typeof(bool?), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
@@ -125,19 +125,19 @@ namespace FFImageLoading.Views
         public static readonly DependencyProperty TransformPlaceholdersProperty = DependencyProperty.Register(nameof(TransformPlaceholders), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(bool?)));
 
         public CacheType? CacheType { get { return (CacheType?)GetValue(CacheTypeProperty); } set { SetValue(CacheTypeProperty, value); } }
-        public static readonly DependencyProperty CacheTypeProperty = DependencyProperty.Register(nameof(CacheType), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(CacheType?)));
+        public static readonly DependencyProperty CacheTypeProperty = DependencyProperty.Register(nameof(CacheType), typeof(CacheType?), typeof(MvxCachedImageView), new PropertyMetadata(default(CacheType?)));
 
         public List<ITransformation> Transformations { get { return (List<ITransformation>)GetValue(TransformationsProperty); } set { SetValue(TransformationsProperty, value); } }
-        public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register(nameof(Transformations), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(new List<ITransformation>(), OnTransformationsChanged));
+        public static readonly DependencyProperty TransformationsProperty = DependencyProperty.Register(nameof(Transformations), typeof(List<ITransformation>), typeof(MvxCachedImageView), new PropertyMetadata(new List<ITransformation>(), OnTransformationsChanged));
 
         public IDataResolver CustomDataResolver { get { return (IDataResolver)GetValue(CustomDataResolverProperty); } set { SetValue(CustomDataResolverProperty, value); } }
-        public static readonly DependencyProperty CustomDataResolverProperty = DependencyProperty.Register(nameof(CustomDataResolver), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
+        public static readonly DependencyProperty CustomDataResolverProperty = DependencyProperty.Register(nameof(CustomDataResolver), typeof(IDataResolver), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
 
         public IDataResolver CustomLoadingPlaceholderDataResolver { get { return (IDataResolver)GetValue(CustomLoadingPlaceholderDataResolverProperty); } set { SetValue(CustomLoadingPlaceholderDataResolverProperty, value); } }
-        public static readonly DependencyProperty CustomLoadingPlaceholderDataResolverProperty = DependencyProperty.Register(nameof(CustomLoadingPlaceholderDataResolver), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
+        public static readonly DependencyProperty CustomLoadingPlaceholderDataResolverProperty = DependencyProperty.Register(nameof(CustomLoadingPlaceholderDataResolver), typeof(IDataResolver), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
 
         public IDataResolver CustomErrorPlaceholderDataResolver { get { return (IDataResolver)GetValue(CustomErrorPlaceholderDataResolverProperty); } set { SetValue(CustomErrorPlaceholderDataResolverProperty, value); } }
-        public static readonly DependencyProperty CustomErrorPlaceholderDataResolverProperty = DependencyProperty.Register(nameof(CustomErrorPlaceholderDataResolver), typeof(bool), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
+        public static readonly DependencyProperty CustomErrorPlaceholderDataResolverProperty = DependencyProperty.Register(nameof(CustomErrorPlaceholderDataResolver), typeof(IDataResolver), typeof(MvxCachedImageView), new PropertyMetadata(default(IDataResolver)));
 
         public string LoadingPlaceholderImagePath { get { return (string)GetValue(LoadingPlaceholderImagePathProperty); } set { SetValue(LoadingPlaceholderImagePathProperty, value); } }
         public static readonly DependencyProperty LoadingPlaceholderImagePathProperty = DependencyProperty.Register(nameof(LoadingPlaceholderImagePath), typeof(string), typeof(MvxCachedImageView), new PropertyMetadata(default(string)));
@@ -158,14 +158,14 @@ namespace FFImageLoading.Views
             ((MvxCachedImageView)d)._internalImage.Stretch = (Windows.UI.Xaml.Media.Stretch)e.NewValue;
         }
 
-        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(FFImage), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty HorizontalImageAlignmentProperty = DependencyProperty.Register(nameof(HorizontalImageAlignment), typeof(HorizontalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(HorizontalAlignment.Stretch, HorizontalImageAlignmentPropertyChanged));
         public HorizontalAlignment HorizontalImageAlignment { get { return (HorizontalAlignment)GetValue(HorizontalImageAlignmentProperty); } set { SetValue(HorizontalImageAlignmentProperty, value); } }
         private static void HorizontalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((MvxCachedImageView)d)._internalImage.HorizontalAlignment = ((HorizontalAlignment)e.NewValue);
         }
 
-        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(FFImage), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
+        public static readonly DependencyProperty VerticalImageAlignmentProperty = DependencyProperty.Register(nameof(VerticalImageAlignment), typeof(VerticalAlignment), typeof(MvxCachedImageView), new PropertyMetadata(VerticalAlignment.Stretch, VerticalImageAlignmentPropertyChanged));
         public VerticalAlignment VerticalImageAlignment { get { return (VerticalAlignment)GetValue(VerticalImageAlignmentProperty); } set { SetValue(VerticalImageAlignmentProperty, value); } }
         private static void VerticalImageAlignmentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -268,21 +268,11 @@ namespace FFImageLoading.Views
                 // Downsample
                 if ((int)DownsampleHeight != 0 || (int)DownsampleWidth != 0)
                 {
-                    if (DownsampleHeight > DownsampleWidth)
-                    {
-                        if (DownsampleUseDipUnits)
-                            imageLoader.DownSampleInDip(height: (int)DownsampleHeight);
-                        else
-                            imageLoader.DownSample(height: (int)DownsampleHeight);
-                    }
-                    else
-                    {
-                        if (DownsampleUseDipUnits)
-                            imageLoader.DownSampleInDip(width: (int)DownsampleWidth);
-                        else
-                            imageLoader.DownSample(width: (int)DownsampleWidth);
-                    }
-                }
+					if (DownsampleUseDipUnits)
+						imageLoader.DownSampleInDip((int)DownsampleWidth, (int)DownsampleHeight);
+					else
+						imageLoader.DownSample((int)DownsampleWidth, (int)DownsampleHeight);
+				}
 
                 // RetryCount
                 if (RetryCount > 0)

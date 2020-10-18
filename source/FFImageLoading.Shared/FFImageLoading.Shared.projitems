@@ -17,6 +17,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MiniLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\FileStore.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Cache\SimpleDiskCache.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Cache\CacheEntry.cs" />
   </ItemGroup>
 </Project>

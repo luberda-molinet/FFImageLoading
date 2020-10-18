@@ -21,7 +21,7 @@ namespace FFImageLoading.Helpers
 
         public static T PostForResult<T>(Func<T> action)
         {
-            T result = default(T);
+            T result = default;
 
             if (NSThread.Current.IsMainThread)
             {
@@ -78,7 +78,7 @@ namespace FFImageLoading.Helpers
             {
                 try
                 {
-                    await action?.Invoke();
+                    await (action?.Invoke()).ConfigureAwait(false);
                     tcs.SetResult(true);
                 }
                 catch (Exception ex)
@@ -92,7 +92,7 @@ namespace FFImageLoading.Helpers
                 {
                     try
                     {
-                        await action?.Invoke();
+                        await (action?.Invoke()).ConfigureAwait(false);
                         tcs.SetResult(true);
                     }
                     catch (Exception ex)
@@ -102,7 +102,7 @@ namespace FFImageLoading.Helpers
                 });
             }
 
-            await tcs.Task;
+            await tcs.Task.ConfigureAwait(false);
         }
     }
 }

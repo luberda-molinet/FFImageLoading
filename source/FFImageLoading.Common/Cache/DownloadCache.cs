@@ -7,6 +7,7 @@ using System.Threading;
 using FFImageLoading.Work;
 using FFImageLoading.Config;
 using System.Linq;
+using FFImageLoading.Exceptions;
 
 namespace FFImageLoading.Cache
 {
@@ -18,13 +19,11 @@ namespace FFImageLoading.Cache
             Configuration = configuration;
         }
 
-        const int BufferSize = 4096;
-
         public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/json", "audio/", "video/", "message" };
 
         protected Configuration Configuration { get; private set; }
 
-        protected virtual IMD5Helper MD5Helper { get { return Configuration.MD5Helper; } }
+        protected virtual IMD5Helper MD5Helper => Configuration.MD5Helper;
 
         public virtual TimeSpan DelayBetweenRetry { get; set; } = TimeSpan.FromSeconds(1);
 
@@ -34,9 +33,9 @@ namespace FFImageLoading.Cache
                                        && (string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) || parameters.LoadingPlaceholderPath != url)
                                        && (string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) || parameters.ErrorPlaceholderPath != url);
 
-            string filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url));
+            var filename = (allowCustomKey ? MD5Helper.MD5(parameters.CustomCacheKey) : MD5Helper.MD5(url));
             var allowDiskCaching = AllowDiskCaching(parameters.CacheType);
-            var duration = parameters.CacheDuration.HasValue ? parameters.CacheDuration.Value : configuration.DiskCacheDuration;
+            var duration = parameters.CacheDuration ?? configuration.DiskCacheDuration;
             string filePath = null;
 
             if (allowDiskCaching)
@@ -67,13 +66,12 @@ namespace FFImageLoading.Cache
             if (allowDiskCaching)
             {
                 Action finishedAction = null;
-                Action<FileWriteInfo> onFileWriteFinished = parameters?.OnFileWriteFinished;
+                var onFileWriteFinished = parameters?.OnFileWriteFinished;
                 if (onFileWriteFinished != null)
                 {
                     finishedAction = new Action(() =>
                     {
-                        if (onFileWriteFinished != null)
-                            onFileWriteFinished(new FileWriteInfo(filePath, url));
+                        onFileWriteFinished?.Invoke(new FileWriteInfo(filePath, url));
                     });
                 }
 
@@ -87,17 +85,11 @@ namespace FFImageLoading.Cache
             return new CacheStream(memoryStream, false, filePath);
         }
 
-        [Obsolete("Use other override")]
-        protected virtual Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, Action<DownloadProgress> progressAction, TaskParameter parameters)
-        {
-            return DownloadAsync(url, token, client, parameters, null);
-        }
-
         protected virtual async Task<byte[]> DownloadAsync(string url, CancellationToken token, HttpClient client, TaskParameter parameters, DownloadInformation downloadInformation)
         {
             if (!parameters.Preload)
             {
-                await Task.Delay(25);
+                await Task.Delay(25).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
             }
 
@@ -119,29 +111,27 @@ namespace FFImageLoading.Cache
                         if (!response.IsSuccessStatusCode)
                         {
                             if (response.Content == null)
-                                throw new HttpRequestException(response.StatusCode.ToString());
-                            
+                                throw new DownloadHttpStatusCodeException(response.StatusCode);
+
                             using (response.Content)
                             {
-                                var content = await response.Content.ReadAsStringAsync();
-                                var hasContent = string.IsNullOrWhiteSpace(content);
-                                var message = hasContent ? $"{response.StatusCode}: {content}" : response.StatusCode.ToString();
-                                throw new HttpRequestException(message);
+                                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                                throw new DownloadHttpStatusCodeException(response.StatusCode, content);
                             }
                         }
 
                         if (response.Content == null)
-                            throw new HttpRequestException("No Content");
-                        
+                            throw new DownloadException("No content");
+
                         var mediaType = response.Content.Headers?.ContentType?.MediaType;
                         if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
                             if (InvalidContentTypes.Any(v => mediaType.StartsWith(v, StringComparison.OrdinalIgnoreCase)))
-                                throw new HttpRequestException($"Invalid response content type ({mediaType})");
+                                throw new DownloadException($"Invalid response content type ({mediaType})");
                         }
 
                         if (!parameters.CacheDuration.HasValue && Configuration.TryToReadDiskCacheDurationFromHttpHeaders
-                            && response.Headers?.CacheControl?.MaxAge != null)
+                            && response.Headers?.CacheControl?.MaxAge != null && response.Headers.CacheControl.MaxAge > TimeSpan.Zero)
                         {
                             downloadInformation.CacheValidity = response.Headers.CacheControl.MaxAge.Value;
                         }
@@ -149,11 +139,11 @@ namespace FFImageLoading.Cache
                         ModifyParametersAfterResponse(response, parameters);
 
                         using (var httpReadTimeoutTokenSource = new CancellationTokenSource())
-                        using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))                            
+                        using (var readTimeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, httpReadTimeoutTokenSource.Token))
                         {
                             var readTimeoutToken = readTimeoutTokenSource.Token;
                             var httpReadTimeoutToken = httpReadTimeoutTokenSource.Token;
-                            int total = (int)(response.Content.Headers.ContentLength ?? -1);
+                            var total = (int)(response.Content.Headers.ContentLength ?? -1);
                             var canReportProgress = progressAction != null;
 
                             httpReadTimeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Configuration.HttpReadTimeout));
@@ -166,25 +156,25 @@ namespace FFImageLoading.Cache
                                 {
                                     httpReadTimeoutToken.Register(() => sourceStream.TryDispose());
 
-                                    int totalRead = 0;
+                                    var totalRead = 0;
                                     var buffer = new byte[Configuration.HttpReadBufferSize];
+                                    var read = 0;
 
-                                    int read = 0;
-                                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
                                     {
                                         readTimeoutToken.ThrowIfCancellationRequested();
                                         outputStream.Write(buffer, 0, read);
                                         totalRead += read;
 
                                         if (canReportProgress)
-                                            progressAction(new DownloadProgress() { Total = total, Current = totalRead });
+                                            progressAction(new DownloadProgress(totalRead, total));
                                     }
 
                                     if (outputStream.Length == 0)
-                                        throw new InvalidDataException("Zero length stream");
+                                        throw new DownloadException("Zero length stream");
 
                                     if (outputStream.Length < 32)
-                                        throw new InvalidDataException("Invalid stream");
+                                        throw new DownloadException("Invalid stream");
 
                                     return outputStream.ToArray();
                                 }
@@ -192,9 +182,9 @@ namespace FFImageLoading.Cache
                             catch (Exception ex) when (ex is OperationCanceledException || ex is ObjectDisposedException)
                             {
                                 if (httpReadTimeoutTokenSource.IsCancellationRequested)
-                                    throw new Exception("HttpReadTimeout");
-                                else
-                                    throw;
+                                    throw new DownloadReadTimeoutException();
+
+                                throw;
                             }
                         }
                     }
@@ -202,7 +192,7 @@ namespace FFImageLoading.Cache
                 catch (OperationCanceledException)
                 {
                     if (httpHeadersTimeoutTokenSource.IsCancellationRequested)
-                        throw new Exception("HttpHeadersTimeout");
+                        throw new DownloadHeadersTimeoutException();
                     else
                         throw;
                 }

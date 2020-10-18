@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using FFImageLoading.Cache;
 using FFImageLoading.Config;
@@ -15,7 +13,7 @@ namespace FFImageLoading.DataResolvers
             Configuration = configuration;
         }
 
-        protected IDownloadCache DownloadCache { get { return Configuration.DownloadCache; } }
+        protected IDownloadCache DownloadCache => Configuration.DownloadCache;
         protected Configuration Configuration { get; private set; }
 
         public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)

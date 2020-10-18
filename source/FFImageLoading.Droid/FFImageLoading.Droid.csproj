@@ -10,7 +10,6 @@
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AndroidResgenClass>Resource</AndroidResgenClass>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Platform</AssemblyName>
     <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <NoWarn>1701;1702;1705;1591;1587;NU1605;NU1605</NoWarn>
@@ -26,6 +25,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <ConsolePause>false</ConsolePause>
     <DefineConstants>DEBUG;ANDROID;__ANDROID__</DefineConstants>         
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +38,7 @@
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Platform.xml</DocumentationFile>
     <DefineConstants>ANDROID;__ANDROID__</DefineConstants>                 
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,6 +50,7 @@
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.IO" />
     <Reference Include="System.Collections" />
+    <Reference Include="Java.Interop" />
   </ItemGroup>
   <Import Project="..\FFImageLoading.Shared\FFImageLoading.Shared.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Shared\FFImageLoading.Shared.projitems')" />
   <Import Project="..\FFImageLoading.Cross\FFImageLoading.Cross.projitems" Label="Shared" Condition="Exists('..\FFImageLoading.Cross\FFImageLoading.Cross.projitems')" />
@@ -56,9 +58,7 @@
   <ItemGroup>
     <Compile Include="Cache\ImageCache.cs" />
     <Compile Include="Helpers\Utils.cs" />
-    <Compile Include="Extensions\ImageViewExtensions.cs" />
     <Compile Include="Cache\IImageCache.cs" />
-    <Compile Include="Views\ManagedImageView.cs" />
     <Compile Include="Views\ImageViewAsync.cs" />
     <Compile Include="Work\BitmapHolder.cs" />
     <Compile Include="Transformations\TransformationBase.cs" />
@@ -85,7 +85,7 @@
     <Compile Include="Cache\LRUCache.cs" />
     <Compile Include="Cache\IByteSizeAware.cs" />
     <Compile Include="Cache\StrongCache.cs" />
-    <Compile Include="Drawables\FFGifDrawable.cs" />
+    <Compile Include="Drawables\FFAnimatedDrawable.cs" />
     <Compile Include="ImageService.cs" />
     <Compile Include="..\FFImageLoading.Mock\Extensions\TaskParameterExtensions.cs">
       <Link>Extensions\TaskParameterExtensions.cs</Link>
@@ -94,6 +94,8 @@
     <Compile Include="Decoders\GifDecoder.cs" />
     <Compile Include="Decoders\BaseDecoder.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
+    <Compile Include="Drawables\ISelfDisposingAnimatedBitmapDrawable.cs" />
+    <Compile Include="Targets\ViewTarget.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>
@@ -101,7 +103,7 @@
       <Properties>
         <Policies>
           <TextStylePolicy TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="80" TabsToSpaces="True" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="True" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="True" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>

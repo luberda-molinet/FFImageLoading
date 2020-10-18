@@ -2,70 +2,76 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using FFImageLoading.Drawables;
+using Android.Graphics;
 
 namespace FFImageLoading
 {
-    internal class HighResolutionTimer<TImageContainer>
+    internal class HighResolutionTimer<TImageContainer> where TImageContainer: class
     {
+#pragma warning disable RECS0108 // Warns about static fields in generic types
         // The number of ticks per one millisecond.
-        static readonly float TickFrequency = 1000f / Stopwatch.Frequency;
+        private static readonly float _tickFrequency = 1000f / Stopwatch.Frequency;
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        readonly IAnimatedImage<TImageContainer>[] _animatedImage;
-        readonly Action<IAnimatedImage<TImageContainer>> _action;
-        volatile bool _isRunning;
+        private readonly Func<HighResolutionTimer<TImageContainer>, Bitmap, Task> _action;
 
-        public HighResolutionTimer(IAnimatedImage<TImageContainer>[] animatedImage, Action<IAnimatedImage<TImageContainer>> action)
+        public HighResolutionTimer(ISelfDisposingAnimatedBitmapDrawable animatedDrawable, Func<HighResolutionTimer<TImageContainer>, Bitmap, Task> action)
         {
-            _animatedImage = animatedImage;
+			AnimatedDrawable = animatedDrawable;
             _action = action;
         }
 
-        public bool Enabled => _isRunning;
+		public ISelfDisposingAnimatedBitmapDrawable AnimatedDrawable { get; private set; }
+		public bool Enabled { get; private set; }
         public int DelayOffset { get; set; }
 
         public void Start()
         {
-            if (_isRunning)
+            if (Enabled)
                 return;
 
-            _isRunning = true;
-            Thread thread = new Thread(ExecuteTimer);
-            thread.Priority = ThreadPriority.BelowNormal;
+            Enabled = true;
+
+            var thread = new Thread(ExecuteTimer)
+            {
+                Priority = ThreadPriority.BelowNormal
+            };
             thread.Start();
         }
 
         public void Stop()
         {
-            _isRunning = false;
+            Enabled = false;
         }
 
-        void ExecuteTimer()
+        private async void ExecuteTimer()
         {
             float elapsed;
-            int count = _animatedImage.Length;
-            float nextTrigger = 0f;
+            var count = AnimatedDrawable.AnimatedImages.Length;
+            var nextTrigger = 0f;
 
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             try
             {
-                while (_isRunning)
+                while (Enabled)
                 {
-                    for (int i = 0; i < count; i++)
+                    for (var i = 0; i < count; i++)
                     {
-                        if (!_isRunning) return;
+                        if (!Enabled) return;
 
-                        var image = _animatedImage[i];
+                        var image = AnimatedDrawable.AnimatedImages[i];
 
                         nextTrigger += (image.Delay + DelayOffset);
 
                         while (true)
                         {
-                            if (!_isRunning) return;
+                            if (!Enabled) return;
 
-                            elapsed = stopwatch.ElapsedTicks * TickFrequency;
-                            float diff = nextTrigger - elapsed;
+                            elapsed = stopwatch.ElapsedTicks * _tickFrequency;
+                            var diff = nextTrigger - elapsed;
                             if (diff <= 0f)
                                 break;
 
@@ -79,10 +85,10 @@ namespace FFImageLoading
                                 Thread.Sleep(10);
                         }
 
-                        if (!_isRunning) return;
+                        if (!Enabled) return;
 
-                        float delay = elapsed - nextTrigger;
-                        _action.Invoke(image);
+                        var delay = elapsed - nextTrigger;
+                        await (_action.Invoke(this, image.Image)).ConfigureAwait(false);
                     }
                 }
             }

@@ -29,6 +29,7 @@ namespace FFImageLoading.Forms.Sample.Mac
         {
             Xamarin.Forms.Forms.Init();
             CachedImageRenderer.Init();
+			CachedImageRenderer.InitImageSourceHandler();
             LoadApplication(new App());
             base.DidFinishLaunching(notification);
         }

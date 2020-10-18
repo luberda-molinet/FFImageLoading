@@ -8,11 +8,7 @@ using System.Collections.Generic;
 
 namespace FFImageLoading.Svg.Forms
 {
-#if __IOS__
-            [Foundation.Preserve(AllMembers = true)]
-#elif __ANDROID__
-    [Android.Runtime.Preserve(AllMembers = true)]
-#endif
+    [Preserve(AllMembers = true)]
     /// <summary>
     /// SVG image source.
     /// </summary>
@@ -146,5 +142,10 @@ namespace FFImageLoading.Svg.Forms
         {
             return new SvgImageSource(new DataUrlImageSource(svg), vectorWidth, vectorHeight, useDipUnits, replaceStringMap);
         }
-    }
+
+		public IVectorImageSource Clone()
+		{
+			return new SvgImageSource(ImageSource, VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
+		}
+	}
 }

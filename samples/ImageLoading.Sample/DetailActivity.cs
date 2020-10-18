@@ -20,7 +20,7 @@ namespace ImageLoading.Sample
     {
         public const string POSITION = "Position";
 
-        ImageViewAsync backgroundImage, logoImage;
+        ImageView backgroundImage, logoImage;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -28,8 +28,8 @@ namespace ImageLoading.Sample
 
             SetContentView(Resource.Layout.detail_item);
 
-            backgroundImage = FindViewById<ImageViewAsync>(Resource.Id.backgroundImage);
-            logoImage = FindViewById<ImageViewAsync>(Resource.Id.logoImage);
+            backgroundImage = FindViewById<ImageView>(Resource.Id.backgroundImage);
+            logoImage = FindViewById<ImageView>(Resource.Id.logoImage);
             var txtTitle = FindViewById<TextView>(Resource.Id.txtTitle);
 
             var position = Intent.GetIntExtra (POSITION, 0);

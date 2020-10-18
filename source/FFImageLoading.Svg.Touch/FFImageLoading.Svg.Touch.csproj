@@ -22,6 +22,7 @@
     <MtouchHttpClientHandler></MtouchHttpClientHandler>
     <MtouchTlsProvider></MtouchTlsProvider>
     <DefineConstants>DEBUG;__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>                
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +37,7 @@
     <MtouchHttpClientHandler></MtouchHttpClientHandler>
     <MtouchTlsProvider></MtouchTlsProvider>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;</DefineConstants>                
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,7 +47,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Net.Http" />
     <Reference Include="SkiaSharp">
-      <HintPath>..\..\packages\SkiaSharp.1.60.0\lib\XamariniOS\SkiaSharp.dll</HintPath>
+      <HintPath>..\..\packages\SkiaSharp.1.68.0\lib\Xamarin.iOS\SkiaSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

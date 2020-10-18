@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using FFImageLoading.Forms.Args;
 using FFImageLoading.Forms.Platform;
+using System.Reflection;
 
 #if __IOS__
 using UIKit;
@@ -26,19 +27,6 @@ using Xamarin.Forms.Platform.MacOS;
 using System.IO;
 #endif
 
-#if __IOS__
-namespace FFImageLoading.Forms.Touch
-#elif __MACOS__
-namespace FFImageLoading.Forms.Mac
-#endif
-{
-    [Obsolete("Use the same class in FFImageLoading.Forms.Platform namespace")]
-    public class CachedImageRenderer : FFImageLoading.Forms.Platform.CachedImageRenderer
-    {
-    }
-
-}
-
 namespace FFImageLoading.Forms.Platform
 {
     /// <summary>
@@ -51,12 +39,11 @@ namespace FFImageLoading.Forms.Platform
         internal class _CachedImageRenderer
         {
         }
-
-        bool _isSizeSet;
+        
         private bool _isDisposed;
-        private IScheduledWork _currentTask;
+		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
-        readonly object _updateBitmapLock = new object();
+        private readonly object _updateBitmapLock = new object();
 
         /// <summary>
         ///   Used for registration with dependency service
@@ -75,7 +62,34 @@ namespace FFImageLoading.Forms.Platform
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
-        protected override void Dispose(bool disposing)
+		/// <summary>
+		/// Call this after Xamarin.Forms.Init to use FFImageLoading in all Xamarin.Forms views,
+		/// including Xamarin.Forms.Image
+		/// </summary>
+		public static void InitImageSourceHandler()
+		{
+			Helpers.Dependency.Register(typeof(FileImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(StreamImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(UriImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(EmbeddedResourceImageSource), typeof(FFImageLoadingImageSourceHandler));
+			Helpers.Dependency.Register(typeof(DataUrlImageSource), typeof(FFImageLoadingImageSourceHandler));
+
+			try
+			{
+				var svgAssembly = Assembly.Load("FFImageLoading.Svg.Forms");
+				if (svgAssembly != null)
+				{
+					var svgImageSourceType = svgAssembly.GetType("FFImageLoading.Svg.Forms.SvgImageSource");
+					if (svgImageSourceType != null)
+					{
+						Helpers.Dependency.Register(svgImageSourceType, typeof(FFImageLoadingImageSourceHandler));
+					}
+				}
+			}
+			catch { }
+		}
+
+		protected override void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
@@ -113,15 +127,14 @@ namespace FFImageLoading.Forms.Platform
 
             if (e.NewElement != null)
             {
-                _isSizeSet = false;
-                e.NewElement.InternalReloadImage = new Action(ReloadImage);
+				e.NewElement.InternalReloadImage = new Action(ReloadImage);
                 e.NewElement.InternalCancel = new Action(CancelIfNeeded);
                 e.NewElement.InternalGetImageAsJPG = new Func<GetImageAsJpgArgs, Task<byte[]>>(GetImageAsJpgAsync);
                 e.NewElement.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
-                SetAspect();
+				SetOpacity();
+				SetAspect();
                 UpdateImage(Control, Element, e.OldElement);
-                SetOpacity();
             }
         }
 
@@ -143,7 +156,7 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        void SetAspect()
+        private void SetAspect()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
                 return;
@@ -166,7 +179,7 @@ namespace FFImageLoading.Forms.Platform
 #endif
         }
 
-        void SetOpacity()
+        private void SetOpacity()
         {
             if (Control == null || Control.Handle == IntPtr.Zero || Element == null || _isDisposed)
                 return;
@@ -177,7 +190,7 @@ namespace FFImageLoading.Forms.Platform
 #endif
         }
 
-        void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
+        private void UpdateImage(PImageView imageView, CachedImage image, CachedImage previousImage)
         {
             lock (_updateBitmapLock)
             {
@@ -207,8 +220,7 @@ namespace FFImageLoading.Forms.Platform
 
                 var placeholderSource = ImageSourceBinding.GetImageSourceBinding(image.LoadingPlaceholder, image);
                 var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
-                TaskParameter imageLoader;
-                image.SetupOnBeforeImageLoading(out imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
+                image.SetupOnBeforeImageLoading(out var imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
                 if (imageLoader != null)
                 {
@@ -235,49 +247,48 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
-        async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
-        {
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
-            {
-                if (element != null && !_isDisposed)
-                {
-                    if (!isLoading || !_isSizeSet)
-                    {
-                        ((IVisualElementController)element).NativeSizeChanged();
-                        _isSizeSet = true;
-                    }
+		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
+		{
+			if (element == null || _isDisposed)
+				return;
 
-                    if (!isLoading)
-                        element.SetIsLoading(isLoading);
-                }
-            });
-        }
+			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			{
+				if (element == null || _isDisposed)
+					return;
 
-        void ReloadImage()
+				((IVisualElementController)element).NativeSizeChanged();
+
+				if (!isLoading)
+					element.SetIsLoading(isLoading);
+			}).ConfigureAwait(false);
+		}
+
+		private void ReloadImage()
         {
             UpdateImage(Control, Element, null);
         }
 
-        void CancelIfNeeded()
+        private void CancelIfNeeded()
         {
             try
             {
                 _currentTask?.Cancel();
             }
-            catch (Exception) { }
+            catch { }
         }
 
-        Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
+        private Task<byte[]> GetImageAsJpgAsync(GetImageAsJpgArgs args)
         {
             return GetImageAsByteAsync(false, args.Quality, args.DesiredWidth, args.DesiredHeight);
         }
 
-        Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
+        private Task<byte[]> GetImageAsPngAsync(GetImageAsPngArgs args)
         {
             return GetImageAsByteAsync(true, 90, args.DesiredWidth, args.DesiredHeight);
         }
 
-        async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
+        private async Task<byte[]> GetImageAsByteAsync(bool usePNG, int quality, int desiredWidth, int desiredHeight)
         {
             PImage image = null;
 
@@ -292,12 +303,12 @@ namespace FFImageLoading.Forms.Platform
 
             if (desiredWidth != 0 || desiredHeight != 0)
             {
-                image = image.ResizeUIImage((double)desiredWidth, (double)desiredHeight, InterpolationMode.Default);
+                image = image.ResizeUIImage(desiredWidth, desiredHeight, InterpolationMode.Default);
             }
 
 #if __IOS__
 
-            NSData imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
+            var imageData = usePNG ? image.AsPNG() : image.AsJPEG((nfloat)quality / 100f);
 
             if (imageData == null || imageData.Length == 0)
                 return null;
@@ -331,8 +342,8 @@ namespace FFImageLoading.Forms.Platform
 
             public FormsNSImageView()
             {
-                Layer = new FFCALayer();
-                WantsLayer = true;
+                //Layer = new FFCALayer();
+                //WantsLayer = true;
             }
 
             public void SetIsOpaque(bool isOpaque)
@@ -340,12 +351,12 @@ namespace FFImageLoading.Forms.Platform
                 _isOpaque = isOpaque;
             }
 
-            public override void DrawRect(CGRect dirtyRect)
-            {
-                // TODO if it isn't disabled then this issue happens: 
-                // https://github.com/luberda-molinet/FFImageLoading/issues/922
-                // base.DrawRect(dirtyRect);
-            }
+            //public override void DrawRect(CGRect dirtyRect)
+            //{
+            //    // TODO if it isn't disabled then this issue happens: 
+            //    // https://github.com/luberda-molinet/FFImageLoading/issues/922
+            //    // base.DrawRect(dirtyRect);
+            //}
 
             public override bool IsOpaque => _isOpaque;
         }

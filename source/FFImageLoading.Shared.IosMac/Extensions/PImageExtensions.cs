@@ -21,19 +21,18 @@ namespace FFImageLoading.Extensions
 
         public static PImage ResizeUIImage(this PImage image, double desiredWidth, double desiredHeight, InterpolationMode interpolationMode)
         {
-            double widthRatio = desiredWidth / image.Size.Width;
-            double heightRatio = desiredHeight / image.Size.Height;
+            var widthRatio = desiredWidth / image.Size.Width;
+            var heightRatio = desiredHeight / image.Size.Height;
+            var scaleRatio = Math.Min(widthRatio, heightRatio);
 
-            double scaleRatio = Math.Min(widthRatio, heightRatio);
-
-            if (desiredWidth == 0)
+            if (Math.Abs(desiredWidth) < double.Epsilon )
                 scaleRatio = heightRatio;
 
-            if (desiredHeight == 0)
+            if (Math.Abs(desiredHeight) < double.Epsilon)
                 scaleRatio = widthRatio;
 
-            double aspectWidth = image.Size.Width * scaleRatio;
-            double aspectHeight = image.Size.Height * scaleRatio;
+            var aspectWidth = image.Size.Width * scaleRatio;
+            var aspectHeight = image.Size.Height * scaleRatio;
 
             var newSize = new CGSize(aspectWidth, aspectHeight);
 #if __MACOS__
@@ -89,7 +88,7 @@ namespace FFImageLoading.Extensions
         public static System.IO.Stream AsJpegStream(this PImage image, int quality = 80)
         {
 #if __IOS__
-            return image.AsJPEG((nfloat)quality).AsStream();
+            return image.AsJPEG(quality / 100f).AsStream();
 #elif __MACOS__
             // todo: jpeg quality?
             var imageRep = new NSBitmapImageRep(image.AsTiff());

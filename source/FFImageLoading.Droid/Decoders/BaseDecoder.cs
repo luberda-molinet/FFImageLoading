@@ -1,5 +1,4 @@
 ﻿using System;
-using FFImageLoading.Decoders;
 using Android.Graphics;
 using FFImageLoading.Work;
 using System.IO;
@@ -11,6 +10,7 @@ using FFImageLoading.Config;
 using FFImageLoading.Extensions;
 using System.Linq;
 using FFImageLoading.Helpers.Exif;
+using Android.Content;
 
 namespace FFImageLoading.Decoders
 {
@@ -51,8 +51,8 @@ namespace FFImageLoading.Decoders
                 options.InPreferQualityOverSpeed = false;
             }
 
-            // CHECK IF BITMAP IS EXIF ROTATED
-            int exifRotation = 0;
+			// CHECK IF BITMAP IS EXIF ROTATED
+			var exifOrientation = ExifOrientation.ORIENTATION_UNDEFINED;
 
             if ((source == ImageSource.Filepath || source == ImageSource.Stream || source == ImageSource.Url)
                 && imageInformation.Type != ImageInformation.ImageType.SVG && imageInformation.Exif != null)
@@ -61,27 +61,11 @@ namespace FFImageLoading.Decoders
                 {
                     var ifd0 = imageInformation.Exif.FirstOrDefault(v => v.HasTagName(ExifDirectoryBase.TagOrientation));
                     var orientationTag = ifd0?.Tags?.FirstOrDefault(v => v.Type == ExifDirectoryBase.TagOrientation);
-                    int.TryParse(orientationTag?.Value, out var orientationValue);
 
-                    if (orientationValue > 0)
-                    {
-                        // 90 = 6, 180 = 3, and 270 = 8
-                        switch (orientationValue)
-                        {
-                            case 3:
-                                exifRotation = 180;
-                                break;
+					if (int.TryParse(orientationTag?.Value, out var orientation) && orientation >= 0 && orientation <= 8)
+						exifOrientation = (ExifOrientation)orientation;
 
-                            case 6:
-                                exifRotation = 90;
-                                break;
-
-                            case 8:
-                                exifRotation = 270;
-                                break;
-                        }
-                    }
-                }
+				}
                 catch (Exception ex)
                 {
                     Logger.Error("Reading EXIF orientation failed", ex);
@@ -95,8 +79,8 @@ namespace FFImageLoading.Decoders
             if (parameters.DownSampleSize != null && (parameters.DownSampleSize.Item1 > 0 || parameters.DownSampleSize.Item2 > 0))
             {
                 // Calculate inSampleSize
-                int downsampleWidth = parameters.DownSampleSize.Item1;
-                int downsampleHeight = parameters.DownSampleSize.Item2;
+                var downsampleWidth = parameters.DownSampleSize.Item1;
+                var downsampleHeight = parameters.DownSampleSize.Item2;
 
                 if (parameters.DownSampleUseDipUnits)
                 {
@@ -104,7 +88,7 @@ namespace FFImageLoading.Decoders
                     downsampleHeight = downsampleHeight.DpToPixels();
                 }
 
-                options.InSampleSize = CalculateInSampleSize(options, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? Configuration.AllowUpscale);
+                options.InSampleSize = CalculateInSampleSize(options.OutWidth, options.OutHeight, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? Configuration.AllowUpscale);
 
                 if (options.InSampleSize > 1)
                     imageInformation.SetCurrentSize(
@@ -125,26 +109,25 @@ namespace FFImageLoading.Decoders
             }
             catch (Java.Lang.IllegalArgumentException)
             {
-                ISelfDisposingBitmapDrawable old = options.InBitmap as object as ISelfDisposingBitmapDrawable;
+                var old = options.InBitmap as object as ISelfDisposingBitmapDrawable;
                 old?.SetIsRetained(true);
                 options.InBitmap = null;
                 bitmap = await BitmapFactory.DecodeStreamAsync(imageData, null, options).ConfigureAwait(false);
             }
 
             // if image is rotated, swap width/height
-            if (exifRotation != 0)
+            if (exifOrientation != ExifOrientation.ORIENTATION_UNDEFINED && exifOrientation != ExifOrientation.ORIENTATION_NORMAL)
             {
-                var oldBitmap = bitmap;
-                bitmap = bitmap.ToRotatedBitmap(exifRotation);
-                ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(oldBitmap) { InCacheKey = Guid.NewGuid().ToString() });
+                bitmap = bitmap.ToRotatedBitmap(exifOrientation);
+                //ImageCache.Instance.AddToReusableSet(new SelfDisposingBitmapDrawable(Context.Resources, oldBitmap) { InCacheKey = Guid.NewGuid().ToString() });
             }
 
             return new DecodedImage<Bitmap>() { Image = bitmap };
         }
 
         public Configuration Configuration => ImageService.Instance.Config;
-
         public IMiniLogger Logger => ImageService.Instance.Config.Logger;
+        protected Context Context => new ContextWrapper(Android.App.Application.Context);
 
         /// <summary>
         /// Calculate an inSampleSize for use in a {@link android.graphics.BitmapFactory.Options} object when decoding
@@ -155,11 +138,11 @@ namespace FFImageLoading.Decoders
         /// <param name="reqHeight"></param>
         /// <param name="allowUpscale"></param>
         /// <returns></returns>
-        public static int CalculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight, bool allowUpscale)
+        public static int CalculateInSampleSize(int sourceWidth, int sourceHeight, int reqWidth, int reqHeight, bool allowUpscale)
         {
-            // Raw height and width of image
-            float height = options.OutHeight;
-            float width = options.OutWidth;
+			// Raw height and width of image
+			float width = sourceWidth;
+			float height = sourceHeight;
 
             if (reqWidth == 0)
                 reqWidth = (int)((reqHeight / height) * width);
@@ -167,13 +150,13 @@ namespace FFImageLoading.Decoders
             if (reqHeight == 0)
                 reqHeight = (int)((reqWidth / width) * height);
             
-            double inSampleSize = 1d;
+            var inSampleSize = 1;
 
             if (height > reqHeight || width > reqWidth || allowUpscale)
             {
                 // Calculate ratios of height and width to requested height and width
-                int heightRatio = (int)Math.Round(height / reqHeight);
-                int widthRatio = (int)Math.Round(width / reqWidth);
+                var heightRatio = (int)Math.Round(height / reqHeight);
+                var widthRatio = (int)Math.Round(width / reqWidth);
 
                 // Choose the smallest ratio as inSampleSize value, this will guarantee
                 // a final image with both dimensions larger than or equal to the
@@ -181,10 +164,10 @@ namespace FFImageLoading.Decoders
                 inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
             }
 
-            return (int)inSampleSize;
+            return inSampleSize;
         }
 
-        void AddInBitmapOptions(BitmapFactory.Options options)
+        private void AddInBitmapOptions(BitmapFactory.Options options)
         {
             // inBitmap only works with mutable bitmaps so force the decoder to
             // return mutable bitmaps.
@@ -195,7 +178,7 @@ namespace FFImageLoading.Decoders
             try
             {
                 bitmapDrawable = ImageCache.Instance.GetBitmapDrawableFromReusableSet(options);
-                var bitmap = bitmapDrawable == null ? null : bitmapDrawable.Bitmap;
+                var bitmap = bitmapDrawable?.Bitmap;
 
                 if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)
                 {

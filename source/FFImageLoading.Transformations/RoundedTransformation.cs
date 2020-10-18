@@ -8,23 +8,23 @@ namespace FFImageLoading.Transformations
     {
         public RoundedTransformation()
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RoundedTransformation(double radius)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public RoundedTransformation(double radius, double cropWidthRatio, double cropHeightRatio, double borderSize, string borderHexColor)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public double Radius { get; set; }
         public double CropWidthRatio { get; set; }
@@ -34,16 +34,10 @@ namespace FFImageLoading.Transformations
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+            return Helpers.ThrowOrDefault<IBitmap>();
+		}
 
-        public string Key
-        {
-            get
-            {
-                throw new Exception(Common.DoNotReferenceMessage);
-            }
-        }
-    }
+		public string Key => Helpers.ThrowOrDefault<string>();
+	}
 }
 

@@ -2,7 +2,7 @@
 
 namespace FFImageLoading
 {
-    public class FileWriteInfo
+    public readonly struct FileWriteInfo
     {
         public FileWriteInfo(string filePath, string sourcePath)
         {
@@ -10,8 +10,8 @@ namespace FFImageLoading
             SourcePath = sourcePath;
         }
 
-        public string SourcePath { get; private set; }
+        public readonly string SourcePath;
 
-        public string FilePath { get; private set; }
+        public readonly string FilePath;
     }
 }

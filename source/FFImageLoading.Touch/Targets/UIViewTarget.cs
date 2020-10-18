@@ -19,7 +19,14 @@ namespace FFImageLoading.Targets
         {
             get
             {
-                return Control != null && Control.Handle != IntPtr.Zero; ;
+                try
+                {
+                    return Control != null && Control.Handle != IntPtr.Zero;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
             }
         }
 
@@ -27,8 +34,7 @@ namespace FFImageLoading.Targets
         {
             get
             {
-                TView control;
-                if (!_controlWeakReference.TryGetTarget(out control))
+                if (!_controlWeakReference.TryGetTarget(out var control))
                     return null;
 
                 if (control == null || control.Handle == IntPtr.Zero)

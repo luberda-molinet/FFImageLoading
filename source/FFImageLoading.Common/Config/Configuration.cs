@@ -22,20 +22,21 @@ namespace FFImageLoading.Config
             FadeAnimationDuration = 300;
             TransformPlaceholders = true;
             DownsampleInterpolationMode = InterpolationMode.Default;
-            HttpHeadersTimeout = 5;
+            HttpHeadersTimeout = 3;
             HttpReadTimeout = 15;
             HttpReadBufferSize = 8192;
             VerbosePerformanceLogging = false;
             VerboseMemoryCacheLogging = false;
             VerboseLoadingCancelledLogging = false;
             VerboseLogging = false;
-            SchedulerMaxParallelTasks = Math.Min(4, Math.Max(2, (int)(Environment.ProcessorCount / 2d)));
+			DecodingMaxParallelTasks = Environment.ProcessorCount <= 2 ? 1 : 2;
+			SchedulerMaxParallelTasks = Math.Max(16, 4 + Environment.ProcessorCount);
             DiskCacheDuration = TimeSpan.FromDays(30d);
             TryToReadDiskCacheDurationFromHttpHeaders = true;
             ExecuteCallbacksOnUIThread = false;
             StreamChecksumsAsKeys = true;
             AnimateGifs = true;
-            DelayInMs = 14; //Task.Delay resolution is around 15ms
+            DelayInMs = 10; //Task.Delay resolution is around 15ms
             ClearMemoryCacheOnOutOfMemory = true;
             InvalidateLayout = true;
         }
@@ -202,12 +203,19 @@ namespace FFImageLoading.Config
         /// <value>The verbose logging.</value>
         public bool VerboseLogging { get; set; }
 
-        /// <summary>
-        /// Gets or sets the scheduler max parallel tasks.
-        /// Default is: Math.Max(2, (int)(Environment.ProcessorCount / 2d))
-        /// </summary>
-        /// <value>The scheduler max parallel tasks.</value>
-        public int SchedulerMaxParallelTasks { get; set; }
+		/// <summary>
+		/// Gets or sets the scheduler max parallel tasks.
+		/// Default: Environment.ProcessorCount <= 2 ? 1 : 2;
+		/// </summary>
+		/// <value>The decoding max parallel tasks.</value>
+		public int DecodingMaxParallelTasks { get; set; }
+
+		/// <summary>
+		/// Gets or sets the scheduler max parallel tasks.
+		/// Default: Math.Max(16, 4 + Environment.ProcessorCount);
+		/// </summary>
+		/// <value>The scheduler max parallel tasks.</value>
+		public int SchedulerMaxParallelTasks { get; set; }
 
         /// <summary>
         /// Gets or sets the scheduler max parallel tasks factory.

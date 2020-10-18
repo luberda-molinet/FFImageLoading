@@ -12,13 +12,12 @@ namespace FFImageLoading.Work
 {
     public class WorkScheduler : IWorkScheduler
     {
-        readonly object _lock = new object();
-
-        long _statsTotalPending;
-        long _statsTotalRunning;
-        long _statsTotalMemoryCacheHits;
-        long _statsTotalWaiting;
-        long _loadCount;
+		private readonly object _lock = new object();
+		private long _statsTotalPending;
+		private long _statsTotalRunning;
+		private long _statsTotalMemoryCacheHits;
+		private long _statsTotalWaiting;
+		private long _loadCount;
 
         public WorkScheduler(Configuration configuration, IPlatformPerformance performance)
         {
@@ -26,23 +25,16 @@ namespace FFImageLoading.Work
             Performance = performance;
         }
 
-        protected int MaxParallelTasks
-        {
-            get
-            {
-                if (Configuration.SchedulerMaxParallelTasksFactory != null)
-                    return Configuration.SchedulerMaxParallelTasksFactory(Configuration);
-
-                return Configuration.SchedulerMaxParallelTasks;
-            }
-        }
+        protected int MaxParallelTasks => Configuration.SchedulerMaxParallelTasksFactory != null
+                    ? Configuration.SchedulerMaxParallelTasksFactory(Configuration)
+                    : Configuration.SchedulerMaxParallelTasks;
 
         protected IPlatformPerformance Performance { get; private set; }
         protected PendingTasksQueue PendingTasks { get; private set; } = new PendingTasksQueue();
         protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; } = new Dictionary<string, IImageLoaderTask>();
         protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; } = new ThreadSafeCollection<IImageLoaderTask>();
         protected Configuration Configuration { get; private set; }
-        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+        protected IMiniLogger Logger => Configuration.Logger;
 
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {
@@ -91,14 +83,30 @@ namespace FFImageLoading.Work
 
         public bool PauseWork { get; private set; }
 
-        public void SetPauseWork(bool pauseWork)
+        public void SetPauseWork(bool pauseWork, bool cancelExisting = false)
         {
             if (PauseWork == pauseWork)
                 return;
 
-            PauseWork = pauseWork;
+			if (cancelExisting)
+			{
+				lock (_lock)
+				{
+					foreach (var task in PendingTasks)
+						task?.Cancel();
 
-            if (pauseWork)
+					PendingTasks.Clear();
+
+					foreach (var task in SimilarTasks)
+						task?.Cancel();
+
+					SimilarTasks.Clear();
+				}
+			}
+
+			PauseWork = pauseWork;
+
+			if (pauseWork)
             {
                 Logger.Debug("SetPauseWork enabled.");
             }
@@ -142,7 +150,7 @@ namespace FFImageLoading.Work
                     LogSchedulerStats();
                 }
 
-                await task.Init();
+                await task.Init().ConfigureAwait(false);
 
                 if (string.IsNullOrWhiteSpace(task.KeyRaw))
                 {
@@ -167,7 +175,7 @@ namespace FFImageLoading.Work
             }
         }
 
-        void Enqueue(IImageLoaderTask task)
+		private void Enqueue(IImageLoaderTask task)
         {
             PendingTasks.Enqueue(task, task.Parameters.Priority ?? GetDefaultPriority(task.Parameters.Source));
         }
@@ -225,19 +233,9 @@ namespace FFImageLoading.Work
             }
         }
 
-        protected void TakeFromPendingTasksAndRun()
+        protected async void TakeFromPendingTasksAndRun()
         {
-            Task.Factory.StartNew(async () =>
-            {
-                try
-                {
-                    await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false); // FMT: we limit concurrent work using MaxParallelTasks
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("TakeFromPendingTasksAndRun exception", ex);
-                }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+			await TakeFromPendingTasksAndRunAsync().ConfigureAwait(false);
         }
 
         protected Task CreateFrameworkTask(IImageLoaderTask imageLoadingTask)
@@ -270,15 +268,15 @@ namespace FFImageLoading.Work
 
             Dictionary<string, IImageLoaderTask> tasksToRun = null;
 
-            int preloadOrUrlTasksCount = 0;
-            int urlTasksCount = 0;
-            int preloadTasksCount = 0;
+            var preloadOrUrlTasksCount = 0;
+            var urlTasksCount = 0;
+            var preloadTasksCount = 0;
 
             lock (_lock)
             {
                 if (RunningTasks.Count >= MaxParallelTasks)
                 {
-                    urlTasksCount = RunningTasks.Count(v => v.Value != null && (!v.Value.Parameters.Preload && v.Value.Parameters.Source == ImageSource.Url));
+                    urlTasksCount = RunningTasks.Count(v => v.Value != null && !v.Value.Parameters.Preload && v.Value.Parameters.Source == ImageSource.Url);
                     preloadTasksCount = RunningTasks.Count(v => v.Value != null && v.Value.Parameters.Preload);
                     preloadOrUrlTasksCount = preloadTasksCount + urlTasksCount;
 
@@ -290,7 +288,7 @@ namespace FFImageLoading.Work
                         return;
                 }
 
-                int numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
+                var numberOfTasks = MaxParallelTasks - RunningTasks.Count + Math.Min(preloadOrUrlTasksCount, MaxParallelTasks / 2);
                 tasksToRun = new Dictionary<string, IImageLoaderTask>();
                 IImageLoaderTask task = null;
 
@@ -301,7 +299,7 @@ namespace FFImageLoading.Work
 
                     // We don't want to load, at the same time, images that have same key or same raw key at the same time
                     // This way we prevent concurrent downloads and benefit from caches
-                    string rawKey = task.KeyRaw;
+                    var rawKey = task.KeyRaw;
                     if (RunningTasks.ContainsKey(rawKey) || tasksToRun.ContainsKey(rawKey))
                     {
                         SimilarTasks.Add(task);
@@ -333,7 +331,20 @@ namespace FFImageLoading.Work
 
             if (tasksToRun != null && tasksToRun.Count > 0)
             {
-                var tasks = tasksToRun.Select(p => RunImageLoadingTaskAsync(p.Value));
+                var tasks = tasksToRun.Select(async p =>
+				{
+					await Task.Factory.StartNew(async () =>
+					{
+						try
+						{
+							await RunImageLoadingTaskAsync(p.Value).ConfigureAwait(false);
+						}
+						catch (Exception ex)
+						{
+							Logger.Error("TakeFromPendingTasksAndRun exception", ex);
+						}
+					}, CancellationToken.None, TaskCreationOptions.PreferFairness | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler, TaskScheduler.Default).ConfigureAwait(false);
+				});
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
@@ -347,7 +358,7 @@ namespace FFImageLoading.Work
                 if (Configuration.VerbosePerformanceLogging)
                 {
                     LogSchedulerStats();
-                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var stopwatch = Stopwatch.StartNew();
 
                     await pendingTask.RunAsync().ConfigureAwait(false);
 

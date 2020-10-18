@@ -1,7 +1,7 @@
 ﻿using System;
 namespace FFImageLoading
 {
-    public class DownloadInformation
+    public struct DownloadInformation
     {
         public DownloadInformation(string url, string customCacheKey, string fileName, bool allowDiskCaching, TimeSpan cacheValidity)
         {
@@ -12,13 +12,13 @@ namespace FFImageLoading
             CacheValidity = cacheValidity;
         }
 
-        public string Url { get; private set; }
+        public string Url { get; internal set; }
 
-        public string CustomCacheKey { get; private set; }
+        public string CustomCacheKey { get; internal set; }
 
-        public string FileName { get; private set; }
+        public string FileName { get; internal set; }
 
-        public bool AllowDiskCaching { get; private set; }
+        public bool AllowDiskCaching { get; internal set; }
 
         public TimeSpan CacheValidity { get; internal set; }
     }

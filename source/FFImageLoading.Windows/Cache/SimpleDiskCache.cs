@@ -60,17 +60,6 @@ namespace FFImageLoading.Cache
             initTask = Init();
         }
 
-        /// <summary>
-        /// Creates new cache default instance.
-        /// </summary>
-        /// <returns>The cache.</returns>
-        /// <param name="cacheName">Cache name.</param>
-        [Obsolete]
-        public static SimpleDiskCache CreateCache(string cacheName, Configuration configuration)
-        {
-            return new SimpleDiskCache(cacheName, configuration);
-        }
-
         protected Configuration Configuration { get; private set; }
         protected IMiniLogger Logger { get { return Configuration.Logger; } }
 
@@ -110,8 +99,8 @@ namespace FFImageLoading.Cache
             foreach (var file in await cacheFolder.GetFilesAsync())
             {
                 string key = Path.GetFileNameWithoutExtension(file.Name);
-                TimeSpan duration = GetDuration(file.FileType);
-                entries.TryAdd(key, new CacheEntry() { Origin = file.DateCreated.UtcDateTime, TimeToLive = duration, FileName = file.Name });
+                var duration = GetDuration(file.FileType);
+                entries.TryAdd(key, new CacheEntry(file.DateCreated.UtcDateTime, duration, file.Name));
             }
         }
 
@@ -138,7 +127,7 @@ namespace FFImageLoading.Cache
                 {
                     try
                     {
-                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", kvp.Key));
+                        Logger.Debug(string.Format("SimpleDiskCache: Removing expired file {0}", oldCacheEntry.FileName));
                         var file = await cacheFolder.GetFileAsync(oldCacheEntry.FileName);
                         await file.DeleteAsync();
                     }
@@ -328,7 +317,7 @@ namespace FFImageLoading.Cache
                     }
                 }
             }
-            catch (IOException) 
+            catch (IOException)
             {
                 cacheFolder = await rootFolder.CreateFolderAsync(cacheFolderName, CreationCollisionOption.OpenIfExists);
             }

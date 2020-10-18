@@ -6,6 +6,10 @@
                 <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" 
                     ReplaceStringMap="{Binding ReplaceMap}"
                     Source="resource://FFImageLoading.Forms.Sample.Resources.replace.svg" />
+                
+                <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" 
+                    Source="{Binding ImageSource}" />                
+                
                 <Button Text="Replace" Command="{Binding ReplaceCommand}"/>
             </StackLayout>
         </ScrollView>

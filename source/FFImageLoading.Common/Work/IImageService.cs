@@ -68,30 +68,35 @@ namespace FFImageLoading
         /// <param name="data">Data.</param>
         TaskParameter LoadBase64String(string data);
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a file from application bundle.
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="filepath">Path to the file.</param>
-        TaskParameter LoadFileFromApplicationBundle(string filepath);
+		/// <summary>
+		/// Load an image from a file from application bundle.
+		/// eg. assets on Android, compiled resource for other platforms
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="filepath">Path to the file.</param>
+		TaskParameter LoadFileFromApplicationBundle(string filepath);
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a compiled drawable resource.
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="resourceName">Name of the resource in drawable folder without extension</param>
-        TaskParameter LoadCompiledResource(string resourceName);
+		/// <summary>
+		/// Load an image from a file from application resource.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="resourceName">Name of the resource in drawable folder without extension</param>
+		TaskParameter LoadCompiledResource(string resourceName);
 
         /// <summary>
         /// Constructs a new TaskParameter to load an image from a compiled drawable resource.
         /// eg. resource://YourProject.Resource.Resource.png
         /// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
         /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="resourceUri">Uri of the resource</param>
         TaskParameter LoadEmbeddedResource(string resourceUri);
 
-        TaskParameter LoadEmbeddedResource(string resourceName, Assembly resourceAssembly);
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a compiled drawable resource.
+		/// eg. resource://YourProject.Resource.Resource.png
+		/// eg. resource://YourProject.Resource.Resource.png?assembly=[FULL_ASSEMBLY_NAME]
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		TaskParameter LoadEmbeddedResource(string resourceName, Assembly resourceAssembly);
 
         /// <summary>
         /// Constructs a new TaskParameter to load an image from a Stream.
@@ -118,17 +123,24 @@ namespace FFImageLoading
         /// <value><c>true</c> if pause work; otherwise, <c>false</c>.</value>
         bool PauseWork { get; }
 
-        /// <summary>
-        /// Sets a value indicating if all loading work should be paused (silently canceled).
-        /// </summary>
-        /// <param name="pauseWork">If set to <c>true</c> pause/cancel work.</param>
-        void SetPauseWork(bool pauseWork);
+		/// <summary>
+		/// Sets a value indicating if all loading work should be paused.
+		/// </summary>
+		/// <param name="pauseWork">If set to <c>true</c> pause work.</param>
+		/// <param name="cancelExisting">If set to <c>true</c> cancels existing tasks.</param>
+		void SetPauseWork(bool pauseWork, bool cancelExisting = false);
 
-        /// <summary>
-        /// Cancel any loading work for the given task
-        /// </summary>
-        /// <param name="task">Image loading task to cancel.</param>
-        void CancelWorkFor(IImageLoaderTask task);
+		/// <summary>
+		/// Sets a value indicating if all loading work should be paused. Also cancels existing tasks.
+		/// </summary>
+		/// <param name="pauseWork">If set to <c>true</c> pause work.</param>
+		void SetPauseWorkAndCancelExisting(bool pauseWork);
+
+		/// <summary>
+		/// Cancel any loading work for the given task
+		/// </summary>
+		/// <param name="task">Image loading task to cancel.</param>
+		void CancelWorkFor(IImageLoaderTask task);
 
         /// <summary>
         /// Cancel any loading work for the given view

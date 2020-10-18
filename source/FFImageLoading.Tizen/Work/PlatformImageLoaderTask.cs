@@ -9,13 +9,12 @@ using FFImageLoading.Decoders;
 using System.Collections.Generic;
 using System.Threading;
 using FFImageLoading.Extensions;
+using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<SharedEvasImage, SharedEvasImage, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(2, 2);
-
         public PlatformImageLoaderTask(ITarget<SharedEvasImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(EvasImageCache.Instance, target, parameters, imageService)
         {
         }
@@ -25,16 +24,16 @@ namespace FFImageLoading.Work
             return size.DpToPixels();
         }
 
-        protected override Task SetTargetAsync(SharedEvasImage image, bool animated)
+        protected override async Task SetTargetAsync(SharedEvasImage image, bool animated)
         {
-            if (Target == null)
-                return Task.FromResult(true);
+			if (Target == null)
+				return;
 
-            return MainThreadDispatcher.PostAsync(() =>
+            await MainThreadDispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override IDecoder<SharedEvasImage> ResolveDecoder(ImageInformation.ImageType type)
@@ -48,7 +47,7 @@ namespace FFImageLoading.Work
 
         protected override async Task<SharedEvasImage> TransformAsync(SharedEvasImage bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            await StaticLocks.DecodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
@@ -82,7 +81,7 @@ namespace FFImageLoading.Work
             }
             finally
             {
-                _decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
             }
 
             return bitmap;            
@@ -99,11 +98,5 @@ namespace FFImageLoading.Work
                 return Task.FromResult(decoded.Image);
             }
         }
-    }
-
-    static class EvasInterop
-    {
-        [DllImport("libevas.so.1")]
-        internal static extern void evas_object_image_load_scale_down_set(IntPtr obj, int scale);
     }
 }

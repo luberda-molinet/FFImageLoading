@@ -83,11 +83,6 @@ namespace FFImageLoading.Cache
         public void Clear()
         {
             _reusableBitmaps.Clear();
-
-            // Force immediate Garbage collection. Please note that is resource intensive.
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.WaitForPendingFinalizers();
             GC.Collect();
         }
 

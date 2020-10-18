@@ -41,6 +41,12 @@ namespace FFImageLoading
         /// <value>The instance.</value>
         public static IImageService Instance => _instance.Value;
 
+        /// <summary>
+        /// Set this to use FFImageLoading in a unit test environment. 
+        /// Instead throwing DoNotReference exception - use Mock implementation
+        /// </summary>
+        public static bool EnableMockImageService { get; set; }
+
         public static Func<EvasObject> MainWindowProvider { get; set; }
 
         protected override IMemoryCache<SharedEvasImage> MemoryCache => EvasImageCache.Instance;

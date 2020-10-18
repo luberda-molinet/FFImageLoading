@@ -172,7 +172,7 @@ namespace FFImageLoading.Forms.Platform
                 {
                     Element.SetIsLoading(false);
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         void OnSourceUpdated(object sender, EventArgs e)

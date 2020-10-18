@@ -7,10 +7,11 @@ using FFImageLoading.Forms.Sample;
 using Xamarin.Forms;
 using Xamvvm;
 using FFImageLoading.Forms.Sample.Pages;
+using FFImageLoading.Forms.Sample.Pages.Transformations;
 
 namespace FFImageLoading.Forms.Sample
 {
-    
+
     public class MenuPageModel : BasePageModel
     {
         public MenuPageModel()
@@ -76,7 +77,16 @@ namespace FFImageLoading.Forms.Sample
                     })
                 },
 
-                new MenuItem() {
+				new MenuItem() {
+					Section = "Advanced",
+					Title = "Exif tests",
+					Command = new BaseCommand(async (param) =>
+					{
+						await this.PushPageFromCacheAsync<ExifPageModel>();
+					})
+				},
+
+				new MenuItem() {
                     Section = "Advanced",
                     Title = "Custom CacheKey example",
                     Command = new BaseCommand(async (param) =>
@@ -120,6 +130,15 @@ namespace FFImageLoading.Forms.Sample
                 //		//TODO
                 //	})
                 //},
+
+                new MenuItem() {
+                    Section = "Transformations",
+                    Title = "ColorFillTransformation",
+                    Command = new BaseCommand(async (param) =>
+                    {
+                        await this.PushPageFromCacheAsync<ColorFillTransformationPageModel>(pm => pm.Reload());
+                    })
+                },
 
                 new MenuItem() {
                     Section = "Transformations",
@@ -315,7 +334,7 @@ namespace FFImageLoading.Forms.Sample
             }
         }
 
-        
+
         public class MenuItem : BaseModel
         {
             public string Section { get; set; }

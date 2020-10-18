@@ -30,6 +30,7 @@
     <LinkMode>None</LinkMode>
     <XamMacArch></XamMacArch>
     <AOTMode>None</AOTMode>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,6 +51,7 @@
     <XamMacArch></XamMacArch>
     <AOTMode>None</AOTMode>
     <DefineConstants>__MACOS__</DefineConstants>        
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

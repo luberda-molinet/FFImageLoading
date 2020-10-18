@@ -30,6 +30,7 @@
     <DebugType>portable</DebugType>        
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS;__WINDOWS__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +38,7 @@
     <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <DefineConstants>TRACE;WINDOWS;__WINDOWS__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>  
   
   <ItemGroup>
@@ -46,9 +48,6 @@
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj" />
     <ProjectReference Include="..\FFImageLoading.Windows\FFImageLoading.Windows.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\FFImageLoading.Transformations\CornerTransformType.cs">

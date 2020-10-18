@@ -8,23 +8,23 @@ namespace FFImageLoading.Transformations
     {
         public CropTransformation()
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public CropTransformation(double zoomFactor, double xOffset, double yOffset)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public CropTransformation(double zoomFactor, double xOffset, double yOffset, double cropWidthRatio, double cropHeightRatio)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			Helpers.ThrowOrDefault();
+		}
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
         {
-            throw new Exception(Common.DoNotReferenceMessage);
-        }
+			return Helpers.ThrowOrDefault<IBitmap>();
+		}
 
         public double ZoomFactor { get; set; }
         public double XOffset { get; set; }
@@ -32,13 +32,7 @@ namespace FFImageLoading.Transformations
         public double CropWidthRatio { get; set; }
         public double CropHeightRatio { get; set; }
 
-        public string Key
-        {
-            get
-            {
-                throw new Exception(Common.DoNotReferenceMessage);
-            }
-        }
-    }
+		public string Key => Helpers.ThrowOrDefault<string>();
+	}
 }
 

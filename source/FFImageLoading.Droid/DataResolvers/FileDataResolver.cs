@@ -1,6 +1,4 @@
-﻿using System;
-using Android.Graphics.Drawables;
-using FFImageLoading.Work;
+﻿using FFImageLoading.Work;
 using System.IO;
 using FFImageLoading.IO;
 using System.Threading.Tasks;

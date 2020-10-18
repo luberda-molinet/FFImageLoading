@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,12 +27,12 @@ namespace FFImageLoading.Work
             return new TaskParameter() { Source = ImageSource.Filepath, Path = filepath };
         }
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a file.
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="resourceUri">Uri to the resource.</param>
-        public static TaskParameter FromEmbeddedResource(string resourceUri)
+		/// <summary>
+		/// Load an image from a file from application resource.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="resourceUri">Uri to the resource.</param>
+		public static TaskParameter FromEmbeddedResource(string resourceUri)
         {
             if (!resourceUri.StartsWith("resource://", StringComparison.OrdinalIgnoreCase))
                 resourceUri = $"resource://{resourceUri}";
@@ -39,25 +40,26 @@ namespace FFImageLoading.Work
             return new TaskParameter() { Source = ImageSource.EmbeddedResource, Path = resourceUri };
         }
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a URL.
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="url">URL to the file</param>
-        /// <param name="cacheDuration">How long the file will be cached on disk</param>
-        public static TaskParameter FromUrl(string url, TimeSpan? cacheDuration = null)
+		/// <summary>
+		/// Load an image from a file from from a URL.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="url">URL to the file</param>
+		/// <param name="cacheDuration">How long the file will be cached on disk</param>
+		public static TaskParameter FromUrl(string url, TimeSpan? cacheDuration = null)
         {
             return new TaskParameter() { Source = ImageSource.Url, Path = url, CacheDuration = cacheDuration };
         }
 
         /// <summary>
-        /// Constructsa new TaskParameter to load an image from a file from application bundle.
+        /// Load an image from a file from application bundle.
+		/// eg. assets on Android, compiled resource for other platforms
         /// </summary>
-        /// <param name="filepath">Path to the file.</param>
+        /// <param name="filePath">Path to the file.</param>
         /// <returns>The new TaskParameter.</returns>
-        public static TaskParameter FromApplicationBundle(string filepath)
+        public static TaskParameter FromApplicationBundle(string filePath)
         {
-            var taskParameter = new TaskParameter() { Source = ImageSource.ApplicationBundle, Path = filepath };
+            var taskParameter = new TaskParameter() { Source = ImageSource.ApplicationBundle, Path = filePath };
 
             if (!taskParameter.Priority.HasValue)
                 taskParameter.Priority = (int)LoadingPriority.Normal + 1;
@@ -66,7 +68,7 @@ namespace FFImageLoading.Work
         }
 
         /// <summary>
-        /// Constructs a new TaskParameter to load an image from a compiled drawable resource.
+        /// Load an image from a compiled application resource
         /// </summary>
         /// <returns>The new TaskParameter.</returns>
         /// <param name="resourceName">Name of the resource in drawable folder without extension</param>
@@ -80,12 +82,12 @@ namespace FFImageLoading.Work
             return taskParameter;
         }
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a stream
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="stream">Stream.</param>
-        public static TaskParameter FromStream(Func<CancellationToken, Task<Stream>> stream)
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a stream
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="stream">Stream.</param>
+		public static TaskParameter FromStream(Func<CancellationToken, Task<Stream>> stream)
         {
             return new TaskParameter() { Source = ImageSource.Stream, Stream = stream };
         }
@@ -103,92 +105,125 @@ namespace FFImageLoading.Work
 
 
         internal Stream StreamRead { get; set; }
+        
+		internal string StreamChecksum { get; set; }
 
-        internal string StreamChecksum { get; set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public ImageSource Source { get; private set; }
 
-        public ImageSource Source { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public string Path { get; private set; }
 
-        public string Path { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
 
-        public Func<CancellationToken, Task<Stream>> Stream { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public TimeSpan? CacheDuration { get; private set; }
 
-        public TimeSpan? CacheDuration { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Tuple<int, int> DownSampleSize { get; private set; }
 
-        public Tuple<int, int> DownSampleSize { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool DownSampleUseDipUnits { get; private set; }
 
-        public bool DownSampleUseDipUnits { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? AllowUpscale { get; private set; }
 
-        public bool? AllowUpscale { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public InterpolationMode DownSampleInterpolationMode { get; private set; }
 
-        public InterpolationMode DownSampleInterpolationMode { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public ImageSource LoadingPlaceholderSource { get; private set; }
 
-        public ImageSource LoadingPlaceholderSource { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public string LoadingPlaceholderPath { get; private set; }
 
-        public string LoadingPlaceholderPath { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public ImageSource ErrorPlaceholderSource { get; private set; }
 
-        public ImageSource ErrorPlaceholderSource { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public string ErrorPlaceholderPath { get; private set; }
 
-        public string ErrorPlaceholderPath { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public int RetryCount { get; private set; }
 
-        public int RetryCount { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public int RetryDelayInMs { get; private set; }
 
-        public int RetryDelayInMs { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
 
-        public Action<ImageInformation, LoadingResult> OnSuccess { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<Exception> OnError { get; private set; }
 
-        public Action<Exception> OnError { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<IScheduledWork> OnFinish { get; private set; }
 
-        public Action<IScheduledWork> OnFinish { get; private set; }
-
-        public Action<DownloadInformation> OnDownloadStarted { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<DownloadInformation> OnDownloadStarted { get; private set; }
 
         internal Action OnLoadingPlaceholderSet { get; private set; }
 
-        public Action<FileWriteInfo> OnFileWriteFinished { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<FileWriteInfo> OnFileWriteFinished { get; private set; }
 
-        public Action<DownloadProgress> OnDownloadProgress { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public Action<DownloadProgress> OnDownloadProgress { get; private set; }
 
-        public List<ITransformation> Transformations { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public List<ITransformation> Transformations { get; private set; }
 
-        public bool? BitmapOptimizationsEnabled { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? BitmapOptimizationsEnabled { get; private set; }
 
-        public bool? FadeAnimationEnabled { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? FadeAnimationEnabled { get; private set; }
 
-        public IDataResolver CustomDataResolver { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public IDataResolver CustomDataResolver { get; private set; }
 
-        public IDataResolver CustomErrorPlaceholderDataResolver { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public IDataResolver CustomErrorPlaceholderDataResolver { get; private set; }
 
-        public IDataResolver CustomLoadingPlaceholderDataResolver { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public IDataResolver CustomLoadingPlaceholderDataResolver { get; private set; }
 
-        public bool? FadeAnimationForCachedImagesEnabled { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? FadeAnimationForCachedImagesEnabled { get; private set; }
 
-        public int? FadeAnimationDuration { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public int? FadeAnimationDuration { get; private set; }
 
-        public bool? TransformPlaceholdersEnabled { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? TransformPlaceholdersEnabled { get; private set; }
 
-        public string CustomCacheKey { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public string CustomCacheKey { get; private set; }
 
-        public int? Priority { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public int? Priority { get; private set; }
 
-        public CacheType? CacheType { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public CacheType? CacheType { get; private set; }
 
-        public DataEncodingType DataEncoding { get; private set; } = DataEncodingType.RAW;
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public DataEncodingType DataEncoding { get; private set; } = DataEncodingType.RAW;
 
-        public int? DelayInMs { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public int? DelayInMs { get; private set; }
 
-        public bool? InvalidateLayoutEnabled { get; private set; }
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool? InvalidateLayoutEnabled { get; private set; }
 
-        bool preload;
-        public bool Preload
+        private bool _preload;
+		[EditorBrowsable(EditorBrowsableState.Advanced)]
+		public bool Preload
         {
-            get
-            {
-                return preload;
-            }
+            get => _preload;
 
             internal set
             {
-                preload = value;
+                _preload = value;
 
                 if (value)
                 {
@@ -264,8 +299,9 @@ namespace FFImageLoading.Work
         }
 
         /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
+        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept.
         /// Uses pixels units for width/height
+		/// If both width / height is set, then height is ignored
         /// </summary>
         /// <returns>The TaskParameter instance for chaining the call.</returns>
         /// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
@@ -274,24 +310,29 @@ namespace FFImageLoading.Work
         public TaskParameter DownSample(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = false;
-            DownSampleSize = Tuple.Create(width, height);
+			width = Math.Max(0, width);
+			height = Math.Max(0, height);
+			DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
             return this;
         }
 
-        /// <summary>
-        /// Reduce memory usage by downsampling the image. Aspect ratio will be kept even if width/height values are incorrect.
-        /// Uses device independent points units for width/height
-        /// </summary>
-        /// <returns>The TaskParameter instance for chaining the call.</returns>
-        /// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
-        /// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
-        /// <param name="allowUpscale">Whether to upscale the image if it is smaller than passed dimensions or not; if <c>null</c> the value is taken from Configuration (<c>false</c> by default)</param>
-        public TaskParameter DownSampleInDip(int width = 0, int height = 0, bool? allowUpscale = null)
+		/// <summary>
+		/// Reduce memory usage by downsampling the image. Aspect ratio will be kept.
+		/// Uses device independent points units for width/height
+		/// If both width / height is set, then height is ignored
+		/// </summary>
+		/// <returns>The TaskParameter instance for chaining the call.</returns>
+		/// <param name="width">Optional width parameter, if value is higher than zero it will try to downsample to this width while keeping aspect ratio.</param>
+		/// <param name="height">Optional height parameter, if value is higher than zero it will try to downsample to this height while keeping aspect ratio.</param>
+		/// <param name="allowUpscale">Whether to upscale the image if it is smaller than passed dimensions or not; if <c>null</c> the value is taken from Configuration (<c>false</c> by default)</param>
+		public TaskParameter DownSampleInDip(int width = 0, int height = 0, bool? allowUpscale = null)
         {
             DownSampleUseDipUnits = true;
-            DownSampleSize = Tuple.Create(width, height);
+			width = Math.Max(0, width);
+			height = Math.Max(0, height);
+			DownSampleSize = Tuple.Create(width, width > 0 ? 0 : height);
             AllowUpscale = allowUpscale;
 
             return this;
@@ -470,10 +511,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when loading succeded. Argument is the size of the image loaded.</param>
         public TaskParameter Success(Action<ImageInformation, LoadingResult> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnSuccess = action;
+            OnSuccess = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -484,10 +522,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when loading failed</param>
         public TaskParameter Error(Action<Exception> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnError = action;
+            OnError = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -498,10 +533,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action to invoke when process is done</param>
         public TaskParameter Finish(Action<IScheduledWork> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnFinish = action;
+            OnFinish = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -512,10 +544,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter DownloadStarted(Action<DownloadInformation> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnDownloadStarted = action;
+            OnDownloadStarted = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -526,10 +555,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter DownloadProgress(Action<DownloadProgress> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnDownloadProgress = action;
+            OnDownloadProgress = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -540,10 +566,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         public TaskParameter FileWriteFinished(Action<FileWriteInfo> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnFileWriteFinished = action;
+            OnFileWriteFinished = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -554,10 +577,7 @@ namespace FFImageLoading.Work
         /// <param name="action">Action.</param>
         internal TaskParameter LoadingPlaceholderSet(Action action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            OnLoadingPlaceholderSet = action;
+            OnLoadingPlaceholderSet = action ?? throw new ArgumentNullException(nameof(action));
             return this;
         }
 
@@ -573,6 +593,8 @@ namespace FFImageLoading.Work
         {
             if (!_disposed)
             {
+                _disposed = true;
+
                 OnSuccess = null;
                 OnError = null;
                 OnFinish = null;
@@ -583,8 +605,6 @@ namespace FFImageLoading.Work
                 Stream = null;
                 StreamRead.TryDispose();
                 StreamRead = null;
-
-                _disposed = true;
             }
         }
     }

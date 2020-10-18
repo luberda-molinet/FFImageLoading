@@ -72,7 +72,7 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetFilePath(file.Path);
 
                 token.ThrowIfCancellationRequested();
-                var stream = await file.OpenStreamForReadAsync();
+                var stream = await file.OpenStreamForReadAsync().ConfigureAwait(false);
 
                 return new DataResolverResult(stream, LoadingResult.CompiledResource, imageInformation);
             }

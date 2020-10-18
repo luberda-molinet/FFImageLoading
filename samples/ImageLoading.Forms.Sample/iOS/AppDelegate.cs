@@ -14,6 +14,7 @@ namespace FFImageLoading.Forms.Sample.iOS
         {
             global::Xamarin.Forms.Forms.Init();
             CachedImageRenderer.Init();
+			CachedImageRenderer.InitImageSourceHandler();
 
             var config = new FFImageLoading.Config.Configuration()
             {

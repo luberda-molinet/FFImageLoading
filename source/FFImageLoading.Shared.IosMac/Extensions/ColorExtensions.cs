@@ -19,7 +19,7 @@ namespace FFImageLoading
             if (!hexColor.StartsWith("#", StringComparison.Ordinal))
                 hexColor = hexColor.Insert(0, "#");
 
-            PColor color = PColor.Clear;
+            var color = PColor.Clear;
 
             switch (hexColor.Length)
             {

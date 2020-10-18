@@ -49,7 +49,7 @@ namespace FFImageLoading.Helpers
             {
                 try
                 {
-                    await action?.Invoke();
+                    await (action?.Invoke()).ConfigureAwait(false);
                     tcs.SetResult(true);
                 }
                 catch (Exception ex)
@@ -63,7 +63,7 @@ namespace FFImageLoading.Helpers
                 {
                     try
                     {
-                        await action?.Invoke();
+                        await (action?.Invoke()).ConfigureAwait(false);
                         tcs.SetResult(true);
                     }
                     catch (Exception ex)
@@ -73,7 +73,7 @@ namespace FFImageLoading.Helpers
                 });
             }
 
-            await tcs.Task;
+            await tcs.Task.ConfigureAwait(false);
         }
     }
 }

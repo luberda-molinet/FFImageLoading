@@ -128,8 +128,11 @@ namespace FFImageLoading
                     {
                     }
                 }
+                
+				if (StaticLocks.DecodingLock == null)
+					StaticLocks.DecodingLock = new SemaphoreSlim(userDefinedConfig.DecodingMaxParallelTasks, userDefinedConfig.DecodingMaxParallelTasks);
 
-                if (userDefinedConfig.Logger == null || !(userDefinedConfig.Logger is MiniLoggerWrapper))
+				if (userDefinedConfig.Logger == null || !(userDefinedConfig.Logger is MiniLoggerWrapper))
                     userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(userDefinedConfig), userDefinedConfig.VerboseLogging);
 
                 userDefinedConfig.MD5Helper = userDefinedConfig.MD5Helper ?? CreatePlatformMD5HelperInstance(userDefinedConfig);
@@ -191,14 +194,17 @@ namespace FFImageLoading
             return TaskParameter.FromStream(stream);
         }
 
-        public void SetExitTasksEarly(bool exitTasksEarly)
+		[Obsolete("Use SetPauseWork(bool pauseWork, bool cancelExistingTasks = false)")]
+		public void SetExitTasksEarly(bool exitTasksEarly)
         {
             Scheduler.SetExitTasksEarly(exitTasksEarly);
         }
 
-        public void SetPauseWork(bool pauseWork)
+		public void SetPauseWorkAndCancelExisting(bool pauseWork) => SetPauseWork(pauseWork, true);
+
+		public void SetPauseWork(bool pauseWork, bool cancelExisting = false)
         {
-            Scheduler.SetPauseWork(pauseWork);
+            Scheduler.SetPauseWork(pauseWork, cancelExisting);
         }
 
         public void CancelWorkFor(IImageLoaderTask task)

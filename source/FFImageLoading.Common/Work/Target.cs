@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace FFImageLoading.Work
+﻿namespace FFImageLoading.Work
 {
     public class Target<TImageContainer, TImageView>: ITarget<TImageContainer, TImageView>
     {
-        public virtual TImageView Control => default(TImageView);
+        public virtual TImageView Control => default;
 
         public virtual bool IsValid { get; } = true;
 

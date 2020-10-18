@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -9,30 +7,25 @@ using FFImageLoading.Cache;
 using FFImageLoading.Config;
 using FFImageLoading.Drawables;
 using FFImageLoading.Extensions;
-using FFImageLoading.Helpers;
 using FFImageLoading.Work;
-using FFImageLoading.Views;
 using FFImageLoading.Decoders;
 using System.Collections.Generic;
+using FFImageLoading.Helpers;
+using Android.Widget;
 
 namespace FFImageLoading
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<Bitmap, SelfDisposingBitmapDrawable, TImageView> where TImageView : class
     {
-        static readonly SemaphoreSlim _decodingLock = new SemaphoreSlim(1, 1);
-        GifDecoder _gifDecoder = new GifDecoder();
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+        private static readonly Color _placeholderHelperColor = Color.Argb(1, 255, 255, 255);
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
         public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
         {
         }
 
-        protected Context Context
-        {
-            get
-            {
-                return new ContextWrapper(Android.App.Application.Context);
-            }
-        }
+        protected Context Context => new ContextWrapper(Android.App.Application.Context);
 
         protected async override Task SetTargetAsync(SelfDisposingBitmapDrawable image, bool animated)
         {
@@ -41,10 +34,9 @@ namespace FFImageLoading
 
             ThrowIfCancellationRequested();
 
-            var ffDrawable = image as FFBitmapDrawable;
-            if (ffDrawable != null)
+            if (image is FFBitmapDrawable ffDrawable)
             {
-                if (ffDrawable.IsAnimationRunning)
+                if (ffDrawable.IsFadeAnimationRunning)
                 {
                     var mut = new FFBitmapDrawable(Context.Resources, ffDrawable.Bitmap, ffDrawable);
                     ffDrawable = mut as FFBitmapDrawable;
@@ -62,18 +54,31 @@ namespace FFImageLoading
                     if (placeholderDrawable == null)
                     {
                         // Enable fade animation when no placeholder is set and the previous image is not null
-                        var imageView = PlatformTarget.Control as ImageViewAsync;
+                        var imageView = PlatformTarget.Control as ImageView;
                         placeholderDrawable = imageView?.Drawable as SelfDisposingBitmapDrawable;
                     }
 
+                    var fadeDuration = Parameters.FadeAnimationDuration ?? Configuration.FadeAnimationDuration;
+
                     if (placeholderDrawable.IsValidAndHasValidBitmap())
                     {
-                        int fadeDuration = Parameters.FadeAnimationDuration.HasValue ?
-                            Parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration;
-
                         placeholderDrawable?.SetIsRetained(true);
                         ffDrawable?.SetPlaceholder(placeholderDrawable, fadeDuration);
                         placeholderDrawable?.SetIsRetained(false);
+                    }
+                    else if (ffDrawable.IsValidAndHasValidBitmap())
+                    {
+                        var width = ffDrawable.Bitmap.Width;
+                        var height = ffDrawable.Bitmap.Height;
+                        var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+
+                        using (var canvas = new Canvas(bitmap))
+                        using (var paint = new Paint() { Color = _placeholderHelperColor })
+                        {
+                            canvas.DrawRect(0, 0, width, height, paint);
+                        }
+
+                        ffDrawable?.SetPlaceholder(new SelfDisposingBitmapDrawable(Context.Resources, bitmap), fadeDuration);
                     }
                 }
                 else
@@ -122,7 +127,7 @@ namespace FFImageLoading
 
         protected override async Task<Bitmap> TransformAsync(Bitmap bitmap, IList<ITransformation> transformations, string path, ImageSource source, bool isPlaceholder)
         {
-            await _decodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
+            await StaticLocks.DecodingLock.WaitAsync(CancellationTokenSource.Token).ConfigureAwait(false); // Applying transformations is both CPU and memory intensive
             ThrowIfCancellationRequested();
 
             try
@@ -159,8 +164,7 @@ namespace FFImageLoading
             }
             catch (Exception ex)
             {
-                var javaException = ex as Java.Lang.Throwable;
-                if (javaException != null && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+                if (ex is Java.Lang.Throwable javaException && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
                 {
                     throw new OutOfMemoryException();
                 }
@@ -169,7 +173,7 @@ namespace FFImageLoading
             }
             finally
             {
-                _decodingLock.Release();
+				StaticLocks.DecodingLock.Release();
             }
 
             return bitmap;
@@ -183,7 +187,7 @@ namespace FFImageLoading
 
                 if (decoded.IsAnimated)
                 {
-                    result = new FFGifDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
+                    result = new FFAnimatedDrawable(Context.Resources, decoded.AnimatedImages[0].Image, decoded.AnimatedImages);
                 }
                 else
                 {
@@ -206,9 +210,11 @@ namespace FFImageLoading
             }
             catch (Exception ex)
             {
-                var javaException = ex as Java.Lang.Throwable;
-                if (javaException != null && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
+                if (ex is Java.Lang.Throwable javaException && javaException.Class == Java.Lang.Class.FromType(typeof(Java.Lang.OutOfMemoryError)))
                 {
+                    if (Configuration.ClearMemoryCacheOnOutOfMemory)
+                        Java.Lang.JavaSystem.Gc();
+
                     throw new OutOfMemoryException();
                 }
 

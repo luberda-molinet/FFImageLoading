@@ -10,13 +10,15 @@ namespace FFImageLoading.Work
         /// <param name="predicate">Predicate for finding relevant tasks to cancel.</param>
         void Cancel(Func<IImageLoaderTask, bool> predicate);
 
+		[Obsolete("Use SetPauseWork(bool pauseWork, bool cancelExistingTasks = false)")]
         bool ExitTasksEarly { get; }
 
-        void SetExitTasksEarly(bool exitTasksEarly);
+		[Obsolete("Use SetPauseWork(bool pauseWork, bool cancelExistingTasks = false)")]
+		void SetExitTasksEarly(bool exitTasksEarly);
 
         bool PauseWork { get; }
 
-        void SetPauseWork(bool pauseWork);
+        void SetPauseWork(bool pauseWork, bool cancelExisting = false);
 
         void RemovePendingTask(IImageLoaderTask task);
 

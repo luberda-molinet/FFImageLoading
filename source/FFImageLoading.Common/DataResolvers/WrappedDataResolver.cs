@@ -4,13 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
-using System.Text;
 
 namespace FFImageLoading.DataResolvers
 {
     public class WrappedDataResolver : IDataResolver
     {
-        readonly IDataResolver _resolver;
+        private readonly IDataResolver _resolver;
 
         public WrappedDataResolver(IDataResolver resolver)
         {
@@ -19,21 +18,12 @@ namespace FFImageLoading.DataResolvers
 
         public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
-            var resolved = await _resolver.Resolve(identifier, parameters, token);
+            var resolved = await _resolver.Resolve(identifier, parameters, token).ConfigureAwait(false);
 
-            if (resolved.Stream == null && resolved.ImageContainer == null)
-                throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.ImageContainer)}");
+            if (resolved.Stream == null && resolved.Decoded == null)
+                throw new ArgumentNullException($"{nameof(resolved.Stream)} and {nameof(resolved.Decoded)}");
 
-            if (resolved.Stream != null && !resolved.Stream.CanSeek)
-            {
-                using (resolved.Stream)
-                {
-                    var memoryStream = new MemoryStream();
-                    await resolved.Stream.CopyToAsync(memoryStream);
-                    memoryStream.Position = 0;
-                    resolved = new DataResolverResult(memoryStream, resolved.LoadingResult, resolved.ImageInformation);
-                }
-            }
+			resolved.Stream = await resolved.Stream.AsSeekableStreamAsync().ConfigureAwait(false);
 
             if (resolved.Stream != null)
             {
@@ -47,12 +37,11 @@ namespace FFImageLoading.DataResolvers
                 {
                     //READ HEADER
                     const int headerLength = 4;
-                    byte[] header = new byte[headerLength];
-                    int offset = 0;
+                    var header = new byte[headerLength];
+                    var offset = 0;
                     while (offset < headerLength)
                     {
-                        int read = await resolved.Stream.ReadAsync(header, offset, headerLength - offset);
-                        offset += read;
+                        offset += await resolved.Stream.ReadAsync(header, offset, headerLength - offset).ConfigureAwait(false);
                     }
 
                     resolved.Stream.Position = 0;

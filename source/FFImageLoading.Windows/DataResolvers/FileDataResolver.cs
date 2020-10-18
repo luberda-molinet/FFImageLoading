@@ -18,7 +18,7 @@ namespace FFImageLoading.DataResolvers
                 var filePath = Path.GetDirectoryName(identifier);
                 if (!string.IsNullOrWhiteSpace(filePath))
                 {
-                    file = await Cache.FFSourceBindingCache.GetFileAsync(identifier);
+                    file = await Cache.FFSourceBindingCache.GetFileAsync(identifier).ConfigureAwait(false);
                 }
             }
             catch (Exception)
@@ -32,7 +32,7 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetFilePath(identifier);
 
                 token.ThrowIfCancellationRequested();
-                var stream = await file.OpenStreamForReadAsync();
+                var stream = await file.OpenStreamForReadAsync().ConfigureAwait(false);
 
                 return new DataResolverResult(stream, LoadingResult.Disk, imageInformation);
             }

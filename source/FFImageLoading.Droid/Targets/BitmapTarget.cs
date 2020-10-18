@@ -1,5 +1,4 @@
 ﻿using System;
-using Android.Graphics.Drawables;
 using FFImageLoading.Work;
 using FFImageLoading.Drawables;
 
@@ -7,7 +6,7 @@ namespace FFImageLoading.Targets
 {
     public class BitmapTarget : Target<SelfDisposingBitmapDrawable, ISelfDisposingBitmapDrawable>
     {
-        WeakReference<SelfDisposingBitmapDrawable> _drawableWeakReference = null;
+        private WeakReference<SelfDisposingBitmapDrawable> _drawableWeakReference;
 
         public override void Set(IImageLoaderTask task, SelfDisposingBitmapDrawable image, bool animated)
         {
@@ -27,8 +26,7 @@ namespace FFImageLoading.Targets
                 if (_drawableWeakReference == null)
                     return null;
 
-                SelfDisposingBitmapDrawable drawable = null;
-                _drawableWeakReference.TryGetTarget(out drawable);
+                _drawableWeakReference.TryGetTarget(out var drawable);
                 var sdDrawable = drawable as SelfDisposingBitmapDrawable;
                 sdDrawable?.SetIsDisplayed(true);
 

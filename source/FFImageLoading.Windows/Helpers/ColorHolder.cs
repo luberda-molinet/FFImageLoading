@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading
 {
-    public struct ColorHolder
+    public readonly struct ColorHolder
     {
         public ColorHolder(int a, int r, int g, int b)
         {
@@ -34,13 +34,13 @@ namespace FFImageLoading
             B = Convert.ToByte(Math.Min(Math.Max(0, b), 255));
         }
 
-        public byte A { get; private set; }
+        public readonly byte A;
 
-        public byte R { get; private set; }
+        public readonly byte R;
 
-        public byte G { get; private set; }
+        public readonly byte G;
 
-        public byte B { get; private set; }
+        public readonly byte B;
 
         public static readonly ColorHolder Transparent = new ColorHolder(0, 0, 0, 0);
     }

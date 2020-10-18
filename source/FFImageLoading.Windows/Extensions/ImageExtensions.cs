@@ -24,7 +24,7 @@ namespace FFImageLoading.Extensions
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
-            });
+            }).ConfigureAwait(false);
 
             return writeableBitmap;
         }
@@ -60,7 +60,7 @@ namespace FFImageLoading.Extensions
                         {
                             resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                             await resizedBitmap.SetSourceAsync(downscaledImage);
-                        });
+                        }).ConfigureAwait(false);
 
                         return resizedBitmap;
                     }
@@ -81,7 +81,7 @@ namespace FFImageLoading.Extensions
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         await bitmap.SetSourceAsync(image);
-                    });
+                    }).ConfigureAwait(false);
 
                     return bitmap;
                 }

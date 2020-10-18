@@ -10,9 +10,8 @@
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AndroidResgenClass>Resource</AndroidResgenClass>
-    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>FFImageLoading.Transformations</AssemblyName>
-    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
     <NoWarn>1701;1702;1705;1591;1587;NU1605</NoWarn> 
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -26,6 +25,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <ConsolePause>false</ConsolePause>
     <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +39,7 @@
     <ConsolePause>false</ConsolePause>
     <DocumentationFile>bin\Release\FFImageLoading.Transformations.xml</DocumentationFile>
     <DefineConstants>ANDROID;__ANDROID__;</DefineConstants>        
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -64,6 +65,7 @@
     <Compile Include="CropTransformation.cs" />
     <Compile Include="RotateTransformation.cs" />
     <Compile Include="TintTransformation.cs" />
+    <Compile Include="ColorFillTransformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FFImageLoading.Common\FFImageLoading.csproj">

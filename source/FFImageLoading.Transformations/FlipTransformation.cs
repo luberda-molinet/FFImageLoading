@@ -8,28 +8,22 @@ namespace FFImageLoading.Transformations
 	{
 		public FlipTransformation()
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
 		public FlipTransformation(FlipType flipType)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			Helpers.ThrowOrDefault();
 		}
 
         public IBitmap Transform(IBitmap sourceBitmap, string path, ImageSource source, bool isPlaceholder, string key)
 		{
-			throw new Exception(Common.DoNotReferenceMessage);
+			return Helpers.ThrowOrDefault<IBitmap>();
 		}
 
         public FlipType FlipType { get; set; }
 
-		public string Key
-		{
-			get
-			{
-				throw new Exception(Common.DoNotReferenceMessage);
-			}
-		}
+		public string Key => Helpers.ThrowOrDefault<string>();
 	}
 }
 

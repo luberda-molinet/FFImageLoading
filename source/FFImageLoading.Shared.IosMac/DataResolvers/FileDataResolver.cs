@@ -14,7 +14,7 @@ namespace FFImageLoading.DataResolvers
         {
             string file = null;
 
-            int scale = (int)ScaleHelper.Scale;
+            var scale = (int)ScaleHelper.Scale;
             if (scale > 1)
             {
                 var filename = Path.GetFileNameWithoutExtension(identifier);

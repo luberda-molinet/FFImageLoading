@@ -27,7 +27,7 @@ namespace FFImageLoading.Cache
                     _cache.Clear();
                 }
 
-                StorageFile file = await GetFileAsync(path);
+                StorageFile file = await GetFileAsync(path).ConfigureAwait(false);
                 _cache.Add(path, new Tuple<bool, StorageFile>(file != null, file));
                 return file != null;
             }

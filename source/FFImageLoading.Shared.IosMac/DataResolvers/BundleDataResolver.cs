@@ -22,14 +22,13 @@ namespace FFImageLoading.DataResolvers
 {
     public class BundleDataResolver : IDataResolver
     {
-        readonly string[] _fileTypes = { null, "png", "jpg", "jpeg", "webp", "gif" };
+        private readonly string[] _fileTypes = { null, "png", "jpg", "jpeg", "webp", "gif" };
 
         public virtual async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
             var fileName = Path.GetFileNameWithoutExtension(identifier);
-            DataResolverResult result = null;
 
-            result = await ResolveFromBundlesAsync(fileName, identifier, parameters, token).ConfigureAwait(false);
+            var result = await ResolveFromBundlesAsync(fileName, identifier, parameters, token).ConfigureAwait(false);
             if (result != null)
                 return result;
 
@@ -48,7 +47,7 @@ namespace FFImageLoading.DataResolvers
             throw new FileNotFoundException(identifier);
         }
 
-        Task<DataResolverResult> ResolveFromBundlesAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private Task<DataResolverResult> ResolveFromBundlesAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
             NSBundle bundle = null;
             var ext = Path.GetExtension(identifier)?.TrimStart(new char[] { '.' });
@@ -65,7 +64,7 @@ namespace FFImageLoading.DataResolvers
 
                 token.ThrowIfCancellationRequested();
 
-                int scale = (int)ScaleHelper.Scale;
+                var scale = (int)ScaleHelper.Scale;
                 if (scale > 1)
                 {
                     while (scale > 1)
@@ -123,7 +122,7 @@ namespace FFImageLoading.DataResolvers
             return Task.FromResult<DataResolverResult>(null);
         }
 
-        async Task<DataResolverResult> ResolveFromAssetCatalogAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private async Task<DataResolverResult> ResolveFromAssetCatalogAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
 #if __IOS__
             if (!UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
@@ -136,7 +135,7 @@ namespace FFImageLoading.DataResolvers
             {
                 await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => asset = new NSDataAsset(identifier, NSBundle.MainBundle)).ConfigureAwait(false);
             }
-            catch (Exception) { }
+            catch { }
 
             if (asset == null && fileName != identifier)
             {
@@ -144,7 +143,7 @@ namespace FFImageLoading.DataResolvers
                 {
                     await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => asset = new NSDataAsset(fileName, NSBundle.MainBundle)).ConfigureAwait(false);
                 }
-                catch (Exception) { }
+                catch { }
             }
 
             if (asset != null)
@@ -161,31 +160,31 @@ namespace FFImageLoading.DataResolvers
             return null;
         }
 
-        async Task<DataResolverResult> ResolveFromNamedResourceAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
+        private async Task<DataResolverResult> ResolveFromNamedResourceAsync(string fileName, string identifier, TaskParameter parameters, CancellationToken token)
         {
             PImage image = null;
 
             try
             {
 #if __IOS__
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(identifier));
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(identifier)).ConfigureAwait(false);
 #elif __MACOS__
-                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(identifier));
+                await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(identifier)).ConfigureAwait(false);
 #endif
             }
-            catch (Exception) { }
+            catch { }
 
             if (image == null && fileName != identifier)
             {
                 try
                 {
 #if __IOS__
-                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(fileName));
+                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.FromBundle(fileName)).ConfigureAwait(false);
 #elif __MACOS__
-                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(fileName));
+					await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() => image = PImage.ImageNamed(fileName)).ConfigureAwait(false);
 #endif
                 }
-                catch (Exception) { }
+                catch { }
             }
 
             if (image != null)
@@ -196,12 +195,12 @@ namespace FFImageLoading.DataResolvers
                 imageInformation.SetPath(identifier);
                 imageInformation.SetFilePath(null);
 
-                var result = new DataResolverResult()
+                var container = new DecodedImage<object>()
                 {
-                    ImageContainer = image,
-                    LoadingResult = LoadingResult.CompiledResource,
-                    ImageInformation = imageInformation,
+                    Image = image
                 };
+
+                var result = new DataResolverResult(container, LoadingResult.CompiledResource, imageInformation);
 
                 return result;
             }
