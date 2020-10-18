@@ -99,10 +99,4 @@ namespace FFImageLoading.Work
             }
         }
     }
-
-    static class EvasInterop
-    {
-        [DllImport("libevas.so.1")]
-        internal static extern void evas_object_image_load_scale_down_set(IntPtr obj, int scale);
-    }
 }
