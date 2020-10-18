@@ -21,7 +21,7 @@ namespace FFImageLoading.Tests.Cache
 
             byte[] bytes = new byte[] { 00, 01, 00, 01 };
 
-            await diskCache.AddToSavingQueueIfNotExistsAsync(key, bytes, TimeSpan.FromDays(1), null);
+            await diskCache.AddToSavingQueueIfNotExistsAsync(key, bytes, TimeSpan.FromDays(1));
             Assert.True(await diskCache.ExistsAsync(key));
 
             var found = await diskCache.TryGetStreamAsync(key);
