@@ -65,17 +65,17 @@ namespace FFImageLoading.Cache
 
             if (allowDiskCaching)
             {
-                Action finishedAction = null;
-                var onFileWriteFinished = parameters?.OnFileWriteFinished;
+				Action<FileWriteInfo> finishedAction = null;
+				var onFileWriteFinished = parameters?.OnFileWriteFinished;
                 if (onFileWriteFinished != null)
                 {
-                    finishedAction = new Action(() =>
+                    finishedAction = (fileWriteInfo) =>
                     {
-                        onFileWriteFinished?.Invoke(new FileWriteInfo(filePath, url));
-                    });
+                        onFileWriteFinished?.Invoke(fileWriteInfo);
+                    };
                 }
 
-                await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, downloadInfo.CacheValidity, finishedAction).ConfigureAwait(false);
+				await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, downloadInfo.CacheValidity, url, finishedAction).ConfigureAwait(false);
             }
 
             token.ThrowIfCancellationRequested();
