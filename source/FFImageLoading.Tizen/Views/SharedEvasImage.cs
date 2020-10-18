@@ -1,4 +1,5 @@
-﻿using ElmSharp;
+﻿using System.Reflection;
+using ElmSharp;
 
 namespace FFImageLoading.Views
 {
@@ -44,6 +45,30 @@ namespace FFImageLoading.Views
                     image.Unrealize();
                 });
             }
+        }
+    }
+
+    internal static class EvasImageEx
+    {
+        public static void SetScaleDown(this EvasImage evasImage, int scale)
+        {
+            var interop = typeof(EvasObject).Assembly.GetType("Interop");
+            var elementary = interop?.GetNestedType("Elementary", BindingFlags.NonPublic | BindingFlags.Static) ?? null;
+            var method = elementary?.GetMethod("evas_object_image_load_scale_down_set", BindingFlags.NonPublic | BindingFlags.Static);
+            if (method != null)
+            {
+                method.Invoke(null, new object[] { evasImage.RealHandle, scale });
+            }
+            else
+            {
+                System.Console.WriteLine("No API evas_object_image_load_scale_down_set");
+            }
+        }
+
+
+        public static void Save(this EvasImage evasImage, string file, string key, string flags)
+        {
+            typeof(EvasImage)?.GetMethod("Save")?.Invoke(evasImage, new[] { file, key, flags });
         }
     }
 }

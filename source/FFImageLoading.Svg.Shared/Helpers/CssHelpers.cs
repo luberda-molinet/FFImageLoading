@@ -26,9 +26,26 @@ namespace FFImageLoading.Svg.Platform
 
             foreach (var item in items)
             {
-                destination.Add(item.Key, item.Value);
+                destination.AddOrUpdate(item.Key, item.Value);
             }
         }
+		
+		static void AddOrUpdate(this Dictionary<string,string> source, string key, string value)
+		{
+			if(value == null) 
+			{
+				return;
+			}
+			
+			if(source.ContainsKey(key))
+			{
+				source[key] += value;
+			}
+			else
+			{
+				source.Add(key, value);
+			}
+		}
 
         static string Minify(this string css) => Regex.Replace(css, @"(\r\n|\r|\n)", string.Empty).Trim();
 

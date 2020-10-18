@@ -261,3 +261,5 @@ artifacts/
 
 # dotnet tools
 .store/
+source/FFImageLoading.Svg.Windows/.droidres/.ffimageloading.svg.windows.droidres.db
+.droidres/.ffimageloading.droidres.db

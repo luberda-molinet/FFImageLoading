@@ -308,7 +308,7 @@ namespace FFImageLoading.Svg.Platform
 				{
 					case "image":
 						{
-							var image = ReadImage(e);
+							var image = ReadImage(e, canvas.DeviceClipBounds);
 							if (image.Bytes != null)
 							{
 								using (var bitmap = SKBitmap.Decode(image.Bytes))
@@ -490,10 +490,22 @@ namespace FFImageLoading.Svg.Platform
 			}
 		}
 
-		private SKSvgImage ReadImage(XElement e)
+		private SKSvgImage ReadImage(XElement e, SKRect sKRect)
 		{
 			var width = ReadNumber(e.Attribute("width"));
 			var height = ReadNumber(e.Attribute("height"));
+			if(e.Attribute("width")?.Value?.Contains("%") == true)
+			{
+				width = ReadNumber(e.Attribute("width")?.Value.Replace("%", ""));
+				width = sKRect.Width * (width / 100.0f);
+			}
+
+			if (e.Attribute("height")?.Value?.Contains("%") == true)
+			{
+				height = ReadNumber(e.Attribute("height")?.Value.Replace("%", ""));
+				height = sKRect.Height * (height / 100.0f);
+			}
+
 			var rect = SKRect.Create(width, height);
 
 			byte[] bytes = null;
@@ -1723,15 +1735,19 @@ namespace FFImageLoading.Svg.Platform
 		private SortedDictionary<float, SKColor> ReadStops(XElement e)
 		{
 			var stops = new SortedDictionary<float, SKColor>();
-
 			var ns = e.Name.Namespace;
 			foreach (var se in e.Elements(ns + "stop"))
 			{
 				var style = ReadStyle(se);
 
-				var offset = ReadNumber(style["offset"]);
+				float offset = 0;
 				var color = SKColors.Black;
 				byte alpha = 255;
+
+				if (style.TryGetValue("offset", out string offsetValue))
+				{
+					offset = ReadNumber(offsetValue);
+				}
 
 				if (style.TryGetValue("stop-color", out string stopColor))
 				{
