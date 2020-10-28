@@ -12,6 +12,7 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FFImageLoading.Helpers;
+using FFImageLoading.Cache;
 
 #if __IOS__
 using Foundation;
@@ -43,6 +44,7 @@ namespace FFImageLoading.Svg.Platform
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 		private static readonly object _encodingLock = new object();
+		private static readonly SimpleLRUCache<string, SKPicture> _cache = new SimpleLRUCache<string, SKPicture>(50);
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
 #if __IOS__
@@ -205,62 +207,81 @@ namespace FFImageLoading.Svg.Platform
 
 		public async Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
-            var source = parameters.Source;
+			var replaceStringMapKey = (ReplaceStringMap == null || ReplaceStringMap.Count == 0) 
+				? null : string.Join(",", ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v));
+			var key = replaceStringMapKey == null ? identifier : $"{identifier};{replaceStringMapKey}";
 
-            if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
-                source = parameters.LoadingPlaceholderSource;
-            else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
-                source = parameters.ErrorPlaceholderSource;
+			DataResolverResult resolvedData;
 
-            var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
-                                            .GetResolver(identifier, source, parameters, Configuration)
-                                            .Resolve(identifier, parameters, token).ConfigureAwait(false);
+			if (_cache.TryGetValue(key, out var picture))
+			{
+				resolvedData = new DataResolverResult()
+				{
+					LoadingResult = LoadingResult.MemoryCache,
+					ImageInformation = new ImageInformation()
+				};
+			}
+			else
+			{
+				var source = parameters.Source;
 
-            if (resolvedData?.Stream == null)
-                throw new FileNotFoundException(identifier);
+				if (!string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) && parameters.LoadingPlaceholderPath == identifier)
+					source = parameters.LoadingPlaceholderSource;
+				else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
+					source = parameters.ErrorPlaceholderSource;
 
-            var svg = new SKSvg()
-            {
-                ThrowOnUnsupportedElement = false,
-            };
-            SKPicture picture;
+				resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
+												.GetResolver(identifier, source, parameters, Configuration)
+												.Resolve(identifier, parameters, token).ConfigureAwait(false);
 
-            if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
-            {
-                using (var svgStream = resolvedData.Stream)
-                {
-                    picture = svg.Load(svgStream, token);
-                }
-            }
-            else
-            {
-                using (var svgStream = resolvedData.Stream)
-                using (var reader = new StreamReader(svgStream))
-                {
-                    var inputString = await reader.ReadToEndAsync().ConfigureAwait(false);
+				if (resolvedData?.Stream == null)
+					throw new FileNotFoundException(identifier);
 
-                    foreach (var map in ReplaceStringMap
-                             .Where(v => v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        inputString = Regex.Replace(inputString, map.Key.Substring(6), map.Value);
-                    }
+				var svg = new SKSvg()
+				{
+					ThrowOnUnsupportedElement = false,
+				};
 
-                    var builder = new StringBuilder(inputString);
+				if (ReplaceStringMap == null || ReplaceStringMap.Count == 0)
+				{
+					using (var svgStream = resolvedData.Stream)
+					{
+						picture = svg.Load(svgStream, token);
+					}
+				}
+				else
+				{
+					using (var svgStream = resolvedData.Stream)
+					using (var reader = new StreamReader(svgStream))
+					{
+						var inputString = await reader.ReadToEndAsync().ConfigureAwait(false);
 
-                    foreach (var map in ReplaceStringMap
-                             .Where(v => !v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        builder.Replace(map.Key, map.Value);
-                    }
+						foreach (var map in ReplaceStringMap
+								 .Where(v => v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
+						{
+							inputString = Regex.Replace(inputString, map.Key.Substring(6), map.Value);
+						}
 
-					token.ThrowIfCancellationRequested();
+						var builder = new StringBuilder(inputString);
 
-					using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
-                    {
-                        picture = svg.Load(svgFinalStream);
-                    }
-                }
-            }
+						foreach (var map in ReplaceStringMap
+								 .Where(v => !v.Key.StartsWith("regex:", StringComparison.OrdinalIgnoreCase)))
+						{
+							builder.Replace(map.Key, map.Value);
+						}
+
+						token.ThrowIfCancellationRequested();
+
+						using (var svgFinalStream = new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString())))
+						{
+							picture = svg.Load(svgFinalStream);
+						}
+					}
+				}
+
+				if (!svg.HasRasterImage)
+					_cache.AddOrReplace(key, picture);
+			}
 
 			token.ThrowIfCancellationRequested();
 
@@ -294,8 +315,6 @@ namespace FFImageLoading.Svg.Platform
                 sizeX = (int)(sizeY / picture.CullRect.Height * picture.CullRect.Width);
             }
 
-            resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
-
             using (var bitmap = new SKBitmap(new SKImageInfo((int)sizeX, (int)sizeY)))
             using (var canvas = new SKCanvas(bitmap))
             using (var paint = new SKPaint())
@@ -308,6 +327,10 @@ namespace FFImageLoading.Svg.Platform
                 canvas.Flush();
 
 				token.ThrowIfCancellationRequested();
+
+				resolvedData.ImageInformation.SetType(ImageInformation.ImageType.SVG);
+				resolvedData.ImageInformation.SetCurrentSize((int)sizeX, (int)sizeY);
+				resolvedData.ImageInformation.SetOriginalSize((int)picture.CullRect.Width, (int)picture.CullRect.Height);
 
 				return await Decode(picture, bitmap, resolvedData).ConfigureAwait(false);
 			}
