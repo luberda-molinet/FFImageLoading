@@ -477,7 +477,7 @@ namespace FFImageLoading.Work
 		private async Task<bool> TryLoadFromMemoryCacheAsync(string key, bool updateImageInformation, bool animated, bool isLoadingPlaceholder)
 		{
 			var found = MemoryCache.Get(key);
-			if (found?.Item1 != null)
+			if (found?.Item1 != null && found.Item2 != null)
 			{
 				try
 				{
