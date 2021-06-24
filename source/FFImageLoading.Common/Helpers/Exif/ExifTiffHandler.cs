@@ -74,6 +74,7 @@ namespace FFImageLoading.Helpers.Exif
             // UPDATE: In multipage TIFFs, the 'follower' IFD points to the next image in the set
             if (CurrentDirectory is ExifIfd0Directory)
             {
+                PushDirectory(new ExifThumbnailDirectory());
                 return true;
             }
 
