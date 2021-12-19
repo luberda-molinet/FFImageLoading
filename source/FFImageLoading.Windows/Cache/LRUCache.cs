@@ -143,7 +143,7 @@ namespace FFImageLoading.Cache
             LinkedListNode<LRUCacheItem<TKey, TValue>> node;
             if (_cacheMap.TryGetValue(key, out node))
             {
-                _lruList.Remove(node);
+                this.RemoveNode(node);
             }
         }
 
