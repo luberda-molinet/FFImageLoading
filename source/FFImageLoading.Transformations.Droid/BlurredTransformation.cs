@@ -71,19 +71,6 @@ namespace FFImageLoading.Transformations
                     rs.Destroy();
                     return output;
                 }
-
-                //Bitmap output = Bitmap.createBitmap(smallBitmap.getWidth(), smallBitmap.getHeight(), smallBitmap.getConfig());
-
-                //RenderScript rs = RenderScript.create(getContext());
-                //ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-                //Allocation inAlloc = Allocation.createFromBitmap(rs, smallBitmap, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_GRAPHICS_TEXTURE);
-                //Allocation outAlloc = Allocation.createFromBitmap(rs, output);
-                //script.setRadius(BLUR_RADIUS);
-                //script.setInput(inAlloc);
-                //script.forEach(outAlloc);
-                //outAlloc.copyTo(output);
-
-                //rs.destroy();
             }
 
             return ToLegacyBlurred(source, context, (int)radius);
