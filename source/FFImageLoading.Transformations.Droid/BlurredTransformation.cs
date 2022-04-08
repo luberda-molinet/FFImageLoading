@@ -64,6 +64,10 @@ namespace FFImageLoading.Transformations
                     script.ForEach(outAlloc);
                     outAlloc.CopyTo(output);
 
+                    // NOTE: Xamarin.Android Dispose() doesn't call 'destroy' on the allocations or scripts. Therefore, we must manually call it.
+                    outAlloc.Destroy();
+                    inAlloc.Destroy();
+                    script.Destroy();
                     rs.Destroy();
                     return output;
                 }
