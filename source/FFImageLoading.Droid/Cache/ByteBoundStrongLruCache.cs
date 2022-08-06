@@ -35,6 +35,9 @@ namespace FFImageLoading.Cache
 
         public TValue Get(string key)
         {
+            if(key==null)
+              return;
+
             lock (_monitor)
             {
                 TryGetValue(key, out var outValue);
@@ -61,6 +64,9 @@ namespace FFImageLoading.Cache
 
         public void Add(string key, TValue value)
         {
+            if(key==null || value==null)
+               return;
+               
             lock (_monitor)
             {
                 _androidCache.Put(new Java.Lang.String(key), value);
