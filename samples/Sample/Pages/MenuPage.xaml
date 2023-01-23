@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+    xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+    x:Class="Sample.MenuPage"
+        Title="FFImageLoading">
+    <ContentPage.Content>
+
+        <ListView HasUnevenRows="true" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="true"
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
+
+            <ListView.Behaviors>
+                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
+            </ListView.Behaviors>
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell TextColor="Black" DetailColor="Gray"
+                        Text="{Binding Title}" Detail="{Binding Details}" Command="{Binding Command}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+    </ContentPage.Content>
+</ContentPage>

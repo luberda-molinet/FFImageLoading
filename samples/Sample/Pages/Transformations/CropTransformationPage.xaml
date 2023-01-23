@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+    xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+    xmlns:ffimageloadingsvg="clr-namespace:FFImageLoading.Svg.Maui;assembly=FFImageLoading.Svg.Maui"
+    x:Class="Sample.CropTransformationPage"
+    Title="CropTransformation">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+
+                <ffimageloading:CachedImage x:Name="image"
+                    LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png"
+                    Aspect="AspectFit" Source="{Binding ImageUrl}"
+                    Transformations="{Binding Transformations}" CacheType="Disk">
+
+                    <ffimageloading:CachedImage.GestureRecognizers>
+                        <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                        <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                    </ffimageloading:CachedImage.GestureRecognizers>
+
+                </ffimageloading:CachedImage>
+
+                <Label Text="CropTransformation" HorizontalTextAlignment="Center"/>
+                <Label Text="Use pan or pinch gestures to crop" HorizontalTextAlignment="Center" FontSize="8"/>
+
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
