@@ -42,6 +42,10 @@ namespace FFImageLoading.Forms.Platform
         private ImageSourceBinding _lastImageSource;
         private bool _isDisposed = false;
 
+		public CachedImageHandler() : base(ViewHandler.ViewMapper, ViewHandler.ViewCommandMapper)
+		{
+		}
+
 		public CachedImageHandler(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
 		{
 		}

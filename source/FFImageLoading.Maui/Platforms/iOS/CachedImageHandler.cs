@@ -39,6 +39,10 @@ namespace FFImageLoading.Maui.Platform
         private ImageSourceBinding _lastImageSource;
         private readonly object _updateBitmapLock = new object();
 
+		public CachedImageHandler() : base(ViewHandler.ViewMapper, ViewHandler.ViewCommandMapper)
+		{
+		}
+
 		public CachedImageHandler(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
 		{
 		}
