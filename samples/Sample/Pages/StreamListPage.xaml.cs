@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Xamarin.Forms;
-using Xamvvm;
-
 namespace Sample
 {
 	public partial class StreamListPage : ContentPage

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample
 {
-    public class SimpleWebpPageModel : ObservableObject
+    public partial class SimpleWebpPageModel : ObservableObject
     {
 		public void Reload()
 		{

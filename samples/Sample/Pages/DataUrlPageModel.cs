@@ -1,7 +1,7 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Sample.Pages
+namespace Sample
 {
     public class DataUrlPageModel : ObservableObject
     {

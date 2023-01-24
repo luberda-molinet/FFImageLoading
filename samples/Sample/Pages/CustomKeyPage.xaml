@@ -10,12 +10,13 @@
 
     <ContentPage.Content>
 
-        <ListView CachingStrategy="RecycleElement" HasUnevenRows="false"
-                RowHeight="180" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
-
-            <ListView.Behaviors>
-                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
-            </ListView.Behaviors>
+        <ListView
+            CachingStrategy="RecycleElement"
+            HasUnevenRows="false"
+            RowHeight="180"
+            ItemSelected="ListView_ItemSelected"
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+            ItemsSource="{Binding Items}">
 
             <ListView.ItemTemplate>
                 <DataTemplate>

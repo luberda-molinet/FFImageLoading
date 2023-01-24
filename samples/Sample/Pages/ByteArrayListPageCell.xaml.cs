@@ -1,6 +1,4 @@
 ﻿using FFImageLoading.Maui;
-using Xamarin.Forms;
-using Xamvvm;
 
 namespace Sample
 {

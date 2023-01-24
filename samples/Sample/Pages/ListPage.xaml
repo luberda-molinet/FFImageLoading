@@ -4,17 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+    xmlns:local="clr-namespace:Sample"
     x:Class="Sample.ListPage"
     Title="List">
     <ContentPage.Content>
 
-        <ListView CachingStrategy="RecycleElement" HasUnevenRows="false"
-                RowHeight="180" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ItemsSource="{Binding Items}">
+        <ListView
+            CachingStrategy="RecycleElement"
+            HasUnevenRows="false"
+            RowHeight="180"
+            ItemSelected="ListView_ItemSelected"
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+            ItemsSource="{Binding Items}">
 
-            <ListView.Behaviors>
-                <xamvvm:BaseEventToCommandBehavior EventName="ItemSelected" Command="{Binding ItemSelectedCommand}"/>
-            </ListView.Behaviors>
-
+            
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <local:ListPageCell/>

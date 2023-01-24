@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Xamarin.Forms;
-using Xamvvm;
 
 namespace Sample
 {
@@ -13,7 +11,7 @@ namespace Sample
 
             View.GestureRecognizers.Add(new TapGestureRecognizer()
             {
-                Command = new BaseCommand((arg) =>
+                Command = new Command((arg) =>
                 {
                     System.Diagnostics.Debug.WriteLine("TAPPED");
                 })
@@ -28,8 +26,8 @@ namespace Sample
             if (item == null)
                 return;
 
-            Image.Source = item.ImageUrl;
-            Label.Text = item.FileName;
+            image.Source = item.ImageUrl;
+            label.Text = item.FileName;
         }
     }
 }

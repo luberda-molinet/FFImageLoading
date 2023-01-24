@@ -5,10 +5,17 @@ namespace Sample
 {
 	public partial class CustomKeyPage : ContentPage
 	{
+		CustomKeyPageModel viewModel;
+
 		public CustomKeyPage()
 		{
 			InitializeComponent();
-			BindingContext = new CustomKeyPageModel();
+			BindingContext = viewModel = new CustomKeyPageModel();
+		}
+
+		void ListView_ItemSelected(System.Object sender, Microsoft.Maui.Controls.SelectedItemChangedEventArgs e)
+		{
+			viewModel.ItemSelected();
 		}
 	}
 }

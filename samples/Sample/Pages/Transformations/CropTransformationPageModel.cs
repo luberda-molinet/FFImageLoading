@@ -7,7 +7,7 @@ using FFImageLoading.Work;
 namespace Sample
 {
     
-    public class CropTransformationPageModel : ObservableObject
+    public partial class CropTransformationPageModel : ObservableObject
     {
         double mX = 0f;
         double mY = 0f;

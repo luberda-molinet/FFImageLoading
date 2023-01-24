@@ -5,10 +5,17 @@ namespace Sample
 {
 	public partial class ListTransformationsPage : ContentPage
 	{
+		ListTransformationsPageModel viewModel;
+
 		public ListTransformationsPage()
 		{
 			InitializeComponent();
-			BindingContext = new ListTransformationsPageModel();
+			BindingContext = viewModel = new ListTransformationsPageModel();
+		}
+
+		void ListView_ItemSelected(System.Object sender, Microsoft.Maui.Controls.SelectedItemChangedEventArgs e)
+		{
+			viewModel.ItemSelected();
 		}
 	}
 }

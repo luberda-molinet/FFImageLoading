@@ -88,7 +88,7 @@ namespace Sample
                     Section = "Advanced",
                     Title = "Data url examples",
 					Command = new AsyncRelayCommand(_ =>
-						Navigation.PushAsync(new Pages.DataUrlPage()))
+						Navigation.PushAsync(new DataUrlPage()))
 				},
 
                 new MenuItem() {
