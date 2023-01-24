@@ -12,28 +12,56 @@ using System.Net;
 
 namespace FFImageLoading
 {
-    public abstract class ImageServiceBase<TImageContainer> : IImageService
+	public abstract class ImageServiceBase<TImageContainer> : IImageService<TImageContainer>
     {
-        protected bool _initialized;
+		public ImageServiceBase(
+			IConfiguration configuration,
+			IMD5Helper mD5Helper,
+			IMiniLogger miniLogger,
+			IPlatformPerformance platformPerformance,
+			IMainThreadDispatcher mainThreadDispatcher,
+			IDataResolverFactory dataResolverFactory)
+		{
+			_config= configuration;
+			Md5Helper= mD5Helper;
+			Logger= miniLogger;
+			PlatformPerformance= platformPerformance;
+			Dispatcher= mainThreadDispatcher;
+			DataResolverFactory = dataResolverFactory;
+		}
+
+		public IMD5Helper Md5Helper { get; }
+		public IMiniLogger Logger { get; }
+		public IPlatformPerformance PlatformPerformance { get; }
+		public IMainThreadDispatcher Dispatcher { get; }
+		public IDataResolverFactory DataResolverFactory { get; }
+		public IDiskCache DiskCache { get; }
+		public IWorkScheduler Scheduler { get; }
+		public IMD5Helper MD5Helper { get; }
+
+		protected abstract IMemoryCache<TImageContainer> MemoryCache { get; }
+
+		protected bool _initialized;
         protected bool _isInitializing;
         protected object _initializeLock = new object();
 
-        protected virtual void PlatformSpecificConfiguration(Configuration configuration) { }
+        protected virtual void PlatformSpecificConfiguration(IConfiguration configuration) { }
 
-        protected abstract IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration);
-        protected abstract IMiniLogger CreatePlatformLoggerInstance(Configuration configuration);
-        protected abstract IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration);
-        protected abstract IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration);
-        protected abstract IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration);
-        protected abstract IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration);
         protected abstract void SetTaskForTarget(IImageLoaderTask currentTask);
         public abstract void CancelWorkForView(object view);
 
-        public abstract int DpToPixels(double dp);
+		public abstract IImageLoaderTask CreateTask(TaskParameter parameters);
+
+		public abstract IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<TImageContainer, TImageView> target) where TImageView : class;
+
+
+
+
+		public abstract int DpToPixels(double dp);
         public abstract double PixelsToDp(double px);
 
-        Configuration _config;
-        public Configuration Config
+        IConfiguration _config;
+        public IConfiguration Configuration
         {
             get
             {
@@ -45,10 +73,6 @@ namespace FFImageLoading
         public bool ExitTasksEarly => Scheduler.ExitTasksEarly;
         public bool PauseWork => Scheduler.PauseWork;
 
-        protected IDiskCache DiskCache => Config.DiskCache;
-        protected IWorkScheduler Scheduler => Config.Scheduler;
-        protected IMD5Helper MD5Helper => Config.MD5Helper;
-        protected abstract IMemoryCache<TImageContainer> MemoryCache { get; }
 
         public void Initialize()
         {
@@ -62,7 +86,7 @@ namespace FFImageLoading
             }
         }
 
-        public void Initialize(Configuration configuration)
+        public void Initialize(IConfiguration configuration)
         {
             lock (_initializeLock)
             {
@@ -72,32 +96,16 @@ namespace FFImageLoading
                 {
                     // Redefine these if they were provided only
                     configuration.HttpClient = configuration.HttpClient ?? _config.HttpClient;
-                    configuration.Scheduler = configuration.Scheduler ?? _config.Scheduler;
-                    configuration.Logger = configuration.Logger ?? _config.Logger;
-                    configuration.DownloadCache = configuration.DownloadCache ?? _config.DownloadCache;
-                    configuration.DataResolverFactory = configuration.DataResolverFactory ?? _config.DataResolverFactory;
                     configuration.SchedulerMaxParallelTasksFactory = configuration.SchedulerMaxParallelTasksFactory ?? _config.SchedulerMaxParallelTasksFactory;
-                    configuration.MD5Helper = configuration.MD5Helper ?? _config.MD5Helper;
-                    configuration.MainThreadDispatcher = configuration.MainThreadDispatcher ?? _config.MainThreadDispatcher;
-                    configuration.DataResolverFactory = configuration.DataResolverFactory ?? _config.DataResolverFactory;
-
-                    // Skip configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.
-                    if (configuration.DiskCache == null)
-                    {
-                        configuration.MaxMemoryCacheSize = _config.MaxMemoryCacheSize;
-                        configuration.DiskCache = _config.DiskCache;
-                    }
-                    else
-                    {
-                        configuration.Logger.Debug("Skipping configuration for maxMemoryCacheSize and diskCache. They cannot be redefined.");
-                    }
+                    
+                    configuration.MaxMemoryCacheSize = _config.MaxMemoryCacheSize;
                 }
 
                 InitializeIfNeeded(configuration);
             }
         }
 
-        void InitializeIfNeeded(Configuration userDefinedConfig = null)
+        void InitializeIfNeeded(IConfiguration userDefinedConfig = null)
         {
             if (_initialized && userDefinedConfig == null)
                 return;
@@ -132,16 +140,7 @@ namespace FFImageLoading
 				if (StaticLocks.DecodingLock == null)
 					StaticLocks.DecodingLock = new SemaphoreSlim(userDefinedConfig.DecodingMaxParallelTasks, userDefinedConfig.DecodingMaxParallelTasks);
 
-				if (userDefinedConfig.Logger == null || !(userDefinedConfig.Logger is MiniLoggerWrapper))
-                    userDefinedConfig.Logger = new MiniLoggerWrapper(userDefinedConfig.Logger ?? CreatePlatformLoggerInstance(userDefinedConfig), userDefinedConfig.VerboseLogging);
-
-                userDefinedConfig.MD5Helper = userDefinedConfig.MD5Helper ?? CreatePlatformMD5HelperInstance(userDefinedConfig);
                 userDefinedConfig.HttpClient = httpClient;
-                userDefinedConfig.Scheduler = userDefinedConfig.Scheduler ?? new WorkScheduler(userDefinedConfig, (userDefinedConfig.VerbosePerformanceLogging ? CreatePlatformPerformanceInstance(userDefinedConfig) : new EmptyPlatformPerformance()));
-                userDefinedConfig.DiskCache = userDefinedConfig.DiskCache ?? CreatePlatformDiskCacheInstance(userDefinedConfig);
-                userDefinedConfig.DownloadCache = userDefinedConfig.DownloadCache ?? new DownloadCache(userDefinedConfig);
-                userDefinedConfig.MainThreadDispatcher = userDefinedConfig.MainThreadDispatcher ?? CreateMainThreadDispatcherInstance(userDefinedConfig);
-                userDefinedConfig.DataResolverFactory = userDefinedConfig.DataResolverFactory ?? CreateDataResolverFactoryInstance(userDefinedConfig);
 
                 _initialized = true;
                 _isInitializing = false;

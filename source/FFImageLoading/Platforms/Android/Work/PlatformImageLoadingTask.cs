@@ -21,7 +21,12 @@ namespace FFImageLoading
         private static readonly Android.Graphics.Color _placeholderHelperColor = Android.Graphics.Color.Argb(1, 255, 255, 255);
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        public PlatformImageLoaderTask(ITarget<SelfDisposingBitmapDrawable, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
+        public PlatformImageLoaderTask(
+			IImageService<SelfDisposingBitmapDrawable> imageService,
+			IMemoryCache<SelfDisposingBitmapDrawable> memoryCache,
+			ITarget<SelfDisposingBitmapDrawable, TImageView> target,
+			TaskParameter parameters)
+			: base(imageService, memoryCache, target, parameters)
         {
         }
 
@@ -110,7 +115,7 @@ namespace FFImageLoading
 
         protected override int DpiToPixels(int size)
         {
-            return size.DpToPixels();
+            return ImageService.DpToPixels(size);
         }
 
         protected override IDecoder<Bitmap> ResolveDecoder(ImageInformation.ImageType type)
@@ -118,10 +123,10 @@ namespace FFImageLoading
             switch (type)
             {
                 case ImageInformation.ImageType.GIF:
-                    return new GifDecoder();
+                    return new GifDecoder(ImageService);
 
                 default:
-                    return new BaseDecoder();
+                    return new BaseDecoder(ImageService, MemoryCache);
             }
         }
 

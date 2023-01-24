@@ -19,69 +19,28 @@ namespace FFImageLoading
         readonly Android.Util.DisplayMetrics _metrics = Android.Content.Res.Resources.System.DisplayMetrics;
 
         static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
-        static IImageService _instance;
 
-        /// <summary>
-        /// FFImageLoading instance.
-        /// </summary>
-        /// <value>The instance.</value>
-        public static IImageService Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new ImageService();
+		public ImageService(
+			IConfiguration configuration,
+			IMD5Helper md5Helper,
+			IMiniLogger miniLogger,
+			IPlatformPerformance platformPerformance,
+			IMainThreadDispatcher mainThreadDispatcher,
+			IDataResolverFactory dataResolverFactory)
+			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+		{
+		}
 
-                return _instance;
-            }
-        }
+		ImageCache imageCache;
 
-        /// <summary>
-        /// Set this to use FFImageLoading in a unit test environment. 
-        /// Instead throwing DoNotReference exception - use Mock implementation
-        /// </summary>
-        public static bool EnableMockImageService { get; set; }
+		protected override IMemoryCache<SelfDisposingBitmapDrawable> MemoryCache => imageCache ?? new ImageCache(Configuration, Logger);
 
-        protected override IMemoryCache<SelfDisposingBitmapDrawable> MemoryCache => ImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new PlatformPerformance();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MainThreadDispatcher();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new DataResolverFactory();
 
-        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration)
-        {
-            if (string.IsNullOrWhiteSpace(configuration.DiskCachePath))
-            {
-                var context = new Android.Content.ContextWrapper(Android.App.Application.Context);
-                string tmpPath = context.CacheDir.AbsolutePath;
-                string cachePath = Path.Combine(tmpPath, "FFSimpleDiskCache");
+        public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
+			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
 
-                Java.IO.File androidTempFolder = new Java.IO.File(cachePath);
-                if (!androidTempFolder.Exists())
-                    androidTempFolder.Mkdir();
-
-                if (!androidTempFolder.CanRead())
-                    androidTempFolder.SetReadable(true, false);
-
-                if (!androidTempFolder.CanWrite())
-                    androidTempFolder.SetWritable(true, false);
-
-                configuration.DiskCachePath = cachePath;
-            }
-
-            return new SimpleDiskCache(configuration.DiskCachePath, configuration);
-        }
-
-        internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
-        {
-            return new PlatformImageLoaderTask<TImageView>(target, parameters, Instance);
-        }
-
-        internal static IImageLoaderTask CreateTask(TaskParameter parameters)
-        {
-            return new PlatformImageLoaderTask<object>(null, parameters, Instance);
-        }
+        public override IImageLoaderTask CreateTask(TaskParameter parameters)
+			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {

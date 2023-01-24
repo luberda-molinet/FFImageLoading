@@ -14,20 +14,26 @@ namespace FFImageLoading.Cache
     [Preserve(AllMembers = true)]
     public class DownloadCache : IDownloadCache
     {
-        public DownloadCache(Configuration configuration)
+        public DownloadCache(IConfiguration configuration, IMD5Helper md5Helper, IDiskCache diskCache, IMiniLogger logger)
         {
             Configuration = configuration;
+			MD5Helper = md5Helper;
+			DiskCache = diskCache;
+			Logger= logger;
         }
 
         public string[] InvalidContentTypes { get; set; } = new[] { "text/html", "application/json", "audio/", "video/", "message" };
 
-        protected Configuration Configuration { get; private set; }
+        protected IConfiguration Configuration { get; private set; }
 
-        protected virtual IMD5Helper MD5Helper => Configuration.MD5Helper;
+		protected virtual IMD5Helper MD5Helper { get; }
+
+		protected IMiniLogger Logger { get; }
+		protected IDiskCache DiskCache { get; }
 
         public virtual TimeSpan DelayBetweenRetry { get; set; } = TimeSpan.FromSeconds(1);
 
-        public virtual async Task<CacheStream> DownloadAndCacheIfNeededAsync(string url, TaskParameter parameters, Configuration configuration, CancellationToken token)
+        public virtual async Task<CacheStream> DownloadAndCacheIfNeededAsync(string url, TaskParameter parameters, IConfiguration configuration, CancellationToken token)
         {
             var allowCustomKey = !string.IsNullOrWhiteSpace(parameters.CustomCacheKey)
                                        && (string.IsNullOrWhiteSpace(parameters.LoadingPlaceholderPath) || parameters.LoadingPlaceholderPath != url)
@@ -40,11 +46,11 @@ namespace FFImageLoading.Cache
 
             if (allowDiskCaching)
             {
-                var diskStream = await configuration.DiskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
+                var diskStream = await DiskCache.TryGetStreamAsync(filename).ConfigureAwait(false);
                 if (diskStream != null)
                 {
                     token.ThrowIfCancellationRequested();
-                    filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+                    filePath = await DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
                     return new CacheStream(diskStream, true, filePath);
                 }
             }
@@ -58,7 +64,7 @@ namespace FFImageLoading.Cache
                 async () => await DownloadAsync(url, token, configuration.HttpClient, parameters, downloadInfo).ConfigureAwait(false),
                 parameters.RetryDelayInMs > 0 ? TimeSpan.FromMilliseconds(parameters.RetryDelayInMs) : DelayBetweenRetry,
                 parameters.RetryCount,
-                () => configuration.Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
+                () => Logger.Debug(string.Format("Retry download: {0}", url))).ConfigureAwait(false);
 
             if (responseBytes == null)
                 throw new HttpRequestException("No Content");
@@ -75,11 +81,11 @@ namespace FFImageLoading.Cache
                     };
                 }
 
-				await configuration.DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, downloadInfo.CacheValidity, url, finishedAction).ConfigureAwait(false);
+				await DiskCache.AddToSavingQueueIfNotExistsAsync(filename, responseBytes, downloadInfo.CacheValidity, url, finishedAction).ConfigureAwait(false);
             }
 
             token.ThrowIfCancellationRequested();
-            filePath = await configuration.DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
+            filePath = await DiskCache.GetFilePathAsync(filename).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
             var memoryStream = new MemoryStream(responseBytes, false);
             return new CacheStream(memoryStream, false, filePath);

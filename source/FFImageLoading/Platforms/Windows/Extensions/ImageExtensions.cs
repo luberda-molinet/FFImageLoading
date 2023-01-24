@@ -13,14 +13,14 @@ namespace FFImageLoading.Extensions
 {
     public static class ImageExtensions
     {
-        public static async Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder)
+        public static async Task<WriteableBitmap> ToBitmapImageAsync(this BitmapHolder holder, IMainThreadDispatcher mainThreadDispatcher)
         {
             if (holder == null || holder.PixelData == null)
                 return null;
 
             WriteableBitmap writeableBitmap = null;
 
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
+            await mainThreadDispatcher.PostAsync(async () =>
             {
                 writeableBitmap = await holder.ToWriteableBitmap();
                 writeableBitmap.Invalidate();
@@ -41,7 +41,7 @@ namespace FFImageLoading.Extensions
             return writeableBitmap;
         }
 
-        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, bool allowUpscale, ImageInformation imageInformation = null)
+        public async static Task<WriteableBitmap> ToBitmapImageAsync(this Stream imageStream, IMainThreadDispatcher mainThreadDispatcher, Tuple<int, int> downscale, bool downscaleDipUnits, InterpolationMode mode, bool allowUpscale, ImageInformation imageInformation = null)
         {
             if (imageStream == null)
                 return null;
@@ -56,7 +56,7 @@ namespace FFImageLoading.Extensions
                         downscaledImage.Seek(0);
                         WriteableBitmap resizedBitmap = null;
 
-                        await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
+                        await mainThreadDispatcher.PostAsync(async () =>
                         {
                             resizedBitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                             await resizedBitmap.SetSourceAsync(downscaledImage);
@@ -77,7 +77,7 @@ namespace FFImageLoading.Extensions
                         imageInformation.SetOriginalSize((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                     }
 
-                    await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(async () =>
+                    await mainThreadDispatcher.PostAsync(async () =>
                     {
                         bitmap = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                         await bitmap.SetSourceAsync(image);

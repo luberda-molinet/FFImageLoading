@@ -16,6 +16,15 @@ namespace FFImageLoading.Decoders
 {
     public class BaseDecoder : IDecoder<Bitmap>
     {
+		public BaseDecoder(IImageService<SelfDisposingBitmapDrawable> imageService, IMemoryCache<SelfDisposingBitmapDrawable> memoryCache)
+		{
+			ImageService = imageService;
+			MemoryCache = memoryCache;
+		}
+
+		protected readonly IMemoryCache<SelfDisposingBitmapDrawable> MemoryCache;
+		protected readonly IImageService<SelfDisposingBitmapDrawable> ImageService;
+
         public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream imageData, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
             BitmapFactory.Options options = null;
@@ -44,7 +53,7 @@ namespace FFImageLoading.Decoders
             imageInformation.SetOriginalSize(options.OutWidth, options.OutHeight);
             imageInformation.SetCurrentSize(options.OutWidth, options.OutHeight);
 
-            if (!Configuration.BitmapOptimizations || (parameters.BitmapOptimizationsEnabled.HasValue && !parameters.BitmapOptimizationsEnabled.Value))
+            if (!ImageService.Configuration.BitmapOptimizations || (parameters.BitmapOptimizationsEnabled.HasValue && !parameters.BitmapOptimizationsEnabled.Value))
             {
                 // Same quality but no transparency channel. This allows to save 50% of memory: 1 pixel=2bytes instead of 4.
                 options.InPreferredConfig = Bitmap.Config.Rgb565;
@@ -68,7 +77,7 @@ namespace FFImageLoading.Decoders
 				}
                 catch (Exception ex)
                 {
-                    Logger.Error("Reading EXIF orientation failed", ex);
+                    ImageService.Logger.Error("Reading EXIF orientation failed", ex);
                 }
             }
 
@@ -84,11 +93,11 @@ namespace FFImageLoading.Decoders
 
                 if (parameters.DownSampleUseDipUnits)
                 {
-                    downsampleWidth = downsampleWidth.DpToPixels();
-                    downsampleHeight = downsampleHeight.DpToPixels();
+                    downsampleWidth = ImageService.DpToPixels(downsampleWidth);
+                    downsampleHeight = ImageService.DpToPixels(downsampleHeight);
                 }
 
-                options.InSampleSize = CalculateInSampleSize(options.OutWidth, options.OutHeight, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? Configuration.AllowUpscale);
+                options.InSampleSize = CalculateInSampleSize(options.OutWidth, options.OutHeight, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? ImageService.Configuration.AllowUpscale);
 
                 if (options.InSampleSize > 1)
                     imageInformation.SetCurrentSize(
@@ -125,8 +134,6 @@ namespace FFImageLoading.Decoders
             return new DecodedImage<Bitmap>() { Image = bitmap };
         }
 
-        public Configuration Configuration => ImageService.Instance.Config;
-        public IMiniLogger Logger => ImageService.Instance.Config.Logger;
         protected Context Context => new ContextWrapper(Android.App.Application.Context);
 
         /// <summary>
@@ -177,7 +184,7 @@ namespace FFImageLoading.Decoders
             ISelfDisposingBitmapDrawable bitmapDrawable = null;
             try
             {
-                bitmapDrawable = ImageCache.Instance.GetBitmapDrawableFromReusableSet(options);
+                bitmapDrawable = (MemoryCache as ImageCache)?.GetBitmapDrawableFromReusableSet(options);
                 var bitmap = bitmapDrawable?.Bitmap;
 
                 if (bitmap != null && bitmap.Handle != IntPtr.Zero && !bitmap.IsRecycled)

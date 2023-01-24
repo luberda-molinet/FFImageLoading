@@ -21,6 +21,12 @@ namespace FFImageLoading.Decoders
     public class WebPDecoder : IDecoder<PImage>
     {
         //WebPCodec _decoder;
+		public WebPDecoder(IImageService<PImage> imageService)
+		{
+			this.imageService = imageService;
+		}
+
+		protected readonly IImageService<PImage> imageService;
 
         public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
@@ -37,13 +43,13 @@ namespace FFImageLoading.Decoders
 
             if (parameters.DownSampleUseDipUnits)
             {
-                downsampleWidth = downsampleWidth.DpToPixels();
-                downsampleHeight = downsampleHeight.DpToPixels();
+                downsampleWidth = imageService.DpToPixels(downsampleWidth);
+                downsampleHeight = imageService.DpToPixels(downsampleHeight);
             }
 
             if (downsampleWidth != 0 || downsampleHeight != 0)
             {
-                var interpolationMode = parameters.DownSampleInterpolationMode == InterpolationMode.Default ? Configuration.DownsampleInterpolationMode : parameters.DownSampleInterpolationMode;
+                var interpolationMode = parameters.DownSampleInterpolationMode == InterpolationMode.Default ? imageService.Configuration.DownsampleInterpolationMode : parameters.DownSampleInterpolationMode;
                 var old = result.Image;
                 result.Image = old.ResizeUIImage(downsampleWidth, downsampleHeight, interpolationMode);
                 old.TryDispose();
@@ -51,9 +57,5 @@ namespace FFImageLoading.Decoders
 
             return Task.FromResult<IDecodedImage<PImage>>(result);
         }
-
-        public Configuration Configuration => ImageService.Instance.Config;
-
-        public IMiniLogger Logger => ImageService.Instance.Config.Logger;
     }
 }

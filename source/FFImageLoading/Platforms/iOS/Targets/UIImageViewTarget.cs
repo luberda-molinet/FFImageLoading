@@ -1,4 +1,5 @@
 ﻿using System;
+using FFImageLoading.Config;
 using FFImageLoading.Work;
 using UIKit;
 
@@ -6,9 +7,12 @@ namespace FFImageLoading.Targets
 {
     public class UIImageViewTarget : UIViewTarget<UIImageView>
     {
-        public UIImageViewTarget(UIImageView control) : base(control)
+        public UIImageViewTarget(IConfiguration configuration, UIImageView control) : base(control)
         {
+			Configuration = configuration;
         }
+
+		protected readonly IConfiguration Configuration;
 
         public override void Set(IImageLoaderTask task, UIImage image, bool animated)
         {
@@ -28,7 +32,7 @@ namespace FFImageLoading.Targets
             {
                 // fade animation
                 double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
-                    parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
+                    parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration)) / 1000;
 
                 UIView.Transition(control, fadeDuration,
                     UIViewAnimationOptions.TransitionCrossDissolve

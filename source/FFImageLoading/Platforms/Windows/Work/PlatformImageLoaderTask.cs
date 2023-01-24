@@ -15,9 +15,14 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<BitmapHolder, BitmapSource, TImageView> where TImageView : class
     {
-        public PlatformImageLoaderTask(ITarget<BitmapSource, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
-        {
-        }
+		public PlatformImageLoaderTask(
+			IImageService<BitmapSource> imageService,
+			IMemoryCache<BitmapSource> memoryCache,
+			ITarget<BitmapSource, TImageView> target,
+			TaskParameter parameters)
+			: base(imageService, memoryCache, target, parameters)
+		{
+		}
 
         public async override Task Init()
         {
@@ -108,7 +113,7 @@ namespace FFImageLoading.Work
                     if (decoded.Image.HasWriteableBitmap)
                         return decoded.Image.WriteableBitmap;
 
-                    return await decoded.Image.ToBitmapImageAsync().ConfigureAwait(false);
+                    return await decoded.Image.ToBitmapImageAsync(MainThreadDispatcher).ConfigureAwait(false);
                 }
                 finally
                 {

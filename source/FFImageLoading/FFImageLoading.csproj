@@ -43,6 +43,8 @@
   <ItemGroup>
     <Folder Include="Exceptions\" />
     <Folder Include="Helpers\Gif\" />
+    <Folder Include="Mock\" />
+    <Folder Include="Platforms\Android\Views\" />
     <Folder Include="Platforms\Windows\Views\" />
   </ItemGroup>
 </Project>

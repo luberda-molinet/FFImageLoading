@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using FFImageLoading.Config;
+using FFImageLoading.Helpers;
 using FFImageLoading.Work;
 
 namespace FFImageLoading.Decoders

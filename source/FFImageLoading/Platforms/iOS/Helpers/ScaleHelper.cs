@@ -3,10 +3,17 @@ using System.Threading.Tasks;
 
 namespace FFImageLoading.Helpers
 {
-    public static class ScaleHelper
+    public class ScaleHelper
     {
-        static nfloat? _scale;
-        public static nfloat Scale
+		public ScaleHelper(IMainThreadDispatcher mainThreadDispatcher)
+		{
+			MainThreadDispatcher = mainThreadDispatcher;
+		}
+
+		protected IMainThreadDispatcher MainThreadDispatcher;
+
+        nfloat? _scale;
+        public nfloat Scale
         {
             get
             {
@@ -19,12 +26,12 @@ namespace FFImageLoading.Helpers
             }
         }
 
-        public static async Task InitAsync()
+        async Task InitAsync()
         {
             if (_scale.HasValue)
                 return;
 
-            var dispatcher = ImageService.Instance.Config.MainThreadDispatcher;
+            var dispatcher = MainThreadDispatcher;
             await dispatcher.PostAsync(() =>
             {
 #if __IOS__

@@ -27,7 +27,7 @@ namespace FFImageLoading.Maui
 
 		public static MauiAppBuilder RegisterFFImageLoadingHandlers(this MauiAppBuilder mauiAppBuilder)
 		{
-#if IOS || MACCATALYST
+#if IOS || MACCATALYST || WINDOWS
 			FFImageLoading.Maui.Platform.CachedImageHandler.Init();
 #endif
 			mauiAppBuilder.ConfigureMauiHandlers(c =>

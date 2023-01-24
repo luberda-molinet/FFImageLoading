@@ -19,7 +19,7 @@ namespace FFImageLoading.Work
 		private long _statsTotalWaiting;
 		private long _loadCount;
 
-        public WorkScheduler(Configuration configuration, IPlatformPerformance performance)
+        public WorkScheduler(IConfiguration configuration, IPlatformPerformance performance)
         {
             Configuration = configuration;
             Performance = performance;
@@ -33,8 +33,8 @@ namespace FFImageLoading.Work
         protected PendingTasksQueue PendingTasks { get; private set; } = new PendingTasksQueue();
         protected Dictionary<string, IImageLoaderTask> RunningTasks { get; private set; } = new Dictionary<string, IImageLoaderTask>();
         protected ThreadSafeCollection<IImageLoaderTask> SimilarTasks { get; private set; } = new ThreadSafeCollection<IImageLoaderTask>();
-        protected Configuration Configuration { get; private set; }
-        protected IMiniLogger Logger => Configuration.Logger;
+        protected IConfiguration Configuration { get; private set; }
+        protected IMiniLogger Logger { get; private set; }
 
         public virtual void Cancel(Func<IImageLoaderTask, bool> predicate)
         {

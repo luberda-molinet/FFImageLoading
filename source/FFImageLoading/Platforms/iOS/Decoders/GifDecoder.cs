@@ -26,29 +26,47 @@ namespace FFImageLoading.Decoders
 {
     public class GifDecoder : IDecoder<PImage>
     {
+		static GifDecoder()
+		{
+
+		}
+
 		private static readonly SemaphoreSlim _gifLock = new SemaphoreSlim(1, 1);
+
+		public GifDecoder(IImageService<PImage> imageService)
+		{
+			ImageService = imageService;
+			scaleHelper = new ScaleHelper(imageService.Dispatcher);
+		}
+
+		static ScaleHelper _scaleHelper;
+		static ScaleHelper GetScaleHelper(IMainThreadDispatcher mainThreadDispatcher)
+			=> _scaleHelper ??= new ScaleHelper(mainThreadDispatcher);
+
+
+		protected readonly IImageService<PImage> ImageService;
 
         public async Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
         {
             var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
             var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
-            var allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
+            var allowUpscale = parameters.AllowUpscale ?? ImageService.Configuration.AllowUpscale;
 
             if (parameters.DownSampleUseDipUnits)
             {
-                downsampleWidth = downsampleWidth.DpToPixels();
-                downsampleHeight = downsampleHeight.DpToPixels();
+                downsampleWidth = ImageService.DpToPixels(downsampleWidth);
+                downsampleHeight = ImageService.DpToPixels(downsampleHeight);
             }
 
             using (var nsdata = NSData.FromStream(stream))
             {
-                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), ScaleHelper.Scale,
-                                                      Configuration, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale).ConfigureAwait(false);
+                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), scaleHelper.Scale,
+													  ImageService, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale).ConfigureAwait(false);
 				return result;
             }
         }
 
-        public static async Task<IDecodedImage<PImage>> SourceRegfToDecodedImageAsync(NSData nsdata, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static async Task<IDecodedImage<PImage>> SourceRegfToDecodedImageAsync(NSData nsdata, CGSize destSize, nfloat destScale, IImageService<PImage> imageService, TaskParameter parameters, RCTResizeMode resizeMode = RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
             using (var sourceRef = CGImageSource.FromData(nsdata))
             {
@@ -75,7 +93,7 @@ namespace FFImageLoading.Decoders
                 }
                 else if (destScale <= 0)
                 {
-                    destScale = ScaleHelper.Scale;
+                    destScale = scaleHelper.Scale;
                 }
 
                 // Calculate target size
@@ -99,7 +117,7 @@ namespace FFImageLoading.Decoders
                 IAnimatedImage<PImage>[] images = null;
 
                 // GIF
-                if (sourceRef.ImageCount > 1 && config.AnimateGifs && imageinformation.Type != ImageInformation.ImageType.ICO)
+                if (sourceRef.ImageCount > 1 && imageService.Configuration.AnimateGifs && imageinformation.Type != ImageInformation.ImageType.ICO)
                 {
 					try
 					{
@@ -177,7 +195,7 @@ namespace FFImageLoading.Decoders
                     {
                         var width = (int)images[0].Image.Size.Width;
                         var height = (int)images[0].Image.Size.Height;
-                        imageinformation.SetCurrentSize(width.DpToPixels(), height.DpToPixels());
+                        imageinformation.SetCurrentSize(imageService.DpToPixels(width), imageService.DpToPixels(height));
                     }
                 }
                 else
@@ -188,17 +206,13 @@ namespace FFImageLoading.Decoders
                     {
                         var width = (int)image.Size.Width;
                         var height = (int)image.Size.Height;
-                        imageinformation.SetCurrentSize(width.DpToPixels(), height.DpToPixels());
+                        imageinformation.SetCurrentSize(imageService.DpToPixels(width), imageService.DpToPixels(height));
                     }
                 }
 
                 return result;
             }
         }
-
-        public Configuration Configuration => ImageService.Instance.Config;
-
-        public IMiniLogger Logger => ImageService.Instance.Config.Logger;
 
         public enum RCTResizeMode : long
         {

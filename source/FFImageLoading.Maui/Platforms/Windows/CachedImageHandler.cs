@@ -24,7 +24,8 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Handlers;
 
-namespace FFImageLoading.Forms.Platform
+
+namespace FFImageLoading.Maui.Platform
 {
     /// <summary>
     /// CachedImage Implementation
@@ -32,11 +33,6 @@ namespace FFImageLoading.Forms.Platform
     [Preserve(AllMembers = true)]
     public class CachedImageHandler : ViewHandler<CachedImage, Microsoft.UI.Xaml.Controls.Image>
     {
-        [RenderWith(typeof(CachedImageHandler))]
-        internal class _CachedImageRenderer
-        {
-        }
-
         private bool _measured;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
@@ -71,6 +67,10 @@ namespace FFImageLoading.Forms.Platform
 			};
 			return Control;
 		}
+
+		IImageService<BitmapSource> _imageService;
+		IImageService<BitmapSource> ImageService
+			=> _imageService ??= MauiContext.Services.GetRequiredService<IImageService<BitmapSource>>();
 
 		protected override void ConnectHandler(Microsoft.UI.Xaml.Controls.Image platformView)
 		{
@@ -195,7 +195,7 @@ namespace FFImageLoading.Forms.Platform
                 imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
 
                 if (!_isDisposed)
-                    _currentTask = imageLoader.Into(imageView);
+                    _currentTask = imageLoader.Into(imageView, ImageService);
             }
         }
 
@@ -219,12 +219,17 @@ namespace FFImageLoading.Forms.Platform
             }
         }
 
+		IMainThreadDispatcher mainThreadDispatcher;
+
 		private async void ImageLoadingSizeChanged(CachedImage element, bool isLoading)
 		{
 			if (element == null || _isDisposed)
 				return;
-				
-			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+
+			mainThreadDispatcher ??=
+				this.MauiContext.Services.GetRequiredService<IMainThreadDispatcher>();
+
+			await mainThreadDispatcher.PostAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;

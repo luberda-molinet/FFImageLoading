@@ -10,41 +10,35 @@ using System;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using System.Linq;
+using FFImageLoading.Config;
 
 namespace FFImageLoading.Cache
 {
-    class ImageCache : IImageCache
+    public class ImageCache : IImageCache
     {
-        private static IImageCache _instance;
         private readonly WriteableBitmapLRUCache _reusableBitmaps;
         private readonly IMiniLogger _logger;
 
-        private ImageCache(int maxCacheSize, IMiniLogger logger)
-        {
-            _logger = logger;
+		public ImageCache(IMiniLogger logger, IConfiguration configuration)
+		{
+			_logger = logger;
 
-            if (maxCacheSize == 0)
-            {
-                //TODO Does anyone know how we could get available app ram from WinRT API?
-                EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
-                if (deviceInfo.OperatingSystem.ToLowerInvariant().Contains("phone"))
-                    maxCacheSize = 1000000 * 64; //64MB
-                else
-                    maxCacheSize = 1000000 * 256; //256MB
+			var maxCacheSize = configuration.MaxMemoryCacheSize;
 
-                _logger?.Debug($"Memory cache size: {maxCacheSize} bytes");
-            }
+			if (maxCacheSize == 0)
+			{
+				//TODO Does anyone know how we could get available app ram from WinRT API?
+				EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
+				if (deviceInfo.OperatingSystem.ToLowerInvariant().Contains("phone"))
+					maxCacheSize = 1000000 * 64; //64MB
+				else
+					maxCacheSize = 1000000 * 256; //256MB
 
-            _reusableBitmaps = new WriteableBitmapLRUCache(maxCacheSize);
-        }
+				_logger?.Debug($"Memory cache size: {maxCacheSize} bytes");
+			}
 
-        public static IImageCache Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger));
-            }
-        }
+			_reusableBitmaps = new WriteableBitmapLRUCache(maxCacheSize);
+		}
 
         public void Add(string key, ImageInformation imageInformation, BitmapSource bitmap)
         {

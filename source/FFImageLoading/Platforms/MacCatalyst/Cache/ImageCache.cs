@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using System.Linq;
+using FFImageLoading.Config;
 
 #if __MACOS__
 using AppKit;
@@ -24,11 +25,16 @@ namespace FFImageLoading.Cache
         private readonly IMiniLogger _logger;
         private readonly object _lock = new object();
 
-        public ImageCache(int maxCacheSize, IMiniLogger logger)
+		protected readonly IConfiguration Configuration;
+
+        public ImageCache(IConfiguration configuration, IMiniLogger miniLogger)
         {
-            _logger = logger;
+			Configuration = configuration;
+            _logger = miniLogger;
             _cache = new NSCache();
             _imageInformations = new ConcurrentDictionary<string, ImageInformation>();
+
+			var maxCacheSize = configuration.MaxMemoryCacheSize;
 
             if (maxCacheSize <= 0)
                 _cache.TotalCostLimit = (nuint)(NSProcessInfo.ProcessInfo.PhysicalMemory * 0.2d); // 20% of physical memory
@@ -36,13 +42,11 @@ namespace FFImageLoading.Cache
                 _cache.TotalCostLimit = (nuint)Math.Min((NSProcessInfo.ProcessInfo.PhysicalMemory * 0.05d), maxCacheSize);
 
             var sizeInMB = Math.Round(_cache.TotalCostLimit / 1024d / 1024d, 2);
-            logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
+            _logger.Debug(string.Format("Image memory cache size: {0} MB", sizeInMB));
 
             // if we get a memory warning notification we should clear the cache
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("UIApplicationDidReceiveMemoryWarningNotification"), notif => Clear());
         }
-
-        public static IMemoryCache<PImage> Instance => _instance ?? (_instance = new ImageCache(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger));
 
         public ImageInformation GetInfo(string key)
         {
@@ -101,7 +105,7 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-            if (log && ImageService.Instance.Config.VerboseMemoryCacheLogging)
+            if (log && Configuration.VerboseMemoryCacheLogging)
                 _logger.Debug(string.Format($"Remove from memory cache called for {key}"));
 
             lock (_lock)

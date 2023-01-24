@@ -18,42 +18,44 @@ using PImage = UIKit.UIImage;
 
 namespace FFImageLoading.Decoders
 {
-    public class WebPDecoder : IDecoder<PImage>
-    {
-        //WebPCodec _decoder;
+	public class WebPDecoder : IDecoder<PImage>
+	{
+		//WebPCodec _decoder;
+		public WebPDecoder(IImageService<PImage> imageService)
+		{
+			this.imageService = imageService;
+		}
 
-        public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
-        {
-            //if (_decoder == null)
-            //    _decoder = new WebPCodec();
+		protected readonly IImageService<PImage> imageService;
 
-            var result = new DecodedImage<PImage>();
-           // result.Image = _decoder.Decode(stream);
+		public Task<IDecodedImage<PImage>> DecodeAsync(Stream stream, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
+		{
+			//if (_decoder == null)
+			//    _decoder = new WebPCodec();
 
-            var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
-            var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
-            // TODO allowUpscale
-            // bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
+			var result = new DecodedImage<PImage>();
+			// result.Image = _decoder.Decode(stream);
 
-            if (parameters.DownSampleUseDipUnits)
-            {
-                downsampleWidth = downsampleWidth.DpToPixels();
-                downsampleHeight = downsampleHeight.DpToPixels();
-            }
+			var downsampleWidth = parameters.DownSampleSize?.Item1 ?? 0;
+			var downsampleHeight = parameters.DownSampleSize?.Item2 ?? 0;
+			// TODO allowUpscale
+			// bool allowUpscale = parameters.AllowUpscale ?? Configuration.AllowUpscale;
 
-            if (downsampleWidth != 0 || downsampleHeight != 0)
-            {
-                var interpolationMode = parameters.DownSampleInterpolationMode == InterpolationMode.Default ? Configuration.DownsampleInterpolationMode : parameters.DownSampleInterpolationMode;
-                var old = result.Image;
-                result.Image = old.ResizeUIImage(downsampleWidth, downsampleHeight, interpolationMode);
-                old.TryDispose();
-            }
+			if (parameters.DownSampleUseDipUnits)
+			{
+				downsampleWidth = imageService.DpToPixels(downsampleWidth);
+				downsampleHeight = imageService.DpToPixels(downsampleHeight);
+			}
 
-            return Task.FromResult<IDecodedImage<PImage>>(result);
-        }
+			if (downsampleWidth != 0 || downsampleHeight != 0)
+			{
+				var interpolationMode = parameters.DownSampleInterpolationMode == InterpolationMode.Default ? imageService.Configuration.DownsampleInterpolationMode : parameters.DownSampleInterpolationMode;
+				var old = result.Image;
+				result.Image = old.ResizeUIImage(downsampleWidth, downsampleHeight, interpolationMode);
+				old.TryDispose();
+			}
 
-        public Configuration Configuration => ImageService.Instance.Config;
-
-        public IMiniLogger Logger => ImageService.Instance.Config.Logger;
-    }
+			return Task.FromResult<IDecodedImage<PImage>>(result);
+		}
+	}
 }

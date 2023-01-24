@@ -6,6 +6,8 @@ using Android.Widget;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using FFImageLoading.Helpers;
+using Java.Util.Logging;
 
 namespace FFImageLoading.Targets
 {
@@ -13,11 +15,14 @@ namespace FFImageLoading.Targets
     {
 		private static readonly ConditionalWeakTable<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>> _runningAnimations = new ConditionalWeakTable<ImageView, HighResolutionTimer<ISelfDisposingAnimatedBitmapDrawable>>();
 
-        public ImageViewTarget(ImageView control) : base(control)
+        public ImageViewTarget(ImageView control, IMiniLogger logger) : base(control)
         {
+			Logger = logger;
         }
 
-		private static void PlayAnimation(ImageView control, ISelfDisposingAnimatedBitmapDrawable drawable)
+		protected readonly IMiniLogger Logger;
+
+		private void PlayAnimation(ImageView control, ISelfDisposingAnimatedBitmapDrawable drawable)
 		{
 			lock (_runningAnimations)
 			{
@@ -36,7 +41,7 @@ namespace FFImageLoading.Targets
 								return;
 							}
 
-							await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+							control.Handler.Post(() =>
 							{
 								if (control == null || control.Handle == IntPtr.Zero
 								|| !drawable.IsValidAndHasValidBitmap())
@@ -46,7 +51,7 @@ namespace FFImageLoading.Targets
 								}
 
 								control.SetImageBitmap(bitmap);
-							}).ConfigureAwait(false);
+							});
 						}
 						catch (ObjectDisposedException)
 						{
@@ -55,7 +60,7 @@ namespace FFImageLoading.Targets
 					}
 					catch (Exception ex)
 					{
-						ImageService.Instance.Config.Logger.Error("GIF", ex);
+						Logger.Error("GIF", ex);
 					}
 				})
 				{
@@ -82,7 +87,7 @@ namespace FFImageLoading.Targets
 			}
 		}
 
-		private static void Set(ImageView control, SelfDisposingBitmapDrawable drawable)
+		private void Set(ImageView control, SelfDisposingBitmapDrawable drawable)
 		{
 			lock (control)
 			{

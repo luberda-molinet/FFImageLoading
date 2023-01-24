@@ -23,28 +23,32 @@ namespace FFImageLoading.Cache
         Task _currentWrite = Task.FromResult<byte>(1);
         ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.SimpleDiskCache"/> class.
-        /// </summary>
-        /// <param name="cachePath">Cache path.</param>
-        /// <param name="configuration">Configuration.</param>
-        public SimpleDiskCache(string cachePath, Configuration configuration)
-        {
-            _cachePath = Path.GetFullPath(cachePath);
-            Configuration = configuration;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:FFImageLoading.Cache.SimpleDiskCache"/> class.
+		/// </summary>
+		/// <param name="cachePath">Cache path.</param>
+		/// <param name="configuration">Configuration.</param>
+		public SimpleDiskCache(IConfiguration configuration, IMiniLogger logger)
+		{
+			Configuration = configuration;
+			Logger = logger;
 
-            Logger?.Debug("SimpleDiskCache path: " + _cachePath);
+			var cacheDir = configuration?.DiskCachePath ?? Path.Combine(FileSystem.CacheDirectory, "FFSimpleDiskCache");
 
-            if (!Directory.Exists(_cachePath))
-                Directory.CreateDirectory(_cachePath);
+			if (!Directory.Exists(cacheDir))
+				Directory.CreateDirectory(cacheDir);
 
-            InitializeEntries();
+			_cachePath = Path.GetFullPath(cacheDir);
 
-            ThreadPool.QueueUserWorkItem(CleanCallback);
-        }
+			Logger?.Debug("SimpleDiskCache path: " + _cachePath);
 
-        protected Configuration Configuration { get; private set; }
-        protected IMiniLogger Logger { get { return Configuration.Logger; } }
+			InitializeEntries();
+
+			ThreadPool.QueueUserWorkItem(CleanCallback);
+		}
+
+		protected readonly IMiniLogger Logger;
+		protected readonly IConfiguration Configuration;
 
         /// <summary>
         /// Adds the file to cache and file saving queue if it does not exists.

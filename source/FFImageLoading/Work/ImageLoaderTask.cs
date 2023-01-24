@@ -20,13 +20,15 @@ namespace FFImageLoading.Work
 		protected static readonly SemaphoreSlim _placeholdersResolveLock = new SemaphoreSlim(1, 1);
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-		protected ImageLoaderTask(IMemoryCache<TImageContainer> memoryCache, ITarget<TImageContainer, TImageView> target, TaskParameter parameters, IImageService imageService)
+		public ImageLoaderTask(
+			IImageService<TImageContainer> imageService,
+			IMemoryCache<TImageContainer> memoryCache,
+			ITarget<TImageContainer, TImageView> target,
+			TaskParameter parameters)
 		{
-			MemoryCache = memoryCache;
-			DataResolverFactory = imageService.Config.DataResolverFactory;
 			PlatformTarget = target;
 			ImageService = imageService;
-			Configuration = imageService.Config;
+			MemoryCache= memoryCache;
 			Parameters = parameters;
 			CancellationTokenSource = new CancellationTokenSource();
 			CanUseMemoryCache = true;
@@ -56,7 +58,7 @@ namespace FFImageLoading.Work
 
 				if (Parameters.StreamRead != null && Parameters.StreamRead.CanSeek)
 				{
-					Parameters.StreamChecksum = Configuration.MD5Helper.MD5(Parameters.StreamRead);
+					Parameters.StreamChecksum = Md5Helper.MD5(Parameters.StreamRead);
 					Parameters.StreamRead.Position = 0;
 
 					SetKeys();
@@ -205,8 +207,6 @@ namespace FFImageLoading.Work
 			}
 		}
 
-		public Configuration Configuration { get; private set; }
-
 		private ImageInformation _imageInformation;
 		public ImageInformation ImageInformation
 		{
@@ -226,21 +226,26 @@ namespace FFImageLoading.Work
 
 		public ITarget Target => PlatformTarget as ITarget;
 
-		protected IImageService ImageService { get; private set; }
+		public IConfiguration Configuration { get; }
 
-		protected IMemoryCache<TImageContainer> MemoryCache { get; private set; }
+		protected readonly IImageService<TImageContainer> ImageService;
 
-		protected IDataResolverFactory DataResolverFactory { get; private set; }
+		protected readonly IMemoryCache<TImageContainer> MemoryCache;
 
-		protected IDiskCache DiskCache => Configuration.DiskCache;
+		protected readonly IDataResolverFactory DataResolverFactory;
 
-		protected IDownloadCache DownloadCache => Configuration.DownloadCache;
+		protected readonly IDiskCache DiskCache;
 
-		protected IMiniLogger Logger => Configuration.Logger;
+		protected readonly IDownloadCache DownloadCache;
+
+		protected readonly IMiniLogger Logger;
+
+		protected readonly IMainThreadDispatcher MainThreadDispatcher;
+
+		protected readonly IMD5Helper Md5Helper;
 
 		protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
-		protected IMainThreadDispatcher MainThreadDispatcher => Configuration.MainThreadDispatcher;
 
 		protected abstract int DpiToPixels(int size);
 
@@ -517,7 +522,7 @@ namespace FFImageLoading.Work
 				try
 				{
 					var customResolver = isLoadingPlaceholder ? Parameters.CustomLoadingPlaceholderDataResolver : Parameters.CustomErrorPlaceholderDataResolver;
-					var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters, Configuration);
+					var loadResolver = customResolver ?? DataResolverFactory.GetResolver(path, source, Parameters);
 					loadResolver = new WrappedDataResolver(loadResolver);
 					DataResolverResult loadImageData;
 					TImageContainer loadImage;
@@ -613,7 +618,7 @@ namespace FFImageLoading.Work
 					}
 
 					Logger.Debug(string.Format("Generating/retrieving image: {0}", Key));
-					var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters, Configuration);
+					var resolver = Parameters.CustomDataResolver ?? DataResolverFactory.GetResolver(Parameters.Path, Parameters.Source, Parameters);
 					resolver = new WrappedDataResolver(resolver);
 					var imageData = await resolver.Resolve(Parameters.Path, Parameters, CancellationTokenSource.Token).ConfigureAwait(false);
 					loadingResult = imageData.LoadingResult;

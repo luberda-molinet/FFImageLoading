@@ -1,5 +1,6 @@
 ﻿#if !ANDROID && !WINDOWS && !IOS && !TIZEN && !MACCATALYST
 using System;
+using FFImageLoading.Cache;
 using FFImageLoading.Config;
 using FFImageLoading.DataResolvers;
 using FFImageLoading.Work;
@@ -8,7 +9,14 @@ namespace FFImageLoading
 {
     public class DataResolverFactory : IDataResolverFactory
     {
-        public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters, Configuration configuration)
+		public DataResolverFactory(IDownloadCache downloadCache)
+		{
+			DownloadCache = downloadCache;
+		}
+
+		protected readonly IDownloadCache DownloadCache;
+
+		public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters, IConfiguration configuration)
         {
             switch (source)
             {
@@ -21,7 +29,7 @@ namespace FFImageLoading
                 case Work.ImageSource.Url:
                     if (!string.IsNullOrWhiteSpace(identifier) && identifier.IsDataUrl())
                         return new DataUrlResolver();
-                    return new UrlDataResolver(configuration);
+                    return new UrlDataResolver(configuration, DownloadCache);
                 case Work.ImageSource.Stream:
                     return new StreamDataResolver();
                 case Work.ImageSource.EmbeddedResource:

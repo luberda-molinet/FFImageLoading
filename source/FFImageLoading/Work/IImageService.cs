@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using FFImageLoading.Config;
 using FFImageLoading.Work;
@@ -17,13 +17,21 @@ namespace FFImageLoading
     /// FFImageLoading by Daniel Luberda
     /// </summary>
     [Preserve(AllMembers = true)]
-    public interface IImageService
+    public interface IImageService<TImageContainer>
     {
         /// <summary>
         /// Gets FFImageLoading configuration
         /// </summary>
         /// <value>The configuration used by FFImageLoading.</value>
-        Configuration Config { get; }
+        IConfiguration Configuration { get; }
+
+		IDiskCache DiskCache { get; }
+
+		IMD5Helper Md5Helper { get; }
+
+		IMiniLogger Logger { get; }
+
+		IMainThreadDispatcher Dispatcher { get; }
 
         /// <summary>
         /// Initializes FFImageLoading with a default Configuration.
@@ -36,14 +44,19 @@ namespace FFImageLoading
         /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)
         /// </summary>
         /// <param name="configuration">Configuration.</param>
-        void Initialize(Configuration configuration);
+        void Initialize(IConfiguration configuration);
 
-        /// <summary>
-        /// Constructs a new TaskParameter to load an image from a file.
-        /// </summary>
-        /// <returns>The new TaskParameter.</returns>
-        /// <param name="filepath">Path to the file.</param>
-        TaskParameter LoadFile(string filepath);
+		IImageLoaderTask CreateTask(TaskParameter parameters);
+
+		IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<TImageContainer, TImageView> target) where TImageView : class;
+
+
+		/// <summary>
+		/// Constructs a new TaskParameter to load an image from a file.
+		/// </summary>
+		/// <returns>The new TaskParameter.</returns>
+		/// <param name="filepath">Path to the file.</param>
+		TaskParameter LoadFile(string filepath);
 
         /// <summary>
         /// Constructs a new TaskParameter to load an image from a URL.

@@ -1,4 +1,5 @@
 ﻿using System;
+using FFImageLoading.Cache;
 using FFImageLoading.Config;
 using FFImageLoading.Work;
 
@@ -13,9 +14,9 @@ namespace FFImageLoading.DataResolvers
             _factory = factory;
         }
 
-        public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters, Configuration configuration)
+        public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters)
         {
-            return new WrappedDataResolver(_factory.GetResolver(identifier, source, parameters, configuration));
+            return new WrappedDataResolver(_factory.GetResolver(identifier, source, parameters));
         }
     }
 }

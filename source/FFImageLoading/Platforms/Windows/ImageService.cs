@@ -18,29 +18,23 @@ namespace FFImageLoading
     [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<BitmapSource>
     {
-        static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
-        static IImageService _instance;
+		public ImageService(
+			IConfiguration configuration,
+			ImageCache imageCache,
+			IMD5Helper md5Helper,
+			IMiniLogger miniLogger,
+			IPlatformPerformance platformPerformance,
+			IMainThreadDispatcher mainThreadDispatcher,
+			IDataResolverFactory dataResolverFactory)
+			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+		{
+			ImageCache = imageCache;
+		}
 
-        /// <summary>
-        /// FFImageLoading instance.
-        /// </summary>
-        /// <value>The instance.</value>
-        public static IImageService Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new ImageService();
+		static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
 
-                return _instance;
-            }
-        }
 
-        /// <summary>
-        /// Set this to use FFImageLoading in a unit test environment. 
-        /// Instead throwing DoNotReference exception - use Mock implementation
-        /// </summary>
-        public static bool EnableMockImageService { get; set; }
+		protected readonly ImageCache ImageCache;
 
         protected override void PlatformSpecificConfiguration(Config.Configuration configuration)
         {
@@ -50,50 +44,13 @@ namespace FFImageLoading
             configuration.ExecuteCallbacksOnUIThread = true;
         }
 
-        protected override IMemoryCache<BitmapSource> MemoryCache => ImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new PlatformPerformance();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MainThreadDispatcher();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new DataResolverFactory();
+        protected override IMemoryCache<BitmapSource> MemoryCache => this.ImageCache;
 
-        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration)
-        {
-            //StorageFolder rootFolder = null;
-            //string folderName = null;
+        public IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
+			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
 
-            //if (string.IsNullOrWhiteSpace(configuration.DiskCachePath))
-            //{
-            //    rootFolder = ApplicationData.Current.TemporaryFolder;
-            //    folderName = "FFSimpleDiskCache";
-            //    string cachePath = Path.Combine(rootFolder.Path, folderName);
-            //    configuration.DiskCachePath = cachePath;
-            //}
-            //else
-            //{
-            //    var separated = configuration.DiskCachePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            //    folderName = separated.Last();
-            //    var rootPath = configuration.DiskCachePath.Substring(0, configuration.DiskCachePath.LastIndexOf(folderName));
-            //    rootFolder = StorageFolder.GetFolderFromPathAsync(rootPath).GetAwaiter().GetResult();
-            //}
-
-			var cacheDir = Path.Combine(FileSystem.CacheDirectory, "FFSimpleDiskCache");
-
-			if (!Directory.Exists(cacheDir))
-				Directory.CreateDirectory(cacheDir);
-
-            return new SimpleDiskCache(cacheDir, Config);
-        }
-
-        internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
-        {
-            return new PlatformImageLoaderTask<TImageView>(target, parameters, Instance);
-        }
-
-        internal static IImageLoaderTask CreateTask(TaskParameter parameters)
-        {
-            return new PlatformImageLoaderTask<object>(null, parameters, Instance);
-        }
+		public override IImageLoaderTask CreateTask(TaskParameter parameters)
+			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {

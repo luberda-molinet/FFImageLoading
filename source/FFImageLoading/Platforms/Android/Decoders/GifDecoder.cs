@@ -7,11 +7,19 @@ using FFImageLoading.Helpers;
 using FFImageLoading.Extensions;
 using FFImageLoading.Config;
 using FFImageLoading.Helpers.Gif;
+using FFImageLoading.Drawables;
 
 namespace FFImageLoading.Decoders
 {
 	public class GifDecoder : IDecoder<Bitmap>
 	{
+		public GifDecoder(IImageService<SelfDisposingBitmapDrawable> imageService)
+		{
+			ImageService = imageService;
+		}
+
+		protected readonly IImageService<SelfDisposingBitmapDrawable> ImageService;
+
 		public async Task<IDecodedImage<Bitmap>> DecodeAsync(Stream stream, string path, Work.ImageSource source, ImageInformation imageInformation, TaskParameter parameters)
 		{
 			var result = new DecodedImage<Bitmap>();
@@ -29,8 +37,8 @@ namespace FFImageLoading.Decoders
 
 					if (parameters.DownSampleUseDipUnits)
 					{
-						downsampleWidth = downsampleWidth.DpToPixels();
-						downsampleHeight = downsampleHeight.DpToPixels();
+						downsampleWidth = ImageService.DpToPixels(downsampleWidth);
+						downsampleHeight = ImageService.DpToPixels(downsampleHeight);
 					}
 					await gifDecoder.ReadHeaderAsync(stream).ConfigureAwait(false);
 					insampleSize = BaseDecoder.CalculateInSampleSize(gifDecoder.Width, gifDecoder.Height, downsampleWidth, downsampleHeight, false);
@@ -46,9 +54,9 @@ namespace FFImageLoading.Decoders
 				else
 					imageInformation.SetCurrentSize(gifDecoder.Width, gifDecoder.Height);
 
-				result.IsAnimated = gifDecoder.FrameCount > 1 && Configuration.AnimateGifs;
+				result.IsAnimated = gifDecoder.FrameCount > 1 && ImageService.Configuration.AnimateGifs;
 
-				if (result.IsAnimated && Configuration.AnimateGifs)
+				if (result.IsAnimated && ImageService.Configuration.AnimateGifs)
 				{
 					result.AnimatedImages = new AnimatedImage<Bitmap>[gifDecoder.FrameCount];
 
@@ -119,10 +127,5 @@ namespace FFImageLoading.Decoders
 				bitmap.SetPixels(pixels, 0, width, 0, 0, width, height);
 			}
 		}
-
-
-		public Configuration Configuration => ImageService.Instance.Config;
-
-		public IMiniLogger Logger => ImageService.Instance.Config.Logger;
 	}
 }

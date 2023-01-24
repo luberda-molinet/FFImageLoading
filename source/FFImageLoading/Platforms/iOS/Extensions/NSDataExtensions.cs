@@ -22,10 +22,10 @@ namespace FFImageLoading.Extensions
 {
     public static class NSDataExtensions
     {
-        public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+        public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, IImageService<PImage> imageService, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
         {
             var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(
-				data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale).ConfigureAwait(false);
+				data, destSize, destScale, imageService, parameters, resizeMode, imageinformation, allowUpscale).ConfigureAwait(false);
 
             PImage result;
 

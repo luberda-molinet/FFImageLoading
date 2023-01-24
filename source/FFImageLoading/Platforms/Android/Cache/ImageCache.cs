@@ -10,22 +10,15 @@ using System;
 using FFImageLoading.Work;
 using System.Collections.Concurrent;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace FFImageLoading.Cache
 {
     public class ImageCache : ImageCache<SelfDisposingBitmapDrawable>
     {
-        public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging) : base(maxCacheSize, logger, verboseLogging)
+        public ImageCache(Config.IConfiguration configuration, IMiniLogger logger)
+			: base(configuration, logger)
         {
-        }
-
-        private static IImageCache<SelfDisposingBitmapDrawable> _instance;
-        public static IImageCache<SelfDisposingBitmapDrawable> Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new ImageCache<SelfDisposingBitmapDrawable>(ImageService.Instance.Config.MaxMemoryCacheSize, ImageService.Instance.Config.Logger, ImageService.Instance.Config.VerboseMemoryCacheLogging));
-            }
         }
     }
 
@@ -39,10 +32,12 @@ namespace FFImageLoading.Cache
         private readonly ReuseBitmapDrawableCache<TValue> _cache;
         private readonly ConcurrentDictionary<string, ImageInformation> _imageInformations;
         private readonly IMiniLogger _logger;
+		private readonly FFImageLoading.Config.IConfiguration _configuration;
         private readonly object _lock = new object();
 
-        public ImageCache(int maxCacheSize, IMiniLogger logger, bool verboseLogging)
+        public ImageCache(Config.IConfiguration configuration, IMiniLogger logger)
         {
+			_configuration = configuration;
             _logger = logger;
             int memoryCacheSize;
             int bitmapPoolSize;
@@ -77,6 +72,7 @@ namespace FFImageLoading.Cache
             var arrayPoolSize = isLowMemoryDevice ? ARRAY_POOL_SIZE_BYTES / LOW_MEMORY_BYTE_ARRAY_POOL_DIVISOR : ARRAY_POOL_SIZE_BYTES;
             var availableSize = maxSize - arrayPoolSize;
 
+			var maxCacheSize = _configuration.MaxMemoryCacheSize;
             if (maxCacheSize >= 1024 * 1024 * 16)
             {
                 var part = (float)maxCacheSize / (BITMAP_POOL_TARGET_SCREENS + MEMORY_CACHE_TARGET_SCREENS);
@@ -99,7 +95,7 @@ namespace FFImageLoading.Cache
             var poolSizeInMB = Math.Round((float)bitmapPoolSize / 1024 / 1024, 2);
             logger.Debug(string.Format("Image memory cache size: {0} MB, reuse pool size:D {1} MB", sizeInMB, poolSizeInMB));
 
-            _cache = new ReuseBitmapDrawableCache<TValue>(logger, memoryCacheSize, bitmapPoolSize, verboseLogging);
+            _cache = new ReuseBitmapDrawableCache<TValue>(logger, memoryCacheSize, bitmapPoolSize, _configuration.VerboseLogging);
             _imageInformations = new ConcurrentDictionary<string, ImageInformation>();
         }
 
@@ -193,7 +189,7 @@ namespace FFImageLoading.Cache
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-            if (log && ImageService.Instance.Config.VerboseMemoryCacheLogging)
+            if (log && _configuration.VerboseMemoryCacheLogging)
                 _logger.Debug(string.Format($"Remove from memory cache called for {key}"));
 
             lock (_lock)

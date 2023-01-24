@@ -17,58 +17,28 @@ namespace FFImageLoading
     public class ImageService : ImageServiceBase<UIImage>
     {
         static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
-        static IImageService _instance;
 
-        /// <summary>
-        /// FFImageLoading instance.
-        /// </summary>
-        /// <value>The instance.</value>
-        public static IImageService Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new ImageService();
-                
-                return _instance;
-            }
-        }
+		public ImageService(
+			IConfiguration configuration,
+			IMD5Helper md5Helper,
+			IMiniLogger miniLogger,
+			IPlatformPerformance platformPerformance,
+			IMainThreadDispatcher mainThreadDispatcher,
+			IDataResolverFactory dataResolverFactory)
+			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+		{
+		}
 
-        /// <summary>
-        /// Set this to use FFImageLoading in a unit test environment. 
-        /// Instead throwing DoNotReference exception - use Mock implementation
-        /// </summary>
-        public static bool EnableMockImageService { get; set; }
+		ImageCache imageCache;
 
-        protected override IMemoryCache<UIImage> MemoryCache => ImageCache.Instance;
-        protected override IMD5Helper CreatePlatformMD5HelperInstance(Configuration configuration) => new MD5Helper();
-        protected override IMiniLogger CreatePlatformLoggerInstance(Configuration configuration) => new MiniLogger();
-        protected override IPlatformPerformance CreatePlatformPerformanceInstance(Configuration configuration) => new PlatformPerformance();
-        protected override IMainThreadDispatcher CreateMainThreadDispatcherInstance(Configuration configuration) => new MainThreadDispatcher();
-        protected override IDataResolverFactory CreateDataResolverFactoryInstance(Configuration configuration) => new DataResolverFactory();
+		protected override IMemoryCache<UIImage> MemoryCache => imageCache ??= new ImageCache(Configuration, Logger);
 
-        protected override IDiskCache CreatePlatformDiskCacheInstance(Configuration configuration)
-        {
-            if (string.IsNullOrWhiteSpace(configuration.DiskCachePath))
-            {
-                var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string tmpPath = Path.Combine(documents, "..", "Library", "Caches");
-                string cachePath = Path.Combine(tmpPath, "FFSimpleDiskCache");
-                configuration.DiskCachePath = cachePath;
-            }
 
-            return new SimpleDiskCache(configuration.DiskCachePath, configuration);
-        }
+        public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
+			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
 
-        internal static IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
-        {
-            return new PlatformImageLoaderTask<TImageView>(target, parameters, Instance);
-        }
-
-        internal static IImageLoaderTask CreateTask(TaskParameter parameters)
-        {
-            return new PlatformImageLoaderTask<object>(null, parameters, Instance);
-        }
+		public override IImageLoaderTask CreateTask(TaskParameter parameters)
+			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {

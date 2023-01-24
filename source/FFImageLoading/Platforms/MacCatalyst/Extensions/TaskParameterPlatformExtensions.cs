@@ -19,9 +19,9 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The PNG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
+        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters, ImageService imageService)
         {
-            var result = await AsUIImageAsync(parameters).ConfigureAwait(false);
+            var result = await AsUIImageAsync(parameters, imageService).ConfigureAwait(false);
             return result.AsPNG().AsStream();
         }
 
@@ -31,9 +31,9 @@ namespace FFImageLoading
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
         /// <param name="quality">Quality.</param>
-        public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, ImageService imageService, int quality = 80)
         {
-            var result = await AsUIImageAsync(parameters).ConfigureAwait(false);
+            var result = await AsUIImageAsync(parameters, imageService).ConfigureAwait(false);
             return result.AsJPEG(quality).AsStream();
         }
 
@@ -42,11 +42,11 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView)
+        public static IScheduledWork Into(this TaskParameter parameters, UIImageView imageView, ImageService imageService)
         {
             var target = new UIImageViewTarget(imageView);
 
-            return parameters.Into(target);
+            return parameters.Into(target, imageService);
         }
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="item">Image view that should receive the image.</param>
-        public static IScheduledWork Into(this TaskParameter parameters, UITabBarItem item)
+        public static IScheduledWork Into(this TaskParameter parameters, UITabBarItem item, ImageService imageService)
         {
             var target = new UIBarItemTarget(item);
-            return parameters.Into(target);
+            return parameters.Into(target, imageService);
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="button">UIButton that should receive the image.</param>
-        public static IScheduledWork Into(this TaskParameter parameters, UIButton button)
+        public static IScheduledWork Into(this TaskParameter parameters, UIButton button, ImageService imageService)
         {
             var target = new UIButtonTarget(button);
-            return parameters.Into(target);
+            return parameters.Into(target, imageService);
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace FFImageLoading
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UIImageView imageView)
+        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UIImageView imageView, ImageService imageService)
         {
-            return parameters.IntoAsync(param => param.Into(imageView));
+            return parameters.IntoAsync(param => param.Into(imageView, imageService));
         }
 
         /// <summary>
@@ -90,9 +90,9 @@ namespace FFImageLoading
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="item">Image view that should receive the image.</param>
-        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UITabBarItem item)
+        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UITabBarItem item, ImageService imageService)
         {
-            return parameters.IntoAsync(param => param.Into(item));
+            return parameters.IntoAsync(param => param.Into(item, imageService));
         }
 
         /// <summary>
@@ -102,9 +102,9 @@ namespace FFImageLoading
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="button">UIButton that should receive the image.</param>
-        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UIButton button)
+        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, UIButton button, ImageService imageService)
         {
-            return parameters.IntoAsync(param => param.Into(button));
+            return parameters.IntoAsync(param => param.Into(button, imageService));
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The PImage async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters)
+        public static Task<UIImage> AsUIImageAsync(this TaskParameter parameters, ImageService imageService)
         {
             var target = new UIImageTarget();
             var userErrorCallback = parameters.OnError;
@@ -139,8 +139,8 @@ namespace FFImageLoading
                 return null;
             }
 
-            var task = ImageService.CreateTask(parameters, target);
-            ImageService.Instance.LoadImage(task);
+            var task = imageService.CreateTask(parameters, target);
+            imageService.LoadImage(task);
 
             return tcs.Task;
         }
@@ -152,7 +152,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
+        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target, ImageService imageService) where TImageView : class
         {
             if (parameters.Source != Work.ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -161,9 +161,9 @@ namespace FFImageLoading
                 return null;
             }
 
-            var task = ImageService.CreateTask(parameters, target);
+            var task = imageService.CreateTask(parameters, target);
 
-            ImageService.Instance.LoadImage(task);
+            imageService.LoadImage(task);
             return task;
         }
 
@@ -175,9 +175,9 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
+        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<UIImage, TImageView> target, ImageService imageService) where TImageView : class
         {
-            return parameters.IntoAsync(param => param.Into(target));
+            return parameters.IntoAsync(param => param.Into(target, imageService));
         }
 
         private static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)

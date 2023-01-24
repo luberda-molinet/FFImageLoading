@@ -22,9 +22,9 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The PNG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters)
+        public static async Task<Stream> AsPNGStreamAsync(this TaskParameter parameters, IImageService<BitmapSource> imageService)
         {
-            var result = await AsWriteableBitmapAsync(parameters).ConfigureAwait(false);
+            var result = await AsWriteableBitmapAsync(parameters, imageService).ConfigureAwait(false);
             var stream = await result.AsPngStreamAsync().ConfigureAwait(false);
 
             return stream;
@@ -35,9 +35,9 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The JPG Stream async.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, int quality = 80)
+        public static async Task<Stream> AsJPGStreamAsync(this TaskParameter parameters, IImageService<BitmapSource> imageService, int quality = 80)
         {
-            var result = await AsWriteableBitmapAsync(parameters).ConfigureAwait(false);
+            var result = await AsWriteableBitmapAsync(parameters, imageService).ConfigureAwait(false);
             var stream = await result.AsJpegStreamAsync(quality).ConfigureAwait(false);
 
             return stream;
@@ -49,7 +49,7 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The WriteableBitmap.</returns>
         /// <param name="parameters">Parameters.</param>
-        public static Task<WriteableBitmap> AsWriteableBitmapAsync(this TaskParameter parameters)
+        public static Task<WriteableBitmap> AsWriteableBitmapAsync(this TaskParameter parameters, IImageService<BitmapSource> imageService)
         {
             var target = new BitmapTarget();
             var userErrorCallback = parameters.OnError;
@@ -75,8 +75,8 @@ namespace FFImageLoading
                 return null;
             }
 
-            var task = ImageService.CreateTask(parameters, target);
-            ImageService.Instance.LoadImage(task);
+            var task = imageService.CreateTask(parameters, target);
+            imageService.LoadImage(task);
 
             return tcs.Task;
         }
@@ -86,10 +86,10 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static IScheduledWork Into(this TaskParameter parameters, Image imageView)
+        public static IScheduledWork Into(this TaskParameter parameters, Image imageView, IImageService<BitmapSource> imageService)
         {
             var target = new ImageTarget(imageView);
-            return parameters.Into<Image>(target);
+            return parameters.Into<Image>(target, imageService);
         }
 
         /// <summary>
@@ -99,9 +99,9 @@ namespace FFImageLoading
         /// <returns>An awaitable Task.</returns>
         /// <param name="parameters">Parameters for loading the image.</param>
         /// <param name="imageView">Image view that should receive the image.</param>
-        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Image imageView)
+        public static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Image imageView, IImageService<BitmapSource> imageService)
         {
-            return parameters.IntoAsync(param => param.Into(imageView));
+            return parameters.IntoAsync(param => param.Into(imageView, imageService));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
+        public static IScheduledWork Into<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target, IImageService<BitmapSource> imageService) where TImageView : class
         {
             if (parameters.Source != ImageSource.Stream && string.IsNullOrWhiteSpace(parameters.Path))
             {
@@ -120,8 +120,8 @@ namespace FFImageLoading
                 return null;
             }
 
-            var task = ImageService.CreateTask(parameters, target);
-            ImageService.Instance.LoadImage(task);
+            var task = imageService.CreateTask(parameters, target);
+            imageService.LoadImage(task);
             return task;
         }
 
@@ -133,9 +133,9 @@ namespace FFImageLoading
         /// <param name="parameters">Parameters.</param>
         /// <param name="target">Target.</param>
         /// <typeparam name="TImageView">The 1st type parameter.</typeparam>
-        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
+        public static Task<IScheduledWork> IntoAsync<TImageView>(this TaskParameter parameters, ITarget<BitmapSource, TImageView> target, IImageService<BitmapSource> imageService) where TImageView : class
         {
-            return parameters.IntoAsync(param => param.Into(target));
+            return parameters.IntoAsync(param => param.Into(target, imageService));
         }
 
         private static Task<IScheduledWork> IntoAsync(this TaskParameter parameters, Action<TaskParameter> into)

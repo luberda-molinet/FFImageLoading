@@ -20,21 +20,21 @@ using PImage = UIKit.UIImage;
 
 namespace FFImageLoading.Extensions
 {
-    public static class NSDataExtensions
-    {
-        public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, Configuration config, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
-        {
-            var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(
-				data, destSize, destScale, config, parameters, resizeMode, imageinformation, allowUpscale).ConfigureAwait(false);
+	public static class NSDataExtensions
+	{
+		public static async Task<PImage> ToImageAsync(this NSData data, CGSize destSize, nfloat destScale, IImageService<PImage> imageService, TaskParameter parameters, GifDecoder.RCTResizeMode resizeMode = GifDecoder.RCTResizeMode.ScaleAspectFit, ImageInformation imageinformation = null, bool allowUpscale = false)
+		{
+			var decoded = await GifDecoder.SourceRegfToDecodedImageAsync(
+				data, destSize, destScale, imageService, parameters, resizeMode, imageinformation, allowUpscale).ConfigureAwait(false);
 
-            PImage result;
+			PImage result;
 
-            if (decoded.IsAnimated)
-            {
+			if (decoded.IsAnimated)
+			{
 #if __IOS__
-                    result = PImage.CreateAnimatedImage(decoded.AnimatedImages
-                                                        .Select(v => v.Image)
-                                                        .Where(v => v?.CGImage != null).ToArray(), decoded.AnimatedImages.Sum(v => v.Delay) / 100.0);
+				result = PImage.CreateAnimatedImage(decoded.AnimatedImages
+													.Select(v => v.Image)
+													.Where(v => v?.CGImage != null).ToArray(), decoded.AnimatedImages.Sum(v => v.Delay) / 100.0);
 #elif __MACOS__
                 result = new PImage();
                 var repr = decoded.AnimatedImages
@@ -42,14 +42,14 @@ namespace FFImageLoading.Extensions
                                   .ToArray();
                 result.AddRepresentations(repr);
 #endif
-            }
-            else
-            {
-                result = decoded.Image;
-            }
+			}
+			else
+			{
+				result = decoded.Image;
+			}
 
-            return result;
-        }
-    }
+			return result;
+		}
+	}
 }
 

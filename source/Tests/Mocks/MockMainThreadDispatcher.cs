@@ -5,7 +5,7 @@ using FFImageLoading.Helpers;
 
 namespace FFImageLoading.Mock
 {
-    public class MockMainThreadDispatcher : IMainThreadDispatcher
+    public class MainThreadDispatcher : IMainThreadDispatcher
     {
         public void Post(Action action)
         {

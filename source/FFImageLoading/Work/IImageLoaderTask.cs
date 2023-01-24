@@ -24,7 +24,7 @@ namespace FFImageLoading.Work
 
         ITarget Target { get; }
 
-        Configuration Configuration { get; }
+        IConfiguration Configuration { get; }
 
         ImageInformation ImageInformation { get; }
 

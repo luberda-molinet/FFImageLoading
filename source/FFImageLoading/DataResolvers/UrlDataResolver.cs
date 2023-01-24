@@ -8,13 +8,14 @@ namespace FFImageLoading.DataResolvers
 {
     public class UrlDataResolver : IDataResolver
     {
-        public UrlDataResolver(Configuration configuration)
+        public UrlDataResolver(IConfiguration configuration, IDownloadCache downloadCache)
         {
             Configuration = configuration;
+			DownloadCache = DownloadCache;
         }
 
-        protected IDownloadCache DownloadCache => Configuration.DownloadCache;
-        protected Configuration Configuration { get; private set; }
+        protected IDownloadCache DownloadCache { get; }
+        protected IConfiguration Configuration { get; }
 
         public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {

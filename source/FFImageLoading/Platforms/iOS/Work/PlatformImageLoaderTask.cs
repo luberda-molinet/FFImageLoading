@@ -12,6 +12,8 @@ using ImageIO;
 using System.Collections.Generic;
 using FFImageLoading.Decoders;
 using CoreGraphics;
+using Microsoft.Maui.Controls.PlatformConfiguration;
+using Microsoft.Maui.Controls;
 
 #if __MACOS__
 using AppKit;
@@ -26,16 +28,25 @@ namespace FFImageLoading.Work
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<PImage, PImage, TImageView> where TImageView : class
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
-        private static readonly IDecoder<PImage> _webpDecoder = new WebPDecoder();
+		readonly IDecoder<PImage> _webpDecoder;
 #pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        public PlatformImageLoaderTask(ITarget<PImage, TImageView> target, TaskParameter parameters, IImageService imageService) : base(ImageCache.Instance, target, parameters, imageService)
-        {
-        }
+		public PlatformImageLoaderTask(
+			IImageService<PImage> imageService,
+			IMemoryCache<PImage> memoryCache,
+			ITarget<PImage, TImageView> target,
+			TaskParameter parameters)
+			: base(imageService, memoryCache, target, parameters)
+		{
+			_webpDecoder = new WebPDecoder(imageService);
+		}
 
-        public async override Task Init()
+		
+
+
+		public async override Task Init()
         {
-            await ScaleHelper.InitAsync().ConfigureAwait(false);
+            await ScaleHelper.InitAsync(ImageService.Dispatcher).ConfigureAwait(false);
             await base.Init().ConfigureAwait(false);
         }
 
@@ -53,7 +64,7 @@ namespace FFImageLoading.Work
 
         protected override int DpiToPixels(int size)
         {
-            return size.DpToPixels();
+            return ImageService.DpToPixels(size);
         }
 
         protected override IDecoder<PImage> ResolveDecoder(ImageInformation.ImageType type)
@@ -61,13 +72,13 @@ namespace FFImageLoading.Work
             switch (type)
             {
                 case ImageInformation.ImageType.GIF:
-                    return new GifDecoder();
+                    return new GifDecoder(ImageService);
 
                 case ImageInformation.ImageType.WEBP:
                     return _webpDecoder;
 
                 default:
-                    return new BaseDecoder();
+                    return new BaseDecoder(ImageService);
             }
         }
 

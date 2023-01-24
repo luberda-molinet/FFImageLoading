@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FFImageLoading.Cache;
 using FFImageLoading.Work;
 using System.IO;
+using Microsoft.Maui.Controls;
 
 namespace FFImageLoading
 {
@@ -16,20 +17,20 @@ namespace FFImageLoading
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
         /// <param name="cacheType">Cache type.</param>
-        public static async Task InvalidateAsync(this TaskParameter parameters, CacheType cacheType)
+        public static async Task InvalidateAsync<TImageContainer>(this TaskParameter parameters, CacheType cacheType, IImageService<TImageContainer> imageService)
         {
-            using (var task = ImageService.CreateTask(parameters))
+            using (var task = imageService.CreateTask(parameters))
             {
                 var key = task.Key;
-                await ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
+                await imageService.InvalidateCacheEntryAsync(key, cacheType).ConfigureAwait(false);
             }
         }
 
-        /// <summary>
-        /// Preloads the image request into memory cache/disk cache for future use.
-        /// </summary>
-        /// <param name="parameters">Image parameters.</param>
-        public static IImageLoaderTask Preload(this TaskParameter parameters)
+		/// <summary>
+		/// Preloads the image request into memory cache/disk cache for future use.
+		/// </summary>
+		/// <param name="parameters">Image parameters.</param>
+        public static IImageLoaderTask Preload<TImageContainer>(this TaskParameter parameters, IImageService<TImageContainer> imageService)
         {
             if (parameters.Priority == null)
             {
@@ -37,8 +38,8 @@ namespace FFImageLoading
             }
 
             parameters.Preload = true;
-            var task = ImageService.CreateTask(parameters);
-            ImageService.Instance.LoadImage(task);
+            var task = imageService.CreateTask(parameters);
+            imageService.LoadImage(task);
             return task;
         }
 
@@ -47,7 +48,7 @@ namespace FFImageLoading
         /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
-        public static Task PreloadAsync(this TaskParameter parameters)
+        public static Task PreloadAsync<TImageContainer>(this TaskParameter parameters, IImageService<TImageContainer> imageService)
         {
             var tcs = new TaskCompletionSource<IScheduledWork>();
 
@@ -57,7 +58,7 @@ namespace FFImageLoading
             }
 
             parameters.Preload = true;
-            var task = ImageService.CreateTask(parameters);
+            var task = imageService.CreateTask(parameters);
 
             var userErrorCallback = parameters.OnError;
             var finishCallback = parameters.OnFinish;
@@ -74,7 +75,7 @@ namespace FFImageLoading
                     tcs.TrySetResult(scheduledWork);
                 });
 
-            ImageService.Instance.LoadImage(task);
+            imageService.LoadImage(task);
 
             return tcs.Task;
         }
@@ -84,11 +85,11 @@ namespace FFImageLoading
         /// Only Url Source supported.
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
-        public static IImageLoaderTask DownloadOnly(this TaskParameter parameters)
+        public static IImageLoaderTask DownloadOnly<TImageContainer>(this TaskParameter parameters, IImageService<TImageContainer> imageService)
         {
             if (parameters.Source == Work.ImageSource.Url)
             {
-                return Preload(parameters.WithCache(CacheType.Disk));
+                return Preload(parameters.WithCache(CacheType.Disk), imageService);
             }
 
             return null;
@@ -100,11 +101,11 @@ namespace FFImageLoading
         /// IMPORTANT: It throws image loading exceptions - you should handle them
         /// </summary>
         /// <param name="parameters">Image parameters.</param>
-        public async static Task DownloadOnlyAsync(this TaskParameter parameters)
+        public async static Task DownloadOnlyAsync<TImageContainer>(this TaskParameter parameters, IImageService<TImageContainer> imageService)
         {
             if (parameters.Source == Work.ImageSource.Url)
             {
-                await PreloadAsync(parameters.WithCache(CacheType.Disk)).ConfigureAwait(false);
+                await PreloadAsync(parameters.WithCache(CacheType.Disk), imageService).ConfigureAwait(false);
             }
         }
     }

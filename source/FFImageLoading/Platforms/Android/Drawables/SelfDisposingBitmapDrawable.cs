@@ -1,4 +1,4 @@
-//
+﻿//
 // SelfDisposingBitmapDrawable.cs
 //
 // Author:
@@ -126,7 +126,9 @@ namespace FFImageLoading.Drawables
 
                 if (isDisplayed && !HasValidBitmap)
                 {
-                    ImageService.Instance.Config.Logger.Error("Cannot display drawable, its resources have been disposed.");
+					Android.Util.Log.Error("FFIMAGELOADING", "Cannot display drawable, its resources have been disposed.");
+
+                    //ImageService.Instance.Config.Logger.Error("Cannot display drawable, its resources have been disposed.");
                 }
                 else if (isDisplayed)
                 {
