@@ -57,8 +57,8 @@ namespace FFImageLoading
 
 
 
-		public abstract int DpToPixels(double dp);
-        public abstract double PixelsToDp(double px);
+		public abstract int DpToPixels(double dp, double scale);
+        public abstract double PixelsToDp(double px, double scale);
 
         IConfiguration _config;
         public IConfiguration Configuration

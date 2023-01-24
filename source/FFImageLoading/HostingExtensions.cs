@@ -12,9 +12,9 @@ namespace FFImageLoading
 			services.AddSingleton<IMD5Helper, MD5Helper>();
 			services.AddSingleton<IMiniLogger, MiniLogger>();
 			services.AddSingleton<IDiskCache, SimpleDiskCache>();
-			services.AddSingleton<IPlatformPerformance, PlatformPerformance>();
-			services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();
-			services.AddSingleton<IDataResolverFactory, DataResolverFactory>();
+			//services.AddSingleton<IPlatformPerformance, PlatformPerformance>();
+			//services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();
+			//services.AddSingleton<IDataResolverFactory, DataResolverFactory>();
 		}
 	}
 }

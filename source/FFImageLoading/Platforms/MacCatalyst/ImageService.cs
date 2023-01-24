@@ -85,17 +85,17 @@ namespace FFImageLoading
             }
         }
 
-        public override int DpToPixels(double dp)
+        public override int DpToPixels(double dp, double scale)
         {
-            return (int)Math.Floor(dp * ScaleHelper.Scale);
+            return (int)Math.Floor(dp * scale);
         }
 
-        public override double PixelsToDp(double px)
+        public override double PixelsToDp(double px, double scale)
         {
             if (Math.Abs(px) < double.Epsilon)
                 return 0d;
 
-            return px / ScaleHelper.Scale;
+            return px / scale;
         }
     }
 }

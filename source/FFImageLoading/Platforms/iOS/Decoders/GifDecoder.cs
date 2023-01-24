@@ -36,13 +36,10 @@ namespace FFImageLoading.Decoders
 		public GifDecoder(IImageService<PImage> imageService)
 		{
 			ImageService = imageService;
-			scaleHelper = new ScaleHelper(imageService.Dispatcher);
+			scale = UIScreen.MainScreen.Scale;
 		}
 
-		static ScaleHelper _scaleHelper;
-		static ScaleHelper GetScaleHelper(IMainThreadDispatcher mainThreadDispatcher)
-			=> _scaleHelper ??= new ScaleHelper(mainThreadDispatcher);
-
+        nfloat scale;
 
 		protected readonly IImageService<PImage> ImageService;
 
@@ -60,7 +57,7 @@ namespace FFImageLoading.Decoders
 
             using (var nsdata = NSData.FromStream(stream))
             {
-                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), scaleHelper.Scale,
+                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), scale,
 													  ImageService, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale).ConfigureAwait(false);
 				return result;
             }
@@ -93,7 +90,7 @@ namespace FFImageLoading.Decoders
                 }
                 else if (destScale <= 0)
                 {
-                    destScale = scaleHelper.Scale;
+                    destScale = UIScreen.MainScreen.Scale;
                 }
 
                 // Calculate target size

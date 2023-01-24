@@ -216,13 +216,13 @@ namespace FFImageLoading
         /// </summary>
         /// <returns>The to pixels.</returns>
         /// <param name="dp">Dp.</param>
-        int DpToPixels(double dp);
+        int DpToPixels(double dp, double scale);
 
         /// <summary>
         /// Pixelses to dp.
         /// </summary>
         /// <returns>The to dp.</returns>
         /// <param name="px">Px.</param>
-        double PixelsToDp(double px);
+        double PixelsToDp(double px, double scale);
     }
 }

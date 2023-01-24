@@ -5,6 +5,7 @@ using FFImageLoading.IO;
 using System.Threading.Tasks;
 using FFImageLoading.Helpers;
 using System.Threading;
+using UIKit;
 
 namespace FFImageLoading.DataResolvers
 {
@@ -14,7 +15,7 @@ namespace FFImageLoading.DataResolvers
         {
             string file = null;
 
-            var scale = (int)ScaleHelper.Scale;
+			var scale = UIScreen.MainScreen.Scale;
             if (scale > 1)
             {
                 var filename = Path.GetFileNameWithoutExtension(identifier);

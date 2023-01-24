@@ -1,108 +1,113 @@
 ﻿using System;
+using FFImageLoading.Config;
 using FFImageLoading.Work;
 using UIKit;
 
 namespace FFImageLoading.Targets
 {
-    public class UIImageViewTarget : UIViewTarget<UIImageView>
-    {
-        public UIImageViewTarget(UIImageView control) : base(control)
-        {
-        }
+	public class UIImageViewTarget : UIViewTarget<UIImageView>
+	{
+		public UIImageViewTarget(IConfiguration configuration, UIImageView control) : base(control)
+		{
+			Configuration = configuration;
+		}
 
-        public override void Set(IImageLoaderTask task, UIImage image, bool animated)
-        {
-            if (task == null || task.IsCancelled)
-                return;
+		protected readonly IConfiguration Configuration;
 
-            var control = Control;
+		public override void Set(IImageLoaderTask task, UIImage image, bool animated)
+		{
+			if (task == null || task.IsCancelled)
+				return;
 
-            if (control == null) return;
-            if (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1))
-                return;
+			var control = Control;
 
-            var isLayoutNeeded = IsLayoutNeeded(task, control.Image, image);
-            
-            var parameters = task.Parameters;
-            if (animated)
-            {
-                // fade animation
-                double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
-                    parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration)) / 1000;
+			if (control == null)
+				return;
+			if (control.Image == image && (control.Image?.Images == null || control.Image.Images.Length <= 1))
+				return;
 
-                UIView.Transition(control, fadeDuration,
-                    UIViewAnimationOptions.TransitionCrossDissolve
-                    | UIViewAnimationOptions.BeginFromCurrentState,
-                    () =>
-                    {
-                        if (control.Image?.Images != null && control.Image.Images.Length > 1)
-                            control.Image = null;
+			var isLayoutNeeded = IsLayoutNeeded(task, control.Image, image);
 
-                        control.Image = image;
+			var parameters = task.Parameters;
+			if (animated)
+			{
+				// fade animation
+				double fadeDuration = (double)((parameters.FadeAnimationDuration.HasValue ?
+					parameters.FadeAnimationDuration.Value : Configuration.FadeAnimationDuration)) / 1000;
 
-                        if (isLayoutNeeded)
-                            control.SetNeedsLayout(); // It's needed for cells, etc
-                    },
-                    () => { });
-            }
-            else
-            {
-                if (control.Image?.Images != null && control.Image.Images.Length > 1)
-                    control.Image = null;
-                control.Image = image;
+				UIView.Transition(control, fadeDuration,
+					UIViewAnimationOptions.TransitionCrossDissolve
+					| UIViewAnimationOptions.BeginFromCurrentState,
+					() =>
+					{
+						if (control.Image?.Images != null && control.Image.Images.Length > 1)
+							control.Image = null;
 
-                if (isLayoutNeeded)
-                    control.SetNeedsLayout(); // It's needed for cells, etc
-            }
-        }
+						control.Image = image;
 
-        bool IsLayoutNeeded(IImageLoaderTask task, UIImage oldImage, UIImage newImage)
-        {
-            if (task.Parameters.InvalidateLayoutEnabled.HasValue)
-            {
-                if (!task.Parameters.InvalidateLayoutEnabled.Value)
-                    return false;
-            }
-            else if (!task.Configuration.InvalidateLayout)
-            {
-                return false;
-            }
+						if (isLayoutNeeded)
+							control.SetNeedsLayout(); // It's needed for cells, etc
+					},
+					() => { });
+			}
+			else
+			{
+				if (control.Image?.Images != null && control.Image.Images.Length > 1)
+					control.Image = null;
+				control.Image = image;
 
-            try
-            {
-                if (oldImage == null && newImage == null)
-                    return false;
+				if (isLayoutNeeded)
+					control.SetNeedsLayout(); // It's needed for cells, etc
+			}
+		}
 
-                if (oldImage == null && newImage != null)
-                    return true;
+		bool IsLayoutNeeded(IImageLoaderTask task, UIImage oldImage, UIImage newImage)
+		{
+			if (task.Parameters.InvalidateLayoutEnabled.HasValue)
+			{
+				if (!task.Parameters.InvalidateLayoutEnabled.Value)
+					return false;
+			}
+			else if (!task.Configuration.InvalidateLayout)
+			{
+				return false;
+			}
 
-                if (oldImage != null && newImage == null)
-                    return true;
+			try
+			{
+				if (oldImage == null && newImage == null)
+					return false;
 
-                if (oldImage != null && newImage != null)
-                {
-                    return !(oldImage.Size.Width == newImage.Size.Width && oldImage.Size.Height == newImage.Size.Height);
-                }
-            }
-            catch (Exception)
-            {
-                return true;
-            }
+				if (oldImage == null && newImage != null)
+					return true;
 
-            return false;
-        }
+				if (oldImage != null && newImage == null)
+					return true;
 
-        public override void SetAsEmpty(IImageLoaderTask task)
-        {
-            if (task == null || task.IsCancelled)
-                return;
+				if (oldImage != null && newImage != null)
+				{
+					return !(oldImage.Size.Width == newImage.Size.Width && oldImage.Size.Height == newImage.Size.Height);
+				}
+			}
+			catch (Exception)
+			{
+				return true;
+			}
 
-            var control = Control;
-            if (control == null)
-                return;
+			return false;
+		}
 
-            control.Image = null;
-        }
+		public override void SetAsEmpty(IImageLoaderTask task)
+		{
+			if (task == null || task.IsCancelled)
+				return;
 
-    }
+			var control = Control;
+			if (control == null)
+				return;
+
+			control.Image = null;
+		}
+
+	}
 }

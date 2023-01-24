@@ -247,7 +247,7 @@ namespace FFImageLoading.Work
 		protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
 
-		protected abstract int DpiToPixels(int size);
+		protected abstract int DpiToPixels(int size, float scale);
 
 		protected abstract IDecoder<TDecoderContainer> ResolveDecoder(ImageInformation.ImageType type);
 

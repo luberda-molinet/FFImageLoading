@@ -41,7 +41,6 @@ namespace FFImageLoading.Work
 
 		public async override Task Init()
         {
-            await ScaleHelper.InitAsync().ConfigureAwait(false);
             await base.Init().ConfigureAwait(false);
         }
 
@@ -57,9 +56,9 @@ namespace FFImageLoading.Work
             }).ConfigureAwait(false);
         }
 
-        protected override int DpiToPixels(int size)
+        protected override int DpiToPixels(int size, float scale)
         {
-            return ImageService.DpToPixels(size);
+            return ImageService.DpToPixels(size, scale);
         }
 
         protected override IDecoder<PImage> ResolveDecoder(ImageInformation.ImageType type)
