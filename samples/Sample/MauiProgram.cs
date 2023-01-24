@@ -15,6 +15,7 @@ namespace Sample
 					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 					fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 				})
+				.RegisterFFImageLoadingHandlers()
 				.ConfigureImageSources(srcs => srcs.UseFFImageLoading());
 
 #if DEBUG

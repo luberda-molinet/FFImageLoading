@@ -24,8 +24,19 @@ namespace Sample
                 new MenuItem() {
                     Section = "Basic",
                     Title = "Basic example",
-                    Command = new AsyncRelayCommand(_ =>
-                        Navigation.PushAsync(new BasicPage()))
+                    Command = new AsyncRelayCommand(async  _ =>
+                    {
+                        try
+                        {
+                            var p = new BasicPage();
+                            await Navigation.PushAsync(p);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
+                        }
+                    })
                 },
 
                 new MenuItem() {
