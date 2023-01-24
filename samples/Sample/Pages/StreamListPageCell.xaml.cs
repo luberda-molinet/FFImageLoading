@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Xamarin.Forms;
 using System.IO;
 
 namespace Sample
@@ -23,8 +22,8 @@ namespace Sample
             if (item == null)
                 return;
 
-            Image.Source = ImageSource.FromStream(() => { return new MemoryStream(imageData); });
-            Label.Text = "Stream";
+            cachedImage.Source = ImageSource.FromStream(() => { return new MemoryStream(imageData); });
+            label.Text = "Stream";
         }
     }
 }

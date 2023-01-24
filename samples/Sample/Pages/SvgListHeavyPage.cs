@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using FFImageLoading.Svg.Forms;
+using FFImageLoading.Svg.Maui;
 using FFImageLoading.Transformations;
 using FFImageLoading.Work;
-using Xamarin.Forms;
-using Xamvvm;
+using Microsoft.Maui.Layouts;
 
 namespace Sample.Pages
 {
-    public class SvgListHeavyPage : ContentPage, IBasePage<SvgListHeavyPageModel>
+    public class SvgListHeavyPage : ContentPage
     {
+        SvgListHeavyPageModel viewModel;
+
         public SvgListHeavyPage()
         {
+            BindingContext = viewModel = new SvgListHeavyPageModel();
+
             Title = "SVG HeavyList Demo";
 
             var listView = new ListView(ListViewCachingStrategy.RecycleElement)
@@ -20,7 +23,7 @@ namespace Sample.Pages
                 HasUnevenRows = false,
                 RowHeight = 110,
             };
-            listView.SetBinding<SvgListHeavyPageModel>(ListView.ItemsSourceProperty, v => v.Items);
+            listView.ItemsSource = viewModel.Items;
 
             listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
@@ -88,16 +91,16 @@ namespace Sample.Pages
                 };
 
                 AbsoluteLayout.SetLayoutFlags(image1, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutBounds(image1, new Rectangle(0d, 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutBounds(image1, new Rect(0d, 0d, 0.25d, 1d));
 
                 AbsoluteLayout.SetLayoutFlags(image2, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutBounds(image2, new Rectangle(0.25d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutBounds(image2, new Rect(0.25d / (1d - 0.25d), 0d, 0.25d, 1d));
 
                 AbsoluteLayout.SetLayoutFlags(image3, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutBounds(image3, new Rectangle(0.50d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutBounds(image3, new Rect(0.50d / (1d - 0.25d), 0d, 0.25d, 1d));
 
                 AbsoluteLayout.SetLayoutFlags(image4, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutBounds(image4, new Rectangle(0.75d / (1d - 0.25d), 0d, 0.25d, 1d));
+                AbsoluteLayout.SetLayoutBounds(image4, new Rect(0.75d / (1d - 0.25d), 0d, 0.25d, 1d));
 
                 root.Children.Add(image1);
                 root.Children.Add(image2);

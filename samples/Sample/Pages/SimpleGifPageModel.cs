@@ -1,15 +1,16 @@
-﻿using Xamvvm;
+﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample
 {
-    
-    public class SimpleGifPageModel : BasePageModel
+    public partial class SimpleGifPageModel : ObservableObject
     {
         public void Reload()
         {
             ImageUrl = "resource://tenor.gif";
         }
 
-        public string ImageUrl { get; set; }
+        [ObservableProperty]
+        string imageUrl;
     }
 }

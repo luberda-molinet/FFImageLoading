@@ -4,25 +4,23 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample
 {
-	public class PlaceholdersPageModel : ObservableObject
+	public partial class PlaceholdersPageModel : ObservableObject
 	{
 		public PlaceholdersPageModel()
 		{
-			LoadingPlaceholderCommand = new BaseCommand((arg) =>
-			{
-				ImageUrl = Helpers.GetRandomImageUrl();
-			});
-
-			ErrorPlaceholderCommand = new BaseCommand((arg) =>
-			{
-				ImageUrl = "http://notexisting.com/notexisting.png";
-			});
 		}
 
-		public ICommand LoadingPlaceholderCommand { get; set; }
+		public void LoadingPlaceholder()
+		{
+			ImageUrl = Helpers.GetRandomImageUrl();
+		}
 
-		public ICommand ErrorPlaceholderCommand { get; set; }
+		public void ErrorPlaceholder()
+		{
+			ImageUrl = "http://notexisting.com/notexisting.png";
+		}
 
-		public string ImageUrl { get; set; }
+		[ObservableProperty]
+		string imageUrl;
 	}
 }

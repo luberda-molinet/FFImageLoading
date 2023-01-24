@@ -1,13 +1,12 @@
-﻿using Xamarin.Forms;
-using Xamvvm;
-
+﻿
 namespace Sample
 {
-    public partial class SvgReplacePage : ContentPage, IBasePage<SvgReplacePageModel>
+    public partial class SvgReplacePage : ContentPage
     {
         public SvgReplacePage()
         {
             InitializeComponent();
+            BindingContext = new SvgReplacePageModel();
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using System;
-using Xamvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample
 {
-    public class SimpleWebpPageModel : BasePageModel
+    public class SimpleWebpPageModel : ObservableObject
     {
 		public void Reload()
 		{
 			ImageUrl = "https://www.gstatic.com/webp/gallery/1.sm.webp";
 		}
 
-		public string ImageUrl { get; set; }
+		[ObservableProperty]
+		string imageUrl;
     }
 }

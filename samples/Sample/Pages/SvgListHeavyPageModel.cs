@@ -2,26 +2,26 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Xamarin.Forms;
-using Xamvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample.Pages
 {
-    public class SvgListHeavyPageModel : BasePageModel
+    public partial class SvgListHeavyPageModel : ObservableObject
     {
         public SvgListHeavyPageModel()
         {
-            ItemSelectedCommand = new BaseCommand<SelectedItemChangedEventArgs>((arg) =>
-            {
-                SelectedItem = null;
-            });
         }
 
-        public ListHeavyItem SelectedItem { get; set; }
+        [ObservableProperty]
+        ListHeavyItem selectedItem;
 
-        public ICommand ItemSelectedCommand { get; set; }
+        public void ItemSelected()
+        {
+            SelectedItem = null;
+        }
 
-        public ObservableCollection<ListHeavyItem> Items { get; set; }
+
+		public ObservableCollection<ListHeavyItem> Items { get; set; }
 
         public void Reload()
         {
@@ -236,15 +236,19 @@ namespace Sample.Pages
         }
 
 
-        public class ListHeavyItem : BaseModel
+        public partial class ListHeavyItem : ObservableObject
         {
-            public string Image1Url { get; set; }
+			[ObservableProperty]
+			string image1Url;
 
-            public string Image2Url { get; set; }
+			[ObservableProperty]
+			string image2Url;
 
-            public string Image3Url { get; set; }
+			[ObservableProperty]
+			string image3Url;
 
-            public string Image4Url { get; set; }
+            [ObservableProperty]
+            string image4Url;
         }
     }
 }

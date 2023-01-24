@@ -1,15 +1,15 @@
 ﻿using System;
-using Xamvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Sample
 {
-    
-    public class SvgSamplePageModel : BasePageModel
+    public partial class SvgSamplePageModel : ObservableObject
     {
         public SvgSamplePageModel()
         {
         }
 
-        public string Source { get; set; } = "sample.svg";
+        [ObservableProperty]
+        string source = "sample.svg";
     }
 }

@@ -8,5 +8,10 @@ namespace Sample
             InitializeComponent();
 			BindingContext = new ByteArrayListPageModel();
 		}
-    }
+
+		void ListView_ItemSelected(System.Object sender, Microsoft.Maui.Controls.SelectedItemChangedEventArgs e)
+		{
+			(BindingContext as ByteArrayListPageModel).ItemSelected();
+		}
+	}
 }

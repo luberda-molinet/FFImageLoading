@@ -5,119 +5,98 @@ using System.Linq;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Sample.Pages;
+using Sample.Pages.Transformations;
 
 namespace Sample
 {
-
     public partial class MenuPageModel : ObservableObject
     {
-        public MenuPageModel()
+        protected readonly INavigation Navigation;
+
+        public MenuPageModel(INavigation navigation)
         {
-            ItemSelectedCommand = new BaseCommand<SelectedItemChangedEventArgs>((arg) =>
-            {
-                SelectedItem = null;
-            });
+            Navigation = navigation;
 
             var menuItems = new List<MenuItem>()
             {
                 new MenuItem() {
                     Section = "Basic",
                     Title = "Basic example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<BasicPageModel>(pm => pm.Reload());
-                    })
+                    Command = new AsyncRelayCommand(_ =>
+                        Navigation.PushAsync(new BasicPage()))
                 },
 
                 new MenuItem() {
                     Section = "Basic",
                     Title = "Placeholders examples",
-                    Command = BaseCommand.FromAction(async(param) =>
-                    {
-                        await this.PushPageFromCacheAsync<PlaceholdersPageModel>();
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new PlaceholdersPage()))
+				},
 
                 new MenuItem() {
                     Section = "Lists",
                     Title = "List example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ListPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ListPage()))
+				},
 
                 new MenuItem() {
                     Section = "Lists",
                     Title = "List transformations example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ListTransformationsPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ListTransformationsPage()))
+				},
 
                 new MenuItem() {
                     Section = "Lists",
                     Title = "Heavy List example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ListHeavyPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ListHeavyPage()))
+				},
 
                 new MenuItem() {
                     Section = "Lists",
                     Title = "ByteArray / custom cache key example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ByteArrayListPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ByteArrayListPage()))
+				},
 
 				new MenuItem() {
 					Section = "Advanced",
 					Title = "Exif tests",
-					Command = new BaseCommand(async (param) =>
-					{
-						await this.PushPageFromCacheAsync<ExifPageModel>();
-					})
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new Pages.ExifPage()))
 				},
 
 				new MenuItem() {
                     Section = "Advanced",
                     Title = "Custom CacheKey example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<CustomKeyPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new CustomKeyPage()))
+				},
 
                 new MenuItem() {
                     Section = "Advanced",
                     Title = "Stream from base64 data",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<StreamListPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new StreamListPage()))
+				},
 
                 new MenuItem() {
                     Section = "Advanced",
                     Title = "Data url examples",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<DataUrlPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new Pages.DataUrlPage()))
+				},
 
                 new MenuItem() {
                     Section = "Advanced",
                     Title = "CachedImage sizing test",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<CachedImageSizingTestPageModel>();
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new CachedImageSizingTestPage()))
+				},
 
                 //new MenuItem() {
                 //	Section = "Advanced",
@@ -131,179 +110,141 @@ namespace Sample
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "ColorFillTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ColorFillTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ColorFillTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "CropTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<CropTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new CropTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "RotateTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<RotateTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new RotateTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "CircleTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<CircleTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new CircleTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "RoundedTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<RoundedTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new RoundedTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "CornersTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<CornersTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new CornersTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "GrayscaleTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<GrayscaleTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new GrayscaleTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "BlurredTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<BlurredTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new BlurredTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "SepiaTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SepiaTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SepiaTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "ColorSpaceTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<ColorSpaceTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new ColorSpaceTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "TintTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<TintTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new TintTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "FlipTransformation",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<FlipTransformationPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new FlipTransformationPage()))
+				},
 
                 new MenuItem() {
                     Section = "Transformations",
                     Title = "Multiple transformations example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<MultipleTransformationsPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new MultipleTransformationsPage()))
+				},
 
                 new MenuItem()
                 {
                     Section = "Transformations",
                     Title = "Transformations selector example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<TransformationsSelectorPageModel>(pm => pm.Reload());
-                    })
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new TransformationsSelectorPage()))
 
-                },
+				},
 
                 new MenuItem() {
                     Section = "File formats",
                     Title = "Simple SVG example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SvgSamplePageModel>();
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SvgSamplePage()))
+				},
 
                 new MenuItem() {
                     Section = "File formats",
                     Title = "Heavy SVG List example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SvgListHeavyPageModel>(pm => pm.Reload());
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SvgListHeavyPage()))
+				},
 
                 new MenuItem() {
                     Section = "File formats",
                     Title = "SVG replace map example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SvgReplacePageModel>();
-                    })
-                },
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SvgReplacePage()))
+				},
 
                 new MenuItem()
                 {
                     Section = "File formats",
                     Title = "Simple Gif example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SimpleGifPageModel>(pm => pm.Reload());
-                    })
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SimpleGifPage()))
 
-                },
+				},
 
                 new MenuItem()
                 {
                     Section = "File formats",
                     Title = "Simple WebP example",
-                    Command = new BaseCommand(async (param) =>
-                    {
-                        await this.PushPageFromCacheAsync<SimpleWebpPageModel>(pm => pm.Reload());
-                    })
+					Command = new AsyncRelayCommand(_ =>
+						Navigation.PushAsync(new SimpleWebpPage()))
 
-                },
+				},
             };
 
             var sorted = menuItems
@@ -315,9 +256,13 @@ namespace Sample
 
         public ObservableCollection<Grouping<string, MenuItem>> Items { get; set; }
 
-        public MenuItem SelectedItem { get; set; }
+        [ObservableProperty]
+        MenuItem selectedItem;
 
-        public ICommand ItemSelectedCommand { get; set; }
+        public void ItemSelected()
+        {
+            SelectedItem = null;
+        }
 
         public class Grouping<K, T> : ObservableCollection<T>
         {
@@ -332,15 +277,20 @@ namespace Sample
         }
 
 
-        public class MenuItem : BaseModel
+
+        public partial class MenuItem : ObservableObject
         {
-            public string Section { get; set; }
+			[ObservableProperty]
+			string section;
 
-            public string Title { get; set; }
+			[ObservableProperty]
+			string title;
 
-            public string Details { get; set; }
+			[ObservableProperty]
+			string details;
 
-            public ICommand Command { get; set; }
+            [ObservableProperty]
+            ICommand command;
         }
     }
 }

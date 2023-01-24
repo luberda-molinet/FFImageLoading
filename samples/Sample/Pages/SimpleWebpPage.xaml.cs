@@ -1,13 +1,12 @@
-﻿using Xamarin.Forms;
-using Xamvvm;
-
-namespace Sample
+﻿namespace Sample
 {
-    public partial class SimpleWebpPage : ContentPage, IBasePage<SimpleWebpPageModel>
+    public partial class SimpleWebpPage : ContentPage
     {
         public SimpleWebpPage()
         {
             InitializeComponent();
+
+            BindingContext = new SimpleWebpPageModel();
         }
     }
 }
