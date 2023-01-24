@@ -23,7 +23,7 @@ namespace FFImageLoading.Maui.Platform
     /// CachedImage Implementation
     /// </summary>
     [Preserve(AllMembers=true)]
-    public class CachedImageRenderer : ViewHandler<CachedImage, CachedImageView>
+    public class CachedImageHandler : ViewHandler<CachedImage, CachedImageView>
     {
 
 		private bool _isDisposed;
@@ -34,7 +34,7 @@ namespace FFImageLoading.Maui.Platform
         //private static readonly MethodInfo _platformDefaultRendererTypeNotifyFakeHandling = _platformDefaultRendererType?.GetMethod("NotifyFakeHandling", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         private readonly object _updateBitmapLock = new object();
 
-		public CachedImageRenderer(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
+		public CachedImageHandler(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
 		{
 		}
 

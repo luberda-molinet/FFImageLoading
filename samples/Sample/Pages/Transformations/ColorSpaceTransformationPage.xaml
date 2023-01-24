@@ -5,19 +5,17 @@
     xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
     xmlns:ffimageloadingsvg="clr-namespace:FFImageLoading.Svg.Maui;assembly=FFImageLoading.Svg.Maui"
-    xmlns:ffstatic="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+    xmlns:ffstaticc="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
     x:Class="Sample.ColorSpaceTransformationPage"
     Title="ColorSpaceTransformation">
     <ContentPage.Content>
         <ScrollView>
             <StackLayout>
 
-                <ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
+                <ffimageloading:CachedImage x:Name="image" HorizontalOptions="Center" VerticalOptions="Center"
                     LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png" DownsampleToViewSize="true"
                     Aspect="AspectFit" HeightRequest="400" WidthRequest="400" Source="{Binding ImageUrl}">
-                    <ffimageloading:CachedImage.Transformations>
-                        <fftransformations:ColorSpaceTransformation RGBAWMatrix="{x:Static ff ffstatic:FFColorMatrix.InvertColorMatrix}"/>
-                    </ffimageloading:CachedImage.Transformations>
+                    
                 </ffimageloading:CachedImage>
 
                 <Label Text="ColorSpaceTransformation" HorizontalTextAlignment="Center"/>

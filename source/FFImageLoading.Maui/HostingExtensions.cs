@@ -24,5 +24,20 @@ namespace FFImageLoading.Maui
 
 			return imageSourceServices;
 		}
+
+		public static MauiAppBuilder RegisterFFImageLoadingHandlers(this MauiAppBuilder mauiAppBuilder)
+		{
+#if IOS || MACCATALYST
+			FFImageLoading.Maui.Platform.CachedImageHandler.Init();
+#endif
+			mauiAppBuilder.ConfigureMauiHandlers(c =>
+			{
+				c.AddHandler(typeof(FFImageLoading.Maui.CachedImage), typeof(FFImageLoading.Maui.Platform.CachedImageHandler));
+			});
+
+
+
+			return mauiAppBuilder;
+		}
 	}
 }

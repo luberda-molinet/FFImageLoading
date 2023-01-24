@@ -32,14 +32,14 @@ namespace FFImageLoading.Maui.Platform
     /// CachedImage Implementation
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class CachedImageRenderer : ViewHandler<CachedImage, PImageView>
+    public class CachedImageHandler : ViewHandler<CachedImage, PImageView>
     {
         private bool _isDisposed;
 		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
         private readonly object _updateBitmapLock = new object();
 
-		public CachedImageRenderer(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
+		public CachedImageHandler(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
 		{
 		}
 
@@ -52,7 +52,7 @@ namespace FFImageLoading.Maui.Platform
 
             // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
 #pragma warning disable 0219
-            var ignore1 = typeof(CachedImageRenderer);
+            var ignore1 = typeof(CachedImageHandler);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

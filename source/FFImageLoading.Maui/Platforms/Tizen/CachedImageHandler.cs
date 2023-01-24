@@ -9,13 +9,8 @@ using Tizen.Applications;
 
 namespace FFImageLoading.Maui.Platform
 {
-    public class CachedImageRenderer : ViewRenderer<CachedImage, EvasImageContainer>, IVisualElementRenderer
+    public class CachedImageHandler : ViewRenderer<CachedImage, EvasImageContainer>, IVisualElementRenderer
     {
-        [RenderWith(typeof(CachedImageRenderer))]
-        internal class _CachedImageRenderer
-        {
-        }
-
         IScheduledWork _currentTask;
 
         IVisualElementController ElementController => Element as IVisualElementController;
