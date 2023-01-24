@@ -15,15 +15,20 @@ namespace Sample
 					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 					fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 				})
-				.UseFFImageLoading()
-				.ConfigureImageSources(srcs => srcs.UseFFImageLoading());
+				.UseFFImageLoading();
 
 #if DEBUG
-		builder.Logging.AddDebug();
+			builder.Logging.AddDebug();
 #endif
 
-			return builder.Build();
+			App = builder.Build();
+
+			return App;
 		}
+
+		public static MauiApp App { get; private set; }
+		public static IServiceProvider Services
+			=> App.Services;
 	}
 
 	public static class Helpers

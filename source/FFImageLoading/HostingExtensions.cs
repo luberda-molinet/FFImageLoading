@@ -2,6 +2,7 @@
 using FFImageLoading.Work;
 using FFImageLoading.Helpers;
 using FFImageLoading.DataResolvers;
+using FFImageLoading.Config;
 
 namespace FFImageLoading
 {
@@ -12,9 +13,16 @@ namespace FFImageLoading
 			services.AddSingleton<IMD5Helper, MD5Helper>();
 			services.AddSingleton<IMiniLogger, MiniLogger>();
 			services.AddSingleton<IDiskCache, SimpleDiskCache>();
-			//services.AddSingleton<IPlatformPerformance, PlatformPerformance>();
-			//services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();
-			//services.AddSingleton<IDataResolverFactory, DataResolverFactory>();
+			services.AddSingleton<IConfiguration, Configuration>();
+			services.AddSingleton<IDownloadCache, DownloadCache>();
+
+
+#if ANDROID || WINDOWS || IOS || MACCATALYST || TIZEN
+			services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();
+			services.AddSingleton<IPlatformPerformance, PlatformPerformance>();
+			services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();
+			services.AddSingleton<IDataResolverFactory, DataResolverFactory>();
+#endif
 		}
 	}
 }

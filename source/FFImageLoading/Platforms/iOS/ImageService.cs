@@ -24,8 +24,9 @@ namespace FFImageLoading
 			IMiniLogger miniLogger,
 			IPlatformPerformance platformPerformance,
 			IMainThreadDispatcher mainThreadDispatcher,
-			IDataResolverFactory dataResolverFactory)
-			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+			IDataResolverFactory dataResolverFactory,
+			IDownloadCache downloadCache)
+			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache)
 		{
 		}
 

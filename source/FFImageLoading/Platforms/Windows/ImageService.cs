@@ -18,17 +18,9 @@ namespace FFImageLoading
     [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<BitmapSource>
     {
-		public ImageService(
-			IConfiguration configuration,
-			ImageCache imageCache,
-			IMD5Helper md5Helper,
-			IMiniLogger miniLogger,
-			IPlatformPerformance platformPerformance,
-			IMainThreadDispatcher mainThreadDispatcher,
-			IDataResolverFactory dataResolverFactory)
-			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+		public ImageService(IConfiguration configuration, IMD5Helper md5Helper, IMiniLogger miniLogger, IPlatformPerformance platformPerformance, IMainThreadDispatcher mainThreadDispatcher, IDataResolverFactory dataResolverFactory, IDownloadCache downloadCache) : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache)
 		{
-			ImageCache = imageCache;
+			ImageCache = new ImageCache(miniLogger, configuration);
 		}
 
 		static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();

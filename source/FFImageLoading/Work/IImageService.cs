@@ -35,6 +35,8 @@ namespace FFImageLoading
 
 		IDataResolverFactory DataResolverFactory { get; }
 
+		IDownloadCache DownloadCache { get; }
+
         /// <summary>
         /// Initializes FFImageLoading with a default Configuration.
         /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)

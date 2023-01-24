@@ -63,14 +63,16 @@ namespace Sample
                 "https://farm4.staticflickr.com/3201/3070391067_c80fb9e942.jpg"
             };
 
+			var imageService = MauiProgram.Services.GetRequiredService<IImageService<TImageContainer>>();
+
             for (int j = 0; j < 5; j++)
             {
                 for (int i = 0; i < images.Length; i++)
                 {
                     // Get your byte array here
                     byte[] byteArray;
-                    var cacheStream = await ImageService.Instance.Config.DownloadCache.DownloadAndCacheIfNeededAsync(
-                        images[i], ImageService.Instance.LoadUrl(images[i]), ImageService.Instance.Config, CancellationToken.None);
+                    var cacheStream = await imageService.DownloadCache.DownloadAndCacheIfNeededAsync(
+                        images[i], imageService.LoadUrl(images[i]), imageService.Configuration, CancellationToken.None);
 
                     using (cacheStream.ImageStream)
                     using (var memoryStream = new MemoryStream())
