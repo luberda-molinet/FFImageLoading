@@ -5,11 +5,20 @@ namespace Sample
 {
     public partial class BasicPage : ContentPage
     {
-        public BasicPage()
+        BasicPageModel viewModel;
+
+		public BasicPage()
         {
             InitializeComponent();
-			BindingContext = new BasicPageModel();
+			BindingContext = viewModel = new BasicPageModel();
 
 		}
-    }
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
+		}
+	}
 }
