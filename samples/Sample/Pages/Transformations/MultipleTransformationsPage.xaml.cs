@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class MultipleTransformationsPage : ContentPage
 	{
+		MultipleTransformationsPageModel viewModel;
+
 		public MultipleTransformationsPage()
 		{
 			InitializeComponent();
-			BindingContext = new MultipleTransformationsPageModel();
+			BindingContext = viewModel = new MultipleTransformationsPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

@@ -21,7 +21,9 @@ namespace Sample
 			SelectedItem = null;
 		}
 
-        public ObservableCollection<ListItem> Items { get; set; }
+        [ObservableProperty]
+        List<ListItem> items;
+
 
         public void Reload()
         {
@@ -61,7 +63,7 @@ namespace Sample
                 }
             }
 
-            Items = new ObservableCollection<ListItem>(list);
+            Items = new List<ListItem>(list);
         }
 
 

@@ -5,10 +5,19 @@ namespace Sample.Pages.Transformations
 {
     public partial class ColorFillTransformationPage : ContentPage
     {
+        ColorFillTransformationPageModel viewModel;
+
         public ColorFillTransformationPage()
         {
             InitializeComponent();
-			BindingContext = new ColorFillTransformationPageModel();
+			BindingContext = viewModel = new ColorFillTransformationPageModel();
         }
-    }
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
+		}
+	}
 }

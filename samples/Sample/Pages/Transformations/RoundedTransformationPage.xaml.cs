@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class RoundedTransformationPage : ContentPage
 	{
+		RoundedTransformationPageModel viewModel;
+
 		public RoundedTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new RoundedTransformationPageModel();
+			BindingContext = viewModel = new RoundedTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

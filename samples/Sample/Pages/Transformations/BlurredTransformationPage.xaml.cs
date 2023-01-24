@@ -6,11 +6,20 @@ namespace Sample
 {
 	public partial class BlurredTransformationPage : ContentPage
 	{
+		BlurredTransformationPageModel viewModel;
+
 		public BlurredTransformationPage()
 		{
 			InitializeComponent();
 
-			BindingContext = new BlurredTransformationPageModel();
+			BindingContext = viewModel = new BlurredTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

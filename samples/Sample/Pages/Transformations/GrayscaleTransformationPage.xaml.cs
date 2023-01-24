@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class GrayscaleTransformationPage : ContentPage
 	{
+		GrayscaleTransformationPageModel viewModel;
+
 		public GrayscaleTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new GrayscaleTransformationPageModel();
+			BindingContext = viewModel = new GrayscaleTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

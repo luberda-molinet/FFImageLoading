@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class FlipTransformationPage : ContentPage
 	{
+		FlipTransformationPageModel viewModel;
+
 		public FlipTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new FlipTransformationPageModel();
+			BindingContext = viewModel = new FlipTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class RotateTransformationPage : ContentPage
 	{
+		RotateTransformationPageModel viewModel;
+
 		public RotateTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new RotateTransformationPageModel();
+			BindingContext = viewModel = new RotateTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

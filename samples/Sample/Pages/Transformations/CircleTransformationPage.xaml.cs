@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class CircleTransformationPage : ContentPage
 	{
+		CircleTransformationPageModel viewModel;
+
 		public CircleTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new CircleTransformationPageModel();
+			BindingContext = viewModel = new CircleTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

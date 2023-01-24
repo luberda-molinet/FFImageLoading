@@ -7,20 +7,24 @@ namespace Sample
 {
 	public partial class ColorSpaceTransformationPage : ContentPage
 	{
+		ColorSpaceTransformationPageModel viewModel;
+
 		public ColorSpaceTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new ColorSpaceTransformationPageModel();
+			BindingContext = viewModel = new ColorSpaceTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
 
 			image.Transformations.Add(new ColorSpaceTransformation
 			{
 				RGBAWMatrix = FFColorMatrix.InvertColorMatrix
 			});
-			//< ffimageloading:CachedImage.Transformations >
 
-			//			< fftransformations:ColorSpaceTransformation RGBAWMatrix = "{x:Static ff:FFColorMatrix.InvertColorMatrix}" />
-
-			//		</ ffimageloading:CachedImage.Transformations >
+			viewModel.Reload();
 		}
 	}
 }

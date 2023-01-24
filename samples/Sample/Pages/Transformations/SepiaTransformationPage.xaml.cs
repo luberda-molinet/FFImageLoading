@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class SepiaTransformationPage : ContentPage
 	{
+		SepiaTransformationPageModel viewModel;
+
 		public SepiaTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new SepiaTransformationPageModel();
+			BindingContext = viewModel = new SepiaTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

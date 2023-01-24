@@ -5,10 +5,12 @@ namespace Sample
 {
 	public partial class CropTransformationPage : ContentPage
 	{
+		CropTransformationPageModel viewModel;
+
 		public CropTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new CropTransformationPageModel
+			BindingContext = viewModel = new CropTransformationPageModel
 			{
 				ReloadImageHandler = () => ReloadImage()
 			};
@@ -28,6 +30,13 @@ namespace Sample
 		void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs args)
 		{
 			(this.BindingContext as CropTransformationPageModel)?.OnPinchUpdated(args);
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }

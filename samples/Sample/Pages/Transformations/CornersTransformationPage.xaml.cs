@@ -5,10 +5,19 @@ namespace Sample
 {
 	public partial class CornersTransformationPage : ContentPage
 	{
+		CornersTransformationPageModel viewModel;
+
 		public CornersTransformationPage()
 		{
 			InitializeComponent();
-			BindingContext = new CornersTransformationPageModel();
+			BindingContext = viewModel = new CornersTransformationPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 	}
 }
