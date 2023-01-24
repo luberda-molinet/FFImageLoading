@@ -37,8 +37,8 @@ namespace FFImageLoading.Decoders
 
 					if (parameters.DownSampleUseDipUnits)
 					{
-						downsampleWidth = ImageService.DpToPixels(downsampleWidth);
-						downsampleHeight = ImageService.DpToPixels(downsampleHeight);
+						downsampleWidth = ImageService.DpToPixels(downsampleWidth, parameters.Scale);
+						downsampleHeight = ImageService.DpToPixels(downsampleHeight, parameters.Scale);
 					}
 					await gifDecoder.ReadHeaderAsync(stream).ConfigureAwait(false);
 					insampleSize = BaseDecoder.CalculateInSampleSize(gifDecoder.Width, gifDecoder.Height, downsampleWidth, downsampleHeight, false);

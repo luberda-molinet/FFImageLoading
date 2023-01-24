@@ -93,8 +93,8 @@ namespace FFImageLoading.Decoders
 
                 if (parameters.DownSampleUseDipUnits)
                 {
-                    downsampleWidth = ImageService.DpToPixels(downsampleWidth);
-                    downsampleHeight = ImageService.DpToPixels(downsampleHeight);
+                    downsampleWidth = ImageService.DpToPixels(downsampleWidth, parameters.Scale);
+                    downsampleHeight = ImageService.DpToPixels(downsampleHeight, parameters.Scale);
                 }
 
                 options.InSampleSize = CalculateInSampleSize(options.OutWidth, options.OutHeight, downsampleWidth, downsampleHeight, parameters.AllowUpscale ?? ImageService.Configuration.AllowUpscale);

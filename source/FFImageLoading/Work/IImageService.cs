@@ -13,17 +13,17 @@ using System.Reflection;
 
 namespace FFImageLoading
 {
-    /// <summary>
-    /// FFImageLoading by Daniel Luberda
-    /// </summary>
-    [Preserve(AllMembers = true)]
-    public interface IImageService<TImageContainer>
-    {
-        /// <summary>
-        /// Gets FFImageLoading configuration
-        /// </summary>
-        /// <value>The configuration used by FFImageLoading.</value>
-        IConfiguration Configuration { get; }
+	/// <summary>
+	/// FFImageLoading by Daniel Luberda
+	/// </summary>
+	[Preserve(AllMembers = true)]
+	public interface IImageService<TImageContainer>
+	{
+		/// <summary>
+		/// Gets FFImageLoading configuration
+		/// </summary>
+		/// <value>The configuration used by FFImageLoading.</value>
+		IConfiguration Configuration { get; }
 
 		IDiskCache DiskCache { get; }
 
@@ -32,6 +32,8 @@ namespace FFImageLoading
 		IMiniLogger Logger { get; }
 
 		IMainThreadDispatcher Dispatcher { get; }
+
+		IDataResolverFactory DataResolverFactory { get; }
 
         /// <summary>
         /// Initializes FFImageLoading with a default Configuration.

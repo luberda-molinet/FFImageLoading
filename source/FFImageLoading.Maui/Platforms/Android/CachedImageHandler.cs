@@ -29,7 +29,7 @@ namespace FFImageLoading.Maui.Platform
 		private bool _isDisposed;
 		private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
-        private readonly MotionEventHelper _motionEventHelper = CachedImage.FixedAndroidMotionEventHandler ? new MotionEventHelper() : null;
+
         //private readonly static Type _platformDefaultRendererType = typeof(ImageRenderer).Assembly.GetType("Xamarin.Forms.Platform.Android.Platform+DefaultRenderer");
         //private static readonly MethodInfo _platformDefaultRendererTypeNotifyFakeHandling = _platformDefaultRendererType?.GetMethod("NotifyFakeHandling", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         private readonly object _updateBitmapLock = new object();
@@ -41,6 +41,9 @@ namespace FFImageLoading.Maui.Platform
 		public CachedImageHandler(IPropertyMapper mapper, CommandMapper commandMapper = null) : base(mapper, commandMapper)
 		{
 		}
+
+		IImageService<TImageContainer> ImageService
+			=> MauiContext.Services.GetRequiredService<IImageService<TImageContainer>>();
 
 		protected override CachedImageView CreatePlatformView()
 		{
@@ -56,7 +59,6 @@ namespace FFImageLoading.Maui.Platform
 			VirtualView.InternalGetImageAsPNG = new Func<GetImageAsPngArgs, Task<byte[]>>(GetImageAsPngAsync);
 
 			VirtualView.PropertyChanged += VirtualView_PropertyChanged;
-			platformView.Touch += PlatformView_Touch;
 
 			//_motionEventHelper?.UpdateElement(VirtualView);
 			UpdateBitmap(platformView, VirtualView, null);
@@ -67,7 +69,6 @@ namespace FFImageLoading.Maui.Platform
 
 		protected override void DisconnectHandler(CachedImageView platformView)
 		{
-			PlatformView.Touch += PlatformView_Touch;
 			VirtualView.PropertyChanged -= VirtualView_PropertyChanged;
 
 			VirtualView.InternalReloadImage = null;
@@ -78,12 +79,6 @@ namespace FFImageLoading.Maui.Platform
 			CancelIfNeeded();
 
 			base.DisconnectHandler(platformView);
-		}
-
-		private void PlatformView_Touch(object sender, Android.Views.View.TouchEventArgs e)
-		{
-			e.Handled = 
-				CachedImage.FixedAndroidMotionEventHandler && _motionEventHelper.HandleMotionEvent(PlatformView.Parent, e.Event);
 		}
 
 		private void VirtualView_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -167,7 +162,7 @@ namespace FFImageLoading.Maui.Platform
                     imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
 
                     if (!_isDisposed)
-                        _currentTask = imageLoader.Into(imageView);
+                        _currentTask = imageLoader.Into(imageView, ImageService);
                 }
             }
         }
@@ -177,7 +172,7 @@ namespace FFImageLoading.Maui.Platform
 			if (element == null || _isDisposed)
 				return;
 
-			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;
@@ -253,69 +248,6 @@ namespace FFImageLoading.Maui.Platform
                 }
 
                 return compressed;
-            }
-        }
-
-        internal class MotionEventHelper
-        {
-            private VisualElement _element;
-            private bool _isInViewCell;
-
-            public bool HandleMotionEvent(IViewParent parent, MotionEvent motionEvent)
-            {
-                if (_isInViewCell || _element.InputTransparent || motionEvent.Action == MotionEventActions.Cancel)
-                {
-                    return false;
-                }
-
-                //var rendererType = parent.GetType();
-                //if (!_platformDefaultRendererType.IsAssignableFrom(rendererType))
-                //{
-                //    return false;
-                //}
-
-                //try
-                //{
-                //    // Let the container know that we're "fake" handling this event
-                //    if (_platformDefaultRendererTypeNotifyFakeHandling != null)
-                //    {
-                //        _platformDefaultRendererTypeNotifyFakeHandling.Invoke(parent, null);
-                //        return true;
-                //    }
-                //}
-                //catch { }
-
-                return false;
-            }
-
-            public void UpdateElement(VisualElement element)
-            {
-                _isInViewCell = false;
-                _element = element;
-
-                if (_element == null)
-                {
-                    return;
-                }
-
-                // Determine whether this control is inside a ViewCell;
-                // we don't fake handle the events because ListView needs them for row selection
-                _isInViewCell = IsInViewCell(element);
-            }
-
-            private static bool IsInViewCell(VisualElement element)
-            {
-                var parent = element.Parent;
-                while (parent != null)
-                {
-                    if (parent is ViewCell)
-                    {
-                        return true;
-                    }
-                    parent = parent.Parent;
-                }
-
-                return false;
             }
         }
     }

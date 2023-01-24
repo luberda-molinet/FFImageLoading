@@ -43,8 +43,8 @@ namespace FFImageLoading.Decoders
 
 			if (parameters.DownSampleUseDipUnits)
 			{
-				downsampleWidth = imageService.DpToPixels(downsampleWidth);
-				downsampleHeight = imageService.DpToPixels(downsampleHeight);
+				downsampleWidth = imageService.DpToPixels(downsampleWidth, parameters.Scale);
+				downsampleHeight = imageService.DpToPixels(downsampleHeight, parameters.Scale);
 			}
 
 			if (downsampleWidth != 0 || downsampleHeight != 0)

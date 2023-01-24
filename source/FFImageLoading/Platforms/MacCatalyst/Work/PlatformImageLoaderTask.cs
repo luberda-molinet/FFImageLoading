@@ -56,7 +56,7 @@ namespace FFImageLoading.Work
             }).ConfigureAwait(false);
         }
 
-        protected override int DpiToPixels(int size, float scale)
+        protected override int DpiToPixels(int size, double scale)
         {
             return ImageService.DpToPixels(size, scale);
         }
@@ -72,7 +72,7 @@ namespace FFImageLoading.Work
                     return _webpDecoder;
 
                 default:
-                    return new BaseDecoder();
+                    return new BaseDecoder(ImageService);
             }
         }
 

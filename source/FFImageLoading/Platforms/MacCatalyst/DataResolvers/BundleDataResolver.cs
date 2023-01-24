@@ -71,7 +71,7 @@ namespace FFImageLoading.DataResolvers
 
                 token.ThrowIfCancellationRequested();
 
-                var scale = (int)ScaleHelper.Scale;
+                var scale = (int)parameters.Scale;
                 if (scale > 1)
                 {
                     while (scale > 1)

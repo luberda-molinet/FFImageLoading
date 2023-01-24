@@ -113,9 +113,9 @@ namespace FFImageLoading
             image?.SetIsRetained(false);
         }
 
-        protected override int DpiToPixels(int size)
+        protected override int DpiToPixels(int size, double scale)
         {
-            return ImageService.DpToPixels(size);
+            return ImageService.DpToPixels(size, scale);
         }
 
         protected override IDecoder<Bitmap> ResolveDecoder(ImageInformation.ImageType type)

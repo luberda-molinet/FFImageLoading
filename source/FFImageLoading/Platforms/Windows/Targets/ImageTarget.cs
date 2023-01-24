@@ -48,7 +48,7 @@ namespace FFImageLoading.Targets
             {
                 // fade animation
                 int fadeDuration = parameters.FadeAnimationDuration.HasValue ?
-                    parameters.FadeAnimationDuration.Value : ImageService.Instance.Config.FadeAnimationDuration;
+                    parameters.FadeAnimationDuration.Value : task.Configuration.FadeAnimationDuration;
                 DoubleAnimation fade = new DoubleAnimation();
                 fade.Duration = TimeSpan.FromMilliseconds(fadeDuration);
                 fade.From = 0f;

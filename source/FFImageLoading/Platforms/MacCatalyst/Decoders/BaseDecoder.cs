@@ -1,6 +1,11 @@
-﻿namespace FFImageLoading.Decoders
+﻿using UIKit;
+
+namespace FFImageLoading.Decoders
 {
-    public class BaseDecoder : GifDecoder
-    {
-    }
+	public class BaseDecoder : GifDecoder
+	{
+		public BaseDecoder(IImageService<UIImage> imageService) : base(imageService)
+		{
+		}
+	}
 }

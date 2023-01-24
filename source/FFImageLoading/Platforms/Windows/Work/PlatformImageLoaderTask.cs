@@ -26,7 +26,6 @@ namespace FFImageLoading.Work
 
         public async override Task Init()
         {
-            await ScaleHelper.InitAsync().ConfigureAwait(false);
             await base.Init().ConfigureAwait(false);
         }
 
@@ -42,9 +41,9 @@ namespace FFImageLoading.Work
             }).ConfigureAwait(false);
         }
 
-        protected override int DpiToPixels(int size)
+        protected override int DpiToPixels(int size, double scale)
         {
-            return size.DpToPixels();
+            return ImageService.DpToPixels(size, scale);
         }
 
         protected override IDecoder<BitmapHolder> ResolveDecoder(ImageInformation.ImageType type)
@@ -55,7 +54,7 @@ namespace FFImageLoading.Work
                 case ImageInformation.ImageType.WEBP:
                     throw new NotImplementedException();
                 default:
-                    return new BaseDecoder();
+                    return new BaseDecoder(ImageService);
             }
         }
 

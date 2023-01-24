@@ -9,6 +9,13 @@ namespace FFImageLoading.Maui.Handlers
 		where TNativeView: class
 		where TImageSource : IImageSource
 	{
+		public HandlerBase(IImageService<TImageContainer> imageService)
+		{
+			ImageService = imageService;
+		}
+
+		protected readonly IImageService<TImageContainer> ImageService;
+
 		protected virtual Task<IImageLoaderTask> LoadImageAsync(IImageSourceBinding binding, IImageSource imageSource, TNativeView imageView, CancellationToken cancellationToken)
 		{
 			TaskParameter parameters = default;
@@ -16,7 +23,7 @@ namespace FFImageLoading.Maui.Handlers
 			if (binding.ImageSource == Work.ImageSource.Url)
 			{
 				var urlSource = (Microsoft.Maui.Controls.UriImageSource)((imageSource as IVectorImageSource)?.ImageSource ?? imageSource);
-				parameters = ImageService.Instance.LoadUrl(binding.Path, urlSource.CacheValidity);
+				parameters = ImageService.LoadUrl(binding.Path, urlSource.CacheValidity);
 
 				if (!urlSource.CachingEnabled)
 				{
@@ -25,23 +32,23 @@ namespace FFImageLoading.Maui.Handlers
 			}
 			else if (binding.ImageSource == Work.ImageSource.CompiledResource)
 			{
-				parameters = ImageService.Instance.LoadCompiledResource(binding.Path);
+				parameters = ImageService.LoadCompiledResource(binding.Path);
 			}
 			else if (binding.ImageSource == Work.ImageSource.ApplicationBundle)
 			{
-				parameters = ImageService.Instance.LoadFileFromApplicationBundle(binding.Path);
+				parameters = ImageService.LoadFileFromApplicationBundle(binding.Path);
 			}
 			else if (binding.ImageSource == Work.ImageSource.Filepath)
 			{
-				parameters = ImageService.Instance.LoadFile(binding.Path);
+				parameters = ImageService.LoadFile(binding.Path);
 			}
 			else if (binding.ImageSource == Work.ImageSource.Stream)
 			{
-				parameters = ImageService.Instance.LoadStream(binding.Stream);
+				parameters = ImageService.LoadStream(binding.Stream);
 			}
 			else if (binding.ImageSource == Work.ImageSource.EmbeddedResource)
 			{
-				parameters = ImageService.Instance.LoadEmbeddedResource(binding.Path);
+				parameters = ImageService.LoadEmbeddedResource(binding.Path);
 			}
 
 			if (parameters != default)

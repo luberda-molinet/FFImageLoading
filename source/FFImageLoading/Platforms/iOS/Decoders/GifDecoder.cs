@@ -51,8 +51,8 @@ namespace FFImageLoading.Decoders
 
             if (parameters.DownSampleUseDipUnits)
             {
-                downsampleWidth = ImageService.DpToPixels(downsampleWidth);
-                downsampleHeight = ImageService.DpToPixels(downsampleHeight);
+                downsampleWidth = ImageService.DpToPixels(downsampleWidth, parameters.Scale);
+                downsampleHeight = ImageService.DpToPixels(downsampleHeight, parameters.Scale);
             }
 
             using (var nsdata = NSData.FromStream(stream))
@@ -192,7 +192,7 @@ namespace FFImageLoading.Decoders
                     {
                         var width = (int)images[0].Image.Size.Width;
                         var height = (int)images[0].Image.Size.Height;
-                        imageinformation.SetCurrentSize(imageService.DpToPixels(width), imageService.DpToPixels(height));
+                        imageinformation.SetCurrentSize(imageService.DpToPixels(width, parameters.Scale), imageService.DpToPixels(height, parameters.Scale));
                     }
                 }
                 else
@@ -203,7 +203,7 @@ namespace FFImageLoading.Decoders
                     {
                         var width = (int)image.Size.Width;
                         var height = (int)image.Size.Height;
-                        imageinformation.SetCurrentSize(imageService.DpToPixels(width), imageService.DpToPixels(height));
+                        imageinformation.SetCurrentSize(imageService.DpToPixels(width, parameters.Scale), imageService.DpToPixels(height, parameters.Scale));
                     }
                 }
 

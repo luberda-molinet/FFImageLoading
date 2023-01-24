@@ -44,12 +44,10 @@ namespace FFImageLoading.Maui
 
 		internal static bool IsRendererInitialized { get; set; } = IsDesignModeEnabled;
 
-		[Obsolete]
-		public static bool FixedOnMeasureBehavior { get; set; } = true;
-		[Obsolete]
-		public static bool FixedAndroidMotionEventHandler { get; set; } = true;
-
 		private bool _reloadBecauseOfMissingSize;
+
+		protected IImageService<TImageContainer> ImageService { get; private set; }
+
 
 		/// <summary>
 		/// CachedImage by Daniel Luberda
@@ -63,6 +61,13 @@ namespace FFImageLoading.Maui
 			{
 				_visualProperty.SetValue(this, _visualMarkerProperty.GetValue(null));
 			}
+		}
+
+		protected override void OnHandlerChanged()
+		{
+			base.OnHandlerChanged();
+
+			ImageService = Handler?.MauiContext?.Services?.GetService<IImageService<TImageContainer>>();
 		}
 
 		/// <summary>
@@ -125,9 +130,6 @@ namespace FFImageLoading.Maui
 		{
 			if (!IsRendererInitialized)
 			{
-				if (ImageService.EnableMockImageService)
-					return;
-
 				throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
 			}
 
@@ -481,55 +483,6 @@ namespace FFImageLoading.Maui
 			if (Math.Abs(desiredWidth) < double.Epsilon || Math.Abs(desiredHeight) < double.Epsilon)
 				return new SizeRequest(new Size(0, 0));
 
-			if (FixedOnMeasureBehavior)
-			{
-				var desiredAspect = desiredSize.Request.Width / desiredSize.Request.Height;
-				var constraintAspect = widthConstraint / heightConstraint;
-				var width = desiredWidth;
-				var height = desiredHeight;
-
-				if (constraintAspect > desiredAspect)
-				{
-					// constraint area is proportionally wider than image
-					switch (Aspect)
-					{
-						case Aspect.AspectFit:
-						case Aspect.AspectFill:
-							height = Math.Min(desiredHeight, heightConstraint);
-							width = desiredWidth * (height / desiredHeight);
-							break;
-						case Aspect.Fill:
-							width = Math.Min(desiredWidth, widthConstraint);
-							height = desiredHeight * (width / desiredWidth);
-							break;
-					}
-				}
-				else if (constraintAspect < desiredAspect)
-				{
-					// constraint area is proportionally taller than image
-					switch (Aspect)
-					{
-						case Aspect.AspectFit:
-						case Aspect.AspectFill:
-							width = Math.Min(desiredWidth, widthConstraint);
-							height = desiredHeight * (width / desiredWidth);
-							break;
-						case Aspect.Fill:
-							height = Math.Min(desiredHeight, heightConstraint);
-							width = desiredWidth * (height / desiredHeight);
-							break;
-					}
-				}
-				else
-				{
-					// constraint area is same aspect as image
-					width = Math.Min(desiredWidth, widthConstraint);
-					height = desiredHeight * (width / desiredWidth);
-				}
-
-				return new SizeRequest(new Size(double.IsNaN(width) ? 0 : width, double.IsNaN(height) ? 0 : height));
-			}
-
 			if (double.IsPositiveInfinity(widthConstraint) && double.IsPositiveInfinity(heightConstraint))
 			{
 				return new SizeRequest(new Size(desiredWidth, desiredHeight));
@@ -631,16 +584,16 @@ namespace FFImageLoading.Maui
 		/// <param name="cacheType">Cache type.</param>
 		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
 		/// (downsampling and transformations variants)</param>
-		public static async Task InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar = false)
+		public async Task InvalidateCache(ImageSource source, Cache.CacheType cacheType, bool removeSimilar = false)
 		{
 			if (source is FileImageSource fileImageSource)
-				await ImageService.Instance.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar).ConfigureAwait(false);
+				await ImageService.InvalidateCacheEntryAsync(fileImageSource.File, cacheType, removeSimilar).ConfigureAwait(false);
 
 			if (source is UriImageSource uriImageSource)
-				await ImageService.Instance.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
+				await ImageService.InvalidateCacheEntryAsync(uriImageSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
 
 			if (source is EmbeddedResourceImageSource embResourceSource)
-				await ImageService.Instance.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
+				await ImageService.InvalidateCacheEntryAsync(embResourceSource.Uri.OriginalString, cacheType, removeSimilar).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -650,9 +603,9 @@ namespace FFImageLoading.Maui
 		/// <param name="cacheType">Cache type.</param>
 		/// <param name = "removeSimilar">If set to <c>true</c> removes all image cache variants
 		/// (downsampling and transformations variants)</param>
-		public static Task InvalidateCache(string key, CacheType cacheType, bool removeSimilar = false)
+		public Task InvalidateCache(string key, CacheType cacheType, bool removeSimilar = false)
 		{
-			return ImageService.Instance.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
+			return ImageService.InvalidateCacheEntryAsync(key, cacheType, removeSimilar);
 		}
 
 		/// <summary>
@@ -877,27 +830,27 @@ namespace FFImageLoading.Maui
 		{
 			if (source.ImageSource == Work.ImageSource.Url)
 			{
-				imageLoader = ImageService.Instance.LoadUrl(source.Path, CacheDuration);
+				imageLoader = ImageService.LoadUrl(source.Path, CacheDuration);
 			}
 			else if (source.ImageSource == Work.ImageSource.CompiledResource)
 			{
-				imageLoader = ImageService.Instance.LoadCompiledResource(source.Path);
+				imageLoader = ImageService.LoadCompiledResource(source.Path);
 			}
 			else if (source.ImageSource == Work.ImageSource.ApplicationBundle)
 			{
-				imageLoader = ImageService.Instance.LoadFileFromApplicationBundle(source.Path);
+				imageLoader = ImageService.LoadFileFromApplicationBundle(source.Path);
 			}
 			else if (source.ImageSource == Work.ImageSource.Filepath)
 			{
-				imageLoader = ImageService.Instance.LoadFile(source.Path);
+				imageLoader = ImageService.LoadFile(source.Path);
 			}
 			else if (source.ImageSource == Work.ImageSource.Stream)
 			{
-				imageLoader = ImageService.Instance.LoadStream(source.Stream);
+				imageLoader = ImageService.LoadStream(source.Stream);
 			}
 			else if (source.ImageSource == Work.ImageSource.EmbeddedResource)
 			{
-				imageLoader = ImageService.Instance.LoadEmbeddedResource(source.Path);
+				imageLoader = ImageService.LoadEmbeddedResource(source.Path);
 			}
 			else
 			{
@@ -1080,7 +1033,7 @@ namespace FFImageLoading.Maui
 
 				if (width <= 0 && height <= 0)
 				{
-					ImageService.Instance.Config.Logger?.Error("Couldn't read view size for auto sizing");
+					ImageService?.Logger?.Error("Couldn't read view size for auto sizing");
 				}
 
 				ReloadImage();

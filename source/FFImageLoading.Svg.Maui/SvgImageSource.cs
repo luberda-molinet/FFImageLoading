@@ -5,6 +5,8 @@ using FFImageLoading.Work;
 using FFImageLoading.Svg.Platform;
 using System.Reflection;
 using System.Collections.Generic;
+using FFImageLoading.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FFImageLoading.Svg.Maui
 {
@@ -35,7 +37,10 @@ namespace FFImageLoading.Svg.Maui
 
         public IVectorDataResolver GetVectorDataResolver()
         {
-            return new SvgDataResolver(VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
+			var ctx = this.Handler.MauiContext;
+			var imageService = ctx.Services.GetRequiredService<IImageService<TImageContainer>>();
+			
+            return new SvgDataResolver<TImageContainer>(imageService, VectorWidth, VectorHeight, UseDipUnits, ReplaceStringMap);
         }
 
         /// <summary>

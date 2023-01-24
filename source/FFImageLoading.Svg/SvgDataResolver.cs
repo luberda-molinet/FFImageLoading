@@ -39,7 +39,7 @@ namespace FFImageLoading.Svg.Platform
     /// Svg data resolver.
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class SvgDataResolver : IVectorDataResolver
+    public class SvgDataResolver<TImageContainer> : IVectorDataResolver
     {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 		private static readonly object _encodingLock = new object();
@@ -60,15 +60,16 @@ namespace FFImageLoading.Svg.Platform
 		/// <param name="vectorHeight">Vector height.</param>
 		/// <param name="useDipUnits">If set to <c>true</c> use dip units.</param>
 		/// <param name="replaceStringMap">Replace string map.</param>
-		public SvgDataResolver(int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
+		public SvgDataResolver(IImageService<TImageContainer> imageService, int vectorWidth = 0, int vectorHeight = 0, bool useDipUnits = true, Dictionary<string, string> replaceStringMap = null)
         {
-            VectorWidth = vectorWidth;
+			ImageService = imageService;
+			VectorWidth = vectorWidth;
             VectorHeight = vectorHeight;
             UseDipUnits = useDipUnits;
             ReplaceStringMap = replaceStringMap;
         }
 
-        public Configuration Configuration => ImageService.Instance.Config;
+		public IImageService<TImageContainer> ImageService { get; }
 
         public bool UseDipUnits { get; private set; }
 
@@ -212,8 +213,8 @@ namespace FFImageLoading.Svg.Platform
             else if (!string.IsNullOrWhiteSpace(parameters.ErrorPlaceholderPath) && parameters.ErrorPlaceholderPath == identifier)
                 source = parameters.ErrorPlaceholderSource;
 
-            var resolvedData = await (Configuration.DataResolverFactory ?? new DataResolverFactory())
-                                            .GetResolver(identifier, source, parameters, Configuration)
+            var resolvedData = await ImageService.DataResolverFactory
+                                            .GetResolver(identifier, source, parameters)
                                             .Resolve(identifier, parameters, token).ConfigureAwait(false);
 
             if (resolvedData?.Stream == null)
@@ -269,8 +270,8 @@ namespace FFImageLoading.Svg.Platform
 
 			if (UseDipUnits)
 			{
-				sizeX = VectorWidth.DpToPixels();
-				sizeY = VectorHeight.DpToPixels();
+				sizeX = ImageService.DpToPixels(VectorWidth, parameters.Scale);
+				sizeY = ImageService.DpToPixels(VectorHeight, parameters.Scale);
 			}
 
 			if (sizeX <= 0 && sizeY <= 0)

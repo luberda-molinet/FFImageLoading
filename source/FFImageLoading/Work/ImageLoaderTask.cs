@@ -107,8 +107,8 @@ namespace FFImageLoading.Work
 					KeyRaw = string.Format(
 						"{0};(size={1}x{2},type={3})",
 						KeyRaw,
-						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth) : vect.VectorWidth,
-						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight) : vect.VectorHeight,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth, Parameters.Scale) : vect.VectorWidth,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight, Parameters.Scale) : vect.VectorHeight,
 						vect.GetType().Name);
 				}
 				else
@@ -116,8 +116,8 @@ namespace FFImageLoading.Work
 					KeyRaw = string.Format(
 						"{0};(size={1}x{2},replace=({3}),type={4})",
 						KeyRaw,
-						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth) : vect.VectorWidth,
-						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight) : vect.VectorHeight,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorWidth, Parameters.Scale) : vect.VectorWidth,
+						vect.UseDipUnits ? DpiToPixels(vect.VectorHeight, Parameters.Scale) : vect.VectorHeight,
 						string.Join(",", vect.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)),
 						vect.GetType().Name);
 				}
@@ -127,9 +127,9 @@ namespace FFImageLoading.Work
 			{
 				KeyDownsamplingOnly = string.Concat(
 					";",
-					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item1) : Parameters.DownSampleSize.Item1,
+					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item1, Parameters.Scale) : Parameters.DownSampleSize.Item1,
 					"x",
-					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item2) : Parameters.DownSampleSize.Item2);
+					Parameters.DownSampleUseDipUnits ? DpiToPixels(Parameters.DownSampleSize.Item2, Parameters.Scale) : Parameters.DownSampleSize.Item2);
 			}
 			else
 			{
@@ -169,14 +169,14 @@ namespace FFImageLoading.Work
 						KeyForLoadingPlaceholder = string.Format(
 							"{0};(size={1}x{2})",
 							KeyForLoadingPlaceholder,
-							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth) : vectLo.VectorWidth,
-							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight) : vectLo.VectorHeight);
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth, Parameters.Scale) : vectLo.VectorWidth,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight, Parameters.Scale) : vectLo.VectorHeight);
 					else
 						KeyForLoadingPlaceholder = string.Format(
 							"{0};(size={1}x{2},replace=({3}))",
 							KeyForLoadingPlaceholder,
-							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth) : vectLo.VectorWidth,
-							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight) : vectLo.VectorHeight,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorWidth, Parameters.Scale) : vectLo.VectorWidth,
+							vectLo.UseDipUnits ? DpiToPixels(vectLo.VectorHeight, Parameters.Scale) : vectLo.VectorHeight,
 							string.Join(",", vectLo.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
 				}
 			}
@@ -194,14 +194,14 @@ namespace FFImageLoading.Work
 						KeyForErrorPlaceholder = string.Format(
 							"{0};(size={1}x{2})",
 							KeyForErrorPlaceholder,
-							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth) : vectEr.VectorWidth,
-							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight) : vectEr.VectorHeight);
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth, Parameters.Scale) : vectEr.VectorWidth,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight, Parameters.Scale) : vectEr.VectorHeight);
 					else
 						KeyForErrorPlaceholder = string.Format(
 							"{0};(size={1}x{2},replace=({3}))",
 							KeyForErrorPlaceholder,
-							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth) : vectEr.VectorWidth,
-							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight) : vectEr.VectorHeight,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorWidth, Parameters.Scale) : vectEr.VectorWidth,
+							vectEr.UseDipUnits ? DpiToPixels(vectEr.VectorHeight, Parameters.Scale) : vectEr.VectorHeight,
 							string.Join(",", vectEr.ReplaceStringMap.Select(x => string.Format("{0}/{1}", x.Key, x.Value)).OrderBy(v => v)));
 				}
 			}
@@ -247,7 +247,7 @@ namespace FFImageLoading.Work
 		protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
 
-		protected abstract int DpiToPixels(int size, float scale);
+		protected abstract int DpiToPixels(int size, double scale);
 
 		protected abstract IDecoder<TDecoderContainer> ResolveDecoder(ImageInformation.ImageType type);
 

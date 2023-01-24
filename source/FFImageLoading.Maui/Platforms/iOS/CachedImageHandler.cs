@@ -47,6 +47,9 @@ namespace FFImageLoading.Maui.Platform
 		{
 		}
 
+		IImageService<TImageContainer> ImageService
+			=> MauiContext.Services.GetRequiredService<IImageService<TImageContainer>>();
+
 		/// <summary>
 		///   Used for registration with dependency service
 		/// </summary>
@@ -59,9 +62,6 @@ namespace FFImageLoading.Maui.Platform
             var ignore1 = typeof(CachedImageHandler);
             var ignore2 = typeof(CachedImage);
 #pragma warning restore 0219
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            ScaleHelper.InitAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
 		protected override PImageView CreatePlatformView()
@@ -212,7 +212,7 @@ namespace FFImageLoading.Maui.Platform
                     imageLoader.LoadingPlaceholderSet(() => ImageLoadingSizeChanged(image, true));
 
                     if (!_isDisposed)
-                        _currentTask = imageLoader.Into(imageView);
+                        _currentTask = imageLoader.Into(imageView, ImageService);
                 }
             }
         }
@@ -222,7 +222,7 @@ namespace FFImageLoading.Maui.Platform
 			if (element == null || _isDisposed)
 				return;
 
-			await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+			await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;
@@ -262,7 +262,7 @@ namespace FFImageLoading.Maui.Platform
         {
             PImage image = null;
 
-            await ImageService.Instance.Config.MainThreadDispatcher.PostAsync(() =>
+            await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
             {
                 if (PlatformView != null)
                     image = PlatformView.Image;

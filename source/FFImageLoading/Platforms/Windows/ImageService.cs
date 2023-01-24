@@ -36,7 +36,7 @@ namespace FFImageLoading
 
 		protected readonly ImageCache ImageCache;
 
-        protected override void PlatformSpecificConfiguration(Config.Configuration configuration)
+        protected override void PlatformSpecificConfiguration(Config.IConfiguration configuration)
         {
             base.PlatformSpecificConfiguration(configuration);
 
@@ -46,7 +46,7 @@ namespace FFImageLoading
 
         protected override IMemoryCache<BitmapSource> MemoryCache => this.ImageCache;
 
-        public IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
+        public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
 			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
 
 		public override IImageLoaderTask CreateTask(TaskParameter parameters)
@@ -97,17 +97,17 @@ namespace FFImageLoading
             }
         }
 
-        public override int DpToPixels(double dp)
+        public override int DpToPixels(double dp, double scale)
         {
-            return (int)Math.Floor(dp * ScaleHelper.Scale);
+            return (int)Math.Floor(dp * scale);
         }
 
-        public override double PixelsToDp(double px)
+        public override double PixelsToDp(double px, double scale)
         {
             if (Math.Abs(px) < double.Epsilon)
                 return 0d;
 
-            return Math.Floor(px / ScaleHelper.Scale);
+            return Math.Floor(px / scale);
         }
     }
 }

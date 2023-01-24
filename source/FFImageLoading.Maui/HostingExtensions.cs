@@ -9,7 +9,7 @@ namespace FFImageLoading.Maui
 {
 	public static class HostingExtensions
 	{
-		public static IImageSourceServiceCollection UseFFImageLoading(this IImageSourceServiceCollection imageSourceServices)
+		static IImageSourceServiceCollection UseFFImageLoading(this IImageSourceServiceCollection imageSourceServices, IServiceCollection services)
 		{
 
 #if IOS || MACCATALYST || ANDROID
@@ -17,22 +17,29 @@ namespace FFImageLoading.Maui
 			imageSourceServices.RemoveAll<StreamImageSource>();
 			imageSourceServices.RemoveAll<UriImageSource>();
 
-			imageSourceServices.AddService<FileImageSource>(svcs => new Platform.FileImageSourceService());
-			imageSourceServices.AddService<StreamImageSource>(svcs => new Platform.StreamImageSourceService());
-			imageSourceServices.AddService<UriImageSource>(svcs => new Platform.UriImageSourceService());
+			imageSourceServices.AddService<FileImageSource, Platform.FileImageSourceService>();
+			imageSourceServices.AddService<StreamImageSource, Platform.StreamImageSourceService>();
+			imageSourceServices.AddService<UriImageSource, Platform.UriImageSourceService>();
 #endif
 
 			return imageSourceServices;
 		}
 
-		public static MauiAppBuilder RegisterFFImageLoadingHandlers(this MauiAppBuilder mauiAppBuilder)
+		public static MauiAppBuilder UseFFImageLoading(this MauiAppBuilder mauiAppBuilder)
 		{
 #if IOS || MACCATALYST || WINDOWS
 			FFImageLoading.Maui.Platform.CachedImageHandler.Init();
 #endif
+
+			FFImageLoading.HostingExtensions.RegisterServices(mauiAppBuilder.Services);
+
 			mauiAppBuilder.ConfigureMauiHandlers(c =>
 			{
 				c.AddHandler(typeof(FFImageLoading.Maui.CachedImage), typeof(FFImageLoading.Maui.Platform.CachedImageHandler));
+			})
+			.ConfigureImageSources(imageSourceServices =>
+			{
+				imageSourceServices.UseFFImageLoading(mauiAppBuilder.Services);
 			});
 
 
