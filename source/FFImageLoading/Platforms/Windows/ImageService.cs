@@ -36,7 +36,7 @@ namespace FFImageLoading
             configuration.ExecuteCallbacksOnUIThread = true;
         }
 
-        protected override IMemoryCache<BitmapSource> MemoryCache => this.ImageCache;
+        public override IMemoryCache<BitmapSource> MemoryCache => this.ImageCache;
 
         public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
 			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);

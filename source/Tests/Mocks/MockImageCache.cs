@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FFImageLoading.Mock
 {
-    public class ImageCache : IMemoryCache<MockBitmap>
+    public class MockImageCache : IMemoryCache<MockBitmap>
     {
         readonly Dictionary<string, Tuple<MockBitmap, ImageInformation>> _cache = new Dictionary<string, Tuple<MockBitmap, ImageInformation>>();
         readonly object _lock = new object();

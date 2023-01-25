@@ -2,21 +2,16 @@
 using Xunit;
 using System.Threading.Tasks;
 using FFImageLoading;
+using FFImageLoading.Mock;
 
 namespace FFImageLoading.Tests.Cache
 {
     public class DiskCacheTests : BaseTests
     {
-        public DiskCacheTests()
-        {
-            ImageService.EnableMockImageService = true;
-            ImageService.Instance.Initialize();
-        }
-
         [Fact]
         public async Task CanAddGet()
         {
-            var diskCache = ImageService.Instance.Config.DiskCache;
+            var diskCache = ImageService.DiskCache;
             var key = Guid.NewGuid().ToString();
 
             byte[] bytes = new byte[] { 00, 01, 00, 01 };

@@ -61,13 +61,30 @@ namespace FFImageLoading.Maui
 			{
 				_visualProperty.SetValue(this, _visualMarkerProperty.GetValue(null));
 			}
+
+			ImageService = this.FindMauiContext().Services.GetRequiredService<IImageService<TImageContainer>>();
+			//ImageService = Handler?.MauiContext?.Services?.GetService<IImageService<TImageContainer>>();
+		}
+
+		internal IMauiContext FindMauiContext()
+		{
+			if (Handler?.MauiContext != null)
+				return Handler.MauiContext;
+
+			if (Window?.Handler?.MauiContext is not null)
+				return Window.Handler.MauiContext;
+
+			if (Application.Current?.Handler?.MauiContext is not null)
+				return Application.Current.Handler.MauiContext;
+
+			return null;
 		}
 
 		protected override void OnHandlerChanged()
 		{
 			base.OnHandlerChanged();
 
-			ImageService = Handler?.MauiContext?.Services?.GetService<IImageService<TImageContainer>>();
+			ImageService = this.FindMauiContext().Services.GetRequiredService<IImageService<TImageContainer>>();
 		}
 
 		/// <summary>

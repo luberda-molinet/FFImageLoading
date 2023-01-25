@@ -15,7 +15,15 @@ namespace FFImageLoading
 			services.AddSingleton<IDiskCache, SimpleDiskCache>();
 			services.AddSingleton<IConfiguration, Configuration>();
 			services.AddSingleton<IDownloadCache, DownloadCache>();
+			services.AddSingleton<IWorkScheduler, WorkScheduler>();
 
+#if IOS || MACCATALYST
+	services.AddSingleton<IImageService<UIKit.UIImage>, ImageService>();
+#elif ANDROID
+			services.AddSingleton<IImageService<FFImageLoading.Drawables.SelfDisposingBitmapDrawable>, ImageService>();
+#elif WINDOWS
+	services.AddSingleton<IImageService<Microsoft.UI.Xaml.Media.Imageing.BitmapSource>, ImageService>();
+#endif
 
 #if ANDROID || WINDOWS || IOS || MACCATALYST || TIZEN
 			services.AddSingleton<IMainThreadDispatcher, MainThreadDispatcher>();

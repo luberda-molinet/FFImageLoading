@@ -21,7 +21,8 @@ namespace FFImageLoading
 			IPlatformPerformance platformPerformance,
 			IMainThreadDispatcher mainThreadDispatcher,
 			IDataResolverFactory dataResolverFactory,
-			IDownloadCache downloadCache)
+			IDownloadCache downloadCache,
+            IWorkScheduler workScheduler)
 		{
 			_config = configuration;
 			Md5Helper = mD5Helper;
@@ -30,6 +31,7 @@ namespace FFImageLoading
 			Dispatcher = mainThreadDispatcher;
 			DataResolverFactory = dataResolverFactory;
 			DownloadCache = downloadCache;
+            Scheduler = workScheduler;
 		}
 
 		public IMD5Helper Md5Helper { get; }
@@ -43,7 +45,7 @@ namespace FFImageLoading
 
 		public IDownloadCache DownloadCache { get; }
 
-		protected abstract IMemoryCache<TImageContainer> MemoryCache { get; }
+		public abstract IMemoryCache<TImageContainer> MemoryCache { get; }
 
 		protected bool _initialized;
         protected bool _isInitializing;

@@ -3,10 +3,19 @@ namespace Sample
 {
     public partial class SimpleGifPage : ContentPage
     {
-        public SimpleGifPage()
+        SimpleGifPageModel viewModel;
+
+		public SimpleGifPage()
         {
             InitializeComponent();
-            BindingContext = new SimpleGifPageModel();
+            BindingContext = viewModel = new SimpleGifPageModel();
         }
-    }
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+            viewModel.Reload();
+		}
+	}
 }

@@ -7,16 +7,10 @@ namespace FFImageLoading.Tests.Cache
 {
     public class MemoryCacheTests : BaseTests
     {
-        public MemoryCacheTests()
-        {
-            ImageService.EnableMockImageService = true;
-            ImageService.Instance.Initialize();
-        }
-
         [Fact]
         public Task CanAddGet()
         {
-            var memoryCache = Mock.MockImageCache.Instance;
+            var memoryCache = ImageService.MemoryCache;
             var key = Guid.NewGuid().ToString();
             byte[] bytes = new byte[] { 00, 01, 00, 01 };
             var bitmap = new Mock.MockBitmap();

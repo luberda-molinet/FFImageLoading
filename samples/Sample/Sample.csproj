@@ -68,5 +68,6 @@
 
 	<ItemGroup>
 	  <EmbeddedResource Include="replace.svg" />
+		<EmbeddedResource Include="tenor.gif" />
 	</ItemGroup>
 </Project>

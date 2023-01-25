@@ -18,20 +18,21 @@ namespace FFImageLoading
     {
         static ConditionalWeakTable<object, IImageLoaderTask> _viewsReferences = new ConditionalWeakTable<object, IImageLoaderTask>();
 
-		public ImageService(IConfiguration configuration, IMD5Helper md5Helper, IMiniLogger miniLogger, IPlatformPerformance platformPerformance, IMainThreadDispatcher mainThreadDispatcher, IDataResolverFactory dataResolverFactory, IDownloadCache downloadCache) : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache)
+		public ImageService(IConfiguration configuration, IMD5Helper md5Helper, IMiniLogger miniLogger, IPlatformPerformance platformPerformance, IMainThreadDispatcher mainThreadDispatcher, IDataResolverFactory dataResolverFactory, IDownloadCache downloadCache,
+			IWorkScheduler workScheduler) : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache, workScheduler)
 		{
 		}
 
 		ImageCache imageCache;
 
-		protected override IMemoryCache<UIImage> MemoryCache => imageCache ??= new ImageCache(Configuration, Logger);
+		public override IMemoryCache<UIImage> MemoryCache => imageCache ??= new ImageCache(Configuration, Logger);
 
 
         public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<UIImage, TImageView> target) where TImageView : class
-			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
+			=> new PlatformImageLoaderTask<TImageView>(this, target, parameters);
 
 		public override IImageLoaderTask CreateTask(TaskParameter parameters)
-			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
+			=> new PlatformImageLoaderTask<object>(this, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {

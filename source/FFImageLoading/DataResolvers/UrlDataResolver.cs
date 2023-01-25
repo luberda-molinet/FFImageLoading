@@ -11,7 +11,7 @@ namespace FFImageLoading.DataResolvers
         public UrlDataResolver(IConfiguration configuration, IDownloadCache downloadCache)
         {
             Configuration = configuration;
-			DownloadCache = DownloadCache;
+			DownloadCache = downloadCache;
         }
 
         protected IDownloadCache DownloadCache { get; }

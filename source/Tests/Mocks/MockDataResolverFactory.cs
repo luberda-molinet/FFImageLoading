@@ -7,16 +7,20 @@ using FFImageLoading.Work;
 
 namespace FFImageLoading
 {
-    public class DataResolverFactory : IDataResolverFactory
+    public class MockDataResolverFactory : IDataResolverFactory
     {
-		public DataResolverFactory(IDownloadCache downloadCache)
+		public MockDataResolverFactory(
+            IConfiguration configuration,
+            IDownloadCache downloadCache)
 		{
-			DownloadCache = downloadCache;
+            Configuration = configuration;
+            DownloadCache = downloadCache;
 		}
 
+		protected readonly IConfiguration Configuration;
 		protected readonly IDownloadCache DownloadCache;
 
-		public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters, IConfiguration configuration)
+		public IDataResolver GetResolver(string identifier, Work.ImageSource source, TaskParameter parameters)
         {
             switch (source)
             {
@@ -29,7 +33,7 @@ namespace FFImageLoading
                 case Work.ImageSource.Url:
                     if (!string.IsNullOrWhiteSpace(identifier) && identifier.IsDataUrl())
                         return new DataUrlResolver();
-                    return new UrlDataResolver(configuration, DownloadCache);
+                    return new UrlDataResolver(Configuration, DownloadCache);
                 case Work.ImageSource.Stream:
                     return new StreamDataResolver();
                 case Work.ImageSource.EmbeddedResource:

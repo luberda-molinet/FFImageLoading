@@ -18,8 +18,30 @@ namespace FFImageLoading.Maui
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ConvertFromInvariantString(value as string);
-        }
+			if (!(value is string text))
+				return null;
+
+			if (text.IsDataUrl())
+			{
+				return new DataUrlImageSource(text);
+			}
+
+			if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
+			{
+				if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+					return ImageSource.FromFile(uri.LocalPath);
+				if (uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
+					return new EmbeddedResourceImageSource(uri);
+
+				return ImageSource.FromUri(uri);
+			}
+			if (!string.IsNullOrWhiteSpace(text))
+			{
+				return ImageSource.FromFile(text);
+			}
+
+			throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
+		}
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -28,30 +50,8 @@ namespace FFImageLoading.Maui
 
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
-            if (!(value is string text))
-                return null;
-
-            if (text.IsDataUrl())
-            {
-                return new DataUrlImageSource(text);
-            }
-
-            if (Uri.TryCreate(text, UriKind.Absolute, out var uri))
-            {
-                if (uri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
-                    return ImageSource.FromFile(uri.LocalPath);
-                if (uri.Scheme.Equals("resource", StringComparison.OrdinalIgnoreCase))
-                    return new EmbeddedResourceImageSource(uri);
-
-                return ImageSource.FromUri(uri);
-            }
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                return ImageSource.FromFile(text);
-            }
-
-            throw new InvalidOperationException(string.Format("Cannot convert \"{0}\" into {1}", value, typeof(ImageSource)));
-        }
-    }
+			return Convert(value, typeof(ImageSource), null, CultureInfo.CurrentCulture);
+		}
+	}
 }
 

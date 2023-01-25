@@ -4,11 +4,13 @@ namespace Sample
 {
     public partial class ByteArrayListPageCell : ViewCell
     {
-        public ByteArrayListPageCell()
+        CustomCacheKeyFactory viewModel;
+
+		public ByteArrayListPageCell()
         {
             InitializeComponent();
 
-            Image.CacheKeyFactory = new CustomCacheKeyFactory();
+            Image.CacheKeyFactory = viewModel = new CustomCacheKeyFactory();
         }
 
         public class CustomCacheKeyFactory : ICacheKeyFactory
@@ -35,5 +37,5 @@ namespace Sample
             Image.Source = item.ImageSource;
             Label.Text = item.FileName;
         }
-    }
+	}
 }

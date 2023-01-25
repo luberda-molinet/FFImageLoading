@@ -24,19 +24,21 @@ namespace FFImageLoading
 			 IMiniLogger miniLogger,
 			 IPlatformPerformance platformPerformance,
 			 IMainThreadDispatcher mainThreadDispatcher,
-			 IDataResolverFactory dataResolverFactory)
-			 : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory)
+			 IDataResolverFactory dataResolverFactory,
+             IDownloadCache downloadCache,
+			    IWorkScheduler workScheduler)
+			 : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache, workScheduler)
 		{
 		}
 
-        protected override IMemoryCache<MockBitmap> MemoryCache => new MockImageCache();
+        public override IMemoryCache<MockBitmap> MemoryCache => new MockImageCache();
 
-        internal IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<MockBitmap, TImageView> target) where TImageView : class
+        public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<MockBitmap, TImageView> target) where TImageView : class
         {
             return new PlatformImageLoaderTask<TImageView>(target, parameters, this);
         }
 
-        internal IImageLoaderTask CreateTask(TaskParameter parameters)
+        public override IImageLoaderTask CreateTask(TaskParameter parameters)
         {
             return new PlatformImageLoaderTask<object>(null, parameters, this);
         }
@@ -51,12 +53,12 @@ namespace FFImageLoading
             // throw new NotImplementedException();
         }
 
-        public override int DpToPixels(double dp)
+        public override int DpToPixels(double dp, double scale)
         {
             return (int)dp;
         }
 
-        public override double PixelsToDp(double px)
+        public override double PixelsToDp(double px, double scale)
         {
             return px;
         }

@@ -33,10 +33,9 @@ namespace FFImageLoading.Work
 
 		public PlatformImageLoaderTask(
 			IImageService<PImage> imageService,
-			IMemoryCache<PImage> memoryCache,
 			ITarget<PImage, TImageView> target,
 			TaskParameter parameters)
-			: base(imageService, memoryCache, target, parameters)
+			: base(imageService, target, parameters)
 		{
 			_webpDecoder = new WebPDecoder(imageService);
 		}
@@ -54,7 +53,7 @@ namespace FFImageLoading.Work
 			if (Target == null)
 				return;
 
-            await MainThreadDispatcher.PostAsync(() =>
+            await ImageService.Dispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
                 PlatformTarget.Set(this, image, animated);
@@ -101,7 +100,7 @@ namespace FFImageLoading.Work
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                        ImageService.Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
                         throw;
                     }
                     finally

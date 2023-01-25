@@ -5,10 +5,13 @@ namespace Sample.Pages
 {
 	public partial class ExifPage : ContentPage
 	{
+		ExifPageModel viewModel;
+
 		public ExifPage()
 		{
 			InitializeComponent();
-			BindingContext = new ExifPageModel();
+			BindingContext = viewModel = new ExifPageModel();
 		}
+
 	}
 }

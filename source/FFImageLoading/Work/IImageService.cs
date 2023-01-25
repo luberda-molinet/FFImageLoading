@@ -37,6 +37,8 @@ namespace FFImageLoading
 
 		IDownloadCache DownloadCache { get; }
 
+        IMemoryCache<TImageContainer> MemoryCache { get; }
+
         /// <summary>
         /// Initializes FFImageLoading with a default Configuration.
         /// Also forces to run disk cache cleaning routines (avoiding delay for first image loading tasks)

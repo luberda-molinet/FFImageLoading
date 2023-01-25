@@ -12,29 +12,18 @@ namespace FFImageLoading.Tests.ImageServiceTests
 {
     public class ImageServiceBaseTests : BaseTests
     {
-        public ImageServiceBaseTests()
-        {
-            ImageService.EnableMockImageService = true;
-			ImageService.Instance.Initialize(new Config.Configuration()
-			{
-
-				HttpHeadersTimeout = 15,
-				HttpReadTimeout = 40
-			});
-        }
-
         [Fact]
         public void CanInitialize()
         {
-            ImageService.Instance.Initialize();
-            Assert.NotNull(ImageService.Instance.Config);
+            ImageService.Initialize();
+            Assert.NotNull(ImageService.Configuration);
         }
 
         [Fact]
         public void CanInitializeWithCustomConfig()
         {
-            ImageService.Instance.Initialize(new Config.Configuration());
-            Assert.NotNull(ImageService.Instance.Config);
+            ImageService.Initialize(new Config.Configuration());
+            Assert.NotNull(ImageService.Configuration);
         }
 
         //[Fact]
@@ -52,47 +41,47 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanPreload()
         {
-            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
-            await ImageService.Instance.LoadUrl(RemoteImage)
-                .PreloadAsync();
+            await ImageService.InvalidateCacheAsync(CacheType.All);
+            await ImageService.LoadUrl(RemoteImage)
+                .PreloadAsync(ImageService);
 
-            var diskCacheKey = ImageService.Instance.Config.MD5Helper.MD5(RemoteImage);
-            var cachedDisk = await ImageService.Instance.Config.DiskCache.ExistsAsync(diskCacheKey);
+            var diskCacheKey = ImageService.Md5Helper.MD5(RemoteImage);
+            var cachedDisk = await ImageService.DiskCache.ExistsAsync(diskCacheKey);
             Assert.True(cachedDisk);
 
-            var cachedMemory = Mock.MockImageCache.Instance.Get(RemoteImage);
+            var cachedMemory = ImageService.MemoryCache.Get(RemoteImage);
             Assert.NotNull(cachedMemory);
         }
 
         [Fact]
         public async Task CanInvalidate()
         {
-            await ImageService.Instance.LoadUrl(RemoteImage)
-                .PreloadAsync();
+            await ImageService.LoadUrl(RemoteImage)
+                .PreloadAsync(ImageService);
 
-            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+            await ImageService.InvalidateCacheAsync(CacheType.All);
 
-            var diskCacheKey = ImageService.Instance.Config.MD5Helper.MD5(RemoteImage);
-            var cachedDisk = await ImageService.Instance.Config.DiskCache.ExistsAsync(diskCacheKey);
+            var diskCacheKey = ImageService.Md5Helper.MD5(RemoteImage);
+            var cachedDisk = await ImageService.DiskCache.ExistsAsync(diskCacheKey);
             Assert.False(cachedDisk);
 
-            var cachedMemory = Mock.MockImageCache.Instance.Get(RemoteImage);
+            var cachedMemory = ImageService.MemoryCache.Get(RemoteImage);
             Assert.Null(cachedMemory);
         }
 
         [Fact]
         public async Task CanInvalidateEntry()
         {
-            await ImageService.Instance.LoadUrl(RemoteImage)
-                .PreloadAsync();
+            await ImageService.LoadUrl(RemoteImage)
+                .PreloadAsync(ImageService);
 
-            await ImageService.Instance.InvalidateCacheEntryAsync(RemoteImage, CacheType.All, true);
+            await ImageService.InvalidateCacheEntryAsync(RemoteImage, CacheType.All, true);
 
-            var diskCacheKey = ImageService.Instance.Config.MD5Helper.MD5(RemoteImage);
-            var cachedDisk = await ImageService.Instance.Config.DiskCache.ExistsAsync(diskCacheKey);
+            var diskCacheKey = ImageService.Md5Helper.MD5(RemoteImage);
+            var cachedDisk = await ImageService.DiskCache.ExistsAsync(diskCacheKey);
             Assert.False(cachedDisk);
 
-            var cachedMemory = Mock.MockImageCache.Instance.Get(RemoteImage);
+            var cachedMemory = ImageService.MemoryCache.Get(RemoteImage);
             Assert.Null(cachedMemory);
         }
 
@@ -127,7 +116,7 @@ namespace FFImageLoading.Tests.ImageServiceTests
         [Fact]
         public async Task CanWaitForSameUrlImageSources()
         {
-            await ImageService.Instance.InvalidateCacheAsync(CacheType.All);
+            await ImageService.InvalidateCacheAsync(CacheType.All);
 
             IList<Task> tasks = new List<Task>();
             int downloadsCount = 0;
@@ -135,7 +124,7 @@ namespace FFImageLoading.Tests.ImageServiceTests
 
             for (int i = 0; i < 5; i++)
             {
-                tasks.Add(ImageService.Instance.LoadUrl(Images.Last())
+                tasks.Add(ImageService.LoadUrl(Images.Last())
                           .DownloadStarted((obj) =>
                           {
                               downloadsCount++;
@@ -144,7 +133,7 @@ namespace FFImageLoading.Tests.ImageServiceTests
                           {
                               successCount++;
                           })
-                          .PreloadAsync());
+                          .PreloadAsync(ImageService));
             }
 
             await Task.WhenAll(tasks);

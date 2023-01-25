@@ -23,10 +23,9 @@ namespace FFImageLoading
 
         public PlatformImageLoaderTask(
 			IImageService<SelfDisposingBitmapDrawable> imageService,
-			IMemoryCache<SelfDisposingBitmapDrawable> memoryCache,
 			ITarget<SelfDisposingBitmapDrawable, TImageView> target,
 			TaskParameter parameters)
-			: base(imageService, memoryCache, target, parameters)
+			: base(imageService, target, parameters)
         {
         }
 
@@ -92,7 +91,7 @@ namespace FFImageLoading
                 }
             }
 
-            await MainThreadDispatcher.PostAsync(() =>
+            await ImageService.Dispatcher.PostAsync(() =>
             {
                 ThrowIfCancellationRequested();
 
@@ -126,7 +125,7 @@ namespace FFImageLoading
                     return new GifDecoder(ImageService);
 
                 default:
-                    return new BaseDecoder(ImageService, MemoryCache);
+                    return new BaseDecoder(ImageService);
             }
         }
 
@@ -150,7 +149,7 @@ namespace FFImageLoading
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
+                        ImageService.Logger.Error(string.Format("Transformation failed: {0}", transformation.Key), ex);
                         throw;
                     }
                     finally

@@ -26,7 +26,7 @@ namespace FFImageLoading.Svg.Maui
             if (string.IsNullOrWhiteSpace(str))
                 return null;
 
-            return ConvertFromInvariantString(str);
+            return base.Convert(value, targetType, parameter, culture);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace FFImageLoading.Svg.Maui
             if (string.IsNullOrWhiteSpace(text))
                 return null;
 
-            var xfSource = base.ConvertFromInvariantString(text) as ImageSource;
+            var xfSource = base.ConvertFrom(text) as ImageSource;
 
             if (text.IsSvgFileUrl() || text.IsSvgDataUrl())
             {

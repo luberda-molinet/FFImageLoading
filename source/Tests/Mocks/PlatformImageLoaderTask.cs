@@ -10,11 +10,12 @@ namespace FFImageLoading.Work
 {
     public class PlatformImageLoaderTask<TImageView> : ImageLoaderTask<MockBitmap, MockBitmap, TImageView> where TImageView : class
     {
-        public PlatformImageLoaderTask(ITarget<MockBitmap, TImageView> target, TaskParameter parameters, IImageService imageService) : base(MockImageCache.Instance, target, parameters, imageService)
+        public PlatformImageLoaderTask(ITarget<MockBitmap, TImageView> target, TaskParameter parameters, IImageService<MockBitmap> imageService)
+            : base(imageService, target, parameters)
         {
         }
 
-        protected override int DpiToPixels(int size)
+        protected override int DpiToPixels(int size, double scale)
         {
             return size;
         }

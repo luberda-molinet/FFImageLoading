@@ -3,10 +3,19 @@ namespace Sample
 {
     public partial class ByteArrayListPage : ContentPage
     {
-        public ByteArrayListPage()
+		ByteArrayListPageModel viewModel;
+
+		public ByteArrayListPage()
         {
             InitializeComponent();
-			BindingContext = new ByteArrayListPageModel();
+			BindingContext = viewModel = new ByteArrayListPageModel();
+		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
 		}
 
 		void ListView_ItemSelected(System.Object sender, Microsoft.Maui.Controls.SelectedItemChangedEventArgs e)

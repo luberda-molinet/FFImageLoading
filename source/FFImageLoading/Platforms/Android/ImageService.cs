@@ -27,21 +27,22 @@ namespace FFImageLoading
 			IPlatformPerformance platformPerformance,
 			IMainThreadDispatcher mainThreadDispatcher,
 			IDataResolverFactory dataResolverFactory,
-			IDownloadCache downloadCache)
-			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache)
+			IDownloadCache downloadCache,
+			IWorkScheduler workScheduler)
+			: base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache, workScheduler)
 		{
 		}
 
 		ImageCache imageCache;
 
-		protected override IMemoryCache<SelfDisposingBitmapDrawable> MemoryCache => imageCache ?? new ImageCache(Configuration, Logger);
+		public override IMemoryCache<SelfDisposingBitmapDrawable> MemoryCache => imageCache ?? new ImageCache(Configuration, Logger);
 
 
         public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<SelfDisposingBitmapDrawable, TImageView> target) where TImageView : class
-			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
+			=> new PlatformImageLoaderTask<TImageView>(this, target, parameters);
 
         public override IImageLoaderTask CreateTask(TaskParameter parameters)
-			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
+			=> new PlatformImageLoaderTask<object>(this, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {
