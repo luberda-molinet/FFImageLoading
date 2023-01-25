@@ -21,7 +21,8 @@ namespace Sample.Pages
         }
 
 
-		public ObservableCollection<ListHeavyItem> Items { get; set; }
+		[ObservableProperty]
+		List<ListHeavyItem> items;
 
         public void Reload()
         {
@@ -232,7 +233,7 @@ namespace Sample.Pages
                 }
             }
 
-            Items = new ObservableCollection<ListHeavyItem>(list);
+            Items = new List<ListHeavyItem>(list);
         }
 
 

@@ -23,14 +23,23 @@ namespace Sample.Pages
                 HasUnevenRows = false,
                 RowHeight = 110,
             };
-            listView.ItemsSource = viewModel.Items;
 
+
+			listView.SetBinding(ListView.ItemsSourceProperty, nameof(SvgListHeavyPageModel.Items));
+			
             listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
 
             Content = listView;
         }
 
-        class SvgListHeavyCell : ViewCell
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
+		}
+
+		class SvgListHeavyCell : ViewCell
         {
             readonly SvgCachedImage image1 = null;
             readonly SvgCachedImage image2 = null;
