@@ -172,7 +172,7 @@ namespace FFImageLoading.Maui.Platform
 			if (element == null || _isDisposed)
 				return;
 
-			await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
+			await ImageService.Dispatcher.PostAsync(() =>
 			{
 				if (element == null || _isDisposed)
 					return;

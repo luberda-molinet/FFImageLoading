@@ -18,7 +18,23 @@ namespace FFImageLoading
     [Preserve(AllMembers = true)]
     public class ImageService : ImageServiceBase<BitmapSource>
     {
-		public ImageService(IConfiguration configuration, IMD5Helper md5Helper, IMiniLogger miniLogger, IPlatformPerformance platformPerformance, IMainThreadDispatcher mainThreadDispatcher, IDataResolverFactory dataResolverFactory, IDownloadCache downloadCache) : base(configuration, md5Helper, miniLogger, platformPerformance, mainThreadDispatcher, dataResolverFactory, downloadCache)
+		public ImageService(
+			IConfiguration configuration,
+			IMD5Helper md5Helper,
+			IMiniLogger miniLogger,
+			IPlatformPerformance platformPerformance,
+			IMainThreadDispatcher mainThreadDispatcher,
+			IDataResolverFactory dataResolverFactory,
+			IDownloadCache downloadCache,
+			IWorkScheduler workScheduler)
+			: base(
+				  configuration,
+				  md5Helper,
+				  miniLogger,
+				  platformPerformance,
+				  mainThreadDispatcher,
+				  dataResolverFactory,
+				  downloadCache, workScheduler)
 		{
 			ImageCache = new ImageCache(miniLogger, configuration);
 		}
@@ -39,10 +55,10 @@ namespace FFImageLoading
         public override IMemoryCache<BitmapSource> MemoryCache => this.ImageCache;
 
         public override IImageLoaderTask CreateTask<TImageView>(TaskParameter parameters, ITarget<BitmapSource, TImageView> target) where TImageView : class
-			=> new PlatformImageLoaderTask<TImageView>(this, MemoryCache, target, parameters);
+			=> new PlatformImageLoaderTask<TImageView>(this, target, parameters);
 
 		public override IImageLoaderTask CreateTask(TaskParameter parameters)
-			=> new PlatformImageLoaderTask<object>(this, MemoryCache, null, parameters);
+			=> new PlatformImageLoaderTask<object>(this, null, parameters);
 
         protected override void SetTaskForTarget(IImageLoaderTask currentTask)
         {

@@ -4,12 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+    xmlns:local="clr-namespace:Sample"
     x:Class="Sample.PlaceholdersPage"
+    x:DataType="local:PlaceholdersPageModel"
     Title="Placeholders">
     <ContentPage.Content>
         <StackLayout>
             <ffimageloading:CachedImage LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png"
-                Source = "{Binding ImageUrl}">
+               Source = "{Binding ImageUrl}">
             </ffimageloading:CachedImage>
             <Button Text="Loading placeholder" Command="{Binding LoadingPlaceholderCommand}"/>
             <Button Text="Error placeholder" Command="{Binding ErrorPlaceholderCommand}"/>

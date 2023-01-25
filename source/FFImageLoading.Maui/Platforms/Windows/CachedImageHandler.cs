@@ -46,13 +46,6 @@ namespace FFImageLoading.Maui.Platform
 		{
 		}
 
-		/// <summary>
-		///   Used for registration with dependency service
-		/// </summary>
-		public static void Init()
-        {
-            CachedImage.IsRendererInitialized = true;
-        }
 
 		public Microsoft.UI.Xaml.Controls.Image Control { get; private set; }
 
@@ -65,9 +58,8 @@ namespace FFImageLoading.Maui.Platform
 			return Control;
 		}
 
-		IImageService<BitmapSource> _imageService;
-		IImageService<BitmapSource> ImageService
-			=> _imageService ??= MauiContext.Services.GetRequiredService<IImageService<BitmapSource>>();
+		IImageService<TImageContainer> ImageService
+			=> this.VirtualView.FindMauiContext()?.Services.GetRequiredService<IImageService<TImageContainer>>();
 
 		protected override void ConnectHandler(Microsoft.UI.Xaml.Controls.Image platformView)
 		{

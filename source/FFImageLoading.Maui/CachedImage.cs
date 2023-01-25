@@ -6,9 +6,11 @@ using System.Windows.Input;
 using FFImageLoading.Cache;
 using System.Reflection;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace FFImageLoading.Maui
 {
+
 	[Preserve(AllMembers = true)]
 	/// <summary>
 	/// CachedImage by Daniel Luberda
@@ -62,8 +64,7 @@ namespace FFImageLoading.Maui
 				_visualProperty.SetValue(this, _visualMarkerProperty.GetValue(null));
 			}
 
-			ImageService = this.FindMauiContext().Services.GetRequiredService<IImageService<TImageContainer>>();
-			//ImageService = Handler?.MauiContext?.Services?.GetService<IImageService<TImageContainer>>();
+			ImageService = this.FindMauiContext()?.Services?.GetRequiredService<IImageService<TImageContainer>>();
 		}
 
 		internal IMauiContext FindMauiContext()
@@ -145,11 +146,6 @@ namespace FFImageLoading.Maui
 
 		private static void OnSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
 		{
-			if (!IsRendererInitialized)
-			{
-				throw new Exception("Please call CachedImageRenderer.Init method in a platform specific project to use FFImageLoading!");
-			}
-
 			if (newValue != null)
 			{
 				SetInheritedBindingContext(newValue as BindableObject, bindable.BindingContext);

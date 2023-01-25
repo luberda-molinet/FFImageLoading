@@ -48,21 +48,7 @@ namespace FFImageLoading.Maui.Platform
 		}
 
 		IImageService<TImageContainer> ImageService
-			=> MauiContext.Services.GetRequiredService<IImageService<TImageContainer>>();
-
-		/// <summary>
-		///   Used for registration with dependency service
-		/// </summary>
-		public static new void Init()
-        {
-            CachedImage.IsRendererInitialized = true;
-
-            // needed because of this STUPID linker issue: https://bugzilla.xamarin.com/show_bug.cgi?id=31076
-#pragma warning disable 0219
-            var ignore1 = typeof(CachedImageHandler);
-            var ignore2 = typeof(CachedImage);
-#pragma warning restore 0219
-        }
+			=> this.VirtualView.FindMauiContext()?.Services.GetRequiredService<IImageService<TImageContainer>>();
 
 		protected override PImageView CreatePlatformView()
 		{

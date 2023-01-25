@@ -22,7 +22,7 @@ namespace FFImageLoading
 #elif ANDROID
 			services.AddSingleton<IImageService<FFImageLoading.Drawables.SelfDisposingBitmapDrawable>, ImageService>();
 #elif WINDOWS
-	services.AddSingleton<IImageService<Microsoft.UI.Xaml.Media.Imageing.BitmapSource>, ImageService>();
+	services.AddSingleton<IImageService<Microsoft.UI.Xaml.Media.Imaging.BitmapSource>, ImageService>();
 #endif
 
 #if ANDROID || WINDOWS || IOS || MACCATALYST || TIZEN

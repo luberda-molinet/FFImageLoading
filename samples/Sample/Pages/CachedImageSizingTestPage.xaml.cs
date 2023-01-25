@@ -3,11 +3,19 @@ namespace Sample
 {
     public partial class CachedImageSizingTestPage : ContentPage
     {
-        public CachedImageSizingTestPage()
+		CachedImageSizingTestPageModel viewModel;
+
+		public CachedImageSizingTestPage()
         {
             InitializeComponent();
-			BindingContext = new CachedImageSizingTestPageModel();
+			BindingContext = viewModel = new CachedImageSizingTestPageModel();
 
 		}
-    }
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+			
+		}
+	}
 }

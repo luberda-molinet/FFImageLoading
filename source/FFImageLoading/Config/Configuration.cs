@@ -3,6 +3,7 @@ using System.Net.Http;
 using FFImageLoading.Helpers;
 using FFImageLoading.Cache;
 using FFImageLoading.Work;
+using System.Net;
 
 namespace FFImageLoading.Config
 {
@@ -23,6 +24,8 @@ namespace FFImageLoading.Config
 			HttpHeadersTimeout = 3;
 			HttpReadTimeout = 15;
 			HttpReadBufferSize = 8192;
+			HttpClient = new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate });
+			HttpClient.Timeout = TimeSpan.FromSeconds(HttpReadTimeout);
 			VerbosePerformanceLogging = false;
 			VerboseMemoryCacheLogging = false;
 			VerboseLoadingCancelledLogging = false;

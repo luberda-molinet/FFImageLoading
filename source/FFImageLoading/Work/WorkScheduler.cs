@@ -19,10 +19,11 @@ namespace FFImageLoading.Work
 		private long _statsTotalWaiting;
 		private long _loadCount;
 
-        public WorkScheduler(IConfiguration configuration, IPlatformPerformance performance)
+        public WorkScheduler(IConfiguration configuration, IMiniLogger logger, IPlatformPerformance performance)
         {
             Configuration = configuration;
             Performance = performance;
+			Logger = logger;
         }
 
         protected int MaxParallelTasks => Configuration.SchedulerMaxParallelTasksFactory != null

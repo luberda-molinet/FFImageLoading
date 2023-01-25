@@ -5,10 +5,12 @@ namespace Sample
 {
 	public partial class PlaceholdersPage : ContentPage
 	{
+		PlaceholdersPageModel viewModel;
 		public PlaceholdersPage()
 		{
 			InitializeComponent();
-			BindingContext = new PlaceholdersPageModel();
+			BindingContext = viewModel = new PlaceholdersPageModel();
 		}
+
 	}
 }

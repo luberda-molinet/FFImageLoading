@@ -13,5 +13,10 @@ namespace Sample.Pages
 			BindingContext = viewModel = new ExifPageModel();
 		}
 
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+		}
+
 	}
 }
