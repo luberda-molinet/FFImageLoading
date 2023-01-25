@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FFImageLoading.Svg.Maui;
 
 namespace Sample
 {
-    public class SvgReplacePageModel : ObservableObject
+    public partial class SvgReplacePageModel : ObservableObject
     {
         private Random _random = new Random();
 
@@ -15,6 +16,7 @@ namespace Sample
 
         public Dictionary<string, string> ReplaceMap { get; set; }
 
+		[RelayCommand]
         public void Replace()
         {
 			var r = _random.Next(256);
@@ -27,10 +29,13 @@ namespace Sample
 					{ "#FILLCOLOR", $"#{r:X2}{g:X2}{b:X2}" }
 				};
 
-			ImageSource = SvgImageSource.FromResource("Sample.Resources.replace.svg",
+			var src = SvgImageSource.FromResource("Sample.replace.svg",
 				replaceStringMap: ReplaceMap);
+
+			ImageSource = src;
 		}
 
-		public ImageSource ImageSource { get; set; }
+		[ObservableProperty]
+		ImageSource imageSource;
     }
 }
