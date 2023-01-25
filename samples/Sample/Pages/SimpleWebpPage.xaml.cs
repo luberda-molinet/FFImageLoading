@@ -2,11 +2,20 @@
 {
     public partial class SimpleWebpPage : ContentPage
     {
-        public SimpleWebpPage()
+		SimpleWebpPageModel viewModel;
+
+		public SimpleWebpPage()
         {
             InitializeComponent();
 
-            BindingContext = new SimpleWebpPageModel();
+            BindingContext = viewModel = new SimpleWebpPageModel();
         }
-    }
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
+		}
+	}
 }
