@@ -92,7 +92,7 @@ namespace FFImageLoading
         public override int DpToPixels(double dp, double scale)
         {
 			// double px = dp * ((float)_metrics.DensityDpi / 160f);
-			double px = dp * ((float)scale / 160f);
+			double px = dp * scale;
 			return (int)Math.Floor(px);
         }
 
@@ -102,7 +102,7 @@ namespace FFImageLoading
                 return 0;
 
 			//return px / ((float)_metrics.DensityDpi / 160f);
-			return px / ((float)scale / 160f);
+			return px / scale;
 		}
     }
 }
