@@ -109,7 +109,7 @@ namespace FFImageLoading.Work
 		internal string StreamChecksum { get; set; }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public double Scale { get; private set; } = 1.0d;
+        public double Scale { get; set; } = 1.0d;
 
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
 		public ImageSource Source { get; private set; }

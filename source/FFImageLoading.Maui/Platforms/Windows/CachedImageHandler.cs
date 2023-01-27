@@ -23,7 +23,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Handlers;
-
+using Microsoft.Graphics.Display;
 
 namespace FFImageLoading.Maui.Platform
 {
@@ -166,7 +166,12 @@ namespace FFImageLoading.Maui.Platform
 
             if (imageLoader != null)
             {
-                var finishAction = imageLoader.OnFinish;
+				// Try and get density from the view to ensure it comes from the appropriate display
+				// the view is on, but fallback to a main display value
+				imageLoader.Scale = VirtualView?.GetVisualElementWindow()?.RequestDisplayDensity()
+					?? (float)DeviceDisplay.MainDisplayInfo.Density;
+
+				var finishAction = imageLoader.OnFinish;
                 var sucessAction = imageLoader.OnSuccess;
 
                 imageLoader.Finish((work) =>
@@ -223,7 +228,8 @@ namespace FFImageLoading.Maui.Platform
 				if (element == null || _isDisposed)
 					return;
 
-				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.RendererReady);
+				Control.InvalidateMeasure();
+//				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
 
 				if (!isLoading)
 					element.SetIsLoading(isLoading);

@@ -178,7 +178,12 @@ namespace FFImageLoading.Maui.Platform
                 var errorPlaceholderSource = ImageSourceBinding.GetImageSourceBinding(image.ErrorPlaceholder, image);
                 image.SetupOnBeforeImageLoading(out var imageLoader, ffSource, placeholderSource, errorPlaceholderSource);
 
-                if (imageLoader != null)
+				// Try and get density from the view to ensure it comes from the appropriate display
+				// the view is on, but fallback to a main display value
+				imageLoader.Scale = VirtualView?.GetVisualElementWindow()?.RequestDisplayDensity()
+					?? (float)DeviceDisplay.MainDisplayInfo.Density;
+
+				if (imageLoader != null)
                 {
                     var finishAction = imageLoader.OnFinish;
                     var sucessAction = imageLoader.OnSuccess;
