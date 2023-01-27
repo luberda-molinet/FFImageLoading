@@ -5,77 +5,44 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.IO;
 using System.Collections.Generic;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.ApplicationModel.Resources.Core;
 
 namespace FFImageLoading.DataResolvers
 {
     public class ResourceDataResolver : IDataResolver
     {
-        private static readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1, 1);
-        private static Dictionary<string, StorageFile> _cache = new Dictionary<string, StorageFile>(128);
-
         public async virtual Task<DataResolverResult> Resolve(string identifier, TaskParameter parameters, CancellationToken token)
         {
-            StorageFile file = null;
-            await _cacheLock.WaitAsync(token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
 
-            try
-            {
-                string resPath = identifier.TrimStart('\\', '/');
+			var resourceContext = new ResourceContext(); // not using ResourceContext.GetForCurrentView
 
-                if (!resPath.StartsWith(@"Assets\") && !resPath.StartsWith("Assets/"))
-                {
-                    resPath = @"Assets\" + resPath;
-                }
+			var scale = ((int)(parameters.Scale * 100)).ToString();
+			resourceContext.QualifierValues["scale"] = scale;
 
-                var imgUri = new Uri("ms-appx:///" + resPath);
-                var key = imgUri.ToString();
-                if (!_cache.TryGetValue(key, out file))
-                {
-                    file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+			var resMgr = ResourceManager.Current;
 
-                    if (_cache.Count >= 128)
-                        _cache.Clear();
+			if (resMgr.MainResourceMap.TryGetValue($"Files/{identifier}", out var namedResource))
+			{
+				if (namedResource != null)
+				{
+					var resourceCandidate = namedResource.Resolve(resourceContext);
 
-                    _cache[key] = file;
-                }
-            }
-            catch (Exception)
-            {
-                try
-                {
-                    var imgUri = new Uri("ms-appx:///" + identifier);
-                    var key = imgUri.ToString();
-                    if (!_cache.TryGetValue(key, out file))
-                    {
-                        file = await StorageFile.GetFileFromApplicationUriAsync(imgUri);
+					if (resourceCandidate != null)
+					{
+						var imageInformation = new ImageInformation();
+						imageInformation.SetPath(identifier);
+						imageInformation.SetFilePath(resourceCandidate.ValueAsString);
 
-                        if (_cache.Count >= 128)
-                            _cache.Clear();
+						token.ThrowIfCancellationRequested();
 
-                        _cache[key] = file;
-                    }
-                }
-                catch (Exception)
-                {
-                }
-            }
-            finally
-            {
-                _cacheLock.Release();
-            }
+						var stream = await resourceCandidate.GetValueAsStreamAsync();
 
-            if (file != null)
-            {
-                var imageInformation = new ImageInformation();
-                imageInformation.SetPath(identifier);
-                imageInformation.SetFilePath(file.Path);
-
-                token.ThrowIfCancellationRequested();
-                var stream = await file.OpenStreamForReadAsync().ConfigureAwait(false);
-
-                return new DataResolverResult(stream, LoadingResult.CompiledResource, imageInformation);
-            }
+						return new DataResolverResult(stream.AsStream(), LoadingResult.CompiledResource, imageInformation);
+					}
+				}
+			}
 
             throw new FileNotFoundException(identifier);
         }
