@@ -27,7 +27,7 @@ namespace FFImageLoading.Tests
 
             var dataResolver = new MockDataResolverFactory(config, downloadCache);
 
-            var scheduler = new Work.WorkScheduler(config, null);
+            var scheduler = new Work.WorkScheduler(config, logger, null);
 
             ImageService = new ImageService(
                 config, md5, logger, null, new MockMainThreadDispatcher(),
