@@ -229,7 +229,7 @@ namespace FFImageLoading.Maui.Platform
 					return;
 
 				Control.InvalidateMeasure();
-//				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
+				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
 
 				if (!isLoading)
 					element.SetIsLoading(isLoading);
