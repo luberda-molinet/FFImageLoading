@@ -8,5 +8,5 @@ global using TImageContainer = object;
 #elif WINDOWS
 global using TImageContainer = Microsoft.UI.Xaml.Media.Imaging.BitmapSource;
 #else
-global using TImageContainer = object;
+global using TImageContainer = System.Object;
 #endif
