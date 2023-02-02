@@ -36,10 +36,7 @@ namespace FFImageLoading.Decoders
 		public GifDecoder(IImageService<PImage> imageService)
 		{
 			ImageService = imageService;
-			scale = UIScreen.MainScreen.Scale;
 		}
-
-        nfloat scale;
 
 		protected readonly IImageService<PImage> ImageService;
 
@@ -57,7 +54,7 @@ namespace FFImageLoading.Decoders
 
             using (var nsdata = NSData.FromStream(stream))
             {
-                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), scale,
+                var result = await SourceRegfToDecodedImageAsync(nsdata, new CGSize(downsampleWidth, downsampleHeight), new System.Runtime.InteropServices.NFloat(parameters.Scale),
 													  ImageService, parameters, RCTResizeMode.ScaleAspectFill, imageInformation, allowUpscale).ConfigureAwait(false);
 				return result;
             }
