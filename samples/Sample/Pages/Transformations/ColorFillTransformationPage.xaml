@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -14,7 +14,7 @@
                 <ffimageloading:CachedImage HorizontalOptions="Center" VerticalOptions="Center"
                     LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png" DownsampleToViewSize="true"
                     Aspect="AspectFit" HeightRequest="400" WidthRequest="400" 
-                                            Source="https://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png">
+                                            Source="{Binding ImageUrl}">
                     <ffimageloading:CachedImage.Transformations>
                         <fftransformations:ColorFillTransformation HexColor="#cccccc"/>
                     </ffimageloading:CachedImage.Transformations>
