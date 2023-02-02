@@ -19,12 +19,10 @@ namespace Sample
 		[RelayCommand]
 		public void ItemSelected() => SelectedItem = null;
 
-        public ObservableCollection<ListHeavyItem> Items { get; set; }
+        public ObservableCollection<ListHeavyItem> Items { get; set; } = new();
 
         public void Reload()
         {
-            var list = new List<ListHeavyItem>();
-
             string[] images = new string[50];
 
             for (int i = 0; i < images.Length; i++)
@@ -47,11 +45,10 @@ namespace Sample
                         Image4Url = images[i],
                     };
 
-                    list.Add(item);
+                    Items.Add(item);
                 }
             }
 
-            Items = new ObservableCollection<ListHeavyItem>(list);
         }
 
         

@@ -9,26 +9,38 @@ namespace Sample
 {
     public class ListHeavyPage : ContentPage
     {
+        ListHeavyPageModel viewModel;
+		ListView listView;
+
         public ListHeavyPage()
         {
-			BindingContext = new ListHeavyPageModel();
+			BindingContext = viewModel = new ListHeavyPageModel();
 
 			Title = "HeavyList Demo";
 
-            var listView = new ListView(ListViewCachingStrategy.RecycleElement)
+            listView = new ListView(ListViewCachingStrategy.RecycleElement)
             {
                 ItemTemplate = new DataTemplate(typeof(ListHeavyCell)),
                 HasUnevenRows = false,
                 RowHeight = 110,
             };
-            listView.ItemsSource = (BindingContext as ListHeavyPageModel).Items;
 
-            listView.ItemSelected += (sender, e) => { listView.SelectedItem = null; };
+            listView.ItemSelected += (sender, e)
+                => { (sender as ListView).SelectedItem = null; };
+
+            listView.SetBinding(ListView.ItemsSourceProperty, "Items");
 
             Content = listView;
         }
 
-        class ListHeavyCell : ViewCell
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+            viewModel.Reload();
+		}
+
+		public class ListHeavyCell : ViewCell
         {
             readonly CachedImage image1 = null;
             readonly CachedImage image2 = null;
