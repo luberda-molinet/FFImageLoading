@@ -25,7 +25,7 @@ namespace FFImageLoading.Transformations
             double sourceWidth = sourceBitmap.Size.Width;
             double sourceHeight = sourceBitmap.Size.Height;
 
-            UIGraphics.BeginImageContextWithOptions(new CGSize(sourceWidth, sourceHeight), false, (nfloat)0.0);
+            UIGraphics.BeginImageContextWithOptions(new CGSize(sourceWidth, sourceHeight), false, (nfloat)1.0);
 
             try
             {
