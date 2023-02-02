@@ -6,7 +6,8 @@
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
     x:Class="Sample.ByteArrayListPage"
     Title="ByteArray / custom cache key"
-    xmlns:local="clr-namespace:Sample">
+    xmlns:local="clr-namespace:Sample"
+    x:DataType="local:ByteArrayListPageModel">
     <ContentPage.Content>
 
         <ListView
@@ -19,7 +20,7 @@
 
             <ListView.ItemTemplate>
                 
-                <DataTemplate>
+                <DataTemplate x:DataType="x:Null">
                     <local:ByteArrayListPageCell/>
                 </DataTemplate>
                 

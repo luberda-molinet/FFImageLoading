@@ -24,11 +24,11 @@ namespace Sample
 		public void ItemSelected()
 			=> SelectedItem = null;
 
-        public ObservableCollection<ListItem> Items { get; set; }
+        public ObservableCollection<ListItem> Items { get; set; } = new();
 
         public async void Reload()
         {
-            var list = new List<ListItem>();
+            Items.Clear();
 
             string[] images = {
                 "https://farm9.staticflickr.com/8625/15806486058_7005d77438.jpg",
@@ -90,7 +90,7 @@ namespace Sample
                         },
                         FileName = string.Format("image{0}.jpeg", i + 1),
                     };
-                    list.Add(item1);
+                    Items.Add(item1);
 
                     var item2 = new ListItem()
                     {
@@ -101,7 +101,7 @@ namespace Sample
                         },
                         FileName = string.Format("image{0}.jpeg", i + 1),
                     };
-                    list.Add(item2);
+					Items.Add(item2);
 
                     var item3 = new ListItem()
                     {
@@ -112,11 +112,9 @@ namespace Sample
                         },
                         FileName = string.Format("image{0}.jpeg", i + 1),
                     };
-                    list.Add(item3);
+					Items.Add(item3);
                 }
             }
-
-            Items = new ObservableCollection<ListItem>(list);
         }
 
         public class CustomStreamImageSource : StreamImageSource
