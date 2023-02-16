@@ -24,6 +24,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Handlers;
 using Microsoft.Graphics.Display;
+using Microsoft.Maui.Platform;
 
 namespace FFImageLoading.Maui.Platform
 {
@@ -33,7 +34,6 @@ namespace FFImageLoading.Maui.Platform
     [Preserve(AllMembers = true)]
     public class CachedImageHandler : ViewHandler<CachedImage, Microsoft.UI.Xaml.Controls.Image>
     {
-        private bool _measured;
         private IScheduledWork _currentTask;
         private ImageSourceBinding _lastImageSource;
         private bool _isDisposed = false;
@@ -64,12 +64,6 @@ namespace FFImageLoading.Maui.Platform
 		protected override void ConnectHandler(Microsoft.UI.Xaml.Controls.Image platformView)
 		{
 			VirtualView.PropertyChanged += VirtualView_PropertyChanged;
-			Control.ImageOpened += OnImageOpened;
-
-
-			Control.HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Center;
-			Control.VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center;
-
 
 			VirtualView.InternalReloadImage = new Action(ReloadImage);
 			VirtualView.InternalCancel = new Action(CancelIfNeeded);
@@ -84,7 +78,6 @@ namespace FFImageLoading.Maui.Platform
 
 		protected override void DisconnectHandler(Microsoft.UI.Xaml.Controls.Image platformView)
 		{
-			Control.ImageOpened -= OnImageOpened;
 			VirtualView.PropertyChanged -= VirtualView_PropertyChanged;
 
 			CancelIfNeeded();
@@ -110,37 +103,28 @@ namespace FFImageLoading.Maui.Platform
 		}
 
 		public override Size GetDesiredSize(double widthConstraint, double heightConstraint)
-        {
-            var bitmapSource = Control.Source as BitmapSource;
+		{
+			var bitmapSource = Control.Source as BitmapSource;
 
-            if (bitmapSource == null)
-                return new SizeRequest();
+			if (bitmapSource == null || VirtualView.Aspect != Aspect.Center)
+				return base.GetDesiredSize(widthConstraint, heightConstraint);
 
-            _measured = true;
+			var s = base.GetDesiredSize(bitmapSource.PixelWidth, bitmapSource.PixelHeight);
 
-            return new SizeRequest(new Size()
-            {
-                Width = bitmapSource.PixelWidth,
-                Height = bitmapSource.PixelHeight
-            });
-        }
+			return new SizeRequest(s);
+		}
 
-        void OnImageOpened(object sender, RoutedEventArgs routedEventArgs)
-        {
-            if (_measured)
-            {
-                ((IVisualElementController)VirtualView)?.InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
-            }
-        }
-
-        async void UpdateImage(Microsoft.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
+		async void UpdateImage(Microsoft.UI.Xaml.Controls.Image imageView, CachedImage image, CachedImage previousImage)
         {
             CancelIfNeeded();
 
             if (image == null || imageView == null || _isDisposed)
                 return;
 
-            var ffSource = await ImageSourceBinding.GetImageSourceBinding(image.Source, image).ConfigureAwait(false);
+			var scale = VirtualView?.GetVisualElementWindow()?.RequestDisplayDensity()
+					?? (float)DeviceDisplay.MainDisplayInfo.Density;
+
+			var ffSource = await ImageSourceBinding.GetImageSourceBinding(image.Source, image).ConfigureAwait(false);
             if (ffSource == null)
             {
                 if (_lastImageSource == null)
@@ -168,8 +152,7 @@ namespace FFImageLoading.Maui.Platform
             {
 				// Try and get density from the view to ensure it comes from the appropriate display
 				// the view is on, but fallback to a main display value
-				imageLoader.Scale = VirtualView?.GetVisualElementWindow()?.RequestDisplayDensity()
-					?? (float)DeviceDisplay.MainDisplayInfo.Density;
+				imageLoader.Scale = scale;
 
 				var finishAction = imageLoader.OnFinish;
                 var sucessAction = imageLoader.OnSuccess;
@@ -208,6 +191,8 @@ namespace FFImageLoading.Maui.Platform
                     return Microsoft.UI.Xaml.Media.Stretch.UniformToFill;
                 case Aspect.Fill:
                     return Microsoft.UI.Xaml.Media.Stretch.Fill;
+				//case Aspect.Center:
+				//	return Microsoft.UI.Xaml.Media.Stretch.None;
                 default:
                     return Microsoft.UI.Xaml.Media.Stretch.Uniform;
             }
@@ -227,9 +212,9 @@ namespace FFImageLoading.Maui.Platform
 			{
 				if (element == null || _isDisposed)
 					return;
-
-				Control.InvalidateMeasure();
-				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
+				
+				// Wonky situation where you need the parent to remeasure to affect the actual image control
+				(PlatformView?.Parent as FrameworkElement)?.InvalidateMeasure();
 
 				if (!isLoading)
 					element.SetIsLoading(isLoading);
