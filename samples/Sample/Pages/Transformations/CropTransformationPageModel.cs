@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FFImageLoading.Transformations;
 using FFImageLoading.Work;
@@ -14,37 +15,37 @@ namespace Sample
         double mRatioPan = -0.0015f;
         double mRatioZoom = 0.8f;
 
-		[ObservableProperty]
-		List<ITransformation> transformations = new List<ITransformation>();
+		public ObservableCollection<ITransformation> Transformations { get; set; } = new ();
 
 		[ObservableProperty]
-        string imageUrl = "http://loremflickr.com/600/600/nature?filename=crop_transformation.jpg";
+        string imageUrl;
 
 
 		public Action ReloadImageHandler { get; set; }
 
-
-        public void Reload()
+        public void ReloadImage()
         {
-            CurrentZoomFactor = 1d;
-            CurrentXOffset = 0d;
-            CurrentYOffset = 0d;
-        }
+			ImageUrl = "http://loremflickr.com/600/600/nature?filename=crop_transformation.jpg";
 
-        void ReloadImage()
-        {
-            Transformations = new List<ITransformation>() {
-                new CropTransformation(CurrentZoomFactor, CurrentXOffset, CurrentYOffset, 1f, 1f)
-            };
+			CurrentZoomFactor = 1d;
+			CurrentXOffset = 0d;
+			CurrentYOffset = 0d;
+
+			Transformations.Clear();
+            Transformations.Add(
+                new CropTransformation(CurrentZoomFactor, CurrentXOffset, CurrentYOffset, 1f, 1f));
 
 			ReloadImageHandler?.Invoke();
         }
 
-        public double CurrentZoomFactor { get; set; }
+        [ObservableProperty]
+        double currentZoomFactor;
 
-        public double CurrentXOffset { get; set; }
+        [ObservableProperty]
+        double currentXOffset;
 
-        public double CurrentYOffset { get; set; }
+        [ObservableProperty]
+        double currentYOffset;
 
         public void OnPanUpdated(PanUpdatedEventArgs e)
         {

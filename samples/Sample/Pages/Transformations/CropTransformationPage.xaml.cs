@@ -12,14 +12,12 @@ namespace Sample
 			InitializeComponent();
 			BindingContext = viewModel = new CropTransformationPageModel
 			{
-				ReloadImageHandler = () => ReloadImage()
+				ReloadImageHandler = () =>
+				{
+					image.ReloadImage();
+					image.LoadingPlaceholder = null;
+				}
 			};
-		}
-
-		public void ReloadImage()
-		{
-			image.ReloadImage();
-			image.LoadingPlaceholder = null;
 		}
 
 		void OnPanUpdated(object sender, PanUpdatedEventArgs args)
@@ -36,7 +34,7 @@ namespace Sample
 		{
 			base.OnAppearing();
 
-			viewModel.Reload();
+			viewModel.ReloadImage();
 		}
 	}
 }

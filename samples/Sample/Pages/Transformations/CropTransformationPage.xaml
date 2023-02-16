@@ -9,7 +9,7 @@
     Title="CropTransformation">
     <ContentPage.Content>
         <ScrollView>
-            <StackLayout>
+            <VerticalStackLayout>
 
                 <ffimageloading:CachedImage x:Name="image"
                     LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png"
@@ -26,7 +26,7 @@
                 <Label Text="CropTransformation" HorizontalTextAlignment="Center"/>
                 <Label Text="Use pan or pinch gestures to crop" HorizontalTextAlignment="Center" FontSize="8"/>
 
-            </StackLayout>
+            </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>
