@@ -74,6 +74,5 @@
     <MauiImage Update="Resources/Images/error.png" Resize="False" />
     <MauiImage Update="Resources/Images/loading.png" Resize="False" />
     <MauiImage Update="Resources/Images/ic_star_black_24dp.png" BaseSize="24,24" />
-    <MauiImage Update="Resources/Images/sample.svg" />
 	</ItemGroup>
 </Project>
