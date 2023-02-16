@@ -9,12 +9,15 @@
     x:DataType="local:PlaceholdersPageModel"
     Title="Placeholders">
     <ContentPage.Content>
-        <StackLayout>
-            <ffimageloading:CachedImage LoadingPlaceholder="loading.png" ErrorPlaceholder="error.png"
-               Source = "{Binding ImageUrl}">
+        <Grid RowDefinitions="Auto,Auto,Auto">
+            <ffimageloading:CachedImage
+                LoadingPlaceholder="loading.png"
+                ErrorPlaceholder="error.png"
+                Grid.Row="0"
+                Source = "{Binding ImageUrl}">
             </ffimageloading:CachedImage>
-            <Button Text="Loading placeholder" Command="{Binding LoadingPlaceholderCommand}"/>
-            <Button Text="Error placeholder" Command="{Binding ErrorPlaceholderCommand}"/>
-        </StackLayout>
+            <Button Text="Loading placeholder" Command="{Binding LoadingPlaceholderCommand}" Grid.Row="1"/>
+            <Button Text="Error placeholder" Command="{Binding ErrorPlaceholderCommand}" Grid.Row="2"/>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
