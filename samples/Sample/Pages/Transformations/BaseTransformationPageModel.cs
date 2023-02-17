@@ -16,7 +16,7 @@ namespace Sample
 		string imageUrl;
 
 		[RelayCommand]
-		public void LoadAnotherCommand()
+		public void LoadAnother()
 			=> Reload();
 
 		[RelayCommand]
