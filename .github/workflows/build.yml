@@ -45,11 +45,11 @@ jobs:
         echo "PACKAGE VERSION: $VERSION"
         
         New-Item -ItemType Directory -Force -Path .\artifacts
-        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading/FFImageLoading.csproj
-        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Maui/FFImageLoading.Maui.csproj
-        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Svg/FFImageLoading.Svg.csproj
-        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Svg.Maui/FFImageLoading.Svg.Maui.csproj
-        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Transformations/FFImageLoading.Transformations.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./source/FFImageLoading/FFImageLoading.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./source/FFImageLoading.Maui/FFImageLoading.Maui.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./source/FFImageLoading.Svg/FFImageLoading.Svg.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./source/FFImageLoading.Svg.Maui/FFImageLoading.Svg.Maui.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./source/FFImageLoading.Transformations/FFImageLoading.Transformations.csproj
 
         $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
         [IO.File]::WriteAllBytes("$pfxPath", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
