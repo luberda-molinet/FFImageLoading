@@ -1,0 +1,76 @@
+name: .NET Core
+
+on:
+  pull_request:
+  push:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build
+    env:
+      NUPKG_MAJOR: 3.999
+      CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.0.x
+          7.0.x
+    - name: Setup NuGet 5.x
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x'
+    - name: Build
+      run: dotnet build --configuration Release
+   # - name: Test
+   #   run: dotnet test --configuration Release
+    - name: Package NuGets
+      shell: pwsh
+      run: |
+        $VERSION="$env:NUPKG_MAJOR-ci$env:GITHUB_RUN_ID"
+        if ($env:GITHUB_EVENT_NAME -eq "release") {
+          $VERSION = $env:GITHUB_REF.Substring($env:GITHUB_REF.LastIndexOf('/') + 1)
+        }
+        echo "::set-output name=pkgverci::$VERSION"
+        echo "PACKAGE VERSION: $VERSION"
+        
+        New-Item -ItemType Directory -Force -Path .\artifacts
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading/FFImageLoading.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Maui/FFImageLoading.Maui.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Svg/FFImageLoading.Svg.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Svg.Maui/FFImageLoading.Svg.Maui.csproj
+        dotnet pack --output ./artifacts --configuration Release -p:PackageVersion=$VERSION ./src/FFImageLoading.Transformations/FFImageLoading.Transformations.csproj
+
+        $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
+        [IO.File]::WriteAllBytes("$pfxPath", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
+        nuget sign .\artifacts\*.nupkg -CertificatePath $pfxPath -Timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
+        
+    - name: Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: NuGet
+        path: ./artifacts
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: windows-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: NuGet
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: Push NuGet
+        run: |
+          dotnet nuget push NuGet\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }}

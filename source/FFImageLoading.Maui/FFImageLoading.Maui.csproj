@@ -11,15 +11,15 @@
 
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 
-    <AssemblyName>FFImageLoading.Maui</AssemblyName>
-    <PackageId>FFImageLoading.Maui</PackageId>
-    <Version>2.0.0</Version>
-    <Authors>Daniel Luberda</Authors>
-    <Company>Daniel Luberda</Company>
-    <Product>FFImageLoading.Maui</Product>
-    <PackageId>FFImageLoading.Maui</PackageId>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyName>FFImageLoading.Compat.Maui</AssemblyName>
+    <PackageId>FFImageLoading.Compat.Maui</PackageId>
+    <Version>3.0.0</Version>
+    <Authors>Redth, Daniel Luberda</Authors>
+    <Company>Redth, Daniel Luberda</Company>
+    <Product>FFImageLoading.Compat.Maui</Product>
+    <PackageId>FFImageLoading.Compat.Maui</PackageId>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Copyright>Daniel Luberda</Copyright>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
