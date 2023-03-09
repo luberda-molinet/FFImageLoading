@@ -26,6 +26,10 @@ jobs:
       uses: nuget/setup-nuget@v1
       with:
         nuget-version: '5.x'
+    - name: Setup .NET MAUI
+      shell: pwsh
+      run: |
+        & dotnet workload install maui ios android maccatalyst
     - name: Build
       run: dotnet build --configuration Release
    # - name: Test
