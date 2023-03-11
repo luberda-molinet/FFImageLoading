@@ -141,7 +141,7 @@ namespace FFImageLoading.Maui.Platform
                 return;
 #if __IOS__
 			PlatformView.Opaque = VirtualView.IsOpaque;
-#elif __MACOS__            
+#elif __MACOS__
             Control.SetIsOpaque(Element.IsOpaque);
 #endif
         }
@@ -213,16 +213,20 @@ namespace FFImageLoading.Maui.Platform
 			if (element == null || _isDisposed)
 				return;
 
-			await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
+			if (element.Dispatcher is not null)
 			{
-				if (element == null || _isDisposed)
-					return;
+				await element.Dispatcher.DispatchAsync(() =>
+				{
+					if (element == null || _isDisposed)
+						return;
 
-				((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals.InvalidationTrigger.MeasureChanged);
+					((IVisualElementController)element).InvalidateMeasure(Microsoft.Maui.Controls.Internals
+						.InvalidationTrigger.MeasureChanged);
 
-				if (!isLoading)
-					element.SetIsLoading(isLoading);
-			}).ConfigureAwait(false);
+					if (!isLoading)
+						element.SetIsLoading(isLoading);
+				}).ConfigureAwait(false);
+			}
 		}
 
 		private void ReloadImage()
@@ -253,11 +257,14 @@ namespace FFImageLoading.Maui.Platform
         {
             PImage image = null;
 
-            await Dispatcher.GetForCurrentThread().DispatchAsync(() =>
+            if (PlatformView is not null && VirtualView.Dispatcher is not null)
             {
-                if (PlatformView != null)
-                    image = PlatformView.Image;
-            }).ConfigureAwait(false);
+	            await VirtualView.Dispatcher.DispatchAsync(() =>
+	            {
+		            if (PlatformView != null)
+			            image = PlatformView.Image;
+	            }).ConfigureAwait(false);
+            }
 
             if (image == null)
                 return null;
@@ -314,7 +321,7 @@ namespace FFImageLoading.Maui.Platform
 
             //public override void DrawRect(CGRect dirtyRect)
             //{
-            //    // TODO if it isn't disabled then this issue happens: 
+            //    // TODO if it isn't disabled then this issue happens:
             //    // https://github.com/luberda-molinet/FFImageLoading/issues/922
             //    // base.DrawRect(dirtyRect);
             //}
