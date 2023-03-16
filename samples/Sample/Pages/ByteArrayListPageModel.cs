@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using System.Threading;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFImageLoading;
+using FFImageLoading.Cache;
 
 namespace Sample
 {
@@ -36,9 +38,7 @@ namespace Sample
                 "https://farm8.staticflickr.com/7423/8729135907_79599de8d8.jpg",
                 "https://farm3.staticflickr.com/2475/4058009019_ecf305f546.jpg",
                 "https://farm6.staticflickr.com/5117/14045101350_113edbe20b.jpg",
-                "https://farm2.staticflickr.com/1227/1116750115_b66dc3830e.jpg",
                 "https://farm8.staticflickr.com/7351/16355627795_204bf423e9.jpg",
-                "https://farm1.staticflickr.com/44/117598011_250aa8ffb1.jpg",
                 "https://farm8.staticflickr.com/7524/15620725287_3357e9db03.jpg",
                 "https://farm9.staticflickr.com/8351/8299022203_de0cb894b0.jpg",
                 "https://farm4.staticflickr.com/3688/10684479284_211f2a8b0f.jpg",
@@ -52,7 +52,6 @@ namespace Sample
                 "https://farm6.staticflickr.com/5083/5377978827_51d978d271.jpg",
                 "https://farm4.staticflickr.com/3626/3499605313_a9d43c1c83.jpg",
                 "https://farm1.staticflickr.com/16/19438696_f103861437.jpg",
-                "https://farm3.staticflickr.com/2221/2243980018_d2925f3d77.jpg",
                 "https://farm8.staticflickr.com/7338/8719134406_74a21b617c.jpg",
                 "https://farm6.staticflickr.com/5149/5626285743_ae6a75dde7.jpg",
                 "https://farm5.staticflickr.com/4105/4963731276_a10e1bd520.jpg",
@@ -71,48 +70,62 @@ namespace Sample
                 {
                     // Get your byte array here
                     byte[] byteArray;
-                    var cacheStream = await imageService.DownloadCache.DownloadAndCacheIfNeededAsync(
-                        images[i], imageService.LoadUrl(images[i]), imageService.Configuration, CancellationToken.None);
+                    CacheStream cacheStream = null;
 
-                    using (cacheStream.ImageStream)
-                    using (var memoryStream = new MemoryStream())
+                    try
                     {
-                        await cacheStream.ImageStream.CopyToAsync(memoryStream);
-                        byteArray = memoryStream.ToArray();
+	                    cacheStream = await imageService.DownloadCache.DownloadAndCacheIfNeededAsync(
+		                    images[i], imageService.LoadUrl(images[i]), imageService.Configuration,
+		                    CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+	                    Debug.WriteLine($"{ex.Message}");
+
                     }
 
-                    var item1 = new ListItem()
+                    if (cacheStream != null)
                     {
-                        ImageSource = new CustomStreamImageSource() 
-                        { 
-                            Key = images[i], 
-                            Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray)) 
-                        },
-                        FileName = string.Format("image{0}.jpeg", i + 1),
-                    };
-                    Items.Add(item1);
+	                    using (cacheStream.ImageStream)
+	                    using (var memoryStream = new MemoryStream())
+	                    {
+		                    await cacheStream.ImageStream.CopyToAsync(memoryStream);
+		                    byteArray = memoryStream.ToArray();
+	                    }
 
-                    var item2 = new ListItem()
-                    {
-                        ImageSource = new CustomStreamImageSource()
-                        {
-                            Key = images[i],
-                            Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray))
-                        },
-                        FileName = string.Format("image{0}.jpeg", i + 1),
-                    };
-					Items.Add(item2);
+	                    var item1 = new ListItem()
+	                    {
+		                    ImageSource = new CustomStreamImageSource()
+		                    {
+			                    Key = images[i],
+			                    Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray))
+		                    },
+		                    FileName = string.Format("image{0}.jpeg", i + 1),
+	                    };
+	                    Items.Add(item1);
 
-                    var item3 = new ListItem()
-                    {
-                        ImageSource = new CustomStreamImageSource()
-                        {
-                            Key = images[i],
-                            Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray))
-                        },
-                        FileName = string.Format("image{0}.jpeg", i + 1),
-                    };
-					Items.Add(item3);
+	                    var item2 = new ListItem()
+	                    {
+		                    ImageSource = new CustomStreamImageSource()
+		                    {
+			                    Key = images[i],
+			                    Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray))
+		                    },
+		                    FileName = string.Format("image{0}.jpeg", i + 1),
+	                    };
+	                    Items.Add(item2);
+
+	                    var item3 = new ListItem()
+	                    {
+		                    ImageSource = new CustomStreamImageSource()
+		                    {
+			                    Key = images[i],
+			                    Stream = (token) => Task.FromResult<Stream>(new MemoryStream(byteArray))
+		                    },
+		                    FileName = string.Format("image{0}.jpeg", i + 1),
+	                    };
+	                    Items.Add(item3);
+                    }
                 }
             }
         }

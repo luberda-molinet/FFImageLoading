@@ -5,16 +5,23 @@
     xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Compat.Maui"
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Compat.Transformations"
     x:Class="Sample.CachedImageSizingTestPage">
+    
+    <ContentPage.Resources>
+        <Style TargetType="Image">
+            <Setter Property="BackgroundColor" Value="#ff3300"/>
+        </Style>
+    </ContentPage.Resources>
+    
     <ScrollView>
-        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="16,32,16,16">
+        <StackLayout Orientation="Vertical" Padding="16,32,16,16">
             <StackLayout Orientation="Horizontal">
-                <Label Text="Forms:Image" FontSize="14" HorizontalOptions="CenterAndExpand"/>
-                <Label Text="FFImageloading:CachedImage" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                <Label Text="Image" FontSize="14" HorizontalOptions="CenterAndExpand"/>
+                <Label Text="CachedImage" HorizontalOptions="CenterAndExpand" FontSize="14"/>
             </StackLayout>
-            <Grid>
+            <Grid BackgroundColor="#f1f1f1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width=".5*" />
-                    <ColumnDefinition Width=".5*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="100" />
@@ -25,37 +32,52 @@
                     <RowDefinition Height="100" />
                 </Grid.RowDefinitions>
 
-                <StackLayout Grid.Column="0" Grid.Row="0" HorizontalOptions="FillAndExpand">
-                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" />
-                </StackLayout>
-
-                <StackLayout Grid.Column="1" Grid.Row="0" HorizontalOptions="FillAndExpand">
-                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" />
-                </StackLayout>
-
-                <StackLayout Grid.Column="0" Grid.Row="1" HorizontalOptions="FillAndExpand">
-                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="40"/>
-                </StackLayout>
-
-                <StackLayout Grid.Column="1" Grid.Row="1" HorizontalOptions="FillAndExpand">
-                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="40"/>
-                </StackLayout>
-
-                <StackLayout Grid.Column="0" Grid.Row="2" HorizontalOptions="FillAndExpand">
-                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="40"/>
-                </StackLayout>
                 
-                <StackLayout Grid.Column="1" Grid.Row="2" HorizontalOptions="FillAndExpand">
-                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="40" DownsampleWidth="24"/>
-                </StackLayout>
-
-                <StackLayout Grid.Column="0" Grid.Row="3" HorizontalOptions="FillAndExpand">
-                    <Image HorizontalOptions="Center" Source="ic_star_black_24dp" WidthRequest="24" />
-                </StackLayout>
+                    <Image 
+                        Grid.Column="0" Grid.Row="0"
+                        HorizontalOptions="Center" 
+                        Source="dotnet_bot.png" />
                 
-                <StackLayout Grid.Column="1" Grid.Row="3" HorizontalOptions="FillAndExpand">
-                    <ffimageloading:CachedImage HorizontalOptions="Center" Source="ic_star_black_24dp" DownsampleToViewSize="true" WidthRequest="24"/>
-                </StackLayout>
+                
+                    <ffimageloading:CachedImage
+                        Grid.Column="1" Grid.Row="0"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" />
+                
+
+                
+                    <Image 
+                        Grid.Column="0" Grid.Row="1"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" WidthRequest="40"/>
+                
+                
+                    <ffimageloading:CachedImage
+                        Grid.Column="1" Grid.Row="1"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" DownsampleToViewSize="true" WidthRequest="40"/>
+                
+
+                
+                    <Image 
+                        Grid.Column="0" Grid.Row="2"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" WidthRequest="40"/>
+                
+                
+                
+                    <ffimageloading:CachedImage
+                        Grid.Column="1" Grid.Row="2"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" DownsampleToViewSize="true" WidthRequest="40" DownsampleWidth="24"/>
+                
+
+                
+                    <Image
+                        Grid.Column="0" Grid.Row="3"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" WidthRequest="24" />
+                
+                
+                
+                    <ffimageloading:CachedImage
+                        Grid.Column="1" Grid.Row="3"
+                        HorizontalOptions="Center" Source="ic_star_black_24dp.png" DownsampleToViewSize="true" WidthRequest="24"/>
+                
                 
             </Grid>
         </StackLayout>

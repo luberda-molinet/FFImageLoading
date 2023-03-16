@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:Sample"
     x:Class="Sample.CustomKeyPage"
     Title="List">
+    
 
     <ContentPage.Content>
 

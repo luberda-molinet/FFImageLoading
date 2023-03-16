@@ -18,15 +18,17 @@
         <ScrollView><StackLayout>
 
             <!-- FIRST APPROACH (fill): -->
-            <ffimageloadingsvg:SvgCachedImage Source="sample.svg"/>
-
+            <!-- <ffimageloadingsvg:SvgCachedImage Source="sample.svg"/> -->
+            
             <!-- SECOND APPROACH (PCL EmbeddedResource): -->
             <ffimageloadingsvg:SvgCachedImage WidthRequest="200" HeightRequest="200" Source="resource://Sample.sample.svg"/>
-
+            <!-- -->
             <!-- THIRD APPROACH: -->
             <ffimageloading:CachedImage WidthRequest="200" HeightRequest="200"
                 Source="{Binding Source, Converter={StaticResource SvgImageSourceConverter}}">
             </ffimageloading:CachedImage>
+            
+            <Label Text="{Binding Source}"></Label>
 
         </StackLayout></ScrollView>
     </ContentPage.Content>

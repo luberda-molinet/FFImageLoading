@@ -17,5 +17,12 @@ namespace Sample
 		{
 			viewModel.ItemSelected();
 		}
+
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+
+			viewModel.Reload();
+		}
 	}
 }

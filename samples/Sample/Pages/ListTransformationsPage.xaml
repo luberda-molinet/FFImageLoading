@@ -9,7 +9,7 @@
     Title="List with transformations">
     <ContentPage.Content>
 
-        <ListView
+        <ListView 
             CachingStrategy="RecycleElement"
             HasUnevenRows="false"
             RowHeight="180"

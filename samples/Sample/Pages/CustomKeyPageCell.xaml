@@ -6,6 +6,7 @@
     xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Compat.Transformations"
     x:Class="Sample.CustomKeyPageCell">
 
+    
 
     <Grid Padding="10">
 

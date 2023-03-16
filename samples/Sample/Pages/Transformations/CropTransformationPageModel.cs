@@ -7,7 +7,7 @@ using FFImageLoading.Work;
 
 namespace Sample
 {
-    
+
     public partial class CropTransformationPageModel : ObservableObject
     {
         double mX = 0f;
@@ -25,7 +25,7 @@ namespace Sample
 
         public void ReloadImage()
         {
-			ImageUrl = "http://loremflickr.com/600/600/nature?filename=crop_transformation.jpg";
+			ImageUrl = "https://loremflickr.com/600/600/nature?filename=crop_transformation.jpg";
 
 			CurrentZoomFactor = 1d;
 			CurrentXOffset = 0d;
